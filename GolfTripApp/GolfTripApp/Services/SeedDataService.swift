@@ -145,6 +145,25 @@ struct SeedDataService {
         
         courses.append(course3)
         
+        // Course 4: Draft example (demonstrates Save Draft flow - missing hole pars)
+        let course4 = Course(name: "Sunset Ridge GC (Draft)", location: "San Diego, CA")
+        context.insert(course4)
+        
+        let teeSet4Gold = TeeSet(
+            name: "Gold",
+            color: "Gold",
+            rating: 69.5,
+            slope: 125,
+            par: 72,
+            holeHandicaps: [3, 11, 1, 15, 7, 17, 5, 9, 13, 4, 12, 2, 16, 8, 18, 6, 10, 14],
+            holePars: nil, // Draft - missing hole pars
+            totalYardage: 6100
+        )
+        teeSet4Gold.course = course4
+        context.insert(teeSet4Gold)
+        
+        courses.append(course4)
+        
         return courses
     }
     

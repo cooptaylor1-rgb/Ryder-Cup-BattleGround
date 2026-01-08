@@ -7,6 +7,7 @@ struct CoursesListView: View {
     
     @State private var searchText = ""
     @State private var showingAddCourse = false
+    @State private var showingCourseWizard = false
     @State private var courseToDelete: Course?
     @State private var showingDeleteAlert = false
     
@@ -29,10 +30,19 @@ struct CoursesListView: View {
                     } description: {
                         Text("Add courses to plan your golf trip rounds.")
                     } actions: {
-                        Button("Add Course") {
-                            showingAddCourse = true
+                        VStack(spacing: 12) {
+                            Button {
+                                showingCourseWizard = true
+                            } label: {
+                                Label("Course Setup Wizard", systemImage: "wand.and.stars")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            
+                            Button("Quick Add") {
+                                showingAddCourse = true
+                            }
+                            .buttonStyle(.bordered)
                         }
-                        .buttonStyle(.borderedProminent)
                     }
                 } else {
                     List {
@@ -51,8 +61,18 @@ struct CoursesListView: View {
             .navigationTitle("Courses")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAddCourse = true
+                    Menu {
+                        Button {
+                            showingCourseWizard = true
+                        } label: {
+                            Label("Course Setup Wizard", systemImage: "wand.and.stars")
+                        }
+                        
+                        Button {
+                            showingAddCourse = true
+                        } label: {
+                            Label("Quick Add Course", systemImage: "plus")
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -60,6 +80,9 @@ struct CoursesListView: View {
             }
             .sheet(isPresented: $showingAddCourse) {
                 CourseFormView(mode: .add)
+            }
+            .fullScreenCover(isPresented: $showingCourseWizard) {
+                CourseSetupWizardView()
             }
             .alert("Delete Course?", isPresented: $showingDeleteAlert) {
                 Button("Cancel", role: .cancel) { }

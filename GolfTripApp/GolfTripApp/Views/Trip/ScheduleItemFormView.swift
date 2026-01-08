@@ -24,6 +24,7 @@ struct ScheduleItemFormView: View {
     
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var showingCourseWizard = false
     
     var body: some View {
         NavigationStack {
@@ -47,8 +48,17 @@ struct ScheduleItemFormView: View {
                 if type == .teeTime {
                     Section("Course") {
                         if courses.isEmpty {
-                            Text("No courses available. Add courses first.")
-                                .foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("No courses available.")
+                                    .foregroundStyle(.secondary)
+                                
+                                Button {
+                                    showingCourseWizard = true
+                                } label: {
+                                    Label("Create New Course", systemImage: "wand.and.stars")
+                                }
+                                .buttonStyle(.borderedProminent)
+                            }
                         } else {
                             Picker("Course", selection: $selectedCourse) {
                                 Text("Select a course").tag(nil as Course?)
@@ -64,6 +74,12 @@ struct ScheduleItemFormView: View {
                                         Text(teeSet.displayName).tag(teeSet as TeeSet?)
                                     }
                                 }
+                            }
+                            
+                            Button {
+                                showingCourseWizard = true
+                            } label: {
+                                Label("Create New Course", systemImage: "plus.circle")
                             }
                         }
                     }
@@ -120,6 +136,13 @@ struct ScheduleItemFormView: View {
                     selectedTeeSet = item.teeSet
                     selectedCourse = item.teeSet?.course
                     notes = item.notes ?? ""
+                }
+            }
+            .fullScreenCover(isPresented: $showingCourseWizard) {
+                CourseSetupWizardView { course, teeSet in
+                    // Auto-select the newly created course and tee set
+                    selectedCourse = course
+                    selectedTeeSet = teeSet
                 }
             }
         }

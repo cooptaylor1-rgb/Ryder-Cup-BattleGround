@@ -22,6 +22,30 @@ A production-grade iOS mobile app for managing golf trips, built with SwiftUI an
   - Hole pars
 - Course detail screen with complete hole handicap table
 
+### Course Setup Wizard ✨ NEW
+A guided multi-step wizard to set up courses quickly (under 2 minutes on a phone):
+
+**Entry Points:**
+- Courses tab → "+ Add Course" → "Course Setup Wizard"
+- Schedule item edit → "Create New Course" (returns with course pre-selected)
+
+**5-Step Flow:**
+1. **Basic Course Info** - Name (required), location, notes
+2. **Tee Set Basics** - Name, rating, slope, par with quick-fill options
+3. **Hole Pars** (Optional) - Skip, use defaults, or enter manually
+4. **Hole Handicaps** (Required) - Three input modes:
+   - **Paste List** - Parse numbers from any format
+   - **Quick Grid** - Direct numeric entry
+   - **Rank by Hole** - Tap holes to assign rankings
+5. **Review & Save** - Summary with edit links
+
+**Key Features:**
+- Progress indicator showing current step
+- Inline validation with clear error messages
+- "Copy from existing tee set" for shared hole handicaps
+- "Save Draft" anytime
+- "Save & Add Another Tee Set" for multiple tees
+
 ### Trip & Schedule
 - Create trips with name, dates, location, and notes
 - Day-by-day schedule view
@@ -79,7 +103,7 @@ A production-grade iOS mobile app for managing golf trips, built with SwiftUI an
 
 The app automatically seeds sample data on first launch:
 - 8 sample players with various handicaps
-- 3 courses with tee sets and hole handicaps
+- 4 courses with tee sets and hole handicaps (including 1 draft example)
 - A sample trip with schedule
 - Two teams in Ryder Cup mode
 
@@ -170,6 +194,66 @@ Unit tests in `Tests/HandicapCalculatorTests.swift`:
 - Stableford points for all scoring scenarios
 - Best ball team calculations
 - Full round integration tests
+
+Unit tests in `Tests/CourseWizardValidatorTests.swift`:
+- Hole handicap validation (missing, duplicates, out-of-range)
+- Hole pars validation (total mismatch, invalid values)
+- Tee set basics validation (rating, slope, par ranges)
+- Paste list parsing (spaces, commas, newlines, mixed formats)
+- Default par generation for different totals
+
+## Course Setup Wizard
+
+### Architecture
+The wizard uses a state-based MVVM pattern:
+
+```
+Views/CourseWizard/
+├── CourseSetupWizardView.swift    # Main container with navigation
+├── CourseWizardState.swift        # Observable state manager
+├── WizardSteps1And2.swift         # Basic Info + Tee Set steps
+├── WizardStep3HolePars.swift      # Optional hole pars entry
+├── WizardStep4HoleHandicaps.swift # Required handicap rankings
+└── WizardStep5Review.swift        # Summary and save
+
+Services/
+└── CourseWizardValidator.swift    # Pure validation functions
+```
+
+### Hole Handicap Input Modes
+
+**1. Paste List Mode**
+- Accepts multiple formats: `7 15 1 11...`, `7, 15, 1, 11...`, `H1: 7 H2: 15...`
+- Robust parsing handles spaces, commas, semicolons, newlines, tabs
+- Shows parsed values and warnings
+
+**2. Quick Grid Mode**
+- 9-hole toggle (Front/Back)
+- Direct numeric entry per hole
+- Visual indicators for duplicates and invalid values
+
+**3. Rank by Hole Mode**
+- Tap-to-assign interface
+- Current rank highlighted
+- Auto-advances to next unassigned rank
+- Undo support
+
+### Validation Service
+`CourseWizardValidator` provides pure functions (easily testable):
+
+```swift
+// Validate hole handicaps
+let result = CourseWizardValidator.validateHoleHandicaps([7, 15, 1, ...])
+// Returns: HoleHandicapValidationResult with missing/duplicates/outOfRange
+
+// Parse pasted text
+let parsed = CourseWizardValidator.parseHandicapList("7, 15, 1, 11...")
+// Returns: ParseResult with values and warnings
+
+// Generate default pars
+let pars = CourseWizardValidator.generateTypicalPars(for: 72)
+// Returns: [4, 4, 3, 5, 4, 4, 3, 4, 5, 4, 4, 3, 5, 4, 4, 3, 4, 5]
+```
 
 ## Teams & Event Scoring Model
 
