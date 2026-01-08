@@ -39,6 +39,9 @@ final class TeeSet {
         rating: Double,
         slope: Int,
         par: Int,
+        /// Hole handicaps array where index 0 = hole 1's handicap.
+        /// Default is sequential 1-18 which is a placeholder.
+        /// Should be replaced with actual course-specific hole handicaps.
         holeHandicaps: [Int] = Array(1...18),
         holePars: [Int]? = nil,
         yardages: [Int]? = nil,

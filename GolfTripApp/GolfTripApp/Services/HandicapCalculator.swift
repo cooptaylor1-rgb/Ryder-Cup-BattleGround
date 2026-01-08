@@ -7,12 +7,16 @@ struct HandicapCalculator {
     
     /// Calculate course handicap from handicap index, slope rating, course rating, and par
     /// Formula: CourseHandicap = round(HandicapIndex * (Slope / 113) + (CourseRating - Par))
+    ///
+    /// Note: Uses Swift's standard rounding (round half away from zero), which rounds 0.5 up.
+    /// This aligns with USGA's recommended rounding method for course handicap calculations.
+    ///
     /// - Parameters:
     ///   - handicapIndex: Player's USGA Handicap Index (can be negative for plus-handicap)
     ///   - slopeRating: Course slope rating (typically 55-155, standard is 113)
     ///   - courseRating: Course rating (typically close to par)
     ///   - par: Course par (typically 70-72)
-    /// - Returns: Course handicap (rounded to nearest integer)
+    /// - Returns: Course handicap (rounded to nearest integer using standard rounding)
     static func calculateCourseHandicap(
         handicapIndex: Double,
         slopeRating: Int,
