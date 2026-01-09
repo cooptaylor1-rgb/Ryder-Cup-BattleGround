@@ -52,6 +52,8 @@ struct StandingsTabView: View {
     
     @ViewBuilder
     private func bigScoreCard(_ trip: Trip) -> some View {
+        let hasClinched = hasTeamClinched(trip)
+        
         VStack(spacing: DesignTokens.Spacing.xl) {
             BigScoreDisplay(
                 teamAScore: trip.teamATotalPoints,
@@ -59,16 +61,50 @@ struct StandingsTabView: View {
                 teamAName: trip.teamA?.name ?? "Team A",
                 teamBName: trip.teamB?.name ?? "Team B",
                 teamAColor: .teamUSA,
-                teamBColor: .teamEurope
+                teamBColor: .teamEurope,
+                showCelebration: hasClinched
             )
             
             // Winner banner if clinched
-            if hasTeamClinched(trip) {
+            if hasClinched {
                 clinchBanner(trip)
             }
+            
+            // Momentum indicator - last 5 matches
+            momentumView(trip)
         }
-        .padding(DesignTokens.Spacing.xl)
-        .cardStyle(elevation: 2)
+        .padding(DesignTokens.Spacing.xxl)
+        .heroCardStyle()
+    }
+    
+    // MARK: - Momentum View
+    
+    @ViewBuilder
+    private func momentumView(_ trip: Trip) -> some View {
+        let recentMatches = trip.sortedSessions
+            .flatMap { $0.sortedMatches }
+            .filter { $0.status == .final }
+            .suffix(5)
+        
+        if !recentMatches.isEmpty {
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Text("MOMENTUM")
+                    .font(.caption2.weight(.bold))
+                    .foregroundColor(.secondary)
+                
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    ForEach(Array(recentMatches), id: \.id) { match in
+                        Circle()
+                            .fill(match.result == .teamAWin ? Color.teamUSA : (match.result == .teamBWin ? Color.teamEurope : Color.secondary))
+                            .frame(width: 12, height: 12)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+        }
     }
     
     @ViewBuilder
@@ -77,16 +113,35 @@ struct StandingsTabView: View {
         let winningTeam = teamAWins ? (trip.teamA?.name ?? "Team A") : (trip.teamB?.name ?? "Team B")
         let winningColor: Color = teamAWins ? .teamUSA : .teamEurope
         
-        HStack {
-            Image(systemName: "trophy.fill")
-            Text("\(winningTeam) WINS!")
-            Image(systemName: "trophy.fill")
+        VStack(spacing: DesignTokens.Spacing.sm) {
+            HStack(spacing: DesignTokens.Spacing.md) {
+                Image(systemName: "trophy.fill")
+                    .font(.title2)
+                Text("\(winningTeam) WINS!")
+                    .font(.title3.weight(.black))
+                Image(systemName: "trophy.fill")
+                    .font(.title2)
+            }
+            .foregroundColor(winningColor)
+            
+            Text("🎉 Congratulations! 🎉")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .font(.headline)
-        .foregroundColor(winningColor)
-        .padding(DesignTokens.Spacing.md)
-        .background(winningColor.opacity(0.15))
+        .padding(DesignTokens.Spacing.lg)
+        .frame(maxWidth: .infinity)
+        .background(
+            LinearGradient(
+                colors: [winningColor.opacity(0.2), winningColor.opacity(0.1)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md))
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
+                .stroke(winningColor.opacity(0.5), lineWidth: 2)
+        )
     }
     
     private func hasTeamClinched(_ trip: Trip) -> Bool {

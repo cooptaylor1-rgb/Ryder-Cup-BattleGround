@@ -117,27 +117,63 @@ struct HapticManager {
 // MARK: - View Modifiers
 
 extension View {
-    /// Apply card styling
+    /// Apply card styling with enhanced depth
     func cardStyle(elevation: Int = 1) -> some View {
         self
             .background(Color.surface)
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.lg))
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.lg)
+                    .stroke(Color.white.opacity(0.05), lineWidth: 1)
+            )
             .shadow(
-                color: Color.black.opacity(elevation == 0 ? 0 : 0.1 + Double(elevation) * 0.05),
-                radius: CGFloat(elevation * 4),
-                y: CGFloat(elevation * 2)
+                color: Color.black.opacity(elevation == 0 ? 0 : 0.15 + Double(elevation) * 0.05),
+                radius: CGFloat(elevation * 6),
+                y: CGFloat(elevation * 3)
             )
     }
     
-    /// Apply primary button styling
+    /// Apply hero card styling with gradient
+    func heroCardStyle() -> some View {
+        self
+            .background(
+                LinearGradient(
+                    colors: [Color.surface, Color.surfaceVariant.opacity(0.9)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl))
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl)
+                    .stroke(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.1), Color.white.opacity(0.02)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.25), radius: 12, y: 6)
+    }
+    
+    /// Apply primary button styling with enhanced depth
     func primaryButtonStyle() -> some View {
         self
             .font(.headline)
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
-            .frame(height: 54)
-            .background(Color.accentColor)
+            .frame(height: 56)
+            .background(
+                LinearGradient(
+                    colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md))
+            .shadow(color: Color.accentColor.opacity(0.3), radius: 8, y: 4)
     }
     
     /// Apply secondary button styling
@@ -146,22 +182,31 @@ extension View {
             .font(.headline)
             .foregroundColor(.accentColor)
             .frame(maxWidth: .infinity)
-            .frame(height: 54)
+            .frame(height: 56)
+            .background(Color.accentColor.opacity(0.1))
             .overlay(
                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
                     .stroke(Color.accentColor, lineWidth: 1.5)
             )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md))
     }
     
-    /// Apply scoring button styling
+    /// Apply scoring button styling with enhanced feedback
     func scoringButtonStyle(teamColor: Color) -> some View {
         self
             .font(.headline)
             .foregroundColor(.white)
-            .frame(height: 60)
+            .frame(height: 72)
             .frame(maxWidth: .infinity)
-            .background(teamColor)
+            .background(
+                LinearGradient(
+                    colors: [teamColor, teamColor.opacity(0.75)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.lg))
+            .shadow(color: teamColor.opacity(0.4), radius: 8, y: 4)
     }
     
     /// Apply badge styling
@@ -185,25 +230,161 @@ extension SwiftUI.Animation {
     static let celebration = SwiftUI.Animation.easeInOut(duration: 1.0)
 }
 
+// MARK: - Gradient Backgrounds
+
+extension LinearGradient {
+    static let heroCard = LinearGradient(
+        colors: [Color.surface, Color.surfaceVariant.opacity(0.8)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    static let teamUSAGradient = LinearGradient(
+        colors: [Color.teamUSA, Color.teamUSALight.opacity(0.8)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    static let teamEuropeGradient = LinearGradient(
+        colors: [Color.teamEurope, Color.teamEuropeLight.opacity(0.8)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    static let goldGradient = LinearGradient(
+        colors: [Color.secondaryGold, Color.secondaryGoldDark],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+}
+
+// MARK: - Pulse Animation Modifier
+
+struct PulseAnimation: ViewModifier {
+    @State private var isPulsing = false
+    
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(isPulsing ? 1.1 : 1.0)
+            .opacity(isPulsing ? 0.8 : 1.0)
+            .animation(
+                .easeInOut(duration: 0.8).repeatForever(autoreverses: true),
+                value: isPulsing
+            )
+            .onAppear { isPulsing = true }
+    }
+}
+
+extension View {
+    func pulsingAnimation() -> some View {
+        modifier(PulseAnimation())
+    }
+}
+
+// MARK: - Button Press Animation
+
+struct ButtonPressModifier: ViewModifier {
+    @State private var isPressed = false
+    
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .animation(.buttonPress, value: isPressed)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in isPressed = true }
+                    .onEnded { _ in isPressed = false }
+            )
+    }
+}
+
+extension View {
+    func pressAnimation() -> some View {
+        modifier(ButtonPressModifier())
+    }
+}
+
+// MARK: - Confetti View
+
+struct ConfettiView: View {
+    let teamColor: Color
+    @State private var animate = false
+    
+    var body: some View {
+        ZStack {
+            ForEach(0..<30, id: \.self) { index in
+                ConfettiPiece(
+                    color: index % 2 == 0 ? teamColor : .secondaryGold,
+                    delay: Double(index) * 0.05
+                )
+            }
+        }
+        .onAppear { animate = true }
+    }
+}
+
+struct ConfettiPiece: View {
+    let color: Color
+    let delay: Double
+    
+    @State private var animate = false
+    
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: CGFloat.random(in: 4...10), height: CGFloat.random(in: 4...10))
+            .offset(
+                x: animate ? CGFloat.random(in: -150...150) : 0,
+                y: animate ? CGFloat.random(in: -300...300) : 0
+            )
+            .opacity(animate ? 0 : 1)
+            .animation(
+                .easeOut(duration: 2.0).delay(delay),
+                value: animate
+            )
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    animate = true
+                }
+            }
+    }
+}
+
 // MARK: - Custom Components
 
 /// Match status badge
 struct MatchStatusBadge: View {
     let status: String
     let teamColor: Color?
+    let isLive: Bool
+    
+    init(status: String, teamColor: Color?, isLive: Bool = false) {
+        self.status = status
+        self.teamColor = teamColor
+        self.isLive = isLive
+    }
     
     var body: some View {
-        Text(status)
-            .font(.subheadline.weight(.semibold))
-            .foregroundColor(teamColor ?? .primary)
-            .padding(.horizontal, DesignTokens.Spacing.md)
-            .padding(.vertical, DesignTokens.Spacing.sm)
-            .background((teamColor ?? Color.gray).opacity(0.15))
-            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm))
+        HStack(spacing: DesignTokens.Spacing.xs) {
+            if isLive {
+                Circle()
+                    .fill(Color.success)
+                    .frame(width: 6, height: 6)
+                    .pulsingAnimation()
+            }
+            
+            Text(status)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(teamColor ?? .primary)
+        }
+        .padding(.horizontal, DesignTokens.Spacing.md)
+        .padding(.vertical, DesignTokens.Spacing.sm)
+        .background((teamColor ?? Color.gray).opacity(0.15))
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm))
     }
 }
 
-/// Big score display
+/// Big score display with enhanced visuals
 struct BigScoreDisplay: View {
     let teamAScore: Double
     let teamBScore: Double
@@ -211,48 +392,88 @@ struct BigScoreDisplay: View {
     let teamBName: String
     let teamAColor: Color
     let teamBColor: Color
+    var showCelebration: Bool = false
+    
+    @State private var animatedTeamAScore: Double = 0
+    @State private var animatedTeamBScore: Double = 0
+    @State private var showConfetti = false
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.md) {
-            HStack(spacing: DesignTokens.Spacing.xl) {
-                VStack {
-                    Text(teamAName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(formatScore(teamAScore))
-                        .font(.scoreLarge)
-                        .foregroundColor(teamAColor)
+            ZStack {
+                HStack(spacing: DesignTokens.Spacing.xl) {
+                    VStack(spacing: DesignTokens.Spacing.xs) {
+                        Text(teamAName)
+                            .font(.caption.weight(.bold))
+                            .foregroundColor(teamAColor.opacity(0.8))
+                            .textCase(.uppercase)
+                        Text(formatScore(animatedTeamAScore))
+                            .font(.scoreHero)
+                            .foregroundColor(teamAColor)
+                            .contentTransition(.numericText())
+                    }
+                    
+                    VStack {
+                        Text("—")
+                            .font(.title2)
+                            .foregroundColor(.secondary.opacity(0.6))
+                    }
+                    
+                    VStack(spacing: DesignTokens.Spacing.xs) {
+                        Text(teamBName)
+                            .font(.caption.weight(.bold))
+                            .foregroundColor(teamBColor.opacity(0.8))
+                            .textCase(.uppercase)
+                        Text(formatScore(animatedTeamBScore))
+                            .font(.scoreHero)
+                            .foregroundColor(teamBColor)
+                            .contentTransition(.numericText())
+                    }
                 }
                 
-                Text("—")
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-                
-                VStack {
-                    Text(teamBName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(formatScore(teamBScore))
-                        .font(.scoreLarge)
-                        .foregroundColor(teamBColor)
+                if showConfetti {
+                    ConfettiView(teamColor: teamAScore > teamBScore ? teamAColor : teamBColor)
                 }
             }
             
-            // Progress bar
+            // Enhanced progress bar with gradient
             GeometryReader { geometry in
                 let total = max(teamAScore + teamBScore, 1)
                 let teamAWidth = (teamAScore / total) * geometry.size.width
                 
-                HStack(spacing: 0) {
-                    Rectangle()
-                        .fill(teamAColor)
-                        .frame(width: teamAWidth)
-                    Rectangle()
-                        .fill(teamBColor)
+                HStack(spacing: 2) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(LinearGradient(colors: [teamAColor, teamAColor.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
+                        .frame(width: max(teamAWidth, 4))
+                    
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(LinearGradient(colors: [teamBColor.opacity(0.7), teamBColor], startPoint: .leading, endPoint: .trailing))
                 }
             }
-            .frame(height: 8)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .frame(height: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.8)) {
+                animatedTeamAScore = teamAScore
+                animatedTeamBScore = teamBScore
+            }
+            if showCelebration {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showConfetti = true
+                }
+            }
+        }
+        .onChange(of: teamAScore) { _, newValue in
+            withAnimation(.scoreChange) {
+                animatedTeamAScore = newValue
+            }
+        }
+        .onChange(of: teamBScore) { _, newValue in
+            withAnimation(.scoreChange) {
+                animatedTeamBScore = newValue
+            }
         }
     }
     
@@ -316,7 +537,7 @@ struct HoleIndicatorDots: View {
     }
 }
 
-/// Empty state view
+/// Empty state view with enhanced styling
 struct EmptyStateView: View {
     let icon: String
     let title: String
@@ -334,25 +555,44 @@ struct EmptyStateView: View {
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
-            Image(systemName: icon)
-                .font(.system(size: 48))
-                .foregroundColor(.secondary)
+            // Enhanced icon with background
+            ZStack {
+                Circle()
+                    .fill(Color.surfaceVariant)
+                    .frame(width: 100, height: 100)
+                
+                Circle()
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 2)
+                    .frame(width: 100, height: 100)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 40))
+                    .foregroundColor(.secondary)
+            }
             
-            Text(title)
-                .font(.title3.weight(.semibold))
-            
-            Text(description)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, DesignTokens.Spacing.xl)
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Text(title)
+                    .font(.title3.weight(.bold))
+                
+                Text(description)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, DesignTokens.Spacing.xl)
             
             if let actionTitle = actionTitle, let action = action {
-                Button(action: action) {
+                Button(action: {
+                    HapticManager.buttonTap()
+                    action()
+                }) {
                     Text(actionTitle)
                         .primaryButtonStyle()
                 }
+                .pressAnimation()
                 .padding(.top, DesignTokens.Spacing.md)
+                .padding(.horizontal, DesignTokens.Spacing.xl)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

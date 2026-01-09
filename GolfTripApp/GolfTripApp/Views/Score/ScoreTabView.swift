@@ -75,12 +75,21 @@ struct ScoreTabView: View {
     private func scoreNowCard(_ match: Match) -> some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             HStack {
-                Image(systemName: match.status == .inProgress ? "play.circle.fill" : "plus.circle.fill")
-                    .font(.title)
-                    .foregroundColor(.accentColor)
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    Image(systemName: match.status == .inProgress ? "play.circle.fill" : "plus.circle.fill")
+                        .font(.title)
+                        .foregroundColor(match.status == .inProgress ? .success : .accentColor)
+                    
+                    if match.status == .inProgress {
+                        Circle()
+                            .fill(Color.success)
+                            .frame(width: 8, height: 8)
+                            .pulsingAnimation()
+                    }
+                }
                 
-                VStack(alignment: .leading) {
-                    Text(match.status == .inProgress ? "Continue Scoring" : "Start Scoring")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(match.status == .inProgress ? "Continue Scoring" : "Score Now")
                         .font(.headline)
                     
                     if let session = match.session {
@@ -96,14 +105,21 @@ struct ScoreTabView: View {
             // Match preview
             matchPreview(match)
             
-            // Big CTA
-            Button(action: { selectedMatch = match }) {
-                Text(match.status == .inProgress ? "Continue" : "Score Now")
-                    .primaryButtonStyle()
+            // Big CTA with animation
+            Button(action: { 
+                HapticManager.buttonTap()
+                selectedMatch = match 
+            }) {
+                HStack {
+                    Image(systemName: match.status == .inProgress ? "play.fill" : "flag.checkered")
+                    Text(match.status == .inProgress ? "Continue" : "Start Match")
+                }
+                .primaryButtonStyle()
             }
+            .pressAnimation()
         }
-        .padding(DesignTokens.Spacing.lg)
-        .cardStyle(elevation: 2)
+        .padding(DesignTokens.Spacing.xl)
+        .heroCardStyle()
     }
     
     @ViewBuilder
@@ -365,12 +381,26 @@ struct MatchScoringView: View {
     // MARK: - Match Status Card
     
     private var matchStatusCard: some View {
-        VStack(spacing: DesignTokens.Spacing.md) {
-            Text(matchState.statusText)
-                .font(.title2.weight(.bold))
-                .foregroundColor(statusColor)
+        VStack(spacing: DesignTokens.Spacing.lg) {
+            // Status with enhanced styling
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Text(matchState.statusText)
+                    .font(.title.weight(.bold))
+                    .foregroundColor(statusColor)
+                    .contentTransition(.numericText())
+                
+                if matchState.isDormie {
+                    Text("DORMIE")
+                        .font(.caption.weight(.black))
+                        .foregroundColor(.warning)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.warning.opacity(0.2))
+                        .clipShape(Capsule())
+                }
+            }
             
-            // Hole indicators
+            // Enhanced hole indicators
             HoleIndicatorDots(
                 holeResults: match.sortedHoleResults,
                 currentHole: match.currentHole,
@@ -378,8 +408,8 @@ struct MatchScoringView: View {
                 teamBColor: .teamEurope
             )
         }
-        .padding(DesignTokens.Spacing.lg)
-        .cardStyle()
+        .padding(DesignTokens.Spacing.xl)
+        .cardStyle(elevation: 1)
     }
     
     private var statusColor: Color {
@@ -391,60 +421,88 @@ struct MatchScoringView: View {
     // MARK: - Current Hole Card
     
     private var currentHoleCard: some View {
-        VStack(spacing: DesignTokens.Spacing.lg) {
-            // Hole number
-            VStack {
-                Text("HOLE \(match.currentHole)")
+        VStack(spacing: DesignTokens.Spacing.xl) {
+            // Hole number with enhanced display
+            VStack(spacing: DesignTokens.Spacing.xs) {
+                Text("HOLE")
                     .font(.caption.weight(.bold))
                     .foregroundColor(.secondary)
                 
+                Text("\(match.currentHole)")
+                    .font(.system(size: 56, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                
                 if let teeSet = match.teeSet {
                     let pars = teeSet.holePars ?? TeeSet.defaultHolePars
-                    Text("Par \(pars[match.currentHole - 1])")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: DesignTokens.Spacing.sm) {
+                        Text("Par \(pars[match.currentHole - 1])")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundColor(.secondary)
+                        
+                        if let hdcp = teeSet.holeHandicaps[safe: match.currentHole - 1] {
+                            Text("•")
+                                .foregroundColor(.secondary)
+                            Text("HDCP \(hdcp)")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.8))
+                        }
+                    }
                 }
             }
+            .padding(.vertical, DesignTokens.Spacing.md)
             
-            // Scoring buttons
+            // Enhanced scoring buttons
             HStack(spacing: DesignTokens.Spacing.md) {
                 // Team A wins
-                Button(action: { scoreHole(.teamA) }) {
-                    VStack {
-                        Image(systemName: "plus")
-                            .font(.title2)
+                Button(action: { 
+                    scoreHole(.teamA)
+                    HapticManager.heavyImpact()
+                }) {
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title)
                         Text("Team A")
-                            .font(.caption)
+                            .font(.subheadline.weight(.semibold))
                     }
                     .scoringButtonStyle(teamColor: .teamUSA)
                 }
+                .pressAnimation()
                 
                 // Halved
-                Button(action: { scoreHole(.halved) }) {
-                    VStack {
-                        Image(systemName: "equal")
-                            .font(.title2)
+                Button(action: { 
+                    scoreHole(.halved)
+                    HapticManager.scoreEntered()
+                }) {
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "equal.circle.fill")
+                            .font(.title)
                         Text("Halved")
-                            .font(.caption)
+                            .font(.subheadline.weight(.semibold))
                     }
-                    .scoringButtonStyle(teamColor: .gray)
+                    .scoringButtonStyle(teamColor: Color.secondary.opacity(0.6))
                 }
+                .pressAnimation()
                 
                 // Team B wins
-                Button(action: { scoreHole(.teamB) }) {
-                    VStack {
-                        Image(systemName: "plus")
-                            .font(.title2)
+                Button(action: { 
+                    scoreHole(.teamB)
+                    HapticManager.heavyImpact()
+                }) {
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title)
                         Text("Team B")
-                            .font(.caption)
+                            .font(.subheadline.weight(.semibold))
                     }
                     .scoringButtonStyle(teamColor: .teamEurope)
                 }
+                .pressAnimation()
             }
             .disabled(!matchState.canContinue)
+            .opacity(matchState.canContinue ? 1.0 : 0.5)
         }
-        .padding(DesignTokens.Spacing.lg)
-        .cardStyle(elevation: 2)
+        .padding(DesignTokens.Spacing.xl)
+        .heroCardStyle()
     }
     
     // MARK: - Hole History
