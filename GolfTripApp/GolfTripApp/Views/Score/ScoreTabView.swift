@@ -369,16 +369,27 @@ struct MatchScoringView: View {
                     }
                 }
                 
-                // Victory overlay
+                // Victory overlay with fireworks
                 if showVictory {
-                    Color.black.opacity(0.8)
+                    ZStack {
+                        Color.black.opacity(0.85)
+                            .ignoresSafeArea()
+                            .onTapGesture { showVictory = false }
+                        
+                        // Fireworks
+                        FireworksView(colors: [
+                            matchState.matchScore > 0 ? .teamUSA : .teamEurope,
+                            .gold,
+                            .white
+                        ])
                         .ignoresSafeArea()
-                        .onTapGesture { showVictory = false }
-                    
-                    TrophyAnimation(
-                        teamColor: matchState.matchScore > 0 ? .teamUSA : .teamEurope,
-                        teamName: matchState.matchScore > 0 ? "Team A" : "Team B"
-                    )
+                        
+                        // Trophy animation
+                        TrophyAnimation(
+                            teamColor: matchState.matchScore > 0 ? .teamUSA : .teamEurope,
+                            teamName: matchState.matchScore > 0 ? "Team A" : "Team B"
+                        )
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)

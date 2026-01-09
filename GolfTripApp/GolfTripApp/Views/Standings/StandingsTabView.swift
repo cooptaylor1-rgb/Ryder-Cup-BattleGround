@@ -385,46 +385,72 @@ struct StandingsTabView: View {
     private func playerRow(rank: Int, stat: (player: Player, points: Double, record: (Int, Int, Int)), teamAIds: Set<UUID>) -> some View {
         let isTeamA = teamAIds.contains(stat.player.id)
         let teamColor: Color = isTeamA ? .teamUSA : .teamEurope
+        let isHotStreak = stat.record.0 >= 2 && stat.record.1 == 0  // 2+ wins, 0 losses
         
         HStack(spacing: DesignTokens.Spacing.md) {
-            // Rank
+            // Rank with crown for top 3
             ZStack {
                 if rank <= 3 {
-                    Circle()
-                        .fill(rank == 1 ? Color.gold : (rank == 2 ? Color.platinum : Color.secondaryGoldDark))
-                        .frame(width: 28, height: 28)
+                    ChampionCrown(rank: rank, size: 20)
+                } else {
+                    Text("\(rank)")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundColor(.secondary)
                 }
-                
-                Text("\(rank)")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(rank <= 3 ? .black : .secondary)
             }
-            .frame(width: 28)
+            .frame(width: 32)
             
-            // Team indicator
-            Circle()
-                .fill(teamColor)
-                .frame(width: 10, height: 10)
+            // Team indicator with avatar
+            ZStack {
+                Circle()
+                    .fill(teamColor.opacity(0.2))
+                    .frame(width: 36, height: 36)
+                
+                Circle()
+                    .stroke(teamColor, lineWidth: 2)
+                    .frame(width: 36, height: 36)
+                
+                Text(String(stat.player.name.prefix(1)))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundColor(teamColor)
+            }
             
-            // Name
-            Text(stat.player.name)
-                .font(.subheadline.weight(.medium))
-                .lineLimit(1)
+            // Name and badges
+            VStack(alignment: .leading, spacing: 2) {
+                Text(stat.player.name)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                
+                if isHotStreak {
+                    PerformanceBadge(type: .hotStreak)
+                }
+            }
             
             Spacer()
             
-            // Stats
+            // Stats with enhanced styling
             VStack(alignment: .trailing, spacing: 2) {
-                Text(String(format: "%.1f", stat.points))
-                    .font(.subheadline.weight(.bold))
-                    .foregroundColor(teamColor)
+                HStack(spacing: 4) {
+                    Text(String(format: "%.1f", stat.points))
+                        .font(.headline.weight(.bold))
+                        .foregroundColor(teamColor)
+                    
+                    Text("pts")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
                 
                 Text("\(stat.record.0)-\(stat.record.1)-\(stat.record.2)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
         }
-        .padding(.vertical, DesignTokens.Spacing.xs)
+        .padding(.vertical, DesignTokens.Spacing.sm)
+        .padding(.horizontal, DesignTokens.Spacing.sm)
+        .background(
+            rank == 1 ? Color.gold.opacity(0.08) : Color.clear
+        )
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md))
     }
     
     // MARK: - Share Button

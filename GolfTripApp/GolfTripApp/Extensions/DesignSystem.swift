@@ -43,19 +43,29 @@ enum DesignTokens {
         static let medium: CGFloat = 56
         static let large: CGFloat = 72
         static let hero: CGFloat = 88
+        static let massive: CGFloat = 96  // Augusta-level prominence
     }
 }
 
 // MARK: - Colors
 
 extension Color {
+    // Augusta National Inspired Palette
+    static let augustaGreen = Color(hex: "#004225")  // The iconic Masters green
+    static let azaleaPink = Color(hex: "#E91E63")    // Azalea pink accents
+    static let magnoliaWhite = Color(hex: "#FDFBF7") // Elegant cream
+    static let patrons = Color(hex: "#2E7D32")       // Club green variant
+    static let sundayRed = Color(hex: "#C62828")     // Championship red
+    
     // Brand Colors
-    static let primaryGreen = Color("PrimaryGreen", bundle: nil)
+    static let primaryGreen = Color(hex: "#004225")  // Augusta green
     static let primaryGreenVariant = Color(hex: "#2E7D32")
     static let secondaryGold = Color(hex: "#FFD54F")
     static let secondaryGoldDark = Color(hex: "#B8860B")
     static let gold = Color(hex: "#FFD700")
     static let platinum = Color(hex: "#E5E4E2")
+    static let bronze = Color(hex: "#CD7F32")
+    static let silver = Color(hex: "#C0C0C0")
     
     // Team Colors - Enhanced with gradients support
     static let teamUSA = Color(hex: "#1565C0")
@@ -91,18 +101,24 @@ extension Color {
     // Glass morphism
     static let glassBackground = Color.white.opacity(0.05)
     static let glassBorder = Color.white.opacity(0.1)
+    
+    // Premium accents
+    static let premiumGlow = Color(hex: "#FFD700").opacity(0.3)
+    static let championGold = Color(hex: "#D4AF37")
 }
 
 // MARK: - Typography
 
 extension Font {
-    // Score Fonts (Monospace) - Enhanced
+    // Score Fonts (Monospace) - Augusta Premium
+    static let scoreMassive = Font.system(size: 96, weight: .black, design: .rounded)
     static let scoreHero = Font.system(size: 80, weight: .black, design: .rounded)
     static let scoreLarge = Font.system(size: 56, weight: .bold, design: .rounded)
     static let scoreMedium = Font.system(size: 40, weight: .bold, design: .rounded)
     static let scoreSmall = Font.system(size: 28, weight: .semibold, design: .rounded)
     
-    // Display Fonts
+    // Display Fonts - Premium Typography
+    static let displayHero = Font.system(size: 64, weight: .black, design: .rounded)
     static let displayLarge = Font.system(size: 48, weight: .black, design: .rounded)
     static let displayMedium = Font.system(size: 36, weight: .bold, design: .rounded)
     static let displaySmall = Font.system(size: 28, weight: .bold, design: .rounded)
@@ -269,7 +285,7 @@ extension View {
         self
             .font(.title2.weight(.bold))
             .foregroundColor(.white)
-            .frame(height: DesignTokens.ButtonSize.hero)
+            .frame(height: DesignTokens.ButtonSize.massive)
             .frame(maxWidth: .infinity)
             .background(
                 ZStack {
@@ -282,18 +298,32 @@ extension View {
                     
                     // Inner glow
                     LinearGradient(
-                        colors: [Color.white.opacity(0.25), Color.clear],
+                        colors: [Color.white.opacity(0.3), Color.clear],
                         startPoint: .top,
                         endPoint: .center
+                    )
+                    
+                    // Shimmer effect
+                    LinearGradient(
+                        colors: [Color.clear, Color.white.opacity(0.1), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl))
             .overlay(
                 RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    .stroke(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.3), Color.white.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
             )
-            .shadow(color: teamColor.opacity(0.5), radius: 16, y: 8)
+            .shadow(color: teamColor.opacity(0.6), radius: 20, y: 10)
     }
     
     /// Apply scoring button styling with enhanced feedback
@@ -1284,4 +1314,487 @@ struct LiveStatusIndicator: View {
         .padding(.horizontal)
     }
     .preferredColorScheme(.dark)
+}
+
+// MARK: - Fireworks Animation
+
+struct FireworksView: View {
+    let colors: [Color]
+    @State private var particles: [FireworkParticle] = []
+    @State private var isAnimating = false
+    
+    init(colors: [Color] = [.gold, .teamUSA, .teamEurope, .white, .azaleaPink]) {
+        self.colors = colors
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(particles) { particle in
+                    Circle()
+                        .fill(particle.color)
+                        .frame(width: particle.size, height: particle.size)
+                        .position(particle.position)
+                        .opacity(particle.opacity)
+                        .blur(radius: particle.blur)
+                }
+            }
+            .onAppear {
+                startFireworks(in: geometry.size)
+            }
+        }
+    }
+    
+    private func startFireworks(in size: CGSize) {
+        // Create multiple bursts
+        for burstIndex in 0..<5 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(burstIndex) * 0.3) {
+                createBurst(at: CGPoint(
+                    x: CGFloat.random(in: size.width * 0.2...size.width * 0.8),
+                    y: CGFloat.random(in: size.height * 0.2...size.height * 0.6)
+                ))
+            }
+        }
+    }
+    
+    private func createBurst(at center: CGPoint) {
+        let particleCount = 20
+        var newParticles: [FireworkParticle] = []
+        
+        for i in 0..<particleCount {
+            let angle = (Double(i) / Double(particleCount)) * 2 * .pi
+            let speed = CGFloat.random(in: 80...150)
+            let color = colors.randomElement() ?? .gold
+            
+            let particle = FireworkParticle(
+                id: UUID(),
+                position: center,
+                velocity: CGPoint(x: cos(angle) * speed, y: sin(angle) * speed),
+                color: color,
+                size: CGFloat.random(in: 4...10),
+                opacity: 1.0,
+                blur: 0
+            )
+            newParticles.append(particle)
+        }
+        
+        particles.append(contentsOf: newParticles)
+        
+        // Animate particles
+        withAnimation(.easeOut(duration: 1.5)) {
+            for i in particles.indices {
+                particles[i].position.x += particles[i].velocity.x
+                particles[i].position.y += particles[i].velocity.y + 50 // gravity
+                particles[i].opacity = 0
+                particles[i].blur = 2
+            }
+        }
+        
+        // Clean up
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            particles.removeAll { $0.opacity < 0.1 }
+        }
+    }
+}
+
+struct FireworkParticle: Identifiable {
+    let id: UUID
+    var position: CGPoint
+    var velocity: CGPoint
+    var color: Color
+    var size: CGFloat
+    var opacity: Double
+    var blur: CGFloat
+}
+
+// MARK: - Champion Crown Badge
+
+struct ChampionCrown: View {
+    let rank: Int
+    let size: CGFloat
+    
+    var body: some View {
+        ZStack {
+            if rank == 1 {
+                // Gold crown
+                Image(systemName: "crown.fill")
+                    .font(.system(size: size))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.gold, .secondaryGold, .secondaryGoldDark],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: .gold.opacity(0.5), radius: 4)
+            } else if rank == 2 {
+                // Silver
+                Image(systemName: "crown.fill")
+                    .font(.system(size: size * 0.9))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.platinum, .silver, .gray],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: .gray.opacity(0.3), radius: 2)
+            } else if rank == 3 {
+                // Bronze
+                Image(systemName: "crown.fill")
+                    .font(.system(size: size * 0.85))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.bronze, .bronze.opacity(0.7), .brown],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: .brown.opacity(0.3), radius: 2)
+            }
+        }
+    }
+}
+
+// MARK: - Performance Badge
+
+struct PerformanceBadge: View {
+    enum BadgeType {
+        case hotStreak
+        case clutch
+        case ironMan
+        case rookie
+        case veteran
+        case captain
+        
+        var icon: String {
+            switch self {
+            case .hotStreak: return "flame.fill"
+            case .clutch: return "star.fill"
+            case .ironMan: return "figure.golf"
+            case .rookie: return "sparkles"
+            case .veteran: return "medal.fill"
+            case .captain: return "crown.fill"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .hotStreak: return .orange
+            case .clutch: return .gold
+            case .ironMan: return .teamUSA
+            case .rookie: return .azaleaPink
+            case .veteran: return .augustaGreen
+            case .captain: return .secondaryGold
+            }
+        }
+        
+        var label: String {
+            switch self {
+            case .hotStreak: return "Hot Streak"
+            case .clutch: return "Clutch"
+            case .ironMan: return "Iron Man"
+            case .rookie: return "Rookie"
+            case .veteran: return "Veteran"
+            case .captain: return "Captain"
+            }
+        }
+    }
+    
+    let type: BadgeType
+    var showLabel: Bool = false
+    
+    var body: some View {
+        HStack(spacing: DesignTokens.Spacing.xs) {
+            Image(systemName: type.icon)
+                .font(.caption2)
+                .foregroundColor(type.color)
+            
+            if showLabel {
+                Text(type.label)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(type.color)
+            }
+        }
+        .padding(.horizontal, showLabel ? DesignTokens.Spacing.sm : DesignTokens.Spacing.xs)
+        .padding(.vertical, DesignTokens.Spacing.xxs)
+        .background(type.color.opacity(0.15))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Premium Momentum Graph
+
+struct MomentumGraph: View {
+    let results: [MatchResult]
+    let teamAColor: Color
+    let teamBColor: Color
+    
+    @State private var animationProgress: CGFloat = 0
+    
+    enum MatchResult {
+        case teamAWin
+        case teamBWin
+        case halved
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            let height = geometry.size.height
+            let stepWidth = width / CGFloat(max(results.count - 1, 1))
+            
+            ZStack {
+                // Background grid
+                ForEach(0..<5) { i in
+                    Rectangle()
+                        .fill(Color.secondary.opacity(0.1))
+                        .frame(height: 1)
+                        .offset(y: CGFloat(i) * height / 4 - height / 2)
+                }
+                
+                // Center line
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.3))
+                    .frame(height: 2)
+                
+                // Momentum line
+                Path { path in
+                    var cumulativeScore: CGFloat = 0
+                    let maxScore: CGFloat = 5
+                    
+                    for (index, result) in results.enumerated() {
+                        switch result {
+                        case .teamAWin: cumulativeScore += 1
+                        case .teamBWin: cumulativeScore -= 1
+                        case .halved: break
+                        }
+                        
+                        let x = CGFloat(index) * stepWidth
+                        let normalizedScore = cumulativeScore / maxScore
+                        let y = height / 2 - normalizedScore * (height / 2 - 10)
+                        
+                        if index == 0 {
+                            path.move(to: CGPoint(x: x, y: height / 2))
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        } else {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                    }
+                }
+                .trim(from: 0, to: animationProgress)
+                .stroke(
+                    LinearGradient(
+                        colors: [teamAColor, .primary, teamBColor],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                )
+                
+                // Result dots
+                ForEach(Array(results.enumerated()), id: \.offset) { index, result in
+                    let x = CGFloat(index) * stepWidth
+                    let cumulativeScore = results.prefix(index + 1).reduce(0) { acc, r in
+                        switch r {
+                        case .teamAWin: return acc + 1
+                        case .teamBWin: return acc - 1
+                        case .halved: return acc
+                        }
+                    }
+                    let normalizedScore = CGFloat(cumulativeScore) / 5
+                    let y = height / 2 - normalizedScore * (height / 2 - 10)
+                    
+                    Circle()
+                        .fill(dotColor(for: result))
+                        .frame(width: 10, height: 10)
+                        .position(x: x, y: y)
+                        .opacity(Double(animationProgress) > Double(index) / Double(results.count) ? 1 : 0)
+                }
+            }
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 1.5)) {
+                animationProgress = 1
+            }
+        }
+    }
+    
+    private func dotColor(for result: MatchResult) -> Color {
+        switch result {
+        case .teamAWin: return teamAColor
+        case .teamBWin: return teamBColor
+        case .halved: return .secondary
+        }
+    }
+}
+
+// MARK: - Branded Share Card
+
+struct BrandedShareCard: View {
+    let tripName: String
+    let teamAName: String
+    let teamBName: String
+    let teamAScore: Double
+    let teamBScore: Double
+    let sessionInfo: String?
+    let date: Date
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with Augusta-style branding
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(LinearGradient.goldGradient)
+                
+                Text(tripName.uppercased())
+                    .font(.headline.weight(.black))
+                    .foregroundColor(.gold)
+                    .tracking(3)
+                
+                if let session = sessionInfo {
+                    Text(session)
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.vertical, DesignTokens.Spacing.xl)
+            .frame(maxWidth: .infinity)
+            .background(
+                LinearGradient(
+                    colors: [Color.augustaGreen.opacity(0.9), Color.augustaGreen],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            
+            // Score section
+            VStack(spacing: DesignTokens.Spacing.lg) {
+                HStack(spacing: DesignTokens.Spacing.xxxl) {
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        Text(teamAName)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundColor(.teamUSA)
+                        
+                        Text(formatScore(teamAScore))
+                            .font(.scoreLarge)
+                            .foregroundColor(.teamUSA)
+                    }
+                    
+                    VStack {
+                        Text("VS")
+                            .font(.caption.weight(.black))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    VStack(spacing: DesignTokens.Spacing.sm) {
+                        Text(teamBName)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundColor(.teamEurope)
+                        
+                        Text(formatScore(teamBScore))
+                            .font(.scoreLarge)
+                            .foregroundColor(.teamEurope)
+                    }
+                }
+                
+                // Date
+                Text(date, style: .date)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(DesignTokens.Spacing.xxl)
+            .background(Color.surface)
+            
+            // Footer
+            HStack {
+                Image(systemName: "flag.fill")
+                    .foregroundColor(.augustaGreen)
+                Text("Ryder Cup Companion")
+                    .font(.caption2.weight(.bold))
+            }
+            .foregroundColor(.secondary)
+            .padding(.vertical, DesignTokens.Spacing.md)
+            .frame(maxWidth: .infinity)
+            .background(Color.surfaceVariant)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl))
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.xl)
+                .stroke(
+                    LinearGradient(
+                        colors: [.gold.opacity(0.5), .gold.opacity(0.2)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+        )
+        .shadow(color: .black.opacity(0.3), radius: 20, y: 10)
+    }
+    
+    private func formatScore(_ score: Double) -> String {
+        if score == floor(score) {
+            return String(format: "%.0f", score)
+        }
+        return String(format: "%.1f", score)
+    }
+}
+
+// MARK: - Digit Flip Animation
+
+struct DigitFlipView: View {
+    let value: Int
+    @State private var animatedValue: Int = 0
+    
+    var body: some View {
+        Text("\(animatedValue)")
+            .font(.countdown)
+            .foregroundColor(.primary)
+            .contentTransition(.numericText())
+            .onChange(of: value) { _, newValue in
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    animatedValue = newValue
+                }
+                HapticManager.countdown()
+            }
+            .onAppear {
+                animatedValue = value
+            }
+    }
+}
+
+// MARK: - Skeleton Loading
+
+struct SkeletonView: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        Rectangle()
+            .fill(Color.surfaceVariant)
+            .overlay(
+                GeometryReader { geometry in
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.clear,
+                                    Color.white.opacity(0.1),
+                                    Color.clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .offset(x: isAnimating ? geometry.size.width : -geometry.size.width)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm))
+            .onAppear {
+                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                    isAnimating = true
+                }
+            }
+    }
 }

@@ -1,37 +1,50 @@
-# Golf Ryder Cup App
+# 🏆 The Ryder Cup Companion
 
-A premium iOS app for managing Ryder Cup-style buddies golf trips. Built with SwiftUI and SwiftData for iOS 17+. Features match play scoring, team management, live standings, and a "Trip Command Center" that makes running a competitive golf trip legendary.
+**The world's best iOS app for buddies trip Ryder Cup tournaments.**
 
-## 🏆 Ryder Cup Mode
+A premium Augusta-level golf trip companion built with SwiftUI and SwiftData for iOS 17+. Features match play scoring, team management, live standings, and a "Trip Command Center" that makes running a competitive golf trip legendary. Designed to be fast, delightful, and impossible to mess up after 3 beers.
 
-The app is designed around the Ryder Cup experience with:
+## ✨ Premium Features
 
-### Match Play Scoring
-- **Quick scoring**: +1 Team A | Halved | +1 Team B buttons
+### 🎯 Match Play Scoring (Bulletproof)
+- **Massive 96pt buttons** - Easy tapping, even after drinks
 - **Live status**: "Team A 2 UP with 5 to play"
 - **Auto-detection**: Dormie, closed out, final results
 - **5-step undo history** for corrections
 - **Haptic feedback** on every interaction
+- **Victory fireworks** with celebration animations
 
-### Sessions & Formats
+### 🎯 Sessions & Formats
 - **Foursomes** (alternate shot) - partners take turns
 - **Fourball** (best ball) - each plays own ball, best score counts
 - **Singles** - 1v1 match play
 - Configurable points per match (default: 1.0, championship: 1.5)
 
-### Handicap Allowances
+### 📊 Handicap Allowances
 ```swift
 // Singles: 100% of course handicap difference
 // Fourball: 90% off lowest handicap
 // Foursomes: 50% of combined team handicap
 ```
 
-### Standings & Leaderboard
-- **Big score display**: Team A 8.5 — Team B 5.5
+### 🏅 Standings & Leaderboard
+- **Big animated score display**: Team A 8.5 — Team B 5.5
 - **Session breakdown** with points per session
-- **Individual player stats**: points, W-L-H record
-- **"Points to win"** and scenario calculator
-- **Share cards** for results
+- **Champion crowns** for top performers (gold/silver/bronze)
+- **Performance badges**: Hot Streak, Clutch, Captain
+- **Magic number** - points needed to clinch
+- **Shareable branded cards** for bragging rights
+
+## 🎨 Premium Design
+
+The app features an Augusta National-inspired premium design system:
+
+- **Dark mode first** - Premium feel, great in bright sunlight
+- **Glass morphism** effects with depth layers
+- **Team color glows** on scoring buttons
+- **Animated momentum graphs**
+- **Trophy animations** for victories
+- **Smooth spring animations** throughout
 
 ## Navigation
 

@@ -25,7 +25,7 @@ struct HomeTabView: View {
                 .padding(DesignTokens.Spacing.lg)
             }
             .background(Color.surfaceBackground)
-            .navigationTitle("🏆 Ryder Cup")
+            .navigationTitle("🏆 The Ryder Cup")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if currentTrip != nil {
@@ -160,26 +160,58 @@ struct HomeTabView: View {
     
     private var weatherPlaceholder: some View {
         HStack(spacing: DesignTokens.Spacing.md) {
-            Image(systemName: "sun.max.fill")
-                .font(.title2)
-                .foregroundColor(.secondaryGold)
+            // Animated weather icon
+            ZStack {
+                Circle()
+                    .fill(Color.secondaryGold.opacity(0.2))
+                    .frame(width: 48, height: 48)
+                
+                Image(systemName: "sun.max.fill")
+                    .font(.title2)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.yellow, .orange],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: .orange.opacity(0.5), radius: 4)
+            }
             
             VStack(alignment: .leading, spacing: 2) {
-                Text("Perfect golf weather")
-                    .font(.subheadline.weight(.medium))
-                Text("Sunny, 72°F")
+                Text("Perfect Golf Weather")
+                    .font(.subheadline.weight(.semibold))
+                Text("72°F • Sunny • Low Wind")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
             
             Spacer()
             
-            Text("☀️")
-                .font(.largeTitle)
+            // Weather animation
+            ZStack {
+                ForEach(0..<3) { i in
+                    Circle()
+                        .stroke(Color.secondaryGold.opacity(0.3 - Double(i) * 0.1), lineWidth: 1)
+                        .frame(width: CGFloat(20 + i * 10), height: CGFloat(20 + i * 10))
+                }
+                Text("☀️")
+                    .font(.title)
+            }
         }
-        .padding(DesignTokens.Spacing.md)
-        .background(Color.surfaceVariant.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md))
+        .padding(DesignTokens.Spacing.lg)
+        .background(
+            LinearGradient(
+                colors: [Color.surfaceVariant.opacity(0.8), Color.surfaceVariant.opacity(0.4)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.lg))
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.lg)
+                .stroke(Color.secondaryGold.opacity(0.2), lineWidth: 1)
+        )
     }
     
     // MARK: - Next Up Card
@@ -430,9 +462,9 @@ struct HomeTabView: View {
     
     private var emptyTripState: some View {
         EmptyStateView(
-            icon: "airplane.departure",
-            title: "Ready for Your Trip?",
-            description: "Create your Ryder Cup trip to start managing teams, matchups, and scoring. Your legendary golf weekend awaits!",
+            icon: "trophy.fill",
+            title: "Welcome to Ryder Cup",
+            description: "Create your legendary buddies trip tournament. Set up teams, build matchups, and compete for the cup!",
             actionTitle: "Create Trip",
             action: { showTripForm = true }
         )
