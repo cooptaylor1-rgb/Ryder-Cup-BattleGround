@@ -1,0 +1,502 @@
+@import "tailwindcss";
+
+/* ============================================
+   Golf Ryder Cup App - Global Styles
+   Augusta National inspired, dark mode first
+   ============================================ */
+
+/* Custom CSS Variables for Dynamic Theming */
+:root {
+  /* Team colors can be customized per trip */
+  --team-a-color: #1565C0;
+  --team-a-light: #42A5F5;
+  --team-a-dark: #0D47A1;
+  --team-b-color: #C62828;
+  --team-b-light: #EF5350;
+  --team-b-dark: #B71C1C;
+
+  /* Surface colors */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --surface: #141414;
+  --surface-variant: #1E1E1E;
+  --surface-elevated: #282828;
+  --surface-border: #404040;
+}
+
+/* Dark mode is default */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+
+/* Score display - always monospace */
+.font-score {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+}
+
+/* ============================================
+   Touch Targets - Accessibility
+   ============================================ */
+
+/* Minimum 44x44 touch target */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Large touch target for primary actions */
+.touch-target-lg {
+  min-height: 56px;
+  min-width: 56px;
+}
+
+/* Hero touch target for scoring buttons */
+.touch-target-hero {
+  min-height: 72px;
+  min-width: 72px;
+}
+
+/* ============================================
+   Card Styles
+   ============================================ */
+
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-elevated {
+  background: var(--surface-elevated);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   Scoring Button Styles (Critical UX)
+   ============================================ */
+
+.score-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 16px;
+  font-weight: 700;
+  transition: all 200ms ease;
+  min-height: 72px;
+  min-width: 72px;
+  user-select: none;
+  cursor: pointer;
+  border: none;
+}
+
+.score-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 213, 79, 0.5);
+}
+
+.score-btn:active {
+  transform: scale(0.95);
+}
+
+.score-btn-team-a {
+  background: var(--team-a-color);
+  color: white;
+  box-shadow: 0 0 20px rgba(21, 101, 192, 0.4);
+}
+
+.score-btn-team-a:hover {
+  background: var(--team-a-light);
+}
+
+.score-btn-team-b {
+  background: var(--team-b-color);
+  color: white;
+  box-shadow: 0 0 20px rgba(198, 40, 40, 0.4);
+}
+
+.score-btn-team-b:hover {
+  background: var(--team-b-light);
+}
+
+.score-btn-halve {
+  background: var(--surface-variant);
+  color: var(--foreground);
+  border: 2px solid var(--surface-border);
+}
+
+.score-btn-halve:hover {
+  background: var(--surface-elevated);
+}
+
+/* Score animation */
+@keyframes scorePop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.score-btn.scored {
+  animation: scorePop 400ms ease-out;
+}
+
+/* ============================================
+   Form Styles
+   ============================================ */
+
+.input {
+  width: 100%;
+  border-radius: 8px;
+  background: var(--surface-variant);
+  border: 1px solid var(--surface-border);
+  padding: 8px 12px;
+  font-size: 17px;
+  color: var(--foreground);
+  transition: all 200ms ease;
+}
+
+.input::placeholder {
+  color: #757575;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #004225;
+  box-shadow: 0 0 0 2px rgba(0, 66, 37, 0.3);
+}
+
+/* ============================================
+   Navigation
+   ============================================ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(40, 40, 40, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--surface-border);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 12px;
+  color: #757575;
+  transition: color 200ms ease;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.nav-item.active {
+  color: #004225;
+}
+
+.nav-item:hover {
+  color: #B0B0B0;
+}
+
+/* ============================================
+   Hole Navigator
+   ============================================ */
+
+.hole-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 200ms ease;
+}
+
+.hole-indicator.scored-a {
+  background: var(--team-a-color);
+  color: white;
+}
+
+.hole-indicator.scored-b {
+  background: var(--team-b-color);
+  color: white;
+}
+
+.hole-indicator.halved {
+  background: var(--surface-elevated);
+  color: #B0B0B0;
+  box-shadow: inset 0 0 0 2px var(--surface-border);
+}
+
+.hole-indicator.unscored {
+  background: var(--surface-variant);
+  color: #757575;
+}
+
+.hole-indicator.current {
+  box-shadow: 0 0 0 2px #FFD54F, 0 0 0 4px var(--background);
+}
+
+/* ============================================
+   Status Badges
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-live {
+  background: rgba(239, 83, 80, 0.2);
+  color: #EF5350;
+}
+
+.badge-live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF5350;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badge-scheduled {
+  background: rgba(100, 181, 246, 0.2);
+  color: #64B5F6;
+}
+
+.badge-final {
+  background: rgba(102, 187, 106, 0.2);
+  color: #66BB6A;
+}
+
+.badge-locked {
+  background: rgba(255, 183, 77, 0.2);
+  color: #FFB74D;
+}
+
+/* ============================================
+   Standings Display
+   ============================================ */
+
+.standings-score {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.standings-bar {
+  height: 12px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: var(--surface-variant);
+}
+
+/* ============================================
+   Player Chip (Lineup Builder)
+   ============================================ */
+
+.player-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--surface-variant);
+  border: 1px solid var(--surface-border);
+  cursor: grab;
+  user-select: none;
+  transition: all 200ms ease;
+}
+
+.player-chip:hover {
+  background: var(--surface-elevated);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.player-chip.dragging {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0.9;
+  cursor: grabbing;
+  transform: scale(1.05);
+  z-index: 50;
+}
+
+.player-chip.team-a {
+  border-left: 4px solid var(--team-a-color);
+}
+
+.player-chip.team-b {
+  border-left: 4px solid var(--team-b-color);
+}
+
+/* ============================================
+   Match Slot (Lineup Builder)
+   ============================================ */
+
+.match-slot {
+  min-height: 80px;
+  border-radius: 8px;
+  border: 2px dashed var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  transition: all 200ms ease;
+}
+
+.match-slot.drag-over {
+  border-color: #004225;
+  background: rgba(0, 66, 37, 0.1);
+}
+
+.match-slot.filled {
+  border-style: solid;
+  background: var(--surface);
+}
+
+/* ============================================
+   Offline Indicator
+   ============================================ */
+
+.offline-banner {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: rgba(255, 183, 77, 0.9);
+  color: #0a0a0a;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: slideUp 300ms ease-out;
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ============================================
+   Loading States
+   ============================================ */
+
+.skeleton {
+  background: var(--surface-variant);
+  border-radius: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
+   Scrollbar Styling (Webkit)
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-elevated);
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
