@@ -4,6 +4,48 @@
 
 A premium Augusta-level golf trip companion built with SwiftUI and SwiftData for iOS 17+. Features match play scoring, team management, live standings, and a "Trip Command Center" that makes running a competitive golf trip legendary. Designed to be fast, delightful, and impossible to mess up after 3 beers.
 
+![CI](https://github.com/your-org/Golf-Ryder-Cup-App/actions/workflows/ci.yml/badge.svg)
+
+---
+
+## 🆕 What's New in v1.1 — Captain's Toolkit
+
+This release transforms the app into the most reliable, delightful, and impossible-to-screw-up Ryder Cup trip companion.
+
+### 👑 Captain Mode (P0.1)
+- **Session Locking**: Lock lineups once scoring begins — no more accidental edits
+- **Auto-Lock**: Sessions auto-lock when any match starts scoring
+- **Hold-to-Unlock**: 1.5-second press required to unlock (prevents drunk-taps)
+- **Audit Log**: Track all critical actions (who changed what, when)
+- **Validation**: Verify sessions before start — catch duplicate players, missing lineups
+
+### 🎯 Lineup Builder (P0.2)
+- **Drag & Drop Interface**: Visual pairing with player chips
+- **Auto-Fill Magic**: One-tap optimal lineups based on handicaps
+- **Fairness Score**: 0-100 rating with explainable drivers
+- **Lock Individual Matches**: Finalize pairings match-by-match
+- **Publish Lineup**: Notify everyone when lineup is locked
+
+### 🏠 Trip Command Center Upgrade (P0.3)
+- **Big Countdown Timer**: Live countdown to next tee time
+- **Magic Number Display**: Points needed to clinch for each team
+- **Live Matches Section**: Quick links to in-progress matches
+- **Enhanced Captain Actions**: Build Lineup, Score Now, view session states
+- **Champion Banner**: Celebration when a team clinches
+
+### 📤 Share & Export (P1.B)
+- **One-Tap Share Cards**: Share standings, match results, session summaries
+- **Branded Text**: Ready-to-paste for group chats with #RyderCup hashtags
+- **Match Results**: Share individual match outcomes instantly
+
+### 🔔 Local Notifications (P1.D)
+- **Tee Time Reminders**: 30-min and 10-min alerts before sessions
+- **Match Complete Alerts**: Know when matches finish
+- **Session Lock Alerts**: Know when lineups are locked
+- **Snooze Support**: Remind me in 15 minutes
+
+---
+
 ## ✨ Premium Features
 
 ### 🎯 Match Play Scoring (Bulletproof)

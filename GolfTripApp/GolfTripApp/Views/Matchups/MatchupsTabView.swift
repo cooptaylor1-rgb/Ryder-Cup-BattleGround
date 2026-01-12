@@ -8,6 +8,10 @@ struct MatchupsTabView: View {
     @Query(sort: \RyderCupSession.scheduledDate) private var sessions: [RyderCupSession]
     @State private var showSessionForm = false
     @State private var selectedSession: RyderCupSession?
+    @State private var showAuditLog = false
+    @State private var sessionToLock: RyderCupSession?
+    @State private var sessionToValidate: RyderCupSession?
+    @State private var validationResult: SessionValidationResult?
     
     private var currentTrip: Trip? {
         trips.first
@@ -28,6 +32,19 @@ struct MatchupsTabView: View {
             }
             .navigationTitle("Matchups")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if let trip = currentTrip, trip.isCaptainModeEnabled {
+                        Menu {
+                            Button(action: { showAuditLog = true }) {
+                                Label("Activity Log", systemImage: "doc.text")
+                            }
+                        } label: {
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(.secondaryGold)
+                        }
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showSessionForm = true }) {
                         Image(systemName: "plus")
@@ -39,6 +56,37 @@ struct MatchupsTabView: View {
             }
             .sheet(item: $selectedSession) { session in
                 SessionDetailView(session: session)
+            }
+            .sheet(isPresented: $showAuditLog) {
+                if let trip = currentTrip {
+                    AuditLogView(trip: trip)
+                }
+            }
+            .sheet(item: $sessionToLock) { session in
+                if let trip = currentTrip {
+                    SessionLockView(session: session, trip: trip)
+                }
+            }
+            .sheet(isPresented: Binding(
+                get: { validationResult != nil },
+                set: { if !$0 { validationResult = nil; sessionToValidate = nil } }
+            )) {
+                if let validation = validationResult {
+                    SessionValidationView(
+                        validation: validation,
+                        onDismiss: { validationResult = nil; sessionToValidate = nil },
+                        onProceed: validation.canStart ? {
+                            // Start first match in session
+                            if let session = sessionToValidate,
+                               let firstMatch = session.sortedMatches.first(where: { $0.status == .scheduled }) {
+                                firstMatch.status = .inProgress
+                                try? modelContext.save()
+                            }
+                            validationResult = nil
+                            sessionToValidate = nil
+                        } : nil
+                    )
+                }
             }
         }
     }
@@ -75,6 +123,8 @@ struct MatchupsTabView: View {
     
     @ViewBuilder
     private func sessionCard(_ session: RyderCupSession, trip: Trip) -> some View {
+        let hasLiveScoring = CaptainModeService.shared.shouldAutoLock(session: session)
+        
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
             // Header
             HStack {
@@ -89,6 +139,7 @@ struct MatchupsTabView: View {
                 
                 Spacer()
                 
+                // Lock/Status badge
                 if session.isComplete {
                     HStack(spacing: DesignTokens.Spacing.xs) {
                         Text("\(String(format: "%.1f", session.teamAPoints))")
@@ -98,6 +149,14 @@ struct MatchupsTabView: View {
                         Text("\(String(format: "%.1f", session.teamBPoints))")
                             .foregroundColor(.teamEurope)
                     }
+                    .font(.subheadline.weight(.semibold))
+                } else {
+                    SessionLockBadge(isLocked: session.isLocked, hasLiveScoring: hasLiveScoring)
+                        .onTapGesture {
+                            sessionToLock = session
+                        }
+                }
+            }
                     .font(.subheadline.weight(.semibold))
                 } else if session.isLocked {
                     Image(systemName: "lock.fill")
@@ -125,7 +184,7 @@ struct MatchupsTabView: View {
                 }
             }
             
-            // Footer
+            // Footer with validation
             HStack {
                 Text("\(matches.count) matches • \(String(format: "%.0f", session.totalPointsAvailable)) points")
                     .font(.caption)
@@ -133,13 +192,40 @@ struct MatchupsTabView: View {
                 
                 Spacer()
                 
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if !session.isComplete && !matches.isEmpty {
+                    Button {
+                        validateAndStart(session: session, trip: trip)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark.shield")
+                            Text("Validate")
+                        }
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(.accentColor)
+                    }
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding(DesignTokens.Spacing.lg)
         .cardStyle()
+    }
+    
+    private func validateAndStart(session: RyderCupSession, trip: Trip) {
+        let teamAPlayers = trip.teamA?.players ?? []
+        let teamBPlayers = trip.teamB?.players ?? []
+        
+        let result = CaptainModeService.shared.validateSessionForStart(
+            session: session,
+            teamAPlayers: teamAPlayers,
+            teamBPlayers: teamBPlayers
+        )
+        
+        sessionToValidate = session
+        validationResult = result
     }
     
     @ViewBuilder
@@ -306,19 +392,35 @@ struct SessionDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Bindable var session: RyderCupSession
+    @Query private var trips: [Trip]
     @Query private var players: [Player]
     
-    @State private var showPairingEditor = false
+    @State private var showLineupBuilder = false
     @State private var showMatchForm = false
+    @State private var showLockView = false
+    
+    private var currentTrip: Trip? {
+        trips.first
+    }
     
     var body: some View {
         NavigationStack {
             List {
+                // Session info
                 Section {
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                        Text(session.sessionType.description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        HStack {
+                            Text(session.sessionType.description)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            SessionLockBadge(
+                                isLocked: session.isLocked,
+                                hasLiveScoring: CaptainModeService.shared.shouldAutoLock(session: session)
+                            )
+                        }
                         
                         HStack {
                             Label("\(session.sortedMatches.count) matches", systemImage: "flag.2.crossed")
@@ -330,28 +432,55 @@ struct SessionDetailView: View {
                     }
                 }
                 
+                // Quick Actions
+                if !session.isLocked {
+                    Section("Quick Actions") {
+                        Button {
+                            showLineupBuilder = true
+                        } label: {
+                            Label("Build Lineup", systemImage: "wand.and.stars")
+                        }
+                        
+                        Button {
+                            showLockView = true
+                        } label: {
+                            Label("Lock Session", systemImage: "lock")
+                        }
+                    }
+                }
+                
+                // Matches
                 Section("Matches") {
                     if session.sortedMatches.isEmpty {
-                        Button(action: { showMatchForm = true }) {
-                            Label("Add Match", systemImage: "plus")
+                        VStack(spacing: DesignTokens.Spacing.md) {
+                            Image(systemName: "rectangle.grid.2x2")
+                                .font(.title)
+                                .foregroundColor(.secondary)
+                            Text("No matches configured")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            if !session.isLocked {
+                                Button {
+                                    showLineupBuilder = true
+                                } label: {
+                                    Text("Build Lineup")
+                                        .font(.subheadline.weight(.medium))
+                                }
+                            }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DesignTokens.Spacing.lg)
                     } else {
                         ForEach(session.sortedMatches, id: \.id) { match in
                             matchDetailRow(match)
                         }
                         
-                        Button(action: { showMatchForm = true }) {
-                            Label("Add Match", systemImage: "plus")
+                        if !session.isLocked {
+                            Button(action: { showMatchForm = true }) {
+                                Label("Add Match", systemImage: "plus")
+                            }
                         }
-                    }
-                }
-                
-                if !session.isLocked {
-                    Section {
-                        Button(action: lockSession) {
-                            Label("Lock & Publish Lineup", systemImage: "lock")
-                        }
-                        .foregroundColor(.accentColor)
                     }
                 }
             }
@@ -365,6 +494,16 @@ struct SessionDetailView: View {
             .sheet(isPresented: $showMatchForm) {
                 MatchFormView(session: session)
             }
+            .sheet(isPresented: $showLineupBuilder) {
+                if let trip = currentTrip {
+                    LineupBuilderView(session: session, trip: trip)
+                }
+            }
+            .sheet(isPresented: $showLockView) {
+                if let trip = currentTrip {
+                    SessionLockView(session: session, trip: trip)
+                }
+            }
         }
     }
     
@@ -377,23 +516,50 @@ struct SessionDetailView: View {
                 
                 Spacer()
                 
-                Text(match.status.displayName)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.2))
-                    .clipShape(Capsule())
+                statusBadgeForMatch(match)
             }
             
-            Text("Team A (\(match.teamAIds.count)) vs Team B (\(match.teamBIds.count))")
+            // Show player names if available
+            let teamANames = match.teamAIds.isEmpty ? "TBD" : "\(match.teamAIds.count) players"
+            let teamBNames = match.teamBIds.isEmpty ? "TBD" : "\(match.teamBIds.count) players"
+            
+            Text("\(teamANames) vs \(teamBNames)")
                 .font(.caption)
                 .foregroundColor(.secondary)
+            
+            // Show result if final
+            if match.status == .final {
+                Text(match.resultString)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(match.result == .teamAWin ? .teamUSA : 
+                                    (match.result == .teamBWin ? .teamEurope : .secondary))
+            }
         }
+        .padding(.vertical, 4)
     }
     
-    private func lockSession() {
-        session.isLocked = true
-        session.updatedAt = Date()
+    @ViewBuilder
+    private func statusBadgeForMatch(_ match: Match) -> some View {
+        let (text, color): (String, Color) = {
+            switch match.status {
+            case .scheduled:
+                return ("Scheduled", .secondary)
+            case .inProgress:
+                return ("Live • Hole \(match.currentHole)", .success)
+            case .final:
+                return ("Final", .info)
+            case .cancelled:
+                return ("Cancelled", .error)
+            }
+        }()
+        
+        Text(text)
+            .font(.caption2.weight(.medium))
+            .foregroundColor(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.15))
+            .clipShape(Capsule())
     }
 }
 

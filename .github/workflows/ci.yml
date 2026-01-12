@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-14
+    
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+    
+    - name: Show available SDKs
+      run: xcodebuild -showsdks
+    
+    - name: Show available simulators
+      run: xcrun simctl list devices available
+    
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/org.swift.swiftpm
+          ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved', '**/Package.swift') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+    
+    - name: Resolve Package Dependencies
+      run: |
+        cd GolfTripApp
+        xcodebuild -resolvePackageDependencies \
+          -project GolfTripApp.xcodeproj \
+          -scheme GolfTripApp
+    
+    - name: Build for Testing
+      run: |
+        cd GolfTripApp
+        xcodebuild build-for-testing \
+          -project GolfTripApp.xcodeproj \
+          -scheme GolfTripApp \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.2' \
+          -configuration Debug \
+          CODE_SIGN_IDENTITY="-" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+    
+    - name: Run Unit Tests
+      run: |
+        cd GolfTripApp
+        xcodebuild test-without-building \
+          -project GolfTripApp.xcodeproj \
+          -scheme GolfTripApp \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.2' \
+          -resultBundlePath TestResults.xcresult
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: GolfTripApp/TestResults.xcresult
+        retention-days: 7
+
+  lint:
+    name: Swift Lint
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Install SwiftLint
+      run: brew install swiftlint
+    
+    - name: Run SwiftLint
+      run: |
+        cd GolfTripApp
+        swiftlint lint --reporter github-actions-logging || true
+      continue-on-error: true
+
+  build-release:
+    name: Build Release
+    runs-on: macos-14
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app
+    
+    - name: Build Release
+      run: |
+        cd GolfTripApp
+        xcodebuild build \
+          -project GolfTripApp.xcodeproj \
+          -scheme GolfTripApp \
+          -destination 'generic/platform=iOS' \
+          -configuration Release \
+          CODE_SIGN_IDENTITY="-" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          ONLY_ACTIVE_ARCH=NO
