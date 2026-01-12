@@ -90,8 +90,6 @@ The app uses a 6-tab layout optimized for "in the moment" use:
 - **Tee Time Notifications** - Local reminders 45min and 10min before start
 - **One-Tap Export** - ShareLink integration for instant sharing
 
-## Features
-
 ### Player Profiles
 - Create/edit/delete players with full profile information
 - USGA Handicap Index (decimal precision)

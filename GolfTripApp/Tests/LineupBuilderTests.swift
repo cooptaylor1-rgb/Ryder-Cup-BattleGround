@@ -198,10 +198,9 @@ struct LineupBuilderTests {
         )
         
         // Create match with player1 and player2 paired
-        let match = Match(
-            teamAPlayerIds: "\(player1.id.uuidString),\(player2.id.uuidString)",
-            teamBPlayerIds: "\(player3.id.uuidString),\(player4.id.uuidString)"
-        )
+        let match = Match()
+        match.setTeamAPlayers([player1, player2])
+        match.setTeamBPlayers([player3, player4])
         match.session = session
         
         let history = LineupBuilder.buildPairingHistory(

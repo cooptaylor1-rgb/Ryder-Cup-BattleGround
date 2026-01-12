@@ -64,12 +64,17 @@ final class AuditLog {
 }
 
 extension AuditLog {
-    /// Formatted timestamp for display
-    var formattedTimestamp: String {
+    /// Static formatter for better performance
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .short
-        return formatter.string(from: timestamp)
+        return formatter
+    }()
+    
+    /// Formatted timestamp for display
+    var formattedTimestamp: String {
+        Self.dateFormatter.string(from: timestamp)
     }
     
     /// Display text for the log entry

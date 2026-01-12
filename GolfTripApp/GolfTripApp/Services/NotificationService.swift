@@ -36,7 +36,8 @@ struct NotificationService {
             return
         }
         
-        guard let startTime = session.scheduledDate as Date else {
+        // Use optional binding to safely get date
+        guard let startTime = session.scheduledDate as Date? else {
             print("Session has no scheduled date")
             return
         }
@@ -150,6 +151,12 @@ struct NotificationService {
     
     /// Clear app badge count
     static func clearBadge() {
-        UNUserNotificationCenter.current().setBadgeCount(0)
+        Task {
+            do {
+                try await UNUserNotificationCenter.current().setBadgeCount(0)
+            } catch {
+                print("Error clearing badge: \(error)")
+            }
+        }
     }
 }
