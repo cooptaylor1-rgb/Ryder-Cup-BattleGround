@@ -1,0 +1,46 @@
+{
+  "name": "Golf Ryder Cup App - Swift Dev Container",
+  "image": "swift:6.0-jammy",
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "sswg.swift-lang",
+        "streetsidesoftware.code-spell-checker",
+        "github.copilot",
+        "github.copilot-chat",
+        "eamodio.gitlens",
+        "gruntfuggly.todo-tree",
+        "redhat.vscode-yaml",
+        "davidanson.vscode-markdownlint"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "files.associations": {
+          "*.swift": "swift"
+        }
+      }
+    }
+  },
+
+  "postCreateCommand": "swift --version && echo '✅ Swift dev container ready! SPM builds work here. Full iOS builds require GitHub Actions CI (macOS).'",
+
+  "containerUser": "root",
+  "remoteUser": "root",
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

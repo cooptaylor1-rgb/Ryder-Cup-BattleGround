@@ -28,7 +28,8 @@ struct GolfTripApp: App {
                 HoleResult.self,
                 BanterPost.self,
                 TripPhoto.self,
-                AuditLog.self
+                // Captain's Toolkit models
+                AuditLogEntry.self
             ])
             
             let modelConfiguration = ModelConfiguration(

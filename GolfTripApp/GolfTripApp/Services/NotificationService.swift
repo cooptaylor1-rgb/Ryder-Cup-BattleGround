@@ -1,163 +1,359 @@
-import UserNotifications
 import Foundation
+import UserNotifications
 
-/// Service for managing local notifications
-struct NotificationService {
+/// Service for managing local notifications (tee time reminders, match updates)
+/// P1.D Local Notifications Feature
+@MainActor
+final class NotificationService: NSObject, ObservableObject {
+    static let shared = NotificationService()
+    
+    @Published var isAuthorized = false
+    @Published var pendingNotifications: [UNNotificationRequest] = []
+    
+    // Notification categories
+    static let teeTimeCategory = "TEE_TIME"
+    static let matchStartCategory = "MATCH_START"
+    static let matchCompleteCategory = "MATCH_COMPLETE"
+    static let sessionLockedCategory = "SESSION_LOCKED"
+    
+    private let notificationCenter = UNUserNotificationCenter.current()
+    
+    private override init() {
+        super.init()
+        checkAuthorizationStatus()
+    }
     
     // MARK: - Authorization
     
-    /// Request notification authorization from user
-    /// - Returns: True if authorized, false if denied
-    static func requestAuthorization() async -> Bool {
-        let center = UNUserNotificationCenter.current()
+    func requestAuthorization() async -> Bool {
         do {
-            return try await center.requestAuthorization(options: [.alert, .sound, .badge])
+            let options: UNAuthorizationOptions = [.alert, .badge, .sound]
+            let granted = try await notificationCenter.requestAuthorization(options: options)
+            await MainActor.run {
+                self.isAuthorized = granted
+            }
+            
+            if granted {
+                setupNotificationCategories()
+            }
+            
+            return granted
         } catch {
             print("Notification authorization error: \(error)")
             return false
         }
     }
     
-    /// Check current authorization status
-    /// - Returns: True if authorized
-    static func isAuthorized() async -> Bool {
-        let center = UNUserNotificationCenter.current()
-        let settings = await center.notificationSettings()
-        return settings.authorizationStatus == .authorized
+    func checkAuthorizationStatus() {
+        notificationCenter.getNotificationSettings { settings in
+            Task { @MainActor in
+                self.isAuthorized = settings.authorizationStatus == .authorized
+            }
+        }
     }
     
-    // MARK: - Tee Time Notifications
+    // MARK: - Notification Categories
     
-    /// Schedule notifications for a session's tee times
-    /// - Parameter session: The session to schedule notifications for
-    static func scheduleTeeTimeNotifications(for session: RyderCupSession) async {
-        guard await isAuthorized() else {
-            print("Notifications not authorized")
-            return
-        }
-        
-        // Use optional binding to safely get date
-        guard let startTime = session.scheduledDate else {
-            print("Session has no scheduled date")
-            return
-        }
-        
-        let center = UNUserNotificationCenter.current()
-        
-        // 45 minutes before
-        await scheduleNotification(
-            id: "tee-45-\(session.id.uuidString)",
-            title: "⛳️ Tee Time Soon",
-            body: "\(session.name) starts in 45 minutes",
-            date: startTime.addingTimeInterval(-45 * 60),
-            sessionId: session.id.uuidString
+    private func setupNotificationCategories() {
+        // Tee Time Actions
+        let viewLineup = UNNotificationAction(
+            identifier: "VIEW_LINEUP",
+            title: "View Lineup",
+            options: [.foreground]
         )
+        
+        let snooze = UNNotificationAction(
+            identifier: "SNOOZE",
+            title: "Remind in 15 min",
+            options: []
+        )
+        
+        let teeTimeCategory = UNNotificationCategory(
+            identifier: Self.teeTimeCategory,
+            actions: [viewLineup, snooze],
+            intentIdentifiers: [],
+            options: []
+        )
+        
+        // Match Start Actions
+        let startScoring = UNNotificationAction(
+            identifier: "START_SCORING",
+            title: "Start Scoring",
+            options: [.foreground]
+        )
+        
+        let matchStartCategory = UNNotificationCategory(
+            identifier: Self.matchStartCategory,
+            actions: [startScoring],
+            intentIdentifiers: [],
+            options: []
+        )
+        
+        // Match Complete Actions
+        let viewResults = UNNotificationAction(
+            identifier: "VIEW_RESULTS",
+            title: "View Results",
+            options: [.foreground]
+        )
+        
+        let shareResults = UNNotificationAction(
+            identifier: "SHARE_RESULTS",
+            title: "Share",
+            options: [.foreground]
+        )
+        
+        let matchCompleteCategory = UNNotificationCategory(
+            identifier: Self.matchCompleteCategory,
+            actions: [viewResults, shareResults],
+            intentIdentifiers: [],
+            options: []
+        )
+        
+        notificationCenter.setNotificationCategories([
+            teeTimeCategory,
+            matchStartCategory,
+            matchCompleteCategory
+        ])
+    }
+    
+    // MARK: - Schedule Notifications
+    
+    /// Schedule a tee time reminder
+    func scheduleTeeTimeReminder(
+        for session: RyderCupSession,
+        at date: Date,
+        minutesBefore: Int = 30
+    ) async {
+        guard isAuthorized else { return }
+        
+        let triggerDate = date.addingTimeInterval(-TimeInterval(minutesBefore * 60))
+        
+        // Don't schedule if it's in the past
+        guard triggerDate > Date() else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "⛳️ Tee Time Reminder"
+        content.body = "\(session.displayTitle) starts in \(minutesBefore) minutes!"
+        content.sound = .default
+        content.categoryIdentifier = Self.teeTimeCategory
+        content.userInfo = [
+            "sessionId": session.id.uuidString,
+            "type": "tee_time"
+        ]
+        
+        let components = Calendar.current.dateComponents(
+            [.year, .month, .day, .hour, .minute],
+            from: triggerDate
+        )
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        
+        let identifier = "tee_time_\(session.id.uuidString)_\(minutesBefore)"
+        let request = UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: trigger
+        )
+        
+        do {
+            try await notificationCenter.add(request)
+            await refreshPendingNotifications()
+        } catch {
+            print("Failed to schedule tee time notification: \(error)")
+        }
+    }
+    
+    /// Schedule multiple tee time reminders (30 min, 10 min before)
+    func scheduleAllTeeTimeReminders(for session: RyderCupSession) async {
+        let date = session.scheduledDate
+        
+        // 30 minutes before
+        await scheduleTeeTimeReminder(for: session, at: date, minutesBefore: 30)
         
         // 10 minutes before
-        await scheduleNotification(
-            id: "tee-10-\(session.id.uuidString)",
-            title: "⏰ Almost Tee Time!",
-            body: "\(session.name) starts in 10 minutes. Get to the first tee!",
-            date: startTime.addingTimeInterval(-10 * 60),
-            sessionId: session.id.uuidString
-        )
+        await scheduleTeeTimeReminder(for: session, at: date, minutesBefore: 10)
     }
     
-    /// Schedule a single notification
-    /// - Parameters:
-    ///   - id: Unique identifier for the notification
-    ///   - title: Notification title
-    ///   - body: Notification body text
-    ///   - date: When to deliver the notification
-    ///   - sessionId: Optional session ID for deep linking
-    private static func scheduleNotification(
-        id: String,
-        title: String,
-        body: String,
-        date: Date,
-        sessionId: String? = nil
-    ) async {
-        // Don't schedule notifications in the past
-        guard date > Date() else {
-            print("Skipping notification for past date: \(date)")
-            return
+    /// Schedule notifications for all upcoming sessions in a trip
+    func scheduleNotificationsForTrip(_ trip: Trip) async {
+        // Cancel existing notifications first
+        await cancelTripNotifications(for: trip)
+        
+        for session in trip.sortedSessions where !session.isComplete {
+            await scheduleAllTeeTimeReminders(for: session)
         }
+    }
+    
+    // MARK: - Cancel Notifications
+    
+    /// Cancel a specific notification
+    func cancelNotification(identifier: String) {
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        Task {
+            await refreshPendingNotifications()
+        }
+    }
+    
+    /// Cancel all notifications for a session
+    func cancelSessionNotifications(for session: RyderCupSession) {
+        let identifiers = [
+            "tee_time_\(session.id.uuidString)_30",
+            "tee_time_\(session.id.uuidString)_10"
+        ]
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+        Task {
+            await refreshPendingNotifications()
+        }
+    }
+    
+    /// Cancel all notifications for a trip
+    func cancelTripNotifications(for trip: Trip) async {
+        var identifiers: [String] = []
+        
+        for session in trip.sortedSessions {
+            identifiers.append("tee_time_\(session.id.uuidString)_30")
+            identifiers.append("tee_time_\(session.id.uuidString)_10")
+        }
+        
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+        await refreshPendingNotifications()
+    }
+    
+    /// Cancel all notifications
+    func cancelAllNotifications() {
+        notificationCenter.removeAllPendingNotificationRequests()
+        Task { @MainActor in
+            self.pendingNotifications = []
+        }
+    }
+    
+    // MARK: - Query Notifications
+    
+    /// Refresh the list of pending notifications
+    func refreshPendingNotifications() async {
+        let requests = await notificationCenter.pendingNotificationRequests()
+        await MainActor.run {
+            self.pendingNotifications = requests
+        }
+    }
+    
+    /// Check if notifications are scheduled for a session
+    func hasNotificationsScheduled(for session: RyderCupSession) -> Bool {
+        pendingNotifications.contains { request in
+            request.identifier.contains(session.id.uuidString)
+        }
+    }
+    
+    // MARK: - Instant Notifications
+    
+    /// Send an immediate notification (for testing or urgent alerts)
+    func sendInstantNotification(title: String, body: String) async {
+        guard isAuthorized else { return }
         
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
-        content.badge = 1
         
-        // Add session ID to userInfo for deep linking
-        if let sessionId = sessionId {
-            content.userInfo = ["sessionId": sessionId, "type": "teeTime"]
-        }
-        
-        let components = Calendar.current.dateComponents(
-            [.year, .month, .day, .hour, .minute],
-            from: date
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: trigger
         )
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         
-        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-        
-        do {
-            try await UNUserNotificationCenter.current().add(request)
-            print("Scheduled notification: \(id) for \(date)")
-        } catch {
-            print("Error scheduling notification \(id): \(error)")
-        }
+        try? await notificationCenter.add(request)
     }
     
-    // MARK: - Notification Management
-    
-    /// Cancel specific notification
-    /// - Parameter id: Notification identifier
-    static func cancelNotification(id: String) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id])
-    }
-    
-    /// Cancel all notifications for a session
-    /// - Parameter session: The session whose notifications should be cancelled
-    static func cancelSessionNotifications(for session: RyderCupSession) {
-        let identifiers = [
-            "tee-45-\(session.id.uuidString)",
-            "tee-10-\(session.id.uuidString)"
+    /// Send match completion notification
+    func sendMatchCompleteNotification(for match: Match, session: RyderCupSession) async {
+        guard isAuthorized else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "🏁 Match Complete"
+        content.body = "\(session.displayTitle): \(match.statusString)"
+        content.sound = .default
+        content.categoryIdentifier = Self.matchCompleteCategory
+        content.userInfo = [
+            "matchId": match.id.uuidString,
+            "sessionId": session.id.uuidString,
+            "type": "match_complete"
         ]
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "match_complete_\(match.id.uuidString)",
+            content: content,
+            trigger: trigger
+        )
+        
+        try? await notificationCenter.add(request)
     }
     
-    /// Cancel all pending notifications
-    static func cancelAllNotifications() {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    /// Send session locked notification
+    func sendSessionLockedNotification(for session: RyderCupSession) async {
+        guard isAuthorized else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "🔒 Session Locked"
+        content.body = "\(session.displayTitle) lineup is now locked and scoring has begun."
+        content.sound = .default
+        content.categoryIdentifier = Self.sessionLockedCategory
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "session_locked_\(session.id.uuidString)",
+            content: content,
+            trigger: trigger
+        )
+        
+        try? await notificationCenter.add(request)
+    }
+}
+
+// MARK: - UNUserNotificationCenterDelegate
+
+extension NotificationService: UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        // Show notification even when app is in foreground
+        [.banner, .sound, .badge]
     }
     
-    /// Get count of pending notifications
-    /// - Returns: Number of pending notifications
-    static func getPendingCount() async -> Int {
-        let center = UNUserNotificationCenter.current()
-        let requests = await center.pendingNotificationRequests()
-        return requests.count
-    }
-    
-    /// Get all pending notification requests (for debugging)
-    /// - Returns: Array of pending notifications
-    static func getPendingNotifications() async -> [UNNotificationRequest] {
-        return await UNUserNotificationCenter.current().pendingNotificationRequests()
-    }
-    
-    // MARK: - Badge Management
-    
-    /// Clear app badge count (iOS 17+)
-    @available(iOS 17.0, *)
-    static func clearBadge() {
-        Task {
-            do {
-                try await UNUserNotificationCenter.current().setBadgeCount(0)
-            } catch {
-                print("Error clearing badge: \(error)")
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        let userInfo = response.notification.request.content.userInfo
+        
+        switch response.actionIdentifier {
+        case "VIEW_LINEUP":
+            // Handle view lineup action - would navigate to lineup view
+            print("User tapped View Lineup")
+            
+        case "START_SCORING":
+            // Handle start scoring action
+            print("User tapped Start Scoring")
+            
+        case "VIEW_RESULTS":
+            // Handle view results action
+            print("User tapped View Results")
+            
+        case "SHARE_RESULTS":
+            // Handle share results action
+            print("User tapped Share Results")
+            
+        case "SNOOZE":
+            // Reschedule notification for 15 minutes later
+            if let sessionIdString = userInfo["sessionId"] as? String {
+                print("Snoozing notification for session: \(sessionIdString)")
+                // Would reschedule notification here
             }
+            
+        default:
+            // Default tap - open app
+            break
         }
     }
 }

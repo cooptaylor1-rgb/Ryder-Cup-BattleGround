@@ -1,213 +1,285 @@
-# Gap Analysis - Captain's Toolkit v1.1
+# Gap Analysis - Captain's Toolkit Upgrade
 
-## Top 10 Friction Points
-
-Current UX/flow pain points that make the app harder to use in-the-moment:
-
-1. **No protection against accidental edits during live scoring** - Sessions can be modified mid-round, potentially corrupting live match data when captains mistakenly tap edit controls.
-
-2. **Pairing creation is manual and tedious** - Building lineups requires individually selecting players for each match with no drag-and-drop or visual pairing interface.
-
-3. **No fairness visibility when building lineups** - Captains must mentally calculate handicap balance; no feedback on whether pairings are equitable until matches begin.
-
-4. **Home tab doesn't clearly answer "What do I do next?"** - While the tab shows information, it lacks a prominent call-to-action hierarchy that guides captains through their workflow.
-
-5. **No audit trail for critical actions** - When pairings change or sessions are modified, there's no record of who made changes or when, making it hard to resolve disputes.
-
-6. **No visual indication when sessions are locked vs editable** - Lock state exists but isn't prominently displayed, leading to confusion about when editing is allowed.
-
-7. **Lineup announcements require manual Banter posts** - After creating pairings, captains must separately announce lineups; no automated "Publish Lineup" workflow.
-
-8. **No quick "Build Lineup" flow that optimizes for balance** - Captain must manually evaluate all player combinations; no AI-assisted lineup suggestion based on handicaps.
-
-9. **Captain actions scattered across tabs** - Key captain functions (pairings, locks, announcements) are spread across Matchups, More, and other tabs with no unified command center.
-
-10. **No countdown or "next up" prominence on Home** - Next match appears but lacks urgency indicators like countdown timers or large visual prominence.
-
-## Top 10 Reliability Risks
-
-Edge cases, data integrity issues, and things that could break:
-
-1. **Duplicate players in same session not prevented** - Data model allows same player ID to appear in multiple matches within a session, causing scoring conflicts.
-
-2. **Players from wrong team assigned to matches** - No validation that Team A player IDs actually belong to Team A in the trip's team structure.
-
-3. **Missing hole handicaps not caught before match starts** - Matches can begin without valid hole handicap data, breaking stroke allocation mid-round.
-
-4. **Session edits possible after scoring has begun** - Existing `isLocked` property isn't enforced; pairings can change while matches are `inProgress`.
-
-5. **Match finalization can be accidentally triggered mid-round** - No confirmation dialog or safeguards against premature finalization when holes remain.
-
-6. **No validation that course/tee set is assigned before starting match** - Scoring can begin without course data, causing nil reference errors in handicap calculations.
-
-7. **Pairing history not used to avoid repeat matchups** - No tracking of previous partnerships means same pairings repeat across sessions without warning.
-
-8. **Undo system doesn't handle session-level changes** - Current 5-step undo only works for hole results; session edits are irreversible.
-
-9. **No safeguard against deleting players mid-tournament** - Players can be deleted while still assigned to active matches, leaving orphaned UUIDs.
-
-10. **Plus handicaps (negative values) not fully tested in stroke allocation** - Edge cases with players having handicap index < 0 may cause incorrect stroke distribution on hardest holes.
-
-## Top 10 "Delight" Wins
-
-Quick wins that make users say "wow":
-
-1. **One-tap "Auto-Fill Lineup" with smart handicap balancing** - Algorithm analyzes all players and suggests optimal pairings in under a second, showing fairness score.
-
-2. **Drag-and-drop pairing builder** - Fantasy football-style draft board where captains drag player chips into match slots with visual feedback.
-
-3. **Live "Fairness Score" when building lineups with explanation** - Real-time 0-100 score with breakdown: "80/100 - Well balanced. 2 repeated pairings, handicaps evenly distributed."
-
-4. **Captain Mode lock badge with clear visual state** - Orange glow and lock icon that pulses when session is locked; requires confirmation to unlock.
-
-5. **Auto-generated lineup announcement posts to Banter feed** - "Publish Lineup" creates formatted Banter post with all pairings, shareable to group chat.
-
-6. **Big countdown timer to next event on Home** - 72pt countdown showing "2:15:00" until tee time with visual urgency as time decreases.
-
-7. **"Magic Number" and path-to-victory display** - Hero card showing "Team USA needs 3.5 points to clinch" with visual progress indicator.
-
-8. **Side games tracking (Skins, Nassau, KP, Long Drive)** - Optional module for tracking additional competitions beyond match play (FUTURE: deferred to v1.2).
-
-9. **One-tap shareable standings cards** - Export button generates branded image with team scores, top performers, and trip branding for social media.
-
-10. **Local notifications for tee times** - iOS notifications 45 minutes and 10 minutes before scheduled tee times with match details.
-
-## Prioritized Implementation Plan
-
-### P0 (Must-Have for v1.1) - Est: 8-12 hours
-
-**P0.1: Captain Mode (locks + safe editing + audit trail) - 3h**
-- Add `AuditLog` model for tracking critical actions
-- Create `CaptainModeService` for validation and logging
-- Build `CaptainModeToggle` UI component with confirmation dialogs
-- Update `SessionDetailView` with lock UI and duplicate warnings
-- Add audit log viewer at bottom of session detail
-
-**P0.2: Lineup Builder (drag-drop + auto-fill + fairness score) - 4h**
-- Create `LineupBuilder` service with auto-fill algorithm
-- Build fairness scoring (0-100) based on handicap balance and pairing history
-- Design `LineupBuilderView` with two-column team layout
-- Implement simplified pairing interface (note: true drag-and-drop deferred to future iteration)
-- Add "Auto-Fill" button with instant suggestions
-- Show fairness score with color-coded indicator
-
-**P0.3: Trip Command Center upgrade (Home tab) - 3h**
-- Add large countdown timer component for next match
-- Create "Magic Number" card showing points needed to clinch
-- Enhance captain quick actions with lineup builder navigation
-- Increase visual hierarchy of "Next Up" card
-- Add session status indicators (locked badges)
-
-### P1 (High-Impact Delighters for v1.1) - Est: 6-10 hours
-
-**SELECTED: P1.B: Share/Export (standings cards, PDF recap) - 3h**
-- Create `ShareCardGenerator` using SwiftUI `ImageRenderer`
-- Build `StandingsShareCard` view (rendered to image)
-- Build `SessionResultCard` view for session summaries
-- Add `ShareLink` buttons to Standings tab and SessionDetailView
-- Generate high-res images (3x scale) for sharing
-
-**SELECTED: P1.D: Local Notifications for tee times - 2h**
-- Create `NotificationService` with UNUserNotificationCenter integration
-- Request notification permissions on app launch (with user consent)
-- Schedule notifications 45 min and 10 min before each session's scheduled date
-- Add notification settings toggle in More/Settings tab
-- Add "Schedule Notifications" action when sessions are created
-
-**DEFERRED:**
-- P1.A: Side Games module (Skins/Nassau/KP/Long Drive) - 4h → v1.2
-- P1.C: Draft Board (snake draft with auto-updates) - 5h → v1.2
-
-### P2 (Future Enhancements) - Backlog
-
-**Infrastructure:**
-- iCloud sync (CloudKit integration)
-- Live Activities (iOS 16.1+ for lock screen)
-- Apple Watch companion app
-- Widgets for standings
-
-**Integrations:**
-- GHIN API for live handicap imports
-- Weather API integration (stub exists in HomeTabView)
-- Course database API
-
-**Advanced Features:**
-- Full drag-and-drop lineup builder (beyond simplified v1.1)
-- Video highlights attachment to matches
-- Multi-trip management and archives
-- Tournament templates library
-
-## Success Metrics
-
-**Must Pass:**
-1. ✅ Session lock prevents pairing edits when matches in progress
-2. ✅ Auto-fill generates balanced lineup in < 1 second
-3. ✅ Fairness score accurately reflects handicap distribution
-4. ✅ Countdown timer updates in real-time
-5. ✅ Share cards export at 3x resolution for social media
-6. ✅ Notifications fire at correct times (45min and 10min before)
-7. ✅ Audit log records all lock/unlock/pairing actions
-8. ✅ All existing tests pass without regression
-9. ✅ CI workflow builds and tests successfully
-10. ✅ Documentation complete (README + ReleaseNotes)
-
-**Quality Targets:**
-- Zero crashes in manual testing
-- < 100ms UI latency for all interactions
-- VoiceOver labels for all new controls
-- Dark mode optimized (primary design mode)
-- 44pt minimum tap targets
-
-## Implementation Notes
-
-**Architecture Decisions:**
-- Audit logs are append-only, stored in SwiftData with relationship to Trip
-- Lineup builder algorithm is pure Swift (no ML), O(n log n) complexity
-- Share cards use `ImageRenderer` (iOS 16+) for high-quality rendering
-- Notifications use local scheduling (no server/push required)
-- Captain mode leverages existing `isLocked` property on RyderCupSession
-
-**Migration Strategy:**
-- New `AuditLog` model added to ModelContainer schema (additive)
-- New `captainModeEnabled` property on Trip with default `true`
-- Existing data fully compatible (no breaking changes)
-- Users see new features immediately on app update
-
-**Testing Strategy:**
-- Unit tests for `CaptainModeService` validation logic
-- Unit tests for `LineupBuilder` algorithm and fairness scoring
-- Manual QA for UI flows (lineup builder, notifications)
-- Regression testing for existing scoring and standings
-
-**Performance Considerations:**
-- Lineup auto-fill: O(n log n) for typical 8-12 player rosters → negligible
-- Fairness calculation: O(n²) worst case for pairing history → acceptable
-- Share card generation: Off main thread with `@MainActor` → smooth
-- Audit log queries: Limited to per-trip, indexed on timestamp
-
-**Accessibility:**
-- All buttons meet 44pt tap target minimum
-- VoiceOver labels for lock badges and fairness indicators
-- High contrast mode tested for lock/unlock states
-- Dynamic Type support for all new text
-
-## Out of Scope (Future PRs)
-
-**Explicitly NOT in v1.1:**
-- Side games tracking (Skins/Nassau) → v1.2
-- Draft board UI → v1.2
-- PDF export (requires complex layout) → future
-- Weather API integration (stub remains)
-- iCloud sync
-- Live Activities
-- Apple Watch companion
-- Multi-trip management
-
-**Rationale:**
-v1.1 focuses on core captain workflow improvements that deliver immediate value without complex dependencies. Side games and draft board require significant UX design and testing. PDF generation needs careful layout work. These features warrant dedicated PRs.
+**Date:** January 12, 2026  
+**Version:** 1.1 Planning Document  
+**Author:** Engineering Team
 
 ---
 
-**Document Version:** 1.0  
-**Date:** 2026-01-12  
-**Author:** GitHub Copilot Agent
+## Executive Summary
+
+After comprehensive repo recon, the Golf Ryder Cup App has a solid foundation with SwiftUI + SwiftData (MVVM), good model design, and premium UX patterns. However, several gaps exist around **captain workflow safety**, **lineup building friction**, and **real-time tournament awareness**. This document outlines the top friction points, reliability risks, and delight opportunities with a prioritized implementation plan.
+
+---
+
+## Top 10 Friction Points
+
+| # | Issue | Severity | Area |
+|---|-------|----------|------|
+| **F1** | No session lock to prevent mid-round pairing edits | 🔴 High | Captain Mode |
+| **F2** | No drag-and-drop lineup builder - must manually edit each match | 🔴 High | Lineup |
+| **F3** | Home tab lacks "Magic Number" and clinch scenarios | 🟡 Medium | Command Center |
+| **F4** | No handicap preview in pairing flow | 🟡 Medium | Lineup |
+| **F5** | Can't "auto-suggest" balanced pairings with one tap | 🟡 Medium | Lineup |
+| **F6** | No fairness explainability beyond score (why is it unfair?) | 🟡 Medium | Lineup |
+| **F7** | Banter feed requires manual posts for lineup announcements | 🟢 Low | Social |
+| **F8** | No local tee time notifications | 🟢 Low | Awareness |
+| **F9** | No side games (skins, Nassau, KP) support | 🟢 Low | Engagement |
+| **F10** | No share/export for standings or trip recap | 🟢 Low | Sharing |
+
+---
+
+## Top 10 Reliability Risks
+
+| # | Risk | Impact | Mitigation |
+|---|------|--------|------------|
+| **R1** | Duplicate player in same session not blocked | 🔴 High | Validation layer |
+| **R2** | Session can be edited while match scoring is active | 🔴 High | Lock mechanism |
+| **R3** | No audit trail for pairing changes or score edits | 🔴 High | Action log |
+| **R4** | Missing hole handicaps silently cause incorrect strokes | 🔴 High | Pre-start validation |
+| **R5** | Undo history limited to 5 steps, no persistence | 🟡 Medium | Expand + persist |
+| **R6** | Player IDs stored as comma-separated strings (brittle parsing) | 🟡 Medium | Documented, acceptable |
+| **R7** | No confirmation on finalizing match | 🟡 Medium | Add confirm dialog |
+| **R8** | Team membership not validated against match pairings | 🟡 Medium | Cross-validation |
+| **R9** | No data export/backup mechanism | 🟢 Low | Future iCloud sync |
+| **R10** | Weather stub is hardcoded (no real data seam) | 🟢 Low | Clean seam exists |
+
+---
+
+## Top 10 Delight Wins
+
+| # | Opportunity | Impact | Effort |
+|---|-------------|--------|--------|
+| **D1** | "Score Now" button on Home → instant deep link | 🔴 High | Low |
+| **D2** | Big countdown timer to next tee time | 🔴 High | Low |
+| **D3** | One-tap "Auto-Fill" lineup with fairness preview | 🔴 High | Medium |
+| **D4** | Animated "Magic Number to Clinch" widget | 🟡 Medium | Low |
+| **D5** | Captain quick actions: Lock/Unlock, Publish Lineup | 🟡 Medium | Medium |
+| **D6** | Auto-generated Banter posts for lineup publish | 🟡 Medium | Low |
+| **D7** | Share card for session results (image export) | 🟡 Medium | Medium |
+| **D8** | "Path to Victory" scenarios on Standings | 🟡 Medium | Medium |
+| **D9** | Skins/Nassau side games with ledger | 🟢 Low | High |
+| **D10** | Local notifications for tee times | 🟢 Low | Medium |
+
+---
+
+## Prioritized Implementation Plan
+
+### P0 - Captain's Toolkit Core (Must Ship)
+
+#### P0.1 Captain Mode (Locks + Safe Editing)
+**Effort:** 2-3 days | **Priority:** Critical
+
+- [ ] Add `isCaptainModeEnabled` and `isSessionLocked` properties to Trip/Session
+- [ ] Implement lock state machine: Auto-lock when any match starts scoring
+- [ ] "Unlock requires confirm" with long-press + confirmation dialog
+- [ ] Audit trail model (`AuditLogEntry`) for: pairing changes, score edits, lock/unlock
+- [ ] Visual lock badges and "Editing disabled during live scoring" messaging
+- [ ] Data integrity checks:
+  - Block duplicate player in session
+  - Validate team membership consistency
+  - Require hole handicaps before session start
+
+**Files to modify:**
+- `Models/Trip.swift` - Add captain mode properties
+- `Models/RyderCupSession.swift` - Lock state
+- New `Models/AuditLogEntry.swift`
+- New `Services/CaptainModeService.swift`
+- `Views/Matchups/MatchupsTabView.swift` - Lock UI
+- New `Views/Captain/CaptainModeView.swift`
+
+#### P0.2 Lineup Builder (Fast, Draggable, Fairness-Aware)
+**Effort:** 3-4 days | **Priority:** Critical
+
+- [ ] New `LineupBuilderView` with two-column team layout
+- [ ] Drag-and-drop player chips into match slots
+- [ ] Handicap shown on each player chip
+- [ ] "Auto-Fill" algorithm:
+  - Optimize handicap balance
+  - Minimize repeat pairings (use pairing history)
+  - Minimize same opponents repeatedly
+  - "Lock" players/pairs and re-run
+- [ ] Fairness Score (0-100) with explainability:
+  - Top 3 drivers: handicap gap, repeat pairings, lopsided matchups
+  - "This session favors Team USA by ~0.8 strokes"
+- [ ] "Preview strokes" per match
+- [ ] "Publish Lineup" action → auto Banter post, pin to top
+
+**Files to modify:**
+- New `Views/Lineup/LineupBuilderView.swift`
+- New `Views/Lineup/PlayerChipView.swift`
+- New `Views/Lineup/FairnessScoreView.swift`
+- New `Services/LineupAutoFillService.swift`
+- `Services/TournamentEngine.swift` - Add pairing history tracking
+- `Models/BanterPost.swift` - Add lineup publish helper
+
+#### P0.3 Trip Command Center Upgrade (Home Tab)
+**Effort:** 2 days | **Priority:** Critical
+
+- [ ] Prominent "Next Up" card with big countdown timer
+- [ ] Today's session status: not started / live / completed
+- [ ] "Score Now" CTA deep links to active match
+- [ ] Captain quick actions: Build Lineup, Publish, Lock/Unlock
+- [ ] "Magic Number" to clinch + simple "Path to Victory" highlight
+- [ ] Weather slot seam (stub with design placeholder)
+- [ ] Performance: ViewModel-based, minimize view recomputation
+
+**Files to modify:**
+- `Views/Home/HomeTabView.swift` - Major upgrade
+- New `ViewModels/HomeViewModel.swift`
+- `Extensions/DesignSystem.swift` - Countdown timer component
+
+---
+
+### P1 - High-Impact Upgrades (Pick 2-3)
+
+#### P1.A Side Games (Skins/Nassau/KP/Long Drive)
+**Effort:** 4-5 days | **Priority:** High value, high effort
+
+- [ ] New `SideGame` model with types: skins, nassau, kp, longDrive
+- [ ] Skins per round (net or gross, configurable)
+- [ ] Nassau (front/back/total) with presses
+- [ ] KP/Long Drive entries (optional photo)
+- [ ] Ledger: who owes who, settle-up summary
+- [ ] Offline-first, big buttons, quick entry
+
+**Files to create:**
+- `Models/SideGame.swift`
+- `Models/SideGameEntry.swift`
+- `Views/SideGames/SideGamesTabView.swift`
+- `Views/SideGames/SkinsView.swift`
+- `Views/SideGames/NassauView.swift`
+- `Views/SideGames/LedgerView.swift`
+- `Services/SideGameEngine.swift`
+
+#### P1.B Share/Export
+**Effort:** 2-3 days | **Priority:** Medium effort, high delight
+
+- [ ] One-tap share cards:
+  - Overall standings
+  - Session results
+  - Player leaderboard
+- [ ] Consistent branding from DesignSystem
+- [ ] Share image via ShareLink
+- [ ] PDF "Trip Recap" (optional):
+  - Teams/rosters
+  - Session results
+  - Final standings
+  - Awards (MVP, best record, worst record)
+- [ ] "Share after match final" prompt (dismissible)
+
+**Files to modify:**
+- `Views/Standings/StandingsTabView.swift` - Add share functionality
+- New `Views/Share/ShareCardView.swift`
+- New `Views/Share/TripRecapView.swift`
+- New `Services/ShareCardRenderer.swift`
+
+#### P1.C Draft Board
+**Effort:** 3-4 days | **Priority:** Medium
+
+- [ ] Draft Board screen with snake draft support
+- [ ] Custom order option, timed picks optional
+- [ ] Tracks picks and auto-updates teams/rosters
+- [ ] Posts draft updates to Banter
+
+**Files to create:**
+- `Views/Draft/DraftBoardView.swift`
+- `Models/DraftPick.swift`
+- `Services/DraftService.swift`
+
+#### P1.D Local Notifications for Tee Times
+**Effort:** 1-2 days | **Priority:** Low effort, medium value
+
+- [ ] Schedule local notifications: "Tee time in 45 minutes", "10 minutes"
+- [ ] Opt-in per device
+- [ ] Based on ScheduleItem times
+
+**Files to create:**
+- `Services/NotificationService.swift`
+- `Views/Settings/NotificationSettingsView.swift`
+
+---
+
+### P2 - Future Enhancements
+
+| Feature | Notes |
+|---------|-------|
+| iCloud Sync | SwiftData seams in place, needs CloudKit config |
+| GHIN API Integration | Stub in Player model, clean seam |
+| Apple Watch Companion | Quick scoring, standings glance |
+| Live Activities | Lock screen standings |
+| Widgets | Home screen standings widget |
+
+---
+
+## Architecture Recommendations
+
+### Current Strengths
+- Clean MVVM with SwiftData works well
+- Design system with tokens is excellent
+- ScoringEngine state machine is solid
+- Test coverage for core engines
+
+### Improvements Needed
+1. **Introduce ViewModels** for complex screens (Home, Lineup Builder)
+2. **Protocol-based services** for testability (e.g., `LineupServiceProtocol`)
+3. **Data validation layer** that runs pre-session-start
+4. **Audit log** for critical actions
+
+### Performance Considerations
+- Home tab should minimize `@Query` overhead - use ViewModel
+- Lineup drag-drop needs smooth 60fps - use lightweight state
+- SwiftData fetches should avoid N+1 (use `#Predicate` filters)
+
+---
+
+## Testing Strategy
+
+### Unit Tests to Add
+- [ ] LineupAutoFillService determinism
+- [ ] Handicap allowances with edge cases (plus handicaps, huge deltas)
+- [ ] Session lock state machine
+- [ ] Duplicate player detection
+- [ ] Fairness score calculation
+
+### Integration Tests
+- [ ] Full lineup → publish → lock → score → finalize flow
+- [ ] Undo/redo across session boundaries
+
+---
+
+## Implementation Order
+
+**Week 1:**
+1. P0.1 Captain Mode (models + lock logic + UI)
+2. P0.3 Command Center basic upgrades
+
+**Week 2:**
+3. P0.2 Lineup Builder (views + auto-fill)
+4. P0.1 Audit trail integration
+
+**Week 3:**
+5. P1.B Share/Export (quick win)
+6. P1.D Local Notifications (quick win)
+
+**Week 4:**
+7. P1.A Side Games (if time permits)
+8. Polish, testing, documentation
+
+---
+
+## Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Time to build lineup | < 60 seconds |
+| Accidental pairing edits during live scoring | 0 |
+| Tap count to score a hole | 1-2 taps |
+| App crashes during tournament | 0 |
+| Captain satisfaction ("feels like command center") | Qualitative feedback |
+
+---
+
+## Conclusion
+
+The app has strong bones. The Captain's Toolkit upgrade focuses on **bulletproof safety** (locks, validation, audit), **speed** (lineup builder, auto-fill), and **awareness** (command center, magic numbers). P0 features address the most critical captain pain points. P1 features add polish and delight. This plan can ship in 3-4 weeks with focused execution.
