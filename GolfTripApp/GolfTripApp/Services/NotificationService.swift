@@ -37,7 +37,7 @@ struct NotificationService {
         }
         
         // Use optional binding to safely get date
-        guard let startTime = session.scheduledDate as Date? else {
+        guard let startTime = session.scheduledDate else {
             print("Session has no scheduled date")
             return
         }
@@ -149,7 +149,8 @@ struct NotificationService {
     
     // MARK: - Badge Management
     
-    /// Clear app badge count
+    /// Clear app badge count (iOS 17+)
+    @available(iOS 17.0, *)
     static func clearBadge() {
         Task {
             do {
