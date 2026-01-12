@@ -2,28 +2,40 @@
  * Computed/ViewModel types for the UI layer
  */
 
-import { UUID, Player, HoleWinner } from './models';
+import { UUID, Player, HoleWinner, Match, HoleResult, MatchStatus } from './models';
 
 // ============================================
 // MATCH STATE (from ScoringEngine)
 // ============================================
 
 /**
- * Match state summary - computed from hole results
+ * Match state - computed from hole results by the scoring engine
  */
 export interface MatchState {
-    /** Match score: positive = Team A leading, negative = Team B leading */
-    matchScore: number;
+    /** The match this state is for */
+    match: Match;
+    /** Sorted hole results for this match */
+    holeResults: HoleResult[];
+    /** Current score: positive = Team A leading, negative = Team B leading */
+    currentScore: number;
+    /** Holes won by Team A */
+    teamAHolesWon: number;
+    /** Holes won by Team B */
+    teamBHolesWon: number;
+    /** Number of holes completed */
     holesPlayed: number;
+    /** Number of holes remaining */
     holesRemaining: number;
     /** Dormie: up by exactly the number of holes remaining */
     isDormie: boolean;
     /** Closed out: up by more holes than remain */
     isClosedOut: boolean;
-    /** Human-readable status (e.g., "Team A 2 UP through 6") */
-    statusText: string;
-    /** Whether more holes can be played */
-    canContinue: boolean;
+    /** Match status */
+    status: MatchStatus;
+    /** Human-readable score display (e.g., "2 UP", "3&2", "AS") */
+    displayScore: string;
+    /** Team currently winning, if any (null if halved or not started) */
+    winningTeam: 'teamA' | 'teamB' | 'halved' | null;
 }
 
 // ============================================
@@ -34,15 +46,33 @@ export interface MatchState {
  * Team standings in the tournament
  */
 export interface TeamStandings {
-    teamId: UUID;
-    teamName: string;
+    teamId?: UUID;
+    teamName?: string;
     colorHex?: string;
-    totalPoints: number;
-    matchesWon: number;
-    matchesLost: number;
-    matchesHalved: number;
+    totalPoints?: number;
+    matchesWon?: number;
+    matchesLost?: number;
+    matchesHalved?: number;
     matchesPlayed: number;
     matchesRemaining: number;
+    /** Points for Team A (USA) */
+    teamAPoints: number;
+    /** Points for Team B (Europe) */
+    teamBPoints: number;
+    /** Projected points for Team A */
+    teamAProjected?: number;
+    /** Projected points for Team B */
+    teamBProjected?: number;
+    /** Total matches completed */
+    matchesCompleted: number;
+    /** Total matches in tournament */
+    totalMatches: number;
+    /** Which team is leading */
+    leader: 'teamA' | 'teamB' | null;
+    /** Point margin between teams */
+    margin: number;
+    /** Remaining matches count */
+    remainingMatches: number;
 }
 
 /**
@@ -58,7 +88,7 @@ export interface PlayerLeaderboard {
     losses: number;
     halves: number;
     /** Formatted record, e.g., "3-1-1" */
-    record: string;
+    record?: string;
     matchesPlayed: number;
 }
 
@@ -70,8 +100,22 @@ export interface MagicNumber {
     teamA: number;
     /** Points Team B needs to clinch */
     teamB: number;
+    /** Points Team A needs to clinch */
+    teamANeeded: number;
+    /** Points Team B needs to clinch */
+    teamBNeeded: number;
+    /** Has Team A clinched? */
+    teamAClinched: boolean;
+    /** Has Team B clinched? */
+    teamBClinched: boolean;
+    /** Can Team A clinch? */
+    teamACanClinch?: boolean;
+    /** Can Team B clinch? */
+    teamBCanClinch?: boolean;
     /** Total points needed to clinch */
     pointsToWin: number;
+    /** Remaining points available */
+    remainingPoints?: number;
     /** Has either team clinched? */
     hasClinched: boolean;
     /** Which team has clinched (if any) */
@@ -110,13 +154,33 @@ export interface FairnessDriver {
  */
 export interface FairnessScore {
     /** Score from 0-100, 100 is perfectly fair */
-    score: number;
+    score?: number;
+    /** Overall score (alias for score) */
+    overallScore?: number;
+    /** Match distribution score */
+    matchScore?: number;
+    /** Session distribution score */
+    sessionScore?: number;
+    /** Match disparity */
+    matchDisparity?: number;
+    /** Session disparity */
+    sessionDisparity?: number;
     /** Strokes advantage: positive = Team A advantage */
-    strokesAdvantage: number;
+    strokesAdvantage?: number;
     /** Which team has the advantage (if any) */
     advantageTeam?: string;
     /** Factors explaining the fairness score */
-    drivers: FairnessDriver[];
+    drivers?: FairnessDriver[];
+    /** Suggestions for improvement */
+    suggestions?: string[];
+    /** Player fairness breakdown */
+    playerFairness?: Array<{
+        playerId: string;
+        playerName: string;
+        matchesPlayed: number;
+        sessionsPlayed: number;
+        expectedMatches: number;
+    }>;
 }
 
 /**

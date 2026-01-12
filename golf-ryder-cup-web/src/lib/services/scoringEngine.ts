@@ -19,7 +19,7 @@ import type {
     MatchResultType,
     TeamMember,
 } from '../types/models';
-import type { ScoringEvent } from '../types/events';
+import { ScoringEventType, type ScoringEvent, type HoleScoredPayload, type HoleEditedPayload, type HoleUndonePayload } from '../types/events';
 import type { MatchState } from '../types/computed';
 import { db } from '../db';
 
@@ -202,7 +202,7 @@ export async function recordHoleResult(
         .where({ matchId, holeNumber })
         .first();
 
-    const now = new Date();
+    const now = new Date().toISOString();
     const result: HoleResult = {
         id: existing?.id || crypto.randomUUID(),
         matchId,
@@ -218,21 +218,32 @@ export async function recordHoleResult(
     await db.holeResults.put(result);
 
     // Record scoring event for undo
-    const event: ScoringEvent = {
-        id: crypto.randomUUID(),
-        type: 'holeScored',
-        matchId,
-        timestamp: now,
-        payload: {
+    const payload = existing
+        ? {
+            type: 'hole_edited' as const,
+            holeNumber,
+            previousWinner: existing.winner,
+            newWinner: winner,
+            previousTeamAStrokes: existing.teamAScore,
+            previousTeamBStrokes: existing.teamBScore,
+            newTeamAStrokes: teamAScore,
+            newTeamBStrokes: teamBScore,
+        }
+        : {
+            type: 'hole_scored' as const,
             holeNumber,
             winner,
-            teamAScore,
-            teamBScore,
-            previousWinner: existing?.winner,
-            previousTeamAScore: existing?.teamAScore,
-            previousTeamBScore: existing?.teamBScore,
-        },
-        scoredBy,
+            teamAStrokes: teamAScore,
+            teamBStrokes: teamBScore,
+        };
+
+    const event: ScoringEvent = {
+        id: crypto.randomUUID(),
+        eventType: existing ? ScoringEventType.HoleEdited : ScoringEventType.HoleScored,
+        matchId,
+        timestamp: now,
+        actorName: scoredBy || 'unknown',
+        payload,
         synced: false,
     };
 
@@ -261,40 +272,49 @@ export async function undoLastScore(matchId: string): Promise<boolean> {
 
     const lastEvent = events[0];
 
-    if (lastEvent.type === 'holeScored') {
-        const payload = lastEvent.payload as {
-            holeNumber: number;
-            previousWinner?: HoleWinner;
-            previousTeamAScore?: number;
-            previousTeamBScore?: number;
-        };
+    if (lastEvent.eventType === ScoringEventType.HoleScored || lastEvent.eventType === ScoringEventType.HoleEdited) {
+        const payload = lastEvent.payload as HoleScoredPayload | HoleEditedPayload;
+        const holeNumber = payload.holeNumber;
 
-        if (payload.previousWinner !== undefined) {
+        if (payload.type === 'hole_edited') {
+            const editPayload = payload as HoleEditedPayload;
             // Revert to previous state
             await db.holeResults
-                .where({ matchId, holeNumber: payload.holeNumber })
+                .where({ matchId, holeNumber })
                 .modify({
-                    winner: payload.previousWinner,
-                    teamAScore: payload.previousTeamAScore,
-                    teamBScore: payload.previousTeamBScore,
+                    winner: editPayload.previousWinner,
+                    teamAScore: editPayload.previousTeamAStrokes,
+                    teamBScore: editPayload.previousTeamBStrokes,
                 });
         } else {
             // Delete the result (it was newly created)
             await db.holeResults
-                .where({ matchId, holeNumber: payload.holeNumber })
+                .where({ matchId, holeNumber })
                 .delete();
         }
 
         // Record the undo event
+        const undoPayload: HoleUndonePayload = {
+            type: 'hole_undone',
+            holeNumber,
+            previousWinner: payload.type === 'hole_edited'
+                ? (payload as HoleEditedPayload).previousWinner
+                : (payload as HoleScoredPayload).winner,
+            previousTeamAStrokes: payload.type === 'hole_edited'
+                ? (payload as HoleEditedPayload).previousTeamAStrokes
+                : (payload as HoleScoredPayload).teamAStrokes,
+            previousTeamBStrokes: payload.type === 'hole_edited'
+                ? (payload as HoleEditedPayload).previousTeamBStrokes
+                : (payload as HoleScoredPayload).teamBStrokes,
+        };
+
         const undoEvent: ScoringEvent = {
             id: crypto.randomUUID(),
-            type: 'holeUndone',
+            eventType: ScoringEventType.HoleUndone,
             matchId,
-            timestamp: new Date(),
-            payload: {
-                undoneEventId: lastEvent.id,
-                holeNumber: payload.holeNumber,
-            },
+            timestamp: new Date().toISOString(),
+            actorName: 'user',
+            payload: undoPayload,
             synced: false,
         };
 
@@ -503,16 +523,22 @@ export async function createMatch(
     teamAPlayers: string[],
     teamBPlayers: string[]
 ): Promise<Match> {
+    const now = new Date().toISOString();
     const match: Match = {
         id: crypto.randomUUID(),
         sessionId,
-        matchNumber,
+        matchOrder: matchNumber,
         teamAPlayerIds: teamAPlayers,
         teamBPlayerIds: teamBPlayers,
         status: 'scheduled',
-        startingHole: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        currentHole: 1,
+        teamAHandicapAllowance: 0,
+        teamBHandicapAllowance: 0,
+        result: 'notFinished',
+        margin: 0,
+        holesRemaining: 18,
+        createdAt: now,
+        updatedAt: now,
     };
 
     await db.matches.add(match);
@@ -541,12 +567,10 @@ export async function finalizeMatch(matchId: string): Promise<void> {
 
         await db.matches.update(matchId, {
             status: 'completed',
-            winningTeam: matchState.winningTeam || undefined,
-            teamAPoints: points.teamAPoints,
-            teamBPoints: points.teamBPoints,
             result: resultType,
-            finalScore: matchState.displayScore,
-            updatedAt: new Date(),
+            margin: Math.abs(matchState.currentScore),
+            holesRemaining: matchState.holesRemaining,
+            updatedAt: new Date().toISOString(),
         });
     }
 }

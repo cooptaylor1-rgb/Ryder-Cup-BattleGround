@@ -13,103 +13,78 @@ export type UUID = string;
 export type ISODateString = string;
 
 // ============================================
-// ENUMS
+// TYPE DEFINITIONS (string literal unions)
 // ============================================
 
 /**
  * Match status for match play scoring
  */
-export enum MatchStatus {
-    Scheduled = 'scheduled',
-    InProgress = 'in_progress',
-    Final = 'final',
-    Cancelled = 'cancelled',
-}
+export type MatchStatus = 'scheduled' | 'inProgress' | 'completed' | 'cancelled';
 
 /**
  * Match result type - who won?
  */
-export enum MatchResultType {
-    TeamAWin = 'team_a_win',
-    TeamBWin = 'team_b_win',
-    Halved = 'halved',
-    NotFinished = 'not_finished',
-}
+export type MatchResultType =
+    | 'teamAWin'
+    | 'teamBWin'
+    | 'halved'
+    | 'notFinished'
+    | 'incomplete'
+    | 'oneUp'
+    | 'twoAndOne'
+    | 'threeAndTwo'
+    | 'fourAndThree'
+    | 'fiveAndFour'
+    | 'sixAndFive';
 
 /**
  * Hole winner for match play
  */
-export enum HoleWinner {
-    TeamA = 'team_a',
-    TeamB = 'team_b',
-    Halved = 'halved',
-}
+export type HoleWinner = 'teamA' | 'teamB' | 'halved' | 'none';
 
 /**
  * Session type for Ryder Cup format
  */
-export enum SessionType {
-    Foursomes = 'foursomes',   // Alternate shot
-    Fourball = 'fourball',     // Best ball
-    Singles = 'singles',       // 1v1 match play
-}
+export type SessionType = 'foursomes' | 'fourball' | 'singles';
 
 /**
  * Team mode (Ryder Cup = 2 teams)
  */
-export enum TeamMode {
-    Freeform = 'freeform',
-    RyderCup = 'ryder_cup',
-}
+export type TeamMode = 'freeform' | 'ryderCup';
 
 /**
  * Game format types for stroke play
  */
-export enum FormatType {
-    StrokePlayGross = 'stroke_play_gross',
-    StrokePlayNet = 'stroke_play_net',
-    Stableford = 'stableford',
-    BestBall = 'best_ball',
-    Scramble = 'scramble',
-}
+export type FormatType = 'strokePlayGross' | 'strokePlayNet' | 'stableford' | 'bestBall' | 'scramble';
 
 /**
  * Audit action types for captain mode
  */
-export enum AuditActionType {
-    SessionCreated = 'session_created',
-    SessionLocked = 'session_locked',
-    SessionUnlocked = 'session_unlocked',
-    PairingCreated = 'pairing_created',
-    PairingEdited = 'pairing_edited',
-    PairingDeleted = 'pairing_deleted',
-    LineupPublished = 'lineup_published',
-    MatchStarted = 'match_started',
-    MatchFinalized = 'match_finalized',
-    ScoreEntered = 'score_entered',
-    ScoreEdited = 'score_edited',
-    ScoreUndone = 'score_undone',
-    CaptainModeEnabled = 'captain_mode_enabled',
-    CaptainModeDisabled = 'captain_mode_disabled',
-}
+export type AuditActionType =
+    | 'sessionCreated'
+    | 'sessionLocked'
+    | 'sessionUnlocked'
+    | 'pairingCreated'
+    | 'pairingEdited'
+    | 'pairingDeleted'
+    | 'lineupPublished'
+    | 'matchStarted'
+    | 'matchFinalized'
+    | 'scoreEntered'
+    | 'scoreEdited'
+    | 'scoreUndone'
+    | 'captainModeEnabled'
+    | 'captainModeDisabled';
 
 /**
  * Schedule item types
  */
-export enum ScheduleItemType {
-    TeeTime = 'tee_time',
-    Event = 'event',
-}
+export type ScheduleItemType = 'teeTime' | 'meal' | 'activity' | 'travel' | 'event' | 'other';
 
 /**
  * Banter post types
  */
-export enum BanterPostType {
-    Message = 'message',
-    Result = 'result',
-    Lineup = 'lineup',
-    System = 'system',
-}
+export type BanterPostType = 'message' | 'result' | 'lineup' | 'system';
 
 // ============================================
 // TRIP
@@ -141,13 +116,15 @@ export interface Trip {
  */
 export interface Player {
     id: UUID;
-    name: string;
-    handicapIndex: number;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    handicapIndex?: number;
     ghin?: string;
     teePreference?: string;
     avatarUrl?: string;
-    createdAt: ISODateString;
-    updatedAt: ISODateString;
+    createdAt?: ISODateString;
+    updatedAt?: ISODateString;
 }
 
 // ============================================
@@ -161,12 +138,13 @@ export interface Team {
     id: UUID;
     tripId: UUID;
     name: string;
+    color: 'usa' | 'europe'; // Team color identifier
     colorHex?: string;
     icon?: string;
     notes?: string;
     mode: TeamMode;
     createdAt: ISODateString;
-    updatedAt: ISODateString;
+    updatedAt?: ISODateString;
 }
 
 /**
@@ -192,14 +170,16 @@ export interface RyderCupSession {
     id: UUID;
     tripId: UUID;
     name: string;
+    sessionNumber: number;
     sessionType: SessionType;
-    scheduledDate: ISODateString;
-    timeSlot: 'AM' | 'PM';
-    pointsPerMatch: number;
+    scheduledDate?: ISODateString;
+    timeSlot?: 'AM' | 'PM';
+    pointsPerMatch?: number;
     notes?: string;
-    isLocked: boolean;
+    status: 'scheduled' | 'inProgress' | 'completed';
+    isLocked?: boolean;
     createdAt: ISODateString;
-    updatedAt: ISODateString;
+    updatedAt?: ISODateString;
 }
 
 // ============================================
@@ -253,6 +233,12 @@ export interface HoleResult {
     winner: HoleWinner;
     teamAStrokes?: number;
     teamBStrokes?: number;
+    /** Alias for teamAStrokes for compatibility */
+    teamAScore?: number;
+    /** Alias for teamBStrokes for compatibility */
+    teamBScore?: number;
+    /** Player who scored this hole */
+    scoredBy?: UUID;
     notes?: string;
     timestamp: ISODateString;
 }
@@ -382,56 +368,56 @@ export interface SyncMetadata {
 // ============================================
 
 export const MatchStatusDisplay: Record<MatchStatus, string> = {
-    [MatchStatus.Scheduled]: 'Scheduled',
-    [MatchStatus.InProgress]: 'In Progress',
-    [MatchStatus.Final]: 'Final',
-    [MatchStatus.Cancelled]: 'Cancelled',
+    scheduled: 'Scheduled',
+    inProgress: 'In Progress',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
 };
 
 export const MatchStatusIcon: Record<MatchStatus, string> = {
-    [MatchStatus.Scheduled]: 'clock',
-    [MatchStatus.InProgress]: 'play-circle',
-    [MatchStatus.Final]: 'check-circle',
-    [MatchStatus.Cancelled]: 'x-circle',
+    scheduled: 'clock',
+    inProgress: 'play-circle',
+    completed: 'check-circle',
+    cancelled: 'x-circle',
 };
 
 export const SessionTypeDisplay: Record<SessionType, string> = {
-    [SessionType.Foursomes]: 'Foursomes',
-    [SessionType.Fourball]: 'Fourball',
-    [SessionType.Singles]: 'Singles',
+    foursomes: 'Foursomes',
+    fourball: 'Fourball',
+    singles: 'Singles',
 };
 
 export const SessionTypeDescription: Record<SessionType, string> = {
-    [SessionType.Foursomes]: 'Alternate shot - partners take turns hitting the same ball',
-    [SessionType.Fourball]: 'Best ball - each player plays their own ball, best score counts',
-    [SessionType.Singles]: '1v1 match play - head to head competition',
+    foursomes: 'Alternate shot - partners take turns hitting the same ball',
+    fourball: 'Best ball - each player plays their own ball, best score counts',
+    singles: '1v1 match play - head to head competition',
 };
 
 export const SessionTypePlayersPerTeam: Record<SessionType, number> = {
-    [SessionType.Foursomes]: 2,
-    [SessionType.Fourball]: 2,
-    [SessionType.Singles]: 1,
+    foursomes: 2,
+    fourball: 2,
+    singles: 1,
 };
 
-export const HoleWinnerDisplay: Record<HoleWinner, string> = {
-    [HoleWinner.TeamA]: 'Team A',
-    [HoleWinner.TeamB]: 'Team B',
-    [HoleWinner.Halved]: 'Halved',
+export const HoleWinnerDisplay: Record<Exclude<HoleWinner, 'none'>, string> = {
+    teamA: 'Team A',
+    teamB: 'Team B',
+    halved: 'Halved',
 };
 
 export const AuditActionTypeDisplay: Record<AuditActionType, string> = {
-    [AuditActionType.SessionCreated]: 'Session Created',
-    [AuditActionType.SessionLocked]: 'Session Locked',
-    [AuditActionType.SessionUnlocked]: 'Session Unlocked',
-    [AuditActionType.PairingCreated]: 'Pairing Created',
-    [AuditActionType.PairingEdited]: 'Pairing Edited',
-    [AuditActionType.PairingDeleted]: 'Pairing Deleted',
-    [AuditActionType.LineupPublished]: 'Lineup Published',
-    [AuditActionType.MatchStarted]: 'Match Started',
-    [AuditActionType.MatchFinalized]: 'Match Finalized',
-    [AuditActionType.ScoreEntered]: 'Score Entered',
-    [AuditActionType.ScoreEdited]: 'Score Edited',
-    [AuditActionType.ScoreUndone]: 'Score Undone',
-    [AuditActionType.CaptainModeEnabled]: 'Captain Mode Enabled',
-    [AuditActionType.CaptainModeDisabled]: 'Captain Mode Disabled',
+    sessionCreated: 'Session Created',
+    sessionLocked: 'Session Locked',
+    sessionUnlocked: 'Session Unlocked',
+    pairingCreated: 'Pairing Created',
+    pairingEdited: 'Pairing Edited',
+    pairingDeleted: 'Pairing Deleted',
+    lineupPublished: 'Lineup Published',
+    matchStarted: 'Match Started',
+    matchFinalized: 'Match Finalized',
+    scoreEntered: 'Score Entered',
+    scoreEdited: 'Score Edited',
+    scoreUndone: 'Score Undone',
+    captainModeEnabled: 'Captain Mode Enabled',
+    captainModeDisabled: 'Captain Mode Disabled',
 };

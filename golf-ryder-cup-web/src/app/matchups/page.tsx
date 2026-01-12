@@ -153,8 +153,8 @@ export default function MatchupsPage() {
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Session {session.sessionNumber}</h3>
-                        <p className="text-sm text-surface-500 capitalize">{session.type}</p>
+                        <h3 className="font-semibold">{session.name}</h3>
+                        <p className="text-sm text-surface-500 capitalize">{session.sessionType}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

@@ -152,11 +152,12 @@ export const useTripStore = create<TripState>()(
 
             // Trip CRUD
             createTrip: async (tripData) => {
+                const now = new Date().toISOString();
                 const trip: Trip = {
                     ...tripData,
                     id: crypto.randomUUID(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    createdAt: now,
+                    updatedAt: now,
                 };
 
                 await db.trips.add(trip);
@@ -167,7 +168,8 @@ export const useTripStore = create<TripState>()(
                     tripId: trip.id,
                     name: 'Team USA',
                     color: 'usa',
-                    createdAt: new Date(),
+                    mode: 'ryderCup',
+                    createdAt: now,
                 };
 
                 const teamB: Team = {
@@ -175,7 +177,8 @@ export const useTripStore = create<TripState>()(
                     tripId: trip.id,
                     name: 'Team Europe',
                     color: 'europe',
-                    createdAt: new Date(),
+                    mode: 'ryderCup',
+                    createdAt: now,
                 };
 
                 await db.teams.bulkAdd([teamA, teamB]);
@@ -192,15 +195,16 @@ export const useTripStore = create<TripState>()(
             },
 
             updateTrip: async (tripId, updates) => {
+                const now = new Date().toISOString();
                 await db.trips.update(tripId, {
                     ...updates,
-                    updatedAt: new Date(),
+                    updatedAt: now,
                 });
 
                 const { currentTrip } = get();
                 if (currentTrip?.id === tripId) {
                     set({
-                        currentTrip: { ...currentTrip, ...updates, updatedAt: new Date() },
+                        currentTrip: { ...currentTrip, ...updates, updatedAt: now },
                     });
                 }
             },
@@ -272,8 +276,9 @@ export const useTripStore = create<TripState>()(
                     id: crypto.randomUUID(),
                     teamId,
                     playerId,
-                    role: 'player',
-                    joinedAt: new Date(),
+                    sortOrder: 0,
+                    isCaptain: false,
+                    createdAt: new Date().toISOString(),
                 };
 
                 await db.teamMembers.add(teamMember);
@@ -300,11 +305,12 @@ export const useTripStore = create<TripState>()(
 
             // Session management
             addSession: async (sessionData) => {
+                const now = new Date().toISOString();
                 const session: RyderCupSession = {
                     ...sessionData,
                     id: crypto.randomUUID(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    createdAt: now,
+                    updatedAt: now,
                 };
 
                 await db.sessions.add(session);
@@ -319,14 +325,15 @@ export const useTripStore = create<TripState>()(
             },
 
             updateSession: async (sessionId, updates) => {
+                const now = new Date().toISOString();
                 await db.sessions.update(sessionId, {
                     ...updates,
-                    updatedAt: new Date(),
+                    updatedAt: now,
                 });
 
                 set(state => ({
                     sessions: state.sessions.map(s =>
-                        s.id === sessionId ? { ...s, ...updates, updatedAt: new Date() } : s
+                        s.id === sessionId ? { ...s, ...updates, updatedAt: now } : s
                     ),
                 }));
             },

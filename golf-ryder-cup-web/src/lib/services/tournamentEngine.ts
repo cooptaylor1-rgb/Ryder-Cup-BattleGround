@@ -123,6 +123,7 @@ export async function calculateTeamStandings(tripId: string): Promise<TeamStandi
         teamBProjected,
         matchesPlayed,
         matchesCompleted,
+        matchesRemaining: remainingMatches,
         totalMatches,
         remainingMatches,
         leader: teamAPoints > teamBPoints ? 'teamA' : teamAPoints < teamBPoints ? 'teamB' : null,
@@ -270,9 +271,10 @@ export async function calculatePlayerLeaderboard(tripId: string): Promise<Player
         const team = teams.find(t => t.id === teamMember?.teamId);
 
         leaderboard.push({
-            player,
+            playerId: player.id,
+            playerName: `${player.firstName} ${player.lastName}`,
+            teamId: team?.id || '',
             teamName: team?.name || 'Unknown',
-            teamColor: team?.color || 'gray',
             ...record,
             matchesPlayed: record.wins + record.losses + record.halves,
         });
@@ -315,12 +317,17 @@ export function calculateMagicNumber(standings: TeamStandings): MagicNumber {
     const teamBClinched = standings.teamBPoints >= POINTS_TO_WIN;
 
     return {
+        teamA: teamANeeded,
+        teamB: teamBNeeded,
         teamANeeded,
         teamBNeeded,
         teamACanClinch,
         teamBCanClinch,
         teamAClinched,
         teamBClinched,
+        pointsToWin: POINTS_TO_WIN,
+        hasClinched: teamAClinched || teamBClinched,
+        clinchingTeam: teamAClinched ? 'A' : teamBClinched ? 'B' : undefined,
         remainingPoints: standings.remainingMatches,
     };
 }

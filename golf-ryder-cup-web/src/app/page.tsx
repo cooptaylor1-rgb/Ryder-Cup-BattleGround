@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, seedDemoData, clearAllData } from '@/lib/db';
+import { db } from '@/lib/db';
+import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { AppShell } from '@/components/layout';
 import { Trophy, Plus, Trash2, Database } from 'lucide-react';
@@ -39,7 +40,7 @@ export default function HomePage() {
   const handleClearData = async () => {
     if (confirm('Are you sure you want to clear all data?')) {
       try {
-        await clearAllData();
+        await clearDemoData();
         showToast('info', 'All data cleared');
       } catch (error) {
         showToast('error', 'Failed to clear data');

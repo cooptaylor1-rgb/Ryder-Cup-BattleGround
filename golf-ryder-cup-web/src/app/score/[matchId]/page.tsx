@@ -110,7 +110,7 @@ export default function MatchScoringPage() {
   return (
     <AppShell
       showBack
-      headerTitle={`Match ${activeMatch.matchNumber}`}
+      headerTitle={`Match ${activeMatch.matchOrder}`}
       headerRight={
         undoStack.length > 0 && (
           <button

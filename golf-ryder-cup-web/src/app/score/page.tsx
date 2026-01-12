@@ -90,7 +90,7 @@ export default function ScorePage() {
                                     <span>Session {activeSession.sessionNumber}</span>
                                 </div>
                                 <h2 className="text-lg font-semibold capitalize">
-                                    {activeSession.type}
+                                    {activeSession.sessionType}
                                 </h2>
                             </div>
                             <span className={cn(

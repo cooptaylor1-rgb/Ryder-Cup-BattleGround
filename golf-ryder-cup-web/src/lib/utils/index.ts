@@ -67,6 +67,19 @@ export function formatPlayerName(
 }
 
 /**
+ * Format a handicap index for display.
+ *
+ * @param handicapIndex - The handicap index
+ * @returns Formatted string (e.g., "10.4" or "+2.1" for plus handicap)
+ */
+export function formatHandicapIndex(handicapIndex: number): string {
+    if (handicapIndex < 0) {
+        return `+${Math.abs(handicapIndex).toFixed(1)}`;
+    }
+    return handicapIndex.toFixed(1);
+}
+
+/**
  * Format date for display
  * @param date - Date to format
  * @param format - Display format
