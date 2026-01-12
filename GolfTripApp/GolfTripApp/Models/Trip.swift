@@ -10,6 +10,7 @@ final class Trip {
     var endDate: Date
     var location: String?
     var notes: String?
+    var captainModeEnabled: Bool
     var createdAt: Date
     var updatedAt: Date
     
@@ -29,6 +30,9 @@ final class Trip {
     @Relationship(deleteRule: .cascade, inverse: \TripPhoto.trip)
     var photos: [TripPhoto]?
     
+    @Relationship(deleteRule: .cascade, inverse: \AuditLog.trip)
+    var auditLogs: [AuditLog]?
+    
     init(
         id: UUID = UUID(),
         name: String,
@@ -36,6 +40,7 @@ final class Trip {
         endDate: Date,
         location: String? = nil,
         notes: String? = nil,
+        captainModeEnabled: Bool = true,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -45,6 +50,7 @@ final class Trip {
         self.endDate = endDate
         self.location = location
         self.notes = notes
+        self.captainModeEnabled = captainModeEnabled
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

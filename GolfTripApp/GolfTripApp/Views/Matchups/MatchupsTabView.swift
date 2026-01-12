@@ -307,18 +307,57 @@ struct SessionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var session: RyderCupSession
     @Query private var players: [Player]
+    @Query private var trips: [Trip]
     
     @State private var showPairingEditor = false
     @State private var showMatchForm = false
+    @State private var showLockError = false
+    @State private var lockErrorMessage = ""
+    
+    private var currentTrip: Trip? {
+        trips.first
+    }
+    
+    private var duplicateWarnings: [String] {
+        CaptainModeService.getDuplicateWarnings(session: session, players: players)
+    }
+    
+    private var recentAuditLogs: [AuditLog] {
+        guard let trip = currentTrip else { return [] }
+        return (trip.auditLogs ?? [])
+            .filter { $0.entityId == session.id.uuidString }
+            .sorted { $0.timestamp > $1.timestamp }
+            .prefix(5)
+            .map { $0 }
+    }
     
     var body: some View {
         NavigationStack {
             List {
+                // Session Info with Lock Badge
                 Section {
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                        Text(session.sessionType.description)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        HStack {
+                            Text(session.sessionType.description)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            if session.isLocked {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.caption)
+                                    Text("LOCKED")
+                                        .font(.caption.weight(.bold))
+                                }
+                                .foregroundColor(.orange)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.orange.opacity(0.15))
+                                .clipShape(Capsule())
+                            }
+                        }
                         
                         HStack {
                             Label("\(session.sortedMatches.count) matches", systemImage: "flag.2.crossed")
@@ -330,28 +369,75 @@ struct SessionDetailView: View {
                     }
                 }
                 
+                // Duplicate Warnings
+                if !duplicateWarnings.isEmpty {
+                    Section {
+                        ForEach(duplicateWarnings, id: \.self) { warning in
+                            HStack(spacing: DesignTokens.Spacing.sm) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.warning)
+                                Text(warning)
+                                    .font(.caption)
+                                    .foregroundColor(.warning)
+                            }
+                        }
+                    } header: {
+                        Text("⚠️ Warnings")
+                    }
+                }
+                
+                // Matches
                 Section("Matches") {
                     if session.sortedMatches.isEmpty {
                         Button(action: { showMatchForm = true }) {
                             Label("Add Match", systemImage: "plus")
                         }
+                        .disabled(session.isLocked)
                     } else {
                         ForEach(session.sortedMatches, id: \.id) { match in
                             matchDetailRow(match)
                         }
                         
-                        Button(action: { showMatchForm = true }) {
-                            Label("Add Match", systemImage: "plus")
+                        if !session.isLocked {
+                            Button(action: { showMatchForm = true }) {
+                                Label("Add Match", systemImage: "plus")
+                            }
                         }
                     }
                 }
                 
-                if !session.isLocked {
+                // Lock/Unlock Controls
+                if let trip = currentTrip, trip.captainModeEnabled {
                     Section {
-                        Button(action: lockSession) {
-                            Label("Lock & Publish Lineup", systemImage: "lock")
+                        HStack {
+                            Text("Captain Mode")
+                                .font(.subheadline.weight(.medium))
+                            
+                            Spacer()
+                            
+                            CaptainModeToggle(isLocked: $session.isLocked) {
+                                handleLockToggle()
+                            }
                         }
-                        .foregroundColor(.accentColor)
+                        
+                        if session.isLocked {
+                            Text("Session is locked to prevent accidental changes during live play.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Lock this session when matches begin to prevent accidental edits.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                
+                // Audit Log
+                if !recentAuditLogs.isEmpty {
+                    Section("Recent Activity") {
+                        ForEach(recentAuditLogs, id: \.id) { log in
+                            auditLogRow(log)
+                        }
                     }
                 }
             }
@@ -364,6 +450,11 @@ struct SessionDetailView: View {
             }
             .sheet(isPresented: $showMatchForm) {
                 MatchFormView(session: session)
+            }
+            .alert("Cannot Change Lock", isPresented: $showLockError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(lockErrorMessage)
             }
         }
     }
@@ -391,9 +482,40 @@ struct SessionDetailView: View {
         }
     }
     
-    private func lockSession() {
-        session.isLocked = true
-        session.updatedAt = Date()
+    @ViewBuilder
+    private func auditLogRow(_ log: AuditLog) -> some View {
+        HStack(spacing: DesignTokens.Spacing.sm) {
+            Image(systemName: log.action.iconName)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 20)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(log.displayText)
+                    .font(.caption)
+                
+                Text(log.formattedTimestamp)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    private func handleLockToggle() {
+        guard let trip = currentTrip else { return }
+        
+        let success = CaptainModeService.toggleLock(
+            session: session,
+            trip: trip,
+            modelContext: modelContext
+        )
+        
+        if !success {
+            lockErrorMessage = "Cannot unlock session with matches in progress"
+            showLockError = true
+            // Revert the binding
+            session.isLocked = true
+        }
     }
 }
 
