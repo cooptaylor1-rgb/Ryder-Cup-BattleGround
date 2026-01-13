@@ -9,10 +9,13 @@ import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/
 import { Trophy, Home, Target, Users, MoreHorizontal, ChevronLeft } from 'lucide-react';
 
 /**
- * STANDINGS PAGE - Monumental Ledger
+ * STANDINGS PAGE — The Leaderboard
  *
- * Design: Editorial, typography-driven, scores as sacred numbers
- * No boxed cards - dividers and whitespace carry structure
+ * Design Philosophy:
+ * - Scores dominate the viewport, monumental and unmissable
+ * - Team colors reinforce identity
+ * - Individual leaders feel prestigious, like a major leaderboard
+ * - Typography creates hierarchy without visual noise
  */
 
 export default function StandingsPage() {
@@ -62,12 +65,19 @@ export default function StandingsPage() {
       {/* Header */}
       <header className="header">
         <div className="container-editorial flex items-center gap-3">
-          <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
-            <ChevronLeft size={20} />
+          <button
+            onClick={() => router.back()}
+            className="p-2 -ml-2"
+            style={{ color: 'var(--ink-secondary)' }}
+            aria-label="Back"
+          >
+            <ChevronLeft size={22} strokeWidth={1.75} />
           </button>
           <div>
             <span className="type-overline">Standings</span>
-            <p className="type-meta truncate" style={{ marginTop: '2px' }}>{currentTrip.name}</p>
+            <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+              {currentTrip.name}
+            </p>
           </div>
         </div>
       </header>
@@ -77,65 +87,129 @@ export default function StandingsPage() {
           <LoadingState />
         ) : standings && magicNumber ? (
           <>
-            {/* HERO - Team Score */}
-            <section className="section text-center" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-10)' }}>
-              {/* Points to win */}
-              <p className="type-meta" style={{ marginBottom: 'var(--space-6)' }}>
-                {magicNumber.pointsToWin} to win
+            {/* HERO — Team Score Display */}
+            <section
+              className="section text-center"
+              style={{ paddingTop: 'var(--space-12)', paddingBottom: 'var(--space-12)' }}
+            >
+              {/* Points to Win Context */}
+              <p
+                className="type-caption"
+                style={{ marginBottom: 'var(--space-8)' }}
+              >
+                {magicNumber.pointsToWin} points to win
               </p>
 
-              {/* Score Display */}
-              <div className="flex items-baseline justify-center gap-10">
+              {/* Monumental Score Display */}
+              <div
+                className="flex items-end justify-center"
+                style={{ gap: 'var(--space-12)' }}
+              >
+                {/* Team USA */}
                 <div className="text-center">
-                  <p className="score-hero" style={{
-                    color: standings.teamAPoints >= standings.teamBPoints ? 'var(--team-usa)' : 'var(--ink)'
-                  }}>
+                  <p
+                    className="score-monumental"
+                    style={{
+                      color: standings.teamAPoints >= standings.teamBPoints
+                        ? 'var(--team-usa)'
+                        : 'var(--ink-tertiary)'
+                    }}
+                  >
                     {standings.teamAPoints}
                   </p>
-                  <p className="type-overline" style={{ marginTop: 'var(--space-2)', color: 'var(--team-usa)' }}>
+                  <p
+                    className="type-overline"
+                    style={{
+                      marginTop: 'var(--space-3)',
+                      color: 'var(--team-usa)'
+                    }}
+                  >
                     {teamAName}
                   </p>
                 </div>
 
-                <span className="score-hero" style={{ color: 'var(--ink-tertiary)' }}>–</span>
+                {/* Separator */}
+                <span
+                  className="score-large"
+                  style={{
+                    color: 'var(--ink-faint)',
+                    marginBottom: '12px'
+                  }}
+                >
+                  –
+                </span>
 
+                {/* Team Europe */}
                 <div className="text-center">
-                  <p className="score-hero" style={{
-                    color: standings.teamBPoints > standings.teamAPoints ? 'var(--team-europe)' : 'var(--ink)'
-                  }}>
+                  <p
+                    className="score-monumental"
+                    style={{
+                      color: standings.teamBPoints > standings.teamAPoints
+                        ? 'var(--team-europe)'
+                        : 'var(--ink-tertiary)'
+                    }}
+                  >
                     {standings.teamBPoints}
                   </p>
-                  <p className="type-overline" style={{ marginTop: 'var(--space-2)', color: 'var(--team-europe)' }}>
+                  <p
+                    className="type-overline"
+                    style={{
+                      marginTop: 'var(--space-3)',
+                      color: 'var(--team-europe)'
+                    }}
+                  >
                     {teamBName}
                   </p>
                 </div>
               </div>
 
-              {/* Victory or Magic Number */}
+              {/* Victory Banner or Magic Number */}
               {magicNumber.hasClinched ? (
-                <div className="flex items-center justify-center gap-2" style={{ marginTop: 'var(--space-6)' }}>
-                  <Trophy size={16} style={{ color: 'var(--masters)' }} />
-                  <span className="type-body" style={{ color: 'var(--masters)', fontWeight: 500 }}>
+                <div
+                  className="flex items-center justify-center gap-2"
+                  style={{
+                    marginTop: 'var(--space-10)',
+                    padding: 'var(--space-3) var(--space-5)',
+                    background: 'var(--masters-subtle)',
+                    borderRadius: 'var(--radius-full)',
+                    display: 'inline-flex'
+                  }}
+                >
+                  <Trophy size={18} strokeWidth={1.75} style={{ color: 'var(--masters)' }} />
+                  <span style={{ color: 'var(--masters)', fontWeight: 600 }}>
                     {magicNumber.clinchingTeam === 'A' ? teamAName : teamBName} Wins
                   </span>
                 </div>
               ) : (magicNumber.teamANeeded <= 3 || magicNumber.teamBNeeded <= 3) && (
-                <p className="type-meta" style={{ marginTop: 'var(--space-6)', color: 'var(--masters)' }}>
+                <p
+                  className="type-caption"
+                  style={{
+                    marginTop: 'var(--space-8)',
+                    color: 'var(--masters)',
+                    fontWeight: 500
+                  }}
+                >
                   Magic Number: {standings.leader === 'teamA' ? magicNumber.teamANeeded : magicNumber.teamBNeeded}
                 </p>
               )}
 
               {/* Progress */}
-              <p className="type-meta" style={{ marginTop: 'var(--space-6)' }}>
+              <p
+                className="type-micro"
+                style={{ marginTop: 'var(--space-8)' }}
+              >
                 {standings.matchesCompleted} of {standings.totalMatches} matches complete
               </p>
             </section>
 
-            <hr className="divider" />
+            <hr className="divider-lg" />
 
-            {/* LEADERBOARD - Individual Leaders */}
-            <section className="section">
-              <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+            {/* LEADERBOARD — Individual Leaders */}
+            <section className="section-sm">
+              <h2
+                className="type-overline"
+                style={{ marginBottom: 'var(--space-6)' }}
+              >
                 Individual Leaders
               </h2>
 
@@ -151,7 +225,10 @@ export default function StandingsPage() {
                   ))}
                 </div>
               ) : (
-                <p className="type-meta" style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+                <p
+                  className="type-caption text-center"
+                  style={{ padding: 'var(--space-10) 0' }}
+                >
                   Complete matches to see individual standings
                 </p>
               )}
@@ -165,23 +242,23 @@ export default function StandingsPage() {
       {/* Bottom Navigation */}
       <nav className="bottom-nav">
         <Link href="/" className="nav-item">
-          <Home size={20} />
+          <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
         <Link href="/score" className="nav-item">
-          <Target size={20} />
+          <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
         </Link>
         <Link href="/matchups" className="nav-item">
-          <Users size={20} />
+          <Users size={22} strokeWidth={1.75} />
           <span>Matches</span>
         </Link>
         <Link href="/standings" className="nav-item nav-item-active">
-          <Trophy size={20} />
+          <Trophy size={22} strokeWidth={1.75} />
           <span>Standings</span>
         </Link>
         <Link href="/more" className="nav-item">
-          <MoreHorizontal size={20} />
+          <MoreHorizontal size={22} strokeWidth={1.75} />
           <span>More</span>
         </Link>
       </nav>
@@ -190,7 +267,7 @@ export default function StandingsPage() {
 }
 
 /* ============================================
-   Player Row - Typography-driven, no cards
+   Player Row — Leaderboard Entry
    ============================================ */
 interface PlayerRowProps {
   entry: PlayerLeaderboard;
@@ -203,30 +280,39 @@ function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
   const teamColor = isTeamA ? 'var(--team-usa)' : 'var(--team-europe)';
 
   return (
-    <div className="match-row" style={{ gap: 'var(--space-4)' }}>
+    <div className="player-row" style={{ gap: 'var(--space-4)' }}>
       {/* Rank */}
       <span
-        className="type-meta"
         style={{
-          width: '24px',
-          fontWeight: isTopThree ? 600 : 400,
-          color: isTopThree ? 'var(--masters)' : 'var(--ink-tertiary)'
+          width: '28px',
+          fontWeight: 600,
+          fontSize: 'var(--text-sm)',
+          color: isTopThree ? 'var(--masters)' : 'var(--ink-tertiary)',
+          textAlign: 'center'
         }}
       >
         {rank}
       </span>
 
-      {/* Player info */}
+      {/* Team Color Indicator */}
+      <span
+        className="team-dot-lg"
+        style={{ background: teamColor }}
+      />
+
+      {/* Player Info */}
       <div className="flex-1 min-w-0">
-        <p style={{ fontWeight: 500 }}>{entry.playerName}</p>
-        <p className="type-meta" style={{ marginTop: '2px' }}>
-          <span style={{ color: teamColor }}>●</span>
-          {' '}{entry.record} · {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'match' : 'matches'}
+        <p className="type-title-sm">{entry.playerName}</p>
+        <p className="type-micro" style={{ marginTop: '2px' }}>
+          {entry.record} · {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'match' : 'matches'}
         </p>
       </div>
 
       {/* Points */}
-      <span className="score-medium" style={{ color: isTopThree ? 'var(--masters)' : 'var(--ink)' }}>
+      <span
+        className="score-medium"
+        style={{ color: isTopThree ? 'var(--masters)' : 'var(--ink)' }}
+      >
         {entry.points}
       </span>
     </div>
@@ -238,8 +324,12 @@ function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
    ============================================ */
 function LoadingState() {
   return (
-    <div className="section text-center" style={{ padding: 'var(--space-16) 0' }}>
-      <p className="type-meta">Loading standings…</p>
+    <div
+      className="section text-center"
+      style={{ padding: 'var(--space-20) 0' }}
+    >
+      <div className="skeleton" style={{ width: '120px', height: '80px', margin: '0 auto var(--space-4)' }} />
+      <div className="skeleton" style={{ width: '200px', height: '16px', margin: '0 auto' }} />
     </div>
   );
 }
@@ -247,7 +337,9 @@ function LoadingState() {
 function EmptyState() {
   return (
     <div className="empty-state">
-      <Trophy size={32} style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }} />
+      <div className="empty-state-icon">
+        <Trophy size={28} strokeWidth={1.5} />
+      </div>
       <p className="empty-state-title">No standings yet</p>
       <p className="empty-state-text">
         Complete matches to see tournament standings

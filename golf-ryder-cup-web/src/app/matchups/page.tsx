@@ -8,9 +8,13 @@ import { formatPlayerName } from '@/lib/utils';
 import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft } from 'lucide-react';
 
 /**
- * MATCHUPS PAGE - Editorial Design
+ * MATCHUPS PAGE — Team Rosters & Sessions
  *
- * Team rosters and sessions with typography-driven hierarchy.
+ * Design Philosophy:
+ * - Team columns with clear color identity
+ * - Player names with handicaps for context
+ * - Sessions as navigable rows
+ * - Captain mode hints are subtle, not intrusive
  */
 
 export default function MatchupsPage() {
@@ -44,17 +48,28 @@ export default function MatchupsPage() {
       <header className="header">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
-              <ChevronLeft size={20} />
+            <button
+              onClick={() => router.back()}
+              className="p-2 -ml-2"
+              style={{ color: 'var(--ink-secondary)' }}
+              aria-label="Back"
+            >
+              <ChevronLeft size={22} strokeWidth={1.75} />
             </button>
             <div>
               <span className="type-overline">Matchups</span>
-              <p className="type-meta truncate" style={{ marginTop: '2px' }}>{currentTrip.name}</p>
+              <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                {currentTrip.name}
+              </p>
             </div>
           </div>
           {isCaptainMode && (
-            <Link href="/players" className="type-meta" style={{ color: 'var(--masters)' }}>
-              <Plus size={14} style={{ display: 'inline', marginRight: '4px' }} />
+            <Link
+              href="/players"
+              className="flex items-center gap-1"
+              style={{ color: 'var(--masters)', fontWeight: 500, fontSize: 'var(--text-sm)' }}
+            >
+              <Plus size={16} strokeWidth={2} />
               Manage
             </Link>
           )}
@@ -64,76 +79,109 @@ export default function MatchupsPage() {
       <main className="container-editorial">
         {/* Team Rosters */}
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Team Rosters</h2>
+          <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
+            Team Rosters
+          </h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Team A */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Team USA */}
             <div>
-              <p className="type-overline" style={{ color: 'var(--team-usa)', marginBottom: 'var(--space-3)' }}>
-                {teamA?.name || 'USA'}
-              </p>
+              <div
+                className="flex items-center gap-2"
+                style={{ marginBottom: 'var(--space-4)' }}
+              >
+                <span className="team-dot-lg team-dot-usa" />
+                <span
+                  className="type-overline"
+                  style={{ color: 'var(--team-usa)', letterSpacing: '0.08em' }}
+                >
+                  {teamA?.name || 'USA'}
+                </span>
+              </div>
               {teamAPlayers.length > 0 ? (
                 <div>
                   {teamAPlayers.map(player => (
-                    <div key={player.id} style={{
-                      padding: 'var(--space-2) 0',
-                      borderBottom: '1px solid var(--rule)'
-                    }}>
-                      <p style={{ fontWeight: 500 }}>
+                    <div
+                      key={player.id}
+                      style={{
+                        padding: 'var(--space-3) 0',
+                        borderBottom: '1px solid var(--rule-faint)'
+                      }}
+                    >
+                      <p className="type-title-sm">
                         {formatPlayerName(player.firstName, player.lastName, 'short')}
                       </p>
                       {player.handicapIndex !== undefined && (
-                        <p className="type-meta">{player.handicapIndex.toFixed(1)}</p>
+                        <p className="type-micro" style={{ marginTop: '2px' }}>
+                          {player.handicapIndex.toFixed(1)} HCP
+                        </p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="type-meta">No players</p>
+                <p className="type-caption">No players</p>
               )}
             </div>
 
-            {/* Team B */}
+            {/* Team Europe */}
             <div>
-              <p className="type-overline" style={{ color: 'var(--team-europe)', marginBottom: 'var(--space-3)' }}>
-                {teamB?.name || 'Europe'}
-              </p>
+              <div
+                className="flex items-center gap-2"
+                style={{ marginBottom: 'var(--space-4)' }}
+              >
+                <span className="team-dot-lg team-dot-europe" />
+                <span
+                  className="type-overline"
+                  style={{ color: 'var(--team-europe)', letterSpacing: '0.08em' }}
+                >
+                  {teamB?.name || 'Europe'}
+                </span>
+              </div>
               {teamBPlayers.length > 0 ? (
                 <div>
                   {teamBPlayers.map(player => (
-                    <div key={player.id} style={{
-                      padding: 'var(--space-2) 0',
-                      borderBottom: '1px solid var(--rule)'
-                    }}>
-                      <p style={{ fontWeight: 500 }}>
+                    <div
+                      key={player.id}
+                      style={{
+                        padding: 'var(--space-3) 0',
+                        borderBottom: '1px solid var(--rule-faint)'
+                      }}
+                    >
+                      <p className="type-title-sm">
                         {formatPlayerName(player.firstName, player.lastName, 'short')}
                       </p>
                       {player.handicapIndex !== undefined && (
-                        <p className="type-meta">{player.handicapIndex.toFixed(1)}</p>
+                        <p className="type-micro" style={{ marginTop: '2px' }}>
+                          {player.handicapIndex.toFixed(1)} HCP
+                        </p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="type-meta">No players</p>
+                <p className="type-caption">No players</p>
               )}
             </div>
           </div>
         </section>
 
-        <hr className="divider" />
+        <hr className="divider-lg" />
 
         {/* Sessions */}
-        <section className="section">
-          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+        <section className="section-sm">
+          <div
+            className="flex items-center justify-between"
+            style={{ marginBottom: 'var(--space-6)' }}
+          >
             <h2 className="type-overline">Sessions</h2>
             {isCaptainMode && (
               <button
                 onClick={() => router.push('/lineup/new')}
-                className="type-meta"
-                style={{ color: 'var(--masters)' }}
+                className="flex items-center gap-1"
+                style={{ color: 'var(--masters)', fontWeight: 500, fontSize: 'var(--text-sm)' }}
               >
-                <Plus size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                <Plus size={16} strokeWidth={2} />
                 Add
               </button>
             )}
@@ -147,14 +195,17 @@ export default function MatchupsPage() {
                   onClick={() => router.push(`/lineup/${session.id}`)}
                   className="match-row w-full text-left"
                 >
-                  <Calendar size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                  <Calendar size={20} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
                   <div className="flex-1">
-                    <p style={{ fontWeight: 500 }}>{session.name}</p>
-                    <p className="type-meta capitalize">{session.sessionType}</p>
+                    <p className="type-title-sm">{session.name}</p>
+                    <p className="type-micro capitalize" style={{ marginTop: '2px' }}>
+                      {session.sessionType}
+                    </p>
                   </div>
                   <span
-                    className="type-meta"
+                    className="type-caption"
                     style={{
+                      fontWeight: 500,
                       color: session.status === 'inProgress' ? 'var(--masters)' :
                         session.status === 'completed' ? 'var(--success)' : 'var(--ink-tertiary)'
                     }}
@@ -162,13 +213,15 @@ export default function MatchupsPage() {
                     {session.status === 'inProgress' ? 'Live' :
                       session.status === 'completed' ? 'Complete' : 'Upcoming'}
                   </span>
-                  <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                  <ChevronRight size={20} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
                 </button>
               ))}
             </div>
           ) : (
             <div className="empty-state">
-              <Users size={32} style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }} />
+              <div className="empty-state-icon">
+                <Users size={28} strokeWidth={1.5} />
+              </div>
               <p className="empty-state-title">No sessions yet</p>
               <p className="empty-state-text">
                 {isCaptainMode ? 'Create a session to set up matches' : 'Enable Captain Mode to create sessions'}
@@ -178,7 +231,7 @@ export default function MatchupsPage() {
                   onClick={() => router.push('/lineup/new')}
                   className="btn btn-primary"
                 >
-                  <Plus size={18} />
+                  <Plus size={18} strokeWidth={2} />
                   Create Session
                 </button>
               )}
@@ -190,12 +243,22 @@ export default function MatchupsPage() {
         {!isCaptainMode && sessions.length > 0 && (
           <>
             <hr className="divider" />
-            <section className="section">
-              <div className="flex items-start gap-3">
-                <Shield size={18} style={{ color: 'var(--masters)', marginTop: '2px' }} />
+            <section className="section-sm">
+              <div
+                className="card"
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 'var(--space-4)',
+                  padding: 'var(--space-5)'
+                }}
+              >
+                <Shield size={20} strokeWidth={1.5} style={{ color: 'var(--masters)', flexShrink: 0 }} />
                 <div>
-                  <p style={{ fontWeight: 500, marginBottom: 'var(--space-1)' }}>Captain Mode</p>
-                  <p className="type-meta">
+                  <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
+                    Captain Mode
+                  </p>
+                  <p className="type-caption">
                     Enable Captain Mode in settings to manage lineups and create sessions.
                   </p>
                 </div>
@@ -208,23 +271,23 @@ export default function MatchupsPage() {
       {/* Bottom Navigation */}
       <nav className="bottom-nav">
         <Link href="/" className="nav-item">
-          <Home size={20} />
+          <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
         <Link href="/score" className="nav-item">
-          <Target size={20} />
+          <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
         </Link>
         <Link href="/matchups" className="nav-item nav-item-active">
-          <Users size={20} />
+          <Users size={22} strokeWidth={1.75} />
           <span>Matches</span>
         </Link>
         <Link href="/standings" className="nav-item">
-          <Trophy size={20} />
+          <Trophy size={22} strokeWidth={1.75} />
           <span>Standings</span>
         </Link>
         <Link href="/more" className="nav-item">
-          <MoreHorizontal size={20} />
+          <MoreHorizontal size={22} strokeWidth={1.75} />
           <span>More</span>
         </Link>
       </nav>

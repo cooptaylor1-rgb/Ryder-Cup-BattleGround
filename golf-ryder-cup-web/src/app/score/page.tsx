@@ -13,10 +13,13 @@ import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 
 /**
- * SCORE PAGE - Match List
+ * SCORE PAGE — Match List
  *
- * Design: Editorial typography, scores as sacred numbers
- * Clean match rows - no cards, dividers carry structure
+ * Design Philosophy:
+ * - Each match is a dignified row, not a cramped card
+ * - Scores use the serif font for warmth
+ * - Team colors identify sides at a glance
+ * - Status is clear without visual clutter
  */
 
 export default function ScorePage() {
@@ -83,12 +86,19 @@ export default function ScorePage() {
             {/* Header */}
             <header className="header">
                 <div className="container-editorial flex items-center gap-3">
-                    <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
-                        <ChevronLeft size={20} />
+                    <button
+                        onClick={() => router.back()}
+                        className="p-2 -ml-2"
+                        style={{ color: 'var(--ink-secondary)' }}
+                        aria-label="Back"
+                    >
+                        <ChevronLeft size={22} strokeWidth={1.75} />
                     </button>
                     <div>
                         <span className="type-overline">Score</span>
-                        <p className="type-meta truncate" style={{ marginTop: '2px' }}>{currentTrip.name}</p>
+                        <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                            {currentTrip.name}
+                        </p>
                     </div>
                 </div>
             </header>
@@ -96,14 +106,14 @@ export default function ScorePage() {
             <main className="container-editorial">
                 {/* Session Header */}
                 {activeSession && (
-                    <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
-                        <p className="type-meta" style={{ color: 'var(--masters)' }}>
+                    <section className="section">
+                        <div className="live-indicator" style={{ marginBottom: 'var(--space-3)' }}>
                             Session {activeSession.sessionNumber}
-                        </p>
-                        <h1 className="type-headline capitalize" style={{ marginTop: 'var(--space-1)' }}>
+                        </div>
+                        <h1 className="type-display capitalize">
                             {activeSession.sessionType}
                         </h1>
-                        <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>
+                        <p className="type-caption" style={{ marginTop: 'var(--space-2)' }}>
                             {activeSession.status === 'inProgress' ? 'In Progress' :
                                 activeSession.status === 'completed' ? 'Complete' : 'Scheduled'}
                         </p>
@@ -113,15 +123,24 @@ export default function ScorePage() {
                 <hr className="divider" />
 
                 {/* Matches */}
-                <section className="section">
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+                <section className="section-sm">
+                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
                         Matches
                     </h2>
 
                     {isLoading ? (
-                        <p className="type-meta" style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
-                            Loading…
-                        </p>
+                        <div style={{ padding: 'var(--space-8) 0' }}>
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="player-row">
+                                    <div className="skeleton" style={{ width: '24px', height: '16px' }} />
+                                    <div className="flex-1">
+                                        <div className="skeleton" style={{ width: '60%', height: '16px', marginBottom: '8px' }} />
+                                        <div className="skeleton" style={{ width: '50%', height: '16px' }} />
+                                    </div>
+                                    <div className="skeleton" style={{ width: '40px', height: '24px' }} />
+                                </div>
+                            ))}
+                        </div>
                     ) : matchStates.length > 0 ? (
                         <div>
                             {matchStates.map((matchState, index) => (
@@ -137,7 +156,9 @@ export default function ScorePage() {
                         </div>
                     ) : (
                         <div className="empty-state">
-                            <Target size={32} style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }} />
+                            <div className="empty-state-icon">
+                                <Target size={28} strokeWidth={1.5} />
+                            </div>
                             <p className="empty-state-title">No matches scheduled</p>
                             <p className="empty-state-text">Set up matchups to start scoring</p>
                             <Link href="/matchups" className="btn btn-primary">
@@ -151,15 +172,18 @@ export default function ScorePage() {
                 {sessions.length > 1 && (
                     <>
                         <hr className="divider" />
-                        <section className="section">
-                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>
+                        <section className="section-sm">
+                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
                                 Sessions
                             </h2>
-                            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                            <div
+                                className="flex gap-3 overflow-x-auto pb-2"
+                                style={{ margin: '0 calc(-1 * var(--space-5))', padding: '0 var(--space-5)' }}
+                            >
                                 {sessions.map(session => (
                                     <button
                                         key={session.id}
-                                        className={session.id === activeSession?.id ? 'btn btn-primary' : 'btn btn-secondary'}
+                                        className={session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
                                         style={{ whiteSpace: 'nowrap' }}
                                     >
                                         Session {session.sessionNumber}
@@ -174,23 +198,23 @@ export default function ScorePage() {
             {/* Bottom Navigation */}
             <nav className="bottom-nav">
                 <Link href="/" className="nav-item">
-                    <Home size={20} />
+                    <Home size={22} strokeWidth={1.75} />
                     <span>Home</span>
                 </Link>
                 <Link href="/score" className="nav-item nav-item-active">
-                    <Target size={20} />
+                    <Target size={22} strokeWidth={1.75} />
                     <span>Score</span>
                 </Link>
                 <Link href="/matchups" className="nav-item">
-                    <Users size={20} />
+                    <Users size={22} strokeWidth={1.75} />
                     <span>Matches</span>
                 </Link>
                 <Link href="/standings" className="nav-item">
-                    <Trophy size={20} />
+                    <Trophy size={22} strokeWidth={1.75} />
                     <span>Standings</span>
                 </Link>
                 <Link href="/more" className="nav-item">
-                    <MoreHorizontal size={20} />
+                    <MoreHorizontal size={22} strokeWidth={1.75} />
                     <span>More</span>
                 </Link>
             </nav>
@@ -199,7 +223,7 @@ export default function ScorePage() {
 }
 
 /* ============================================
-   Match Row - Typography-driven match display
+   Match Row — Dignified Match Display
    ============================================ */
 interface MatchRowProps {
     matchState: MatchState;
@@ -222,28 +246,42 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
     return (
         <button onClick={onClick} className="match-row w-full text-left">
             {/* Match number */}
-            <span className="type-meta" style={{ width: '24px', color: 'var(--ink-tertiary)' }}>
+            <span
+                style={{
+                    width: '28px',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    color: 'var(--ink-tertiary)',
+                    textAlign: 'center'
+                }}
+            >
                 {matchNumber}
             </span>
 
             {/* Players */}
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--team-usa)' }}>●</span>
-                    <span className="truncate" style={{ fontWeight: currentScore > 0 ? 500 : 400 }}>
+                    <span className="team-dot team-dot-usa" />
+                    <span
+                        className="truncate type-body-sm"
+                        style={{ fontWeight: currentScore > 0 ? 600 : 400 }}
+                    >
                         {formatPlayers(teamAPlayers)}
                     </span>
                 </div>
-                <div className="flex items-center gap-2" style={{ marginTop: 'var(--space-1)' }}>
-                    <span style={{ color: 'var(--team-europe)' }}>●</span>
-                    <span className="truncate" style={{ fontWeight: currentScore < 0 ? 500 : 400 }}>
+                <div className="flex items-center gap-2" style={{ marginTop: 'var(--space-2)' }}>
+                    <span className="team-dot team-dot-europe" />
+                    <span
+                        className="truncate type-body-sm"
+                        style={{ fontWeight: currentScore < 0 ? 600 : 400 }}
+                    >
                         {formatPlayers(teamBPlayers)}
                     </span>
                 </div>
             </div>
 
             {/* Score */}
-            <div className="text-right" style={{ minWidth: '60px' }}>
+            <div className="text-right" style={{ minWidth: '64px' }}>
                 <span
                     className="score-medium"
                     style={{
@@ -254,16 +292,20 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                     {displayScore}
                 </span>
                 {holesPlayed > 0 && (
-                    <p className="type-meta" style={{ marginTop: '2px' }}>
+                    <p className="type-micro" style={{ marginTop: '4px' }}>
                         {status === 'completed' ? 'Final' : `thru ${holesPlayed}`}
                     </p>
                 )}
                 {status === 'scheduled' && holesPlayed === 0 && (
-                    <p className="type-meta">Not started</p>
+                    <p className="type-micro">Not started</p>
                 )}
             </div>
 
-            <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', marginLeft: 'var(--space-2)' }} />
+            <ChevronRight
+                size={20}
+                strokeWidth={1.5}
+                style={{ color: 'var(--ink-tertiary)', marginLeft: 'var(--space-2)' }}
+            />
         </button>
     );
 }
