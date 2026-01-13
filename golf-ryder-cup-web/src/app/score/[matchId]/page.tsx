@@ -7,7 +7,6 @@ import { useMatchState, useHaptic } from '@/lib/hooks';
 import { AppShellNew } from '@/components/layout';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle } from 'lucide-react';
-import { BUTTON_SCALE_SIZES } from '@/lib/types/scoringPreferences';
 import type { HoleWinner } from '@/lib/types/models';
 
 /**
@@ -150,7 +149,7 @@ export default function MatchScoringPage() {
           className="flex items-center justify-center h-64"
           style={{ color: 'var(--text-tertiary)' }}
         >
-          Loading match...
+          Loading
         </div>
       </AppShellNew>
     );
@@ -441,35 +440,59 @@ export default function MatchScoringPage() {
             </button>
           </div>
         ) : (
-          /* Match Complete State */
+          /* Match Complete State — The Emotional Finish
+             This moment should feel inevitable, composed.
+             Not celebratory, but quietly satisfying. */
           <div
-            className="rounded-lg p-8 text-center"
+            className="rounded-lg p-8 text-center match-complete-state"
             style={{
-              background: 'var(--masters-gold-muted)',
-              border: '1px solid rgba(201, 162, 39, 0.2)'
+              background: 'var(--surface-card)',
+              border: '1px solid var(--border-subtle)'
             }}
           >
-            <Check
-              className="w-12 h-12 mx-auto mb-4"
-              style={{ color: 'var(--masters-gold)' }}
-            />
-            <h3
-              className="font-display text-xl mb-2"
+            <div
+              className="w-12 h-12 mx-auto mb-5 rounded-full flex items-center justify-center"
+              style={{
+                background: 'var(--masters-gold-muted)',
+                border: '1px solid rgba(201, 162, 39, 0.3)'
+              }}
+            >
+              <Check
+                className="w-6 h-6"
+                style={{ color: 'var(--masters-gold)' }}
+              />
+            </div>
+            <p
+              className="font-display text-xl mb-1"
               style={{ color: 'var(--text-primary)' }}
             >
-              Match Complete
-            </h3>
-            <p style={{ color: 'var(--text-secondary)' }}>
               {matchState.currentScore > 0
-                ? `${teamAName} wins`
+                ? teamAName
                 : matchState.currentScore < 0
-                  ? `${teamBName} wins`
-                  : 'Match halved'
-              } {matchState.displayScore}
+                  ? teamBName
+                  : 'Match Halved'
+              }
+            </p>
+            <p
+              className="text-lg font-medium mb-1"
+              style={{ color: 'var(--masters-gold)' }}
+            >
+              {matchState.displayScore}
+            </p>
+            <p
+              className="text-sm"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
+              {matchState.currentScore !== 0 ? 'wins' : ''}
             </p>
             <button
               onClick={() => router.push('/score')}
-              className="btn btn-primary mt-6"
+              className="mt-8 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              style={{
+                background: 'var(--surface-raised)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-default)'
+              }}
             >
               Back to Matches
             </button>

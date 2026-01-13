@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Search, MapPin, Flag, Trash2, Copy, ChevronRight, Database, Globe } from 'lucide-react';
+import { ArrowLeft, Plus, Search, MapPin, Flag, Trash2, Copy, ChevronRight, Globe } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { deleteCourseProfile, createCourseProfile } from '@/lib/services/courseLibraryService';
@@ -324,12 +324,12 @@ export default function CourseLibraryPage() {
                     <div className="bg-surface-card rounded-xl border border-surface-border p-8 text-center">
                         <Flag className="w-12 h-12 mx-auto mb-4 text-text-tertiary" />
                         <h3 className="font-semibold text-magnolia mb-1">
-                            {searchQuery ? 'No courses found' : 'No saved courses'}
+                            {searchQuery ? 'No matches' : 'No courses yet'}
                         </h3>
                         <p className="text-text-secondary text-sm mb-4">
                             {searchQuery
-                                ? 'Try a different search term'
-                                : 'Save courses from your trips to reuse them later'}
+                                ? 'Try a different search'
+                                : 'Add courses to build your library'}
                         </p>
                         {!searchQuery && (
                             <Link

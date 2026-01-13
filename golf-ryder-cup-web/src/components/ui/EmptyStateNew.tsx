@@ -167,8 +167,8 @@ export function NoTripsEmptyNew({ onCreateTrip }: { onCreateTrip: () => void }) 
     return (
         <EmptyStateNew
             icon={Trophy}
-            title="No trips yet"
-            description="Start your golf adventure! Create a trip to begin tracking your Ryder Cup style matches."
+            title="No tournaments yet"
+            description="Create your first trip to start tracking matches."
             action={{
                 label: 'Create trip',
                 onClick: onCreateTrip,
@@ -183,8 +183,8 @@ export function NoMatchesEmptyNew({ onSetupMatchups }: { onSetupMatchups: () => 
     return (
         <EmptyStateNew
             icon={Users}
-            title="No matches scheduled"
-            description="Set up your matchups to start scoring. You'll be tracking points in no time!"
+            title="No matches yet"
+            description="Set up matchups to begin scoring."
             action={{
                 label: 'Set up matchups',
                 onClick: onSetupMatchups,
@@ -207,8 +207,8 @@ export function NoSessionsEmptyNew({
             title="No sessions yet"
             description={
                 isCaptain
-                    ? "Create a session to organize your matches by day and format."
-                    : "No sessions have been created yet. Ask your captain to set things up!"
+                    ? "Organize matches by day and format."
+                    : "Waiting for your captain to create sessions."
             }
             action={
                 isCaptain
@@ -227,8 +227,8 @@ export function NoPlayersEmptyNew({ onAddPlayer }: { onAddPlayer: () => void }) 
     return (
         <EmptyStateNew
             icon={Users}
-            title="No players added"
-            description="Add players to your trip roster. You'll need at least 2 players per team to start."
+            title="No players yet"
+            description="Add players to build your team rosters."
             action={{
                 label: 'Add player',
                 onClick: onAddPlayer,
@@ -242,8 +242,8 @@ export function NoStandingsEmptyNew() {
     return (
         <EmptyStateNew
             icon={BarChart3}
-            title="No standings data"
-            description="Complete some matches to see the leaderboard. Every point counts!"
+            title="No standings yet"
+            description="Standings appear as matches complete."
             variant="compact"
         />
     );
@@ -253,10 +253,10 @@ export function NoCoursesEmptyNew({ onSearchCourses }: { onSearchCourses: () => 
     return (
         <EmptyStateNew
             icon={MapPin}
-            title="No courses saved"
-            description="Search for golf courses to add them to your trip. Course data helps with scoring."
+            title="No courses yet"
+            description="Add courses to your trip."
             action={{
-                label: 'Search courses',
+                label: 'Find courses',
                 onClick: onSearchCourses,
                 icon: Sparkles,
             }}
@@ -269,7 +269,7 @@ export function NoScoresEmptyNew({ onStartScoring }: { onStartScoring: () => voi
         <EmptyStateNew
             icon={Target}
             title="Ready to score"
-            description="Tap a match to start recording hole-by-hole results. The standings update live!"
+            description="Select a match to begin."
             action={{
                 label: 'Start scoring',
                 onClick: onStartScoring,
