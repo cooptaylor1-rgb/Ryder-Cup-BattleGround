@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Search, MapPin, Flag, Trash2, Copy, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Search, MapPin, Flag, Trash2, Copy, ChevronRight, Database, Globe } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { deleteCourseProfile } from '@/lib/services/courseLibraryService';
+import { deleteCourseProfile, createCourseProfile } from '@/lib/services/courseLibraryService';
+import { isGolfCourseAPIConfigured } from '@/lib/services/golfCourseAPIService';
+import { CourseSearch } from '@/components/CourseSearch';
 import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
@@ -118,6 +120,9 @@ function CourseCard({
 export default function CourseLibraryPage() {
     const { showToast } = useUIStore();
     const [searchQuery, setSearchQuery] = useState('');
+    const [showDatabaseSearch, setShowDatabaseSearch] = useState(false);
+
+    const apiConfigured = isGolfCourseAPIConfigured();
 
     // Load course profiles from Dexie
     const courseProfiles = useLiveQuery(
@@ -158,6 +163,69 @@ export default function CourseLibraryPage() {
             showToast('error', `Failed to delete: ${error}`);
         }
     };
+
+    const handleImportFromDatabase = async (courseData: {
+        name: string;
+        location: string;
+        teeSets: Array<{
+            name: string;
+            color: string;
+            rating: number;
+            slope: number;
+            par: number;
+            yardage: number;
+            holePars: number[];
+            holeHandicaps: number[];
+        }>;
+    }) => {
+        try {
+            await createCourseProfile(
+                {
+                    name: courseData.name,
+                    location: courseData.location,
+                },
+                courseData.teeSets.map(tee => ({
+                    name: tee.name,
+                    color: tee.color,
+                    rating: tee.rating,
+                    slope: tee.slope,
+                    par: tee.par,
+                    holePars: tee.holePars,
+                    holeHandicaps: tee.holeHandicaps,
+                    totalYardage: tee.yardage,
+                }))
+            );
+            showToast('success', `${courseData.name} imported to library`);
+            setShowDatabaseSearch(false);
+        } catch (error) {
+            showToast('error', `Failed to import: ${error}`);
+        }
+    };
+
+    // Database search modal
+    if (showDatabaseSearch) {
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <header className="bg-augusta-green text-white px-4 py-4 shadow-lg">
+                    <div className="max-w-4xl mx-auto flex items-center gap-3">
+                        <button
+                            onClick={() => setShowDatabaseSearch(false)}
+                            className="p-2 hover:bg-white/10 rounded-lg"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <h1 className="text-lg font-semibold">Search Course Database</h1>
+                    </div>
+                </header>
+                <main className="max-w-4xl mx-auto">
+                    <CourseSearch
+                        onSelectCourse={handleImportFromDatabase}
+                        onClose={() => setShowDatabaseSearch(false)}
+                    />
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -204,6 +272,31 @@ export default function CourseLibraryPage() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        onClick={() => setShowDatabaseSearch(true)}
+                        className={cn(
+                            "p-4 bg-white rounded-xl border-2 border-dashed text-left hover:border-augusta-green hover:bg-augusta-green/5 transition-colors",
+                            apiConfigured ? "border-augusta-green/30" : "border-gray-200"
+                        )}
+                    >
+                        <Globe className={cn("w-6 h-6 mb-2", apiConfigured ? "text-augusta-green" : "text-gray-400")} />
+                        <div className="font-medium text-gray-900">Search Database</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                            {apiConfigured ? "Import from 30,000+ courses" : "API not configured"}
+                        </div>
+                    </button>
+                    <Link
+                        href="/courses/new"
+                        className="p-4 bg-white rounded-xl border-2 border-dashed border-gray-200 text-left hover:border-augusta-green hover:bg-augusta-green/5 transition-colors"
+                    >
+                        <Plus className="w-6 h-6 mb-2 text-gray-400" />
+                        <div className="font-medium text-gray-900">Add Manually</div>
+                        <div className="text-xs text-gray-500 mt-1">Enter course details</div>
+                    </Link>
                 </div>
 
                 {/* Course List */}
