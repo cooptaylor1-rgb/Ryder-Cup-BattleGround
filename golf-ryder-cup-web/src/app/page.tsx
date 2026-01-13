@@ -1,41 +1,35 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
-import { ChevronRight, MapPin, Calendar, Plus } from 'lucide-react';
+import { ChevronRight, MapPin, Calendar, Plus, Home, Target, Users, Trophy, MoreHorizontal } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
+import type { TeamStandings } from '@/lib/types/computed';
 
 /**
- * HOME PAGE - Masters Tournament Inspired
- *
- * Design Philosophy:
- * - Editorial layout, not a dashboard
- * - Hierarchy above all: What is happening now? What matters most?
- * - Typography carries the design
- * - Calm, confident, quiet
- *
- * IA Note: Developer tools (Load Demo, Clear Data) exist in More > Data.
- * Removed from Home to reduce clutter and prevent accidental data loss.
+ * HOME PAGE - Editorial Front Page
+ * 
+ * Structure:
+ * 1. Lead - Active tournament with live score
+ * 2. Next - What's happening next
+ * 3. Archive - Past tournaments (quiet)
  */
 export default function HomePage() {
   const router = useRouter();
-  const { loadTrip } = useTripStore();
+  const { loadTrip, currentTrip } = useTripStore();
+  const [standings, setStandings] = useState<TeamStandings | null>(null);
 
   const trips = useLiveQuery(
     () => db.trips.orderBy('startDate').reverse().toArray(),
     []
   );
 
-  const handleSelectTrip = async (tripId: string) => {
-    await loadTrip(tripId);
-    router.push('/standings');
-  };
-
-  const handleCreateTrip = () => router.push('/trip/new');
-
-  const hasTrips = trips && trips.length > 0;
+  // Find active trip
   const activeTrip = trips?.find(t => {
     const now = new Date();
     const start = new Date(t.startDate);
@@ -43,203 +37,207 @@ export default function HomePage() {
     return now >= start && now <= end;
   });
 
+  // Load standings for active trip
+  useEffect(() => {
+    if (activeTrip) {
+      loadTrip(activeTrip.id);
+      calculateTeamStandings(activeTrip.id).then(setStandings);
+    }
+  }, [activeTrip, loadTrip]);
+
+  const handleSelectTrip = async (tripId: string) => {
+    await loadTrip(tripId);
+    router.push('/standings');
+  };
+
+  const hasTrips = trips && trips.length > 0;
+  const pastTrips = trips?.filter(t => t.id !== activeTrip?.id) || [];
+
   return (
-    <div className="min-h-screen" style={{ background: 'var(--surface-base)' }}>
-      {/* Header - 48px height per spec */}
-      <header
-        className="px-5 flex items-center border-b"
-        style={{
-          borderColor: 'var(--border-subtle)',
-          height: '48px'
-        }}
-      >
-        <div className="max-w-[480px] w-full mx-auto">
-          <h1
-            className="font-display text-xl"
-            style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em' }}
-          >
-            Ryder Cup Tracker
-          </h1>
+    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+      {/* Minimal Header */}
+      <header className="header">
+        <div className="container-editorial">
+          <span className="type-overline">Ryder Cup Tracker</span>
         </div>
       </header>
 
-      {/* Main Content - 480px max-width, 20px padding */}
-      <main className="px-5 pt-10 max-w-[480px] mx-auto pb-24">
-
-        {/* Active Tournament - Hero treatment */}
-        {activeTrip && (
-          <section className="mb-10">
+      <main className="container-editorial">
+        {/* LEAD - Active Tournament */}
+        {activeTrip && standings ? (
+          <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
             <button
               onClick={() => handleSelectTrip(activeTrip.id)}
-              className="w-full text-left p-5 rounded-lg transition-colors"
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--masters-gold)',
-                boxShadow: '0 0 0 1px rgba(201, 162, 39, 0.15)'
-              }}
+              className="w-full text-left"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-overline mb-2" style={{ color: 'var(--masters-gold)' }}>
-                    Active Tournament
+              <p className="type-overline" style={{ color: 'var(--masters)', marginBottom: 'var(--space-2)' }}>
+                Live
+              </p>
+              <h1 className="type-headline" style={{ marginBottom: 'var(--space-4)' }}>
+                {activeTrip.name}
+              </h1>
+
+              {/* Score Hero */}
+              <div className="flex items-baseline justify-center gap-8" style={{ margin: 'var(--space-8) 0' }}>
+                <div className="text-center">
+                  <p className="score-hero" style={{ color: standings.teamAPoints >= standings.teamBPoints ? 'var(--team-usa)' : 'var(--ink)' }}>
+                    {standings.teamAPoints}
                   </p>
-                  <h2
-                    className="font-display text-xl"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {activeTrip.name}
-                  </h2>
+                  <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>USA</p>
                 </div>
-                <ChevronRight
-                  className="mt-1 opacity-60"
-                  style={{ color: 'var(--masters-gold)', width: 20, height: 20 }}
-                />
+                <span className="type-meta" style={{ alignSelf: 'center' }}>–</span>
+                <div className="text-center">
+                  <p className="score-hero" style={{ color: standings.teamBPoints > standings.teamAPoints ? 'var(--team-europe)' : 'var(--ink)' }}>
+                    {standings.teamBPoints}
+                  </p>
+                  <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>EUR</p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+              {/* Context */}
+              <div className="flex items-center justify-center gap-4 type-meta">
                 {activeTrip.location && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin style={{ width: 14, height: 14 }} />
+                  <span className="flex items-center gap-1">
+                    <MapPin size={14} />
                     {activeTrip.location}
                   </span>
                 )}
-                <span className="flex items-center gap-1.5">
-                  <Calendar style={{ width: 14, height: 14 }} />
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} />
                   {formatDate(activeTrip.startDate, 'short')}
                 </span>
               </div>
+
+              {/* CTA */}
+              <div 
+                className="flex items-center justify-center gap-2 type-meta"
+                style={{ marginTop: 'var(--space-6)', color: 'var(--masters)' }}
+              >
+                <span>View standings</span>
+                <ChevronRight size={16} />
+              </div>
             </button>
           </section>
-        )}
-
-        {/* Tournaments List */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h3
-              className="text-section"
-              style={{ color: 'var(--text-secondary)' }}
+        ) : activeTrip ? (
+          /* Active trip but no standings yet */
+          <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
+            <button
+              onClick={() => handleSelectTrip(activeTrip.id)}
+              className="w-full text-left"
             >
-              {hasTrips ? 'Your Tournaments' : 'Get Started'}
-            </h3>
-            {hasTrips && (
-              <button
-                onClick={handleCreateTrip}
-                className="flex items-center gap-1.5 text-sm font-medium transition-colors"
-                style={{ color: 'var(--masters-green)' }}
+              <p className="type-overline" style={{ color: 'var(--masters)', marginBottom: 'var(--space-2)' }}>
+                Active Tournament
+              </p>
+              <h1 className="type-headline" style={{ marginBottom: 'var(--space-4)' }}>
+                {activeTrip.name}
+              </h1>
+              <div className="flex items-center gap-4 type-meta">
+                {activeTrip.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin size={14} />
+                    {activeTrip.location}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  {formatDate(activeTrip.startDate, 'short')}
+                </span>
+              </div>
+              <div 
+                className="flex items-center gap-2 type-meta"
+                style={{ marginTop: 'var(--space-4)', color: 'var(--masters)' }}
               >
-                <Plus style={{ width: 16, height: 16 }} />
+                <span>Continue</span>
+                <ChevronRight size={16} />
+              </div>
+            </button>
+          </section>
+        ) : null}
+
+        {activeTrip && <hr className="divider" />}
+
+        {/* ARCHIVE - Past Tournaments */}
+        <section className="section">
+          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+            <h2 className="type-overline">
+              {hasTrips ? 'Tournaments' : 'Get Started'}
+            </h2>
+            {hasTrips && (
+              <Link
+                href="/trip/new"
+                className="flex items-center gap-1 type-meta"
+                style={{ color: 'var(--masters)' }}
+              >
+                <Plus size={14} />
                 New
-              </button>
+              </Link>
             )}
           </div>
 
-          {hasTrips ? (
-            <div className="space-y-2">
-              {trips
-                .filter(t => t.id !== activeTrip?.id)
-                .map((trip) => (
-                  <button
-                    key={trip.id}
-                    onClick={() => handleSelectTrip(trip.id)}
-                    className="w-full text-left px-4 py-3.5 rounded-lg flex items-center justify-between group transition-colors"
-                    style={{
-                      background: 'var(--surface-raised)',
-                      border: '1px solid var(--border-subtle)'
-                    }}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className="font-medium truncate"
-                        style={{ color: 'var(--text-primary)', fontSize: '15px' }}
-                      >
-                        {trip.name}
-                      </p>
-                      <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: 'var(--text-tertiary)' }}>
-                        {trip.location && (
-                          <span className="flex items-center gap-1 truncate">
-                            <MapPin style={{ width: 12, height: 12, flexShrink: 0 }} />
-                            <span className="truncate">{trip.location}</span>
-                          </span>
-                        )}
-                        <span>{formatDate(trip.startDate, 'short')}</span>
-                      </div>
+          {pastTrips.length > 0 ? (
+            <div>
+              {pastTrips.map((trip) => (
+                <button
+                  key={trip.id}
+                  onClick={() => handleSelectTrip(trip.id)}
+                  className="match-row w-full text-left"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p style={{ fontWeight: 500, marginBottom: 'var(--space-1)' }}>
+                      {trip.name}
+                    </p>
+                    <div className="flex items-center gap-3 type-meta">
+                      {trip.location && (
+                        <span className="flex items-center gap-1 truncate">
+                          <MapPin size={12} />
+                          <span className="truncate">{trip.location}</span>
+                        </span>
+                      )}
+                      <span>{formatDate(trip.startDate, 'short')}</span>
                     </div>
-                    <ChevronRight
-                      className="ml-3 opacity-40 group-hover:opacity-70 transition-opacity"
-                      style={{ color: 'var(--text-tertiary)', width: 18, height: 18 }}
-                    />
-                  </button>
-                ))}
+                  </div>
+                  <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', marginLeft: 'var(--space-3)' }} />
+                </button>
+              ))}
             </div>
-          ) : (
-            /* Empty State - Intentional, not unfinished */
-            <div
-              className="text-center py-12 px-6 rounded-lg"
-              style={{
-                background: 'var(--surface-raised)',
-                border: '1px solid var(--border-subtle)'
-              }}
-            >
-              <p
-                className="font-display text-lg mb-2"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                No tournaments yet
+          ) : !activeTrip ? (
+            /* Empty state */
+            <div className="empty-state">
+              <p className="empty-state-title">No tournaments yet</p>
+              <p className="empty-state-text">
+                Create a tournament to start tracking matches
               </p>
-              <p
-                className="text-sm mb-6"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
-                Create a tournament to track matches and standings
-              </p>
-              <button
-                onClick={handleCreateTrip}
-                className="btn btn-primary"
-              >
-                <Plus style={{ width: 18, height: 18 }} />
+              <Link href="/trip/new" className="btn btn-primary">
+                <Plus size={18} />
                 Create Tournament
-              </button>
+              </Link>
             </div>
-          )}
+          ) : null}
         </section>
       </main>
 
-      {/* Bottom Navigation - Simple, functional */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around px-4 safe-bottom"
-        style={{
-          background: 'var(--surface-base)',
-          borderTop: '1px solid var(--border-subtle)'
-        }}
-      >
-        {[
-          { label: 'Home', path: '/', active: true },
-          { label: 'Score', path: '/score', active: false },
-          { label: 'Matches', path: '/matchups', active: false },
-          { label: 'Standings', path: '/standings', active: false },
-          { label: 'More', path: '/more', active: false },
-        ].map((item) => (
-          <button
-            key={item.label}
-            onClick={() => router.push(item.path)}
-            className="flex flex-col items-center gap-1 py-2 px-3 min-w-[56px]"
-          >
-            <div
-              className="w-5 h-5 rounded"
-              style={{
-                background: item.active ? 'var(--masters-green)' : 'var(--surface-elevated)'
-              }}
-            />
-            <span
-              className="text-xs font-medium"
-              style={{
-                color: item.active ? 'var(--masters-green)' : 'var(--text-disabled)'
-              }}
-            >
-              {item.label}
-            </span>
-          </button>
-        ))}
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        <Link href="/" className="nav-item nav-item-active">
+          <Home size={20} />
+          <span>Home</span>
+        </Link>
+        <Link href="/score" className="nav-item">
+          <Target size={20} />
+          <span>Score</span>
+        </Link>
+        <Link href="/matchups" className="nav-item">
+          <Users size={20} />
+          <span>Matches</span>
+        </Link>
+        <Link href="/standings" className="nav-item">
+          <Trophy size={20} />
+          <span>Standings</span>
+        </Link>
+        <Link href="/more" className="nav-item">
+          <MoreHorizontal size={20} />
+          <span>More</span>
+        </Link>
       </nav>
     </div>
   );
