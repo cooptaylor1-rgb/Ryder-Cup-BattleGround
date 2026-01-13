@@ -1,0 +1,14 @@
+# Nixpacks configuration for Railway deployment
+# Points to the Next.js web app in the subdirectory
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["cd golf-ryder-cup-web && npm ci"]
+
+[phases.build]
+cmds = ["cd golf-ryder-cup-web && npm run build"]
+
+[start]
+cmd = "cd golf-ryder-cup-web && npm start"

@@ -1,0 +1,25 @@
+{
+    "name": "golf-ryder-cup-app",
+    "version": "1.0.0",
+    "description": "Golf Ryder Cup Tournament Tracker - Web App",
+    "private": true,
+    "scripts": {
+        "dev": "cd golf-ryder-cup-web && npm run dev",
+        "build": "cd golf-ryder-cup-web && npm run build",
+        "start": "cd golf-ryder-cup-web && npm start",
+        "lint": "cd golf-ryder-cup-web && npm run lint",
+        "postinstall": "cd golf-ryder-cup-web && npm install"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "golf",
+        "ryder-cup",
+        "tournament",
+        "scoring",
+        "pwa"
+    ],
+    "author": "",
+    "license": "MIT"
+}
