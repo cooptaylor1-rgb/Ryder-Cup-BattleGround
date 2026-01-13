@@ -2,332 +2,268 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useScoringStore } from '@/lib/stores';
-import { AppShellNew } from '@/components/layout';
-import {
-    Card,
-    Badge,
-    StatusBadge,
-    SectionHeader,
-    Button,
-    MatchCardSkeleton,
-    NoMatchesEmptyNew,
-} from '@/components/ui';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
-import { cn, formatPlayerName } from '@/lib/utils';
-import { ChevronRight, Calendar, Trophy, Target, Users } from 'lucide-react';
+import { formatPlayerName } from '@/lib/utils';
+import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 
-// Match card component with enhanced styling
-interface MatchCardNewProps {
-    matchState: MatchState;
-    matchNumber: number;
-    teamAPlayers: Player[];
-    teamBPlayers: Player[];
-    onClick: () => void;
-}
-
-function MatchCardNew({
-    matchState,
-    matchNumber,
-    teamAPlayers,
-    teamBPlayers,
-    onClick,
-}: MatchCardNewProps) {
-    const { currentScore, holesPlayed, isDormie, status, displayScore } = matchState;
-
-    const getStatusConfig = () => {
-        if (status === 'completed') return { status: 'completed' as const, label: 'Complete' };
-        if (isDormie) return { status: 'dormie' as const, label: 'Dormie' };
-        if (holesPlayed > 0) return { status: 'inProgress' as const, label: `Hole ${holesPlayed}` };
-        return { status: 'notStarted' as const, label: 'Not Started' };
-    };
-
-    const statusConfig = getStatusConfig();
-
-    return (
-        <Card interactive onClick={onClick} className="group">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    <div className={cn(
-                        'h-8 w-8 rounded-lg flex items-center justify-center',
-                        'bg-surface-elevated text-text-secondary',
-                        'text-sm font-semibold',
-                    )}>
-                        {matchNumber}
-                    </div>
-                    <span className="text-sm font-medium text-text-secondary">
-                        Match {matchNumber}
-                    </span>
-                </div>
-                <StatusBadge status={statusConfig.status} />
-            </div>
-
-            {/* Teams vs Score Layout */}
-            <div className="flex items-stretch gap-3">
-                {/* Team A */}
-                <div className={cn(
-                    'flex-1 p-3 rounded-lg',
-                    'bg-team-usa/5 border-l-[3px] border-team-usa',
-                )}>
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="h-2 w-2 rounded-full bg-team-usa" />
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-team-usa">
-                            USA
-                        </span>
-                    </div>
-                    <div className="space-y-1">
-                        {teamAPlayers.length > 0 ? (
-                            teamAPlayers.map(player => (
-                                <p key={player.id} className="text-sm font-medium text-text-primary truncate">
-                                    {formatPlayerName(player.firstName, player.lastName, 'short')}
-                                </p>
-                            ))
-                        ) : (
-                            <p className="text-sm text-text-tertiary italic">No players</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Score */}
-                <div className="flex flex-col items-center justify-center px-4 min-w-[72px]">
-                    <span className={cn(
-                        'text-2xl font-bold font-mono',
-                        currentScore > 0 && 'text-team-usa',
-                        currentScore < 0 && 'text-team-europe',
-                        currentScore === 0 && 'text-text-secondary',
-                    )}>
-                        {displayScore}
-                    </span>
-                    {holesPlayed > 0 && (
-                        <span className="text-xs text-text-tertiary mt-1">
-                            thru {holesPlayed}
-                        </span>
-                    )}
-                </div>
-
-                {/* Team B */}
-                <div className={cn(
-                    'flex-1 p-3 rounded-lg',
-                    'bg-team-europe/5 border-r-[3px] border-team-europe',
-                )}>
-                    <div className="flex items-center justify-end gap-2 mb-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-team-europe">
-                            EUR
-                        </span>
-                        <div className="h-2 w-2 rounded-full bg-team-europe" />
-                    </div>
-                    <div className="space-y-1 text-right">
-                        {teamBPlayers.length > 0 ? (
-                            teamBPlayers.map(player => (
-                                <p key={player.id} className="text-sm font-medium text-text-primary truncate">
-                                    {formatPlayerName(player.firstName, player.lastName, 'short')}
-                                </p>
-                            ))
-                        ) : (
-                            <p className="text-sm text-text-tertiary italic">No players</p>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Footer - Tap to score hint */}
-            <div className={cn(
-                'flex items-center justify-center gap-2 mt-4 pt-3',
-                'border-t border-surface-border/50',
-                'text-text-tertiary group-hover:text-masters-green-light',
-                'transition-colors duration-150',
-            )}>
-                <Target className="h-4 w-4" />
-                <span className="text-xs font-medium">
-                    {status === 'completed' ? 'View results' : 'Tap to score'}
-                </span>
-                <ChevronRight className="h-4 w-4" />
-            </div>
-        </Card>
-    );
-}
+/**
+ * SCORE PAGE - Match List
+ *
+ * Design: Editorial typography, scores as sacred numbers
+ * Clean match rows - no cards, dividers carry structure
+ */
 
 export default function ScorePage() {
-    const router = useRouter();
-    const { currentTrip, sessions, players, teams, teamMembers } = useTripStore();
-    const { selectMatch } = useScoringStore();
+  const router = useRouter();
+  const { currentTrip, sessions, players, teams, teamMembers } = useTripStore();
+  const { selectMatch } = useScoringStore();
 
-    // Redirect if no trip selected
-    useEffect(() => {
-        if (!currentTrip) {
-            router.push('/');
-        }
-    }, [currentTrip, router]);
-
-    // Get active session (first in-progress or next scheduled)
-    const activeSession = sessions.find(s => s.status === 'inProgress') ||
-        sessions.find(s => s.status === 'scheduled');
-
-    // Get matches for active session
-    const matches = useLiveQuery(
-        async () => {
-            if (!activeSession) return [];
-            return db.matches
-                .where('sessionId')
-                .equals(activeSession.id)
-                .sortBy('matchNumber');
-        },
-        [activeSession?.id],
-        []
-    );
-
-    // Get all hole results for these matches
-    const holeResults = useLiveQuery(
-        async () => {
-            if (!matches || matches.length === 0) return [];
-            const matchIds = matches.map(m => m.id);
-            return db.holeResults
-                .where('matchId')
-                .anyOf(matchIds)
-                .toArray();
-        },
-        [matches],
-        []
-    );
-
-    // Calculate match states
-    const matchStates: MatchState[] = matches.map(match => {
-        const results = holeResults.filter(r => r.matchId === match.id);
-        return calculateMatchState(match, results);
-    });
-
-    // Helper to get players for a match
-    const getMatchPlayers = (playerIds: string[]) => {
-        return playerIds
-            .map(id => players.find(p => p.id === id))
-            .filter(Boolean) as typeof players;
-    };
-
-    const handleMatchSelect = async (matchId: string) => {
-        await selectMatch(matchId);
-        router.push(`/score/${matchId}`);
-    };
-
-    const isLoading = matches === undefined || holeResults === undefined;
-
+  useEffect(() => {
     if (!currentTrip) {
-        return null; // Will redirect
+      router.push('/');
     }
+  }, [currentTrip, router]);
 
-    return (
-        <AppShellNew
-            headerTitle="Score"
-            headerSubtitle={currentTrip.name}
-        >
-            <div className="px-5 pt-10 max-w-[480px] mx-auto pb-24 space-y-10">
-                {/* Session Header - Masters refined */}
-                {activeSession && (
-                    <Card variant="elevated" className="bg-masters-green/5 border-masters-green/20">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className={cn(
-                                    'h-11 w-11 rounded-xl flex items-center justify-center',
-                                    'bg-masters-green text-magnolia',
-                                )}>
-                                    <Calendar className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-text-secondary">
-                                        Session {activeSession.sessionNumber}
-                                    </p>
-                                    <h2 className="font-serif text-xl font-semibold text-magnolia capitalize">
-                                        {activeSession.sessionType}
-                                    </h2>
-                                </div>
-                            </div>
-                            <StatusBadge
-                                status={
-                                    activeSession.status === 'inProgress'
-                                        ? 'inProgress'
-                                        : activeSession.status === 'completed'
-                                            ? 'completed'
-                                            : 'scheduled'
-                                }
-                            />
-                        </div>
-                    </Card>
-                )}
+  const activeSession = sessions.find(s => s.status === 'inProgress') ||
+    sessions.find(s => s.status === 'scheduled');
 
-                {/* Matches Section */}
-                <section>
-                    <SectionHeader
-                        title="Matches"
-                        subtitle={matchStates.length > 0 ? `${matchStates.length} matches` : undefined}
-                        icon={Target}
-                        className="mb-4"
-                    />
+  const matches = useLiveQuery(
+    async () => {
+      if (!activeSession) return [];
+      return db.matches
+        .where('sessionId')
+        .equals(activeSession.id)
+        .sortBy('matchNumber');
+    },
+    [activeSession?.id],
+    []
+  );
 
-                    {/* Loading state */}
-                    {isLoading && (
-                        <div className="space-y-3">
-                            <MatchCardSkeleton />
-                            <MatchCardSkeleton />
-                            <MatchCardSkeleton />
-                        </div>
-                    )}
+  const holeResults = useLiveQuery(
+    async () => {
+      if (!matches || matches.length === 0) return [];
+      const matchIds = matches.map(m => m.id);
+      return db.holeResults
+        .where('matchId')
+        .anyOf(matchIds)
+        .toArray();
+    },
+    [matches],
+    []
+  );
 
-                    {/* Match cards */}
-                    {!isLoading && matchStates.length > 0 && (
-                        <div className="space-y-3">
-                            {matchStates.map((matchState, index) => (
-                                <MatchCardNew
-                                    key={matchState.match.id}
-                                    matchState={matchState}
-                                    matchNumber={index + 1}
-                                    teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
-                                    teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
-                                    onClick={() => handleMatchSelect(matchState.match.id)}
-                                />
-                            ))}
-                        </div>
-                    )}
+  const matchStates: MatchState[] = matches.map(match => {
+    const results = holeResults.filter(r => r.matchId === match.id);
+    return calculateMatchState(match, results);
+  });
 
-                    {/* Empty state */}
-                    {!isLoading && matchStates.length === 0 && (
-                        <Card variant="outlined" padding="none">
-                            <NoMatchesEmptyNew onSetupMatchups={() => router.push('/matchups')} />
-                        </Card>
-                    )}
-                </section>
+  const getMatchPlayers = (playerIds: string[]) => {
+    return playerIds
+      .map(id => players.find(p => p.id === id))
+      .filter(Boolean) as typeof players;
+  };
 
-                {/* Session Selector */}
-                {sessions.length > 1 && (
-                    <section>
-                        <SectionHeader
-                            title="Other Sessions"
-                            size="sm"
-                            className="mb-3"
-                        />
-                        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-                            {sessions.map(session => (
-                                <button
-                                    key={session.id}
-                                    onClick={() => {/* TODO: Switch session */ }}
-                                    className={cn(
-                                        'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap',
-                                        'transition-colors duration-150',
-                                        session.id === activeSession?.id
-                                            ? 'bg-masters-green text-magnolia'
-                                            : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight',
-                                    )}
-                                >
-                                    Session {session.sessionNumber}
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-                )}
+  const handleMatchSelect = async (matchId: string) => {
+    await selectMatch(matchId);
+    router.push(`/score/${matchId}`);
+  };
+
+  const isLoading = matches === undefined || holeResults === undefined;
+
+  if (!currentTrip) return null;
+
+  return (
+    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+      {/* Header */}
+      <header className="header">
+        <div className="container-editorial flex items-center gap-3">
+          <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
+            <ChevronLeft size={20} />
+          </button>
+          <div>
+            <span className="type-overline">Score</span>
+            <p className="type-meta truncate" style={{ marginTop: '2px' }}>{currentTrip.name}</p>
+          </div>
+        </div>
+      </header>
+
+      <main className="container-editorial">
+        {/* Session Header */}
+        {activeSession && (
+          <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
+            <p className="type-meta" style={{ color: 'var(--masters)' }}>
+              Session {activeSession.sessionNumber}
+            </p>
+            <h1 className="type-headline capitalize" style={{ marginTop: 'var(--space-1)' }}>
+              {activeSession.sessionType}
+            </h1>
+            <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>
+              {activeSession.status === 'inProgress' ? 'In Progress' : 
+               activeSession.status === 'completed' ? 'Complete' : 'Scheduled'}
+            </p>
+          </section>
+        )}
+
+        <hr className="divider" />
+
+        {/* Matches */}
+        <section className="section">
+          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+            Matches
+          </h2>
+
+          {isLoading ? (
+            <p className="type-meta" style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+              Loading…
+            </p>
+          ) : matchStates.length > 0 ? (
+            <div>
+              {matchStates.map((matchState, index) => (
+                <MatchRow
+                  key={matchState.match.id}
+                  matchState={matchState}
+                  matchNumber={index + 1}
+                  teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
+                  teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
+                  onClick={() => handleMatchSelect(matchState.match.id)}
+                />
+              ))}
             </div>
-        </AppShellNew>
-    );
+          ) : (
+            <div className="empty-state">
+              <Target size={32} style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }} />
+              <p className="empty-state-title">No matches scheduled</p>
+              <p className="empty-state-text">Set up matchups to start scoring</p>
+              <Link href="/matchups" className="btn btn-primary">
+                Set Up Matches
+              </Link>
+            </div>
+          )}
+        </section>
+
+        {/* Session Selector */}
+        {sessions.length > 1 && (
+          <>
+            <hr className="divider" />
+            <section className="section">
+              <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>
+                Sessions
+              </h2>
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                {sessions.map(session => (
+                  <button
+                    key={session.id}
+                    className={session.id === activeSession?.id ? 'btn btn-primary' : 'btn btn-secondary'}
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    Session {session.sessionNumber}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        <Link href="/" className="nav-item">
+          <Home size={20} />
+          <span>Home</span>
+        </Link>
+        <Link href="/score" className="nav-item nav-item-active">
+          <Target size={20} />
+          <span>Score</span>
+        </Link>
+        <Link href="/matchups" className="nav-item">
+          <Users size={20} />
+          <span>Matches</span>
+        </Link>
+        <Link href="/standings" className="nav-item">
+          <Trophy size={20} />
+          <span>Standings</span>
+        </Link>
+        <Link href="/more" className="nav-item">
+          <MoreHorizontal size={20} />
+          <span>More</span>
+        </Link>
+      </nav>
+    </div>
+  );
+}
+
+/* ============================================
+   Match Row - Typography-driven match display
+   ============================================ */
+interface MatchRowProps {
+  matchState: MatchState;
+  matchNumber: number;
+  teamAPlayers: Player[];
+  teamBPlayers: Player[];
+  onClick: () => void;
+}
+
+function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick }: MatchRowProps) {
+  const { currentScore, holesPlayed, status, displayScore } = matchState;
+
+  const formatPlayers = (playerList: Player[]) => {
+    if (playerList.length === 0) return '—';
+    return playerList
+      .map(p => formatPlayerName(p.firstName, p.lastName, 'short'))
+      .join(' / ');
+  };
+
+  return (
+    <button onClick={onClick} className="match-row w-full text-left">
+      {/* Match number */}
+      <span className="type-meta" style={{ width: '24px', color: 'var(--ink-tertiary)' }}>
+        {matchNumber}
+      </span>
+
+      {/* Players */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span style={{ color: 'var(--team-usa)' }}>●</span>
+          <span className="truncate" style={{ fontWeight: currentScore > 0 ? 500 : 400 }}>
+            {formatPlayers(teamAPlayers)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2" style={{ marginTop: 'var(--space-1)' }}>
+          <span style={{ color: 'var(--team-europe)' }}>●</span>
+          <span className="truncate" style={{ fontWeight: currentScore < 0 ? 500 : 400 }}>
+            {formatPlayers(teamBPlayers)}
+          </span>
+        </div>
+      </div>
+
+      {/* Score */}
+      <div className="text-right" style={{ minWidth: '60px' }}>
+        <span 
+          className="score-medium"
+          style={{
+            color: currentScore > 0 ? 'var(--team-usa)' : 
+                   currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-secondary)'
+          }}
+        >
+          {displayScore}
+        </span>
+        {holesPlayed > 0 && (
+          <p className="type-meta" style={{ marginTop: '2px' }}>
+            {status === 'completed' ? 'Final' : `thru ${holesPlayed}`}
+          </p>
+        )}
+        {status === 'scheduled' && holesPlayed === 0 && (
+          <p className="type-meta">Not started</p>
+        )}
+      </div>
+
+      <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', marginLeft: 'var(--space-2)' }} />
+    </button>
+  );
 }

@@ -4,20 +4,19 @@ import { useEffect, useMemo, useState, TouchEvent } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
-import { AppShellNew } from '@/components/layout';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 
 /**
- * MATCH SCORING PAGE - Masters Tournament Inspired
+ * MATCH SCORING PAGE - Sacred Action Surface
  *
  * This is sacred. Design for:
  * - Fast, legible, stress-free
  * - Large tap targets for outdoor use
  * - Clear score deltas
- * - No unnecessary animation
- * - Undo is mandatory
+ * - Minimal decoration
+ * - Undo is always visible
  */
 
 export default function MatchScoringPage() {
@@ -43,7 +42,7 @@ export default function MatchScoringPage() {
     prevHole,
   } = useScoringStore();
 
-  // Local state for swipe gesture
+  // Swipe state
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -51,20 +50,17 @@ export default function MatchScoringPage() {
   const liveMatchState = useMatchState(matchId);
   const matchState = liveMatchState || activeMatchState;
 
-  // Load match if not already loaded
   useEffect(() => {
     if (matchId && (!activeMatch || activeMatch.id !== matchId)) {
       selectMatch(matchId);
     }
   }, [matchId, activeMatch, selectMatch]);
 
-  // Get team names
   const teamA = teams.find(t => t.color === 'usa');
   const teamB = teams.find(t => t.color === 'europe');
-  const teamAName = teamA?.name || 'Team A';
-  const teamBName = teamB?.name || 'Team B';
+  const teamAName = teamA?.name || 'USA';
+  const teamBName = teamB?.name || 'Europe';
 
-  // Get players for this match
   const teamAPlayers = useMemo(() => {
     if (!activeMatch) return [];
     return activeMatch.teamAPlayerIds
@@ -79,7 +75,6 @@ export default function MatchScoringPage() {
       .filter(Boolean);
   }, [activeMatch, players]);
 
-  // Current hole result
   const currentHoleResult = useMemo(() => {
     if (!matchState) return null;
     return matchState.holeResults.find(r => r.holeNumber === currentHole);
@@ -117,7 +112,6 @@ export default function MatchScoringPage() {
   const handleScore = async (winner: HoleWinner) => {
     if (isSaving) return;
 
-    // Check if this would close out the match
     if (scoringPreferences.confirmCloseout && matchState) {
       const wouldCloseOut =
         Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0))
@@ -144,155 +138,158 @@ export default function MatchScoringPage() {
 
   if (!activeMatch || !matchState) {
     return (
-      <AppShellNew showBack headerTitle="Scoring">
-        <div
-          className="flex items-center justify-center h-64"
-          style={{ color: 'var(--text-tertiary)' }}
-        >
-          Loading
+      <div className="min-h-screen" style={{ background: 'var(--canvas)' }}>
+        <header className="header">
+          <div className="container-editorial flex items-center gap-3">
+            <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
+              <ChevronLeft size={20} />
+            </button>
+            <span className="type-overline">Scoring</span>
+          </div>
+        </header>
+        <div className="flex items-center justify-center h-64">
+          <p className="type-meta">Loading…</p>
         </div>
-      </AppShellNew>
+      </div>
     );
   }
 
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
   return (
-    <AppShellNew
-      showBack
-      headerTitle={`Match ${activeMatch.matchOrder}`}
+    <div 
+      className="min-h-screen" 
+      style={{ background: 'var(--canvas)' }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
-      <div
-        className="px-5 py-6 max-w-lg mx-auto pb-24 lg:pb-8"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        {/* Match Score Header */}
-        <div
-          className="rounded-lg p-5 mb-6"
-          style={{
-            background: 'var(--surface-card)',
-            border: '1px solid var(--border-subtle)'
-          }}
-        >
-          <div className="flex items-center justify-between">
+      {/* Header */}
+      <header className="header">
+        <div className="container-editorial flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/score')} className="nav-item p-1" aria-label="Back">
+              <ChevronLeft size={20} />
+            </button>
+            <span className="type-overline">Match {activeMatch.matchOrder}</span>
+          </div>
+          
+          {/* Undo - Always visible in header */}
+          <button
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
+            className="flex items-center gap-1 type-meta"
+            style={{ 
+              color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
+              opacity: undoStack.length === 0 ? 0.5 : 1,
+            }}
+          >
+            <Undo2 size={16} />
+            <span>Undo</span>
+          </button>
+        </div>
+      </header>
+
+      <main className="container-editorial">
+        {/* Match Score - Hero */}
+        <section className="section text-center" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
+          <div className="flex items-baseline justify-center gap-8">
             {/* Team A */}
-            <div className="text-center flex-1">
-              <div
-                className="w-3 h-3 rounded-full mx-auto mb-2"
-                style={{ background: 'var(--team-a-color)' }}
-              />
-              <p
-                className="text-overline"
-                style={{ color: 'var(--team-a-color)' }}
-              >
+            <div className="text-center">
+              <p className="type-overline" style={{ color: 'var(--team-usa)', marginBottom: 'var(--space-2)' }}>
                 {teamAName}
               </p>
-              <div className="mt-2 space-y-0.5">
-                {teamAPlayers.map(player => (
-                  <p
-                    key={player!.id}
-                    className="text-sm truncate"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {formatPlayerName(player!.firstName, player!.lastName, 'short')}
-                  </p>
+              <div className="type-meta">
+                {teamAPlayers.map(p => (
+                  <p key={p!.id}>{formatPlayerName(p!.firstName, p!.lastName, 'short')}</p>
                 ))}
               </div>
             </div>
 
             {/* Score */}
-            <div className="px-6 text-center">
-              <p
-                className="font-score text-5xl"
+            <div className="text-center">
+              <p 
+                className="score-hero"
                 style={{
-                  color: matchState.currentScore > 0
-                    ? 'var(--team-a-color)'
-                    : matchState.currentScore < 0
-                      ? 'var(--team-b-color)'
-                      : 'var(--text-tertiary)'
+                  color: matchState.currentScore > 0 ? 'var(--team-usa)' :
+                         matchState.currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-tertiary)'
                 }}
               >
                 {matchState.displayScore}
               </p>
-              <p
-                className="text-xs mt-1"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
+              <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
                 thru {matchState.holesPlayed}
               </p>
               {matchState.isDormie && (
-                <div
-                  className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded text-xs font-medium"
-                  style={{
-                    background: 'rgba(196, 152, 61, 0.1)',
-                    color: 'var(--warning)'
-                  }}
-                >
-                  <AlertCircle className="w-3 h-3" />
+                <p className="type-meta" style={{ color: 'var(--warning)', marginTop: 'var(--space-2)' }}>
+                  <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px' }} />
                   Dormie
-                </div>
+                </p>
               )}
             </div>
 
             {/* Team B */}
-            <div className="text-center flex-1">
-              <div
-                className="w-3 h-3 rounded-full mx-auto mb-2"
-                style={{ background: 'var(--team-b-color)' }}
-              />
-              <p
-                className="text-overline"
-                style={{ color: 'var(--team-b-color)' }}
-              >
+            <div className="text-center">
+              <p className="type-overline" style={{ color: 'var(--team-europe)', marginBottom: 'var(--space-2)' }}>
                 {teamBName}
               </p>
-              <div className="mt-2 space-y-0.5">
-                {teamBPlayers.map(player => (
-                  <p
-                    key={player!.id}
-                    className="text-sm truncate"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {formatPlayerName(player!.firstName, player!.lastName, 'short')}
-                  </p>
+              <div className="type-meta">
+                {teamBPlayers.map(p => (
+                  <p key={p!.id}>{formatPlayerName(p!.firstName, p!.lastName, 'short')}</p>
                 ))}
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Hole Progress Strip */}
-        <div className="mb-6">
-          <div className="flex gap-1 overflow-x-auto pb-2 -mx-2 px-2">
+        <hr className="divider" />
+
+        {/* Hole Progress */}
+        <section className="section" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+          <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4">
             {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
               const result = matchState.holeResults.find(r => r.holeNumber === hole);
               const isCurrent = hole === currentHole;
+
+              let bg = 'var(--canvas-sunken)';
+              let color = 'var(--ink-tertiary)';
+              let border = '1px solid var(--rule)';
+
+              if (result?.winner === 'teamA') {
+                bg = 'var(--team-usa)';
+                color = 'white';
+                border = 'none';
+              } else if (result?.winner === 'teamB') {
+                bg = 'var(--team-europe)';
+                color = 'white';
+                border = 'none';
+              } else if (result?.winner === 'halved') {
+                bg = 'var(--canvas-raised)';
+                color = 'var(--ink-secondary)';
+                border = '1px solid var(--rule-strong)';
+              } else if (isCurrent) {
+                bg = 'var(--masters)';
+                color = 'white';
+                border = 'none';
+              }
 
               return (
                 <button
                   key={hole}
                   onClick={() => goToHole(hole)}
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 transition-all',
-                  )}
+                  className="shrink-0"
                   style={{
-                    background: result?.winner === 'teamA'
-                      ? 'var(--team-a-color)'
-                      : result?.winner === 'teamB'
-                        ? 'var(--team-b-color)'
-                        : result?.winner === 'halved'
-                          ? 'var(--surface-elevated)'
-                          : isCurrent
-                            ? 'var(--masters-green)'
-                            : 'var(--surface-raised)',
-                    color: result?.winner && result.winner !== 'halved'
-                      ? 'white'
-                      : isCurrent
-                        ? 'white'
-                        : 'var(--text-tertiary)',
-                    border: isCurrent ? '2px solid var(--masters-gold)' : '1px solid var(--border-subtle)',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    background: bg,
+                    color: color,
+                    border: border,
                   }}
                 >
                   {hole}
@@ -300,44 +297,31 @@ export default function MatchScoringPage() {
               );
             })}
           </div>
-        </div>
+        </section>
+
+        <hr className="divider" />
 
         {/* Scoring Controls */}
         {!isMatchComplete ? (
-          <div
-            className="rounded-lg p-5"
-            style={{
-              background: 'var(--surface-card)',
-              border: '1px solid var(--border-subtle)'
-            }}
-          >
+          <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
             {/* Hole Navigation */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-6)' }}>
               <button
                 onClick={prevHole}
                 disabled={currentHole <= 1}
-                className="p-3 rounded-lg touch-target transition-colors"
+                className="p-3"
                 style={{
-                  background: currentHole > 1 ? 'var(--surface-elevated)' : 'transparent',
-                  color: currentHole > 1 ? 'var(--text-primary)' : 'var(--text-disabled)',
-                  opacity: currentHole <= 1 ? 0.4 : 1
+                  opacity: currentHole <= 1 ? 0.3 : 1,
+                  color: currentHole > 1 ? 'var(--ink)' : 'var(--ink-tertiary)',
                 }}
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft size={24} />
               </button>
 
               <div className="text-center">
-                <p
-                  className="font-display text-3xl"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  Hole {currentHole}
-                </p>
+                <p className="type-headline">Hole {currentHole}</p>
                 {currentHoleResult && currentHoleResult.winner !== 'none' && (
-                  <p
-                    className="text-sm mt-1"
-                    style={{ color: 'var(--text-tertiary)' }}
-                  >
+                  <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
                     {currentHoleResult.winner === 'halved' ? 'Halved' :
                       currentHoleResult.winner === 'teamA' ? `${teamAName} won` : `${teamBName} won`}
                   </p>
@@ -347,158 +331,112 @@ export default function MatchScoringPage() {
               <button
                 onClick={nextHole}
                 disabled={currentHole >= 18}
-                className="p-3 rounded-lg touch-target transition-colors"
+                className="p-3"
                 style={{
-                  background: currentHole < 18 ? 'var(--surface-elevated)' : 'transparent',
-                  color: currentHole < 18 ? 'var(--text-primary)' : 'var(--text-disabled)',
-                  opacity: currentHole >= 18 ? 0.4 : 1
+                  opacity: currentHole >= 18 ? 0.3 : 1,
+                  color: currentHole < 18 ? 'var(--ink)' : 'var(--ink-tertiary)',
                 }}
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight size={24} />
               </button>
             </div>
 
-            {/* Score Buttons - Large, clear tap targets */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            {/* Score Buttons */}
+            <div className="grid grid-cols-3 gap-3" style={{ marginBottom: 'var(--space-4)' }}>
               <button
                 onClick={() => handleScore('teamA')}
                 disabled={isSaving}
-                className={cn(
-                  'py-5 px-4 rounded-lg font-semibold text-center transition-all touch-target-xl',
-                  currentHoleResult?.winner === 'teamA' && 'ring-2 ring-offset-2',
-                )}
+                className="score-btn"
                 style={{
-                  background: 'var(--team-a-color)',
+                  background: 'var(--team-usa)',
                   color: 'white',
                   opacity: isSaving ? 0.5 : 1,
-                  // Use CSS custom properties for ring via box-shadow
                   boxShadow: currentHoleResult?.winner === 'teamA'
-                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--team-a-color)'
+                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--team-usa)'
                     : undefined,
                 }}
               >
-                <span className="block text-lg">{teamAName}</span>
-                <span className="block text-xs opacity-75 mt-0.5">wins hole</span>
+                <span className="score-btn-label">{teamAName}</span>
+                <span className="score-btn-hint">wins hole</span>
               </button>
 
               <button
                 onClick={() => handleScore('halved')}
                 disabled={isSaving}
-                className={cn(
-                  'py-5 px-4 rounded-lg font-semibold text-center transition-all touch-target-xl',
-                  currentHoleResult?.winner === 'halved' && 'ring-2 ring-offset-2',
-                )}
+                className="score-btn"
                 style={{
-                  background: 'var(--surface-elevated)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-default)',
+                  background: 'var(--canvas-raised)',
+                  color: 'var(--ink)',
+                  border: '1px solid var(--rule-strong)',
                   opacity: isSaving ? 0.5 : 1,
                   boxShadow: currentHoleResult?.winner === 'halved'
-                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--text-tertiary)'
+                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--ink-tertiary)'
                     : undefined,
                 }}
               >
-                <span className="block text-lg">Halve</span>
-                <span className="block text-xs opacity-75 mt-0.5">tie hole</span>
+                <span className="score-btn-label">Halve</span>
+                <span className="score-btn-hint">tie hole</span>
               </button>
 
               <button
                 onClick={() => handleScore('teamB')}
                 disabled={isSaving}
-                className={cn(
-                  'py-5 px-4 rounded-lg font-semibold text-center transition-all touch-target-xl',
-                  currentHoleResult?.winner === 'teamB' && 'ring-2 ring-offset-2',
-                )}
+                className="score-btn"
                 style={{
-                  background: 'var(--team-b-color)',
+                  background: 'var(--team-europe)',
                   color: 'white',
                   opacity: isSaving ? 0.5 : 1,
                   boxShadow: currentHoleResult?.winner === 'teamB'
-                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--team-b-color)'
+                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--team-europe)'
                     : undefined,
                 }}
               >
-                <span className="block text-lg">{teamBName}</span>
-                <span className="block text-xs opacity-75 mt-0.5">wins hole</span>
+                <span className="score-btn-label">{teamBName}</span>
+                <span className="score-btn-hint">wins hole</span>
               </button>
             </div>
-
-            {/* Undo - Always accessible, mandatory */}
-            <button
-              onClick={handleUndo}
-              disabled={undoStack.length === 0}
-              className="w-full py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
-              style={{
-                background: undoStack.length > 0 ? 'var(--surface-raised)' : 'transparent',
-                color: undoStack.length > 0 ? 'var(--text-secondary)' : 'var(--text-disabled)',
-                border: '1px solid var(--border-subtle)',
-                opacity: undoStack.length === 0 ? 0.5 : 1,
-              }}
-            >
-              <Undo2 className="w-4 h-4" />
-              <span className="text-sm font-medium">Undo Last Score</span>
-            </button>
-          </div>
+          </section>
         ) : (
-          /* Match Complete State — The Emotional Finish
-             This moment should feel inevitable, composed.
-             Not celebratory, but quietly satisfying. */
-          <div
-            className="rounded-lg p-8 text-center match-complete-state"
-            style={{
-              background: 'var(--surface-card)',
-              border: '1px solid var(--border-subtle)'
-            }}
-          >
+          /* Match Complete */
+          <section className="section text-center" style={{ paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-10)' }}>
             <div
-              className="w-12 h-12 mx-auto mb-5 rounded-full flex items-center justify-center"
               style={{
-                background: 'var(--masters-gold-muted)',
-                border: '1px solid rgba(201, 162, 39, 0.3)'
+                width: '48px',
+                height: '48px',
+                margin: '0 auto var(--space-4)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0, 103, 71, 0.1)',
               }}
             >
-              <Check
-                className="w-6 h-6"
-                style={{ color: 'var(--masters-gold)' }}
-              />
+              <Check size={24} style={{ color: 'var(--masters)' }} />
             </div>
-            <p
-              className="font-display text-xl mb-1"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              {matchState.currentScore > 0
-                ? teamAName
-                : matchState.currentScore < 0
-                  ? teamBName
-                  : 'Match Halved'
-              }
+            
+            <p className="type-headline" style={{ marginBottom: 'var(--space-2)' }}>
+              {matchState.currentScore > 0 ? teamAName :
+               matchState.currentScore < 0 ? teamBName : 'Match Halved'}
             </p>
-            <p
-              className="text-lg font-medium mb-1"
-              style={{ color: 'var(--masters-gold)' }}
-            >
+            
+            <p className="score-large" style={{ color: 'var(--masters)', marginBottom: 'var(--space-1)' }}>
               {matchState.displayScore}
             </p>
-            <p
-              className="text-sm"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              {matchState.currentScore !== 0 ? 'wins' : ''}
-            </p>
+            
+            {matchState.currentScore !== 0 && (
+              <p className="type-meta">wins</p>
+            )}
+
             <button
               onClick={() => router.push('/score')}
-              className="mt-8 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-default)'
-              }}
+              className="btn btn-secondary"
+              style={{ marginTop: 'var(--space-8)' }}
             >
               Back to Matches
             </button>
-          </div>
+          </section>
         )}
-      </div>
-    </AppShellNew>
+      </main>
+    </div>
   );
 }

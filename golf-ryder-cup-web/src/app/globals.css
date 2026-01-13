@@ -287,6 +287,18 @@ button, a, [role="button"] {
   transform: scale(0.97);
 }
 
+.score-btn-label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.score-btn-hint {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
 .score-btn-usa {
   background: var(--team-usa);
   color: white;
