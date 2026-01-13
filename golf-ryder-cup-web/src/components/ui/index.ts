@@ -15,6 +15,23 @@ export { ToastContainer } from './Toast';
 export { UndoToast, useUndoToast } from './UndoToast';
 export { Tooltip, type TooltipProps } from './Tooltip';
 
+// Error handling
+export {
+    ErrorBoundary,
+    ErrorFallback,
+    MiniErrorFallback,
+    ErrorCard
+} from './ErrorBoundary';
+
+// Celebration & success
+export {
+    ConfettiBurst,
+    SuccessOverlay,
+    VictoryCelebration,
+    PointScored,
+    AchievementBadge,
+} from './Celebration';
+
 // Navigation & organization
 export { Tabs, TabList, TabTrigger, TabContent, type TabsProps } from './Tabs';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
