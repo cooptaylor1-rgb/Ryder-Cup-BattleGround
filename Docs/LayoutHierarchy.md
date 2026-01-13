@@ -15,6 +15,7 @@
 | **Caption** | 11–12px | 500 | 1.4 | Metadata, labels, overlines |
 
 **Typeface Intent:**
+
 - Display/Headline: Serif. Creates weight without shouting.
 - Title/Body/Caption: Sans-serif. Functional, recedes.
 
@@ -40,6 +41,7 @@
 ### Layout Description
 
 **Container:**
+
 - Max-width: 480px (centered)
 - Horizontal padding: 20px
 - Creates a reading column, not edge-to-edge sprawl
@@ -83,7 +85,7 @@
 ```
             [caption: overline label]
                    TEAM A
-                     
+
     ┌─────────────────────────────────┐
     │                                 │
     │      7          │         5     │   ← Display type (56px)
@@ -91,11 +93,12 @@
     │   [Team A]      │     [Team B]  │   ← Caption labels below
     │                                 │
     └─────────────────────────────────┘
-                     
+
               [thin progress bar]          ← Optional, 4px height
 ```
 
 **Key decisions:**
+
 - Scores are set in Display type, nothing else on screen approaches this size
 - Vertical divider separates teams without enclosing them in boxes
 - Team labels sit BELOW scores (not above) — score is primary, label is context
@@ -103,6 +106,7 @@
 - Asymmetric tension: if scores differ, the larger number has more visual weight
 
 **Why the eye moves correctly:**
+
 1. Display type creates immediate focal point (team scores)
 2. Eye naturally scans left-to-right across the score pair
 3. Descending type size (56→12) guides eye downward to secondary content
@@ -124,17 +128,19 @@
 │  [Caption: 11px]                            │
 │  thru 14                                    │
 └─────────────────────────────────────────────┘
-                                              
+
 [space-sm: 8px between rows]
 ```
 
 **Key decisions:**
+
 - NO cards. Rows are separated by spacing only.
 - Player names flush left, score flush right (creates scannable column)
 - Match progress ("thru 14") is tertiary — smallest type, muted weight
 - Touch target: full row width, minimum 56px height
 
 **Why this works:**
+
 - Consistent left edge creates a strong vertical axis
 - Right-aligned scores form a second axis — eye can scan the "score column" rapidly
 - No visual ornamentation competing with data
@@ -151,6 +157,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 ```
 
 **Key decisions:**
+
 - Smallest type on page
 - Not styled as a "badge" or "chip"
 - Integrated into flow, not called out
@@ -162,6 +169,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 ### Layout Description
 
 **Container:**
+
 - Max-width: 400px (tighter than home — focused context)
 - Horizontal padding: 20px
 - Optimized for one-handed portrait use
@@ -216,12 +224,13 @@ BETHPAGE BLACK • DAY 2 OF 3
 
 ```
         3 UP              ← Headline type (28px)
-        
+
    [Team A]  vs  [Team B]  ← Caption (11px)
     thru 13
 ```
 
 **Key decisions:**
+
 - Single line for score state ("3 UP" or "AS")
 - Player names NOT shown — user knows who's playing
 - "thru X" provides context without competing for attention
@@ -240,12 +249,14 @@ BETHPAGE BLACK • DAY 2 OF 3
 ```
 
 **Key decisions:**
+
 - Largest type on this screen
 - Centered — breaks the left-alignment pattern intentionally to signal primacy
 - "HOLE" as overline in caption size, separated by space-xs
 - Nothing else at this size competes
 
 **Why this works:**
+
 - Breaking alignment pattern signals "this is different, this matters"
 - Isolation (whitespace above and below) creates visual weight
 - User can glance and know the state in <1 second
@@ -271,6 +282,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 ```
 
 **Key decisions:**
+
 - Three columns, equal weight
 - Generous height (72px) — outdoor touch target
 - Team names only, no secondary text within buttons
@@ -278,6 +290,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 - Space between buttons prevents mis-taps
 
 **Typography within buttons:**
+
 - Title weight (18px, 500)
 - Centered horizontally and vertically
 - ALL CAPS for scannability
@@ -295,6 +308,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 ```
 
 **Key decisions:**
+
 - Centered to avoid competing with left-aligned content
 - Small enough to not distract
 - Large enough to tap (full width touch target)
@@ -317,6 +331,7 @@ BETHPAGE BLACK • DAY 2 OF 3
 ```
 
 **Key decisions:**
+
 - Fixed to bottom of scroll area
 - Small indicators (28px circles)
 - Current hole is visually distinct (bold number, or slight size increase)
@@ -342,6 +357,7 @@ EXIT: Navigation at bottom
 ```
 
 **Why it works:**
+
 - Largest type is centered, capturing entry
 - Horizontal scan for comparison (natural for scores)
 - Vertical descent follows type size reduction
@@ -364,6 +380,7 @@ ORIENTATION: Hole strip at bottom (glanceable)
 ```
 
 **Why it works:**
+
 - Breaking center alignment signals "start here"
 - Downward flow matches thumb reach (top of action zone)
 - Three equal buttons prevent decision bias

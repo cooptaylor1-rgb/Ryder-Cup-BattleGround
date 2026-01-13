@@ -12,6 +12,7 @@ export { Input, type InputProps } from './Input';
 export { Modal, ConfirmDialog, type ModalProps, type ConfirmDialogProps } from './Modal';
 export { OfflineIndicator } from './OfflineIndicator';
 export { ToastContainer } from './Toast';
+export { UndoToast, useUndoToast } from './UndoToast';
 export { Tooltip, type TooltipProps } from './Tooltip';
 
 // Navigation & organization

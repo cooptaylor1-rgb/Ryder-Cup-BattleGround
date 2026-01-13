@@ -146,7 +146,7 @@ export default function MatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <AppShellNew showBack headerTitle="Scoring">
-        <div 
+        <div
           className="flex items-center justify-center h-64"
           style={{ color: 'var(--text-tertiary)' }}
         >
@@ -170,9 +170,9 @@ export default function MatchScoringPage() {
         onTouchEnd={onTouchEnd}
       >
         {/* Match Score Header */}
-        <div 
+        <div
           className="rounded-lg p-5 mb-6"
-          style={{ 
+          style={{
             background: 'var(--surface-card)',
             border: '1px solid var(--border-subtle)'
           }}
@@ -180,11 +180,11 @@ export default function MatchScoringPage() {
           <div className="flex items-center justify-between">
             {/* Team A */}
             <div className="text-center flex-1">
-              <div 
+              <div
                 className="w-3 h-3 rounded-full mx-auto mb-2"
                 style={{ background: 'var(--team-a-color)' }}
               />
-              <p 
+              <p
                 className="text-overline"
                 style={{ color: 'var(--team-a-color)' }}
               >
@@ -192,8 +192,8 @@ export default function MatchScoringPage() {
               </p>
               <div className="mt-2 space-y-0.5">
                 {teamAPlayers.map(player => (
-                  <p 
-                    key={player!.id} 
+                  <p
+                    key={player!.id}
                     className="text-sm truncate"
                     style={{ color: 'var(--text-primary)' }}
                   >
@@ -205,28 +205,28 @@ export default function MatchScoringPage() {
 
             {/* Score */}
             <div className="px-6 text-center">
-              <p 
+              <p
                 className="font-score text-5xl"
-                style={{ 
-                  color: matchState.currentScore > 0 
+                style={{
+                  color: matchState.currentScore > 0
                     ? 'var(--team-a-color)'
-                    : matchState.currentScore < 0 
+                    : matchState.currentScore < 0
                       ? 'var(--team-b-color)'
                       : 'var(--text-tertiary)'
                 }}
               >
                 {matchState.displayScore}
               </p>
-              <p 
+              <p
                 className="text-xs mt-1"
                 style={{ color: 'var(--text-tertiary)' }}
               >
                 thru {matchState.holesPlayed}
               </p>
               {matchState.isDormie && (
-                <div 
+                <div
                   className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded text-xs font-medium"
-                  style={{ 
+                  style={{
                     background: 'rgba(196, 152, 61, 0.1)',
                     color: 'var(--warning)'
                   }}
@@ -239,11 +239,11 @@ export default function MatchScoringPage() {
 
             {/* Team B */}
             <div className="text-center flex-1">
-              <div 
+              <div
                 className="w-3 h-3 rounded-full mx-auto mb-2"
                 style={{ background: 'var(--team-b-color)' }}
               />
-              <p 
+              <p
                 className="text-overline"
                 style={{ color: 'var(--team-b-color)' }}
               >
@@ -251,8 +251,8 @@ export default function MatchScoringPage() {
               </p>
               <div className="mt-2 space-y-0.5">
                 {teamBPlayers.map(player => (
-                  <p 
-                    key={player!.id} 
+                  <p
+                    key={player!.id}
                     className="text-sm truncate"
                     style={{ color: 'var(--text-primary)' }}
                   >
@@ -270,7 +270,7 @@ export default function MatchScoringPage() {
             {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
               const result = matchState.holeResults.find(r => r.holeNumber === hole);
               const isCurrent = hole === currentHole;
-              
+
               return (
                 <button
                   key={hole}
@@ -279,7 +279,7 @@ export default function MatchScoringPage() {
                     'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 transition-all',
                   )}
                   style={{
-                    background: result?.winner === 'teamA' 
+                    background: result?.winner === 'teamA'
                       ? 'var(--team-a-color)'
                       : result?.winner === 'teamB'
                         ? 'var(--team-b-color)'
@@ -305,9 +305,9 @@ export default function MatchScoringPage() {
 
         {/* Scoring Controls */}
         {!isMatchComplete ? (
-          <div 
+          <div
             className="rounded-lg p-5"
-            style={{ 
+            style={{
               background: 'var(--surface-card)',
               border: '1px solid var(--border-subtle)'
             }}
@@ -318,7 +318,7 @@ export default function MatchScoringPage() {
                 onClick={prevHole}
                 disabled={currentHole <= 1}
                 className="p-3 rounded-lg touch-target transition-colors"
-                style={{ 
+                style={{
                   background: currentHole > 1 ? 'var(--surface-elevated)' : 'transparent',
                   color: currentHole > 1 ? 'var(--text-primary)' : 'var(--text-disabled)',
                   opacity: currentHole <= 1 ? 0.4 : 1
@@ -328,14 +328,14 @@ export default function MatchScoringPage() {
               </button>
 
               <div className="text-center">
-                <p 
+                <p
                   className="font-display text-3xl"
                   style={{ color: 'var(--text-primary)' }}
                 >
                   Hole {currentHole}
                 </p>
                 {currentHoleResult && currentHoleResult.winner !== 'none' && (
-                  <p 
+                  <p
                     className="text-sm mt-1"
                     style={{ color: 'var(--text-tertiary)' }}
                   >
@@ -349,7 +349,7 @@ export default function MatchScoringPage() {
                 onClick={nextHole}
                 disabled={currentHole >= 18}
                 className="p-3 rounded-lg touch-target transition-colors"
-                style={{ 
+                style={{
                   background: currentHole < 18 ? 'var(--surface-elevated)' : 'transparent',
                   color: currentHole < 18 ? 'var(--text-primary)' : 'var(--text-disabled)',
                   opacity: currentHole >= 18 ? 0.4 : 1
@@ -372,8 +372,10 @@ export default function MatchScoringPage() {
                   background: 'var(--team-a-color)',
                   color: 'white',
                   opacity: isSaving ? 0.5 : 1,
-                  ringColor: 'var(--team-a-color)',
-                  ringOffsetColor: 'var(--surface-card)',
+                  // Use CSS custom properties for ring via box-shadow
+                  boxShadow: currentHoleResult?.winner === 'teamA'
+                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--team-a-color)'
+                    : undefined,
                 }}
               >
                 <span className="block text-lg">{teamAName}</span>
@@ -392,8 +394,9 @@ export default function MatchScoringPage() {
                   color: 'var(--text-primary)',
                   border: '1px solid var(--border-default)',
                   opacity: isSaving ? 0.5 : 1,
-                  ringColor: 'var(--text-tertiary)',
-                  ringOffsetColor: 'var(--surface-card)',
+                  boxShadow: currentHoleResult?.winner === 'halved'
+                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--text-tertiary)'
+                    : undefined,
                 }}
               >
                 <span className="block text-lg">Halve</span>
@@ -411,8 +414,9 @@ export default function MatchScoringPage() {
                   background: 'var(--team-b-color)',
                   color: 'white',
                   opacity: isSaving ? 0.5 : 1,
-                  ringColor: 'var(--team-b-color)',
-                  ringOffsetColor: 'var(--surface-card)',
+                  boxShadow: currentHoleResult?.winner === 'teamB'
+                    ? '0 0 0 2px var(--surface-card), 0 0 0 4px var(--team-b-color)'
+                    : undefined,
                 }}
               >
                 <span className="block text-lg">{teamBName}</span>
@@ -438,28 +442,28 @@ export default function MatchScoringPage() {
           </div>
         ) : (
           /* Match Complete State */
-          <div 
+          <div
             className="rounded-lg p-8 text-center"
-            style={{ 
+            style={{
               background: 'var(--masters-gold-muted)',
               border: '1px solid rgba(201, 162, 39, 0.2)'
             }}
           >
-            <Check 
-              className="w-12 h-12 mx-auto mb-4" 
+            <Check
+              className="w-12 h-12 mx-auto mb-4"
               style={{ color: 'var(--masters-gold)' }}
             />
-            <h3 
+            <h3
               className="font-display text-xl mb-2"
               style={{ color: 'var(--text-primary)' }}
             >
               Match Complete
             </h3>
             <p style={{ color: 'var(--text-secondary)' }}>
-              {matchState.currentScore > 0 
-                ? `${teamAName} wins` 
-                : matchState.currentScore < 0 
-                  ? `${teamBName} wins` 
+              {matchState.currentScore > 0
+                ? `${teamAName} wins`
+                : matchState.currentScore < 0
+                  ? `${teamBName} wins`
                   : 'Match halved'
               } {matchState.displayScore}
             </p>
