@@ -65,10 +65,10 @@ export function AppShellNew({
     }[maxWidth];
 
     return (
-        <div className={cn(
-            'min-h-screen flex',
-            'bg-surface-base text-text-primary',
-        )}>
+        <div
+            className={cn('min-h-screen flex')}
+            style={{ background: '#0F0D0A', color: '#F5F1E8' }}
+        >
             {/* Desktop Sidebar */}
             {showNav && (
                 <SidebarNav

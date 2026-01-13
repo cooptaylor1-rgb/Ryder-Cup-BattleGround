@@ -50,10 +50,13 @@ export function BottomNavNew() {
                 'fixed bottom-0 left-0 right-0 z-50',
                 'flex items-stretch justify-around',
                 'h-16 px-2',
-                'bg-surface-raised/95 backdrop-blur-xl',
-                'border-t border-surface-border/50',
+                'backdrop-blur-xl',
                 'safe-bottom',
             )}
+            style={{
+                background: 'rgba(26, 24, 20, 0.95)',
+                borderTop: '1px solid rgba(58, 53, 48, 0.5)'
+            }}
             aria-label="Main navigation"
         >
             {navItems.map((item) => {
@@ -68,11 +71,9 @@ export function BottomNavNew() {
                             'relative flex flex-col items-center justify-center',
                             'flex-1 min-w-[64px] py-2',
                             'transition-colors duration-200',
-                            'focus-visible:outline-none focus-visible:bg-surface-highlight',
-                            active
-                                ? 'text-gold'
-                                : 'text-text-tertiary hover:text-text-secondary',
+                            'focus-visible:outline-none',
                         )}
+                        style={{ color: active ? '#C4A747' : '#807868' }}
                         aria-current={active ? 'page' : undefined}
                     >
                         {/* Icon with subtle scale on active */}
@@ -107,8 +108,9 @@ export function BottomNavNew() {
                             <span
                                 className={cn(
                                     'absolute bottom-1 left-1/2 -translate-x-1/2',
-                                    'w-1 h-1 rounded-full bg-gold',
+                                    'w-1 h-1 rounded-full',
                                 )}
+                                style={{ background: '#C4A747' }}
                                 aria-hidden="true"
                             />
                         )}
