@@ -21,7 +21,7 @@ import type { TeamStandings } from '@/lib/types/computed';
  */
 export default function HomePage() {
   const router = useRouter();
-  const { loadTrip, currentTrip } = useTripStore();
+  const { loadTrip } = useTripStore();
   const [standings, setStandings] = useState<TeamStandings | null>(null);
 
   const trips = useLiveQuery(

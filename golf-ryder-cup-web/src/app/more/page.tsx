@@ -12,7 +12,6 @@ import {
     Vibrate,
     Database,
     Trash2,
-    Info,
     ChevronRight,
     LogOut,
     Lock,
@@ -358,7 +357,7 @@ export default function MorePage() {
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <h2 className="type-headline" style={{ marginBottom: 'var(--space-3)' }}>Exit Trip?</h2>
                         <p className="type-body" style={{ marginBottom: 'var(--space-4)' }}>
-                            You'll be taken back to the trip selector. Your data will be saved and you can return to this trip anytime.
+                            You&apos;ll be taken back to the trip selector. Your data will be saved and you can return to this trip anytime.
                         </p>
                         <div className="flex gap-3">
                             <button onClick={() => setShowExitTripConfirm(false)} className="btn btn-secondary flex-1">

@@ -21,7 +21,7 @@ import type { Player } from '@/lib/types/models';
 
 export default function ScorePage() {
     const router = useRouter();
-    const { currentTrip, sessions, players, teams, teamMembers } = useTripStore();
+    const { currentTrip, sessions, players } = useTripStore();
     const { selectMatch } = useScoringStore();
 
     useEffect(() => {

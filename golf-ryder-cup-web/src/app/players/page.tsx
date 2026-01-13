@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
-import { Plus, Edit2, Trash2, UserPlus, Users, X, ChevronLeft } from 'lucide-react';
+import { Edit2, Trash2, UserPlus, Users, X, ChevronLeft } from 'lucide-react';
 
 /**
  * PLAYERS PAGE - Editorial Design

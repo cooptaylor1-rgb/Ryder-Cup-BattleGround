@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, TouchEvent } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
-import { cn, formatPlayerName } from '@/lib/utils';
+import { formatPlayerName } from '@/lib/utils';
 import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 
