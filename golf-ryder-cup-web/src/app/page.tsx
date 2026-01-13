@@ -45,11 +45,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--surface-base)' }}>
-      {/* Header - Minimal, confident */}
-      <header className="px-5 pt-6 pb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="max-w-lg mx-auto">
+      {/* Header - 48px height per spec */}
+      <header
+        className="px-5 flex items-center border-b"
+        style={{
+          borderColor: 'var(--border-subtle)',
+          height: '48px'
+        }}
+      >
+        <div className="max-w-[480px] w-full mx-auto">
           <h1
-            className="font-display text-2xl"
+            className="font-display text-xl"
             style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em' }}
           >
             Ryder Cup Tracker
@@ -57,12 +63,12 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="px-5 py-6 max-w-lg mx-auto pb-24">
+      {/* Main Content - 480px max-width, 20px padding */}
+      <main className="px-5 pt-10 max-w-[480px] mx-auto pb-24">
 
-        {/* Active Tournament - Hero treatment if exists */}
+        {/* Active Tournament - Hero treatment */}
         {activeTrip && (
-          <section className="mb-8">
+          <section className="mb-10">
             <button
               onClick={() => handleSelectTrip(activeTrip.id)}
               className="w-full text-left p-5 rounded-lg transition-colors"

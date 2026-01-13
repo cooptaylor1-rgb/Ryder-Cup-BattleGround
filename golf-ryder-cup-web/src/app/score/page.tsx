@@ -224,7 +224,7 @@ export default function ScorePage() {
             headerTitle="Score"
             headerSubtitle={currentTrip.name}
         >
-            <div className="p-4 lg:p-6 space-y-6">
+            <div className="px-5 pt-10 max-w-[480px] mx-auto pb-24 space-y-10">
                 {/* Session Header - Masters refined */}
                 {activeSession && (
                     <Card variant="elevated" className="bg-masters-green/5 border-masters-green/20">

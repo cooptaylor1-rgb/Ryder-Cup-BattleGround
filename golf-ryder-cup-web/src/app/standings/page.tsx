@@ -68,11 +68,11 @@ export default function StandingsPage() {
 
   return (
     <AppShellNew headerTitle="Standings" headerSubtitle={currentTrip.name}>
-      <div className="px-5 py-6 max-w-2xl mx-auto pb-24 lg:pb-8">
+      <div className="px-5 pt-10 max-w-[480px] mx-auto pb-24 lg:pb-8">
         {isLoading ? (
           <LoadingState />
         ) : standings && magicNumber ? (
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Team Score - The hero moment */}
             <TeamScoreCard
               standings={standings}
@@ -83,16 +83,16 @@ export default function StandingsPage() {
 
             {/* Player Leaderboard */}
             <section>
-              <h2 
+              <h2
                 className="text-section mb-4"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Individual Leaders
               </h2>
-              
-              <div 
+
+              <div
                 className="rounded-lg overflow-hidden"
-                style={{ 
+                style={{
                   background: 'var(--surface-raised)',
                   border: '1px solid var(--border-subtle)'
                 }}
@@ -116,21 +116,21 @@ export default function StandingsPage() {
 
             {/* Match Progress */}
             <section>
-              <h2 
+              <h2
                 className="text-section mb-4"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 Tournament Progress
               </h2>
-              
+
               <div className="grid grid-cols-2 gap-3">
-                <StatBlock 
-                  value={standings.matchesPlayed} 
-                  label="Complete" 
+                <StatBlock
+                  value={standings.matchesPlayed}
+                  label="Complete"
                 />
-                <StatBlock 
-                  value={standings.matchesRemaining} 
-                  label="Remaining" 
+                <StatBlock
+                  value={standings.matchesRemaining}
+                  label="Remaining"
                 />
               </div>
             </section>
@@ -156,27 +156,27 @@ interface TeamScoreCardProps {
 function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamScoreCardProps) {
   const { teamAPoints, teamBPoints, leader } = standings;
   const { pointsToWin, hasClinched, clinchingTeam, teamANeeded, teamBNeeded } = magicNumber;
-  
+
   const totalPoints = teamAPoints + teamBPoints;
   const teamAPercent = totalPoints > 0 ? (teamAPoints / totalPoints) * 100 : 50;
 
   return (
-    <div 
+    <div
       className="rounded-lg overflow-hidden"
-      style={{ 
+      style={{
         background: 'var(--surface-card)',
         border: '1px solid var(--border-subtle)'
       }}
     >
       {/* Points to win header */}
-      <div 
+      <div
         className="px-4 py-3 text-center"
-        style={{ 
+        style={{
           borderBottom: '1px solid var(--border-subtle)',
           background: 'var(--surface-raised)'
         }}
       >
-        <span 
+        <span
           className="text-xs font-medium uppercase tracking-wider"
           style={{ color: 'var(--text-tertiary)' }}
         >
@@ -189,15 +189,15 @@ function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamSco
         <div className="flex items-center justify-between">
           {/* Team A */}
           <div className="text-center flex-1">
-            <p 
+            <p
               className="text-overline mb-3"
               style={{ color: 'var(--team-a-color)' }}
             >
               {teamAName}
             </p>
-            <p 
+            <p
               className="font-score text-5xl lg:text-6xl"
-              style={{ 
+              style={{
                 color: teamAPoints >= teamBPoints ? 'var(--text-primary)' : 'var(--text-tertiary)'
               }}
             >
@@ -206,22 +206,22 @@ function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamSco
           </div>
 
           {/* Divider */}
-          <div 
+          <div
             className="mx-6 w-px h-16"
             style={{ background: 'var(--border-subtle)' }}
           />
 
           {/* Team B */}
           <div className="text-center flex-1">
-            <p 
+            <p
               className="text-overline mb-3"
               style={{ color: 'var(--team-b-color)' }}
             >
               {teamBName}
             </p>
-            <p 
+            <p
               className="font-score text-5xl lg:text-6xl"
-              style={{ 
+              style={{
                 color: teamBPoints >= teamAPoints ? 'var(--text-primary)' : 'var(--text-tertiary)'
               }}
             >
@@ -231,20 +231,20 @@ function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamSco
         </div>
 
         {/* Progress bar - subtle, informational */}
-        <div 
+        <div
           className="h-1 mt-6 rounded-full overflow-hidden flex"
           style={{ background: 'var(--surface-elevated)' }}
         >
           <div
             className="transition-all duration-500"
-            style={{ 
+            style={{
               width: `${teamAPercent}%`,
               background: 'var(--team-a-color)'
             }}
           />
           <div
             className="transition-all duration-500"
-            style={{ 
+            style={{
               width: `${100 - teamAPercent}%`,
               background: 'var(--team-b-color)'
             }}
@@ -253,19 +253,19 @@ function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamSco
 
         {/* Victory or Magic Number */}
         {hasClinched ? (
-          <div 
+          <div
             className="mt-6 py-3 text-center rounded"
-            style={{ 
+            style={{
               background: 'var(--masters-gold-muted)',
               border: '1px solid rgba(201, 162, 39, 0.2)'
             }}
           >
             <div className="flex items-center justify-center gap-2">
-              <Trophy 
-                className="w-4 h-4" 
-                style={{ color: 'var(--masters-gold)' }} 
+              <Trophy
+                className="w-4 h-4"
+                style={{ color: 'var(--masters-gold)' }}
               />
-              <span 
+              <span
                 className="font-display text-base"
                 style={{ color: 'var(--masters-gold)' }}
               >
@@ -274,14 +274,14 @@ function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamSco
             </div>
           </div>
         ) : (teamANeeded <= 3 || teamBNeeded <= 3) && (
-          <div 
+          <div
             className="mt-6 py-3 text-center rounded"
-            style={{ 
+            style={{
               background: 'rgba(0, 103, 71, 0.08)',
               border: '1px solid rgba(0, 103, 71, 0.15)'
             }}
           >
-            <span 
+            <span
               className="text-sm"
               style={{ color: 'var(--masters-green-light)' }}
             >
@@ -307,23 +307,23 @@ interface PlayerRowProps {
 
 function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
   const isTopThree = rank <= 3;
-  
+
   return (
-    <div 
+    <div
       className="flex items-center gap-4 px-4 py-3"
-      style={{ 
+      style={{
         background: isTopThree ? 'rgba(201, 162, 39, 0.03)' : 'transparent'
       }}
     >
       {/* Rank */}
-      <div 
+      <div
         className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
         style={{
-          background: rank === 1 
-            ? 'var(--masters-gold)' 
-            : rank === 2 
+          background: rank === 1
+            ? 'var(--masters-gold)'
+            : rank === 2
               ? '#A8A8A8'
-              : rank === 3 
+              : rank === 3
                 ? '#CD7F32'
                 : 'var(--surface-elevated)',
           color: rank <= 3 ? 'var(--surface-base)' : 'var(--text-secondary)'
@@ -334,18 +334,18 @@ function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
 
       {/* Player info */}
       <div className="flex-1 min-w-0">
-        <p 
+        <p
           className="font-medium truncate text-sm"
           style={{ color: 'var(--text-primary)' }}
         >
           {entry.playerName}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <div 
+          <div
             className="w-2 h-2 rounded-full"
             style={{ background: isTeamA ? 'var(--team-a-color)' : 'var(--team-b-color)' }}
           />
-          <span 
+          <span
             className="text-xs"
             style={{ color: 'var(--text-tertiary)' }}
           >
@@ -356,13 +356,13 @@ function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
 
       {/* Points */}
       <div className="text-right shrink-0">
-        <p 
+        <p
           className="font-score text-lg"
           style={{ color: isTopThree ? 'var(--masters-gold)' : 'var(--text-primary)' }}
         >
           {entry.points}
         </p>
-        <p 
+        <p
           className="text-xs"
           style={{ color: 'var(--text-disabled)' }}
         >
@@ -383,20 +383,20 @@ interface StatBlockProps {
 
 function StatBlock({ value, label }: StatBlockProps) {
   return (
-    <div 
+    <div
       className="p-4 rounded-lg text-center"
-      style={{ 
+      style={{
         background: 'var(--surface-raised)',
         border: '1px solid var(--border-subtle)'
       }}
     >
-      <p 
+      <p
         className="font-score text-2xl mb-1"
         style={{ color: 'var(--text-primary)' }}
       >
         {value}
       </p>
-      <p 
+      <p
         className="text-xs"
         style={{ color: 'var(--text-tertiary)' }}
       >
@@ -412,7 +412,7 @@ function StatBlock({ value, label }: StatBlockProps) {
 function LoadingState() {
   return (
     <div className="space-y-6">
-      <div 
+      <div
         className="rounded-lg p-6 animate-pulse"
         style={{ background: 'var(--surface-raised)' }}
       >
@@ -435,17 +435,17 @@ function LoadingState() {
 function EmptyLeaderboard() {
   return (
     <div className="py-12 px-6 text-center">
-      <Trophy 
-        className="w-8 h-8 mx-auto mb-4" 
-        style={{ color: 'var(--text-disabled)' }} 
+      <Trophy
+        className="w-8 h-8 mx-auto mb-4"
+        style={{ color: 'var(--text-disabled)' }}
       />
-      <p 
+      <p
         className="font-medium"
         style={{ color: 'var(--text-secondary)' }}
       >
         No matches completed
       </p>
-      <p 
+      <p
         className="text-sm mt-1"
         style={{ color: 'var(--text-tertiary)' }}
       >
@@ -457,24 +457,24 @@ function EmptyLeaderboard() {
 
 function EmptyState() {
   return (
-    <div 
+    <div
       className="py-16 px-6 text-center rounded-lg"
-      style={{ 
+      style={{
         background: 'var(--surface-raised)',
         border: '1px solid var(--border-subtle)'
       }}
     >
-      <Trophy 
-        className="w-10 h-10 mx-auto mb-4" 
-        style={{ color: 'var(--text-disabled)' }} 
+      <Trophy
+        className="w-10 h-10 mx-auto mb-4"
+        style={{ color: 'var(--text-disabled)' }}
       />
-      <p 
+      <p
         className="font-display text-lg mb-2"
         style={{ color: 'var(--text-primary)' }}
       >
         No standings available
       </p>
-      <p 
+      <p
         className="text-sm"
         style={{ color: 'var(--text-tertiary)' }}
       >

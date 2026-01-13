@@ -45,7 +45,7 @@ export default function MatchupsPage() {
 
   return (
     <AppShellNew headerTitle="Matchups" headerSubtitle={currentTrip.name}>
-      <div className="p-4 lg:p-6 space-y-8">
+      <div className="px-5 pt-10 max-w-[480px] mx-auto pb-24 space-y-10">
         {/* Team Rosters */}
         <section>
           <div className="flex items-center justify-between mb-4">
