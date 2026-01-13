@@ -256,7 +256,9 @@ const config: Config = {
             // ============================================
             boxShadow: {
                 'card': '0 2px 8px rgba(0, 0, 0, 0.3)',
-                'card-hover': '0 4px 16px rgba(0, 0, 0, 0.4)',
+                'card-default': '0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05)',
+                'card-hover': '0 4px 16px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08)',
+                'card-elevated': '0 8px 24px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1)',
                 'elevated': '0 8px 24px rgba(0, 0, 0, 0.5)',
                 'glow-primary': '0 0 20px rgba(0, 66, 37, 0.4)',
                 'glow-gold': '0 0 20px rgba(255, 213, 79, 0.4)',
