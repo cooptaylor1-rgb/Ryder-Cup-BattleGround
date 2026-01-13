@@ -90,20 +90,33 @@ const config: Config = {
                 rough: '#8BC34A',
                 'putting-green': '#2E7D32',
 
-                // Surface Colors (Dark Mode First)
+                // Surface Colors (Dark Mode First) - Layered surfaces
                 surface: {
                     DEFAULT: '#141414',
+                    base: '#0A0A0A',
                     background: '#0A0A0A',
+                    raised: '#141414',
                     variant: '#1E1E1E',
+                    overlay: '#1A1A1A',
                     elevated: '#282828',
                     highlight: '#333333',
-                    border: '#404040',
+                    muted: '#333333',
+                    border: '#3A3A3A',
                 },
 
-                // Text Colors
+                // Text Colors - Semantic text hierarchy
+                text: {
+                    primary: '#FFFFFF',
+                    secondary: '#A0A0A0',
+                    tertiary: '#707070',
+                    disabled: '#505050',
+                    inverse: '#0A0A0A',
+                },
+
+                // Legacy text color aliases
                 'text-primary': '#FFFFFF',
-                'text-secondary': '#B0B0B0',
-                'text-tertiary': '#757575',
+                'text-secondary': '#A0A0A0',
+                'text-tertiary': '#707070',
                 'text-on-primary': '#FFFFFF',
                 'text-on-secondary': '#000000',
             },

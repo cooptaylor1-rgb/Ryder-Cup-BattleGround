@@ -5,12 +5,152 @@ import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useScoringStore } from '@/lib/stores';
-import { AppShell } from '@/components/layout';
-import { MatchCard } from '@/components/ui';
+import { AppShellNew } from '@/components/layout';
+import {
+    Card,
+    Badge,
+    StatusBadge,
+    SectionHeader,
+    Button,
+    MatchCardSkeleton,
+    NoMatchesEmptyNew,
+} from '@/components/ui';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { cn, formatPlayerName } from '@/lib/utils';
-import { ChevronRight, Calendar, Trophy } from 'lucide-react';
+import { ChevronRight, Calendar, Trophy, Target, Users } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
+import type { Player } from '@/lib/types/models';
+
+// Match card component with enhanced styling
+interface MatchCardNewProps {
+    matchState: MatchState;
+    matchNumber: number;
+    teamAPlayers: Player[];
+    teamBPlayers: Player[];
+    onClick: () => void;
+}
+
+function MatchCardNew({
+    matchState,
+    matchNumber,
+    teamAPlayers,
+    teamBPlayers,
+    onClick,
+}: MatchCardNewProps) {
+    const { currentScore, holesPlayed, isDormie, status, displayScore } = matchState;
+
+    const getStatusConfig = () => {
+        if (status === 'completed') return { status: 'completed' as const, label: 'Complete' };
+        if (isDormie) return { status: 'dormie' as const, label: 'Dormie' };
+        if (holesPlayed > 0) return { status: 'inProgress' as const, label: `Hole ${holesPlayed}` };
+        return { status: 'notStarted' as const, label: 'Not Started' };
+    };
+
+    const statusConfig = getStatusConfig();
+
+    return (
+        <Card interactive onClick={onClick} className="group">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <div className={cn(
+                        'h-8 w-8 rounded-lg flex items-center justify-center',
+                        'bg-surface-elevated text-text-secondary',
+                        'text-sm font-semibold',
+                    )}>
+                        {matchNumber}
+                    </div>
+                    <span className="text-sm font-medium text-text-secondary">
+                        Match {matchNumber}
+                    </span>
+                </div>
+                <StatusBadge status={statusConfig.status} />
+            </div>
+
+            {/* Teams vs Score Layout */}
+            <div className="flex items-stretch gap-3">
+                {/* Team A */}
+                <div className={cn(
+                    'flex-1 p-3 rounded-lg',
+                    'bg-team-usa/5 border-l-[3px] border-team-usa',
+                )}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="h-2 w-2 rounded-full bg-team-usa" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-team-usa">
+                            USA
+                        </span>
+                    </div>
+                    <div className="space-y-1">
+                        {teamAPlayers.length > 0 ? (
+                            teamAPlayers.map(player => (
+                                <p key={player.id} className="text-sm font-medium text-text-primary truncate">
+                                    {formatPlayerName(player.firstName, player.lastName, 'short')}
+                                </p>
+                            ))
+                        ) : (
+                            <p className="text-sm text-text-tertiary italic">No players</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Score */}
+                <div className="flex flex-col items-center justify-center px-4 min-w-[72px]">
+                    <span className={cn(
+                        'text-2xl font-bold font-mono',
+                        currentScore > 0 && 'text-team-usa',
+                        currentScore < 0 && 'text-team-europe',
+                        currentScore === 0 && 'text-text-secondary',
+                    )}>
+                        {displayScore}
+                    </span>
+                    {holesPlayed > 0 && (
+                        <span className="text-xs text-text-tertiary mt-1">
+                            thru {holesPlayed}
+                        </span>
+                    )}
+                </div>
+
+                {/* Team B */}
+                <div className={cn(
+                    'flex-1 p-3 rounded-lg',
+                    'bg-team-europe/5 border-r-[3px] border-team-europe',
+                )}>
+                    <div className="flex items-center justify-end gap-2 mb-2">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-team-europe">
+                            EUR
+                        </span>
+                        <div className="h-2 w-2 rounded-full bg-team-europe" />
+                    </div>
+                    <div className="space-y-1 text-right">
+                        {teamBPlayers.length > 0 ? (
+                            teamBPlayers.map(player => (
+                                <p key={player.id} className="text-sm font-medium text-text-primary truncate">
+                                    {formatPlayerName(player.firstName, player.lastName, 'short')}
+                                </p>
+                            ))
+                        ) : (
+                            <p className="text-sm text-text-tertiary italic">No players</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer - Tap to score hint */}
+            <div className={cn(
+                'flex items-center justify-center gap-2 mt-4 pt-3',
+                'border-t border-surface-border/50',
+                'text-text-tertiary group-hover:text-augusta-green',
+                'transition-colors duration-150',
+            )}>
+                <Target className="h-4 w-4" />
+                <span className="text-xs font-medium">
+                    {status === 'completed' ? 'View results' : 'Tap to score'}
+                </span>
+                <ChevronRight className="h-4 w-4" />
+            </div>
+        </Card>
+    );
+}
 
 export default function ScorePage() {
     const router = useRouter();
@@ -73,86 +213,112 @@ export default function ScorePage() {
         router.push(`/score/${matchId}`);
     };
 
+    const isLoading = matches === undefined || holeResults === undefined;
+
     if (!currentTrip) {
         return null; // Will redirect
     }
 
     return (
-        <AppShell headerTitle="Score">
-            <div className="p-4 space-y-4">
+        <AppShellNew
+            headerTitle="Score"
+            headerSubtitle={currentTrip.name}
+        >
+            <div className="p-4 lg:p-6 space-y-6">
                 {/* Session Header */}
                 {activeSession && (
-                    <div className="card p-4">
+                    <Card variant="elevated" className="bg-augusta-green/5 border-augusta-green/20">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <div className="flex items-center gap-2 text-sm text-surface-500 mb-1">
-                                    <Calendar className="w-4 h-4" />
-                                    <span>Session {activeSession.sessionNumber}</span>
+                            <div className="flex items-center gap-3">
+                                <div className={cn(
+                                    'h-10 w-10 rounded-xl flex items-center justify-center',
+                                    'bg-augusta-green text-white',
+                                )}>
+                                    <Calendar className="h-5 w-5" />
                                 </div>
-                                <h2 className="text-lg font-semibold capitalize">
-                                    {activeSession.sessionType}
-                                </h2>
+                                <div>
+                                    <p className="text-sm text-text-secondary">
+                                        Session {activeSession.sessionNumber}
+                                    </p>
+                                    <h2 className="text-lg font-semibold text-text-primary capitalize">
+                                        {activeSession.sessionType}
+                                    </h2>
+                                </div>
                             </div>
-                            <span className={cn(
-                                'badge',
-                                activeSession.status === 'inProgress' && 'badge-info',
-                                activeSession.status === 'scheduled' && 'badge-default',
-                                activeSession.status === 'completed' && 'badge-success'
-                            )}>
-                                {activeSession.status === 'inProgress' ? 'In Progress' :
-                                    activeSession.status === 'scheduled' ? 'Scheduled' : 'Complete'}
-                            </span>
+                            <StatusBadge
+                                status={
+                                    activeSession.status === 'inProgress'
+                                        ? 'inProgress'
+                                        : activeSession.status === 'completed'
+                                            ? 'completed'
+                                            : 'scheduled'
+                                }
+                            />
                         </div>
-                    </div>
+                    </Card>
                 )}
 
-                {/* Match Cards */}
-                {matchStates.length > 0 ? (
-                    <div className="space-y-3">
-                        {matchStates.map((matchState, index) => (
-                            <MatchCard
-                                key={matchState.match.id}
-                                matchState={matchState}
-                                matchNumber={index + 1}
-                                teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
-                                teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
-                                onClick={() => handleMatchSelect(matchState.match.id)}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="card p-8 text-center">
-                        <Trophy className="w-12 h-12 mx-auto mb-4 text-surface-400" />
-                        <p className="text-surface-500 mb-4">
-                            {sessions.length === 0
-                                ? 'No sessions created yet'
-                                : 'No matches in this session'}
-                        </p>
-                        <button
-                            onClick={() => router.push('/matchups')}
-                            className="btn-primary"
-                        >
-                            Set Up Matchups
-                        </button>
-                    </div>
-                )}
+                {/* Matches Section */}
+                <section>
+                    <SectionHeader
+                        title="Matches"
+                        subtitle={matchStates.length > 0 ? `${matchStates.length} matches` : undefined}
+                        icon={Target}
+                        className="mb-4"
+                    />
+
+                    {/* Loading state */}
+                    {isLoading && (
+                        <div className="space-y-3">
+                            <MatchCardSkeleton />
+                            <MatchCardSkeleton />
+                            <MatchCardSkeleton />
+                        </div>
+                    )}
+
+                    {/* Match cards */}
+                    {!isLoading && matchStates.length > 0 && (
+                        <div className="space-y-3">
+                            {matchStates.map((matchState, index) => (
+                                <MatchCardNew
+                                    key={matchState.match.id}
+                                    matchState={matchState}
+                                    matchNumber={index + 1}
+                                    teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
+                                    teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
+                                    onClick={() => handleMatchSelect(matchState.match.id)}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Empty state */}
+                    {!isLoading && matchStates.length === 0 && (
+                        <Card variant="outlined" padding="none">
+                            <NoMatchesEmptyNew onSetupMatchups={() => router.push('/matchups')} />
+                        </Card>
+                    )}
+                </section>
 
                 {/* Session Selector */}
                 {sessions.length > 1 && (
-                    <section className="pt-4">
-                        <h3 className="text-sm font-medium text-surface-500 mb-2">
-                            Other Sessions
-                        </h3>
-                        <div className="flex gap-2 overflow-x-auto pb-2">
+                    <section>
+                        <SectionHeader
+                            title="Other Sessions"
+                            size="sm"
+                            className="mb-3"
+                        />
+                        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
                             {sessions.map(session => (
                                 <button
                                     key={session.id}
                                     onClick={() => {/* TODO: Switch session */ }}
                                     className={cn(
                                         'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap',
+                                        'transition-colors duration-150',
                                         session.id === activeSession?.id
                                             ? 'bg-augusta-green text-white'
-                                            : 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-400'
+                                            : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight',
                                     )}
                                 >
                                     Session {session.sessionNumber}
@@ -162,6 +328,6 @@ export default function ScorePage() {
                     </section>
                 )}
             </div>
-        </AppShell>
+        </AppShellNew>
     );
 }

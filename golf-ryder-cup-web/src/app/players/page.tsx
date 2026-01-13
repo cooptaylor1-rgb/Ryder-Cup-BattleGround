@@ -3,10 +3,20 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { AppShell } from '@/components/layout';
+import { AppShellNew } from '@/components/layout';
+import {
+    Card,
+    SectionHeader,
+    Button,
+    IconButton,
+    Modal,
+    ConfirmDialog,
+    Input,
+    NoPlayersEmptyNew,
+} from '@/components/ui';
 import { cn, formatPlayerName, formatHandicapIndex } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
-import { Plus, Edit2, Trash2, UserPlus, Users, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, UserPlus, Users, X, ChevronLeft } from 'lucide-react';
 
 export default function PlayersPage() {
     const router = useRouter();
@@ -15,6 +25,7 @@ export default function PlayersPage() {
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+    const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -112,11 +123,12 @@ export default function PlayersPage() {
     };
 
     // Delete player
-    const handleDelete = async (player: Player) => {
-        if (!confirm(`Delete ${player.firstName} ${player.lastName}?`)) return;
+    const handleDelete = async () => {
+        if (!playerToDelete) return;
 
         try {
-            await removePlayer(player.id);
+            await removePlayer(playerToDelete.id);
+            setPlayerToDelete(null);
             showToast('info', 'Player deleted');
         } catch (error) {
             console.error('Failed to delete player:', error);
@@ -135,30 +147,36 @@ export default function PlayersPage() {
     const unassignedPlayers = players.filter(p => !getPlayerTeam(p.id));
 
     return (
-        <AppShell
-            showBack
+        <AppShellNew
             headerTitle="Players"
+            headerSubtitle={`${players.length} players`}
+            showBack
             headerRight={
-                isCaptainMode && (
-                    <button
+                isCaptainMode ? (
+                    <Button
+                        variant="primary"
+                        size="sm"
                         onClick={() => setShowAddModal(true)}
-                        className="p-2 rounded-full hover:bg-surface-200 dark:hover:bg-surface-800"
                     >
-                        <UserPlus className="w-5 h-5" />
-                    </button>
-                )
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Add
+                    </Button>
+                ) : undefined
             }
         >
-            <div className="p-4 space-y-6">
+            <div className="p-4 lg:p-6 space-y-6">
                 {/* Team USA */}
                 <section>
                     <div className="flex items-center gap-2 mb-3">
-                        <div className="w-3 h-3 rounded-full bg-team-usa" />
-                        <h2 className="font-semibold text-team-usa">{teamA?.name || 'Team USA'}</h2>
-                        <span className="text-sm text-surface-500">({teamAPlayers.length})</span>
+                        <div className="h-3 w-3 rounded-full bg-team-usa" />
+                        <SectionHeader
+                            title={teamA?.name || 'Team USA'}
+                            subtitle={`${teamAPlayers.length} players`}
+                            size="sm"
+                        />
                     </div>
 
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
+                    <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
                         {teamAPlayers.length > 0 ? (
                             teamAPlayers.map(player => (
                                 <PlayerRow
@@ -167,26 +185,29 @@ export default function PlayersPage() {
                                     teamColor="usa"
                                     canEdit={isCaptainMode}
                                     onEdit={() => handleEdit(player)}
-                                    onDelete={() => handleDelete(player)}
+                                    onDelete={() => setPlayerToDelete(player)}
                                 />
                             ))
                         ) : (
-                            <div className="p-4 text-center text-surface-400">
+                            <div className="p-6 text-center text-text-tertiary">
                                 No players on this team
                             </div>
                         )}
-                    </div>
+                    </Card>
                 </section>
 
                 {/* Team Europe */}
                 <section>
                     <div className="flex items-center gap-2 mb-3">
-                        <div className="w-3 h-3 rounded-full bg-team-europe" />
-                        <h2 className="font-semibold text-team-europe">{teamB?.name || 'Team Europe'}</h2>
-                        <span className="text-sm text-surface-500">({teamBPlayers.length})</span>
+                        <div className="h-3 w-3 rounded-full bg-team-europe" />
+                        <SectionHeader
+                            title={teamB?.name || 'Team Europe'}
+                            subtitle={`${teamBPlayers.length} players`}
+                            size="sm"
+                        />
                     </div>
 
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
+                    <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
                         {teamBPlayers.length > 0 ? (
                             teamBPlayers.map(player => (
                                 <PlayerRow
@@ -195,152 +216,130 @@ export default function PlayersPage() {
                                     teamColor="europe"
                                     canEdit={isCaptainMode}
                                     onEdit={() => handleEdit(player)}
-                                    onDelete={() => handleDelete(player)}
+                                    onDelete={() => setPlayerToDelete(player)}
                                 />
                             ))
                         ) : (
-                            <div className="p-4 text-center text-surface-400">
+                            <div className="p-6 text-center text-text-tertiary">
                                 No players on this team
                             </div>
                         )}
-                    </div>
+                    </Card>
                 </section>
 
                 {/* Unassigned */}
                 {unassignedPlayers.length > 0 && (
                     <section>
-                        <div className="flex items-center gap-2 mb-3">
-                            <Users className="w-4 h-4 text-surface-400" />
-                            <h2 className="font-semibold text-surface-500">Unassigned</h2>
-                            <span className="text-sm text-surface-500">({unassignedPlayers.length})</span>
-                        </div>
+                        <SectionHeader
+                            title="Unassigned"
+                            subtitle={`${unassignedPlayers.length} players`}
+                            icon={Users}
+                            className="mb-3"
+                        />
 
-                        <div className="card divide-y divide-surface-200 dark:divide-surface-700">
+                        <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
                             {unassignedPlayers.map(player => (
                                 <PlayerRow
                                     key={player.id}
                                     player={player}
                                     canEdit={isCaptainMode}
                                     onEdit={() => handleEdit(player)}
-                                    onDelete={() => handleDelete(player)}
+                                    onDelete={() => setPlayerToDelete(player)}
                                 />
                             ))}
-                        </div>
+                        </Card>
                     </section>
                 )}
 
                 {/* Empty State */}
                 {players.length === 0 && (
-                    <div className="text-center py-12">
-                        <Users className="w-16 h-16 mx-auto mb-4 text-surface-300" />
-                        <p className="text-surface-500 mb-4">No players yet</p>
-                        {isCaptainMode && (
-                            <button
-                                onClick={() => setShowAddModal(true)}
-                                className="btn-primary"
-                            >
-                                Add First Player
-                            </button>
-                        )}
-                    </div>
+                    <Card variant="outlined" padding="none">
+                        <NoPlayersEmptyNew onAddPlayer={() => setShowAddModal(true)} />
+                    </Card>
                 )}
             </div>
 
             {/* Add/Edit Modal */}
-            {showAddModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-                    <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto sm:rounded-xl rounded-t-xl">
-                        <div className="sticky top-0 bg-white dark:bg-surface-900 p-4 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">
-                                {editingPlayer ? 'Edit Player' : 'Add Player'}
-                            </h3>
-                            <button
-                                onClick={resetForm}
-                                className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-800"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
+            <Modal
+                isOpen={showAddModal}
+                onClose={resetForm}
+                title={editingPlayer ? 'Edit Player' : 'Add Player'}
+            >
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                        <Input
+                            label="First Name"
+                            required
+                            value={formData.firstName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                            placeholder="John"
+                        />
+                        <Input
+                            label="Last Name"
+                            required
+                            value={formData.lastName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                            placeholder="Doe"
+                        />
+                    </div>
 
-                        <div className="p-4 space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">First Name *</label>
-                                    <input
-                                        type="text"
-                                        value={formData.firstName}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                                        className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800"
-                                        placeholder="John"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Last Name *</label>
-                                    <input
-                                        type="text"
-                                        value={formData.lastName}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                                        className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800"
-                                        placeholder="Doe"
-                                    />
-                                </div>
-                            </div>
+                    <Input
+                        label="Handicap Index"
+                        type="number"
+                        value={formData.handicapIndex}
+                        onChange={(e) => setFormData(prev => ({ ...prev, handicapIndex: e.target.value }))}
+                        placeholder="12.4"
+                    />
 
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Handicap Index</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={formData.handicapIndex}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, handicapIndex: e.target.value }))}
-                                    className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800"
-                                    placeholder="12.4"
-                                />
-                            </div>
+                    <Input
+                        label="Email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        placeholder="john@example.com"
+                    />
 
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Email</label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                                    className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800"
-                                    placeholder="john@example.com"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Team</label>
-                                <select
-                                    value={formData.teamId}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, teamId: e.target.value }))}
-                                    className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800"
-                                >
-                                    <option value="">Unassigned</option>
-                                    {teamA && <option value={teamA.id}>{teamA.name}</option>}
-                                    {teamB && <option value={teamB.id}>{teamB.name}</option>}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="p-4 border-t border-surface-200 dark:border-surface-700 flex gap-3">
-                            <button
-                                onClick={resetForm}
-                                className="flex-1 py-3 rounded-lg border border-surface-300 dark:border-surface-600 font-medium"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                className="flex-1 py-3 rounded-lg bg-augusta-green text-white font-medium"
-                            >
-                                {editingPlayer ? 'Save Changes' : 'Add Player'}
-                            </button>
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">Team</label>
+                        <select
+                            value={formData.teamId}
+                            onChange={(e) => setFormData(prev => ({ ...prev, teamId: e.target.value }))}
+                            className={cn(
+                                'w-full px-4 py-3 rounded-lg',
+                                'bg-surface-base border border-surface-border',
+                                'text-text-primary',
+                                'focus:outline-none focus:ring-2 focus:ring-augusta-green/50 focus:border-augusta-green',
+                                'transition-colors duration-150',
+                            )}
+                        >
+                            <option value="">Unassigned</option>
+                            {teamA && <option value={teamA.id}>{teamA.name}</option>}
+                            {teamB && <option value={teamB.id}>{teamB.name}</option>}
+                        </select>
                     </div>
                 </div>
-            )}
-        </AppShell>
+
+                <div className="flex gap-3 mt-6">
+                    <Button variant="outline" onClick={resetForm} className="flex-1">
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSave} className="flex-1">
+                        {editingPlayer ? 'Save Changes' : 'Add Player'}
+                    </Button>
+                </div>
+            </Modal>
+
+            {/* Delete Confirmation */}
+            <ConfirmDialog
+                isOpen={!!playerToDelete}
+                onClose={() => setPlayerToDelete(null)}
+                onConfirm={handleDelete}
+                title="Delete Player?"
+                description={playerToDelete ? `Are you sure you want to delete ${playerToDelete.firstName} ${playerToDelete.lastName}? This will also remove them from any matches.` : ''}
+                confirmLabel="Delete"
+                variant="danger"
+            />
+        </AppShellNew>
     );
 }
 
@@ -359,25 +358,25 @@ function PlayerRow({
     onDelete: () => void;
 }) {
     return (
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-center justify-between p-4 hover:bg-surface-highlight transition-colors duration-150">
             <div className="flex items-center gap-3 min-w-0">
                 {/* Avatar */}
                 <div className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm',
+                    'h-10 w-10 rounded-full flex items-center justify-center font-semibold text-sm shrink-0',
                     teamColor === 'usa' && 'bg-team-usa/10 text-team-usa',
                     teamColor === 'europe' && 'bg-team-europe/10 text-team-europe',
-                    !teamColor && 'bg-surface-200 dark:bg-surface-700 text-surface-600 dark:text-surface-300'
+                    !teamColor && 'bg-surface-elevated text-text-secondary',
                 )}>
                     {player.firstName[0]}{player.lastName[0]}
                 </div>
 
                 {/* Info */}
                 <div className="min-w-0">
-                    <p className="font-medium truncate">
+                    <p className="font-medium text-text-primary truncate">
                         {formatPlayerName(player.firstName, player.lastName)}
                     </p>
                     {player.handicapIndex !== undefined && (
-                        <p className="text-sm text-surface-500">
+                        <p className="text-sm text-text-secondary">
                             HCP: {player.handicapIndex.toFixed(1)}
                         </p>
                     )}
@@ -387,18 +386,19 @@ function PlayerRow({
             {/* Actions */}
             {canEdit && (
                 <div className="flex items-center gap-1">
-                    <button
+                    <IconButton
+                        icon={<Edit2 className="h-4 w-4" />}
+                        aria-label="Edit player"
+                        size="sm"
                         onClick={onEdit}
-                        className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-400"
-                    >
-                        <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
+                    />
+                    <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
+                        aria-label="Delete player"
+                        size="sm"
+                        variant="danger"
                         onClick={onDelete}
-                        className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
+                    />
                 </div>
             )}
         </div>

@@ -3,6 +3,7 @@
 /* ============================================
    Golf Ryder Cup App - Global Styles
    Augusta National inspired, dark mode first
+   Palantir clarity + Spotify delight
    ============================================ */
 
 /* Custom CSS Variables for Dynamic Theming */
@@ -15,13 +16,36 @@
   --team-b-light: #EF5350;
   --team-b-dark: #B71C1C;
 
-  /* Surface colors */
+  /* Surface colors - layered dark (not pure black) */
   --background: #0a0a0a;
   --foreground: #ffffff;
   --surface: #141414;
   --surface-variant: #1E1E1E;
   --surface-elevated: #282828;
-  --surface-border: #404040;
+  --surface-border: #3a3a3a;
+  --surface-highlight: #333333;
+
+  /* Additional surface tokens */
+  --surface-base: #0a0a0a;
+  --surface-raised: #141414;
+  --surface-overlay: #1a1a1a;
+  --surface-muted: #333333;
+
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #707070;
+  --text-disabled: #505050;
+
+  /* Border colors */
+  --border-subtle: #2a2a2a;
+  --border-default: #3a3a3a;
+  --border-strong: #4a4a4a;
+
+  /* Shadow card tokens */
+  --shadow-card-default: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-card-elevated: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Dark mode is default */
@@ -30,8 +54,8 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--surface-base);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -499,4 +523,358 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================
+   Micro-interactions - Palantir clarity + Spotify delight
+   ============================================ */
+
+/* Smooth transition utility */
+.transition-micro {
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Card hover lift effect */
+.hover-lift {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.hover-lift:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-card-default);
+}
+
+/* Button press effect */
+.press-scale {
+  transition: transform 100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.press-scale:active {
+  transform: scale(0.97);
+}
+
+/* Subtle glow on focus */
+.focus-glow:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--surface-base),
+    0 0 0 4px #006d35,
+    0 0 20px rgba(0, 109, 53, 0.3);
+}
+
+/* Stagger animation for lists */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-children>* {
+  animation: stagger-fade-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 200ms;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 250ms;
+}
+
+.stagger-children>*:nth-child(7) {
+  animation-delay: 300ms;
+}
+
+.stagger-children>*:nth-child(8) {
+  animation-delay: 350ms;
+}
+
+/* Score pulse animation (for live scores) */
+@keyframes score-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+.score-live {
+  animation: score-pulse 2s ease-in-out infinite;
+}
+
+/* Badge pulse for live status */
+@keyframes badge-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 83, 80, 0);
+  }
+}
+
+.badge-live-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Slide in from right (for nav transitions) */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slide-in-right 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Fade in scale (for modals) */
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in-scale {
+  animation: fade-in-scale 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      var(--surface-muted) 0%,
+      var(--surface-elevated) 50%,
+      var(--surface-muted) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Success checkmark animation */
+@keyframes check-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.check-pop {
+  animation: check-pop 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Bounce attention animation */
+@keyframes bounce-attention {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  25% {
+    transform: translateY(-4px);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(-2px);
+  }
+}
+
+.bounce-attention {
+  animation: bounce-attention 600ms ease-in-out;
+}
+
+/* Ripple effect for buttons */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+      rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 400ms ease-out, opacity 400ms ease-out;
+}
+
+.ripple:active::after {
+  opacity: 1;
+  transform: scale(2);
+  transition: transform 0ms, opacity 0ms;
+}
+
+/* Toast slide animation */
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(100%) translateX(-50%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) translateX(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateY(0) translateX(-50%);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(100%) translateX(-50%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.toast-exit {
+  animation: toast-slide-out 200ms ease-in both;
+}
+
+/* Number counter animation */
+@keyframes number-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.number-pop {
+  animation: number-pop 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Skeleton loading with shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(90deg,
+      var(--surface-muted) 0%,
+      var(--surface-elevated) 40%,
+      var(--surface-muted) 80%);
+  background-size: 300% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Interactive card glow */
+.card-glow {
+  position: relative;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg,
+      rgba(0, 109, 53, 0.3) 0%,
+      transparent 50%,
+      rgba(0, 109, 53, 0.3) 100%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+/* Page transition */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }

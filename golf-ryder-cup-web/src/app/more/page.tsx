@@ -3,7 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { AppShell } from '@/components/layout';
+import { AppShellNew } from '@/components/layout';
+import {
+    Card,
+    SectionHeader,
+    Button,
+    Modal,
+    ConfirmDialog,
+    Input,
+} from '@/components/ui';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import { cn } from '@/lib/utils';
 import {
@@ -25,6 +33,77 @@ import {
     Unlock,
 } from 'lucide-react';
 
+// Reusable Toggle Switch component
+interface ToggleSwitchProps {
+    enabled: boolean;
+    onChange: () => void;
+}
+
+function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
+    return (
+        <button
+            role="switch"
+            aria-checked={enabled}
+            onClick={onChange}
+            className={cn(
+                'w-12 h-7 rounded-full transition-colors relative shrink-0',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-augusta-green/50',
+                enabled ? 'bg-augusta-green' : 'bg-surface-muted',
+            )}
+        >
+            <div className={cn(
+                'absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200',
+                enabled ? 'translate-x-6' : 'translate-x-1',
+            )} />
+        </button>
+    );
+}
+
+// Setting row component
+interface SettingRowProps {
+    icon: React.ElementType;
+    title: string;
+    subtitle?: string;
+    onClick?: () => void;
+    trailing?: React.ReactNode;
+    danger?: boolean;
+}
+
+function SettingRow({ icon: Icon, title, subtitle, onClick, trailing, danger = false }: SettingRowProps) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'w-full flex items-center justify-between p-4',
+                'transition-colors duration-150',
+                'hover:bg-surface-highlight active:bg-surface-highlight',
+                danger && 'text-red-500',
+            )}
+        >
+            <div className="flex items-center gap-3">
+                <Icon className={cn(
+                    'h-5 w-5',
+                    danger ? 'text-red-500' : 'text-text-tertiary',
+                )} />
+                <div className="text-left">
+                    <p className={cn('font-medium', danger ? 'text-red-500' : 'text-text-primary')}>
+                        {title}
+                    </p>
+                    {subtitle && (
+                        <p className={cn(
+                            'text-sm',
+                            danger ? 'text-red-500/70' : 'text-text-secondary',
+                        )}>
+                            {subtitle}
+                        </p>
+                    )}
+                </div>
+            </div>
+            {trailing}
+        </button>
+    );
+}
+
 export default function MorePage() {
     const router = useRouter();
     const { currentTrip, loadTrip, clearTrip } = useTripStore();
@@ -42,12 +121,15 @@ export default function MorePage() {
     const [showCaptainModal, setShowCaptainModal] = useState(false);
     const [captainPin, setCaptainPin] = useState('');
     const [isSeeding, setIsSeeding] = useState(false);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [showExitTripConfirm, setShowExitTripConfirm] = useState(false);
 
     const handleEnableCaptainMode = () => {
         if (captainPin.length >= 4) {
             enableCaptainMode(captainPin);
             setShowCaptainModal(false);
             setCaptainPin('');
+            showToast('success', 'Captain mode enabled');
         }
     };
 
@@ -66,311 +148,277 @@ export default function MorePage() {
     };
 
     const handleClearData = async () => {
-        if (!confirm('This will delete ALL data. Are you sure?')) return;
-
         try {
             await clearDemoData();
             clearTrip();
+            setShowClearConfirm(false);
             showToast('info', 'All data cleared');
+            router.push('/');
         } catch (error) {
             console.error('Failed to clear data:', error);
             showToast('error', 'Failed to clear data');
         }
     };
 
+    const handleExitTrip = () => {
+        clearTrip();
+        setShowExitTripConfirm(false);
+        router.push('/');
+    };
+
     return (
-        <AppShell headerTitle="More">
-            <div className="p-4 space-y-6">
+        <AppShellNew headerTitle="More" headerSubtitle="Settings & Data">
+            <div className="p-4 lg:p-6 space-y-6">
                 {/* Current Trip */}
                 {currentTrip && (
                     <section>
-                        <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                            Current Trip
-                        </h2>
-                        <div className="card p-4">
+                        <SectionHeader
+                            title="Current Trip"
+                            size="sm"
+                            className="mb-3"
+                        />
+                        <Card>
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="font-semibold">{currentTrip.name}</h3>
-                                    <p className="text-sm text-surface-500">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-semibold text-text-primary truncate">{currentTrip.name}</h3>
+                                    <p className="text-sm text-text-secondary">
                                         {new Date(currentTrip.startDate).toLocaleDateString()} - {new Date(currentTrip.endDate).toLocaleDateString()}
                                     </p>
                                 </div>
-                                <button
-                                    onClick={() => {
-                                        clearTrip();
-                                        router.push('/');
-                                    }}
-                                    className="p-2 text-surface-400 hover:text-surface-600"
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setShowExitTripConfirm(true)}
+                                    className="shrink-0"
                                 >
-                                    <LogOut className="w-5 h-5" />
-                                </button>
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Exit Trip
+                                </Button>
                             </div>
-                        </div>
+                        </Card>
                     </section>
                 )}
 
                 {/* Captain Mode */}
                 <section>
-                    <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                        Captain Mode
-                    </h2>
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
-                        <button
+                    <SectionHeader
+                        title="Captain Mode"
+                        size="sm"
+                        className="mb-3"
+                    />
+                    <Card padding="none" className="overflow-hidden">
+                        <SettingRow
+                            icon={isCaptainMode ? Unlock : Lock}
+                            title="Captain Mode"
+                            subtitle={isCaptainMode ? 'Enabled - can edit lineups' : 'Disabled - view only'}
                             onClick={() => isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                {isCaptainMode ? (
-                                    <Unlock className="w-5 h-5 text-augusta-green" />
-                                ) : (
-                                    <Lock className="w-5 h-5 text-surface-400" />
-                                )}
-                                <div className="text-left">
-                                    <p className="font-medium">Captain Mode</p>
-                                    <p className="text-sm text-surface-500">
-                                        {isCaptainMode ? 'Enabled - can edit lineups' : 'Disabled - view only'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className={cn(
-                                'w-12 h-7 rounded-full transition-colors relative',
-                                isCaptainMode ? 'bg-augusta-green' : 'bg-surface-300 dark:bg-surface-600'
-                            )}>
-                                <div className={cn(
-                                    'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
-                                    isCaptainMode ? 'translate-x-6' : 'translate-x-1'
-                                )} />
-                            </div>
-                        </button>
-                    </div>
+                            trailing={<ToggleSwitch enabled={isCaptainMode} onChange={() => { }} />}
+                        />
+                    </Card>
                 </section>
 
                 {/* Navigation */}
                 <section>
-                    <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                        Manage
-                    </h2>
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
-                        <button
+                    <SectionHeader
+                        title="Manage"
+                        icon={Settings}
+                        size="sm"
+                        className="mb-3"
+                    />
+                    <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
+                        <SettingRow
+                            icon={Users}
+                            title="Players"
                             onClick={() => router.push('/players')}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Users className="w-5 h-5 text-surface-400" />
-                                <span className="font-medium">Players</span>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-surface-400" />
-                        </button>
-                        <button
+                            trailing={<ChevronRight className="h-5 w-5 text-text-tertiary" />}
+                        />
+                        <SettingRow
+                            icon={MapPin}
+                            title="Courses"
                             onClick={() => router.push('/courses')}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <MapPin className="w-5 h-5 text-surface-400" />
-                                <span className="font-medium">Courses</span>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-surface-400" />
-                        </button>
-                    </div>
+                            trailing={<ChevronRight className="h-5 w-5 text-text-tertiary" />}
+                        />
+                    </Card>
                 </section>
 
                 {/* Preferences */}
                 <section>
-                    <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                        Preferences
-                    </h2>
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
+                    <SectionHeader
+                        title="Preferences"
+                        size="sm"
+                        className="mb-3"
+                    />
+                    <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
                         {/* Dark Mode */}
-                        <button
+                        <SettingRow
+                            icon={isDarkMode ? Moon : Sun}
+                            title="Dark Mode"
                             onClick={toggleDarkMode}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                {isDarkMode ? (
-                                    <Moon className="w-5 h-5 text-surface-400" />
-                                ) : (
-                                    <Sun className="w-5 h-5 text-surface-400" />
-                                )}
-                                <span className="font-medium">Dark Mode</span>
-                            </div>
-                            <div className={cn(
-                                'w-12 h-7 rounded-full transition-colors relative',
-                                isDarkMode ? 'bg-augusta-green' : 'bg-surface-300 dark:bg-surface-600'
-                            )}>
-                                <div className={cn(
-                                    'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
-                                    isDarkMode ? 'translate-x-6' : 'translate-x-1'
-                                )} />
-                            </div>
-                        </button>
+                            trailing={<ToggleSwitch enabled={isDarkMode} onChange={toggleDarkMode} />}
+                        />
 
                         {/* Haptic Feedback */}
-                        <button
+                        <SettingRow
+                            icon={Vibrate}
+                            title="Haptic Feedback"
+                            subtitle="Vibrate on score entry"
                             onClick={() => updateScoringPreference('hapticFeedback', !scoringPreferences.hapticFeedback)}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Vibrate className="w-5 h-5 text-surface-400" />
-                                <div className="text-left">
-                                    <p className="font-medium">Haptic Feedback</p>
-                                    <p className="text-sm text-surface-500">Vibrate on score entry</p>
-                                </div>
-                            </div>
-                            <div className={cn(
-                                'w-12 h-7 rounded-full transition-colors relative',
-                                scoringPreferences.hapticFeedback ? 'bg-augusta-green' : 'bg-surface-300 dark:bg-surface-600'
-                            )}>
-                                <div className={cn(
-                                    'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
-                                    scoringPreferences.hapticFeedback ? 'translate-x-6' : 'translate-x-1'
-                                )} />
-                            </div>
-                        </button>
+                            trailing={
+                                <ToggleSwitch
+                                    enabled={scoringPreferences.hapticFeedback}
+                                    onChange={() => updateScoringPreference('hapticFeedback', !scoringPreferences.hapticFeedback)}
+                                />
+                            }
+                        />
 
                         {/* Auto Advance */}
-                        <button
+                        <SettingRow
+                            icon={ChevronRight}
+                            title="Auto-Advance"
+                            subtitle="Move to next hole after scoring"
                             onClick={() => updateScoringPreference('autoAdvance', !scoringPreferences.autoAdvance)}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <ChevronRight className="w-5 h-5 text-surface-400" />
-                                <div className="text-left">
-                                    <p className="font-medium">Auto-Advance</p>
-                                    <p className="text-sm text-surface-500">Move to next hole after scoring</p>
-                                </div>
-                            </div>
-                            <div className={cn(
-                                'w-12 h-7 rounded-full transition-colors relative',
-                                scoringPreferences.autoAdvance ? 'bg-augusta-green' : 'bg-surface-300 dark:bg-surface-600'
-                            )}>
-                                <div className={cn(
-                                    'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
-                                    scoringPreferences.autoAdvance ? 'translate-x-6' : 'translate-x-1'
-                                )} />
-                            </div>
-                        </button>
+                            trailing={
+                                <ToggleSwitch
+                                    enabled={scoringPreferences.autoAdvance}
+                                    onChange={() => updateScoringPreference('autoAdvance', !scoringPreferences.autoAdvance)}
+                                />
+                            }
+                        />
 
                         {/* Confirm Closeout */}
-                        <button
+                        <SettingRow
+                            icon={Shield}
+                            title="Confirm Match End"
+                            subtitle="Ask before recording closeout"
                             onClick={() => updateScoringPreference('confirmCloseout', !scoringPreferences.confirmCloseout)}
-                            className="w-full flex items-center justify-between p-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Shield className="w-5 h-5 text-surface-400" />
-                                <div className="text-left">
-                                    <p className="font-medium">Confirm Match End</p>
-                                    <p className="text-sm text-surface-500">Ask before recording closeout</p>
-                                </div>
-                            </div>
-                            <div className={cn(
-                                'w-12 h-7 rounded-full transition-colors relative',
-                                scoringPreferences.confirmCloseout ? 'bg-augusta-green' : 'bg-surface-300 dark:bg-surface-600'
-                            )}>
-                                <div className={cn(
-                                    'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
-                                    scoringPreferences.confirmCloseout ? 'translate-x-6' : 'translate-x-1'
-                                )} />
-                            </div>
-                        </button>
-                    </div>
+                            trailing={
+                                <ToggleSwitch
+                                    enabled={scoringPreferences.confirmCloseout}
+                                    onChange={() => updateScoringPreference('confirmCloseout', !scoringPreferences.confirmCloseout)}
+                                />
+                            }
+                        />
+                    </Card>
                 </section>
 
                 {/* Data Management */}
                 <section>
-                    <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                        Data
-                    </h2>
-                    <div className="card divide-y divide-surface-200 dark:divide-surface-700">
-                        <button
+                    <SectionHeader
+                        title="Data"
+                        icon={Database}
+                        size="sm"
+                        className="mb-3"
+                    />
+                    <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
+                        <SettingRow
+                            icon={Database}
+                            title="Load Demo Data"
+                            subtitle="Create sample trip with players"
                             onClick={handleSeedData}
-                            disabled={isSeeding}
-                            className="w-full flex items-center justify-between p-4 disabled:opacity-50"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Database className="w-5 h-5 text-surface-400" />
-                                <div className="text-left">
-                                    <p className="font-medium">Load Demo Data</p>
-                                    <p className="text-sm text-surface-500">Create sample trip with players</p>
-                                </div>
-                            </div>
-                            {isSeeding && (
-                                <div className="animate-spin w-5 h-5 border-2 border-augusta-green border-t-transparent rounded-full" />
-                            )}
-                        </button>
-                        <button
-                            onClick={handleClearData}
-                            className="w-full flex items-center justify-between p-4 text-red-500"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Trash2 className="w-5 h-5" />
-                                <div className="text-left">
-                                    <p className="font-medium">Clear All Data</p>
-                                    <p className="text-sm opacity-70">Delete everything and start fresh</p>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
+                            trailing={
+                                isSeeding ? (
+                                    <div className="animate-spin h-5 w-5 border-2 border-augusta-green border-t-transparent rounded-full" />
+                                ) : undefined
+                            }
+                        />
+                        <SettingRow
+                            icon={Trash2}
+                            title="Clear All Data"
+                            subtitle="Delete everything and start fresh"
+                            onClick={() => setShowClearConfirm(true)}
+                            danger
+                        />
+                    </Card>
                 </section>
 
                 {/* About */}
                 <section>
-                    <h2 className="text-xs uppercase text-surface-500 font-medium mb-2 px-1">
-                        About
-                    </h2>
-                    <div className="card p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-augusta-green flex items-center justify-center">
-                                <span className="text-white font-bold text-lg">RC</span>
+                    <SectionHeader
+                        title="About"
+                        icon={Info}
+                        size="sm"
+                        className="mb-3"
+                    />
+                    <Card>
+                        <div className="flex items-center gap-4">
+                            <div className="h-14 w-14 rounded-xl bg-augusta-green flex items-center justify-center shrink-0">
+                                <span className="text-white font-bold text-xl">RC</span>
                             </div>
                             <div>
-                                <h3 className="font-semibold">Golf Ryder Cup App</h3>
-                                <p className="text-sm text-surface-500">Version 1.0.0 (Web)</p>
+                                <h3 className="font-semibold text-text-primary">Golf Ryder Cup App</h3>
+                                <p className="text-sm text-text-secondary">Version 1.0.0 (Web)</p>
                             </div>
                         </div>
-                        <p className="text-sm text-surface-500 mt-3">
+                        <p className="text-sm text-text-secondary mt-4">
                             Offline-first match play scoring for your golf trip Ryder Cup format.
                         </p>
-                    </div>
+                    </Card>
                 </section>
             </div>
 
             {/* Captain Mode Modal */}
-            {showCaptainModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="card p-6 w-full max-w-sm">
-                        <h3 className="text-lg font-semibold mb-4">Enable Captain Mode</h3>
-                        <p className="text-sm text-surface-500 mb-4">
-                            Enter a PIN to unlock captain features like editing lineups and managing players.
-                        </p>
-                        <input
-                            type="password"
-                            value={captainPin}
-                            onChange={(e) => setCaptainPin(e.target.value)}
-                            placeholder="Enter 4+ digit PIN"
-                            className="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-800 mb-4"
-                            autoFocus
-                        />
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => {
-                                    setShowCaptainModal(false);
-                                    setCaptainPin('');
-                                }}
-                                className="flex-1 py-3 rounded-lg border border-surface-300 dark:border-surface-600 font-medium"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleEnableCaptainMode}
-                                disabled={captainPin.length < 4}
-                                className="flex-1 py-3 rounded-lg bg-augusta-green text-white font-medium disabled:opacity-50"
-                            >
-                                Enable
-                            </button>
-                        </div>
-                    </div>
+            <Modal
+                isOpen={showCaptainModal}
+                onClose={() => {
+                    setShowCaptainModal(false);
+                    setCaptainPin('');
+                }}
+                title="Enable Captain Mode"
+            >
+                <p className="text-sm text-text-secondary mb-4">
+                    Enter a PIN to unlock captain features like editing lineups and managing players.
+                </p>
+                <Input
+                    type="password"
+                    value={captainPin}
+                    onChange={(e) => setCaptainPin(e.target.value)}
+                    placeholder="Enter 4+ digit PIN"
+                    autoFocus
+                />
+                <div className="flex gap-3 mt-6">
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            setShowCaptainModal(false);
+                            setCaptainPin('');
+                        }}
+                        className="flex-1"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={handleEnableCaptainMode}
+                        disabled={captainPin.length < 4}
+                        className="flex-1"
+                    >
+                        Enable
+                    </Button>
                 </div>
-            )}
-        </AppShell>
+            </Modal>
+
+            {/* Clear Data Confirmation */}
+            <ConfirmDialog
+                isOpen={showClearConfirm}
+                onClose={() => setShowClearConfirm(false)}
+                onConfirm={handleClearData}
+                title="Clear All Data?"
+                description="This will permanently delete all trips, players, matches, and scores. This action cannot be undone."
+                confirmLabel="Clear All Data"
+                variant="danger"
+                confirmText="DELETE"
+            />
+
+            {/* Exit Trip Confirmation */}
+            <ConfirmDialog
+                isOpen={showExitTripConfirm}
+                onClose={() => setShowExitTripConfirm(false)}
+                onConfirm={handleExitTrip}
+                title="Exit Trip?"
+                description="You'll be taken back to the trip selector. Your data will be saved and you can return to this trip anytime."
+                confirmLabel="Exit Trip"
+                variant="default"
+            />
+        </AppShellNew>
     );
 }

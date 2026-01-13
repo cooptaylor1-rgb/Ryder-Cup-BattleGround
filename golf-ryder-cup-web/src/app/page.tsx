@@ -6,18 +6,151 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { AppShell } from '@/components/layout';
-import { Trophy, Plus, Trash2, Database } from 'lucide-react';
+import { AppShellNew } from '@/components/layout';
+import {
+  Button,
+  Card,
+  Badge,
+  SectionHeader,
+  ConfirmDialog,
+  NoTripsEmptyNew,
+  Skeleton,
+} from '@/components/ui';
+import {
+  Trophy,
+  Plus,
+  Trash2,
+  Database,
+  ChevronRight,
+  Calendar,
+  MapPin,
+} from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
+
+// Trip card component
+interface TripCardProps {
+  trip: {
+    id: string;
+    name: string;
+    location?: string;
+    startDate: Date | string;
+    endDate: Date | string;
+  };
+  onSelect: () => void;
+}
+
+function TripCard({ trip, onSelect }: TripCardProps) {
+  const startDate = new Date(trip.startDate);
+  const endDate = new Date(trip.endDate);
+  const now = new Date();
+
+  // Determine trip status
+  let status: 'upcoming' | 'active' | 'completed' = 'upcoming';
+  if (now > endDate) status = 'completed';
+  else if (now >= startDate) status = 'active';
+
+  return (
+    <Card interactive onClick={onSelect} className="group">
+      <div className="flex items-start gap-4">
+        {/* Icon */}
+        <div
+          className={cn(
+            'flex-shrink-0 flex items-center justify-center',
+            'h-12 w-12 rounded-xl',
+            'bg-augusta-green/10 text-augusta-green',
+            'group-hover:bg-augusta-green group-hover:text-white',
+            'transition-colors duration-200'
+          )}
+        >
+          <Trophy className="h-6 w-6" />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-text-primary truncate">
+                {trip.name}
+              </h3>
+              {trip.location && (
+                <div className="flex items-center gap-1.5 mt-1 text-text-secondary">
+                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="text-sm truncate">{trip.location}</span>
+                </div>
+              )}
+            </div>
+            <Badge
+              variant={
+                status === 'active'
+                  ? 'success'
+                  : status === 'upcoming'
+                    ? 'info'
+                    : 'default'
+              }
+              dot={status === 'active'}
+              pulse={status === 'active'}
+            >
+              {status === 'active'
+                ? 'Active'
+                : status === 'upcoming'
+                  ? 'Upcoming'
+                  : 'Completed'}
+            </Badge>
+          </div>
+
+          {/* Date range */}
+          <div className="flex items-center gap-1.5 mt-2 text-text-tertiary">
+            <Calendar className="h-3.5 w-3.5" />
+            <span className="text-xs">
+              {formatDate(trip.startDate, 'short')} –{' '}
+              {formatDate(trip.endDate, 'short')}
+            </span>
+          </div>
+        </div>
+
+        {/* Arrow */}
+        <ChevronRight
+          className={cn(
+            'h-5 w-5 text-text-tertiary flex-shrink-0',
+            'group-hover:text-text-secondary transition-colors'
+          )}
+        />
+      </div>
+    </Card>
+  );
+}
+
+// Loading skeleton for trip cards
+function TripCardSkeleton() {
+  return (
+    <Card>
+      <div className="flex items-start gap-4">
+        <Skeleton className="h-12 w-12 rounded-xl flex-shrink-0" />
+        <div className="flex-1 min-w-0 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-28" />
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 export default function HomePage() {
   const router = useRouter();
   const { loadTrip } = useTripStore();
   const { showToast } = useUIStore();
   const [isSeeding, setIsSeeding] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Get all trips
-  const trips = useLiveQuery(() => db.trips.toArray(), []);
+  const trips = useLiveQuery(
+    () => db.trips.orderBy('startDate').reverse().toArray(),
+    []
+  );
 
   const handleTripSelect = async (tripId: string) => {
     await loadTrip(tripId);
@@ -27,8 +160,10 @@ export default function HomePage() {
   const handleSeedData = async () => {
     setIsSeeding(true);
     try {
-      await seedDemoData();
+      const tripId = await seedDemoData();
+      await loadTrip(tripId);
       showToast('success', 'Demo data loaded successfully');
+      router.push('/score');
     } catch (error) {
       showToast('error', 'Failed to load demo data');
       console.error(error);
@@ -38,120 +173,153 @@ export default function HomePage() {
   };
 
   const handleClearData = async () => {
-    if (confirm('Are you sure you want to clear all data?')) {
-      try {
-        await clearDemoData();
-        showToast('info', 'All data cleared');
-      } catch (error) {
-        showToast('error', 'Failed to clear data');
-        console.error(error);
-      }
+    try {
+      await clearDemoData();
+      showToast('info', 'All data cleared');
+      setShowClearConfirm(false);
+    } catch (error) {
+      showToast('error', 'Failed to clear data');
+      console.error(error);
     }
   };
 
+  const isLoading = trips === undefined;
+  const hasTrips = trips && trips.length > 0;
+
   return (
-    <AppShell showNav={false} headerTitle="Ryder Cup Tracker">
-      <div className="p-4 space-y-6">
-        {/* Hero Section */}
-        <div className="text-center py-8">
-          <div className="w-20 h-20 bg-augusta-green rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Trophy className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold mb-2">Ryder Cup Tracker</h1>
-          <p className="text-surface-500 dark:text-surface-400">
-            Score your matches, track standings, manage your tournament
-          </p>
-        </div>
+    <AppShellNew headerTitle="Ryder Cup Tracker" showNav={true}>
+      <div className="p-4 lg:p-6 space-y-8">
+        {/* Hero Section - Only show when no trips */}
+        {!hasTrips && !isLoading && (
+          <section className="pt-8 pb-4">
+            <div className="text-center">
+              <div
+                className={cn(
+                  'inline-flex items-center justify-center',
+                  'h-20 w-20 rounded-2xl mb-6',
+                  'bg-augusta-green shadow-lg shadow-augusta-green/30'
+                )}
+              >
+                <Trophy className="h-10 w-10 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-text-primary mb-2">
+                Welcome to Ryder Cup Tracker
+              </h1>
+              <p className="text-text-secondary max-w-md mx-auto">
+                Track your golf trip matches with Ryder Cup-style scoring.
+                Create a trip to get started.
+              </p>
+            </div>
+          </section>
+        )}
 
-        {/* Trips List */}
+        {/* Trips Section */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Your Trips</h2>
-            <button
-              onClick={() => router.push('/trip/new')}
-              className="flex items-center gap-1 text-sm text-augusta-green font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              New Trip
-            </button>
-          </div>
+          <SectionHeader
+            title={hasTrips ? 'Your Trips' : 'Get Started'}
+            subtitle={
+              hasTrips
+                ? `${trips.length} trip${trips.length !== 1 ? 's' : ''}`
+                : undefined
+            }
+            icon={Trophy}
+            action={
+              <Button
+                onClick={() => router.push('/trip/new')}
+                leftIcon={<Plus className="h-4 w-4" />}
+                size="sm"
+              >
+                New trip
+              </Button>
+            }
+            className="mb-4"
+          />
 
-          {trips && trips.length > 0 ? (
+          {/* Loading state */}
+          {isLoading && (
+            <div className="space-y-3">
+              <TripCardSkeleton />
+              <TripCardSkeleton />
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isLoading && !hasTrips && (
+            <Card variant="outlined" padding="none">
+              <NoTripsEmptyNew onCreateTrip={() => router.push('/trip/new')} />
+            </Card>
+          )}
+
+          {/* Trip list */}
+          {hasTrips && (
             <div className="space-y-3">
               {trips.map(trip => (
-                <button
+                <TripCard
                   key={trip.id}
-                  onClick={() => handleTripSelect(trip.id)}
-                  className={cn(
-                    'card w-full p-4 text-left',
-                    'hover:bg-surface-100 dark:hover:bg-surface-800',
-                    'transition-colors duration-150'
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold">{trip.name}</h3>
-                      {trip.location && (
-                        <p className="text-sm text-surface-500 mt-0.5">
-                          {trip.location}
-                        </p>
-                      )}
-                    </div>
-                    <span className="text-xs text-surface-400">
-                      {formatDate(trip.startDate)}
-                    </span>
-                  </div>
-                </button>
+                  trip={trip}
+                  onSelect={() => handleTripSelect(trip.id)}
+                />
               ))}
-            </div>
-          ) : (
-            <div className="card p-8 text-center">
-              <p className="text-surface-500 mb-4">No trips yet</p>
-              <button
-                onClick={() => router.push('/trip/new')}
-                className="btn-primary"
-              >
-                Create Your First Trip
-              </button>
             </div>
           )}
         </section>
 
-        {/* Dev Tools (remove in production) */}
-        <section className="pt-4 border-t border-surface-200 dark:border-surface-800">
-          <h3 className="text-sm font-medium text-surface-400 mb-3">
-            Developer Tools
-          </h3>
-          <div className="flex gap-3">
-            <button
+        {/* Quick Actions Section */}
+        <section>
+          <SectionHeader title="Quick Actions" size="sm" className="mb-3" />
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
               onClick={handleSeedData}
-              disabled={isSeeding}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-2',
-                'py-3 px-4 rounded-lg',
-                'bg-augusta-green/10 text-augusta-green',
-                'hover:bg-augusta-green/20 transition-colors',
-                isSeeding && 'opacity-50 cursor-not-allowed'
-              )}
+              isLoading={isSeeding}
+              loadingText="Loading..."
+              leftIcon={<Database className="h-4 w-4" />}
+              fullWidth
             >
-              <Database className="w-4 h-4" />
-              {isSeeding ? 'Loading...' : 'Load Demo'}
-            </button>
-            <button
-              onClick={handleClearData}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-2',
-                'py-3 px-4 rounded-lg',
-                'bg-red-500/10 text-red-500',
-                'hover:bg-red-500/20 transition-colors'
-              )}
+              Load demo
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowClearConfirm(true)}
+              leftIcon={<Trash2 className="h-4 w-4" />}
+              fullWidth
+              className="text-error border-error/30 hover:bg-error/10"
             >
-              <Trash2 className="w-4 h-4" />
-              Clear Data
-            </button>
+              Clear data
+            </Button>
           </div>
         </section>
+
+        {/* Footer */}
+        <footer className="pt-8 pb-4 text-center">
+          <div className="flex items-center justify-center gap-2 text-text-tertiary">
+            <div
+              className={cn(
+                'h-6 w-6 rounded-md',
+                'bg-augusta-green text-white',
+                'flex items-center justify-center',
+                'text-xs font-bold'
+              )}
+            >
+              RC
+            </div>
+            <span className="text-xs">Golf Ryder Cup App • v1.0.0</span>
+          </div>
+        </footer>
       </div>
-    </AppShell>
+
+      {/* Confirm Clear Dialog */}
+      <ConfirmDialog
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={handleClearData}
+        title="Clear all data?"
+        description="This will permanently delete all trips, players, matches, and scores. This action cannot be undone."
+        confirmLabel="Clear everything"
+        cancelLabel="Cancel"
+        variant="danger"
+        confirmText="DELETE"
+      />
+    </AppShellNew>
   );
 }
