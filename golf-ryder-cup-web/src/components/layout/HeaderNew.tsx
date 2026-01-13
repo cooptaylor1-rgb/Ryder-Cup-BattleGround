@@ -1,8 +1,8 @@
 /**
- * Header Component (Enhanced)
+ * Header Component - Masters Inspired
  *
- * Compact top app bar with contextual actions.
- * Palantir-inspired: clean, informative, unobtrusive.
+ * Elegant top app bar with serif headlines.
+ * Refined styling with gold accents.
  */
 
 'use client';
@@ -64,8 +64,8 @@ export function HeaderNew({
                 'sticky top-0 z-40',
                 'h-14 px-4',
                 'flex items-center gap-3',
-                'bg-surface-raised/95 backdrop-blur-md',
-                'border-b border-surface-border',
+                'bg-surface-card/95 backdrop-blur-md',
+                'border-b border-surface-border/50',
             )}
         >
             {/* Left side - Back button or Menu */}
@@ -92,7 +92,7 @@ export function HeaderNew({
 
             {/* Center - Title & Context */}
             <div className="flex-1 min-w-0 text-center lg:text-left">
-                <h1 className="text-base font-semibold text-text-primary truncate">
+                <h1 className="font-serif text-lg font-semibold text-magnolia truncate">
                     {displayTitle}
                 </h1>
                 {subtitle && (
@@ -114,15 +114,15 @@ export function HeaderNew({
                     </Tooltip>
                 )}
 
-                {/* Captain mode indicator */}
+                {/* Captain mode indicator - gold accent */}
                 {isCaptainMode && (
                     <Tooltip content="Captain Mode enabled. Tap to disable.">
                         <button
                             onClick={disableCaptainMode}
                             className={cn(
                                 'flex items-center gap-1.5 px-2 py-1 rounded-full',
-                                'bg-augusta-green/10 text-augusta-green',
-                                'hover:bg-augusta-green/20 transition-colors',
+                                'bg-gold/10 text-gold',
+                                'hover:bg-gold/20 transition-colors',
                             )}
                         >
                             <Shield className="w-3.5 h-3.5" />

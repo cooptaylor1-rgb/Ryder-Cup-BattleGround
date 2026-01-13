@@ -139,7 +139,7 @@ function MatchCardNew({
             <div className={cn(
                 'flex items-center justify-center gap-2 mt-4 pt-3',
                 'border-t border-surface-border/50',
-                'text-text-tertiary group-hover:text-augusta-green',
+                'text-text-tertiary group-hover:text-masters-green-light',
                 'transition-colors duration-150',
             )}>
                 <Target className="h-4 w-4" />
@@ -225,14 +225,14 @@ export default function ScorePage() {
             headerSubtitle={currentTrip.name}
         >
             <div className="p-4 lg:p-6 space-y-6">
-                {/* Session Header */}
+                {/* Session Header - Masters refined */}
                 {activeSession && (
-                    <Card variant="elevated" className="bg-augusta-green/5 border-augusta-green/20">
+                    <Card variant="elevated" className="bg-masters-green/5 border-masters-green/20">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className={cn(
-                                    'h-10 w-10 rounded-xl flex items-center justify-center',
-                                    'bg-augusta-green text-white',
+                                    'h-11 w-11 rounded-xl flex items-center justify-center',
+                                    'bg-masters-green text-magnolia',
                                 )}>
                                     <Calendar className="h-5 w-5" />
                                 </div>
@@ -240,7 +240,7 @@ export default function ScorePage() {
                                     <p className="text-sm text-text-secondary">
                                         Session {activeSession.sessionNumber}
                                     </p>
-                                    <h2 className="text-lg font-semibold text-text-primary capitalize">
+                                    <h2 className="font-serif text-xl font-semibold text-magnolia capitalize">
                                         {activeSession.sessionType}
                                     </h2>
                                 </div>
@@ -317,7 +317,7 @@ export default function ScorePage() {
                                         'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap',
                                         'transition-colors duration-150',
                                         session.id === activeSession?.id
-                                            ? 'bg-augusta-green text-white'
+                                            ? 'bg-masters-green text-magnolia'
                                             : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight',
                                     )}
                                 >

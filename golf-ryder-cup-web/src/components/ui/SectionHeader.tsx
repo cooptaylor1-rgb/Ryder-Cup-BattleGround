@@ -1,8 +1,8 @@
 /**
- * Section Header Component
+ * Section Header Component - Masters Inspired
  *
- * Consistent section titles with optional actions.
- * Palantir-inspired: brutal hierarchy, clear structure.
+ * Elegant section titles with serif headlines.
+ * Refined styling with gold icon accents.
  */
 
 'use client';
@@ -33,8 +33,8 @@ export function SectionHeader({
             <div className="flex items-center gap-3 min-w-0">
                 {Icon && (
                     <div className={cn(
-                        'flex items-center justify-center rounded-lg',
-                        'bg-augusta-green/10 text-augusta-green',
+                        'flex items-center justify-center rounded-xl',
+                        'bg-masters-green/10 text-masters-green-light',
                         size === 'sm' && 'h-8 w-8',
                         size === 'md' && 'h-10 w-10',
                         size === 'lg' && 'h-12 w-12',
@@ -48,10 +48,10 @@ export function SectionHeader({
                 )}
                 <div className="min-w-0">
                     <h2 className={cn(
-                        'font-semibold text-text-primary truncate',
+                        'font-serif font-semibold text-magnolia truncate',
                         size === 'sm' && 'text-sm',
                         size === 'md' && 'text-base',
-                        size === 'lg' && 'text-lg',
+                        size === 'lg' && 'text-xl',
                     )}>
                         {title}
                     </h2>

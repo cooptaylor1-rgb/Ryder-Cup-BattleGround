@@ -1,9 +1,9 @@
 /**
- * Button Component
+ * Button Component - Masters Inspired
  *
- * Primary action component with multiple variants.
+ * Primary action component with elegant styling.
  * Follows WCAG 2.2 touch target guidelines (44px minimum).
- * Palantir-inspired: restrained, confident, clear hierarchy.
+ * Masters-inspired: restrained luxury, confident, gold accents.
  */
 
 'use client';
@@ -50,53 +50,53 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 className={cn(
                     // Base styles
                     'relative inline-flex items-center justify-center gap-2',
-                    'font-medium transition-all duration-150',
+                    'font-semibold transition-all duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                     'focus-visible:ring-offset-surface-base',
                     'disabled:pointer-events-none disabled:opacity-50',
                     'select-none',
 
                     // Size variants
-                    size === 'sm' && 'h-8 px-3 text-sm rounded-md min-w-[64px]',
-                    size === 'md' && 'h-10 px-4 text-sm rounded-lg min-w-[80px]',
-                    size === 'lg' && 'h-12 px-6 text-base rounded-lg min-w-[96px]',
-                    size === 'icon' && 'h-10 w-10 rounded-lg p-0 min-w-0',
+                    size === 'sm' && 'h-8 px-3 text-sm rounded-lg min-w-[64px]',
+                    size === 'md' && 'h-10 px-4 text-sm rounded-xl min-w-[80px]',
+                    size === 'lg' && 'h-12 px-6 text-base rounded-xl min-w-[96px]',
+                    size === 'icon' && 'h-10 w-10 rounded-xl p-0 min-w-0',
 
-                    // Variant styles
+                    // Variant styles - Masters elegance
                     variant === 'primary' && [
-                        'bg-augusta-green text-white',
-                        'hover:bg-augusta-light active:bg-primary-dark',
-                        'focus-visible:ring-augusta-green',
+                        'bg-masters-green text-magnolia',
+                        'hover:bg-masters-green-light active:bg-masters-green',
+                        'focus-visible:ring-masters-green',
                         'shadow-sm hover:shadow-md',
                     ],
 
                     variant === 'secondary' && [
-                        'bg-surface-elevated text-white',
+                        'bg-surface-elevated text-magnolia',
                         'border border-surface-border',
-                        'hover:bg-surface-highlight active:bg-surface-muted',
-                        'focus-visible:ring-surface-border',
+                        'hover:bg-surface-highlight hover:border-gold/30 active:bg-surface-muted',
+                        'focus-visible:ring-gold',
                     ],
 
                     variant === 'ghost' && [
                         'bg-transparent text-text-secondary',
-                        'hover:bg-surface-highlight hover:text-text-primary',
+                        'hover:bg-surface-highlight hover:text-magnolia',
                         'active:bg-surface-elevated',
-                        'focus-visible:ring-surface-border',
+                        'focus-visible:ring-gold/50',
                     ],
 
                     variant === 'danger' && [
-                        'bg-error text-white',
-                        'hover:bg-error-dark active:bg-error-dark',
-                        'focus-visible:ring-error',
+                        'bg-azalea text-white',
+                        'hover:bg-azalea/90 active:bg-azalea/80',
+                        'focus-visible:ring-azalea',
                         'shadow-sm hover:shadow-md',
                     ],
 
                     variant === 'outline' && [
-                        'bg-transparent text-text-primary',
+                        'bg-transparent text-magnolia',
                         'border border-surface-border',
-                        'hover:bg-surface-highlight hover:border-surface-elevated',
+                        'hover:bg-surface-highlight hover:border-gold/30',
                         'active:bg-surface-elevated',
-                        'focus-visible:ring-augusta-green',
+                        'focus-visible:ring-gold',
                     ],
 
                     // Full width

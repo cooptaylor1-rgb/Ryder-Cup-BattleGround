@@ -1,8 +1,8 @@
 /**
- * Badge / Chip Component
+ * Badge / Chip Component - Masters Inspired
  *
- * Small labels for status, categories, and metadata.
- * Spotify-inspired: confident, clear, subtle personality.
+ * Elegant labels for status, categories, and metadata.
+ * Refined styling with subtle backgrounds and warm tones.
  */
 
 'use client';
@@ -50,33 +50,33 @@ export function Badge({
                 'whitespace-nowrap select-none',
 
                 // Size variants
-                size === 'sm' && 'px-2 py-0.5 text-xs',
+                size === 'sm' && 'px-2.5 py-0.5 text-xs',
                 size === 'md' && 'px-3 py-1 text-sm',
 
-                // Color variants
+                // Color variants - Masters refined
                 variant === 'default' && [
                     'bg-surface-elevated text-text-secondary',
                     'border border-surface-border',
                 ],
 
                 variant === 'primary' && [
-                    'bg-augusta-green/15 text-augusta-light',
-                    'border border-augusta-green/30',
+                    'bg-masters-green/10 text-masters-green-light',
+                    'border border-masters-green/20',
                 ],
 
                 variant === 'success' && [
-                    'bg-success/15 text-success-light',
-                    'border border-success/30',
+                    'bg-masters-green/10 text-masters-green-light',
+                    'border border-masters-green/20',
                 ],
 
                 variant === 'warning' && [
-                    'bg-warning/15 text-warning',
-                    'border border-warning/30',
+                    'bg-gold/10 text-gold-light',
+                    'border border-gold/20',
                 ],
 
                 variant === 'error' && [
-                    'bg-error/15 text-error-light',
-                    'border border-error/30',
+                    'bg-azalea/10 text-azalea',
+                    'border border-azalea/20',
                 ],
 
                 variant === 'info' && [
@@ -85,18 +85,18 @@ export function Badge({
                 ],
 
                 variant === 'usa' && [
-                    'bg-team-usa/15 text-team-usa-light',
-                    'border border-team-usa/30',
+                    'bg-team-usa/10 text-team-usa-light',
+                    'border border-team-usa/20',
                 ],
 
                 variant === 'europe' && [
-                    'bg-team-europe/15 text-team-europe-light',
-                    'border border-team-europe/30',
+                    'bg-team-europe/10 text-team-europe-light',
+                    'border border-team-europe/20',
                 ],
 
                 variant === 'live' && [
-                    'bg-error/20 text-error-light',
-                    'border border-error/30',
+                    'bg-azalea/15 text-azalea',
+                    'border border-azalea/30',
                 ],
 
                 className

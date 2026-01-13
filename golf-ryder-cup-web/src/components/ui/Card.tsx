@@ -1,8 +1,8 @@
 /**
- * Card Component
+ * Card Component - Masters Inspired
  *
- * Flexible container with consistent styling.
- * Supports multiple variants and interactive states.
+ * Elegant container with warm shadows and refined styling.
+ * Understated luxury with subtle gold highlights.
  */
 
 'use client';
@@ -38,7 +38,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
                 ref={ref}
                 className={cn(
                     // Base styles
-                    'rounded-xl transition-all duration-150',
+                    'rounded-xl transition-all duration-200',
 
                     // Padding variants
                     padding === 'none' && 'p-0',
@@ -46,16 +46,16 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
                     padding === 'md' && 'p-4',
                     padding === 'lg' && 'p-6',
 
-                    // Card variants
+                    // Card variants - Masters elegance
                     variant === 'default' && [
-                        'bg-surface-raised',
-                        'shadow-card-default',
-                        'border border-transparent',
+                        'bg-surface-card',
+                        'shadow-card-md',
+                        'border border-surface-border',
                     ],
 
                     variant === 'elevated' && [
                         'bg-surface-elevated',
-                        'shadow-card-elevated',
+                        'shadow-card-lg',
                         'border border-surface-border/50',
                     ],
 
@@ -69,19 +69,20 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
                         'border border-transparent',
                     ],
 
-                    // Interactive states
+                    // Interactive states - refined hover with gold accent
                     interactive && [
                         'cursor-pointer',
-                        'hover-lift', // Use the new hover-lift animation
-                        'hover:border-surface-border',
+                        'hover:shadow-card-lg',
+                        'hover:border-gold/20',
                         'active:scale-[0.995]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-augusta-green',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50',
                     ],
 
-                    // Selected state
+                    // Selected state - gold highlight
                     selected && [
-                        'border-augusta-green',
-                        'ring-1 ring-augusta-green',
+                        'border-gold/50',
+                        'ring-1 ring-gold/30',
+                        'shadow-glow-gold',
                     ],
 
                     className

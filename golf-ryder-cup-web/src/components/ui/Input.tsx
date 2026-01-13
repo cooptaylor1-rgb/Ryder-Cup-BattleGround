@@ -78,13 +78,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             leftIcon && 'pl-10',
                             rightIcon && 'pr-10',
 
-                            // Focus state
-                            'focus:outline-none focus:ring-2 focus:ring-augusta-green focus:border-transparent',
+                            // Focus state - Masters gold accent
+                            'focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold',
 
                             // Error state
                             error && [
-                                'border-error focus:ring-error',
-                                'text-error placeholder:text-error/60',
+                                'border-azalea focus:ring-azalea/50 focus:border-azalea',
+                                'text-azalea placeholder:text-azalea/60',
                             ],
 
                             // Disabled state
@@ -113,7 +113,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         id={error ? `${inputId}-error` : `${inputId}-hint`}
                         className={cn(
                             'mt-1.5 text-xs',
-                            error ? 'text-error' : 'text-text-tertiary',
+                            error ? 'text-azalea' : 'text-text-tertiary',
                         )}
                     >
                         {error || hint}

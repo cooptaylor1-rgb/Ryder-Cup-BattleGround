@@ -1,8 +1,8 @@
 /**
- * Empty State Component (Enhanced)
+ * Empty State Component - Masters Inspired
  *
- * Beautiful, instructive empty states.
- * Palantir clarity + Spotify personality.
+ * Elegant, instructive empty states.
+ * Refined typography and warm accents.
  */
 
 'use client';
@@ -68,11 +68,11 @@ export function EmptyStateNew({
                     variant === 'large' && 'mb-6',
                 )}
             >
-                {/* Glow effect */}
+                {/* Glow effect - Masters gold */}
                 <div
                     className={cn(
-                        'absolute inset-0 rounded-full blur-xl opacity-20',
-                        'bg-augusta-green',
+                        'absolute inset-0 rounded-full blur-xl opacity-10',
+                        'bg-gold',
                     )}
                     aria-hidden="true"
                 />
@@ -80,7 +80,7 @@ export function EmptyStateNew({
                 {/* Icon circle */}
                 <div
                     className={cn(
-                        'relative flex items-center justify-center rounded-full',
+                        'relative flex items-center justify-center rounded-2xl',
                         'bg-surface-elevated border border-surface-border',
                         variant === 'compact' && 'h-12 w-12',
                         variant === 'default' && 'h-16 w-16',
@@ -98,10 +98,10 @@ export function EmptyStateNew({
                 </div>
             </div>
 
-            {/* Title */}
+            {/* Title - Serif */}
             <h3
                 className={cn(
-                    'font-semibold text-text-primary',
+                    'font-serif font-semibold text-magnolia',
                     variant === 'compact' && 'text-base',
                     variant === 'default' && 'text-lg',
                     variant === 'large' && 'text-xl',
