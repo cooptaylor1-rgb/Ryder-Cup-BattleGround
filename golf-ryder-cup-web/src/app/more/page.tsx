@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useUIStore, useAuthStore } from '@/lib/stores';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import {
     Users,
@@ -22,6 +22,8 @@ import {
     MoreHorizontal,
     ChevronLeft,
     X,
+    User,
+    LogIn,
 } from 'lucide-react';
 
 /**
@@ -33,6 +35,7 @@ import {
 export default function MorePage() {
     const router = useRouter();
     const { currentTrip, loadTrip, clearTrip } = useTripStore();
+    const { currentUser, isAuthenticated } = useAuthStore();
     const {
         isCaptainMode,
         enableCaptainMode,
@@ -103,6 +106,54 @@ export default function MorePage() {
             </header>
 
             <main className="container-editorial">
+                {/* Account Section */}
+                <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
+                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Account</h2>
+                    {isAuthenticated && currentUser ? (
+                        <Link href="/profile" className="match-row">
+                            <div
+                                className="flex items-center justify-center rounded-full"
+                                style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    background: 'var(--masters)',
+                                    color: 'white',
+                                    fontWeight: 600,
+                                    fontSize: '12px',
+                                }}
+                            >
+                                {currentUser.firstName[0]}{currentUser.lastName[0]}
+                            </div>
+                            <div className="flex-1">
+                                <p style={{ fontWeight: 500 }}>{currentUser.firstName} {currentUser.lastName}</p>
+                                <p className="type-meta">{currentUser.email}</p>
+                            </div>
+                            <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                        </Link>
+                    ) : (
+                        <>
+                            <Link href="/login" className="match-row">
+                                <LogIn size={18} style={{ color: 'var(--masters)' }} />
+                                <div className="flex-1">
+                                    <p style={{ fontWeight: 500 }}>Sign In</p>
+                                    <p className="type-meta">Access your profile and sync data</p>
+                                </div>
+                                <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                            </Link>
+                            <Link href="/profile/create" className="match-row">
+                                <User size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                                <div className="flex-1">
+                                    <p style={{ fontWeight: 500 }}>Create Profile</p>
+                                    <p className="type-meta">Set up your golf profile for trips</p>
+                                </div>
+                                <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                            </Link>
+                        </>
+                    )}
+                </section>
+
+                <hr className="divider" />
+
                 {/* Current Trip */}
                 {currentTrip && (
                     <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
