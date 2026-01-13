@@ -1,13 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { seedDemoData, clearDemoData } from '@/lib/db/seed';
-import { useTripStore, useUIStore } from '@/lib/stores';
-import { ConfirmDialog } from '@/components/ui';
-import { ChevronRight, MapPin, Calendar, Plus, Database, Trash2 } from 'lucide-react';
+import { useTripStore } from '@/lib/stores';
+import { ChevronRight, MapPin, Calendar, Plus } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
 /**
@@ -18,14 +15,13 @@ import { formatDate } from '@/lib/utils';
  * - Hierarchy above all: What is happening now? What matters most?
  * - Typography carries the design
  * - Calm, confident, quiet
+ *
+ * IA Note: Developer tools (Load Demo, Clear Data) exist in More > Data.
+ * Removed from Home to reduce clutter and prevent accidental data loss.
  */
 export default function HomePage() {
   const router = useRouter();
   const { loadTrip } = useTripStore();
-  const { showToast } = useUIStore();
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [showDevTools, setShowDevTools] = useState(false);
 
   const trips = useLiveQuery(
     () => db.trips.orderBy('startDate').reverse().toArray(),
@@ -38,31 +34,6 @@ export default function HomePage() {
   };
 
   const handleCreateTrip = () => router.push('/trip/new');
-
-  const handleLoadDemo = async () => {
-    setIsDemoLoading(true);
-    try {
-      await seedDemoData();
-      showToast('success', 'Demo tournament loaded');
-    } catch {
-      showToast('error', 'Failed to load demo data');
-    } finally {
-      setIsDemoLoading(false);
-    }
-  };
-
-  const handleClearData = async () => {
-    setIsDemoLoading(true);
-    try {
-      await clearDemoData();
-      showToast('info', 'All data cleared');
-    } catch {
-      showToast('error', 'Failed to clear data');
-    } finally {
-      setIsDemoLoading(false);
-      setShowClearConfirm(false);
-    }
-  };
 
   const hasTrips = trips && trips.length > 0;
   const activeTrip = trips?.find(t => {
@@ -77,9 +48,6 @@ export default function HomePage() {
       {/* Header - Minimal, confident */}
       <header className="px-5 pt-6 pb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <div className="max-w-lg mx-auto">
-          <p className="text-overline mb-1" style={{ color: 'var(--text-tertiary)' }}>
-            Tournament Companion
-          </p>
           <h1
             className="font-display text-2xl"
             style={{ color: 'var(--text-primary)', letterSpacing: '-0.02em' }}
@@ -228,58 +196,6 @@ export default function HomePage() {
             </div>
           )}
         </section>
-
-        {/* Developer Tools - Demoted, discreet */}
-        <section className="mt-10 pt-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <button
-            onClick={() => setShowDevTools(!showDevTools)}
-            className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider transition-colors"
-            style={{ color: 'var(--text-disabled)' }}
-          >
-            Developer Tools
-            <ChevronRight
-              style={{
-                width: 14,
-                height: 14,
-                transform: showDevTools ? 'rotate(90deg)' : 'none',
-                transition: 'transform 150ms'
-              }}
-            />
-          </button>
-
-          {showDevTools && (
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <button
-                onClick={handleLoadDemo}
-                disabled={isDemoLoading}
-                className="p-3.5 rounded-lg flex items-center justify-center gap-2 text-sm transition-colors"
-                style={{
-                  background: 'var(--surface-raised)',
-                  border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-tertiary)',
-                  opacity: isDemoLoading ? 0.5 : 1,
-                }}
-              >
-                <Database style={{ width: 16, height: 16 }} />
-                Load Demo
-              </button>
-              <button
-                onClick={() => setShowClearConfirm(true)}
-                disabled={isDemoLoading}
-                className="p-3.5 rounded-lg flex items-center justify-center gap-2 text-sm transition-colors"
-                style={{
-                  background: 'rgba(155, 74, 74, 0.1)',
-                  border: '1px solid rgba(155, 74, 74, 0.2)',
-                  color: 'var(--error)',
-                  opacity: isDemoLoading ? 0.5 : 1,
-                }}
-              >
-                <Trash2 style={{ width: 16, height: 16 }} />
-                Clear Data
-              </button>
-            </div>
-          )}
-        </section>
       </main>
 
       {/* Bottom Navigation - Simple, functional */}
@@ -319,17 +235,6 @@ export default function HomePage() {
           </button>
         ))}
       </nav>
-
-      {/* Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={showClearConfirm}
-        onClose={() => setShowClearConfirm(false)}
-        onConfirm={handleClearData}
-        title="Clear All Data"
-        description="This will permanently delete all tournaments, players, and scores. This action cannot be undone."
-        confirmLabel="Clear Everything"
-        variant="danger"
-      />
     </div>
   );
 }
