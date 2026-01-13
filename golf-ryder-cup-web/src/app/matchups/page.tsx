@@ -2,18 +2,15 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { AppShellNew } from '@/components/layout';
-import { cn, formatPlayerName } from '@/lib/utils';
-import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
+import { formatPlayerName } from '@/lib/utils';
+import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft } from 'lucide-react';
 
 /**
- * MATCHUPS PAGE - Masters-inspired elegance
+ * MATCHUPS PAGE - Editorial Design
  *
- * Team rosters and session management with
- * refined typography and warm accents.
+ * Team rosters and sessions with typography-driven hierarchy.
  */
 
 export default function MatchupsPage() {
@@ -21,14 +18,12 @@ export default function MatchupsPage() {
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore();
   const { isCaptainMode } = useUIStore();
 
-  // Redirect if no trip
   useEffect(() => {
     if (!currentTrip) {
       router.push('/');
     }
   }, [currentTrip, router]);
 
-  // Get players by team
   const getTeamPlayers = (teamId: string) => {
     const memberIds = teamMembers
       .filter(tm => tm.teamId === teamId)
@@ -44,191 +39,195 @@ export default function MatchupsPage() {
   if (!currentTrip) return null;
 
   return (
-    <AppShellNew headerTitle="Matchups" headerSubtitle={currentTrip.name}>
-      <div className="px-5 pt-10 max-w-[480px] mx-auto pb-24 space-y-10">
-        {/* Team Rosters */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-xl text-magnolia">Team Rosters</h2>
-            {isCaptainMode && (
-              <button
-                onClick={() => router.push('/players')}
-                className="text-sm text-gold font-medium flex items-center gap-1 hover:text-gold-light transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Manage
-              </button>
-            )}
+    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+      {/* Header */}
+      <header className="header">
+        <div className="container-editorial flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
+              <ChevronLeft size={20} />
+            </button>
+            <div>
+              <span className="type-overline">Matchups</span>
+              <p className="type-meta truncate" style={{ marginTop: '2px' }}>{currentTrip.name}</p>
+            </div>
           </div>
+          {isCaptainMode && (
+            <Link href="/players" className="type-meta" style={{ color: 'var(--masters)' }}>
+              <Plus size={14} style={{ display: 'inline', marginRight: '4px' }} />
+              Manage
+            </Link>
+          )}
+        </div>
+      </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <main className="container-editorial">
+        {/* Team Rosters */}
+        <section className="section">
+          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Team Rosters</h2>
+
+          <div className="grid grid-cols-2 gap-4">
             {/* Team A */}
-            <div className="rounded-xl bg-surface-card border border-surface-border p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-team-usa" />
-                <h3 className="font-semibold text-team-usa">{teamA?.name || 'Team USA'}</h3>
-              </div>
-              <div className="space-y-2">
-                {teamAPlayers.length > 0 ? (
-                  teamAPlayers.map(player => (
-                    <div
-                      key={player.id}
-                      className="text-sm py-2 border-b border-surface-border/50 last:border-0"
-                    >
-                      <p className="font-medium text-magnolia">
+            <div>
+              <p className="type-overline" style={{ color: 'var(--team-usa)', marginBottom: 'var(--space-3)' }}>
+                {teamA?.name || 'USA'}
+              </p>
+              {teamAPlayers.length > 0 ? (
+                <div>
+                  {teamAPlayers.map(player => (
+                    <div key={player.id} style={{ 
+                      padding: 'var(--space-2) 0',
+                      borderBottom: '1px solid var(--rule)'
+                    }}>
+                      <p style={{ fontWeight: 500 }}>
                         {formatPlayerName(player.firstName, player.lastName, 'short')}
                       </p>
                       {player.handicapIndex !== undefined && (
-                        <p className="text-xs text-text-tertiary mt-0.5">
-                          HCP: {player.handicapIndex.toFixed(1)}
-                        </p>
+                        <p className="type-meta">{player.handicapIndex.toFixed(1)}</p>
                       )}
                     </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-text-tertiary italic py-2">No players assigned</p>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="type-meta">No players</p>
+              )}
             </div>
 
             {/* Team B */}
-            <div className="rounded-xl bg-surface-card border border-surface-border p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-team-europe" />
-                <h3 className="font-semibold text-team-europe">{teamB?.name || 'Team Europe'}</h3>
-              </div>
-              <div className="space-y-2">
-                {teamBPlayers.length > 0 ? (
-                  teamBPlayers.map(player => (
-                    <div
-                      key={player.id}
-                      className="text-sm py-2 border-b border-surface-border/50 last:border-0"
-                    >
-                      <p className="font-medium text-magnolia">
+            <div>
+              <p className="type-overline" style={{ color: 'var(--team-europe)', marginBottom: 'var(--space-3)' }}>
+                {teamB?.name || 'Europe'}
+              </p>
+              {teamBPlayers.length > 0 ? (
+                <div>
+                  {teamBPlayers.map(player => (
+                    <div key={player.id} style={{ 
+                      padding: 'var(--space-2) 0',
+                      borderBottom: '1px solid var(--rule)'
+                    }}>
+                      <p style={{ fontWeight: 500 }}>
                         {formatPlayerName(player.firstName, player.lastName, 'short')}
                       </p>
                       {player.handicapIndex !== undefined && (
-                        <p className="text-xs text-text-tertiary mt-0.5">
-                          HCP: {player.handicapIndex.toFixed(1)}
-                        </p>
+                        <p className="type-meta">{player.handicapIndex.toFixed(1)}</p>
                       )}
                     </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-text-tertiary italic py-2">No players assigned</p>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="type-meta">No players</p>
+              )}
             </div>
           </div>
         </section>
 
+        <hr className="divider" />
+
         {/* Sessions */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-xl text-magnolia">Sessions</h2>
+        <section className="section">
+          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+            <h2 className="type-overline">Sessions</h2>
             {isCaptainMode && (
               <button
                 onClick={() => router.push('/lineup/new')}
-                className="text-sm text-gold font-medium flex items-center gap-1 hover:text-gold-light transition-colors"
+                className="type-meta"
+                style={{ color: 'var(--masters)' }}
               >
-                <Plus className="w-4 h-4" />
-                Add Session
+                <Plus size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                Add
               </button>
             )}
           </div>
 
           {sessions.length > 0 ? (
-            <div className="space-y-3">
+            <div>
               {sessions.map(session => (
                 <button
                   key={session.id}
                   onClick={() => router.push(`/lineup/${session.id}`)}
-                  className={cn(
-                    'w-full p-4 rounded-xl text-left',
-                    'bg-surface-card border border-surface-border',
-                    'hover:border-gold/20 hover:shadow-card-md',
-                    'transition-all duration-200'
-                  )}
+                  className="match-row w-full text-left"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={cn(
-                        'w-11 h-11 rounded-xl flex items-center justify-center',
-                        session.status === 'completed' && 'bg-masters-green/10 text-masters-green-light',
-                        session.status === 'inProgress' && 'bg-azalea/10 text-azalea',
-                        session.status === 'scheduled' && 'bg-surface-elevated text-text-tertiary'
-                      )}>
-                        <Calendar className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-magnolia">{session.name}</h3>
-                        <p className="text-sm text-text-secondary capitalize">{session.sessionType}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={cn(
-                        'px-3 py-1 rounded-full text-xs font-medium',
-                        session.status === 'completed' && 'bg-masters-green/10 text-masters-green-light',
-                        session.status === 'inProgress' && 'bg-azalea/10 text-azalea',
-                        session.status === 'scheduled' && 'bg-surface-elevated text-text-secondary'
-                      )}>
-                        {session.status === 'inProgress' ? 'Live' :
-                          session.status === 'completed' ? 'Complete' : 'Upcoming'}
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-text-tertiary" />
-                    </div>
+                  <Calendar size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                  <div className="flex-1">
+                    <p style={{ fontWeight: 500 }}>{session.name}</p>
+                    <p className="type-meta capitalize">{session.sessionType}</p>
                   </div>
+                  <span 
+                    className="type-meta"
+                    style={{ 
+                      color: session.status === 'inProgress' ? 'var(--masters)' :
+                             session.status === 'completed' ? 'var(--success)' : 'var(--ink-tertiary)'
+                    }}
+                  >
+                    {session.status === 'inProgress' ? 'Live' :
+                     session.status === 'completed' ? 'Complete' : 'Upcoming'}
+                  </span>
+                  <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
                 </button>
               ))}
             </div>
           ) : (
-            <div className="rounded-xl bg-surface-card border border-surface-border p-10 text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-surface-elevated mb-4">
-                <Users className="w-7 h-7 text-text-tertiary" />
-              </div>
-              <p className="text-text-secondary font-medium mb-4">No sessions created yet</p>
-              {isCaptainMode ? (
+            <div className="empty-state">
+              <Users size={32} style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }} />
+              <p className="empty-state-title">No sessions yet</p>
+              <p className="empty-state-text">
+                {isCaptainMode ? 'Create a session to set up matches' : 'Enable Captain Mode to create sessions'}
+              </p>
+              {isCaptainMode && (
                 <button
                   onClick={() => router.push('/lineup/new')}
-                  className={cn(
-                    'inline-flex items-center gap-2',
-                    'px-6 py-3 rounded-xl',
-                    'bg-gradient-to-r from-gold to-gold-dark',
-                    'text-surface-base font-semibold',
-                    'hover:shadow-glow-gold',
-                    'transition-all duration-200'
-                  )}
+                  className="btn btn-primary"
                 >
-                  <Plus className="w-4 h-4" />
-                  Create First Session
+                  <Plus size={18} />
+                  Create Session
                 </button>
-              ) : (
-                <p className="text-sm text-text-tertiary">
-                  <Shield className="w-4 h-4 inline mr-1" />
-                  Enable Captain Mode to create sessions
-                </p>
               )}
             </div>
           )}
         </section>
 
         {/* Captain Mode Hint */}
-        {!isCaptainMode && (
-          <div className="rounded-xl p-5 bg-masters-green/5 border border-masters-green/20">
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-masters-green/10">
-                <Shield className="w-5 h-5 text-masters-green-light" />
+        {!isCaptainMode && sessions.length > 0 && (
+          <>
+            <hr className="divider" />
+            <section className="section">
+              <div className="flex items-start gap-3">
+                <Shield size={18} style={{ color: 'var(--masters)', marginTop: '2px' }} />
+                <div>
+                  <p style={{ fontWeight: 500, marginBottom: 'var(--space-1)' }}>Captain Mode</p>
+                  <p className="type-meta">
+                    Enable Captain Mode in settings to manage lineups and create sessions.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-masters-green-light">Captain Mode</p>
-                <p className="text-sm text-text-secondary mt-1">
-                  Enable Captain Mode in settings to manage lineups, add players, and create sessions.
-                </p>
-              </div>
-            </div>
-          </div>
+            </section>
+          </>
         )}
-      </div>
-    </AppShellNew>
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        <Link href="/" className="nav-item">
+          <Home size={20} />
+          <span>Home</span>
+        </Link>
+        <Link href="/score" className="nav-item">
+          <Target size={20} />
+          <span>Score</span>
+        </Link>
+        <Link href="/matchups" className="nav-item nav-item-active">
+          <Users size={20} />
+          <span>Matches</span>
+        </Link>
+        <Link href="/standings" className="nav-item">
+          <Trophy size={20} />
+          <span>Standings</span>
+        </Link>
+        <Link href="/more" className="nav-item">
+          <MoreHorizontal size={20} />
+          <span>More</span>
+        </Link>
+      </nav>
+    </div>
   );
 }
