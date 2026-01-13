@@ -4,226 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore } from '@/lib/stores';
 import { AppShellNew } from '@/components/layout';
-import {
-  Card,
-  SectionHeader,
-  StandingsCardSkeleton,
-  NoStandingsEmptyNew,
-} from '@/components/ui';
 import { calculateTeamStandings, calculateMagicNumber, calculatePlayerLeaderboard } from '@/lib/services/tournamentEngine';
-import { cn } from '@/lib/utils';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
-import { Trophy, Medal, TrendingUp, Target, Award } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 /**
- * STANDINGS PAGE - Masters-inspired Championship View
+ * STANDINGS PAGE - Masters Tournament Inspired
  *
- * The hero moment: large, elegant score display
- * Gold accents for winners and special achievements
+ * Design Philosophy:
+ * - Numbers first, visual weight on leaders
+ * - Typography carries the hierarchy
+ * - Ties handled gracefully
+ * - No charts unless they add clarity
+ * - Calm, confident, trusted under pressure
  */
-
-// Enhanced Team Standings Card component
-interface TeamStandingsCardProps {
-  standings: TeamStandings;
-  magicNumber: MagicNumber;
-  teamAName: string;
-  teamBName: string;
-}
-
-function TeamStandingsCardNew({
-  standings,
-  magicNumber,
-  teamAName,
-  teamBName,
-}: TeamStandingsCardProps) {
-  const { teamAPoints, teamBPoints, matchesPlayed, leader } = standings;
-  const { pointsToWin, hasClinched, clinchingTeam, teamANeeded, teamBNeeded } = magicNumber;
-
-  const totalPoints = teamAPoints + teamBPoints;
-  const teamAPercent = totalPoints > 0 ? (teamAPoints / totalPoints) * 100 : 50;
-  const teamBPercent = totalPoints > 0 ? (teamBPoints / totalPoints) * 100 : 50;
-
-  // Determine if a team can clinch based on needed points
-  const canClinch = !hasClinched && (teamANeeded <= 3 || teamBNeeded <= 3);
-
-  return (
-    <div className="relative overflow-hidden rounded-2xl bg-surface-card border border-surface-border">
-      {/* Subtle ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-gold/5 rounded-full blur-3xl" />
-
-      {/* Points to Win Banner - elegant gold */}
-      <div className="relative bg-gradient-to-r from-gold/5 via-gold/10 to-gold/5 px-4 py-3 text-center border-b border-gold/10">
-        <span className="text-sm text-gold font-medium">
-          {pointsToWin} points to win
-        </span>
-      </div>
-
-      {/* Main Score Display */}
-      <div className="relative p-6 lg:p-8">
-        <div className="flex items-center justify-between mb-8">
-          {/* Team A */}
-          <div className="text-center flex-1">
-            <div className={cn(
-              'inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3',
-              'bg-team-usa/10 border border-team-usa/20',
-            )}>
-              <div className="h-2 w-2 rounded-full bg-team-usa" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-team-usa">
-                {teamAName}
-              </span>
-            </div>
-            <p className={cn(
-              'font-mono text-5xl lg:text-6xl font-bold tracking-tight',
-              teamAPoints > teamBPoints ? 'text-team-usa' : 'text-magnolia',
-            )}>
-              {teamAPoints}
-            </p>
-          </div>
-
-          {/* VS Divider - elegant */}
-          <div className="px-6">
-            <div className="h-14 w-14 rounded-full bg-surface-elevated border border-surface-border flex items-center justify-center">
-              <span className="text-xs font-bold text-text-tertiary tracking-wider">VS</span>
-            </div>
-          </div>
-
-          {/* Team B */}
-          <div className="text-center flex-1">
-            <div className={cn(
-              'inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3',
-              'bg-team-europe/10 border border-team-europe/20',
-            )}>
-              <div className="h-2 w-2 rounded-full bg-team-europe" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-team-europe">
-                {teamBName}
-              </span>
-            </div>
-            <p className={cn(
-              'font-mono text-5xl lg:text-6xl font-bold tracking-tight',
-              teamBPoints > teamAPoints ? 'text-team-europe' : 'text-magnolia',
-            )}>
-              {teamBPoints}
-            </p>
-          </div>
-        </div>
-
-        {/* Progress Bar - refined */}
-        <div className="h-2 rounded-full bg-surface-elevated overflow-hidden flex">
-          <div
-            className="bg-team-usa transition-all duration-500"
-            style={{ width: `${teamAPercent}%` }}
-          />
-          <div
-            className="bg-team-europe transition-all duration-500"
-            style={{ width: `${teamBPercent}%` }}
-          />
-        </div>
-
-        {/* Magic Number / Victory State */}
-        {(canClinch || hasClinched) && (
-          <div className={cn(
-            'mt-6 p-4 rounded-xl text-center',
-            hasClinched
-              ? 'bg-gradient-to-r from-gold/10 via-gold/15 to-gold/10 border border-gold/20'
-              : 'bg-masters-green/10 border border-masters-green/20',
-          )}>
-            {hasClinched ? (
-              <div className="flex items-center justify-center gap-3">
-                <Trophy className="h-5 w-5 text-gold" />
-                <span className="font-serif text-lg text-gold">
-                  {clinchingTeam === 'A' ? teamAName : teamBName} Wins!
-                </span>
-              </div>
-            ) : (
-              <p className="text-sm text-masters-green-light font-medium">
-                Magic Number: <span className="font-bold text-lg ml-1">
-                  {leader === 'teamA' ? teamANeeded : teamBNeeded}
-                </span>
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Player Leaderboard Entry - Masters elegance
-interface LeaderboardEntryProps {
-  entry: PlayerLeaderboard;
-  rank: number;
-  isTeamA: boolean;
-}
-
-function LeaderboardEntry({ entry, rank, isTeamA }: LeaderboardEntryProps) {
-  return (
-    <div className={cn(
-      'flex items-center gap-4 p-4',
-      rank <= 3 && 'bg-gold/3',
-    )}>
-      {/* Rank Badge - Gold medals for top 3 */}
-      <div className={cn(
-        'h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0',
-        rank === 1 && 'bg-gradient-to-br from-gold to-gold-dark text-surface-base',
-        rank === 2 && 'bg-gradient-to-br from-silver to-gray-400 text-gray-800',
-        rank === 3 && 'bg-gradient-to-br from-bronze to-amber-700 text-amber-100',
-        rank > 3 && 'bg-surface-elevated text-text-secondary',
-      )}>
-        {rank}
-      </div>
-
-      {/* Player Info */}
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-magnolia truncate">
-          {entry.playerName}
-        </p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <div className={cn(
-            'h-2 w-2 rounded-full',
-            isTeamA ? 'bg-team-usa' : 'bg-team-europe',
-          )} />
-          <span className="text-xs text-text-secondary">
-            {entry.record}
-          </span>
-        </div>
-      </div>
-
-      {/* Points - Gold accent */}
-      <div className="text-right shrink-0">
-        <p className={cn(
-          'text-xl font-bold',
-          rank <= 3 ? 'text-gold' : 'text-masters-green-light',
-        )}>
-          {entry.points}
-        </p>
-        <p className="text-xs text-text-tertiary">
-          {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'match' : 'matches'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// Stat Card component - refined
-interface StatCardProps {
-  value: number;
-  label: string;
-  highlight?: boolean;
-}
-
-function StatCard({ value, label, highlight = false }: StatCardProps) {
-  return (
-    <div className="p-5 rounded-xl bg-surface-card border border-surface-border text-center">
-      <p className={cn(
-        'text-3xl font-mono font-bold',
-        highlight ? 'text-gold' : 'text-magnolia',
-      )}>
-        {value}
-      </p>
-      <p className="text-xs text-text-tertiary mt-2">{label}</p>
-    </div>
-  );
-}
 
 export default function StandingsPage() {
   const router = useRouter();
@@ -269,103 +63,423 @@ export default function StandingsPage() {
 
   const teamA = teams.find(t => t.color === 'usa');
   const teamB = teams.find(t => t.color === 'europe');
+  const teamAName = teamA?.name || 'Team A';
+  const teamBName = teamB?.name || 'Team B';
 
   return (
-    <AppShellNew
-      headerTitle="Standings"
-      headerSubtitle={currentTrip.name}
-    >
-      <div className="p-4 lg:p-6 space-y-6">
+    <AppShellNew headerTitle="Standings" headerSubtitle={currentTrip.name}>
+      <div className="px-5 py-6 max-w-2xl mx-auto pb-24 lg:pb-8">
         {isLoading ? (
-          // Loading state with skeletons
-          <div className="space-y-6">
-            <StandingsCardSkeleton />
-            <Card>
-              <SectionHeader title="Player Leaderboard" icon={Medal} size="sm" className="mb-4" />
-              <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="flex items-center gap-3 p-4 animate-pulse">
-                    <div className="h-8 w-8 rounded-full bg-surface-muted" />
-                    <div className="flex-1">
-                      <div className="h-4 w-24 bg-surface-muted rounded" />
-                      <div className="h-3 w-16 bg-surface-muted rounded mt-1" />
-                    </div>
-                    <div className="h-6 w-8 bg-surface-muted rounded" />
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
+          <LoadingState />
         ) : standings && magicNumber ? (
-          <>
-            {/* Team Standings Card */}
-            <TeamStandingsCardNew
+          <div className="space-y-8">
+            {/* Team Score - The hero moment */}
+            <TeamScoreCard
               standings={standings}
               magicNumber={magicNumber}
-              teamAName={teamA?.name || 'Team USA'}
-              teamBName={teamB?.name || 'Team Europe'}
+              teamAName={teamAName}
+              teamBName={teamBName}
             />
 
             {/* Player Leaderboard */}
             <section>
-              <SectionHeader
-                title="Player Leaderboard"
-                subtitle={leaderboard.length > 0 ? `${leaderboard.length} players` : undefined}
-                icon={Medal}
-                className="mb-4"
-              />
-
-              <Card padding="none" className="overflow-hidden divide-y divide-surface-border/50">
+              <h2 
+                className="text-section mb-4"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Individual Leaders
+              </h2>
+              
+              <div 
+                className="rounded-lg overflow-hidden"
+                style={{ 
+                  background: 'var(--surface-raised)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+              >
                 {leaderboard.length > 0 ? (
-                  leaderboard.map((entry, index) => (
-                    <LeaderboardEntry
-                      key={entry.playerId}
-                      entry={entry}
-                      rank={index + 1}
-                      isTeamA={entry.teamId === teamA?.id}
-                    />
-                  ))
-                ) : (
-                  <div className="p-8 text-center">
-                    <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-surface-elevated mb-4">
-                      <Trophy className="h-6 w-6 text-text-tertiary" />
-                    </div>
-                    <p className="text-text-secondary font-medium">No matches completed yet</p>
-                    <p className="text-sm text-text-tertiary mt-1">Player records will appear here</p>
+                  <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+                    {leaderboard.map((entry, index) => (
+                      <PlayerRow
+                        key={entry.playerId}
+                        entry={entry}
+                        rank={index + 1}
+                        isTeamA={entry.teamId === teamA?.id}
+                      />
+                    ))}
                   </div>
+                ) : (
+                  <EmptyLeaderboard />
                 )}
-              </Card>
+              </div>
             </section>
 
-            {/* Match Stats */}
+            {/* Match Progress */}
             <section>
-              <SectionHeader
-                title="Match Stats"
-                icon={TrendingUp}
-                size="sm"
-                className="mb-4"
-              />
-
+              <h2 
+                className="text-section mb-4"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Tournament Progress
+              </h2>
+              
               <div className="grid grid-cols-2 gap-3">
-                <StatCard
-                  value={standings.matchesPlayed}
-                  label="Matches Complete"
-                  highlight
+                <StatBlock 
+                  value={standings.matchesPlayed} 
+                  label="Complete" 
                 />
-                <StatCard
-                  value={standings.matchesRemaining}
-                  label="Matches Remaining"
+                <StatBlock 
+                  value={standings.matchesRemaining} 
+                  label="Remaining" 
                 />
               </div>
             </section>
-          </>
+          </div>
         ) : (
-          // Empty state
-          <Card variant="outlined" padding="none">
-            <NoStandingsEmptyNew />
-          </Card>
+          <EmptyState />
         )}
       </div>
     </AppShellNew>
+  );
+}
+
+/* ============================================
+   Team Score Card - The hero of standings
+   ============================================ */
+interface TeamScoreCardProps {
+  standings: TeamStandings;
+  magicNumber: MagicNumber;
+  teamAName: string;
+  teamBName: string;
+}
+
+function TeamScoreCard({ standings, magicNumber, teamAName, teamBName }: TeamScoreCardProps) {
+  const { teamAPoints, teamBPoints, leader } = standings;
+  const { pointsToWin, hasClinched, clinchingTeam, teamANeeded, teamBNeeded } = magicNumber;
+  
+  const totalPoints = teamAPoints + teamBPoints;
+  const teamAPercent = totalPoints > 0 ? (teamAPoints / totalPoints) * 100 : 50;
+
+  return (
+    <div 
+      className="rounded-lg overflow-hidden"
+      style={{ 
+        background: 'var(--surface-card)',
+        border: '1px solid var(--border-subtle)'
+      }}
+    >
+      {/* Points to win header */}
+      <div 
+        className="px-4 py-3 text-center"
+        style={{ 
+          borderBottom: '1px solid var(--border-subtle)',
+          background: 'var(--surface-raised)'
+        }}
+      >
+        <span 
+          className="text-xs font-medium uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          {pointsToWin} points to win
+        </span>
+      </div>
+
+      {/* Main score display */}
+      <div className="p-6 lg:p-8">
+        <div className="flex items-center justify-between">
+          {/* Team A */}
+          <div className="text-center flex-1">
+            <p 
+              className="text-overline mb-3"
+              style={{ color: 'var(--team-a-color)' }}
+            >
+              {teamAName}
+            </p>
+            <p 
+              className="font-score text-5xl lg:text-6xl"
+              style={{ 
+                color: teamAPoints >= teamBPoints ? 'var(--text-primary)' : 'var(--text-tertiary)'
+              }}
+            >
+              {teamAPoints}
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div 
+            className="mx-6 w-px h-16"
+            style={{ background: 'var(--border-subtle)' }}
+          />
+
+          {/* Team B */}
+          <div className="text-center flex-1">
+            <p 
+              className="text-overline mb-3"
+              style={{ color: 'var(--team-b-color)' }}
+            >
+              {teamBName}
+            </p>
+            <p 
+              className="font-score text-5xl lg:text-6xl"
+              style={{ 
+                color: teamBPoints >= teamAPoints ? 'var(--text-primary)' : 'var(--text-tertiary)'
+              }}
+            >
+              {teamBPoints}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar - subtle, informational */}
+        <div 
+          className="h-1 mt-6 rounded-full overflow-hidden flex"
+          style={{ background: 'var(--surface-elevated)' }}
+        >
+          <div
+            className="transition-all duration-500"
+            style={{ 
+              width: `${teamAPercent}%`,
+              background: 'var(--team-a-color)'
+            }}
+          />
+          <div
+            className="transition-all duration-500"
+            style={{ 
+              width: `${100 - teamAPercent}%`,
+              background: 'var(--team-b-color)'
+            }}
+          />
+        </div>
+
+        {/* Victory or Magic Number */}
+        {hasClinched ? (
+          <div 
+            className="mt-6 py-3 text-center rounded"
+            style={{ 
+              background: 'var(--masters-gold-muted)',
+              border: '1px solid rgba(201, 162, 39, 0.2)'
+            }}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Trophy 
+                className="w-4 h-4" 
+                style={{ color: 'var(--masters-gold)' }} 
+              />
+              <span 
+                className="font-display text-base"
+                style={{ color: 'var(--masters-gold)' }}
+              >
+                {clinchingTeam === 'A' ? teamAName : teamBName} Wins
+              </span>
+            </div>
+          </div>
+        ) : (teamANeeded <= 3 || teamBNeeded <= 3) && (
+          <div 
+            className="mt-6 py-3 text-center rounded"
+            style={{ 
+              background: 'rgba(0, 103, 71, 0.08)',
+              border: '1px solid rgba(0, 103, 71, 0.15)'
+            }}
+          >
+            <span 
+              className="text-sm"
+              style={{ color: 'var(--masters-green-light)' }}
+            >
+              Magic Number: <span className="font-score font-bold">
+                {leader === 'teamA' ? teamANeeded : teamBNeeded}
+              </span>
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================
+   Player Row - Individual standings entry
+   ============================================ */
+interface PlayerRowProps {
+  entry: PlayerLeaderboard;
+  rank: number;
+  isTeamA: boolean;
+}
+
+function PlayerRow({ entry, rank, isTeamA }: PlayerRowProps) {
+  const isTopThree = rank <= 3;
+  
+  return (
+    <div 
+      className="flex items-center gap-4 px-4 py-3"
+      style={{ 
+        background: isTopThree ? 'rgba(201, 162, 39, 0.03)' : 'transparent'
+      }}
+    >
+      {/* Rank */}
+      <div 
+        className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
+        style={{
+          background: rank === 1 
+            ? 'var(--masters-gold)' 
+            : rank === 2 
+              ? '#A8A8A8'
+              : rank === 3 
+                ? '#CD7F32'
+                : 'var(--surface-elevated)',
+          color: rank <= 3 ? 'var(--surface-base)' : 'var(--text-secondary)'
+        }}
+      >
+        {rank}
+      </div>
+
+      {/* Player info */}
+      <div className="flex-1 min-w-0">
+        <p 
+          className="font-medium truncate text-sm"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          {entry.playerName}
+        </p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <div 
+            className="w-2 h-2 rounded-full"
+            style={{ background: isTeamA ? 'var(--team-a-color)' : 'var(--team-b-color)' }}
+          />
+          <span 
+            className="text-xs"
+            style={{ color: 'var(--text-tertiary)' }}
+          >
+            {entry.record}
+          </span>
+        </div>
+      </div>
+
+      {/* Points */}
+      <div className="text-right shrink-0">
+        <p 
+          className="font-score text-lg"
+          style={{ color: isTopThree ? 'var(--masters-gold)' : 'var(--text-primary)' }}
+        >
+          {entry.points}
+        </p>
+        <p 
+          className="text-xs"
+          style={{ color: 'var(--text-disabled)' }}
+        >
+          {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'match' : 'matches'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================
+   Stat Block - Simple, clear numbers
+   ============================================ */
+interface StatBlockProps {
+  value: number;
+  label: string;
+}
+
+function StatBlock({ value, label }: StatBlockProps) {
+  return (
+    <div 
+      className="p-4 rounded-lg text-center"
+      style={{ 
+        background: 'var(--surface-raised)',
+        border: '1px solid var(--border-subtle)'
+      }}
+    >
+      <p 
+        className="font-score text-2xl mb-1"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        {value}
+      </p>
+      <p 
+        className="text-xs"
+        style={{ color: 'var(--text-tertiary)' }}
+      >
+        {label}
+      </p>
+    </div>
+  );
+}
+
+/* ============================================
+   Loading & Empty States
+   ============================================ */
+function LoadingState() {
+  return (
+    <div className="space-y-6">
+      <div 
+        className="rounded-lg p-6 animate-pulse"
+        style={{ background: 'var(--surface-raised)' }}
+      >
+        <div className="h-4 w-24 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+        <div className="flex justify-between mt-8">
+          <div className="text-center flex-1">
+            <div className="h-3 w-16 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+            <div className="h-12 w-16 mx-auto rounded mt-3" style={{ background: 'var(--surface-elevated)' }} />
+          </div>
+          <div className="text-center flex-1">
+            <div className="h-3 w-16 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+            <div className="h-12 w-16 mx-auto rounded mt-3" style={{ background: 'var(--surface-elevated)' }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyLeaderboard() {
+  return (
+    <div className="py-12 px-6 text-center">
+      <Trophy 
+        className="w-8 h-8 mx-auto mb-4" 
+        style={{ color: 'var(--text-disabled)' }} 
+      />
+      <p 
+        className="font-medium"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        No matches completed
+      </p>
+      <p 
+        className="text-sm mt-1"
+        style={{ color: 'var(--text-tertiary)' }}
+      >
+        Player records will appear here
+      </p>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div 
+      className="py-16 px-6 text-center rounded-lg"
+      style={{ 
+        background: 'var(--surface-raised)',
+        border: '1px solid var(--border-subtle)'
+      }}
+    >
+      <Trophy 
+        className="w-10 h-10 mx-auto mb-4" 
+        style={{ color: 'var(--text-disabled)' }} 
+      />
+      <p 
+        className="font-display text-lg mb-2"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        No standings available
+      </p>
+      <p 
+        className="text-sm"
+        style={{ color: 'var(--text-tertiary)' }}
+      >
+        Complete matches to see tournament standings
+      </p>
+    </div>
   );
 }

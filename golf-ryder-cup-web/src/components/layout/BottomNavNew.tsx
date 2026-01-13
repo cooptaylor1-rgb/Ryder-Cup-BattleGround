@@ -1,8 +1,13 @@
 /**
- * Bottom Navigation Component (Enhanced)
+ * Bottom Navigation Component
  *
  * Mobile-first bottom tab bar.
- * Masters-inspired elegance with gold accents.
+ * Masters-inspired: restrained, functional, quietly confident.
+ *
+ * Design principles:
+ * - Large touch targets for outdoor use
+ * - Clear active state without being loud
+ * - Information hierarchy in color, not size
  */
 
 'use client';
@@ -28,7 +33,7 @@ interface NavItem {
 const navItems: NavItem[] = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/score', label: 'Score', icon: Target },
-    { href: '/matchups', label: 'Matchups', icon: Users },
+    { href: '/matchups', label: 'Matches', icon: Users },
     { href: '/standings', label: 'Standings', icon: Trophy },
     { href: '/more', label: 'More', icon: Settings },
 ];
@@ -46,16 +51,15 @@ export function BottomNavNew() {
     return (
         <nav
             className={cn(
-                'lg:hidden', // Hide on desktop (use sidebar)
+                'lg:hidden',
                 'fixed bottom-0 left-0 right-0 z-50',
                 'flex items-stretch justify-around',
                 'h-16 px-2',
-                'backdrop-blur-xl',
                 'safe-bottom',
             )}
             style={{
-                background: 'rgba(26, 24, 20, 0.95)',
-                borderTop: '1px solid rgba(58, 53, 48, 0.5)'
+                background: 'var(--surface-base)',
+                borderTop: '1px solid var(--border-subtle)'
             }}
             aria-label="Main navigation"
         >
@@ -69,25 +73,24 @@ export function BottomNavNew() {
                         onClick={() => router.push(item.href)}
                         className={cn(
                             'relative flex flex-col items-center justify-center',
-                            'flex-1 min-w-[64px] py-2',
-                            'transition-colors duration-200',
+                            'flex-1 min-w-[56px] py-2',
+                            'transition-colors',
                             'focus-visible:outline-none',
                         )}
-                        style={{ color: active ? '#C4A747' : '#807868' }}
+                        style={{
+                            color: active ? 'var(--masters-green)' : 'var(--text-disabled)',
+                            transitionDuration: 'var(--duration-fast)'
+                        }}
                         aria-current={active ? 'page' : undefined}
                     >
-                        {/* Icon with subtle scale on active */}
+                        {/* Icon */}
                         <div className="relative">
-                            <Icon
-                                className={cn(
-                                    'w-5 h-5 transition-all duration-200',
-                                    active && 'scale-110',
-                                )}
-                            />
-                            {/* Captain badge on More */}
+                            <Icon className="w-5 h-5" />
+                            {/* Captain badge on More - subtle */}
                             {item.href === '/more' && isCaptainMode && (
                                 <Shield
-                                    className="absolute -top-1 -right-2 w-3 h-3 text-masters-green"
+                                    className="absolute -top-0.5 -right-1.5 w-2.5 h-2.5"
+                                    style={{ color: 'var(--masters-green)' }}
                                     aria-hidden="true"
                                 />
                             )}
@@ -96,24 +99,11 @@ export function BottomNavNew() {
                         {/* Label */}
                         <span
                             className={cn(
-                                'text-[10px] mt-1.5 font-medium tracking-wide',
-                                active && 'font-semibold',
+                                'text-[10px] mt-1 font-medium tracking-wide',
                             )}
                         >
                             {item.label}
                         </span>
-
-                        {/* Active indicator - elegant gold dot */}
-                        {active && (
-                            <span
-                                className={cn(
-                                    'absolute bottom-1 left-1/2 -translate-x-1/2',
-                                    'w-1 h-1 rounded-full',
-                                )}
-                                style={{ background: '#C4A747' }}
-                                aria-hidden="true"
-                            />
-                        )}
                     </button>
                 );
             })}

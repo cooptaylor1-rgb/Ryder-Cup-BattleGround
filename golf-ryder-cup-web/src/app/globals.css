@@ -3,85 +3,102 @@
 /* ============================================
    Golf Ryder Cup App - Global Styles
 
-   THE MASTERS / AUGUSTA NATIONAL DESIGN SYSTEM
+   THE MASTERS TOURNAMENT - DESIGN SYSTEM
 
-   Design Philosophy:
-   - Understated luxury, timeless elegance
-   - The quiet confidence of a private club
-   - Warm surfaces, not cold/sterile
-   - Championship gold as premium accent
-   - Serif typography for elegance
+   "Someone who knows golf built this,
+    and they expect it to be used seriously."
+
+   Philosophy:
+   - Timeless over trendy
+   - Calm over clever
+   - Information-dense without feeling busy
+   - Trusted under pressure
+   - Quietly premium
+
+   This is NOT a dashboard. This is NOT a SaaS app.
+   This is a tournament companion.
    ============================================ */
 
 /* ============================================
-   CSS Custom Properties - Masters Palette
+   CSS Custom Properties - Championship Palette
    ============================================ */
 :root {
-  /* Masters Primary Colors */
+  /* Masters Green - The canonical tournament color */
   --masters-green: #006747;
-  --masters-green-light: #1B8F6A;
+  --masters-green-light: #0A7B58;
   --masters-green-dark: #004D35;
-  --masters-gold: #C4A747;
-  --masters-gold-light: #D4BC6A;
-  --masters-gold-dark: #A38B2D;
 
-  /* Augusta Course Elements */
-  --magnolia: #F5F1E8;
-  --azalea: #D84C6F;
-  --amen-corner: #E8DCC8;
-  --rae-creek: #5B8FA8;
+  /* Championship Gold - Used sparingly, signals importance */
+  --masters-gold: #C9A227;
+  --masters-gold-light: #D4B142;
+  --masters-gold-dark: #A68B1B;
+  --masters-gold-muted: rgba(201, 162, 39, 0.12);
+
+  /* Augusta Palette - Natural, course-inspired */
+  --magnolia: #FAF8F3;
+  --magnolia-dark: #EDE9E0;
+  --cream: #F5F2EB;
+  --parchment: #E8E4DB;
   --dogwood: #FEFEFE;
 
-  /* Team colors - customizable per trip */
-  --team-a-color: #002868;
-  --team-a-light: #3C5A99;
-  --team-a-dark: #001A4D;
-  --team-b-color: #003399;
-  --team-b-light: #4169E1;
-  --team-b-dark: #002266;
+  /* Team Colors - Refined, distinguished */
+  --team-a-color: #1E3A5F;
+  --team-a-light: #2B4F7A;
+  --team-a-dark: #152940;
+  --team-b-color: #6B2D2D;
+  --team-b-light: #8B3D3D;
+  --team-b-dark: #4A1F1F;
 
-  /* Surface colors - Warm dark (not pure black) */
-  --background: #0F0D0A;
-  --foreground: #F5F1E8;
-  --surface: #1A1814;
-  --surface-base: #0F0D0A;
-  --surface-raised: #1A1814;
-  --surface-card: #211F1A;
-  --surface-elevated: #2A2620;
-  --surface-overlay: #1E1C18;
-  --surface-highlight: #3A3530;
-  --surface-muted: #2A2620;
-  --surface-border: #3A3530;
+  /* Surface System - Warm charcoal, never pure black */
+  --background: #1A1918;
+  --surface-base: #1A1918;
+  --surface-raised: #222120;
+  --surface-card: #2A2928;
+  --surface-elevated: #333231;
+  --surface-overlay: #252423;
+  --surface-highlight: #3D3C3A;
+  --surface-muted: #2A2928;
 
-  /* Text colors - Warm cream hierarchy */
-  --text-primary: #F5F1E8;
-  --text-secondary: #B8B0A0;
-  --text-tertiary: #807868;
-  --text-disabled: #605850;
-  --text-gold: #C4A747;
+  /* Borders - Subtle, warm undertones */
+  --surface-border: #3A3938;
+  --border-subtle: #2E2D2C;
+  --border-default: #3A3938;
+  --border-strong: #4A4948;
+  --border-accent: rgba(201, 162, 39, 0.25);
 
-  /* Border colors - Warm tones */
-  --border-subtle: #2A2620;
-  --border-default: #3A3530;
-  --border-strong: #4A4540;
-  --border-gold: rgba(196, 167, 71, 0.3);
+  /* Text Hierarchy - Cream-based, not pure white */
+  --text-primary: #FAF8F3;
+  --text-secondary: #B5B0A5;
+  --text-tertiary: #85817A;
+  --text-disabled: #5A5752;
+  --text-gold: var(--masters-gold);
+  --text-inverse: #1A1918;
 
-  /* Shadow tokens - Warm, luxurious */
-  --shadow-card-sm: 0 1px 3px rgba(15, 13, 10, 0.3), 0 1px 2px rgba(15, 13, 10, 0.2);
-  --shadow-card: 0 2px 8px rgba(15, 13, 10, 0.4), 0 0 1px rgba(196, 167, 71, 0.05);
-  --shadow-card-md: 0 4px 12px rgba(15, 13, 10, 0.4), 0 0 1px rgba(196, 167, 71, 0.08);
-  --shadow-card-lg: 0 8px 24px rgba(15, 13, 10, 0.5), 0 0 1px rgba(196, 167, 71, 0.1);
-  --shadow-card-xl: 0 12px 40px rgba(15, 13, 10, 0.6), 0 0 1px rgba(196, 167, 71, 0.12);
-  --shadow-glow-gold: 0 0 30px rgba(196, 167, 71, 0.25);
-  --shadow-glow-green: 0 0 30px rgba(0, 103, 71, 0.3);
+  /* Semantic - Muted, not alarming */
+  --success: #4A8B5C;
+  --success-light: #5A9B6C;
+  --warning: #C4983D;
+  --warning-light: #D4A84D;
+  --error: #9B4A4A;
+  --error-light: #B55A5A;
+  --info: #4A6B8B;
 
-  /* Timing */
-  --ease-masters: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Shadow System - Subtle, layered */
+  --shadow-sm: 0 1px 2px rgba(20, 19, 18, 0.25);
+  --shadow-md: 0 2px 6px rgba(20, 19, 18, 0.35);
+  --shadow-lg: 0 4px 12px rgba(20, 19, 18, 0.4);
+  --shadow-xl: 0 8px 24px rgba(20, 19, 18, 0.5);
+
+  /* Timing - Deliberate, not bouncy */
+  --ease-subtle: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 350ms;
 }
 
 /* ============================================
-   Base Styles - Dark mode first
+   Base Styles
    ============================================ */
 html {
   color-scheme: dark;
@@ -90,10 +107,12 @@ html {
 body {
   background: var(--surface-base);
   color: var(--text-primary);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: contain;
+  line-height: 1.5;
 }
 
 /* Prevent text selection on interactive elements */
@@ -105,39 +124,43 @@ a,
 }
 
 /* ============================================
-   Typography - Masters Elegance
+   Typography System
+
+   Hierarchy is everything. Numbers dominate.
+   Text supports. Labels whisper.
    ============================================ */
 
-/* Serif display text - timeless elegance */
-.font-serif {
-  font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
-}
-
+/* Display - Serif for tournament headings */
 .font-display {
-  font-family: Georgia, Cambria, serif;
+  font-family: Georgia, 'Times New Roman', serif;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
-/* Score display - tabular monospace */
+/* Score Typography - The hero of the UI */
 .font-score {
-  font-family: 'SF Mono', ui-monospace, Monaco, Consolas, monospace;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-/* Gold accent text */
-.text-gold-accent {
-  color: var(--masters-gold);
-}
-
-/* Overline/label styling */
-.text-overline {
-  font-size: 11px;
+  font-family: 'SF Mono', ui-monospace, 'Cascadia Code', 'Menlo', monospace;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.03em;
   font-weight: 600;
-  letter-spacing: 0.1em;
+}
+
+/* Overline labels - Understated, structural */
+.text-overline {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-tertiary);
+}
+
+/* Section titles - Clear hierarchy, not loud */
+.text-section {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 /* ============================================
@@ -154,7 +177,7 @@ a,
 }
 
 /* ============================================
-   Touch Targets - Accessibility
+   Touch Targets - Critical for outdoor use
    ============================================ */
 .touch-target {
   min-height: 44px;
@@ -197,64 +220,66 @@ a,
 }
 
 /* ============================================
-   Button Base Styles
+   Button System - Restrained, purposeful
    ============================================ */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
-  transition: all 200ms var(--ease-masters);
+  transition: all var(--duration-fast) var(--ease-subtle);
   cursor: pointer;
   border: none;
 }
 
 .btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--surface-base), 0 0 0 4px var(--masters-gold);
+  box-shadow: 0 0 0 2px var(--surface-base), 0 0 0 3px var(--masters-green);
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
-/* Primary button - Masters green */
+/* Primary button - Masters green, confident */
 .btn-primary {
   background: var(--masters-green);
-  color: white;
-  padding: 12px 24px;
-  min-height: 48px;
+  color: var(--magnolia);
+  padding: 12px 20px;
+  min-height: 44px;
 }
 
 .btn-primary:hover {
   background: var(--masters-green-light);
 }
 
-/* Gold button - Premium action */
-.btn-gold {
-  background: linear-gradient(135deg, var(--masters-gold) 0%, var(--masters-gold-dark) 100%);
-  color: var(--surface-base);
-  padding: 12px 24px;
-  min-height: 48px;
-  font-weight: 600;
-}
-
-.btn-gold:hover {
-  box-shadow: var(--shadow-glow-gold);
-}
-
-/* Ghost button */
-.btn-ghost {
-  background: transparent;
+/* Secondary button - Understated */
+.btn-secondary {
+  background: var(--surface-elevated);
   color: var(--text-primary);
-  padding: 12px 24px;
+  padding: 12px 20px;
+  min-height: 44px;
   border: 1px solid var(--border-default);
 }
 
+.btn-secondary:hover {
+  background: var(--surface-highlight);
+  border-color: var(--border-strong);
+}
+
+/* Ghost button - Minimal presence */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 12px 20px;
+}
+
 .btn-ghost:hover {
-  background: var(--surface-elevated);
+  background: var(--surface-raised);
+  color: var(--text-primary);
   border-color: var(--border-strong);
 }
 
