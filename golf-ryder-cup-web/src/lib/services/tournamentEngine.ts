@@ -406,13 +406,13 @@ export async function calculateFairnessScore(
 
     // Calculate fairness metrics
     const matchCountValues = Array.from(matchCounts.values());
-    const maxMatches = Math.max(...matchCountValues);
-    const minMatches = Math.min(...matchCountValues);
+    const maxMatches = matchCountValues.length > 0 ? Math.max(...matchCountValues) : 0;
+    const minMatches = matchCountValues.length > 0 ? Math.min(...matchCountValues) : 0;
     const matchDisparity = maxMatches - minMatches;
 
     const sessionCountValues = Array.from(sessionCounts.values());
-    const maxSessions = Math.max(...sessionCountValues);
-    const minSessions = Math.min(...sessionCountValues);
+    const maxSessions = sessionCountValues.length > 0 ? Math.max(...sessionCountValues) : 0;
+    const minSessions = sessionCountValues.length > 0 ? Math.min(...sessionCountValues) : 0;
     const sessionDisparity = maxSessions - minSessions;
 
     // Score: 100 = perfect balance, lower = more imbalanced
@@ -450,7 +450,7 @@ export async function calculateFairnessScore(
         playerName: `${p.firstName} ${p.lastName}`,
         matchesPlayed: matchCounts.get(p.id) || 0,
         sessionsPlayed: sessionCounts.get(p.id) || 0,
-        expectedMatches: Math.round(sessions.length * 4 / players.length), // Approximate
+        expectedMatches: players.length > 0 ? Math.round(sessions.length * 4 / players.length) : 0, // Approximate
     }));
 
     return {

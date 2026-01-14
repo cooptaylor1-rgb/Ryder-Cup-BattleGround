@@ -74,13 +74,18 @@ export default function LivePage() {
     return () => clearInterval(interval);
   }, [activeSession, loadSessionMatches]);
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      // Fullscreen may not be supported or user denied permission
+      console.warn('Fullscreen toggle failed:', error);
     }
   };
 

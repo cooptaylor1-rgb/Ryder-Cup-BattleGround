@@ -168,7 +168,12 @@ export default function MatchScoringPage() {
     }
 
     haptic.scorePoint();
-    await scoreHole(winner);
+    try {
+      await scoreHole(winner);
+    } catch (error) {
+      console.error('Failed to score hole:', error);
+      return;
+    }
 
     // Show sticky undo banner
     setUndoAction({
@@ -193,10 +198,12 @@ export default function MatchScoringPage() {
     setUndoAction(null);
   }, [undoStack.length, haptic, undoLastHole]);
 
-  // Handle voice score
+  // Handle voice score - intentionally not including handleScore in deps
+  // as we want to capture the current handleScore function at call time
   const handleVoiceScore = useCallback((winner: HoleWinner) => {
     handleScore(winner);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSaving, scoringPreferences.confirmCloseout, matchState, teamAName, teamBName, currentHole]);
 
   // Handle photo capture
   const handlePhotoCapture = useCallback((photo: { id: string }) => {

@@ -324,7 +324,7 @@ function PlayerRow({
     onEdit: () => void;
     onDelete: () => void;
 }) {
-    const initials = `${player.firstName[0]}${player.lastName[0]}`;
+    const initials = `${player.firstName?.[0] || '?'}${player.lastName?.[0] || '?'}`;
     const bgColor = teamColor === 'usa' ? 'var(--team-usa)' : teamColor === 'europe' ? 'var(--team-europe)' : 'var(--ink-tertiary)';
 
     return (

@@ -122,7 +122,7 @@ export default function MorePage() {
                                     fontSize: '12px',
                                 }}
                             >
-                                {currentUser.firstName[0]}{currentUser.lastName[0]}
+                                {currentUser.firstName?.[0] || '?'}{currentUser.lastName?.[0] || '?'}
                             </div>
                             <div className="flex-1">
                                 <p style={{ fontWeight: 500 }}>{currentUser.firstName} {currentUser.lastName}</p>

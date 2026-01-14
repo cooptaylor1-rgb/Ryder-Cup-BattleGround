@@ -222,7 +222,7 @@ export function LiveMatchCardSkeleton() {
 export function AchievementCardSkeleton() {
   return (
     <div
-      className="p-4 rounded-xl"
+      className="p-4 rounded-xl relative"
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--rule)',

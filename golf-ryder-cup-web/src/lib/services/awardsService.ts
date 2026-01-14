@@ -185,8 +185,8 @@ export async function computeAwards(tripId: string): Promise<Award[]> {
     // Most Halves
     awards.push(createAward('most-halves', playerStats, s => s.halves, v => `${v} halves`));
 
-    // Biggest Win
-    awards.push(createAward('biggest-win', playerStats, s => s.biggestWin, v => `${v}&${9 - v}`));
+    // Biggest Win - show the margin directly since we don't have holes remaining at closeout
+    awards.push(createAward('biggest-win', playerStats, s => s.biggestWin, v => `+${v} holes`));
 
     // Iron Man - Most matches
     awards.push(createAward('iron-man', playerStats, s => s.matchesPlayed, v => `${v} matches`));

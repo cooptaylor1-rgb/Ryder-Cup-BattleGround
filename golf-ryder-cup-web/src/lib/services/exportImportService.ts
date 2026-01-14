@@ -271,40 +271,66 @@ export async function importTrip(exportData: TripExport): Promise<ImportResult> 
         updatedAt: now,
     }));
 
-    const newMatches: Match[] = exportData.matches.map((m) => ({
-        ...m,
-        id: idMap.match.get(m.id)!,
-        sessionId: idMap.session.get(m.sessionId)!,
-        courseId: m.courseId ? idMap.course.get(m.courseId) : undefined,
-        teeSetId: m.teeSetId ? idMap.teeSet.get(m.teeSetId) : undefined,
-        teamAPlayerIds: m.teamAPlayerIds.map((id) => idMap.player.get(id) || id),
-        teamBPlayerIds: m.teamBPlayerIds.map((id) => idMap.player.get(id) || id),
-        createdAt: now,
-        updatedAt: now,
-    }));
+    const newMatches: Match[] = exportData.matches.map((m) => {
+        const newMatchId = idMap.match.get(m.id);
+        const newSessionId = idMap.session.get(m.sessionId);
+        if (!newMatchId || !newSessionId) {
+            throw new Error(`Missing ID mapping for match ${m.id}`);
+        }
+        return {
+            ...m,
+            id: newMatchId,
+            sessionId: newSessionId,
+            courseId: m.courseId ? idMap.course.get(m.courseId) : undefined,
+            teeSetId: m.teeSetId ? idMap.teeSet.get(m.teeSetId) : undefined,
+            teamAPlayerIds: m.teamAPlayerIds.map((id) => idMap.player.get(id) || id),
+            teamBPlayerIds: m.teamBPlayerIds.map((id) => idMap.player.get(id) || id),
+            createdAt: now,
+            updatedAt: now,
+        };
+    });
 
-    const newHoleResults: HoleResult[] = exportData.holeResults.map((hr) => ({
-        ...hr,
-        id: uuidv4(),
-        matchId: idMap.match.get(hr.matchId)!,
-        scoredBy: hr.scoredBy ? idMap.player.get(hr.scoredBy) : undefined,
-        timestamp: now,
-    }));
+    const newHoleResults: HoleResult[] = exportData.holeResults.map((hr) => {
+        const newMatchId = idMap.match.get(hr.matchId);
+        if (!newMatchId) {
+            throw new Error(`Missing ID mapping for hole result matchId ${hr.matchId}`);
+        }
+        return {
+            ...hr,
+            id: uuidv4(),
+            matchId: newMatchId,
+            scoredBy: hr.scoredBy ? idMap.player.get(hr.scoredBy) : undefined,
+            timestamp: now,
+        };
+    });
 
-    const newCourses: Course[] = exportData.courses.map((c) => ({
-        ...c,
-        id: idMap.course.get(c.id)!,
-        createdAt: now,
-        updatedAt: now,
-    }));
+    const newCourses: Course[] = exportData.courses.map((c) => {
+        const newCourseId = idMap.course.get(c.id);
+        if (!newCourseId) {
+            throw new Error(`Missing ID mapping for course ${c.id}`);
+        }
+        return {
+            ...c,
+            id: newCourseId,
+            createdAt: now,
+            updatedAt: now,
+        };
+    });
 
-    const newTeeSets: TeeSet[] = exportData.teeSets.map((t) => ({
-        ...t,
-        id: idMap.teeSet.get(t.id)!,
-        courseId: idMap.course.get(t.courseId)!,
-        createdAt: now,
-        updatedAt: now,
-    }));
+    const newTeeSets: TeeSet[] = exportData.teeSets.map((t) => {
+        const newTeeSetId = idMap.teeSet.get(t.id);
+        const newCourseId = idMap.course.get(t.courseId);
+        if (!newTeeSetId || !newCourseId) {
+            throw new Error(`Missing ID mapping for tee set ${t.id}`);
+        }
+        return {
+            ...t,
+            id: newTeeSetId,
+            courseId: newCourseId,
+            createdAt: now,
+            updatedAt: now,
+        };
+    });
 
     // Save everything in a transaction
     try {

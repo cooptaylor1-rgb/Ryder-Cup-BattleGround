@@ -74,8 +74,12 @@ export default function ScorePage() {
     };
 
     const handleMatchSelect = async (matchId: string) => {
-        await selectMatch(matchId);
-        router.push(`/score/${matchId}`);
+        try {
+            await selectMatch(matchId);
+            router.push(`/score/${matchId}`);
+        } catch (error) {
+            console.error('Failed to select match:', error);
+        }
     };
 
     const isLoading = matches === undefined || holeResults === undefined;
