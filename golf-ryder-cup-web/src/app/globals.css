@@ -177,6 +177,28 @@
   --shadow-md: 0 2px 8px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
   --shadow-lg: 0 8px 24px rgba(28, 25, 23, 0.08), 0 2px 6px rgba(28, 25, 23, 0.04);
   --shadow-glow-masters: 0 0 0 3px var(--masters-glow);
+  --shadow-glow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
+  --shadow-card-sm: var(--shadow-sm);
+  --shadow-card-md: var(--shadow-md);
+  --shadow-card-lg: var(--shadow-lg);
+
+  /* ---- SEMANTIC ALIASES ----
+     Self-documenting design tokens */
+  --color-primary: var(--masters);
+  --color-primary-hover: var(--masters-hover);
+  --color-accent: #D4AF37;
+  --color-accent-subtle: rgba(212, 175, 55, 0.2);
+  --background-base: var(--canvas);
+  --background-elevated: var(--canvas-raised);
+  --background-muted: var(--canvas-sunken);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-secondary);
+  --text-muted: var(--ink-tertiary);
+  --border-default: var(--rule);
+  --border-subtle: var(--rule-faint);
+  --border-strong: var(--rule-strong);
+  --focus-ring: var(--masters);
+  --focus-ring-offset: var(--canvas);
 }
 
 /* ============================================
@@ -2916,6 +2938,240 @@ a,
     background: var(--canvas-warm);
     transform: scale(0.99);
   }
+}
+
+/* ============================================
+   CONSOLIDATED MICRO-INTERACTION UTILITIES
+   System-wide interaction patterns
+   ============================================ */
+
+/* Standard interactive element - use on all clickable elements */
+.interactive {
+  transition: transform var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.interactive:hover {
+  transform: scale(1.02);
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+.interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--canvas), 0 0 0 4px var(--masters);
+}
+
+/* Gold focus ring variant - for important actions */
+.focus-ring-gold:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--canvas), 0 0 0 4px #D4AF37;
+}
+
+/* Subtle interactive - for list items, cards */
+.interactive-subtle {
+  transition: background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.interactive-subtle:hover {
+  background-color: var(--surface-highlight, rgba(255, 255, 255, 0.05));
+}
+
+.interactive-subtle:active {
+  transform: scale(0.99);
+}
+
+/* Scale feedback classes */
+.scale-on-hover:hover {
+  transform: scale(1.02);
+}
+
+.scale-on-active:active {
+  transform: scale(0.96);
+}
+
+.scale-press {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.scale-press:hover {
+  transform: scale(1.02);
+}
+
+.scale-press:active {
+  transform: scale(0.96);
+}
+
+/* Lift effect - elevates on hover */
+.lift-on-hover {
+  transition: transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.lift-on-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.lift-on-hover:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Glow on focus/hover */
+.glow-on-hover:hover {
+  box-shadow: 0 0 0 3px var(--masters-glow);
+}
+
+.glow-gold:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+/* Team-specific glows */
+.glow-usa:hover {
+  box-shadow: 0 0 0 3px var(--team-usa-glow);
+}
+
+.glow-europe:hover {
+  box-shadow: 0 0 0 3px var(--team-europe-glow);
+}
+
+/* Loading state overlay */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--canvas);
+  opacity: 0.7;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Disabled state with visual feedback */
+.disabled-state {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+/* Selection highlight */
+.selected-highlight {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.3);
+}
+
+/* Reveal animation on scroll */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slow pulse for attention */
+.animate-pulse-slow {
+  animation: pulse-slow 2s var(--ease-in-out) infinite;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Entrance animations with stagger support */
+.animate-enter {
+  animation: enterAnimation var(--duration-normal) var(--ease-out) both;
+}
+
+@keyframes enterAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Toast animations */
+.toast-enter {
+  animation: toastEnter var(--duration-normal) var(--ease-spring);
+}
+
+.toast-exit {
+  animation: toastExit var(--duration-fast) var(--ease-out) forwards;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.95);
+  }
+}
+
+/* Ripple effect utility */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.ripple:active::before {
+  transform: translate(-50%, -50%) scale(2);
+  transition: transform 0s;
 }
 
 /* ============================================
