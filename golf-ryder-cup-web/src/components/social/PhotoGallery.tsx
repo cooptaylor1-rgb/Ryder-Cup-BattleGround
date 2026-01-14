@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, getSupabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Camera, X, Upload, Image, Loader2, MapPin, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -69,12 +69,13 @@ export function PhotoGallery({
         setUploadProgress(0);
 
         try {
-            if (isSupabaseConfigured && supabase) {
+            if (isSupabaseConfigured) {
+                const sb = getSupabase();
                 // Upload to Supabase Storage
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${tripId}/${crypto.randomUUID()}.${fileExt}`;
 
-                const { data, error } = await supabase.storage
+                const { error } = await sb.storage
                     .from('photos')
                     .upload(fileName, file, {
                         cacheControl: '3600',
@@ -84,7 +85,7 @@ export function PhotoGallery({
                 if (error) throw error;
 
                 // Get public URL
-                const { data: urlData } = supabase.storage
+                const { data: urlData } = sb.storage
                     .from('photos')
                     .getPublicUrl(fileName);
 
@@ -98,8 +99,8 @@ export function PhotoGallery({
                     createdAt: new Date().toISOString(),
                 };
 
-                const { error: insertError } = await supabase
-                    .from('photos')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error: insertError } = await (sb.from('photos') as any)
                     .insert({
                         id: photo.id,
                         trip_id: photo.tripId,

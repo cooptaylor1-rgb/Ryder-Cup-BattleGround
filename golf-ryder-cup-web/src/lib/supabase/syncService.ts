@@ -5,7 +5,7 @@
  * Provides offline-first experience with automatic sync when online.
  */
 
-import { supabase, isSupabaseConfigured } from './client';
+import { supabase, isSupabaseConfigured, getSupabase } from './client';
 import { db } from '../db';
 import type {
     Trip,
@@ -187,20 +187,22 @@ class SyncService {
         for (const change of [...this.pendingChanges]) {
             try {
                 const snakeCaseData = convertKeysToSnakeCase(change.data as Record<string, unknown>);
+                const sb = getSupabase();
 
                 switch (change.operation) {
                     case 'insert':
-                        await supabase.from(change.table).insert(snakeCaseData);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        await (sb.from(change.table) as any).insert(snakeCaseData);
                         break;
                     case 'update':
-                        await supabase
-                            .from(change.table)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        await (sb.from(change.table) as any)
                             .update(snakeCaseData)
                             .eq('id', (change.data as { id: string }).id);
                         break;
                     case 'delete':
-                        await supabase
-                            .from(change.table)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        await (sb.from(change.table) as any)
                             .delete()
                             .eq('id', (change.data as { id: string }).id);
                         break;
@@ -266,17 +268,19 @@ class SyncService {
             const matchIds = matches.map((m) => m.id);
             const holeResults = await db.holeResults.where('matchId').anyOf(matchIds).toArray();
 
-            // Upsert to Supabase
-            const { error: tripError } = await supabase
-                .from('trips')
+            const sb = getSupabase();
+
+            // Upsert to Supabase (using type assertions for dynamic data)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: tripError } = await (sb.from('trips') as any)
                 .upsert(convertKeysToSnakeCase(trip as unknown as Record<string, unknown>));
             if (tripError) errors.push(`Trip: ${tripError.message}`);
             else synced++;
 
             // Sync players
             for (const player of players) {
-                const { error } = await supabase
-                    .from('players')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('players') as any)
                     .upsert(convertKeysToSnakeCase(player as unknown as Record<string, unknown>));
                 if (error) errors.push(`Player ${player.id}: ${error.message}`);
                 else synced++;
@@ -284,8 +288,8 @@ class SyncService {
 
             // Sync teams
             for (const team of teams) {
-                const { error } = await supabase
-                    .from('teams')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('teams') as any)
                     .upsert(convertKeysToSnakeCase(team as unknown as Record<string, unknown>));
                 if (error) errors.push(`Team ${team.id}: ${error.message}`);
                 else synced++;
@@ -293,8 +297,8 @@ class SyncService {
 
             // Sync team members
             for (const tm of relevantTeamMembers) {
-                const { error } = await supabase
-                    .from('team_members')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('team_members') as any)
                     .upsert(convertKeysToSnakeCase(tm as unknown as Record<string, unknown>));
                 if (error) errors.push(`TeamMember ${tm.id}: ${error.message}`);
                 else synced++;
@@ -302,8 +306,8 @@ class SyncService {
 
             // Sync sessions
             for (const session of sessions) {
-                const { error } = await supabase
-                    .from('sessions')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('sessions') as any)
                     .upsert(convertKeysToSnakeCase(session as unknown as Record<string, unknown>));
                 if (error) errors.push(`Session ${session.id}: ${error.message}`);
                 else synced++;
@@ -311,8 +315,8 @@ class SyncService {
 
             // Sync matches
             for (const match of matches) {
-                const { error } = await supabase
-                    .from('matches')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('matches') as any)
                     .upsert(convertKeysToSnakeCase(match as unknown as Record<string, unknown>));
                 if (error) errors.push(`Match ${match.id}: ${error.message}`);
                 else synced++;
@@ -320,8 +324,8 @@ class SyncService {
 
             // Sync hole results
             for (const result of holeResults) {
-                const { error } = await supabase
-                    .from('hole_results')
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (sb.from('hole_results') as any)
                     .upsert(convertKeysToSnakeCase(result as unknown as Record<string, unknown>));
                 if (error) errors.push(`HoleResult ${result.id}: ${error.message}`);
                 else synced++;
@@ -417,8 +421,8 @@ class SyncService {
                 }
 
                 // Fetch matches for all sessions
-                const sessionIds = sessionsData.map((s) => s.id);
-                const { data: matchesData } = await supabase
+                const sessionIds = (sessionsData as Array<{ id: string }>).map((s) => s.id);
+                const { data: matchesData } = await getSupabase()
                     .from('matches')
                     .select('*')
                     .in('session_id', sessionIds);
@@ -431,8 +435,8 @@ class SyncService {
                     }
 
                     // Fetch hole results for all matches
-                    const matchIds = matchesData.map((m) => m.id);
-                    const { data: holeResultsData } = await supabase
+                    const matchIds = (matchesData as Array<{ id: string }>).map((m) => m.id);
+                    const { data: holeResultsData } = await getSupabase()
                         .from('hole_results')
                         .select('*')
                         .in('match_id', matchIds);
@@ -449,17 +453,17 @@ class SyncService {
 
             // Fetch team members and players
             if (teamsData) {
-                const teamIds = teamsData.map((t) => t.id);
-                const { data: teamMembersData } = await supabase
+                const teamIds = (teamsData as Array<{ id: string }>).map((t) => t.id);
+                const { data: teamMembersData } = await getSupabase()
                     .from('team_members')
                     .select('*')
                     .in('team_id', teamIds);
 
                 if (teamMembersData) {
-                    const playerIds = teamMembersData.map((tm) => tm.player_id);
+                    const playerIds = (teamMembersData as Array<{ player_id: string }>).map((tm) => tm.player_id);
 
                     // Fetch players
-                    const { data: playersData } = await supabase
+                    const { data: playersData } = await getSupabase()
                         .from('players')
                         .select('*')
                         .in('id', playerIds);
@@ -499,14 +503,14 @@ class SyncService {
      * Push a hole result to Supabase immediately
      */
     async pushHoleResult(holeResult: HoleResult): Promise<boolean> {
-        if (!isSupabaseConfigured || !supabase) {
+        if (!isSupabaseConfigured) {
             this.addPendingChange('hole_results', 'insert', holeResult);
             return false;
         }
 
         try {
-            const { error } = await supabase
-                .from('hole_results')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (getSupabase().from('hole_results') as any)
                 .upsert(convertKeysToSnakeCase(holeResult as unknown as Record<string, unknown>));
 
             if (error) {
@@ -525,14 +529,14 @@ class SyncService {
      * Push a match update to Supabase immediately
      */
     async pushMatchUpdate(match: Match): Promise<boolean> {
-        if (!isSupabaseConfigured || !supabase) {
+        if (!isSupabaseConfigured) {
             this.addPendingChange('matches', 'update', match);
             return false;
         }
 
         try {
-            const { error } = await supabase
-                .from('matches')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (getSupabase().from('matches') as any)
                 .update(convertKeysToSnakeCase(match as unknown as Record<string, unknown>))
                 .eq('id', match.id);
 
