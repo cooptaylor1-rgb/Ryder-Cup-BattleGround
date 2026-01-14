@@ -141,10 +141,10 @@ export function TripRecap({
     const mvp = playerRecords[0];
 
     // Find best single match (largest margin)
-    const bestMatch = useMemo(() => {
+    const bestMatch: { match: Match; state: MatchState; margin: number } | null = useMemo(() => {
         let best: { match: Match; state: MatchState; margin: number } | null = null;
 
-        matches.forEach((match) => {
+        matches.forEach((match: Match) => {
             const state = matchStates.get(match.id);
             if (!state || state.status !== 'completed') return;
 
@@ -288,22 +288,22 @@ export function TripRecap({
                     </div>
 
                     {/* Best Match */}
-                    {bestMatch && (
+                    {bestMatch !== null && (
                         <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
                             <div className="flex items-center gap-2 text-surface-500 mb-3">
                                 <Star className="w-4 h-4" />
                                 <span className="text-sm">Most Dominant Victory</span>
                             </div>
                             <div className="text-lg font-bold">
-                                {bestMatch.state.displayScore}
+                                {(bestMatch as { match: Match; state: MatchState; margin: number }).state.displayScore}
                             </div>
                             <div className="text-sm text-surface-500 mt-1">
-                                {bestMatch.match.teamAPlayerIds.map(id => {
+                                {(bestMatch as { match: Match; state: MatchState; margin: number }).match.teamAPlayerIds.map((id: string) => {
                                     const p = players.get(id);
                                     return p ? formatPlayerName(p.firstName, p.lastName, 'short') : '';
                                 }).join(' & ')}
                                 {' vs '}
-                                {bestMatch.match.teamBPlayerIds.map(id => {
+                                {(bestMatch as { match: Match; state: MatchState; margin: number }).match.teamBPlayerIds.map((id: string) => {
                                     const p = players.get(id);
                                     return p ? formatPlayerName(p.firstName, p.lastName, 'short') : '';
                                 }).join(' & ')}

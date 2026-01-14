@@ -7,6 +7,8 @@
  * - Weather conditions
  * - Hole-by-hole data
  * - Course map
+ *
+ * @version 1.0.1
  */
 
 'use client';
@@ -15,7 +17,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { WeatherWidget } from './WeatherWidget';
 import type { GolfCourseAPICourse, GolfCourseAPITee } from '@/lib/services/golfCourseAPIService';
-import { formatCourseLocation, getAllTees, inferTeeColor } from '@/lib/services/golfCourseAPIService';
+import { formatCourseLocation, getAllTees } from '@/lib/services/golfCourseAPIService';
 import {
     MapPin,
     Flag,
