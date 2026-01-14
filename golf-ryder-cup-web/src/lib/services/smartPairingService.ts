@@ -156,19 +156,21 @@ function calculateHandicapGap(
  * Calculate team handicap based on session type
  */
 function calculateTeamHandicap(players: Player[], sessionType: SessionType): number {
+    if (players.length === 0) return 18; // Default if no players
+
     const handicaps = players.map(p => p.handicapIndex ?? 18); // Default to 18 if missing
 
     switch (sessionType) {
         case 'singles':
-            return handicaps[0] || 0;
+            return handicaps[0] ?? 18;
         case 'fourball':
             // Best ball - use lower handicap
-            return Math.min(...handicaps);
+            return handicaps.length > 0 ? Math.min(...handicaps) : 18;
         case 'foursomes':
             // Alternate shot - use average
-            return handicaps.reduce((a, b) => a + b, 0) / handicaps.length;
+            return handicaps.length > 0 ? handicaps.reduce((a, b) => a + b, 0) / handicaps.length : 18;
         default:
-            return handicaps.reduce((a, b) => a + b, 0) / handicaps.length;
+            return handicaps.length > 0 ? handicaps.reduce((a, b) => a + b, 0) / handicaps.length : 18;
     }
 }
 

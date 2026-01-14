@@ -88,7 +88,9 @@ export function calculateMatchState(
     if (holesPlayed > 0) {
         status = isClosedOut ? 'completed' : 'inProgress';
     }
-    if (holesPlayed === TOTAL_HOLES && !isClosedOut) {
+    // Only mark as completed if all holes have actual results (not 'none')
+    const actualScoredHoles = sortedResults.filter(r => r.winner !== 'none').length;
+    if (actualScoredHoles === TOTAL_HOLES && !isClosedOut) {
         status = 'completed';
     }
 

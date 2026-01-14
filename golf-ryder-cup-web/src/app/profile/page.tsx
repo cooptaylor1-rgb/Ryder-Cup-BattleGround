@@ -126,7 +126,7 @@ export default function ProfilePage() {
                                     />
                                 ) : (
                                     <span className="text-4xl font-bold text-masters">
-                                        {currentUser.firstName[0]}{currentUser.lastName[0]}
+                                        {currentUser.firstName?.[0] || '?'}{currentUser.lastName?.[0] || '?'}
                                     </span>
                                 )}
                             </div>

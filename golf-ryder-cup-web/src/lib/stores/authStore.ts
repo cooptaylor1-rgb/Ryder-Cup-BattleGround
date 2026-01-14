@@ -80,9 +80,16 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     // Look up user by email in local storage
                     const storedUsers = localStorage.getItem('golf-app-users');
-                    const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
-                        ? JSON.parse(storedUsers)
-                        : {};
+                    let users: Record<string, { profile: UserProfile; pin: string }> = {};
+                    if (storedUsers) {
+                        try {
+                            users = JSON.parse(storedUsers);
+                        } catch (parseError) {
+                            console.error('Failed to parse stored users:', parseError);
+                            set({ isLoading: false, error: 'Login data corrupted. Please contact support.' });
+                            return false;
+                        }
+                    }
 
                     const userEntry = Object.values(users).find(
                         u => u.profile.email?.toLowerCase() === email.toLowerCase()
@@ -158,9 +165,15 @@ export const useAuthStore = create<AuthState>()(
 
                     // Save to local users storage
                     const storedUsers = localStorage.getItem('golf-app-users');
-                    const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
-                        ? JSON.parse(storedUsers)
-                        : {};
+                    let users: Record<string, { profile: UserProfile; pin: string }> = {};
+                    if (storedUsers) {
+                        try {
+                            users = JSON.parse(storedUsers);
+                        } catch (parseError) {
+                            console.error('Failed to parse stored users:', parseError);
+                            // Continue with empty users object since we're creating a new user
+                        }
+                    }
 
                     // Check if email already exists
                     const existingUser = Object.values(users).find(
@@ -199,12 +212,10 @@ export const useAuthStore = create<AuthState>()(
 
                     return profile;
                 } catch (error) {
-                    if (!get().error) {
-                        set({
-                            isLoading: false,
-                            error: error instanceof Error ? error.message : 'Failed to create profile',
-                        });
-                    }
+                    set({
+                        isLoading: false,
+                        error: error instanceof Error ? error.message : 'Failed to create profile',
+                    });
                     throw error;
                 }
             },
@@ -234,9 +245,15 @@ export const useAuthStore = create<AuthState>()(
 
                     // Update local users storage
                     const storedUsers = localStorage.getItem('golf-app-users');
-                    const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
-                        ? JSON.parse(storedUsers)
-                        : {};
+                    let users: Record<string, { profile: UserProfile; pin: string }> = {};
+                    if (storedUsers) {
+                        try {
+                            users = JSON.parse(storedUsers);
+                        } catch (parseError) {
+                            console.error('Failed to parse stored users:', parseError);
+                            // Continue - we'll try to save anyway
+                        }
+                    }
 
                     if (users[currentUser.id]) {
                         users[currentUser.id].profile = updatedProfile;
@@ -268,16 +285,21 @@ export const useAuthStore = create<AuthState>()(
 
             // Check if user exists by email
             checkExistingUser: async (email: string) => {
-                const storedUsers = localStorage.getItem('golf-app-users');
-                const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
-                    ? JSON.parse(storedUsers)
-                    : {};
+                try {
+                    const storedUsers = localStorage.getItem('golf-app-users');
+                    if (!storedUsers) return null;
 
-                const userEntry = Object.values(users).find(
-                    u => u.profile.email?.toLowerCase() === email.toLowerCase()
-                );
+                    const users: Record<string, { profile: UserProfile; pin: string }> = JSON.parse(storedUsers);
 
-                return userEntry?.profile || null;
+                    const userEntry = Object.values(users).find(
+                        u => u.profile.email?.toLowerCase() === email.toLowerCase()
+                    );
+
+                    return userEntry?.profile || null;
+                } catch (error) {
+                    console.error('Failed to parse stored users:', error);
+                    return null;
+                }
             },
 
             // Clear error

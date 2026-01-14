@@ -178,7 +178,7 @@ export default function StandingsPage() {
                     {magicNumber.clinchingTeam === 'A' ? teamAName : teamBName} Wins
                   </p>
                 </div>
-              ) : (magicNumber.teamANeeded <= 3 || magicNumber.teamBNeeded <= 3) && (
+              ) : (magicNumber.teamANeeded <= 3 || magicNumber.teamBNeeded <= 3) && standings.leader && (
                 <p
                   className="type-caption"
                   style={{

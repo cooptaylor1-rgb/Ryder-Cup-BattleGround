@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase, isSupabaseConfigured, getSupabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Camera, X, Upload, Image, Loader2, MapPin, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -48,6 +48,17 @@ export function PhotoGallery({
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
     const [viewerIndex, setViewerIndex] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const objectUrlsRef = useRef<Set<string>>(new Set());
+
+    // Cleanup object URLs on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            objectUrlsRef.current.forEach(url => {
+                URL.revokeObjectURL(url);
+            });
+            objectUrlsRef.current.clear();
+        };
+    }, []);
 
     const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -115,12 +126,15 @@ export function PhotoGallery({
                 onPhotoUpload?.(photo);
             } else {
                 // Local mode - create object URL
+                const objectUrl = URL.createObjectURL(file);
+                // Track the object URL for cleanup
+                objectUrlsRef.current.add(objectUrl);
                 const photo: Photo = {
                     id: crypto.randomUUID(),
                     tripId,
                     matchId,
                     uploadedBy: currentPlayerId,
-                    url: URL.createObjectURL(file),
+                    url: objectUrl,
                     createdAt: new Date().toISOString(),
                 };
                 onPhotoUpload?.(photo);

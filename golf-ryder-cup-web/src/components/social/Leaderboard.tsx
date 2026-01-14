@@ -281,7 +281,7 @@ interface PodiumSpotProps {
 }
 
 function PodiumSpot({ entry, rank, height, isWinner, onClick }: PodiumSpotProps) {
-  const initials = `${entry.firstName[0]}${entry.lastName[0]}`;
+  const initials = `${entry.firstName?.[0] || '?'}${entry.lastName?.[0] || '?'}`;
   const teamColor = entry.team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
 
   const rankColors: Record<number, string> = {
@@ -388,8 +388,8 @@ interface LeaderboardRowProps {
 }
 
 function LeaderboardRow({ entry, rank, sortBy, onClick }: LeaderboardRowProps) {
-  const fullName = `${entry.firstName} ${entry.lastName}`;
-  const initials = `${entry.firstName[0]}${entry.lastName[0]}`;
+  const fullName = `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || 'Unknown';
+  const initials = `${entry.firstName?.[0] || '?'}${entry.lastName?.[0] || '?'}`;
   const teamColor = entry.team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
 
   // Calculate rank change

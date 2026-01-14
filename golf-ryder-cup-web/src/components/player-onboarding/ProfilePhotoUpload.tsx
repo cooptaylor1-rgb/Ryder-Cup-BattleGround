@@ -94,11 +94,28 @@ export function ProfilePhotoUpload({
         try {
             // Read file as data URL
             const reader = new FileReader();
+
+            reader.onerror = () => {
+                console.error('Failed to read file');
+                setIsProcessing(false);
+            };
+
             reader.onload = async (event) => {
                 const dataUrl = event.target?.result as string;
+                if (!dataUrl) {
+                    console.error('Failed to read file data');
+                    setIsProcessing(false);
+                    return;
+                }
 
                 // Create image to resize
                 const img = new Image();
+
+                img.onerror = () => {
+                    console.error('Failed to load image');
+                    setIsProcessing(false);
+                };
+
                 img.onload = () => {
                     // Resize to max 500x500
                     const canvas = document.createElement('canvas');
@@ -123,16 +140,20 @@ export function ProfilePhotoUpload({
                     canvas.height = size;
 
                     const ctx = canvas.getContext('2d');
-                    if (ctx) {
-                        const sx = (img.width - Math.min(img.width, img.height)) / 2;
-                        const sy = (img.height - Math.min(img.width, img.height)) / 2;
-                        const sSize = Math.min(img.width, img.height);
-
-                        ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, size, size);
-
-                        const resizedUrl = canvas.toDataURL('image/jpeg', 0.85);
-                        setPreviewPhoto(resizedUrl);
+                    if (!ctx) {
+                        console.error('Failed to get canvas context');
+                        setIsProcessing(false);
+                        return;
                     }
+
+                    const sx = (img.width - Math.min(img.width, img.height)) / 2;
+                    const sy = (img.height - Math.min(img.width, img.height)) / 2;
+                    const sSize = Math.min(img.width, img.height);
+
+                    ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, size, size);
+
+                    const resizedUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    setPreviewPhoto(resizedUrl);
                     setIsProcessing(false);
                 };
                 img.src = dataUrl;

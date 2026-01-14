@@ -354,7 +354,7 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 text-success">
                         <Trophy className="w-4 h-4" />
                         <span className="text-sm font-medium">
-                            {winner.firstName} {winner.lastName.charAt(0)}.
+                            {winner.firstName || 'Unknown'} {winner.lastName?.charAt(0) || ''}.
                         </span>
                     </div>
                 ) : !readonly ? (

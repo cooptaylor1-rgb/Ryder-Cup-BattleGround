@@ -224,11 +224,25 @@ export function WeatherAlerts({
             });
         }
 
-        // Sunset warning
+        // Sunset warning - parse sunset time in various formats
         const now = new Date();
         const sunsetTime = new Date();
-        const [hours, minutes] = conditions.sunset.replace(' PM', '').split(':');
-        sunsetTime.setHours(parseInt(hours) + 12, parseInt(minutes), 0);
+        try {
+            const sunsetStr = conditions.sunset.trim().toUpperCase();
+            const isPM = sunsetStr.includes('PM');
+            const isAM = sunsetStr.includes('AM');
+            const timePart = sunsetStr.replace(/\s*(AM|PM)\s*/i, '').trim();
+            const [hours, minutes] = timePart.split(':').map(s => parseInt(s) || 0);
+
+            let adjustedHours = hours;
+            if (isPM && hours < 12) adjustedHours = hours + 12;
+            else if (isAM && hours === 12) adjustedHours = 0;
+
+            sunsetTime.setHours(adjustedHours, minutes, 0);
+        } catch {
+            // Default to 7:30 PM if parsing fails
+            sunsetTime.setHours(19, 30, 0);
+        }
         const minutesToSunset = (sunsetTime.getTime() - now.getTime()) / (1000 * 60);
 
         if (minutesToSunset > 0 && minutesToSunset < 60) {

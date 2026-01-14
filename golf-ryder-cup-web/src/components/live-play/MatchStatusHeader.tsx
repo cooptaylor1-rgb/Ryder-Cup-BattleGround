@@ -285,7 +285,7 @@ export function MatchStatusHeader({
                         <span className="text-sm font-bold text-white">
                             {formatScore()}
                         </span>
-                        {!isComplete && (
+                        {!isComplete && currentHole > 1 && (
                             <span className="text-xs text-white/50">
                                 thru {currentHole - 1}
                             </span>
@@ -352,7 +352,7 @@ export function MatchStatusHeader({
                                         </span>
                                     </div>
                                     <p className="font-medium text-white text-xs">
-                                        {teamAPlayers.map(p => `${p.firstName} ${p.lastName[0]}.`).join(' / ')}
+                                        {teamAPlayers.map(p => `${p.firstName || '?'} ${p.lastName?.[0] || '?'}.`).join(' / ')}
                                     </p>
                                     <p className="text-xl font-bold text-white mt-1">{teamAWins}</p>
                                 </div>
@@ -375,7 +375,7 @@ export function MatchStatusHeader({
                                         />
                                     </div>
                                     <p className="font-medium text-white text-xs">
-                                        {teamBPlayers.map(p => `${p.firstName} ${p.lastName[0]}.`).join(' / ')}
+                                        {teamBPlayers.map(p => `${p.firstName || '?'} ${p.lastName?.[0] || '?'}.`).join(' / ')}
                                     </p>
                                     <p className="text-xl font-bold text-white mt-1">{teamBWins}</p>
                                 </div>

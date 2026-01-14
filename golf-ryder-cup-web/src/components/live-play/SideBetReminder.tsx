@@ -113,6 +113,15 @@ export function SideBetReminder({
     const [expandedBet, setExpandedBet] = useState<string | null>(null);
     const [ctpValue, setCtpValue] = useState('');
     const [showAll, setShowAll] = useState(false);
+    const [snoozeTimeouts] = useState<Map<string, NodeJS.Timeout>>(new Map());
+
+    // Cleanup snooze timeouts on unmount
+    useEffect(() => {
+        return () => {
+            snoozeTimeouts.forEach((timeout) => clearTimeout(timeout));
+            snoozeTimeouts.clear();
+        };
+    }, [snoozeTimeouts]);
 
     // Calculate active reminders based on current hole
     const reminders = useMemo((): SideBetReminder[] => {
@@ -170,18 +179,25 @@ export function SideBetReminder({
     const handleDismiss = useCallback((betId: string, snooze = false) => {
         trigger('light');
         if (snooze) {
-            // Snooze for 1 hole
-            setTimeout(() => {
+            // Clear any existing snooze timeout for this bet
+            const existingTimeout = snoozeTimeouts.get(betId);
+            if (existingTimeout) {
+                clearTimeout(existingTimeout);
+            }
+            // Snooze for 1 minute, then re-appear
+            const timeout = setTimeout(() => {
                 setDismissedBets(prev => {
                     const next = new Set(prev);
                     next.delete(betId);
                     return next;
                 });
-            }, 60000); // Re-appear after 1 minute
+                snoozeTimeouts.delete(betId);
+            }, 60000);
+            snoozeTimeouts.set(betId, timeout);
         }
         setDismissedBets(prev => new Set([...prev, betId]));
         onDismiss?.(betId, snooze);
-    }, [trigger, onDismiss]);
+    }, [trigger, onDismiss, snoozeTimeouts]);
 
     // Handle CTP/Long Drive result entry
     const handleResultSubmit = useCallback((betId: string, holeNumber: number) => {
@@ -242,7 +258,7 @@ export function SideBetReminder({
     // Get player name
     const getPlayerName = (playerId: string) => {
         const player = players.find(p => p.id === playerId);
-        return player ? `${player.firstName} ${player.lastName[0]}.` : 'Unknown';
+        return player ? `${player.firstName || 'Unknown'} ${player.lastName?.[0] || ''}.` : 'Unknown';
     };
 
     const displayReminders = showAll ? reminders : reminders.slice(0, 2);

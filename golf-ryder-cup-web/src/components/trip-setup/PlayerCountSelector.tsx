@@ -214,7 +214,7 @@ export function PlayerCountSelector({
             </AnimatePresence>
 
             {/* Format recommendation */}
-            {recommendation && (
+            {recommendation ? (
                 <button
                     onClick={() => setShowDetails(!showDetails)}
                     className="w-full p-3 rounded-xl bg-augusta-green/5 border border-augusta-green/20 text-left hover:bg-augusta-green/10 transition-colors"
@@ -253,6 +253,17 @@ export function PlayerCountSelector({
                         </div>
                     </div>
                 </button>
+            ) : (
+                <div className="w-full p-3 rounded-xl bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700">
+                    <div className="flex items-start gap-3">
+                        <Lightbulb className="w-5 h-5 text-surface-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-surface-600 dark:text-surface-400">
+                                Custom size: {playersPerTeam} singles, {Math.floor(playersPerTeam / 2)} team pairings possible
+                            </p>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

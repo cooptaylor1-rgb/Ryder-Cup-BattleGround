@@ -41,16 +41,26 @@ export function SmartPairingSuggestions({
   const [showHistory, setShowHistory] = useState(false);
 
   // Get current trip ID from first session
-  const tripId = sessions[0]?.tripId || '';
+  const tripId = sessions[0]?.tripId;
+
+  // Early return if no trip ID
+  if (!tripId) {
+    return (
+      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+        No active trip found. Please create a trip first.
+      </div>
+    );
+  }
 
   // Split players by team
   const { teamAPlayers, teamBPlayers } = useMemo(() => {
     if (teams.length < 2) {
-      // Default split if no teams defined
-      const half = Math.ceil(players.length / 2);
+      // Default split if no teams defined - use stable player order
+      const sortedPlayers = [...players].sort((a, b) => a.id.localeCompare(b.id));
+      const half = Math.ceil(sortedPlayers.length / 2);
       return {
-        teamAPlayers: players.slice(0, half),
-        teamBPlayers: players.slice(half),
+        teamAPlayers: sortedPlayers.slice(0, half),
+        teamBPlayers: sortedPlayers.slice(half),
       };
     }
 
@@ -63,9 +73,17 @@ export function SmartPairingSuggestions({
       m.teamBPlayerIds?.forEach(id => teamBIds.add(id));
     });
 
+    // For unassigned players, split them evenly in a stable manner
+    const unassignedPlayers = players
+      .filter(p => !teamAIds.has(p.id) && !teamBIds.has(p.id))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    const halfUnassigned = Math.ceil(unassignedPlayers.length / 2);
+    const unassignedToA = new Set(unassignedPlayers.slice(0, halfUnassigned).map(p => p.id));
+
     return {
-      teamAPlayers: players.filter(p => teamAIds.has(p.id) || (!teamBIds.has(p.id) && players.indexOf(p) % 2 === 0)),
-      teamBPlayers: players.filter(p => teamBIds.has(p.id) || (!teamAIds.has(p.id) && players.indexOf(p) % 2 === 1)),
+      teamAPlayers: players.filter(p => teamAIds.has(p.id) || unassignedToA.has(p.id)),
+      teamBPlayers: players.filter(p => teamBIds.has(p.id) || (!teamAIds.has(p.id) && !unassignedToA.has(p.id))),
     };
   }, [players, teams, matches]);
 

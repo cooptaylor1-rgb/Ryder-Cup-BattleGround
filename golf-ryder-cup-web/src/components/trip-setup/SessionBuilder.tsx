@@ -142,7 +142,7 @@ export function SessionBuilder({
             dayOffset,
             timeSlot: 'AM',
             sessionType: 'fourball',
-            matchCount: Math.min(playersPerTeam / 2, 4),
+            matchCount: Math.min(Math.floor(playersPerTeam / 2), 4),
             name: `Session ${sessions.length + 1}`,
             pointsPerMatch: 1,
         };
@@ -375,7 +375,7 @@ export function SessionBuilder({
             </div>
 
             {/* Empty state */}
-            {sessions.length === 0 && totalDays === 0 && (
+            {sessions.length === 0 && (
                 <div className="text-center py-12">
                     <Calendar className="w-12 h-12 mx-auto text-surface-400 mb-3" />
                     <p className="text-surface-600 dark:text-surface-400">
