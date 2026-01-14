@@ -21,7 +21,7 @@ import {
     GolfSwingIllustration,
     CelebrationIllustration,
 } from './illustrations';
-import { Plus, ArrowRight, Sparkles, Trophy, Users, Calendar, MapPin, Target, Check } from 'lucide-react';
+import { Plus, ArrowRight, Sparkles, Trophy, Users, Calendar, MapPin, Target, Check, DollarSign, MessageCircle, Camera, RefreshCw } from 'lucide-react';
 
 // ============================================
 // TYPES
@@ -436,11 +436,153 @@ export function ErrorEmpty({
                     ? {
                         label: 'Try Again',
                         onClick: onRetry,
-                        icon: <ArrowRight className="w-5 h-5" />,
+                        icon: <RefreshCw className="w-5 h-5" />,
                     }
                     : undefined
             }
             variant="compact"
+        />
+    );
+}
+
+/**
+ * No Side Bets Yet
+ * Encourage fun side action
+ */
+export function NoBetsEmpty({
+    onAddBet,
+    isActive = true,
+}: {
+    onAddBet?: () => void;
+    isActive?: boolean;
+}) {
+    return (
+        <EmptyStatePremium
+            illustration="trophy"
+            title={isActive ? "Make it interesting" : "No completed bets"}
+            description={
+                isActive
+                    ? "Add side bets for skins, closest to pin, long drives, and more. Make every hole count!"
+                    : "Completed bets and winners will appear here."
+            }
+            features={isActive ? [
+                { icon: <DollarSign className="w-3 h-3" />, text: 'Skins games & Nassau' },
+                { icon: <Target className="w-3 h-3" />, text: 'Closest to pin' },
+                { icon: <Trophy className="w-3 h-3" />, text: 'Long drive contests' },
+            ] : undefined}
+            action={
+                isActive && onAddBet
+                    ? {
+                        label: 'Add First Bet',
+                        onClick: onAddBet,
+                        icon: <Plus className="w-5 h-5" />,
+                    }
+                    : undefined
+            }
+            hint={isActive ? "Keep it friendly, keep it fun" : undefined}
+            variant={isActive ? 'default' : 'compact'}
+        />
+    );
+}
+
+/**
+ * No Messages Yet
+ * Social/chat empty state
+ */
+export function NoMessagesEmpty({
+    onStartChat,
+}: {
+    onStartChat?: () => void;
+}) {
+    return (
+        <EmptyStatePremium
+            illustration="golfers"
+            title="The 19th hole awaits"
+            description="Start the conversation! Talk smack, celebrate big shots, and keep the banter going."
+            features={[
+                { icon: <MessageCircle className="w-3 h-3" />, text: 'Team trash talk' },
+                { icon: <Sparkles className="w-3 h-3" />, text: 'React to big moments' },
+                { icon: <Trophy className="w-3 h-3" />, text: 'Celebrate victories' },
+            ]}
+            action={
+                onStartChat
+                    ? {
+                        label: 'Start Talking',
+                        onClick: onStartChat,
+                        icon: <MessageCircle className="w-5 h-5" />,
+                    }
+                    : undefined
+            }
+            hint="What happens on the course, stays on the app"
+        />
+    );
+}
+
+/**
+ * No Photos Yet
+ * Photo gallery empty state
+ */
+export function NoPhotosEmpty({
+    onUploadPhoto,
+}: {
+    onUploadPhoto?: () => void;
+}) {
+    return (
+        <EmptyStatePremium
+            illustration="celebration"
+            title="Capture the memories"
+            description="Upload photos from your golf trip. Great shots, funny moments, and everything in between!"
+            features={[
+                { icon: <Camera className="w-3 h-3" />, text: 'Share course photos' },
+                { icon: <Users className="w-3 h-3" />, text: 'Team moments' },
+                { icon: <Trophy className="w-3 h-3" />, text: 'Victory celebrations' },
+            ]}
+            action={
+                onUploadPhoto
+                    ? {
+                        label: 'Upload Photo',
+                        onClick: onUploadPhoto,
+                        icon: <Camera className="w-5 h-5" />,
+                    }
+                    : undefined
+            }
+            hint="Every great trip deserves great photos"
+        />
+    );
+}
+
+/**
+ * No Activity Yet
+ * Activity feed empty state
+ */
+export function NoActivityEmpty() {
+    return (
+        <EmptyStatePremium
+            illustration="golf-ball"
+            title="Activity starts here"
+            description="As scores are recorded and matches progress, live updates will appear here."
+            variant="compact"
+            hint="Play a hole to see it come alive"
+        />
+    );
+}
+
+/**
+ * Loading State
+ * While content is being fetched
+ */
+export function LoadingEmpty({
+    message,
+}: {
+    message?: string;
+}) {
+    return (
+        <EmptyStatePremium
+            illustration="swing"
+            title={message || "Loading..."}
+            description="Getting everything ready for you."
+            variant="compact"
+            animated={true}
         />
     );
 }

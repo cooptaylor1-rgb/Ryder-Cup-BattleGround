@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
+import { NoBetsEmpty } from '@/components/ui';
 import type { Player } from '@/lib/types/models';
 import {
   ChevronLeft,
@@ -14,7 +15,6 @@ import {
   MoreHorizontal,
   DollarSign,
   Zap,
-  MapPin,
   TrendingUp,
   Plus,
   ChevronRight,
@@ -224,17 +224,7 @@ export default function BetsPage() {
 
         {/* Empty State */}
         {(selectedTab === 'active' ? activeBets : completedBets).length === 0 && (
-          <div className="text-center py-12">
-            <DollarSign size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">
-              {selectedTab === 'active' ? 'No active bets' : 'No completed bets'}
-            </p>
-            <p className="type-caption mt-2">
-              {selectedTab === 'active'
-                ? 'Add a side bet to make things interesting!'
-                : 'Completed bets will show up here'}
-            </p>
-          </div>
+          <NoBetsEmpty isActive={selectedTab === 'active'} />
         )}
 
         {/* Quick Add Section */}

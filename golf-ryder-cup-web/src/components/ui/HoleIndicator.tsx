@@ -27,10 +27,12 @@ export function HoleIndicator({
     onClick,
     size = 'md',
 }: HoleIndicatorProps) {
+    // WCAG 2.2 compliant touch targets (minimum 44x44px)
+    // Inner circle may be smaller, but hit area is always >= 44px
     const sizeClasses = {
-        sm: 'w-7 h-7 text-xs',
-        md: 'w-9 h-9 text-sm',
-        lg: 'w-11 h-11 text-base',
+        sm: 'min-w-[44px] min-h-[44px] w-8 h-8 text-xs',
+        md: 'min-w-[44px] min-h-[44px] w-10 h-10 text-sm',
+        lg: 'min-w-[48px] min-h-[48px] w-12 h-12 text-base',
     };
 
     const getWinnerClasses = () => {
@@ -54,12 +56,14 @@ export function HoleIndicator({
             className={cn(
                 'hole-indicator',
                 'flex flex-col items-center justify-center',
-                'rounded-lg font-medium',
-                'transition-all duration-150',
+                'rounded-xl font-medium',
+                'transition-transform duration-150 ease-out',
                 sizeClasses[size],
                 getWinnerClasses(),
                 isCurrentHole && 'ring-2 ring-augusta-green ring-offset-2',
-                onClick && 'cursor-pointer hover:opacity-90 active:scale-95',
+                // Enhanced interaction feedback
+                onClick && 'cursor-pointer hover:scale-105 active:scale-95',
+                onClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2',
                 !onClick && 'cursor-default'
             )}
             aria-label={`Hole ${holeNumber}${par ? `, Par ${par}` : ''}${winner !== 'none' ? `, ${winner === 'halved' ? 'Halved' : `Won by ${winner}`}` : ''
