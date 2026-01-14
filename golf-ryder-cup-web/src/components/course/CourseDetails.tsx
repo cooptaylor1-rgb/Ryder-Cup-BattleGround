@@ -7,6 +7,8 @@
  * - Weather conditions
  * - Hole-by-hole data
  * - Course map
+ *
+ * @version 1.0.1
  */
 
 'use client';
