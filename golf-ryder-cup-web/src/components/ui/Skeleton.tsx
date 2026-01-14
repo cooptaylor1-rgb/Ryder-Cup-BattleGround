@@ -171,4 +171,211 @@ export function SessionCardSkeleton() {
   );
 }
 
+// Live Match Card Skeleton (for jumbotron view)
+export function LiveMatchCardSkeleton() {
+  return (
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}
+    >
+      {/* Header */}
+      <div
+        className="px-4 py-2 flex items-center justify-between"
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
+
+      {/* Teams */}
+      <div className="p-4 space-y-2">
+        <div className="flex items-center justify-between py-3 px-4 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between py-3 px-4 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div className="px-4 pb-4">
+        <div className="flex gap-1">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <Skeleton key={i} className="h-1 flex-1 rounded-full" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Achievement Card Skeleton
+export function AchievementCardSkeleton() {
+  return (
+    <div
+      className="p-4 rounded-xl"
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--rule)',
+      }}
+    >
+      <Skeleton className="absolute top-2 right-2 h-4 w-12 rounded-full" />
+      <Skeleton className="w-12 h-12 rounded-xl mb-3" />
+      <Skeleton className="h-4 w-20 mb-1" />
+      <Skeleton className="h-3 w-full" />
+    </div>
+  );
+}
+
+// Side Bet Card Skeleton
+export function BetCardSkeleton() {
+  return (
+    <div
+      className="p-4 rounded-xl"
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--rule)',
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <Skeleton className="w-10 h-10 rounded-lg" />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-5 w-12" />
+          </div>
+          <Skeleton className="h-3 w-40 mt-2" />
+          <Skeleton className="h-3 w-20 mt-2" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Comment/Social Card Skeleton
+export function CommentCardSkeleton() {
+  return (
+    <div
+      className="p-4 rounded-xl"
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--rule)',
+      }}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <Skeleton className="w-10 h-10 rounded-full" />
+        <div className="flex-1">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-16 mt-1" />
+        </div>
+      </div>
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4 mt-2" />
+      <div className="flex gap-2 mt-3">
+        <Skeleton className="h-6 w-12 rounded-full" />
+        <Skeleton className="h-6 w-12 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
+// Photo Grid Skeleton
+export function PhotoGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {Array.from({ length: count }).map((_, i) => (
+        <Skeleton key={i} className="aspect-square rounded-lg" />
+      ))}
+    </div>
+  );
+}
+
+// Weather Widget Skeleton
+export function WeatherWidgetSkeleton() {
+  return (
+    <div
+      className="p-4 rounded-xl"
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--rule)',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <Skeleton className="w-12 h-12 rounded-full" />
+        <div className="flex-1">
+          <Skeleton className="h-6 w-16" />
+          <Skeleton className="h-3 w-32 mt-1" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Home Dashboard Skeleton
+export function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="text-center">
+            <Skeleton className="w-12 h-12 rounded-xl mx-auto" />
+            <Skeleton className="h-3 w-12 mx-auto mt-2" />
+          </div>
+        ))}
+      </div>
+
+      {/* Weather */}
+      <WeatherWidgetSkeleton />
+
+      {/* Standings */}
+      <StandingsCardSkeleton />
+
+      {/* Sessions */}
+      <div className="space-y-3">
+        <SessionCardSkeleton />
+        <SessionCardSkeleton />
+      </div>
+    </div>
+  );
+}
+
+// Full Page Skeleton with optional header
+export function PageSkeleton({
+  showHeader = true,
+  children,
+}: {
+  showHeader?: boolean;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen" style={{ background: 'var(--canvas)' }}>
+      {showHeader && (
+        <div
+          className="h-14 px-4 flex items-center gap-3"
+          style={{
+            background: 'var(--surface)',
+            borderBottom: '1px solid var(--rule)',
+          }}
+        >
+          <Skeleton className="w-8 h-8 rounded-lg" />
+          <Skeleton className="h-5 w-32" />
+        </div>
+      )}
+      <div className="p-4">
+        {children || <DashboardSkeleton />}
+      </div>
+    </div>
+  );
+}
+
 export default Skeleton;

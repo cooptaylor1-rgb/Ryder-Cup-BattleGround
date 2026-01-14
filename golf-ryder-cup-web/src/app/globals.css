@@ -1506,6 +1506,49 @@ a,
   }
 }
 
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* ---- CANVAS (Dark) ---- */
+    --canvas: #0F0D0A;
+    --canvas-raised: #1A1814;
+    --canvas-sunken: #0A0908;
+    --canvas-warm: #151310;
+
+    /* ---- INK (Dark) ---- */
+    --ink: #F5F1E8;
+    --ink-secondary: #B8B0A0;
+    --ink-tertiary: #807868;
+    --ink-faint: #3A3530;
+
+    /* ---- RULE (Dark) ---- */
+    --rule: #3A3530;
+    --rule-strong: #4A4540;
+    --rule-faint: #2A2520;
+
+    /* ---- SURFACE (for components) ---- */
+    --surface: #1A1814;
+    --surface-base: #0F0D0A;
+    --surface-elevated: #1E1C18;
+    --surface-muted: #151310;
+    --border-subtle: rgba(58, 53, 48, 0.5);
+
+    /* ---- SHADOWS (Dark) ---- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Light theme surface aliases */
+:root {
+  --surface: var(--canvas-raised);
+  --surface-base: var(--canvas);
+  --surface-elevated: var(--canvas-raised);
+  --surface-muted: var(--canvas-sunken);
+  --border-subtle: var(--rule);
+}
+
 /* ============================================
    LIVE INDICATOR
    ============================================ */

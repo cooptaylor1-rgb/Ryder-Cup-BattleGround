@@ -1,15 +1,16 @@
 /**
  * Layout Components barrel export
+ *
+ * Consolidated layout components - world-class quality.
  */
 
-// Legacy components (for backwards compatibility during migration)
-export { BottomNav } from './BottomNav';
-export { Header } from './Header';
+// Core layout components
 export { AppShell } from './AppShell';
-
-// New enhanced components
-export { AppShellNew } from './AppShellNew';
-export { HeaderNew } from './HeaderNew';
-export { BottomNavNew } from './BottomNavNew';
+export { Header } from './Header';
+export { BottomNav } from './BottomNav';
 export { SidebarNav } from './SidebarNav';
 
+// Legacy aliases for backwards compatibility
+export { AppShell as AppShellNew } from './AppShell';
+export { Header as HeaderNew } from './Header';
+export { BottomNav as BottomNavNew } from './BottomNav';
