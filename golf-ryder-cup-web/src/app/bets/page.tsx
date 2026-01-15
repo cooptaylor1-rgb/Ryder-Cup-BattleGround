@@ -21,6 +21,7 @@ import {
   Check,
   Clock,
   Crown,
+  CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -263,6 +264,10 @@ export default function BetsPage() {
         <Link href="/" className="nav-item">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
+        </Link>
+        <Link href="/schedule" className="nav-item">
+          <CalendarDays size={22} strokeWidth={1.75} />
+          <span>Schedule</span>
         </Link>
         <Link href="/score" className="nav-item">
           <Target size={22} strokeWidth={1.75} />

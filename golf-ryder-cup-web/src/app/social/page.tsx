@@ -18,6 +18,7 @@ import {
   Smile,
   Image,
   Flame,
+  CalendarDays,
 } from 'lucide-react';
 import type { Player } from '@/lib/types/models';
 
@@ -221,6 +222,10 @@ export default function SocialPage() {
         <Link href="/" className="nav-item">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
+        </Link>
+        <Link href="/schedule" className="nav-item">
+          <CalendarDays size={22} strokeWidth={1.75} />
+          <span>Schedule</span>
         </Link>
         <Link href="/score" className="nav-item">
           <Target size={22} strokeWidth={1.75} />

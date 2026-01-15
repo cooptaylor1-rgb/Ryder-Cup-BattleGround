@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { formatPlayerName } from '@/lib/utils';
-import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal, CalendarDays } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 import { NoScoresPremiumEmpty } from '@/components/ui';
@@ -197,6 +197,10 @@ export default function ScorePage() {
                 <Link href="/" className="nav-item">
                     <Home size={22} strokeWidth={1.75} />
                     <span>Home</span>
+                </Link>
+                <Link href="/schedule" className="nav-item">
+                    <CalendarDays size={22} strokeWidth={1.75} />
+                    <span>Schedule</span>
                 </Link>
                 <Link href="/score" className="nav-item nav-item-active">
                     <Target size={22} strokeWidth={1.75} />

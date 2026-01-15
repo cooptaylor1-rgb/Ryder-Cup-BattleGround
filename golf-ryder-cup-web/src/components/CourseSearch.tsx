@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Search, MapPin, Loader2, ChevronRight, Database, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -9,7 +9,7 @@ import {
     formatCourseLocation,
     getAllTees,
     convertAPITeeToTeeSet,
-    isGolfCourseAPIConfigured,
+    checkGolfCourseAPIConfigured,
     type GolfCourseAPICourse,
     type GolfCourseAPITee,
 } from '@/lib/services/golfCourseAPIService';
@@ -39,8 +39,20 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     const [selectedCourse, setSelectedCourse] = useState<GolfCourseAPICourse | null>(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
+    const [isCheckingConfig, setIsCheckingConfig] = useState(true);
 
-    const isConfigured = isGolfCourseAPIConfigured();
+    // Check if API is configured on mount
+    useEffect(() => {
+        checkGolfCourseAPIConfigured()
+            .then(configured => {
+                setIsConfigured(configured);
+            })
+            .catch(() => {
+                setIsConfigured(false);
+            })
+            .finally(() => setIsCheckingConfig(false));
+    }, []);
 
     const handleSearch = useCallback(async () => {
         if (!query.trim() || query.trim().length < 2) {
@@ -95,13 +107,23 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
         });
     };
 
-    if (!isConfigured) {
+    // Show loading state while checking configuration
+    if (isCheckingConfig) {
+        return (
+            <div className="p-6 text-center">
+                <Loader2 className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin" />
+                <p className="text-sm text-gray-500">Checking course database...</p>
+            </div>
+        );
+    }
+
+    if (isConfigured === false) {
         return (
             <div className="p-6 text-center">
                 <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Course Database Not Configured</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Course Database Not Configured</h3>
                 <p className="text-sm text-gray-500 mb-4">
-                    Set the <code className="bg-gray-100 px-1 rounded">NEXT_PUBLIC_GOLF_COURSE_API_KEY</code> environment variable to enable course search.
+                    Set the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">GOLF_COURSE_API_KEY</code> environment variable to enable course search.
                 </p>
                 {onClose && (
                     <button

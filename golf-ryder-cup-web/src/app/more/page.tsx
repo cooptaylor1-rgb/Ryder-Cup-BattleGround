@@ -24,6 +24,7 @@ import {
     X,
     User,
     LogIn,
+    CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -193,6 +194,18 @@ export default function MorePage() {
                         </div>
                         <Toggle enabled={isCaptainMode} />
                     </button>
+
+                    {/* Captain Command Center Link */}
+                    {isCaptainMode && currentTrip && (
+                        <Link href="/captain" className="match-row mt-2">
+                            <Shield size={18} style={{ color: 'var(--masters)' }} />
+                            <div className="flex-1">
+                                <p style={{ fontWeight: 500 }}>Captain Command Center</p>
+                                <p className="type-meta">Manage lineups, attendance, and more</p>
+                            </div>
+                            <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                        </Link>
+                    )}
                 </section>
 
                 <hr className="divider" />
@@ -322,6 +335,10 @@ export default function MorePage() {
                 <Link href="/" className="nav-item">
                     <Home size={20} />
                     <span>Home</span>
+                </Link>
+                <Link href="/schedule" className="nav-item">
+                    <CalendarDays size={20} />
+                    <span>Schedule</span>
                 </Link>
                 <Link href="/score" className="nav-item">
                     <Target size={20} />
