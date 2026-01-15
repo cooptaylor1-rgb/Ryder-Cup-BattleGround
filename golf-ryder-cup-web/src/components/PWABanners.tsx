@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePWA } from './PWAProvider';
 
 /**
@@ -8,6 +9,7 @@ import { usePWA } from './PWAProvider';
  */
 export function PWABanners() {
     const { isOnline, hasUpdate, updateApp } = usePWA();
+    const [isDismissed, setIsDismissed] = useState(false);
 
     return (
         <>
@@ -26,7 +28,7 @@ export function PWABanners() {
             )}
 
             {/* Update Available Banner */}
-            {hasUpdate && (
+            {hasUpdate && !isDismissed && (
                 <div className="fixed bottom-20 left-4 right-4 z-50 sm:left-auto sm:right-4 sm:w-80">
                     <div className="bg-augusta-green text-white rounded-lg shadow-lg p-4">
                         <div className="flex items-start gap-3">
@@ -50,7 +52,7 @@ export function PWABanners() {
                                         Update Now
                                     </button>
                                     <button
-                                        onClick={() => { }} // TODO: Add dismiss functionality
+                                        onClick={() => setIsDismissed(true)}
                                         className="text-white/80 px-3 py-1.5 rounded text-sm hover:text-white transition-colors"
                                     >
                                         Later
