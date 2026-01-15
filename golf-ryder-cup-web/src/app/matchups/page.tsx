@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
-import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft } from 'lucide-react';
+import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft, CalendarDays } from 'lucide-react';
 import { NoSessionsPremiumEmpty } from '@/components/ui';
 
 /**
@@ -263,13 +263,13 @@ export default function MatchupsPage() {
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
+        <Link href="/schedule" className="nav-item">
+          <CalendarDays size={22} strokeWidth={1.75} />
+          <span>Schedule</span>
+        </Link>
         <Link href="/score" className="nav-item">
           <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item nav-item-active">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
         </Link>
         <Link href="/standings" className="nav-item">
           <Trophy size={22} strokeWidth={1.75} />

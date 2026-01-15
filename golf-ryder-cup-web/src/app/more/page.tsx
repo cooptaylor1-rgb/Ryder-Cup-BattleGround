@@ -24,6 +24,7 @@ import {
     X,
     User,
     LogIn,
+    CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -323,13 +324,13 @@ export default function MorePage() {
                     <Home size={20} />
                     <span>Home</span>
                 </Link>
+                <Link href="/schedule" className="nav-item">
+                    <CalendarDays size={20} />
+                    <span>Schedule</span>
+                </Link>
                 <Link href="/score" className="nav-item">
                     <Target size={20} />
                     <span>Score</span>
-                </Link>
-                <Link href="/matchups" className="nav-item">
-                    <Users size={20} />
-                    <span>Matches</span>
                 </Link>
                 <Link href="/standings" className="nav-item">
                     <Trophy size={20} />

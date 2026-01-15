@@ -21,6 +21,7 @@ import {
   MessageCircle,
   Grid,
   LayoutGrid,
+  CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -280,13 +281,13 @@ export default function PhotosPage() {
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
+        <Link href="/schedule" className="nav-item">
+          <CalendarDays size={22} strokeWidth={1.75} />
+          <span>Schedule</span>
+        </Link>
         <Link href="/score" className="nav-item">
           <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
         </Link>
         <Link href="/standings" className="nav-item">
           <Trophy size={22} strokeWidth={1.75} />

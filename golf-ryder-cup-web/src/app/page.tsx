@@ -125,7 +125,7 @@ export default function HomePage() {
 
   // Navigation badges
   const navBadges: NavBadges = {
-    matches: liveMatchesCount > 0 ? liveMatchesCount : undefined,
+    score: liveMatchesCount > 0 ? liveMatchesCount : undefined,
   };
 
   return (

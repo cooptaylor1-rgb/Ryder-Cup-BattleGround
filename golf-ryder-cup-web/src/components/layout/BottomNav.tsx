@@ -18,32 +18,32 @@ import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import {
   Target,
-  Users,
   Trophy,
   Home,
   Settings,
   Shield,
+  CalendarDays,
 } from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  badgeKey?: 'home' | 'score' | 'matches' | 'standings' | 'more';
+  badgeKey?: 'home' | 'schedule' | 'score' | 'standings' | 'more';
 }
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home, badgeKey: 'home' },
+  { href: '/schedule', label: 'Schedule', icon: CalendarDays, badgeKey: 'schedule' },
   { href: '/score', label: 'Score', icon: Target, badgeKey: 'score' },
-  { href: '/matchups', label: 'Matches', icon: Users, badgeKey: 'matches' },
   { href: '/standings', label: 'Standings', icon: Trophy, badgeKey: 'standings' },
   { href: '/more', label: 'More', icon: Settings, badgeKey: 'more' },
 ];
 
 export interface NavBadges {
   home?: number;
+  schedule?: number;
   score?: number;
-  matches?: number;
   standings?: number;
   more?: number;
 }

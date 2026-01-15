@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
 import { calculateTeamStandings, calculateMagicNumber, calculatePlayerLeaderboard } from '@/lib/services/tournamentEngine';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
-import { Trophy, Home, Target, Users, MoreHorizontal, ChevronLeft } from 'lucide-react';
+import { Trophy, Home, Target, Users, MoreHorizontal, ChevronLeft, CalendarDays } from 'lucide-react';
 import { NoStandingsPremiumEmpty } from '@/components/ui';
 
 /**
@@ -244,13 +244,13 @@ export default function StandingsPage() {
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
+        <Link href="/schedule" className="nav-item">
+          <CalendarDays size={22} strokeWidth={1.75} />
+          <span>Schedule</span>
+        </Link>
         <Link href="/score" className="nav-item">
           <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
         </Link>
         <Link href="/standings" className="nav-item nav-item-active">
           <Trophy size={22} strokeWidth={1.75} />
