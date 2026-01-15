@@ -400,7 +400,7 @@ export function LineupCanvas({
         const player = event.active.data.current?.player as PlayerCardData;
         if (player) {
             setActivePlayer(player);
-            haptic.selection();
+            haptic.select();
         }
     }, [haptic]);
 

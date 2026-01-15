@@ -112,7 +112,7 @@ export function HoleMiniMap({
 
     // Handle hole tap
     const handleHoleTap = useCallback((holeNumber: number) => {
-        haptic.selection();
+        haptic.select();
         onHoleSelect(holeNumber);
     }, [haptic, onHoleSelect]);
 
@@ -456,7 +456,7 @@ export function HoleMiniMapInline({
                     <button
                         key={hole}
                         onClick={() => {
-                            haptic.selection();
+                            haptic.select();
                             onHoleSelect(hole);
                         }}
                         className={`

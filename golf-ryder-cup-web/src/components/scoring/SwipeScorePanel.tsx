@@ -122,7 +122,7 @@ export function SwipeScorePanel({
                 if (gestureState !== newState) {
                     setGestureState(newState);
                     if (!hasTriggeredHaptic) {
-                        haptic.selection();
+                        haptic.select();
                         setHasTriggeredHaptic(true);
                     }
                 }
@@ -130,7 +130,7 @@ export function SwipeScorePanel({
                 if (gestureState !== 'halved') {
                     setGestureState('halved');
                     if (!hasTriggeredHaptic) {
-                        haptic.selection();
+                        haptic.select();
                         setHasTriggeredHaptic(true);
                     }
                 }
