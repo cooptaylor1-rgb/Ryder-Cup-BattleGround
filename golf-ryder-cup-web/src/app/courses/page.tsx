@@ -325,24 +325,32 @@ export default function CourseLibraryPage() {
                 {/* Featured: Scan Scorecard with AI */}
                 <button
                     onClick={() => setShowScorecardUpload(true)}
-                    className="w-full p-4 rounded-xl text-left transition-all hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
-                    style={{ background: 'linear-gradient(to right, #006747, #006747cc)' }}
+                    className="w-full p-4 rounded-xl border-2 border-dashed transition-all hover:border-[var(--masters)] hover:bg-[var(--masters-soft)]"
+                    style={{
+                        borderColor: 'var(--masters)',
+                        background: 'linear-gradient(135deg, var(--masters-soft) 0%, transparent 100%)',
+                    }}
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <Camera className="w-6 h-6 text-white" />
+                    <div className="flex items-center justify-center gap-3">
+                        <div
+                            className="flex items-center justify-center flex-shrink-0"
+                            style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: 'var(--radius-lg)',
+                                background: 'var(--masters)',
+                            }}
+                        >
+                            <Camera size={24} style={{ color: 'var(--color-accent)' }} />
                         </div>
-                        <div className="flex-1">
+                        <div className="text-left">
                             <div className="flex items-center gap-2">
-                                <span className="font-semibold text-white text-lg">Scan Scorecard</span>
-                                <span className="flex items-center gap-1 px-2 py-0.5 bg-white/20 rounded-full text-xs text-white/90">
-                                    <Sparkles className="w-3 h-3" />
-                                    AI
-                                </span>
+                                <span className="type-title-sm">Scan Scorecard</span>
+                                <Sparkles size={14} style={{ color: 'var(--masters)' }} />
                             </div>
-                            <div className="text-sm text-white/80 mt-1">
-                                Take a photo of any scorecard to auto-fill course data
-                            </div>
+                            <p className="type-caption" style={{ color: 'var(--ink-secondary)' }}>
+                                Upload a photo or PDF to auto-fill hole data
+                            </p>
                         </div>
                     </div>
                 </button>

@@ -523,8 +523,8 @@ function MatchEditor({ match, players, getPlayerNames, isEditing, onEdit, onSave
                     <Hash size={14} style={{ color: 'var(--ink-tertiary)' }} />
                     <span className="type-meta" style={{ fontWeight: 600 }}>Match {match.matchOrder}</span>
                     <span className={`type-micro px-2 py-0.5 rounded-full ${match.status === 'completed' ? 'bg-green-500/20 text-green-600' :
-                            match.status === 'inProgress' ? 'bg-amber-500/20 text-amber-600' :
-                                'bg-gray-500/20 text-gray-500'
+                        match.status === 'inProgress' ? 'bg-amber-500/20 text-amber-600' :
+                            'bg-gray-500/20 text-gray-500'
                         }`}>
                         {match.status}
                     </span>
