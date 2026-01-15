@@ -57,7 +57,6 @@ export {
 export {
   useOfflineQueue,
   type QueuedAction,
-  type QueueStatus,
 } from './useOfflineQueue';
 
 // Trip data management
