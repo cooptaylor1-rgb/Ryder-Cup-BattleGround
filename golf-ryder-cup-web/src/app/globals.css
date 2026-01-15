@@ -2197,36 +2197,89 @@ a,
 
 /* Manual dark mode class support */
 .dark {
-  /* ---- CANVAS (Dark) ---- */
-  --canvas: #0F0D0A;
-  --canvas-raised: #1A1814;
-  --canvas-sunken: #0A0908;
-  --canvas-warm: #151310;
+  /* ---- CANVAS (Dark) ----
+     Rich, warm dark tones - not pure black */
+  --canvas: #0D0B08;
+  --canvas-raised: #181512;
+  --canvas-sunken: #080706;
+  --canvas-warm: #121010;
 
   /* ---- INK (Dark) ----
-     WCAG AA compliant text colors */
-  --ink: #F5F1E8;
-  --ink-secondary: #D0C8B8;
-  --ink-tertiary: #A09888;
-  --ink-faint: #4A4540;
+     WCAG AAA compliant text colors for readability */
+  --ink: #F8F5EE;
+  --ink-secondary: #D8D0C0;
+  --ink-tertiary: #A8A090;
+  --ink-faint: #504840;
 
   /* ---- RULE (Dark) ---- */
-  --rule: #3A3530;
-  --rule-strong: #5A5550;
-  --rule-faint: #2A2520;
+  --rule: #383330;
+  --rule-strong: #585550;
+  --rule-faint: #282520;
 
   /* ---- SURFACE (for components) ---- */
-  --surface: #1A1814;
-  --surface-base: #0F0D0A;
-  --surface-elevated: #1E1C18;
-  --surface-muted: #151310;
-  --surface-highlight: #252320;
-  --border-subtle: rgba(90, 85, 80, 0.5);
+  --surface: #181512;
+  --surface-base: #0D0B08;
+  --surface-elevated: #1C1A16;
+  --surface-muted: #141210;
+  --surface-highlight: #282520;
+  --border-subtle: rgba(100, 95, 85, 0.4);
 
   /* ---- SHADOWS (Dark) ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-card-sm: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --shadow-card-md: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-card-lg: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* ---- TEAM USA (Dark Mode) ----
+     Rich navy with vibrant contrast */
+  --team-usa: #3B6A9E;
+  --team-usa-deep: #1E3A5F;
+  --team-usa-light: rgba(59, 106, 158, 0.18);
+  --team-usa-muted: #5A8ABE;
+  --team-usa-glow: rgba(59, 106, 158, 0.35);
+  --team-usa-gradient-start: #2A5080;
+  --team-usa-gradient-end: #3B6A9E;
+  --team-usa-accent: #FFD54F;
+
+  /* ---- TEAM EUROPE (Dark Mode) ----
+     Rich burgundy with warm presence */
+  --team-europe: #A24858;
+  --team-europe-deep: #722F37;
+  --team-europe-light: rgba(162, 72, 88, 0.18);
+  --team-europe-muted: #C06878;
+  --team-europe-glow: rgba(162, 72, 88, 0.35);
+  --team-europe-gradient-start: #8A3A48;
+  --team-europe-gradient-end: #A24858;
+  --team-europe-accent: #FFD54F;
+
+  /* ---- MASTERS GREEN (Dark Mode) ----
+     Vibrant green that pops on dark backgrounds */
+  --masters: #00B87A;
+  --masters-hover: #00D88E;
+  --masters-subtle: rgba(0, 184, 122, 0.12);
+  --masters-glow: rgba(0, 184, 122, 0.25);
+  --masters-deep: #008855;
+  --masters-muted: rgba(0, 184, 122, 0.18);
+
+  /* ---- GOLD ACCENT (Dark Mode) ----
+     Bright, premium gold for dark surfaces */
+  --color-accent: #FFD54F;
+  --color-accent-subtle: rgba(255, 213, 79, 0.15);
+
+  /* ---- STATUS COLORS (Dark Mode) ---- */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+
+  /* ---- PREMIUM GLOW EFFECTS ----
+     Subtle luminous glows for depth */
+  --shadow-glow-green: 0 0 24px rgba(0, 184, 122, 0.35), 0 0 48px rgba(0, 184, 122, 0.15);
+  --shadow-glow-gold: 0 0 24px rgba(255, 213, 79, 0.3), 0 0 48px rgba(255, 213, 79, 0.12);
+  --shadow-glow-usa: 0 0 24px rgba(59, 106, 158, 0.4), 0 0 48px rgba(59, 106, 158, 0.15);
+  --shadow-glow-europe: 0 0 24px rgba(162, 72, 88, 0.4), 0 0 48px rgba(162, 72, 88, 0.15);
+  --shadow-glow-masters: 0 0 0 3px rgba(0, 184, 122, 0.2);
 }
 
 /* Light theme surface aliases */
@@ -2236,6 +2289,261 @@ a,
   --surface-elevated: var(--canvas-raised);
   --surface-muted: var(--canvas-sunken);
   --border-subtle: var(--rule);
+}
+
+/* ============================================
+   DARK MODE COMPONENT OVERRIDES
+
+   Premium dark mode styling for all components.
+   Rich, luxurious feel with excellent contrast.
+   ============================================ */
+
+/* ---- DARK MODE CARDS ----
+   Elevated surfaces with subtle inner light */
+.dark .card {
+  background: var(--canvas-raised);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-card-md);
+}
+
+.dark .card-elevated {
+  background: var(--surface-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-card-lg);
+}
+
+/* ---- DARK MODE SCORE CARDS ----
+   Team-colored score displays with depth */
+.dark .score-vs-usa {
+  background: linear-gradient(180deg,
+    rgba(59, 106, 158, 0.25) 0%,
+    rgba(59, 106, 158, 0.08) 100%);
+  border: 1px solid rgba(59, 106, 158, 0.3);
+}
+
+.dark .score-vs-usa.leading {
+  background: linear-gradient(180deg,
+    rgba(59, 106, 158, 0.35) 0%,
+    rgba(59, 106, 158, 0.12) 100%);
+  border-color: rgba(59, 106, 158, 0.5);
+  box-shadow: var(--shadow-glow-usa);
+}
+
+.dark .score-vs-europe {
+  background: linear-gradient(180deg,
+    rgba(162, 72, 88, 0.25) 0%,
+    rgba(162, 72, 88, 0.08) 100%);
+  border: 1px solid rgba(162, 72, 88, 0.3);
+}
+
+.dark .score-vs-europe.leading {
+  background: linear-gradient(180deg,
+    rgba(162, 72, 88, 0.35) 0%,
+    rgba(162, 72, 88, 0.12) 100%);
+  border-color: rgba(162, 72, 88, 0.5);
+  box-shadow: var(--shadow-glow-europe);
+}
+
+/* ---- DARK MODE TEAM SCORE BLOCKS ---- */
+.dark .team-score-block {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark .team-score-usa {
+  background: linear-gradient(135deg,
+    rgba(59, 106, 158, 0.22) 0%,
+    rgba(30, 58, 95, 0.12) 100%);
+}
+
+.dark .team-score-europe {
+  background: linear-gradient(135deg,
+    rgba(162, 72, 88, 0.22) 0%,
+    rgba(114, 47, 55, 0.12) 100%);
+}
+
+.dark .team-score-leading {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dark .team-score-usa.team-score-leading {
+  box-shadow: var(--shadow-glow-usa);
+}
+
+.dark .team-score-europe.team-score-leading {
+  box-shadow: var(--shadow-glow-europe);
+}
+
+/* ---- DARK MODE TEAM BADGES ---- */
+.dark .team-badge-usa {
+  background: rgba(59, 106, 158, 0.2);
+  color: #6B9BD2;
+  border: 1px solid rgba(59, 106, 158, 0.3);
+}
+
+.dark .team-badge-europe {
+  background: rgba(162, 72, 88, 0.2);
+  color: #D0808F;
+  border: 1px solid rgba(162, 72, 88, 0.3);
+}
+
+.dark .team-badge-solid-usa {
+  background: var(--team-usa);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 106, 158, 0.3);
+}
+
+.dark .team-badge-solid-europe {
+  background: var(--team-europe);
+  color: white;
+  box-shadow: 0 2px 8px rgba(162, 72, 88, 0.3);
+}
+
+/* ---- DARK MODE TEAM BACKGROUNDS ---- */
+.dark .team-bg-usa {
+  background: linear-gradient(135deg,
+    rgba(59, 106, 158, 0.15) 0%,
+    var(--canvas) 100%);
+}
+
+.dark .team-bg-europe {
+  background: linear-gradient(135deg,
+    rgba(162, 72, 88, 0.15) 0%,
+    var(--canvas) 100%);
+}
+
+/* ---- DARK MODE BUTTONS ---- */
+.dark .btn-premium {
+  background: linear-gradient(180deg, var(--masters) 0%, var(--masters-deep) 100%);
+  box-shadow: 0 2px 8px rgba(0, 184, 122, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .btn-premium:hover {
+  background: linear-gradient(180deg, var(--masters-hover) 0%, var(--masters) 100%);
+  box-shadow: var(--shadow-glow-green);
+}
+
+.dark .btn-secondary {
+  background: var(--canvas-raised);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+}
+
+.dark .btn-secondary:hover {
+  background: var(--surface-highlight);
+  border-color: var(--rule-strong);
+}
+
+/* ---- DARK MODE INPUTS ---- */
+.dark .input {
+  background: var(--canvas-sunken);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+}
+
+.dark .input:focus {
+  border-color: var(--masters);
+  box-shadow: 0 0 0 3px rgba(0, 184, 122, 0.15);
+}
+
+.dark .input::placeholder {
+  color: var(--ink-tertiary);
+}
+
+/* ---- DARK MODE NAVIGATION ---- */
+.dark .nav-premium {
+  background: rgba(13, 11, 8, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .nav-item {
+  color: var(--ink-tertiary);
+}
+
+.dark .nav-item:hover,
+.dark .nav-item.active {
+  color: var(--masters);
+}
+
+/* ---- DARK MODE HEADER ---- */
+.dark .header-premium {
+  background: rgba(13, 11, 8, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ---- DARK MODE MATCH ROWS ---- */
+.dark .match-row {
+  background: var(--canvas-raised);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark .match-row:hover {
+  background: var(--surface-highlight);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- DARK MODE TEAM ROW HOVER ---- */
+.dark .team-row-usa:hover {
+  background: rgba(59, 106, 158, 0.15);
+}
+
+.dark .team-row-europe:hover {
+  background: rgba(162, 72, 88, 0.15);
+}
+
+/* ---- DARK MODE PROGRESS BAR ---- */
+.dark .progress-premium-track {
+  background: var(--canvas-sunken);
+}
+
+.dark .progress-premium-fill.team-usa {
+  background: linear-gradient(90deg, var(--team-usa) 0%, var(--team-usa-muted) 100%);
+  box-shadow: 0 0 12px rgba(59, 106, 158, 0.4);
+}
+
+.dark .progress-premium-fill.team-europe {
+  background: linear-gradient(90deg, var(--team-europe) 0%, var(--team-europe-muted) 100%);
+  box-shadow: 0 0 12px rgba(162, 72, 88, 0.4);
+}
+
+/* ---- DARK MODE HOLE DOTS ---- */
+.dark .hole-dot.team-usa-win {
+  background: var(--team-usa);
+  box-shadow: 0 0 8px var(--team-usa-glow);
+}
+
+.dark .hole-dot.team-europe-win {
+  background: var(--team-europe);
+  box-shadow: 0 0 8px var(--team-europe-glow);
+}
+
+/* ---- DARK MODE STANDINGS ---- */
+.dark .standings-score.team-usa {
+  color: #6B9BD2;
+}
+
+.dark .standings-score.team-europe {
+  color: #D0808F;
+}
+
+/* ---- DARK MODE DIVIDERS ---- */
+.dark .divider {
+  border-color: var(--rule-faint);
+}
+
+.dark hr {
+  border-color: var(--rule-faint);
+}
+
+/* ---- DARK MODE TOAST NOTIFICATIONS ---- */
+.dark .toast {
+  background: var(--surface-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ============================================
