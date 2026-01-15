@@ -118,10 +118,25 @@ export default function HomePage() {
   const hasTrips = trips && trips.length > 0;
   const pastTrips = trips?.filter(t => t.id !== activeTrip?.id) || [];
 
-  // Mock data for demo - replace with real data
-  const liveMatchesCount = 3;
-  const recentPhotosCount = 12;
-  const unreadMessages = 5;
+  // Get real live match count from database
+  const liveMatches = useLiveQuery(async () => {
+    if (!activeTrip) return [];
+    const sessions = await db.sessions.where('tripId').equals(activeTrip.id).toArray();
+    const sessionIds = sessions.map(s => s.id);
+    if (sessionIds.length === 0) return [];
+    return db.matches.where('sessionId').anyOf(sessionIds).and(m => m.status === 'inProgress').toArray();
+  }, [activeTrip?.id]);
+
+  // Get real banter/social counts
+  const banterPosts = useLiveQuery(async () => {
+    if (!activeTrip) return [];
+    return db.banterPosts.where('tripId').equals(activeTrip.id).toArray();
+  }, [activeTrip?.id]);
+
+  // Calculate real counts
+  const liveMatchesCount = liveMatches?.length || 0;
+  const recentPhotosCount = 0; // Photos not implemented yet
+  const unreadMessages = banterPosts?.length || 0;
 
   // Navigation badges
   const navBadges: NavBadges = {
@@ -159,16 +174,11 @@ export default function HomePage() {
 
       <main className="container-editorial">
         {/* LIVE MATCH BANNER — Top priority when matches are happening */}
-        {activeTrip && liveMatchesCount > 0 && (
+        {activeTrip && liveMatchesCount > 0 && liveMatches && liveMatches[0] && (
           <section className="section-sm">
             <LiveMatchBanner
               matchCount={liveMatchesCount}
-              currentHole={7}
-              closestMatch={{
-                teamA: 'Smith & Jones',
-                teamB: 'Brown & Wilson',
-                score: '2 UP',
-              }}
+              currentHole={liveMatches[0].currentHole || undefined}
             />
           </section>
         )}

@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
 import { NoBetsEmpty } from '@/components/ui';
-import type { Player } from '@/lib/types/models';
+import type { Player, SideBet, SideBetType } from '@/lib/types/models';
 import {
   ChevronLeft,
   Home,
@@ -31,18 +33,6 @@ import {
  * long drive, and other side action!
  */
 
-interface SideBet {
-  id: string;
-  type: 'skins' | 'nassau' | 'ctp' | 'longdrive' | 'custom';
-  name: string;
-  description: string;
-  status: 'active' | 'completed' | 'pending';
-  pot?: number;
-  winner?: string;
-  hole?: number;
-  participants: string[];
-}
-
 export default function BetsPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
@@ -54,68 +44,18 @@ export default function BetsPage() {
     }
   }, [currentTrip, router]);
 
-  // Demo side bets
-  const sideBets: SideBet[] = [
-    {
-      id: '1',
-      type: 'skins',
-      name: 'Round 1 Skins',
-      description: '$5 per hole, carry-overs',
-      status: 'active',
-      pot: 45,
-      participants: players.slice(0, 4).map((p) => p.id),
+  // Get real side bets from database
+  const sideBets = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      return db.sideBets
+        .where('tripId')
+        .equals(currentTrip.id)
+        .toArray();
     },
-    {
-      id: '2',
-      type: 'ctp',
-      name: 'Closest to Pin',
-      description: 'Hole 7 - Par 3',
-      status: 'active',
-      hole: 7,
-      pot: 20,
-      participants: players.map((p) => p.id),
-    },
-    {
-      id: '3',
-      type: 'longdrive',
-      name: 'Long Drive',
-      description: 'Hole 12 - Par 5',
-      status: 'active',
-      hole: 12,
-      pot: 20,
-      participants: players.map((p) => p.id),
-    },
-    {
-      id: '4',
-      type: 'nassau',
-      name: 'Nassau - Match 1',
-      description: 'Front 9, Back 9, Overall',
-      status: 'active',
-      pot: 30,
-      participants: players.slice(0, 2).map((p) => p.id),
-    },
-    {
-      id: '5',
-      type: 'ctp',
-      name: 'Closest to Pin',
-      description: 'Hole 3 - Par 3',
-      status: 'completed',
-      hole: 3,
-      pot: 20,
-      winner: players[0]?.id,
-      participants: players.map((p) => p.id),
-    },
-    {
-      id: '6',
-      type: 'custom',
-      name: 'First Birdie',
-      description: 'First player to make birdie',
-      status: 'completed',
-      pot: 40,
-      winner: players[1]?.id,
-      participants: players.map((p) => p.id),
-    },
-  ];
+    [currentTrip?.id],
+    []
+  );
 
   const activeBets = sideBets.filter((b) => b.status === 'active' || b.status === 'pending');
   const completedBets = sideBets.filter((b) => b.status === 'completed');
@@ -124,7 +64,7 @@ export default function BetsPage() {
 
   const getPlayer = (id: string) => players.find((p) => p.id === id);
 
-  const getBetIcon = (type: SideBet['type']) => {
+  const getBetIcon = (type: SideBetType) => {
     switch (type) {
       case 'skins':
         return <Zap size={20} />;
@@ -137,6 +77,40 @@ export default function BetsPage() {
       default:
         return <Trophy size={20} />;
     }
+  };
+
+  const createQuickBet = async (type: SideBetType) => {
+    if (!currentTrip) return;
+
+    const betNames: Record<SideBetType, string> = {
+      skins: 'Skins Game',
+      ctp: 'Closest to Pin',
+      longdrive: 'Long Drive',
+      nassau: 'Nassau',
+      custom: 'Custom Bet',
+    };
+
+    const betDescriptions: Record<SideBetType, string> = {
+      skins: '$5 per hole, carry-overs',
+      ctp: 'Par 3 challenge',
+      longdrive: 'Longest drive wins',
+      nassau: 'Front 9, Back 9, Overall',
+      custom: 'Custom side bet',
+    };
+
+    const newBet: SideBet = {
+      id: crypto.randomUUID(),
+      tripId: currentTrip.id,
+      type,
+      name: betNames[type],
+      description: betDescriptions[type],
+      status: 'active',
+      pot: 20,
+      participantIds: players.map(p => p.id),
+      createdAt: new Date().toISOString(),
+    };
+
+    await db.sideBets.add(newBet);
   };
 
   if (!currentTrip) return null;
@@ -230,21 +204,25 @@ export default function BetsPage() {
                 icon={<Zap size={20} />}
                 label="Skins Game"
                 color="var(--warning)"
+                onClick={() => createQuickBet('skins')}
               />
               <QuickAddButton
                 icon={<Target size={20} />}
                 label="Closest to Pin"
                 color="var(--team-usa)"
+                onClick={() => createQuickBet('ctp')}
               />
               <QuickAddButton
                 icon={<TrendingUp size={20} />}
                 label="Long Drive"
                 color="var(--team-europe)"
+                onClick={() => createQuickBet('longdrive')}
               />
               <QuickAddButton
                 icon={<DollarSign size={20} />}
                 label="Nassau"
                 color="var(--masters)"
+                onClick={() => createQuickBet('nassau')}
               />
             </div>
           </>
@@ -290,7 +268,7 @@ interface BetCardProps {
 }
 
 function BetCard({ bet, icon, getPlayer }: BetCardProps) {
-  const winner = bet.winner ? getPlayer(bet.winner) : null;
+  const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
 
   return (
     <div className="card" style={{ padding: 'var(--space-4)' }}>
@@ -345,7 +323,7 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
           {/* Participants */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginTop: 'var(--space-2)' }}>
             <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
-              {bet.participants.length} player{bet.participants.length !== 1 ? 's' : ''}
+              {bet.participantIds.length} player{bet.participantIds.length !== 1 ? 's' : ''}
             </span>
           </div>
         </div>
@@ -361,11 +339,13 @@ interface QuickAddButtonProps {
   icon: React.ReactNode;
   label: string;
   color: string;
+  onClick?: () => void;
 }
 
-function QuickAddButton({ icon, label, color }: QuickAddButtonProps) {
+function QuickAddButton({ icon, label, color, onClick }: QuickAddButtonProps) {
   return (
     <button
+      onClick={onClick}
       className="card press-scale"
       style={{
         display: 'flex',

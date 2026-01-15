@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -28,14 +28,30 @@ export default function ScorePage() {
     const { currentTrip, sessions, players } = useTripStore();
     const { selectMatch } = useScoringStore();
 
+    // Track selected session - default to active or first available
+    const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+
     useEffect(() => {
         if (!currentTrip) {
             router.push('/');
         }
     }, [currentTrip, router]);
 
-    const activeSession = sessions.find(s => s.status === 'inProgress') ||
+    // Determine the default active session (in progress or scheduled)
+    const defaultActiveSession = sessions.find(s => s.status === 'inProgress') ||
         sessions.find(s => s.status === 'scheduled');
+
+    // Use selected session if set, otherwise use default
+    const activeSession = selectedSessionId
+        ? sessions.find(s => s.id === selectedSessionId) || defaultActiveSession
+        : defaultActiveSession;
+
+    // Set initial selected session when sessions load
+    useEffect(() => {
+        if (!selectedSessionId && defaultActiveSession) {
+            setSelectedSessionId(defaultActiveSession.id);
+        }
+    }, [selectedSessionId, defaultActiveSession]);
 
     const matches = useLiveQuery(
         async () => {
@@ -180,6 +196,7 @@ export default function ScorePage() {
                                 {sessions.map(session => (
                                     <button
                                         key={session.id}
+                                        onClick={() => setSelectedSessionId(session.id)}
                                         className={session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
                                         style={{ whiteSpace: 'nowrap' }}
                                     >
