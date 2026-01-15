@@ -83,6 +83,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Always prefer network for document navigations to avoid stale HTML/chunk mismatches
+    if (request.mode === 'navigate' || request.destination === 'document') {
+        event.respondWith(networkFirstNoCache(request));
+        return;
+    }
+
     // Cache first for static assets
     if (
         url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/) ||
@@ -108,10 +114,7 @@ async function cacheFirst(request) {
 
     try {
         const response = await fetch(request);
-        if (response.ok) {
-            const cache = await caches.open(STATIC_CACHE);
-            cache.put(request, response.clone());
-        }
+        await putInCache(STATIC_CACHE, request, response);
         return response;
     } catch (error) {
         console.error('[SW] Cache-first fetch failed:', error);
@@ -126,10 +129,7 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const response = await fetch(request);
-        if (response.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(request, response.clone());
-        }
+        await putInCache(CACHE_NAME, request, response);
         return response;
     } catch (error) {
         console.log('[SW] Network failed, trying cache...');
@@ -152,10 +152,7 @@ async function staleWhileRevalidate(request) {
     const cached = await caches.match(request);
 
     const fetchPromise = fetch(request).then((response) => {
-        if (response.ok) {
-            const cache = caches.open(CACHE_NAME);
-            cache.then(c => c.put(request, response.clone()));
-        }
+        putInCache(CACHE_NAME, request, response);
         return response;
     }).catch((error) => {
         console.log('[SW] Revalidation failed:', error);
@@ -180,6 +177,45 @@ async function staleWhileRevalidate(request) {
         status: 503,
         headers: { 'Content-Type': 'text/html' },
     });
+}
+
+/**
+ * Network-first for navigations without caching HTML
+ */
+async function networkFirstNoCache(request) {
+    try {
+        return await fetch(request);
+    } catch (error) {
+        const cached = await caches.match(request);
+        if (cached) {
+            return cached;
+        }
+        return new Response('Offline - Golf Ryder Cup App', {
+            status: 503,
+            headers: { 'Content-Type': 'text/html' },
+        });
+    }
+}
+
+/**
+ * Safely cache responses
+ */
+async function putInCache(cacheName, request, response) {
+    if (!response || !response.ok) {
+        return;
+    }
+
+    if (response.bodyUsed) {
+        console.warn('[SW] Skip caching used response:', request.url);
+        return;
+    }
+
+    try {
+        const cache = await caches.open(cacheName);
+        await cache.put(request, response.clone());
+    } catch (error) {
+        console.warn('[SW] Cache put failed:', error);
+    }
 }
 
 // Handle messages from the app

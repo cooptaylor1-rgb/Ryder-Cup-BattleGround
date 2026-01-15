@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
 
 /* ============================================
    RYDER CUP TRACKER — DESIGN SYSTEM v2.1
@@ -20,21 +21,7 @@
    - Inter: Clean, legible UI text (loaded via next/font)
    - Instrument Serif: Elegant, warm display numbers
    ============================================ */
-@font-face {
-  font-family: 'Instrument Serif';
-  src: url('https://fonts.gstatic.com/s/instrumentserif/v4/jizBRFtNs2ka5fXjeivQ4LroWlx-2zIZj1bIkNo.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Instrument Serif';
-  src: url('https://fonts.gstatic.com/s/instrumentserif/v4/jizHRFtNs2ka5fXjeivQ4LroWlx-6zATi3TNgNq55w.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
+/* Instrument Serif loaded via Google Fonts import above */
 
 /* ============================================
    DESIGN TOKENS
