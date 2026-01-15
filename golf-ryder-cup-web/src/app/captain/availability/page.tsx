@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
@@ -50,17 +50,18 @@ export default function AvailabilityPage() {
     }
   }, [currentTrip, isCaptainMode, router]);
 
-  // Get active/upcoming sessions
-  const activeSessions = sessions.filter(
-    s => s.status === 'inProgress' || s.status === 'scheduled'
+  // Get active/upcoming sessions (memoized for stable reference)
+  const activeSessions = useMemo(() =>
+    sessions.filter(s => s.status === 'inProgress' || s.status === 'scheduled'),
+    [sessions]
   );
 
-  // Auto-select first session
+  // Auto-select first session when none selected
   useEffect(() => {
     if (!selectedSession && activeSessions.length > 0) {
       setSelectedSession(activeSessions[0].id);
     }
-  }, [activeSessions, selectedSession]);
+  }, [activeSessions.length, selectedSession, activeSessions]);
 
   // Get team for a player
   const getPlayerTeam = useCallback((playerId: string): 'A' | 'B' => {
@@ -131,8 +132,6 @@ export default function AvailabilityPage() {
   }, [showToast]);
 
   const currentSession = sessions.find(s => s.id === selectedSession);
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
 
   if (!currentTrip || !isCaptainMode) {
     return null;

@@ -24,7 +24,7 @@ import {
 
 export default function InvitesPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
+  const { currentTrip } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
   useEffect(() => {

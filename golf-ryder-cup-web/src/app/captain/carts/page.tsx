@@ -123,7 +123,7 @@ export default function CartsPage() {
                 players={cartPlayers}
                 teamAName={teamA?.name || 'USA'}
                 teamBName={teamB?.name || 'Europe'}
-                onAssignmentsChange={(carts) => {
+                onAssignmentsChange={() => {
                   // Cart assignments saved
                   showToast('success', 'Cart assignments updated');
                 }}

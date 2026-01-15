@@ -33,7 +33,7 @@ export default function LivePage() {
   const router = useRouter();
   const { currentTrip, players, getActiveSession } = useTripStore();
   const { matchStates, loadSessionMatches } = useScoringStore();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
 

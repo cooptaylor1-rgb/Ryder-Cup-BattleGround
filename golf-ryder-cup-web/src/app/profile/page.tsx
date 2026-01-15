@@ -16,7 +16,6 @@ import {
     Edit2,
     LogOut,
     ChevronLeft,
-    Check,
     X,
     Save,
 } from 'lucide-react';

@@ -10,12 +10,8 @@ import {
   MapPin,
   Calendar,
   Plus,
-  Home,
   Target,
-  Users,
   Trophy,
-  MoreHorizontal,
-  Cloud,
   MessageCircle,
   Camera,
   Award,
@@ -53,7 +49,7 @@ export default function HomePage() {
   const { loadTrip, currentTrip } = useTripStore();
   const [standings, setStandings] = useState<TeamStandings | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
-  const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const [, setShowWhatsNew] = useState(false);
   const [dismissedFeatureCard, setDismissedFeatureCard] = useState(false);
 
   const trips = useLiveQuery(

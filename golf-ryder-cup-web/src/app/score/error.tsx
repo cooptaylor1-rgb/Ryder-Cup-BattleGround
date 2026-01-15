@@ -8,7 +8,7 @@
  */
 
 import { useEffect } from 'react';
-import { AlertTriangle, RefreshCw, ArrowLeft, Target } from 'lucide-react';
+import { RefreshCw, ArrowLeft, Target } from 'lucide-react';
 
 interface ErrorPageProps {
     error: Error & { digest?: string };

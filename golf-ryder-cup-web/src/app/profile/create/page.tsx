@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, type UserProfile } from '@/lib/stores';
-import { Button, Card, CardContent } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
     User,
     Mail,
     Hash,
     Phone,
-    ArrowRight,
     ArrowLeft,
     Check,
     ChevronRight,

@@ -53,10 +53,9 @@ const RARITY_COLORS = {
 
 export default function AchievementsPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
+  const { currentTrip } = useTripStore();
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!currentTrip) {
@@ -69,13 +68,10 @@ export default function AchievementsPage() {
     async function loadStats() {
       if (!currentTrip) return;
       try {
-        setIsLoading(true);
         const stats = await calculatePlayerStats(currentTrip.id);
         setPlayerStats(stats);
       } catch (error) {
         console.error('Failed to load player stats:', error);
-      } finally {
-        setIsLoading(false);
       }
     }
     loadStats();
@@ -85,7 +81,6 @@ export default function AchievementsPage() {
   const achievements = useMemo((): Achievement[] => {
     // Aggregate stats across all players
     const totalHolesWon = playerStats.reduce((sum, s) => sum + s.holesWon, 0);
-    const totalMatchesPlayed = playerStats.reduce((sum, s) => sum + s.matchesPlayed, 0);
     const maxMatchesPlayed = Math.max(0, ...playerStats.map(s => s.matchesPlayed));
     const maxWins = Math.max(0, ...playerStats.map(s => s.wins));
     const maxPoints = Math.max(0, ...playerStats.map(s => s.points));

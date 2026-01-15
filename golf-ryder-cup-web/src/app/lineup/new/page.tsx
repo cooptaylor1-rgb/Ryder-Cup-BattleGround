@@ -15,9 +15,6 @@ import {
 import {
   ChevronLeft,
   Users,
-  Shuffle,
-  Calendar,
-  Clock,
   AlertTriangle,
   CheckCircle2,
   Home,
@@ -27,8 +24,8 @@ import {
   CalendarDays,
   Info,
 } from 'lucide-react';
-import type { SessionType, RyderCupSession } from '@/lib/types';
-import type { ExtendedFormatType, ScoringMode } from '@/lib/types/scoringFormats';
+import type { SessionType } from '@/lib/types';
+import type { ScoringMode } from '@/lib/types/scoringFormats';
 
 /**
  * NEW SESSION / LINEUP PAGE
@@ -171,7 +168,6 @@ export default function NewLineupPage() {
   const [matchCount, setMatchCount] = useState(4);
   const [pointsPerMatch, setPointsPerMatch] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
-  const [createdSession, setCreatedSession] = useState<RyderCupSession | null>(null);
 
   // Get team players
   const getTeamPlayers = useCallback((teamId: string) => {
@@ -272,12 +268,12 @@ export default function NewLineupPage() {
   }, [lineupTeamA, lineupTeamB, matchCount, selectedType.playersPerTeam]);
 
   // Save lineup
-  const handleSave = useCallback(async (matches: MatchSlot[]) => {
+  const handleSave = useCallback(async () => {
     showToast('info', 'Lineup saved as draft');
   }, [showToast]);
 
   // Publish lineup
-  const handlePublish = useCallback(async (matches: MatchSlot[]) => {
+  const handlePublish = useCallback(async (_matches: MatchSlot[]) => {
     if (!currentTrip) return;
 
     setIsCreating(true);
@@ -295,7 +291,6 @@ export default function NewLineupPage() {
         isLocked: true,
       });
 
-      setCreatedSession(session);
       showToast('success', 'Session created and lineup published!');
 
       // Navigate to the session view

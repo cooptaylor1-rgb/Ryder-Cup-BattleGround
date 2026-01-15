@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { formatPlayerName } from '@/lib/utils';
 import {
   Shield,
   Users,
@@ -27,7 +26,6 @@ import {
   MoreHorizontal,
   CalendarDays,
   Zap,
-  FileText,
   Car,
   Phone,
 } from 'lucide-react';

@@ -7,8 +7,6 @@ import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import {
   CalendarDays,
-  Clock,
-  MapPin,
   Users,
   ChevronRight,
   Home,
@@ -22,7 +20,7 @@ import {
   User,
   AlertCircle,
 } from 'lucide-react';
-import type { Match, Player, RyderCupSession } from '@/lib/types/models';
+import type { Match, RyderCupSession } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
 
 /**

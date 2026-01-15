@@ -26,13 +26,11 @@ import {
   Target,
   MoreHorizontal,
   CalendarDays,
-  CheckCircle2,
   ChevronRight,
-  Zap,
   Edit3,
   Eye,
 } from 'lucide-react';
-import type { Match, RyderCupSession } from '@/lib/types';
+import type { Match } from '@/lib/types';
 
 /**
  * SESSION / LINEUP VIEW & EDIT PAGE
@@ -126,7 +124,7 @@ export default function SessionPage() {
 
   // Convert existing matches to lineup format
   const initialMatches: MatchSlot[] = useMemo(() => {
-    return matches.map((match, idx) => ({
+    return matches.map((match) => ({
       id: match.id,
       teamAPlayers: match.teamAPlayerIds.map(id => {
         const player = players.find(p => p.id === id);
@@ -159,7 +157,7 @@ export default function SessionPage() {
     try {
       await updateSession(session.id, { isLocked: !session.isLocked });
       showToast('success', session.isLocked ? 'Session unlocked' : 'Session locked');
-    } catch (error) {
+    } catch {
       showToast('error', 'Failed to update session');
     }
   };
@@ -170,7 +168,7 @@ export default function SessionPage() {
     try {
       await updateSession(session.id, { status: 'inProgress' });
       showToast('success', 'Session started! Scoring is now available.');
-    } catch (error) {
+    } catch {
       showToast('error', 'Failed to start session');
     }
   };
@@ -189,7 +187,7 @@ export default function SessionPage() {
   }, [allLineupPlayers]);
 
   // Get player names for match display
-  const getMatchPlayerNames = (playerIds: string[], team: 'A' | 'B') => {
+  const getMatchPlayerNames = (playerIds: string[]) => {
     return playerIds.map(id => {
       const player = players.find(p => p.id === id);
       return player ? formatPlayerName(player.firstName, player.lastName, 'short') : 'Unknown';
@@ -361,8 +359,8 @@ export default function SessionPage() {
             ) : (
               <div className="space-y-3">
                 {matches.map((match, idx) => {
-                  const teamANames = getMatchPlayerNames(match.teamAPlayerIds, 'A');
-                  const teamBNames = getMatchPlayerNames(match.teamBPlayerIds, 'B');
+                  const teamANames = getMatchPlayerNames(match.teamAPlayerIds);
+                  const teamBNames = getMatchPlayerNames(match.teamBPlayerIds);
                   const canScore = match.status === 'inProgress' || session.status === 'inProgress';
 
                   return (
@@ -435,10 +433,10 @@ export default function SessionPage() {
                 teamAPlayers={lineupTeamA}
                 teamBPlayers={lineupTeamB}
                 initialMatches={initialMatches}
-                onSave={(slots) => {
+                onSave={() => {
                   showToast('info', 'Lineup saved as draft');
                 }}
-                onPublish={(slots) => {
+                onPublish={() => {
                   showToast('success', 'Lineup published!');
                   setViewMode('matches');
                 }}
