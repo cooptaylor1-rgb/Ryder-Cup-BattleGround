@@ -271,10 +271,12 @@ export function useMatchScoring({
         async () => {
             if (!courseId) return defaultPars;
 
-            const course = await db.courses.get(courseId);
-            if (!course?.holes) return defaultPars;
+            // Get the first tee set for this course to get hole pars
+            const teeSets = await db.teeSets.where('courseId').equals(courseId).toArray();
+            const teeSet = teeSets[0];
+            if (!teeSet?.holePars) return defaultPars;
 
-            return course.holes.map((h: { par: number }) => h.par);
+            return teeSet.holePars;
         },
         [courseId],
         defaultPars
