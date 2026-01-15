@@ -86,9 +86,9 @@ export default function SocialPage() {
   if (!currentTrip) return null;
 
   return (
-    <div className="pb-nav" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--canvas)' }}>
-      {/* Header */}
-      <header className="header">
+    <div className="pb-nav page-premium-enter texture-grain" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--canvas)' }}>
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <button
@@ -99,14 +99,31 @@ export default function SocialPage() {
             >
               <ChevronLeft size={22} />
             </button>
-            <div>
-              <span className="type-overline">Trash Talk</span>
-              <p className="type-caption">{currentTrip.name}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow-green)',
+                }}
+              >
+                <MessageCircle size={16} style={{ color: 'var(--color-accent)' }} />
+              </div>
+              <div>
+                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Trash Talk</span>
+                <p className="type-caption">{currentTrip.name}</p>
+              </div>
             </div>
           </div>
           <Link
             href="/social/photos"
-            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', color: 'var(--masters)' }}
+            className="btn-premium"
+            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)' }}
           >
             <Camera size={22} />
           </Link>
@@ -227,7 +244,7 @@ export default function SocialPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav className="nav-premium bottom-nav">
         <Link href="/" className="nav-item">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>

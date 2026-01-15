@@ -102,35 +102,50 @@ export default function LivePage() {
 
   return (
     <div
-      className="min-h-screen pb-nav"
+      className="min-h-screen pb-nav page-premium-enter"
       style={{
         background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
         color: 'white',
       }}
     >
-      {/* Header */}
-      <header className="header" style={{ background: 'transparent', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* Premium Header */}
+      <header className="header-premium" style={{ background: 'transparent', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
               className="p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label="Back"
             >
               <ChevronLeft size={22} />
             </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <Tv size={16} className="text-red-500" />
-                <span className="type-overline" style={{ color: 'rgba(255,255,255,0.7)' }}>Live Scores</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 16px rgba(239, 68, 68, 0.4)',
+                }}
+              >
+                <Tv size={16} style={{ color: 'white' }} />
               </div>
-              <p className="text-sm opacity-70">{currentTrip.name}</p>
+              <div>
+                <span className="type-overline" style={{ color: 'rgba(255,255,255,0.8)', letterSpacing: '0.1em' }}>Live Scores</span>
+                <p className="text-sm opacity-70">{currentTrip.name}</p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label={soundEnabled ? 'Mute' : 'Unmute'}
             >
               {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -138,6 +153,7 @@ export default function LivePage() {
             <button
               onClick={toggleFullscreen}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label="Toggle fullscreen"
             >
               <Maximize2 size={20} />
@@ -148,6 +164,7 @@ export default function LivePage() {
                 setLastUpdate(new Date());
               }}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label="Refresh"
             >
               <RefreshCw size={20} />
@@ -192,7 +209,7 @@ export default function LivePage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="bottom-nav" style={{ background: 'rgba(26, 26, 46, 0.95)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <nav className="nav-premium bottom-nav" style={{ background: 'rgba(26, 26, 46, 0.95)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <Link href="/" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
