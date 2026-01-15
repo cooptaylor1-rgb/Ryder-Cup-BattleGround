@@ -407,10 +407,10 @@ export function useMatchScoring({
 
             try {
                 const id = `${matchId}-hole-${holeNumber}`;
-                const winner: 'teamA' | 'teamB' | 'halved' = 
-                    team1Score < team2Score ? 'teamA' : 
-                    team2Score < team1Score ? 'teamB' : 'halved';
-                
+                const winner: 'teamA' | 'teamB' | 'halved' =
+                    team1Score < team2Score ? 'teamA' :
+                        team2Score < team1Score ? 'teamB' : 'halved';
+
                 await db.holeResults.update(id, {
                     winner,
                     teamAStrokes: team1Score,
@@ -465,7 +465,7 @@ export function useMatchScoring({
 
         try {
             await db.matches.update(matchId, {
-                status: 'complete',
+                status: 'completed',
                 result: matchStatus.matchResult?.result,
                 winnerId: matchStatus.matchResult?.winner,
                 updatedAt: new Date().toISOString(),
