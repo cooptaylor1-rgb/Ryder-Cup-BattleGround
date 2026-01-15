@@ -411,6 +411,10 @@ export default function SchedulePage() {
           <Target size={20} />
           <span>Score</span>
         </Link>
+        <Link href="/matchups" className="nav-item">
+          <Users size={20} />
+          <span>Matches</span>
+        </Link>
         <Link href="/standings" className="nav-item">
           <Trophy size={20} />
           <span>Standings</span>

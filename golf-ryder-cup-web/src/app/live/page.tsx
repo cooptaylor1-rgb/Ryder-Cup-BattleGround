@@ -205,6 +205,10 @@ export default function LivePage() {
           <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
         </Link>
+        <Link href="/matchups" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <Users size={22} strokeWidth={1.75} />
+          <span>Matches</span>
+        </Link>
         <Link href="/standings" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
           <Trophy size={22} strokeWidth={1.75} />
           <span>Standings</span>

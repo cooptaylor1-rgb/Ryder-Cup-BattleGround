@@ -3,11 +3,10 @@
  *
  * Integration with external Golf Course Database API
  * for searching and importing real course data.
+ * Uses server-side API route to keep API key secure.
  *
  * API Documentation: https://golfcourseapi.com
  */
-
-const API_BASE_URL = 'https://api.golfcourseapi.com/v1';
 
 /**
  * API Response Types
@@ -62,55 +61,41 @@ export interface GolfCourseAPICourseResponse {
     course: GolfCourseAPICourse;
 }
 
+// Cache the configuration check result
+let configuredCache: boolean | null = null;
+
 /**
- * Get API key from environment or return null
+ * Check if the Golf Course API is configured (via server-side API route)
  */
-function getApiKey(): string | null {
-    // Check for environment variable (server-side or build-time)
-    if (typeof process !== 'undefined' && process.env.GOLF_COURSE_API_KEY) {
-        return process.env.GOLF_COURSE_API_KEY;
+export async function checkGolfCourseAPIConfigured(): Promise<boolean> {
+    if (configuredCache !== null) {
+        return configuredCache;
     }
-    // Check for Next.js public environment variable (client-side)
-    if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_GOLF_COURSE_API_KEY) {
-        return process.env.NEXT_PUBLIC_GOLF_COURSE_API_KEY;
+
+    try {
+        const response = await fetch('/api/golf-courses?action=check');
+        const data = await response.json();
+        configuredCache = data.configured === true;
+        return configuredCache;
+    } catch {
+        configuredCache = false;
+        return false;
     }
-    return null;
 }
 
 /**
- * Check if the Golf Course API is configured
+ * Synchronous check - returns cached value or assumes not configured
+ * Use checkGolfCourseAPIConfigured() for accurate async check
  */
 export function isGolfCourseAPIConfigured(): boolean {
-    return getApiKey() !== null;
-}
-
-/**
- * Make authenticated request to Golf Course API
- */
-async function apiRequest<T>(endpoint: string): Promise<T> {
-    const apiKey = getApiKey();
-    if (!apiKey) {
-        throw new Error('Golf Course API key not configured. Set NEXT_PUBLIC_GOLF_COURSE_API_KEY environment variable.');
+    // If we've checked before, return cached value
+    if (configuredCache !== null) {
+        return configuredCache;
     }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: {
-            'Authorization': `Key ${apiKey}`,
-            'Accept': 'application/json',
-        },
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error('Invalid Golf Course API key');
-        }
-        if (response.status === 429) {
-            throw new Error('Golf Course API rate limit exceeded. Please try again later.');
-        }
-        throw new Error(`Golf Course API error: ${response.status} ${response.statusText}`);
-    }
-
-    return response.json();
+    // Trigger async check for future calls
+    checkGolfCourseAPIConfigured();
+    // Default to true to show the search UI - actual API call will verify
+    return true;
 }
 
 /**
@@ -121,12 +106,19 @@ export async function searchCourses(query: string): Promise<GolfCourseAPICourse[
         return [];
     }
 
-    const encodedQuery = encodeURIComponent(query.trim());
-    const response = await apiRequest<GolfCourseAPISearchResponse>(
-        `/courses?search=${encodedQuery}`
-    );
+    const response = await fetch(`/api/golf-courses?action=search&q=${encodeURIComponent(query.trim())}`);
 
-    return response.courses || [];
+    if (!response.ok) {
+        const error = await response.json();
+        if (error.configured === false) {
+            configuredCache = false;
+            throw new Error('Golf Course API not configured');
+        }
+        throw new Error(error.error || 'Search failed');
+    }
+
+    const data = await response.json();
+    return data.courses || [];
 }
 
 /**
@@ -134,10 +126,15 @@ export async function searchCourses(query: string): Promise<GolfCourseAPICourse[
  */
 export async function getCourseById(courseId: number): Promise<GolfCourseAPICourse | null> {
     try {
-        const response = await apiRequest<GolfCourseAPICourseResponse>(
-            `/courses/${courseId}`
-        );
-        return response.course || null;
+        const response = await fetch(`/api/golf-courses?action=get&id=${courseId}`);
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to fetch course');
+        }
+
+        const data = await response.json();
+        return data.course || null;
     } catch (error) {
         console.error('Failed to fetch course:', error);
         return null;
@@ -152,20 +149,17 @@ export async function searchCoursesByLocation(
     state?: string,
     country?: string
 ): Promise<GolfCourseAPICourse[]> {
-    const params = new URLSearchParams();
-    if (city) params.append('city', city);
-    if (state) params.append('state', state);
-    if (country) params.append('country', country);
+    const parts: string[] = [];
+    if (city) parts.push(city);
+    if (state) parts.push(state);
+    if (country) parts.push(country);
 
-    if (params.toString() === '') {
+    if (parts.length === 0) {
         return [];
     }
 
-    const response = await apiRequest<GolfCourseAPISearchResponse>(
-        `/courses?${params.toString()}`
-    );
-
-    return response.courses || [];
+    // Use the location as search query
+    return searchCourses(parts.join(', '));
 }
 
 /**

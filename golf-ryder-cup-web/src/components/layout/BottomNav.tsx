@@ -23,19 +23,21 @@ import {
   Settings,
   Shield,
   CalendarDays,
+  Users,
 } from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  badgeKey?: 'home' | 'schedule' | 'score' | 'standings' | 'more';
+  badgeKey?: 'home' | 'schedule' | 'score' | 'matches' | 'standings' | 'more';
 }
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: Home, badgeKey: 'home' },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays, badgeKey: 'schedule' },
   { href: '/score', label: 'Score', icon: Target, badgeKey: 'score' },
+  { href: '/matchups', label: 'Matches', icon: Users, badgeKey: 'matches' },
   { href: '/standings', label: 'Standings', icon: Trophy, badgeKey: 'standings' },
   { href: '/more', label: 'More', icon: Settings, badgeKey: 'more' },
 ];
@@ -44,6 +46,7 @@ export interface NavBadges {
   home?: number;
   schedule?: number;
   score?: number;
+  matches?: number;
   standings?: number;
   more?: number;
 }
@@ -93,7 +96,7 @@ export function BottomNav({ badges = {} }: BottomNavProps) {
             onClick={() => router.push(item.href)}
             className={cn(
               'relative flex flex-col items-center justify-center',
-              'flex-1 min-w-[56px] py-2',
+              'flex-1 min-w-[48px] py-2',
               'transition-colors',
               'focus-visible:outline-none',
             )}
