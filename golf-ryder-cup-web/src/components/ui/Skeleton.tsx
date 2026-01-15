@@ -175,16 +175,11 @@ export function SessionCardSkeleton() {
 export function LiveMatchCardSkeleton() {
   return (
     <div
-      className="rounded-2xl overflow-hidden"
-      style={{
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
-      }}
+      className="rounded-2xl overflow-hidden bg-card border border-border"
     >
       {/* Header */}
       <div
-        className="px-4 py-2 flex items-center justify-between"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
+        className="px-4 py-2 flex items-center justify-between bg-muted/50"
       >
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-5 w-20 rounded-full" />

@@ -169,6 +169,9 @@
   --shadow-card-md: var(--shadow-md);
   --shadow-card-lg: var(--shadow-lg);
 
+  /* ---- SKELETON ---- */
+  --shimmer-color: rgba(0, 0, 0, 0.08);
+
   /* ---- SEMANTIC ALIASES ----
      Self-documenting design tokens */
   --color-primary: var(--masters);
@@ -2407,6 +2410,9 @@ html.outdoor body {
   --shadow-card-sm: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
   --shadow-card-md: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --shadow-card-lg: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* ---- SKELETON (Dark Mode) ---- */
+  --shimmer-color: rgba(255, 255, 255, 0.4);
 
   /* ---- TEAM USA (Dark Mode) ----
      Rich navy with vibrant contrast */

@@ -324,7 +324,7 @@ function PhotoPreview({
             </div>
 
             {/* Context Panel */}
-            <div className="bg-gray-900 p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+            <div className="bg-card dark:bg-zinc-900 p-4 space-y-4 max-h-[50vh] overflow-y-auto">
                 {/* Moment Type */}
                 <div>
                     <label className="text-xs text-gray-400 uppercase tracking-wide mb-2 block">
@@ -442,7 +442,7 @@ function PhotoPreview({
             </div>
 
             {/* Actions */}
-            <div className="bg-gray-900 border-t border-gray-800 p-4 pb-safe">
+            <div className="bg-card dark:bg-zinc-900 border-t border-border p-4 pb-safe">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onRetake}

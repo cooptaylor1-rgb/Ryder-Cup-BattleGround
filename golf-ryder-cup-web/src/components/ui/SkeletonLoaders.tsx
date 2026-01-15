@@ -63,9 +63,9 @@ export function Skeleton({
         >
             {animation === 'shimmer' && (
                 <motion.div
-                    className="absolute inset-0"
+                    className="absolute inset-0 dark:opacity-100"
                     style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+                        background: 'linear-gradient(90deg, transparent 0%, var(--shimmer-color, rgba(255,255,255,0.4)) 50%, transparent 100%)',
                     }}
                     animate={{
                         x: ['-100%', '100%'],

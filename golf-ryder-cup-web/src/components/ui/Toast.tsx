@@ -74,8 +74,7 @@ function ToastProgress({
 
   return (
     <div
-      className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden"
-      style={{ background: 'rgba(0,0,0,0.15)' }}
+      className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-black/15 dark:bg-white/15"
     >
       <div
         className="h-full"

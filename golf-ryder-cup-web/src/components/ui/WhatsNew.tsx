@@ -147,16 +147,14 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
         >
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-2 rounded-full transition-colors"
-            style={{ background: 'rgba(255,255,255,0.1)' }}
+            className="absolute top-4 right-4 p-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"
             aria-label="Close"
           >
             <X className="w-5 h-5 text-white/80" />
           </button>
 
           <div
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.15)' }}
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-white/15"
           >
             <Sparkles className="w-8 h-8 text-white" />
           </div>

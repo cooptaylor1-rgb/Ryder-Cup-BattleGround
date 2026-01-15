@@ -271,10 +271,10 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
         <span className="text-sm text-muted-foreground">Match {match.matchOrder}</span>
         <span
           className={`text-xs px-2 py-1 rounded-full ${state?.status === 'inProgress'
-              ? 'bg-red-500/20 text-red-500'
-              : state?.status === 'completed'
-                ? 'bg-green-500/20 text-green-500'
-                : 'bg-muted text-muted-foreground'
+            ? 'bg-red-500/20 text-red-500'
+            : state?.status === 'completed'
+              ? 'bg-green-500/20 text-green-500'
+              : 'bg-muted text-muted-foreground'
             }`}
         >
           {getStatusText()}
@@ -345,10 +345,10 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
                 <div
                   key={i}
                   className={`h-1 flex-1 rounded-full transition-all ${isCurrent
-                      ? 'bg-green-500 animate-pulse'
-                      : isPlayed
-                        ? 'bg-foreground/40'
-                        : 'bg-muted'
+                    ? 'bg-green-500 animate-pulse'
+                    : isPlayed
+                      ? 'bg-foreground/40'
+                      : 'bg-muted'
                     }`}
                 />
               );
