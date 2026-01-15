@@ -23,6 +23,7 @@ import {
     Clock,
     ChevronDown,
     ChevronUp,
+    ChevronRight,
     History,
     User,
     ArrowRight,
