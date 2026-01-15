@@ -309,10 +309,20 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
             setError(null);
             try {
                 const id = `player-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                // Split name into firstName and lastName for Player model
+                const nameParts = player.name.trim().split(/\s+/);
+                const firstName = nameParts[0] || '';
+                const lastName = nameParts.slice(1).join(' ') || '';
+                
                 await db.players.add({
-                    ...player,
                     id,
                     tripId,
+                    firstName,
+                    lastName,
+                    email: player.email,
+                    avatarUrl: player.avatarUrl,
+                    team: player.team,
+                    handicapIndex: player.handicap,
                     joinedAt: new Date().toISOString(),
                 });
                 haptic.tap();
