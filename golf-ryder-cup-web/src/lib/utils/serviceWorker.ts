@@ -7,6 +7,8 @@
  * for the UI to show update prompts.
  */
 
+import { pwaLogger } from './logger';
+
 export type SWUpdateCallback = (registration: ServiceWorkerRegistration) => void;
 
 interface SWConfig {
@@ -24,7 +26,7 @@ let updateCallback: SWUpdateCallback | null = null;
  */
 export async function registerServiceWorker(config?: SWConfig): Promise<ServiceWorkerRegistration | null> {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
-        console.log('[PWA] Service workers not supported');
+        pwaLogger.log('Service workers not supported');
         return null;
     }
 
@@ -34,7 +36,7 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
         });
 
         swRegistration = registration;
-        console.log('[PWA] Service worker registered:', registration.scope);
+        pwaLogger.log('Service worker registered:', registration.scope);
 
         // Check for updates periodically (every hour)
         setInterval(() => {
@@ -50,7 +52,7 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
                 if (installingWorker.state === 'installed') {
                     if (navigator.serviceWorker.controller) {
                         // New update available
-                        console.log('[PWA] New content available');
+                        pwaLogger.log('New content available');
                         if (config?.onUpdate) {
                             config.onUpdate(registration);
                         }
@@ -59,7 +61,7 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
                         }
                     } else {
                         // Content cached for offline use
-                        console.log('[PWA] Content cached for offline use');
+                        pwaLogger.log('Content cached for offline use');
                         if (config?.onSuccess) {
                             config.onSuccess(registration);
                         }
@@ -76,7 +78,7 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
 
         return registration;
     } catch (error) {
-        console.error('[PWA] Service worker registration failed:', error);
+        pwaLogger.error('Service worker registration failed:', error);
         return null;
     }
 }
@@ -92,10 +94,10 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     try {
         const registration = await navigator.serviceWorker.ready;
         await registration.unregister();
-        console.log('[PWA] Service worker unregistered');
+        pwaLogger.log('Service worker unregistered');
         return true;
     } catch (error) {
-        console.error('[PWA] Service worker unregister failed:', error);
+        pwaLogger.error('Service worker unregister failed:', error);
         return false;
     }
 }

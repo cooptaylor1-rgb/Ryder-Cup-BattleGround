@@ -8,6 +8,7 @@ import {
     isInstalledPWA,
     type SWUpdateCallback
 } from '@/lib/utils/serviceWorker';
+import { pwaLogger } from '@/lib/utils/logger';
 
 interface PWAContextValue {
     isOnline: boolean;
@@ -53,7 +54,7 @@ export function PWAProvider({ children }: PWAProviderProps) {
             onOffline: () => setOnline(false),
             onOnline: () => setOnline(true),
             onSuccess: () => {
-                console.log('[PWA] App ready for offline use');
+                pwaLogger.log('App ready for offline use');
             },
         });
 

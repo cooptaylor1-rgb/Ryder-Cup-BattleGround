@@ -9,6 +9,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Player } from '../types/models';
 import { db } from '../db';
+import { authLogger } from '../utils/logger';
 
 // ============================================
 // TYPES
@@ -85,7 +86,7 @@ export const useAuthStore = create<AuthState>()(
                         try {
                             users = JSON.parse(storedUsers);
                         } catch (parseError) {
-                            console.error('Failed to parse stored users:', parseError);
+                            authLogger.error('Failed to parse stored users:', parseError);
                             set({ isLoading: false, error: 'Login data corrupted. Please contact support.' });
                             return false;
                         }
@@ -170,7 +171,7 @@ export const useAuthStore = create<AuthState>()(
                         try {
                             users = JSON.parse(storedUsers);
                         } catch (parseError) {
-                            console.error('Failed to parse stored users:', parseError);
+                            authLogger.error('Failed to parse stored users:', parseError);
                             // Continue with empty users object since we're creating a new user
                         }
                     }
@@ -207,7 +208,8 @@ export const useAuthStore = create<AuthState>()(
                     });
 
                     // Return the PIN so it can be shown to the user
-                    console.log(`New user PIN: ${pin}`); // In production, email this
+                    // Note: authLogger.log is silent in production - PIN only shows in dev
+                    authLogger.log(`New user PIN: ${pin}`);
                     alert(`Your PIN is: ${pin}\n\nSave this PIN to log in again!`);
 
                     return profile;
@@ -250,7 +252,7 @@ export const useAuthStore = create<AuthState>()(
                         try {
                             users = JSON.parse(storedUsers);
                         } catch (parseError) {
-                            console.error('Failed to parse stored users:', parseError);
+                            authLogger.error('Failed to parse stored users:', parseError);
                             // Continue - we'll try to save anyway
                         }
                     }
@@ -297,7 +299,7 @@ export const useAuthStore = create<AuthState>()(
 
                     return userEntry?.profile || null;
                 } catch (error) {
-                    console.error('Failed to parse stored users:', error);
+                    authLogger.error('Failed to parse stored users:', error);
                     return null;
                 }
             },

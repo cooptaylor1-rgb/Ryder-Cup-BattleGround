@@ -19,6 +19,7 @@ import {
     undoLastScore,
     getCurrentHole,
 } from '../services/scoringEngine';
+import { ScoringEventType } from '../types/events';
 
 // ============================================
 // TYPES
@@ -145,12 +146,41 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
             const matchState = calculateMatchState(match, holeResults);
             const nextHole = await getCurrentHole(matchId);
 
+            // Reconstruct undo stack from persisted scoring events
+            const scoringEvents = await db.scoringEvents
+                .where('matchId')
+                .equals(matchId)
+                .sortBy('timestamp');
+
+            // Build undo stack from events (exclude HoleUndone events, they represent completed undos)
+            const undoStack: Array<{
+                matchId: string;
+                holeNumber: number;
+                previousResult: HoleResult | null;
+            }> = [];
+
+            for (const event of scoringEvents) {
+                if (event.eventType === ScoringEventType.HoleScored || event.eventType === ScoringEventType.HoleEdited) {
+                    const payload = event.payload as { holeNumber: number; previousWinner?: string };
+                    // Find if there was a previous result for this hole
+                    const prevResult = holeResults.find(r => r.holeNumber === payload.holeNumber) || null;
+                    undoStack.push({
+                        matchId: event.matchId,
+                        holeNumber: payload.holeNumber,
+                        previousResult: prevResult,
+                    });
+                } else if (event.eventType === ScoringEventType.HoleUndone) {
+                    // An undo event means we should pop from the stack
+                    undoStack.pop();
+                }
+            }
+
             set({
                 activeMatch: match,
                 activeMatchState: matchState,
                 currentHole: nextHole || 18, // Default to 18 if complete
                 isLoading: false,
-                undoStack: [],
+                undoStack,
             });
         } catch (error) {
             set({

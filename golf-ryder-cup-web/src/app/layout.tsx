@@ -5,6 +5,9 @@ import { PWABanners } from '@/components/PWABanners';
 import { ToastContainer } from '@/components/ui/Toast';
 import { AppOnboardingProvider } from '@/components/AppOnboardingProvider';
 import { NotificationProvider } from '@/components/live-play';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { QuickScoreFAB } from '@/components/QuickScoreFAB';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
 
 export const metadata: Metadata = {
   title: 'Ryder Cup Tracker',
@@ -53,13 +56,17 @@ export default function RootLayout({
           Skip to main content
         </a>
         <PWAProvider>
-          <NotificationProvider>
-            <AppOnboardingProvider>
-              <main id="main-content">
-                {children}
-              </main>
-            </AppOnboardingProvider>
-          </NotificationProvider>
+          <ErrorBoundary variant="fullscreen" showDetails={process.env.NODE_ENV === 'development'}>
+            <NotificationProvider>
+              <AppOnboardingProvider>
+                <main id="main-content">
+                  {children}
+                </main>
+              </AppOnboardingProvider>
+            </NotificationProvider>
+          </ErrorBoundary>
+          <QuickScoreFAB />
+          <OfflineIndicator />
           <ToastContainer />
           <PWABanners />
         </PWAProvider>

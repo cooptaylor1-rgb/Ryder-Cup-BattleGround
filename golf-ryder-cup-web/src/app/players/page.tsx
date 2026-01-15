@@ -119,12 +119,12 @@ export default function PlayersPage() {
     const unassignedPlayers = players.filter(p => !getPlayerTeam(p.id));
 
     return (
-        <div className="min-h-screen" style={{ background: 'var(--canvas)' }}>
+        <div style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
             {/* Header */}
             <header className="header">
-                <div className="container-editorial flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
+                <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                        <button onClick={() => router.back()} className="press-scale" style={{ padding: 'var(--space-1)', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-secondary)' }} aria-label="Back">
                             <ChevronLeft size={20} />
                         </button>
                         <div>
@@ -225,9 +225,9 @@ export default function PlayersPage() {
             {showAddModal && (
                 <div className="modal-backdrop" onClick={resetForm}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
                             <h2 className="type-headline">{editingPlayer ? 'Edit Player' : 'Add Player'}</h2>
-                            <button onClick={resetForm}>
+                            <button onClick={resetForm} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                                 <X size={20} style={{ color: 'var(--ink-tertiary)' }} />
                             </button>
                         </div>
@@ -281,9 +281,9 @@ export default function PlayersPage() {
                             </div>
                         </div>
 
-                        <div className="flex gap-3" style={{ marginTop: 'var(--space-6)' }}>
-                            <button onClick={resetForm} className="btn btn-secondary flex-1">Cancel</button>
-                            <button onClick={handleSave} className="btn btn-primary flex-1">
+                        <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
+                            <button onClick={resetForm} className="btn btn-secondary" style={{ flex: 1 }}>Cancel</button>
+                            <button onClick={handleSave} className="btn btn-primary" style={{ flex: 1 }}>
                                 {editingPlayer ? 'Save' : 'Add'}
                             </button>
                         </div>
@@ -299,9 +299,9 @@ export default function PlayersPage() {
                         <p className="type-body" style={{ marginBottom: 'var(--space-4)' }}>
                             Are you sure you want to delete {playerToDelete.firstName} {playerToDelete.lastName}? This will also remove them from any matches.
                         </p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setPlayerToDelete(null)} className="btn btn-secondary flex-1">Cancel</button>
-                            <button onClick={handleDelete} className="btn btn-danger flex-1">Delete</button>
+                        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                            <button onClick={() => setPlayerToDelete(null)} className="btn btn-secondary" style={{ flex: 1 }}>Cancel</button>
+                            <button onClick={handleDelete} className="btn btn-danger" style={{ flex: 1 }}>Delete</button>
                         </div>
                     </div>
                 </div>
@@ -334,7 +334,7 @@ function PlayerRow({
                 style={{
                     width: '36px',
                     height: '36px',
-                    borderRadius: '50%',
+                    borderRadius: 'var(--radius-full)',
                     background: bgColor,
                     color: 'white',
                     display: 'flex',
@@ -349,7 +349,7 @@ function PlayerRow({
             </div>
 
             {/* Info */}
-            <div className="flex-1 min-w-0">
+            <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontWeight: 500 }}>{formatPlayerName(player.firstName, player.lastName)}</p>
                 {player.handicapIndex !== undefined && (
                     <p className="type-meta">HCP: {player.handicapIndex.toFixed(1)}</p>
@@ -358,11 +358,11 @@ function PlayerRow({
 
             {/* Actions */}
             {canEdit && (
-                <div className="flex items-center gap-1">
-                    <button onClick={onEdit} style={{ padding: 'var(--space-2)', color: 'var(--ink-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                    <button onClick={onEdit} style={{ padding: 'var(--space-2)', color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
                         <Edit2 size={16} />
                     </button>
-                    <button onClick={onDelete} style={{ padding: 'var(--space-2)', color: 'var(--error)' }}>
+                    <button onClick={onDelete} style={{ padding: 'var(--space-2)', color: 'var(--error)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
                         <Trash2 size={16} />
                     </button>
                 </div>

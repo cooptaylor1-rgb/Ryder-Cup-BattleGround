@@ -129,7 +129,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-enter" style={{ background: 'var(--canvas)' }}>
+    <div className="pb-nav page-enter" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
       {/* Quick Start Wizard Modal */}
       {showQuickStart && (
         <QuickStartWizard
@@ -143,13 +143,12 @@ export default function HomePage() {
 
       {/* Minimal Header */}
       <header className="header">
-        <div className="container-editorial flex items-center justify-between">
+        <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span className="type-overline">Ryder Cup Tracker</span>
           {hasTrips && (
             <button
               onClick={() => setShowWhatsNew(true)}
-              className="p-2 -mr-2 rounded-lg transition-colors"
-              style={{ color: 'var(--masters)' }}
+              style={{ padding: 'var(--space-2)', marginRight: 'calc(-1 * var(--space-2))', borderRadius: 'var(--radius-md)', color: 'var(--masters)', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'all 0.2s ease' }}
               aria-label="What's new"
             >
               <Sparkles className="w-5 h-5" />
@@ -310,7 +309,7 @@ export default function HomePage() {
               <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
                 Quick Actions
               </h2>
-              <div className="grid grid-cols-4 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-3)' }}>
                 <QuickActionButton
                   icon={<Tv size={20} />}
                   label="Live"
@@ -359,7 +358,7 @@ export default function HomePage() {
               <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
                 Momentum
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
                 <MomentumCard
                   team="USA"
                   streak={2}
@@ -377,17 +376,17 @@ export default function HomePage() {
 
             {/* Side Bets Quick View */}
             <section className="section-sm">
-              <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
                 <h2 className="type-overline">Side Bets</h2>
                 <Link
                   href="/bets"
-                  className="flex items-center gap-1 type-caption"
-                  style={{ color: 'var(--masters)' }}
+                  className="type-caption"
+                  style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--masters)' }}
                 >
                   View All <ChevronRight size={14} />
                 </Link>
               </div>
-              <div className="space-y-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 <SideBetRow type="Skins" status="$45 in pot" icon={<Zap size={16} />} />
                 <SideBetRow type="Closest to Pin" status="Hole 7 - Open" icon={<Target size={16} />} />
                 <SideBetRow type="Long Drive" status="Hole 12 - Open" icon={<TrendingUp size={16} />} />
@@ -439,8 +438,12 @@ export default function HomePage() {
         {/* ARCHIVE — Tournament List */}
         <section className={activeTrip ? 'section-sm' : 'section'}>
           <div
-            className="flex items-center justify-between"
-            style={{ marginBottom: 'var(--space-6)' }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--space-6)',
+            }}
           >
             <h2 className="type-overline">
               {hasTrips ? 'Tournaments' : 'Get Started'}
@@ -448,8 +451,10 @@ export default function HomePage() {
             {hasTrips && (
               <button
                 onClick={() => setShowQuickStart(true)}
-                className="flex items-center gap-1"
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-1)',
                   color: 'var(--masters)',
                   fontWeight: 500,
                   fontSize: 'var(--text-sm)',
@@ -470,18 +475,18 @@ export default function HomePage() {
                 <button
                   key={trip.id}
                   onClick={() => handleSelectTrip(trip.id)}
-                  className="match-row row-interactive w-full text-left stagger-item"
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  className="match-row row-interactive stagger-item"
+                  style={{ width: '100%', textAlign: 'left', animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="flex-1 min-w-0">
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
                       {trip.name}
                     </p>
-                    <div className="flex items-center gap-4 type-caption">
+                    <div className="type-caption" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                       {trip.location && (
-                        <span className="flex items-center gap-1 truncate">
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           <MapPin size={12} strokeWidth={1.5} />
-                          <span className="truncate">{trip.location}</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trip.location}</span>
                         </span>
                       )}
                       <span>{formatDate(trip.startDate, 'short')}</span>
@@ -522,21 +527,34 @@ function QuickActionButton({ icon, label, href, badge, color }: QuickActionButto
   return (
     <Link
       href={href}
-      className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all press-scale"
+      className="press-scale"
       style={{
-        background: 'var(--surface)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 'var(--space-2)',
+        padding: 'var(--space-3)',
+        borderRadius: 'var(--radius-xl)',
+        background: 'var(--canvas-raised)',
         border: '1px solid var(--rule)',
+        transition: 'all 0.2s ease',
+        textDecoration: 'none',
       }}
     >
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         <div style={{ color: color || 'var(--ink-secondary)' }}>{icon}</div>
         {badge && (
           <span
-            className="absolute -top-1 -right-2 px-1.5 py-0.5 text-xs font-bold rounded-full"
             style={{
+              position: 'absolute',
+              top: '-4px',
+              right: '-8px',
+              padding: '2px 6px',
+              fontSize: '10px',
+              fontWeight: 700,
+              borderRadius: 'var(--radius-full)',
               background: 'var(--error)',
               color: 'white',
-              fontSize: '10px',
               minWidth: '16px',
               textAlign: 'center',
             }}
@@ -561,18 +579,15 @@ interface MomentumCardProps {
 function MomentumCard({ team, streak, trend, color }: MomentumCardProps) {
   return (
     <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
+      className="card"
+      style={{ padding: 'var(--space-4)' }}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
         <span className="type-overline" style={{ color }}>{team}</span>
         {trend === 'up' && <Flame size={16} style={{ color: 'var(--error)' }} />}
       </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold" style={{ color }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+        <span className="score-large" style={{ color }}>
           {streak}
         </span>
         <span className="type-caption">
@@ -593,14 +608,16 @@ interface SideBetRowProps {
 function SideBetRow({ type, status, icon }: SideBetRowProps) {
   return (
     <div
-      className="flex items-center gap-3 p-3 rounded-lg"
+      className="card"
       style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-3)',
+        padding: 'var(--space-3)',
       }}
     >
       <div style={{ color: 'var(--masters)' }}>{icon}</div>
-      <div className="flex-1">
+      <div style={{ flex: 1 }}>
         <p className="type-title-sm">{type}</p>
         <p className="type-caption">{status}</p>
       </div>

@@ -9,6 +9,7 @@ import { DraftBoard } from './DraftBoard';
 import { SmartPairingSuggestions } from './SmartPairingSuggestions';
 import { SideBetsTracker } from './SideBetsTracker';
 import { SessionWeatherPanel } from './SessionWeatherPanel';
+import { captainLogger } from '@/lib/utils/logger';
 import {
   Rocket,
   Users,
@@ -178,7 +179,7 @@ export function CaptainToolkit({
             players={players}
             teams={teams}
             onDraftComplete={(assignments) => {
-              console.log('Draft complete:', assignments);
+              captainLogger.log('Draft complete:', assignments);
               onDataUpdate();
               setActiveSection(null);
             }}
@@ -201,7 +202,7 @@ export function CaptainToolkit({
             players={players}
             teams={teams}
             onSave={(teeSheet) => {
-              console.log('Tee sheet saved:', teeSheet);
+              captainLogger.log('Tee sheet saved:', teeSheet);
               onDataUpdate();
             }}
           />
@@ -216,7 +217,7 @@ export function CaptainToolkit({
             matches={matches}
             currentSessionId={currentSession?.id}
             onApplySuggestion={(suggestion) => {
-              console.log('Applying suggestion:', suggestion);
+              captainLogger.log('Applying suggestion:', suggestion);
               onDataUpdate();
             }}
           />
@@ -341,7 +342,7 @@ export function CaptainToolkit({
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImportComplete={(result) => {
-          console.log('Import complete:', result);
+          captainLogger.log('Import complete:', result);
           onDataUpdate();
           setShowImportModal(false);
         }}
