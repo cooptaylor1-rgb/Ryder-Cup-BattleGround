@@ -33,6 +33,7 @@ import {
     Undo2,
     Info,
     Trophy,
+    RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
