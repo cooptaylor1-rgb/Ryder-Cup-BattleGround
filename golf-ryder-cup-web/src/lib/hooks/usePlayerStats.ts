@@ -518,14 +518,14 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
 
     return {
         // Core data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        player: player as any
+        player: player
             ? {
-                id: player?.id,
-                name: player ? `${player.firstName} ${player.lastName}` : '',
-                avatarUrl: player?.avatarUrl,
+                id: player.id,
+                name: `${player.firstName} ${player.lastName}`,
+                avatarUrl: player.avatarUrl,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 team: (player as any)?.team,
-                handicap: player?.handicapIndex,
+                handicap: player.handicapIndex,
             }
             : null,
 
