@@ -147,3 +147,70 @@ export {
   type HoleSetup,
   type CourseSetupItem,
 } from './CourseSetupConfirmation';
+
+// ============================================
+// Phase 2: Captain Empowerment Components
+// ============================================
+
+// Lineup Builder v2 (Drag-and-Drop)
+export {
+  PlayerCard,
+  DraggablePlayerCard,
+} from './lineup-builder';
+export { MatchSlot as MatchSlotDropZone } from './lineup-builder';
+export { LineupCanvas } from './lineup-builder';
+export {
+  autoBalanceLineup,
+  calculateLineupFairness,
+  calculateMatchFairness,
+  suggestSwaps as suggestLineupSwaps,
+  type BalanceConfig,
+  type BalancedLineup,
+} from './lineup-builder';
+
+// Captain Dashboard v2
+export {
+  LiveMatchMonitor,
+  type LiveMatchData,
+  type SessionOverview,
+} from './dashboard';
+export {
+  PointsCalculator,
+  type MatchOutcome,
+  type ProjectedMatch,
+} from './dashboard';
+export {
+  AlertCenter,
+  type CaptainAlert,
+  type AlertPriority,
+  type AlertCategory,
+  type AlertStatus,
+} from './dashboard';
+export {
+  OverrideModal,
+  type OverrideReason,
+  type AuditEntry,
+  type MatchScore as OverrideMatchScore,
+} from './dashboard';
+export {
+  BatchScoreGrid,
+  type BatchMatch,
+  type BatchScoreEntry,
+} from './dashboard';
+
+// Session Management
+export {
+  SessionCloner,
+  type SessionPlayer as ClonerSessionPlayer,
+  type SessionMatch as ClonerSessionMatch,
+  type SessionTemplate,
+  type CloneOptions,
+} from './sessions';
+
+// Audit Trail UI
+export {
+  AuditBadge,
+  InlineAuditIndicator,
+  AuditHistoryList,
+  type AuditInfo,
+} from './audit';
