@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { supabase, isSupabaseConfigured, getSupabase } from '@/lib/supabase';
+import { isSupabaseConfigured, getSupabase, insertRecord } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Camera, X, Upload, Image, Loader2, MapPin, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -110,16 +110,14 @@ export function PhotoGallery({
                     createdAt: new Date().toISOString(),
                 };
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error: insertError } = await (sb.from('photos') as any)
-                    .insert({
-                        id: photo.id,
-                        trip_id: photo.tripId,
-                        match_id: photo.matchId,
-                        uploaded_by: photo.uploadedBy,
-                        url: photo.url,
-                        created_at: photo.createdAt,
-                    });
+                const { error: insertError } = await insertRecord('photos', {
+                    id: photo.id,
+                    trip_id: photo.tripId,
+                    match_id: photo.matchId,
+                    uploaded_by: photo.uploadedBy,
+                    url: photo.url,
+                    created_at: photo.createdAt,
+                });
 
                 if (insertError) throw insertError;
 

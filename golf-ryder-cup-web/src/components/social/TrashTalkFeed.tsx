@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { isSupabaseConfigured, getSupabase } from '@/lib/supabase';
+import { isSupabaseConfigured, insertRecord } from '@/lib/supabase';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Send, Smile, Trophy, MessageCircle, Loader2 } from 'lucide-react';
@@ -73,8 +73,7 @@ export function TrashTalkFeed({
             };
 
             if (isSupabaseConfigured) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (getSupabase().from('comments') as any).insert({
+                await insertRecord('comments', {
                     trip_id: tripId,
                     match_id: matchId,
                     player_id: currentPlayerId,
@@ -109,8 +108,7 @@ export function TrashTalkFeed({
         };
 
         if (isSupabaseConfigured) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (getSupabase().from('comments') as any).insert({
+            await insertRecord('comments', {
                 trip_id: tripId,
                 match_id: matchId,
                 player_id: currentPlayerId,

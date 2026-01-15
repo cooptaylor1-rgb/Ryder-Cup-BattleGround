@@ -157,3 +157,69 @@ export async function trackPresence(
         online_at: new Date().toISOString(),
     });
 }
+
+// ============================================
+// TYPE-SAFE TABLE HELPERS
+// ============================================
+
+export type TableName = keyof Database['public']['Tables'];
+
+// Type helper to get insert type for a table
+type InsertType<T extends TableName> = Database['public']['Tables'][T]['Insert'];
+type UpdateType<T extends TableName> = Database['public']['Tables'][T]['Update'];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyQueryBuilder = { insert: (data: unknown) => any; update: (data: unknown) => any; upsert: (data: unknown) => any; delete: () => any; eq: (col: string, value: unknown) => any };
+
+/**
+ * Type-safe insert helper for any table
+ * External API is type-safe; internal uses cast for dynamic table access
+ */
+export async function insertRecord<T extends TableName>(
+    table: T,
+    data: InsertType<T>
+): Promise<{ error: Error | null }> {
+    const sb = getSupabase();
+    // Dynamic table access requires internal cast - external API remains type-safe
+    const { error } = await (sb.from(table) as unknown as AnyQueryBuilder).insert(data);
+    return { error };
+}
+
+/**
+ * Type-safe update helper for any table
+ */
+export async function updateRecord<T extends TableName>(
+    table: T,
+    id: string,
+    data: UpdateType<T>
+): Promise<{ error: Error | null }> {
+    const sb = getSupabase();
+    const builder = sb.from(table) as unknown as AnyQueryBuilder;
+    const { error } = await builder.update(data).eq('id', id);
+    return { error };
+}
+
+/**
+ * Type-safe upsert helper for any table
+ */
+export async function upsertRecord<T extends TableName>(
+    table: T,
+    data: InsertType<T>
+): Promise<{ error: Error | null }> {
+    const sb = getSupabase();
+    const { error } = await (sb.from(table) as unknown as AnyQueryBuilder).upsert(data);
+    return { error };
+}
+
+/**
+ * Type-safe delete helper for any table
+ */
+export async function deleteRecord<T extends TableName>(
+    table: T,
+    id: string
+): Promise<{ error: Error | null }> {
+    const sb = getSupabase();
+    const builder = sb.from(table) as unknown as AnyQueryBuilder;
+    const { error } = await builder.delete().eq('id', id);
+    return { error };
+}

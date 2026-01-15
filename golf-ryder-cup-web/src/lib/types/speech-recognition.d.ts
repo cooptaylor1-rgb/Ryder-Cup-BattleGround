@@ -60,6 +60,15 @@ declare global {
         SpeechRecognition?: SpeechRecognitionConstructor;
         webkitSpeechRecognition?: SpeechRecognitionConstructor;
     }
+
+    /**
+     * iOS Safari Navigator Extensions
+     * The `standalone` property indicates if the app is running as an installed PWA
+     */
+    interface Navigator {
+        /** iOS Safari: true if app is running in standalone mode (added to home screen) */
+        standalone?: boolean;
+    }
 }
 
 export { };

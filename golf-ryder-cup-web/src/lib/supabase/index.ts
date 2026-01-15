@@ -4,8 +4,16 @@
  * Real-time sync capabilities for the Golf Ryder Cup App.
  */
 
-export { supabase, isSupabaseConfigured, getSupabase } from './client';
-export type { ConnectionStatus } from './client';
+export {
+    supabase,
+    isSupabaseConfigured,
+    getSupabase,
+    insertRecord,
+    updateRecord,
+    upsertRecord,
+    deleteRecord,
+} from './client';
+export type { ConnectionStatus, TableName } from './client';
 
 export { syncService, useSyncStatus } from './syncService';
 export type { SyncResult, SyncStatus } from './syncService';

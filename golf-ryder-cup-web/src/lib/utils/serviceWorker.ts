@@ -135,8 +135,8 @@ export function isInstalledPWA(): boolean {
     // Check display-mode media query
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-    // iOS Safari specific
-    const isIOSStandalone = (window.navigator as any).standalone === true;
+    // iOS Safari specific (Navigator.standalone type defined in speech-recognition.d.ts)
+    const isIOSStandalone = window.navigator.standalone === true;
 
     return isStandalone || isIOSStandalone;
 }

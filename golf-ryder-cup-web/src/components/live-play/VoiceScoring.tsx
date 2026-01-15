@@ -148,8 +148,8 @@ export function VoiceScoring({
     position = { bottom: 160, right: 16 },
     className,
 }: VoiceScoringProps) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recognitionRef = useRef<any>(null);
+    // Use the globally declared SpeechRecognition type from speech-recognition.d.ts
+    const recognitionRef = useRef<InstanceType<NonNullable<typeof window.SpeechRecognition>> | null>(null);
 
     const [state, setState] = useState<ListeningState>('idle');
     const [recognizedScore, setRecognizedScore] = useState<RecognizedScore | null>(null);
@@ -230,9 +230,9 @@ export function VoiceScoring({
             setState('listening');
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onresult = (event: any) => {
-            const results = event.results;
+        recognition.onresult = (event) => {
+            // Event type is SpeechRecognitionEvent from our d.ts
+            const results = (event as unknown as { results: SpeechRecognitionResultList }).results;
             const lastResult = results[results.length - 1];
             const text = lastResult[0].transcript;
             setTranscript(text);
@@ -253,14 +253,15 @@ export function VoiceScoring({
             }
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        recognition.onerror = (event: any) => {
-            console.error('Speech recognition error:', event.error);
+        recognition.onerror = (event) => {
+            // Event type is SpeechRecognitionErrorEvent from our d.ts
+            const errorEvent = event as unknown as { error: string };
+            console.error('Speech recognition error:', errorEvent.error);
             triggerHaptic('error');
             setErrorMessage(
-                event.error === 'no-speech'
+                errorEvent.error === 'no-speech'
                     ? 'No speech detected. Tap to try again.'
-                    : `Error: ${event.error}`
+                    : `Error: ${errorEvent.error}`
             );
             setState('error');
         };

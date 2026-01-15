@@ -5,7 +5,16 @@
  * Provides offline-first experience with automatic sync when online.
  */
 
-import { supabase, isSupabaseConfigured, getSupabase } from './client';
+import {
+    supabase,
+    isSupabaseConfigured,
+    getSupabase,
+    insertRecord,
+    updateRecord,
+    upsertRecord,
+    deleteRecord,
+    type TableName,
+} from './client';
 import { db } from '../db';
 import type {
     Trip,
@@ -187,25 +196,25 @@ class SyncService {
         for (const change of [...this.pendingChanges]) {
             try {
                 const snakeCaseData = convertKeysToSnakeCase(change.data as Record<string, unknown>);
-                const sb = getSupabase();
+                const tableName = change.table as TableName;
+                const id = (change.data as { id: string }).id;
+                let result: { error: Error | null };
 
                 switch (change.operation) {
                     case 'insert':
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        await (sb.from(change.table) as any).insert(snakeCaseData);
+                        result = await insertRecord(tableName, snakeCaseData as never);
                         break;
                     case 'update':
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        await (sb.from(change.table) as any)
-                            .update(snakeCaseData)
-                            .eq('id', (change.data as { id: string }).id);
+                        result = await updateRecord(tableName, id, snakeCaseData as never);
                         break;
                     case 'delete':
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        await (sb.from(change.table) as any)
-                            .delete()
-                            .eq('id', (change.data as { id: string }).id);
+                        result = await deleteRecord(tableName, id);
                         break;
+                }
+
+                if (result!.error) {
+                    errors.push(`Failed to sync ${change.table}: ${result!.error.message}`);
+                    continue;
                 }
 
                 // Remove from pending
@@ -268,65 +277,56 @@ class SyncService {
             const matchIds = matches.map((m) => m.id);
             const holeResults = await db.holeResults.where('matchId').anyOf(matchIds).toArray();
 
-            const sb = getSupabase();
-
-            // Upsert to Supabase (using type assertions for dynamic data)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: tripError } = await (sb.from('trips') as any)
-                .upsert(convertKeysToSnakeCase(trip as unknown as Record<string, unknown>));
+            // Upsert to Supabase using type-safe helpers
+            const { error: tripError } = await upsertRecord('trips',
+                convertKeysToSnakeCase(trip as unknown as Record<string, unknown>) as never);
             if (tripError) errors.push(`Trip: ${tripError.message}`);
             else synced++;
 
             // Sync players
             for (const player of players) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('players') as any)
-                    .upsert(convertKeysToSnakeCase(player as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('players',
+                    convertKeysToSnakeCase(player as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`Player ${player.id}: ${error.message}`);
                 else synced++;
             }
 
             // Sync teams
             for (const team of teams) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('teams') as any)
-                    .upsert(convertKeysToSnakeCase(team as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('teams',
+                    convertKeysToSnakeCase(team as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`Team ${team.id}: ${error.message}`);
                 else synced++;
             }
 
             // Sync team members
             for (const tm of relevantTeamMembers) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('team_members') as any)
-                    .upsert(convertKeysToSnakeCase(tm as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('team_members',
+                    convertKeysToSnakeCase(tm as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`TeamMember ${tm.id}: ${error.message}`);
                 else synced++;
             }
 
             // Sync sessions
             for (const session of sessions) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('sessions') as any)
-                    .upsert(convertKeysToSnakeCase(session as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('sessions',
+                    convertKeysToSnakeCase(session as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`Session ${session.id}: ${error.message}`);
                 else synced++;
             }
 
             // Sync matches
             for (const match of matches) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('matches') as any)
-                    .upsert(convertKeysToSnakeCase(match as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('matches',
+                    convertKeysToSnakeCase(match as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`Match ${match.id}: ${error.message}`);
                 else synced++;
             }
 
             // Sync hole results
             for (const result of holeResults) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { error } = await (sb.from('hole_results') as any)
-                    .upsert(convertKeysToSnakeCase(result as unknown as Record<string, unknown>));
+                const { error } = await upsertRecord('hole_results',
+                    convertKeysToSnakeCase(result as unknown as Record<string, unknown>) as never);
                 if (error) errors.push(`HoleResult ${result.id}: ${error.message}`);
                 else synced++;
             }
@@ -509,9 +509,8 @@ class SyncService {
         }
 
         try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (getSupabase().from('hole_results') as any)
-                .upsert(convertKeysToSnakeCase(holeResult as unknown as Record<string, unknown>));
+            const { error } = await upsertRecord('hole_results',
+                convertKeysToSnakeCase(holeResult as unknown as Record<string, unknown>) as never);
 
             if (error) {
                 this.addPendingChange('hole_results', 'insert', holeResult);
@@ -535,10 +534,8 @@ class SyncService {
         }
 
         try {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (getSupabase().from('matches') as any)
-                .update(convertKeysToSnakeCase(match as unknown as Record<string, unknown>))
-                .eq('id', match.id);
+            const { error } = await updateRecord('matches', match.id,
+                convertKeysToSnakeCase(match as unknown as Record<string, unknown>) as never);
 
             if (error) {
                 this.addPendingChange('matches', 'update', match);
