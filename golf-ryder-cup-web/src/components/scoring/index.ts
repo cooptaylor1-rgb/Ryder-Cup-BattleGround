@@ -43,3 +43,7 @@ export {
   type MatchScorecardProps,
   type PlayerScore,
 } from './MatchScorecard';
+
+export {
+  StablefordScorecard,
+} from './StablefordScorecard';
