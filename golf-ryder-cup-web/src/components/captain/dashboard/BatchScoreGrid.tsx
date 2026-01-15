@@ -533,7 +533,7 @@ export function BatchScoreGrid({
 
     // Handle reset
     const handleReset = () => {
-        haptic.medium();
+        haptic.press();
         setScores(() => {
             const initial: Record<string, Record<number, { teamA: number | null; teamB: number | null }>> = {};
             for (const match of matches) {

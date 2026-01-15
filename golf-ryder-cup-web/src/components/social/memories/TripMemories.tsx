@@ -652,7 +652,7 @@ function ShareFooter({ onShare, onExport }: { onShare?: () => void; onExport?: (
                 <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
-                        haptic.medium();
+                        haptic.press();
                         onShare?.();
                     }}
                     className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-white"

@@ -377,11 +377,11 @@ export function useMatchScoring({
                 // Celebration haptic for birdie or better
                 const holePar = par || coursePars[holeNumber - 1] || 4;
                 if (team1Score <= holePar - 1 || team2Score <= holePar - 1) {
-                    haptic.heavy();
+                    haptic.impact();
                 }
             } catch (err) {
                 setError(err as Error);
-                haptic.medium();
+                haptic.press();
             } finally {
                 setIsSaving(false);
             }
@@ -464,7 +464,7 @@ export function useMatchScoring({
                 data: matchStatus.matchResult,
             });
 
-            haptic.heavy();
+            haptic.impact();
         } catch (err) {
             setError(err as Error);
         } finally {
@@ -491,7 +491,7 @@ export function useMatchScoring({
                 updatedAt: new Date().toISOString(),
             });
 
-            haptic.medium();
+            haptic.press();
         } catch (err) {
             setError(err as Error);
         } finally {

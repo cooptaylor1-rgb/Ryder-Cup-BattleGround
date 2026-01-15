@@ -235,7 +235,7 @@ export function useOfflineQueue(): UseOfflineQueueReturn {
                         retryCount: newRetryCount,
                         error: error.message,
                     });
-                    haptic.medium();
+                    haptic.press();
                 } else {
                     // Will retry - keep as pending
                     queueStore.update(action.id, {

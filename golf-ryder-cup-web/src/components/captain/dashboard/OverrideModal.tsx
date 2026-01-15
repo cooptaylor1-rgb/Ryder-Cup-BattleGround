@@ -546,7 +546,7 @@ export function OverrideModal({
     };
 
     const handleContinue = () => {
-        haptic.medium();
+        haptic.press();
         setStep('confirm');
     };
 
@@ -559,7 +559,7 @@ export function OverrideModal({
     const handleSubmit = async () => {
         if (!canSubmit || selectedHole === null || reason === null) return;
 
-        haptic.heavy();
+        haptic.impact();
         setIsSubmitting(true);
 
         try {

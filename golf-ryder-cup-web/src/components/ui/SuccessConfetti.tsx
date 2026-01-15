@@ -169,7 +169,7 @@ export function SuccessConfetti({
 
     useEffect(() => {
         if (isActive) {
-            haptic.heavy();
+            haptic.impact();
             setPieces(generatePieces());
 
             const timer = setTimeout(() => {
@@ -249,7 +249,7 @@ export function ConfettiCannon({
 
     useEffect(() => {
         if (isActive) {
-            haptic.medium();
+            haptic.press();
 
             const newPieces = Array.from({ length: pieceCount }, (_, i) => {
                 // Calculate angle based on direction

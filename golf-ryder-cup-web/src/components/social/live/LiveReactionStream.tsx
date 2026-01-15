@@ -374,7 +374,7 @@ export function ScoreCelebration({
     const config = REACTION_CONFIG[type];
 
     useEffect(() => {
-        haptic.heavy();
+        haptic.impact();
         const timer = setTimeout(onComplete, 3000);
         return () => clearTimeout(timer);
     }, [haptic, onComplete]);

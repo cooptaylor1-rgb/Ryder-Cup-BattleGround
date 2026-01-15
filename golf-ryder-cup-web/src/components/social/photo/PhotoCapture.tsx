@@ -161,7 +161,7 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
     const handleCapture = () => {
         if (!videoRef.current || !canvasRef.current) return;
 
-        haptic.heavy();
+        haptic.impact();
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -524,7 +524,7 @@ export function PhotoCapture({
     const handleConfirm = async () => {
         if (!capturedPhoto) return;
 
-        haptic.heavy();
+        haptic.impact();
 
         const photo: CapturedPhoto = {
             id: crypto.randomUUID(),

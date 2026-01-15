@@ -276,8 +276,8 @@ export function AchievementUnlock({
     useEffect(() => {
         if (achievement) {
             // Haptic burst for achievement
-            haptic.heavy();
-            setTimeout(() => haptic.medium(), 200);
+            haptic.impact();
+            setTimeout(() => haptic.press(), 200);
             setTimeout(() => haptic.tap(), 400);
 
             // Show details after animation
@@ -295,7 +295,7 @@ export function AchievementUnlock({
 
     const handleShare = () => {
         if (achievement) {
-            haptic.medium();
+            haptic.press();
             onShare?.(achievement.id);
         }
     };

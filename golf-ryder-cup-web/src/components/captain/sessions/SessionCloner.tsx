@@ -348,7 +348,7 @@ function PlayerPickerModal({
                         <button
                             key={p.id}
                             onClick={() => {
-                                haptic.medium();
+                                haptic.press();
                                 onSelect(p.id);
                                 onClose();
                             }}
@@ -473,7 +473,7 @@ export function SessionCloner({
     };
 
     const handleClone = async () => {
-        haptic.heavy();
+        haptic.impact();
         setIsCloning(true);
 
         try {
@@ -744,7 +744,7 @@ export function SessionCloner({
 
                 {step === 'options' && (
                     <button
-                        onClick={() => { haptic.medium(); setStep('players'); }}
+                        onClick={() => { haptic.press(); setStep('players'); }}
                         disabled={!canProceed}
                         className={cn(
                             'px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2',
@@ -759,7 +759,7 @@ export function SessionCloner({
 
                 {step === 'players' && (
                     <button
-                        onClick={() => { haptic.medium(); setStep('preview'); }}
+                        onClick={() => { haptic.press(); setStep('preview'); }}
                         className="px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2"
                         style={{ background: 'var(--masters)' }}
                     >

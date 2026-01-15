@@ -147,7 +147,7 @@ export function QuickScoreFABv2({
     // Handle long press start
     const handlePressStart = useCallback(() => {
         longPressTimer.current = setTimeout(() => {
-            haptic.heavy();
+            haptic.impact();
             setIsVoiceMode(true);
             setIsExpanded(true);
         }, 500);

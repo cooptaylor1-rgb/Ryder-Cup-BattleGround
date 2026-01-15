@@ -130,7 +130,7 @@ function ReactionBar({ reactions, onReact }: ReactionBarProps) {
         .sort((a, b) => b[1].count - a[1].count);
 
     const handleReact = (emoji: string) => {
-        haptic.medium();
+        haptic.press();
         onReact(emoji);
         setShowPicker(false);
     };
@@ -234,7 +234,7 @@ export function MomentCard({
     };
 
     const handleSave = () => {
-        haptic.medium();
+        haptic.press();
         onSave?.(moment.id);
     };
 
