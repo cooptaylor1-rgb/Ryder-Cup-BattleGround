@@ -102,58 +102,42 @@ export default function LivePage() {
 
   return (
     <div
-      className="min-h-screen pb-nav page-premium-enter"
-      style={{
-        background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
-        color: 'white',
-      }}
+      className="min-h-screen pb-nav page-premium-enter bg-background text-foreground"
     >
       {/* Premium Header */}
-      <header className="header-premium" style={{ background: 'transparent', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      <header className="header-premium bg-transparent border-b border-border">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
               aria-label="Back"
             >
               <ChevronLeft size={22} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div className="flex items-center gap-3">
               <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 0 16px rgba(239, 68, 68, 0.4)',
-                }}
+                className="w-8 h-8 rounded-md bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg"
               >
-                <Tv size={16} style={{ color: 'white' }} />
+                <Tv size={16} className="text-white" />
               </div>
               <div>
-                <span className="type-overline" style={{ color: 'rgba(255,255,255,0.8)', letterSpacing: '0.1em' }}>Live Scores</span>
-                <p className="text-sm opacity-70">{currentTrip.name}</p>
+                <span className="type-overline text-muted-foreground tracking-wider">Live Scores</span>
+                <p className="text-sm text-muted-foreground">{currentTrip.name}</p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
               aria-label={soundEnabled ? 'Mute' : 'Unmute'}
             >
               {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
               aria-label="Toggle fullscreen"
             >
               <Maximize2 size={20} />
@@ -163,8 +147,7 @@ export default function LivePage() {
                 if (activeSession) loadSessionMatches(activeSession.id);
                 setLastUpdate(new Date());
               }}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
               aria-label="Refresh"
             >
               <RefreshCw size={20} />
@@ -178,7 +161,7 @@ export default function LivePage() {
         {activeSession && (
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="opacity-70">
+            <p className="text-muted-foreground">
               Last updated: {lastUpdate.toLocaleTimeString()}
             </p>
           </div>
@@ -200,7 +183,7 @@ export default function LivePage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-20 opacity-70">
+          <div className="text-center py-20 text-muted-foreground">
             <Tv size={48} className="mx-auto mb-4 opacity-50" />
             <p className="text-xl">No live matches</p>
             <p className="text-sm mt-2">Start a session to see live scores here</p>
@@ -209,28 +192,28 @@ export default function LivePage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav" style={{ background: 'rgba(26, 26, 46, 0.95)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <Link href="/" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+      <nav className="nav-premium bottom-nav bg-background/95 backdrop-blur-sm border-t border-border">
+        <Link href="/" className="nav-item text-muted-foreground hover:text-foreground">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>
         </Link>
-        <Link href="/schedule" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/schedule" className="nav-item text-muted-foreground hover:text-foreground">
           <CalendarDays size={22} strokeWidth={1.75} />
           <span>Schedule</span>
         </Link>
-        <Link href="/score" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/score" className="nav-item text-muted-foreground hover:text-foreground">
           <Target size={22} strokeWidth={1.75} />
           <span>Score</span>
         </Link>
-        <Link href="/matchups" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/matchups" className="nav-item text-muted-foreground hover:text-foreground">
           <Users size={22} strokeWidth={1.75} />
           <span>Matches</span>
         </Link>
-        <Link href="/standings" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/standings" className="nav-item text-muted-foreground hover:text-foreground">
           <Trophy size={22} strokeWidth={1.75} />
           <span>Standings</span>
         </Link>
-        <Link href="/more" className="nav-item" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Link href="/more" className="nav-item text-muted-foreground hover:text-foreground">
           <MoreHorizontal size={22} strokeWidth={1.75} />
           <span>More</span>
         </Link>
@@ -279,26 +262,20 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
 
   return (
     <div
-      className="rounded-2xl overflow-hidden"
-      style={{
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
-      }}
+      className="rounded-2xl overflow-hidden bg-card border border-border"
     >
       {/* Match Header */}
       <div
-        className="px-4 py-2 flex items-center justify-between"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
+        className="px-4 py-2 flex items-center justify-between bg-muted/50"
       >
-        <span className="text-sm opacity-70">Match {match.matchOrder}</span>
+        <span className="text-sm text-muted-foreground">Match {match.matchOrder}</span>
         <span
-          className={`text-xs px-2 py-1 rounded-full ${
-            state?.status === 'inProgress'
-              ? 'bg-red-500/20 text-red-400'
+          className={`text-xs px-2 py-1 rounded-full ${state?.status === 'inProgress'
+              ? 'bg-red-500/20 text-red-500'
               : state?.status === 'completed'
-              ? 'bg-green-500/20 text-green-400'
-              : 'bg-white/10 text-white/50'
-          }`}
+                ? 'bg-green-500/20 text-green-500'
+                : 'bg-muted text-muted-foreground'
+            }`}
         >
           {getStatusText()}
         </span>
@@ -308,16 +285,15 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
       <div className="p-4">
         {/* Team A */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg mb-2 transition-all ${
-            isTeamAWinning ? 'bg-blue-500/20' : ''
-          }`}
+          className={`flex items-center justify-between py-3 px-4 rounded-lg mb-2 transition-all ${isTeamAWinning ? 'bg-blue-500/20' : ''
+            }`}
         >
           <div className="flex items-center gap-3">
             <div
               className="w-3 h-3 rounded-full"
               style={{ background: 'var(--team-usa)' }}
             />
-            <span className={`font-medium ${isTeamAWinning ? 'text-white' : 'text-white/70'}`}>
+            <span className={`font-medium ${isTeamAWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
               {formatPlayerNames(teamAPlayers)}
             </span>
           </div>
@@ -330,16 +306,15 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
 
         {/* Team B */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg transition-all ${
-            isTeamBWinning ? 'bg-yellow-500/20' : ''
-          }`}
+          className={`flex items-center justify-between py-3 px-4 rounded-lg transition-all ${isTeamBWinning ? 'bg-yellow-500/20' : ''
+            }`}
         >
           <div className="flex items-center gap-3">
             <div
               className="w-3 h-3 rounded-full"
               style={{ background: 'var(--team-europe)' }}
             />
-            <span className={`font-medium ${isTeamBWinning ? 'text-white' : 'text-white/70'}`}>
+            <span className={`font-medium ${isTeamBWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
               {formatPlayerNames(teamBPlayers)}
             </span>
           </div>
@@ -353,7 +328,7 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
         {/* Halved indicator */}
         {isHalved && state && state.holesPlayed > 0 && (
           <div className="text-center mt-2">
-            <span className="text-sm text-white/50">All Square</span>
+            <span className="text-sm text-muted-foreground">All Square</span>
           </div>
         )}
       </div>
@@ -369,18 +344,17 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
               return (
                 <div
                   key={i}
-                  className={`h-1 flex-1 rounded-full transition-all ${
-                    isCurrent
+                  className={`h-1 flex-1 rounded-full transition-all ${isCurrent
                       ? 'bg-green-500 animate-pulse'
                       : isPlayed
-                      ? 'bg-white/40'
-                      : 'bg-white/10'
-                  }`}
+                        ? 'bg-foreground/40'
+                        : 'bg-muted'
+                    }`}
                 />
               );
             })}
           </div>
-          <p className="text-xs text-center mt-2 opacity-50">
+          <p className="text-xs text-center mt-2 text-muted-foreground">
             Hole {state.holesPlayed + 1} of 18
           </p>
         </div>

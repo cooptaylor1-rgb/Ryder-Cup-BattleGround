@@ -373,7 +373,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
                     singles: 'singles',
                     mixed: 'fourball', // default mixed to fourball
                 };
-                
+
                 await db.sessions.add({
                     id,
                     tripId,
