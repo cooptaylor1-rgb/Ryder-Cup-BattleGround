@@ -243,21 +243,34 @@ export default function SchedulePage() {
   const hasUserSchedule = mySchedule.length > 0;
 
   return (
-    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
-      {/* Header */}
-      <header className="header">
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CalendarDays size={22} style={{ color: 'var(--masters)' }} />
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--shadow-glow-green)',
+              }}
+            >
+              <CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />
+            </div>
             <div>
-              <span className="type-overline">Schedule</span>
+              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Schedule</span>
               <p className="type-caption">{currentTrip.name}</p>
             </div>
           </div>
           {currentUserPlayer && (
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+              style={{ background: 'var(--surface-card)', border: '1px solid var(--rule)', boxShadow: 'var(--shadow-sm)' }}
             >
               <User size={14} style={{ color: 'var(--masters)' }} />
               <span className="text-xs font-medium">{currentUserPlayer.firstName}</span>
@@ -398,7 +411,7 @@ export default function SchedulePage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav className="nav-premium bottom-nav">
         <Link href="/" className="nav-item">
           <Home size={20} />
           <span>Home</span>

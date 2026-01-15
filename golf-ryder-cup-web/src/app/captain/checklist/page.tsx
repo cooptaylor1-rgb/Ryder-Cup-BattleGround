@@ -61,31 +61,42 @@ export default function ChecklistPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-enter" style={{ background: 'var(--canvas)' }}>
-      {/* Header */}
-      <header className="header">
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
               className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)' }}
+              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label="Back"
             >
               <ChevronLeft size={22} strokeWidth={1.75} />
             </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <Shield size={16} style={{ color: 'var(--masters)' }} />
-                <span className="type-overline">Pre-Flight Check</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow-green)',
+                }}
+              >
+                <Rocket size={16} style={{ color: 'var(--color-accent)' }} />
               </div>
-              <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                Verify trip setup
-              </p>
+              <div>
+                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Pre-Flight Check</span>
+                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                  Verify trip setup
+                </p>
+              </div>
             </div>
           </div>
-
-          <Rocket size={24} style={{ color: 'var(--masters)' }} />
         </div>
       </header>
 
@@ -149,7 +160,7 @@ export default function ChecklistPage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav className="nav-premium bottom-nav">
         <Link href="/" className="nav-item">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>

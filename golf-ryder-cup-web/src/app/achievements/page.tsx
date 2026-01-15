@@ -206,21 +206,37 @@ export default function AchievementsPage() {
   if (!currentTrip) return null;
 
   return (
-    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
-      {/* Header */}
-      <header className="header">
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial flex items-center gap-3">
           <button
             onClick={() => router.back()}
             className="p-2 -ml-2 press-scale"
-            style={{ color: 'var(--ink-secondary)' }}
+            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
             aria-label="Back"
           >
             <ChevronLeft size={22} />
           </button>
-          <div>
-            <span className="type-overline">Achievements</span>
-            <p className="type-caption">{unlockedCount} of {totalCount} unlocked</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--shadow-glow-green)',
+              }}
+            >
+              <Award size={16} style={{ color: 'var(--color-accent)' }} />
+            </div>
+            <div>
+              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Achievements</span>
+              <p className="type-caption">{unlockedCount} of {totalCount} unlocked</p>
+            </div>
           </div>
         </div>
       </header>
@@ -281,7 +297,7 @@ export default function AchievementsPage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav className="nav-premium bottom-nav">
         <Link href="/" className="nav-item">
           <Home size={22} strokeWidth={1.75} />
           <span>Home</span>

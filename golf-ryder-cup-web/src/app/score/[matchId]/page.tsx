@@ -301,20 +301,36 @@ export default function MatchScoringPage() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen page-premium-enter"
       style={{ background: 'var(--canvas)' }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Header */}
-      <header className="header">
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push('/score')} className="nav-item p-1" aria-label="Back">
+            <button onClick={() => router.push('/score')} className="nav-item p-1" style={{ background: 'transparent', border: 'none', cursor: 'pointer' }} aria-label="Back">
               <ChevronLeft size={20} />
             </button>
-            <span className="type-overline">Match {activeMatch.matchOrder}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow-green)',
+                }}
+              >
+                <Zap size={14} style={{ color: 'var(--color-accent)' }} />
+              </div>
+              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Match {activeMatch.matchOrder}</span>
+            </div>
           </div>
 
           {/* Undo - Always visible in header */}
@@ -325,6 +341,9 @@ export default function MatchScoringPage() {
             style={{
               color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
               opacity: undoStack.length === 0 ? 0.5 : 1,
+              background: 'transparent',
+              border: 'none',
+              cursor: undoStack.length > 0 ? 'pointer' : 'default',
             }}
           >
             <Undo2 size={16} />

@@ -95,14 +95,30 @@ export default function MorePage() {
     };
 
     return (
-        <div className="pb-nav" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
-            {/* Header */}
-            <header className="header">
+        <div className="pb-nav page-premium-enter texture-grain" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
+            {/* Premium Header */}
+            <header className="header-premium">
                 <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                     <button onClick={() => router.back()} className="press-scale" style={{ padding: 'var(--space-1)', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-secondary)' }} aria-label="Back">
                         <ChevronLeft size={20} />
                     </button>
-                    <span className="type-overline">More</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                        <div
+                            style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: 'var(--shadow-glow-green)',
+                            }}
+                        >
+                            <MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />
+                        </div>
+                        <span className="type-overline" style={{ letterSpacing: '0.1em' }}>More</span>
+                    </div>
                 </div>
             </header>
 
@@ -340,7 +356,7 @@ export default function MorePage() {
             </main>
 
             {/* Bottom Navigation */}
-            <nav className="bottom-nav">
+            <nav className="nav-premium bottom-nav">
                 <Link href="/" className="nav-item">
                     <Home size={20} />
                     <span>Home</span>
