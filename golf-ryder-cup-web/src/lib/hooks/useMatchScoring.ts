@@ -301,13 +301,16 @@ export function useMatchScoring({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (rawScores || []).map((result: any) => {
             const par = coursePars[result.holeNumber - 1] || 4;
-            const team1ToPar = result.team1Score - par;
-            const team2ToPar = result.team2Score - par;
+            // Map from DB schema (teamAStrokes/teamBStrokes) to local schema (team1Score/team2Score)
+            const team1Score = result.teamAStrokes ?? result.teamAScore ?? 0;
+            const team2Score = result.teamBStrokes ?? result.teamBScore ?? 0;
+            const team1ToPar = team1Score - par;
+            const team2ToPar = team2Score - par;
 
             let winner: HoleScore['winner'] = null;
-            if (result.team1Score < result.team2Score) {
+            if (team1Score < team2Score) {
                 winner = 'team1';
-            } else if (result.team2Score < result.team1Score) {
+            } else if (team2Score < team1Score) {
                 winner = 'team2';
             } else {
                 winner = 'halved';
@@ -315,13 +318,13 @@ export function useMatchScoring({
 
             return {
                 holeNumber: result.holeNumber,
-                team1Score: result.team1Score,
-                team2Score: result.team2Score,
+                team1Score,
+                team2Score,
                 winner,
                 par,
                 team1ToPar,
                 team2ToPar,
-                timestamp: result.updatedAt,
+                timestamp: result.timestamp,
             };
         });
     }, [rawScores, coursePars]);
