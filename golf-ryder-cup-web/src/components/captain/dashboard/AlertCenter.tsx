@@ -188,7 +188,7 @@ function AlertCard({
 
     const handlePrimary = (e: React.MouseEvent) => {
         e.stopPropagation();
-        haptic.medium();
+        haptic.press();
         onPrimaryAction?.();
     };
 

@@ -153,8 +153,8 @@ export function SessionLockManager({
             </Modal>
 
             {/* Unlock Modal with PIN */}
-            <Modal 
-                isOpen={showUnlockModal} 
+            <Modal
+                isOpen={showUnlockModal}
                 onClose={() => {
                     setShowUnlockModal(false);
                     setPinInput('');
