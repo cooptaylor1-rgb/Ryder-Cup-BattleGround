@@ -177,6 +177,7 @@ export interface Trip {
  */
 export interface Player {
     id: UUID;
+    tripId?: UUID;
     firstName: string;
     lastName: string;
     email?: string;
@@ -184,6 +185,8 @@ export interface Player {
     ghin?: string;
     teePreference?: string;
     avatarUrl?: string;
+    team?: 'usa' | 'europe';
+    joinedAt?: ISODateString;
     createdAt?: ISODateString;
     updatedAt?: ISODateString;
 }
