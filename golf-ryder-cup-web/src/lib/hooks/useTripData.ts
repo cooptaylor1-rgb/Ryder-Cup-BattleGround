@@ -273,8 +273,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
 
     // Calculate standings
     const standings = useMemo(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const totalMatches = (trip as any)?.settings?.totalMatches || 28;
+        const totalMatches = trip?.settings?.totalMatches || 28;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return calculateStandings(
             (matches || []).map((m: any) => ({
@@ -285,8 +284,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
             players,
             totalMatches
         );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }, [matches, players, (trip as any)?.settings?.totalMatches]);
+    }, [matches, players, trip?.settings?.totalMatches]);
 
     // ========== ACTIONS ==========
 

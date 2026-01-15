@@ -140,6 +140,16 @@ export type BanterPostType = 'message' | 'result' | 'lineup' | 'system';
 // ============================================
 
 /**
+ * Trip settings for configuring competition rules.
+ */
+export interface TripSettings {
+    pointsToWin: number;
+    totalMatches: number;
+    allowSpectators: boolean;
+    isPublic: boolean;
+}
+
+/**
  * Trip entity representing a golf trip/event.
  * The top-level container for all trip data.
  */
@@ -153,6 +163,7 @@ export interface Trip {
     isCaptainModeEnabled: boolean;
     captainName?: string;
     captainPin?: string;
+    settings?: TripSettings;
     createdAt: ISODateString;
     updatedAt: ISODateString;
 }
