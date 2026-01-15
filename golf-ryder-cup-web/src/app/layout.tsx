@@ -10,6 +10,7 @@ import { QuickScoreFAB } from '@/components/QuickScoreFAB';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { TripRehydrationProvider } from '@/components/TripRehydrationProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AuthGuard } from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'Ryder Cup Tracker',
@@ -60,15 +61,17 @@ export default function RootLayout({
         <PWAProvider>
           <ThemeProvider>
             <ErrorBoundary variant="fullscreen" showDetails={process.env.NODE_ENV === 'development'}>
-              <TripRehydrationProvider>
-                <NotificationProvider>
-                  <AppOnboardingProvider>
-                    <main id="main-content">
-                      {children}
-                    </main>
-                  </AppOnboardingProvider>
-                </NotificationProvider>
-              </TripRehydrationProvider>
+              <AuthGuard>
+                <TripRehydrationProvider>
+                  <NotificationProvider>
+                    <AppOnboardingProvider>
+                      <main id="main-content">
+                        {children}
+                      </main>
+                    </AppOnboardingProvider>
+                  </NotificationProvider>
+                </TripRehydrationProvider>
+              </AuthGuard>
             </ErrorBoundary>
             <QuickScoreFAB />
             <OfflineIndicator />
