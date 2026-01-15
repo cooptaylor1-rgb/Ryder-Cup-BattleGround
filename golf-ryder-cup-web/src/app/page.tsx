@@ -144,7 +144,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="pb-nav page-enter" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
+    <div className="pb-nav page-premium-enter texture-grain" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
       {/* Quick Start Wizard Modal */}
       {showQuickStart && (
         <QuickStartWizard
@@ -156,14 +156,40 @@ export default function HomePage() {
       {/* What's New Modal (auto-shows for returning users) */}
       <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
 
-      {/* Minimal Header */}
-      <header className="header">
+      {/* Premium Header */}
+      <header className="header-premium">
         <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span className="type-overline">Ryder Cup Tracker</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--shadow-glow-green)'
+              }}
+            >
+              <Trophy size={16} style={{ color: 'var(--color-accent)' }} />
+            </div>
+            <span className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--ink)' }}>Ryder Cup Tracker</span>
+          </div>
           {hasTrips && (
             <button
               onClick={() => setShowWhatsNew(true)}
-              style={{ padding: 'var(--space-2)', marginRight: 'calc(-1 * var(--space-2))', borderRadius: 'var(--radius-md)', color: 'var(--masters)', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'all 0.2s ease' }}
+              className="press-scale"
+              style={{
+                padding: 'var(--space-2)',
+                marginRight: 'calc(-1 * var(--space-2))',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--masters)',
+                background: 'rgba(var(--masters-rgb), 0.1)',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
               aria-label="What's new"
             >
               <Sparkles className="w-5 h-5" />
@@ -455,58 +481,87 @@ export default function HomePage() {
               marginBottom: 'var(--space-6)',
             }}
           >
-            <h2 className="type-overline">
+            <h2 className="type-overline" style={{ letterSpacing: '0.15em' }}>
               {hasTrips ? 'Tournaments' : 'Get Started'}
             </h2>
             {hasTrips && (
               <button
                 onClick={() => setShowQuickStart(true)}
+                className="btn-premium press-scale"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--space-1)',
-                  color: 'var(--masters)',
-                  fontWeight: 500,
+                  gap: 'var(--space-2)',
+                  padding: 'var(--space-2) var(--space-4)',
+                  borderRadius: 'var(--radius-full)',
                   fontSize: 'var(--text-sm)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
                 }}
               >
-                <Plus size={16} strokeWidth={2} />
+                <Plus size={14} strokeWidth={2.5} />
                 New
               </button>
             )}
           </div>
 
           {pastTrips.length > 0 ? (
-            <div className="stagger-fast">
+            <div className="stagger-fast" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {pastTrips.map((trip, index) => (
                 <button
                   key={trip.id}
                   onClick={() => handleSelectTrip(trip.id)}
-                  className="match-row row-interactive stagger-item"
-                  style={{ width: '100%', textAlign: 'left', animationDelay: `${index * 50}ms` }}
+                  className="card-premium press-scale stagger-item"
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    animationDelay: `${index * 50}ms`,
+                    padding: 'var(--space-5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-4)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: 'var(--surface-card)',
+                    borderRadius: 'var(--radius-xl)',
+                    boxShadow: 'var(--shadow-card)',
+                    transition: 'all 0.2s ease',
+                  }}
                 >
+                  {/* Tournament Icon */}
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Trophy size={22} style={{ color: 'var(--color-accent)' }} />
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
+                    <p className="type-title" style={{ marginBottom: 'var(--space-2)', fontWeight: 600 }}>
                       {trip.name}
                     </p>
                     <div className="type-caption" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                       {trip.location && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          <MapPin size={12} strokeWidth={1.5} />
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <MapPin size={14} strokeWidth={1.5} style={{ color: 'var(--masters)', flexShrink: 0 }} />
                           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trip.location}</span>
                         </span>
                       )}
-                      <span>{formatDate(trip.startDate, 'short')}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                        <Calendar size={14} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
+                        {formatDate(trip.startDate, 'short')}
+                      </span>
                     </div>
                   </div>
                   <ChevronRight
-                    size={20}
+                    size={22}
                     strokeWidth={1.5}
-                    className="row-chevron"
-                    style={{ color: 'var(--ink-tertiary)' }}
+                    style={{ color: 'var(--masters)', flexShrink: 0 }}
                   />
                 </button>
               ))}

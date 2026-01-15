@@ -73,6 +73,7 @@ export function BottomNav({ badges = {} }: BottomNavProps) {
   return (
     <nav
       className={cn(
+        'nav-premium',
         'lg:hidden',
         'fixed bottom-0 left-0 right-0 z-50',
         'flex items-stretch justify-around',
@@ -80,8 +81,10 @@ export function BottomNav({ badges = {} }: BottomNavProps) {
         'safe-bottom',
       )}
       style={{
-        background: 'var(--surface, #1A1814)',
-        borderTop: '1px solid var(--rule, rgba(58, 53, 48, 0.5))',
+        background: 'linear-gradient(180deg, var(--surface) 0%, var(--canvas) 100%)',
+        borderTop: '1px solid var(--rule)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
       }}
       aria-label="Main navigation"
     >
