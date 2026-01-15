@@ -55,3 +55,20 @@ export {
   type Reaction,
   type ReactionData,
 } from './ReactionPicker';
+
+// Photo Capture
+export { PhotoCapture, type PhotoContext, type CapturedPhoto, type MomentType } from './photo/PhotoCapture';
+
+// Moments
+export { MomentCard, type Moment, type MomentReaction, type MomentComment } from './moments/MomentCard';
+
+// Memories
+export { TripMemories, type TripMemory, type TripStats, type TripHighlight, type TripData } from './memories/TripMemories';
+
+// Live Reactions
+export {
+  LiveReactionStream,
+  ScoreCelebration,
+  type LiveReaction,
+  type LiveReactionType,
+} from './live/LiveReactionStream';

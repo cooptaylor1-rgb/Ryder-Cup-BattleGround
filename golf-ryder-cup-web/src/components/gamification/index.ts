@@ -9,3 +9,11 @@ export { Achievements, AchievementBadge, ACHIEVEMENT_DEFINITIONS } from './Achie
 export type { Achievement, AchievementDefinition } from './Achievements';
 
 export { MomentumMeter, PressureIndicator, calculateMomentum } from './MomentumMeter';
+
+// Achievement Celebration
+export {
+    AchievementUnlock,
+    AchievementNotification,
+    type Achievement as UnlockableAchievement,
+    type AchievementRarity,
+} from './AchievementUnlock';
