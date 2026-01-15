@@ -194,6 +194,18 @@ export default function MorePage() {
                         </div>
                         <Toggle enabled={isCaptainMode} />
                     </button>
+
+                    {/* Captain Command Center Link */}
+                    {isCaptainMode && currentTrip && (
+                        <Link href="/captain" className="match-row mt-2">
+                            <Shield size={18} style={{ color: 'var(--masters)' }} />
+                            <div className="flex-1">
+                                <p style={{ fontWeight: 500 }}>Captain Command Center</p>
+                                <p className="type-meta">Manage lineups, attendance, and more</p>
+                            </div>
+                            <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                        </Link>
+                    )}
                 </section>
 
                 <hr className="divider" />

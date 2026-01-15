@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { formatPlayerName } from '@/lib/utils';
-import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle, Camera, Mic } from 'lucide-react';
+import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle, Camera, Mic, Zap } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 import {
   StickyUndoBanner,
@@ -15,6 +15,7 @@ import {
   WeatherAlerts,
   type UndoAction,
 } from '@/components/live-play';
+import { PressTracker, HandicapStrokeIndicator, type Press } from '@/components/scoring';
 
 /**
  * MATCH SCORING PAGE - Sacred Action Surface
@@ -88,9 +89,24 @@ export default function MatchScoringPage() {
   // Undo banner state
   const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
 
+  // Press tracking state
+  const [presses, setPresses] = useState<Press[]>([]);
+  const [showHandicapDetails, setShowHandicapDetails] = useState(false);
+
   // Live match state
   const liveMatchState = useMatchState(matchId);
   const matchState = liveMatchState || activeMatchState;
+
+  // Get tee set for handicap info (would come from match/course data)
+  const { teeSets } = useTripStore();
+  const currentTeeSet = activeMatch?.teeSetId
+    ? teeSets.find(t => t.id === activeMatch.teeSetId)
+    : teeSets[0]; // Fallback to first tee set
+
+  // Demo hole handicaps if no real data (standard layout)
+  const holeHandicaps = currentTeeSet?.holeHandicaps || [
+    7, 11, 3, 13, 9, 1, 15, 5, 17, 8, 16, 10, 4, 12, 6, 18, 2, 14
+  ];
 
   useEffect(() => {
     if (matchId && (!activeMatch || activeMatch.id !== matchId)) {
@@ -209,6 +225,59 @@ export default function MatchScoringPage() {
   const handlePhotoCapture = useCallback((photo: { id: string }) => {
     showToast('success', 'Photo saved to gallery');
   }, [showToast]);
+
+  // Handle press bet
+  const handlePress = useCallback((pressedBy: 'teamA' | 'teamB') => {
+    if (!matchState) return;
+
+    const newPress: Press = {
+      id: `press-${Date.now()}`,
+      startHole: currentHole,
+      pressedBy,
+      status: 'active',
+      score: 0,
+    };
+
+    setPresses(prev => [...prev, newPress]);
+    haptic.tap();
+    showToast('info', `${pressedBy === 'teamA' ? teamAName : teamBName} pressed!`);
+  }, [currentHole, matchState, haptic, showToast, teamAName, teamBName]);
+
+  // Update press scores when match score changes
+  useEffect(() => {
+    if (!matchState) return;
+
+    setPresses(prev => prev.map(press => {
+      if (press.status !== 'active') return press;
+
+      // Calculate score for this press from its start hole
+      const pressHoleResults = matchState.holeResults.filter(
+        r => r.holeNumber >= press.startHole
+      );
+
+      let score = 0;
+      for (const result of pressHoleResults) {
+        if (result.winner === 'teamA') score += 1;
+        else if (result.winner === 'teamB') score -= 1;
+      }
+
+      // Check if press should close (match ends)
+      const holesRemaining = 18 - matchState.holesPlayed;
+      const isClosedOut = Math.abs(score) > holesRemaining;
+
+      if (isClosedOut || matchState.isClosedOut) {
+        return {
+          ...press,
+          score,
+          status: 'closed' as const,
+          result: score > 0 ? 'teamA' : score < 0 ? 'teamB' : 'halved',
+          closedAtHole: matchState.holesPlayed,
+        };
+      }
+
+      return { ...press, score };
+    }));
+  }, [matchState]);
 
   if (!activeMatch || !matchState) {
     return (
@@ -379,7 +448,7 @@ export default function MatchScoringPage() {
         {!isMatchComplete ? (
           <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
             {/* Hole Navigation */}
-            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-6)' }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
               <button
                 onClick={prevHole}
                 disabled={currentHole <= 1}
@@ -414,6 +483,26 @@ export default function MatchScoringPage() {
                 <ChevronRight size={24} />
               </button>
             </div>
+
+            {/* Handicap Stroke Indicator */}
+            {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <button
+                  onClick={() => setShowHandicapDetails(!showHandicapDetails)}
+                  className="w-full"
+                >
+                  <HandicapStrokeIndicator
+                    currentHole={currentHole}
+                    teamAStrokes={activeMatch.teamAHandicapAllowance}
+                    teamBStrokes={activeMatch.teamBHandicapAllowance}
+                    holeHandicaps={holeHandicaps}
+                    teamAName={teamAName}
+                    teamBName={teamBName}
+                    showAllHoles={showHandicapDetails}
+                  />
+                </button>
+              </div>
+            )}
 
             {/* Score Buttons */}
             <div className="grid grid-cols-3 gap-3" style={{ marginBottom: 'var(--space-4)' }}>
@@ -469,6 +558,19 @@ export default function MatchScoringPage() {
                 <span className="score-btn-hint">wins hole</span>
               </button>
             </div>
+
+            {/* Press Tracker */}
+            <PressTracker
+              currentHole={currentHole}
+              mainMatchScore={matchState.currentScore}
+              holesRemaining={matchState.holesRemaining}
+              presses={presses}
+              onPress={handlePress}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              betAmount={10} // Would come from bet configuration
+              autoPress={false}
+            />
           </section>
         ) : (
           /* Match Complete */
