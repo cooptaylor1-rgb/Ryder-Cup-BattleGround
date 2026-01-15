@@ -47,3 +47,27 @@ export {
 export {
   StablefordScorecard,
 } from './StablefordScorecard';
+
+export {
+  SessionLockManager,
+  SessionLockBadge,
+} from './SessionLockManager';
+
+// Phase 1: Core Flow Excellence Components
+export {
+  SwipeScorePanel,
+} from './SwipeScorePanel';
+
+export {
+  HoleMiniMap,
+  HoleMiniMapInline,
+} from './HoleMiniMap';
+
+export {
+  ScoreCelebration,
+  ScoreToast,
+} from './ScoreCelebration';
+
+export {
+  QuickScoreFABv2,
+} from './QuickScoreFABv2';

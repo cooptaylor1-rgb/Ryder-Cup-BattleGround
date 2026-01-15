@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { useTripStore, useScoringStore } from '@/lib/stores';
+import { useTripStore, useScoringStore, useAuthStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { formatPlayerName } from '@/lib/utils';
 import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal, CalendarDays } from 'lucide-react';
@@ -27,6 +27,18 @@ export default function ScorePage() {
     const router = useRouter();
     const { currentTrip, sessions, players } = useTripStore();
     const { selectMatch } = useScoringStore();
+    const { currentUser, isAuthenticated } = useAuthStore();
+
+    // Find the current user's player record (P0-3)
+    const currentUserPlayer = useMemo(() => {
+        if (!isAuthenticated || !currentUser) return null;
+        return players.find(
+            p =>
+                (p.email && currentUser.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+                (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
+                    p.lastName.toLowerCase() === currentUser.lastName.toLowerCase())
+        );
+    }, [currentUser, isAuthenticated, players]);
 
     // Track selected session - default to active or first available
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -180,17 +192,26 @@ export default function ScorePage() {
                         </div>
                     ) : matchStates.length > 0 ? (
                         <div className="stagger-fast">
-                            {matchStates.map((matchState, index) => (
-                                <MatchRow
-                                    key={matchState.match.id}
-                                    matchState={matchState}
-                                    matchNumber={index + 1}
-                                    teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
-                                    teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
-                                    onClick={() => handleMatchSelect(matchState.match.id)}
-                                    animationDelay={index * 50}
-                                />
-                            ))}
+                            {matchStates.map((matchState, index) => {
+                                // Check if current user is in this match (P0-3)
+                                const isUserMatch = currentUserPlayer && (
+                                    matchState.match.teamAPlayerIds.includes(currentUserPlayer.id) ||
+                                    matchState.match.teamBPlayerIds.includes(currentUserPlayer.id)
+                                );
+
+                                return (
+                                    <MatchRow
+                                        key={matchState.match.id}
+                                        matchState={matchState}
+                                        matchNumber={index + 1}
+                                        teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
+                                        teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
+                                        onClick={() => handleMatchSelect(matchState.match.id)}
+                                        animationDelay={index * 50}
+                                        isUserMatch={isUserMatch || false}
+                                    />
+                                );
+                            })}
                         </div>
                     ) : (
                         <NoScoresPremiumEmpty onStartScoring={() => router.push('/matchups')} />
@@ -266,9 +287,10 @@ interface MatchRowProps {
     teamBPlayers: Player[];
     onClick: () => void;
     animationDelay?: number;
+    isUserMatch?: boolean; // P0-3: Highlight user's match
 }
 
-function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick, animationDelay = 0 }: MatchRowProps) {
+function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick, animationDelay = 0, isUserMatch = false }: MatchRowProps) {
     const { currentScore, holesPlayed, status, displayScore } = matchState;
 
     const formatPlayers = (playerList: Player[]) => {
@@ -297,17 +319,42 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                 marginLeft: 'calc(-1 * var(--space-3))',
                 marginRight: 'calc(-1 * var(--space-3))',
                 borderRadius: 'var(--radius-md)',
+                border: isUserMatch ? '2px solid var(--masters)' : undefined,
+                background: isUserMatch ? 'rgba(var(--masters-rgb), 0.05)' : undefined,
                 position: 'relative',
                 animationDelay: `${animationDelay}ms`
             }}
         >
+            {/* Your Match Badge (P0-3) */}
+            {isUserMatch && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '-8px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        padding: '2px 10px',
+                        background: 'var(--masters)',
+                        color: 'white',
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        borderRadius: 'var(--radius-full)',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    Your Match
+                </div>
+            )}
+
             {/* Match number */}
             <span
                 style={{
                     width: '28px',
                     fontSize: 'var(--text-sm)',
                     fontWeight: 600,
-                    color: 'var(--ink-tertiary)',
+                    color: isUserMatch ? 'var(--masters)' : 'var(--ink-tertiary)',
                     textAlign: 'center'
                 }}
             >

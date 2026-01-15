@@ -290,6 +290,28 @@ export interface HoleResult {
     scoredBy?: UUID;
     notes?: string;
     timestamp: ISODateString;
+
+    // P0-4: Audit trail fields
+    /** Player who last edited this score (if edited) */
+    lastEditedBy?: UUID;
+    /** When the score was last edited */
+    lastEditedAt?: ISODateString;
+    /** Reason for edit (required for captain overrides) */
+    editReason?: string;
+    /** History of edits for dispute resolution */
+    editHistory?: HoleResultEdit[];
+}
+
+/**
+ * P0-4: Audit entry for score edits
+ */
+export interface HoleResultEdit {
+    editedAt: ISODateString;
+    editedBy: UUID;
+    previousWinner: HoleWinner;
+    newWinner: HoleWinner;
+    reason?: string;
+    isCaptainOverride?: boolean;
 }
 
 // ============================================

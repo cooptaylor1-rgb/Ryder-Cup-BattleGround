@@ -1,709 +1,821 @@
+/**
+ * Enhanced Match Scoring Page — Phase 1: Core Flow Excellence
+ *
+ * World-class scoring experience with:
+ * - Swipe-to-score gestures (SwipeScorePanel)
+ * - Visual hole mini-map (HoleMiniMap)
+ * - Score celebrations (ScoreCelebration)
+ * - Voice scoring integration
+ * - Premium haptic feedback
+ * - Side bet reminders
+ * - Weather alerts
+ * - Quick photo capture
+ * - Stroke alert banners
+ *
+ * Sacred action surface: Fast, legible, stress-free.
+ */
+
 'use client';
 
-import { useEffect, useMemo, useState, useCallback, TouchEvent } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { formatPlayerName } from '@/lib/utils';
-import { Undo2, ChevronLeft, ChevronRight, Check, AlertCircle, Camera, Mic, Zap } from 'lucide-react';
+import {
+    Undo2,
+    ChevronLeft,
+    ChevronRight,
+    AlertCircle,
+    Mic,
+    Camera,
+    Trophy,
+    X,
+    Flag,
+} from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 import {
-  StickyUndoBanner,
-  QuickPhotoCapture,
-  VoiceScoring,
-  SideBetReminder,
-  WeatherAlerts,
-  type UndoAction,
+    SwipeScorePanel,
+    HoleMiniMap,
+    ScoreCelebration,
+    ScoreToast,
+    HandicapStrokeIndicator,
+    StrokeAlertBanner,
+    PressTracker,
+    type Press,
+} from '@/components/scoring';
+import {
+    StickyUndoBanner,
+    VoiceScoring,
+    QuickPhotoCapture,
+    SideBetReminder,
+    WeatherAlerts,
+    type UndoAction,
 } from '@/components/live-play';
-import { PressTracker, HandicapStrokeIndicator, StrokeAlertBanner, type Press } from '@/components/scoring';
-
-/**
- * MATCH SCORING PAGE - Sacred Action Surface
- *
- * This is sacred. Design for:
- * - Fast, legible, stress-free
- * - Large tap targets for outdoor use
- * - Clear score deltas
- * - Minimal decoration
- * - Undo is always visible
- *
- * Enhanced (v2.0):
- * - Sticky undo banner with 5-second window
- * - Quick photo capture
- * - Voice scoring
- * - Side bet reminders
- * - Weather alerts
- */
 
 // Demo side bets for testing - in production these come from the bets store
 const DEMO_SIDE_BETS = [
-  {
-    id: 'ctp-7',
-    type: 'ctp' as const,
-    name: 'Closest to Pin #7',
-    holes: [7],
-    buyIn: 5,
-    pot: 40,
-    participants: [],
-    status: 'active' as const,
-  },
-  {
-    id: 'long-12',
-    type: 'long_drive' as const,
-    name: 'Long Drive #12',
-    holes: [12],
-    buyIn: 5,
-    pot: 40,
-    participants: [],
-    status: 'active' as const,
-  },
+    {
+        id: 'ctp-7',
+        type: 'ctp' as const,
+        name: 'Closest to Pin #7',
+        holes: [7],
+        buyIn: 5,
+        pot: 40,
+        participants: [],
+        status: 'active' as const,
+    },
+    {
+        id: 'long-12',
+        type: 'long_drive' as const,
+        name: 'Long Drive #12',
+        holes: [12],
+        buyIn: 5,
+        pot: 40,
+        participants: [],
+        status: 'active' as const,
+    },
 ];
 
-export default function MatchScoringPage() {
-  const router = useRouter();
-  const params = useParams();
-  const matchId = params.matchId as string;
+/**
+ * Enhanced Match Scoring Page
+ *
+ * Sacred action surface redesigned for Phase 1 excellence.
+ */
+export default function EnhancedMatchScoringPage() {
+    const router = useRouter();
+    const params = useParams();
+    const matchId = params.matchId as string;
 
-  const { players, teams } = useTripStore();
-  const { showToast, scoringPreferences } = useUIStore();
-  const haptic = useHaptic();
+    const { players, teams, teeSets } = useTripStore();
+    const { showToast, scoringPreferences } = useUIStore();
+    const haptic = useHaptic();
 
-  const {
-    activeMatch,
-    activeMatchState,
-    currentHole,
-    isSaving,
-    undoStack,
-    selectMatch,
-    scoreHole,
-    undoLastHole,
-    goToHole,
-    nextHole,
-    prevHole,
-  } = useScoringStore();
+    const {
+        activeMatch,
+        activeMatchState,
+        currentHole,
+        isSaving,
+        undoStack,
+        selectMatch,
+        scoreHole,
+        undoLastHole,
+        goToHole,
+        nextHole,
+        prevHole,
+    } = useScoringStore();
 
-  // Swipe state
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    // UI State
+    const [showVoiceModal, setShowVoiceModal] = useState(false);
+    const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
+    const [presses, setPresses] = useState<Press[]>([]);
+    const [showHandicapDetails, setShowHandicapDetails] = useState(false);
+    const [scoringMode, setScoringMode] = useState<'swipe' | 'buttons'>('swipe');
 
-  // Undo banner state
-  const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
+    // Celebration state
+    const [celebration, setCelebration] = useState<{
+        type: 'holeWon' | 'holeLost' | 'holeHalved' | 'matchWon' | 'matchHalved';
+        winner?: HoleWinner;
+        teamName?: string;
+        teamColor?: string;
+        holeNumber?: number;
+        finalScore?: string;
+    } | null>(null);
 
-  // Press tracking state
-  const [presses, setPresses] = useState<Press[]>([]);
-  const [showHandicapDetails, setShowHandicapDetails] = useState(false);
+    // Toast state
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
-  // Live match state
-  const liveMatchState = useMatchState(matchId);
-  const matchState = liveMatchState || activeMatchState;
+    // Live match state (reactive updates)
+    const liveMatchState = useMatchState(matchId);
+    const matchState = liveMatchState || activeMatchState;
 
-  // Get tee set for handicap info (would come from match/course data)
-  const { teeSets } = useTripStore();
-  const currentTeeSet = activeMatch?.teeSetId
-    ? teeSets.find(t => t.id === activeMatch.teeSetId)
-    : teeSets[0]; // Fallback to first tee set
+    // Get tee set for handicap info
+    const currentTeeSet = activeMatch?.teeSetId
+        ? teeSets.find(t => t.id === activeMatch.teeSetId)
+        : teeSets[0];
 
-  // Demo hole handicaps if no real data (standard layout)
-  const holeHandicaps = currentTeeSet?.holeHandicaps || [
-    7, 11, 3, 13, 9, 1, 15, 5, 17, 8, 16, 10, 4, 12, 6, 18, 2, 14
-  ];
+    const holeHandicaps = currentTeeSet?.holeHandicaps || [
+        7, 11, 3, 13, 9, 1, 15, 5, 17, 8, 16, 10, 4, 12, 6, 18, 2, 14
+    ];
 
-  useEffect(() => {
-    if (matchId && (!activeMatch || activeMatch.id !== matchId)) {
-      selectMatch(matchId);
-    }
-  }, [matchId, activeMatch, selectMatch]);
-
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
-  const teamAName = teamA?.name || 'USA';
-  const teamBName = teamB?.name || 'Europe';
-
-  const teamAPlayers = useMemo(() => {
-    if (!activeMatch) return [];
-    return activeMatch.teamAPlayerIds
-      .map(id => players.find(p => p.id === id))
-      .filter(Boolean);
-  }, [activeMatch, players]);
-
-  const teamBPlayers = useMemo(() => {
-    if (!activeMatch) return [];
-    return activeMatch.teamBPlayerIds
-      .map(id => players.find(p => p.id === id))
-      .filter(Boolean);
-  }, [activeMatch, players]);
-
-  const currentHoleResult = useMemo(() => {
-    if (!matchState) return null;
-    return matchState.holeResults.find(r => r.holeNumber === currentHole);
-  }, [matchState, currentHole]);
-
-  // Swipe handlers
-  const minSwipeDistance = 50;
-
-  const onTouchStart = (e: TouchEvent) => {
-    if (!scoringPreferences.swipeNavigation) return;
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: TouchEvent) => {
-    if (!scoringPreferences.swipeNavigation) return;
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!scoringPreferences.swipeNavigation || !touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && currentHole < 18) {
-      nextHole();
-      haptic.tap();
-    } else if (isRightSwipe && currentHole > 1) {
-      prevHole();
-      haptic.tap();
-    }
-  };
-
-  const handleScore = async (winner: HoleWinner) => {
-    if (isSaving) return;
-
-    if (scoringPreferences.confirmCloseout && matchState) {
-      const wouldCloseOut =
-        Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0))
-        > (matchState.holesRemaining - 1);
-
-      if (wouldCloseOut && winner !== 'halved') {
-        const winningTeam = winner === 'teamA' ? teamAName : teamBName;
-        if (!confirm(`This will end the match with ${winningTeam} winning. Continue?`)) {
-          return;
+    // Load match on mount
+    useEffect(() => {
+        if (matchId && (!activeMatch || activeMatch.id !== matchId)) {
+            selectMatch(matchId);
         }
-      }
-    }
+    }, [matchId, activeMatch, selectMatch]);
 
-    haptic.scorePoint();
-    try {
-      await scoreHole(winner);
-    } catch (error) {
-      console.error('Failed to score hole:', error);
-      return;
-    }
+    // Team data
+    const teamA = teams.find(t => t.color === 'usa');
+    const teamB = teams.find(t => t.color === 'europe');
+    const teamAName = teamA?.name || 'USA';
+    const teamBName = teamB?.name || 'Europe';
+    const teamAColor = '#0047AB';
+    const teamBColor = '#8B0000';
 
-    // Show sticky undo banner
-    setUndoAction({
-      id: crypto.randomUUID(),
-      type: 'score',
-      description: `Hole ${currentHole} scored`,
-      metadata: {
-        holeNumber: currentHole,
-        result: winner === 'none' ? undefined : winner,
-        teamAName,
-        teamBName,
-      },
-      timestamp: Date.now(),
-      onUndo: handleUndo,
-    });
-  };
+    const teamAPlayers = useMemo(() => {
+        if (!activeMatch) return [];
+        return activeMatch.teamAPlayerIds
+            .map(id => players.find(p => p.id === id))
+            .filter(Boolean);
+    }, [activeMatch, players]);
 
-  const handleUndo = useCallback(async () => {
-    if (undoStack.length === 0) return;
-    haptic.warning();
-    await undoLastHole();
-    setUndoAction(null);
-  }, [undoStack.length, haptic, undoLastHole]);
+    const teamBPlayers = useMemo(() => {
+        if (!activeMatch) return [];
+        return activeMatch.teamBPlayerIds
+            .map(id => players.find(p => p.id === id))
+            .filter(Boolean);
+    }, [activeMatch, players]);
 
-  // Handle voice score - intentionally not including handleScore in deps
-  // as we want to capture the current handleScore function at call time
-  const handleVoiceScore = useCallback((winner: HoleWinner) => {
-    handleScore(winner);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSaving, scoringPreferences.confirmCloseout, matchState, teamAName, teamBName, currentHole]);
+    const currentHoleResult = useMemo(() => {
+        if (!matchState) return null;
+        return matchState.holeResults.find(r => r.holeNumber === currentHole);
+    }, [matchState, currentHole]);
 
-  // Handle photo capture
-  const handlePhotoCapture = useCallback((photo: { id: string }) => {
-    showToast('success', 'Photo saved to gallery');
-  }, [showToast]);
+    // Score handler with celebrations
+    const handleScore = useCallback(async (winner: HoleWinner) => {
+        if (isSaving || !matchState) return;
 
-  // Handle press bet
-  const handlePress = useCallback((pressedBy: 'teamA' | 'teamB') => {
-    if (!matchState) return;
+        // Check for match closeout
+        const wouldCloseOut =
+            Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0))
+            > (matchState.holesRemaining - 1);
 
-    const newPress: Press = {
-      id: `press-${Date.now()}`,
-      startHole: currentHole,
-      pressedBy,
-      status: 'active',
-      score: 0,
-    };
+        if (scoringPreferences.confirmCloseout && wouldCloseOut && winner !== 'halved') {
+            const winningTeam = winner === 'teamA' ? teamAName : teamBName;
+            if (!confirm(`This will end the match with ${winningTeam} winning. Continue?`)) {
+                return;
+            }
+        }
 
-    setPresses(prev => [...prev, newPress]);
-    haptic.tap();
-    showToast('info', `${pressedBy === 'teamA' ? teamAName : teamBName} pressed!`);
-  }, [currentHole, matchState, haptic, showToast, teamAName, teamBName]);
+        // Score the hole
+        haptic.scorePoint();
+        await scoreHole(winner);
 
-  // Update press scores when match score changes
-  useEffect(() => {
-    if (!matchState) return;
+        // Show celebration
+        if (wouldCloseOut && winner !== 'halved') {
+            setCelebration({
+                type: 'matchWon',
+                winner,
+                teamName: winner === 'teamA' ? teamAName : teamBName,
+                teamColor: winner === 'teamA' ? teamAColor : teamBColor,
+                finalScore: matchState.displayScore,
+            });
+        } else if (winner === 'halved') {
+            setCelebration({
+                type: 'holeHalved',
+                holeNumber: currentHole,
+            });
+        } else {
+            // Show brief toast instead of full celebration for normal holes
+            setToast({
+                message: `Hole ${currentHole}: ${winner === 'teamA' ? teamAName : teamBName} wins`,
+                type: 'success',
+            });
+        }
 
-    setPresses(prev => prev.map(press => {
-      if (press.status !== 'active') return press;
+        // Show undo banner
+        setUndoAction({
+            id: crypto.randomUUID(),
+            type: 'score',
+            description: `Hole ${currentHole} scored`,
+            metadata: {
+                holeNumber: currentHole,
+                result: winner === 'none' ? undefined : winner,
+                teamAName,
+                teamBName,
+            },
+            timestamp: Date.now(),
+            onUndo: handleUndo,
+        });
+    }, [isSaving, matchState, scoringPreferences.confirmCloseout, teamAName, teamBName, haptic, scoreHole, currentHole]);
 
-      // Calculate score for this press from its start hole
-      const pressHoleResults = matchState.holeResults.filter(
-        r => r.holeNumber >= press.startHole
-      );
+    // Undo handler
+    const handleUndo = useCallback(async () => {
+        if (undoStack.length === 0) return;
+        haptic.warning();
+        await undoLastHole();
+        setUndoAction(null);
+        setToast({ message: 'Score undone', type: 'info' });
+    }, [undoStack.length, haptic, undoLastHole]);
 
-      let score = 0;
-      for (const result of pressHoleResults) {
-        if (result.winner === 'teamA') score += 1;
-        else if (result.winner === 'teamB') score -= 1;
-      }
+    // Voice score handler
+    const handleVoiceScore = useCallback((winner: HoleWinner) => {
+        setShowVoiceModal(false);
+        handleScore(winner);
+    }, [handleScore]);
 
-      // Check if press should close (match ends)
-      const holesRemaining = 18 - matchState.holesPlayed;
-      const isClosedOut = Math.abs(score) > holesRemaining;
+    // Photo capture handler
+    const handlePhotoCapture = useCallback((photo: { id: string }) => {
+        showToast('success', 'Photo saved to gallery');
+    }, [showToast]);
 
-      if (isClosedOut || matchState.isClosedOut) {
-        return {
-          ...press,
-          score,
-          status: 'closed' as const,
-          result: score > 0 ? 'teamA' : score < 0 ? 'teamB' : 'halved',
-          closedAtHole: matchState.holesPlayed,
+    // Press handler
+    const handlePress = useCallback((pressedBy: 'teamA' | 'teamB') => {
+        if (!matchState) return;
+
+        const newPress: Press = {
+            id: `press-${Date.now()}`,
+            startHole: currentHole,
+            pressedBy,
+            status: 'active',
+            score: 0,
         };
-      }
 
-      return { ...press, score };
-    }));
-  }, [matchState]);
+        setPresses(prev => [...prev, newPress]);
+        haptic.tap();
+        setToast({
+            message: `${pressedBy === 'teamA' ? teamAName : teamBName} pressed!`,
+            type: 'info',
+        });
+    }, [currentHole, matchState, haptic, teamAName, teamBName]);
 
-  if (!activeMatch || !matchState) {
+    // Update press scores
+    useEffect(() => {
+        if (!matchState) return;
+
+        setPresses(prev => prev.map(press => {
+            if (press.status !== 'active') return press;
+
+            const pressHoleResults = matchState.holeResults.filter(
+                r => r.holeNumber >= press.startHole
+            );
+
+            let score = 0;
+            for (const result of pressHoleResults) {
+                if (result.winner === 'teamA') score += 1;
+                else if (result.winner === 'teamB') score -= 1;
+            }
+
+            const holesRemaining = 18 - matchState.holesPlayed;
+            const isClosedOut = Math.abs(score) > holesRemaining;
+
+            if (isClosedOut || matchState.isClosedOut) {
+                return {
+                    ...press,
+                    score,
+                    status: 'closed' as const,
+                    result: score > 0 ? 'teamA' : score < 0 ? 'teamB' : 'halved',
+                    closedAtHole: matchState.holesPlayed,
+                };
+            }
+
+            return { ...press, score };
+        }));
+    }, [matchState]);
+
+    // Loading state
+    if (!activeMatch || !matchState) {
+        return (
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+                <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderColor: 'var(--masters)', borderTopColor: 'transparent' }} />
+                    <p className="type-meta">Loading match...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
+
     return (
-      <div className="min-h-screen" style={{ background: 'var(--canvas)' }}>
-        <header className="header">
-          <div className="container-editorial flex items-center gap-3">
-            <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
-              <ChevronLeft size={20} />
-            </button>
-            <span className="type-overline">Scoring</span>
-          </div>
-        </header>
-        <div className="flex items-center justify-center h-64">
-          <p className="type-meta">Loading…</p>
-        </div>
-      </div>
-    );
-  }
-
-  const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
-
-  return (
-    <div
-      className="min-h-screen page-premium-enter"
-      style={{ background: 'var(--canvas)' }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.push('/score')} className="nav-item p-1" style={{ background: 'transparent', border: 'none', cursor: 'pointer' }} aria-label="Back">
-              <ChevronLeft size={20} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Zap size={14} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Match {activeMatch.matchOrder}</span>
-            </div>
-          </div>
-
-          {/* Undo - Always visible in header */}
-          <button
-            onClick={handleUndo}
-            disabled={undoStack.length === 0}
-            className="flex items-center gap-1 type-meta"
-            style={{
-              color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
-              opacity: undoStack.length === 0 ? 0.5 : 1,
-              background: 'transparent',
-              border: 'none',
-              cursor: undoStack.length > 0 ? 'pointer' : 'default',
-            }}
-          >
-            <Undo2 size={16} />
-            <span>Undo</span>
-          </button>
-        </div>
-      </header>
-
-      <main className="container-editorial">
-        {/* Match Score - Hero */}
-        <section className="section text-center" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-          <div className="flex items-baseline justify-center gap-8">
-            {/* Team A */}
-            <div className="text-center">
-              <p className="type-overline" style={{ color: 'var(--team-usa)', marginBottom: 'var(--space-2)' }}>
-                {teamAName}
-              </p>
-              <div className="type-meta">
-                {teamAPlayers.map(p => (
-                  <p key={p!.id}>{formatPlayerName(p!.firstName, p!.lastName, 'short')}</p>
-                ))}
-              </div>
-            </div>
-
-            {/* Score */}
-            <div className="text-center">
-              <p
-                className="score-hero"
-                style={{
-                  color: matchState.currentScore > 0 ? 'var(--team-usa)' :
-                    matchState.currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-tertiary)'
-                }}
-              >
-                {matchState.displayScore}
-              </p>
-              <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
-                thru {matchState.holesPlayed}
-              </p>
-              {matchState.isDormie && (
-                <p className="type-meta" style={{ color: 'var(--warning)', marginTop: 'var(--space-2)' }}>
-                  <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                  Dormie
-                </p>
-              )}
-            </div>
-
-            {/* Team B */}
-            <div className="text-center">
-              <p className="type-overline" style={{ color: 'var(--team-europe)', marginBottom: 'var(--space-2)' }}>
-                {teamBName}
-              </p>
-              <div className="type-meta">
-                {teamBPlayers.map(p => (
-                  <p key={p!.id}>{formatPlayerName(p!.firstName, p!.lastName, 'short')}</p>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className="divider" />
-
-        {/* Hole Progress */}
-        <section className="section" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
-          <div className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4">
-            {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
-              const result = matchState.holeResults.find(r => r.holeNumber === hole);
-              const isCurrent = hole === currentHole;
-
-              let bg = 'var(--canvas-sunken)';
-              let color = 'var(--ink-tertiary)';
-              let border = '1px solid var(--rule)';
-
-              if (result?.winner === 'teamA') {
-                bg = 'var(--team-usa)';
-                color = 'white';
-                border = 'none';
-              } else if (result?.winner === 'teamB') {
-                bg = 'var(--team-europe)';
-                color = 'white';
-                border = 'none';
-              } else if (result?.winner === 'halved') {
-                bg = 'var(--canvas-raised)';
-                color = 'var(--ink-secondary)';
-                border = '1px solid var(--rule-strong)';
-              } else if (isCurrent) {
-                bg = 'var(--masters)';
-                color = 'white';
-                border = 'none';
-              }
-
-              return (
-                <button
-                  key={hole}
-                  onClick={() => goToHole(hole)}
-                  className="shrink-0"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    background: bg,
-                    color: color,
-                    border: border,
-                  }}
-                >
-                  {hole}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <hr className="divider" />
-
-        {/* Scoring Controls */}
-        {!isMatchComplete ? (
-          <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
-            {/* Hole Navigation */}
-            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
-              <button
-                onClick={prevHole}
-                disabled={currentHole <= 1}
-                className="p-3"
-                style={{
-                  opacity: currentHole <= 1 ? 0.3 : 1,
-                  color: currentHole > 1 ? 'var(--ink)' : 'var(--ink-tertiary)',
-                }}
-              >
-                <ChevronLeft size={24} />
-              </button>
-
-              <div className="text-center">
-                <p className="type-headline">Hole {currentHole}</p>
-                {currentHoleResult && currentHoleResult.winner !== 'none' && (
-                  <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
-                    {currentHoleResult.winner === 'halved' ? 'Halved' :
-                      currentHoleResult.winner === 'teamA' ? `${teamAName} won` : `${teamBName} won`}
-                  </p>
+        <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+            {/* Celebration Overlay */}
+            <AnimatePresence>
+                {celebration && (
+                    <ScoreCelebration
+                        type={celebration.type}
+                        winner={celebration.winner}
+                        teamName={celebration.teamName}
+                        teamColor={celebration.teamColor}
+                        holeNumber={celebration.holeNumber}
+                        finalScore={celebration.finalScore}
+                        show={true}
+                        onComplete={() => setCelebration(null)}
+                        duration={celebration.type === 'matchWon' ? 3500 : 1500}
+                    />
                 )}
-              </div>
+            </AnimatePresence>
 
-              <button
-                onClick={nextHole}
-                disabled={currentHole >= 18}
-                className="p-3"
-                style={{
-                  opacity: currentHole >= 18 ? 0.3 : 1,
-                  color: currentHole < 18 ? 'var(--ink)' : 'var(--ink-tertiary)',
-                }}
-              >
-                <ChevronRight size={24} />
-              </button>
-            </div>
+            {/* Toast */}
+            <AnimatePresence>
+                {toast && (
+                    <ScoreToast
+                        message={toast.message}
+                        type={toast.type}
+                        show={true}
+                        onComplete={() => setToast(null)}
+                    />
+                )}
+            </AnimatePresence>
 
-            {/* Handicap Stroke Indicator */}
-            {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <button
-                  onClick={() => setShowHandicapDetails(!showHandicapDetails)}
-                  className="w-full"
-                >
-                  <HandicapStrokeIndicator
+            {/* Sticky Undo Banner */}
+            <StickyUndoBanner
+                action={undoAction}
+                duration={5000}
+                bottomOffset={80}
+                onDismiss={() => setUndoAction(null)}
+            />
+
+            {/* Voice Scoring Modal */}
+            <AnimatePresence>
+                {showVoiceModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="w-full max-w-sm mx-4 p-6 rounded-2xl"
+                            style={{ background: 'var(--canvas)' }}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold">Voice Score</h3>
+                                <button
+                                    onClick={() => setShowVoiceModal(false)}
+                                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+                            <VoiceScoring
+                                teamAName={teamAName}
+                                teamBName={teamBName}
+                                currentHole={currentHole}
+                                onScoreConfirmed={handleVoiceScore}
+                                floating={false}
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Stroke Alert Banner */}
+            {!isMatchComplete && (activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
+                <StrokeAlertBanner
                     currentHole={currentHole}
                     teamAStrokes={activeMatch.teamAHandicapAllowance}
                     teamBStrokes={activeMatch.teamBHandicapAllowance}
                     holeHandicaps={holeHandicaps}
                     teamAName={teamAName}
                     teamBName={teamBName}
-                    showAllHoles={showHandicapDetails}
-                  />
-                </button>
-              </div>
+                    autoDismissMs={5000}
+                    onAlertShown={(hole, aStrokes, bStrokes) => {
+                        if (aStrokes > 0 || bStrokes > 0) {
+                            haptic.tap();
+                        }
+                    }}
+                    position="top"
+                />
             )}
 
-            {/* Score Buttons */}
-            <div className="grid grid-cols-3 gap-3" style={{ marginBottom: 'var(--space-4)' }}>
-              <button
-                onClick={() => handleScore('teamA')}
-                disabled={isSaving}
-                className="score-btn"
-                style={{
-                  background: 'var(--team-usa)',
-                  color: 'white',
-                  opacity: isSaving ? 0.5 : 1,
-                  boxShadow: currentHoleResult?.winner === 'teamA'
-                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--team-usa)'
-                    : undefined,
-                }}
-              >
-                <span className="score-btn-label">{teamAName}</span>
-                <span className="score-btn-hint">wins hole</span>
-              </button>
+            {/* Header */}
+            <header className="sticky top-0 z-30 backdrop-blur-lg border-b" style={{ background: 'rgba(var(--canvas-rgb), 0.9)', borderColor: 'var(--rule)' }}>
+                <div className="container-editorial py-3">
+                    <div className="flex items-center justify-between">
+                        {/* Back + Title */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => router.push('/score')}
+                                className="p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Back"
+                            >
+                                <ChevronLeft size={20} style={{ color: 'var(--ink-secondary)' }} />
+                            </button>
+                            <div>
+                                <p className="type-overline" style={{ color: 'var(--masters)' }}>
+                                    Match {activeMatch.matchOrder}
+                                </p>
+                                <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                                    {teamAPlayers.map(p => formatPlayerName(p!.firstName, p!.lastName, 'short')).join(' & ')} vs {teamBPlayers.map(p => formatPlayerName(p!.firstName, p!.lastName, 'short')).join(' & ')}
+                                </p>
+                            </div>
+                        </div>
 
-              <button
-                onClick={() => handleScore('halved')}
-                disabled={isSaving}
-                className="score-btn"
-                style={{
-                  background: 'var(--canvas-raised)',
-                  color: 'var(--ink)',
-                  border: '1px solid var(--rule-strong)',
-                  opacity: isSaving ? 0.5 : 1,
-                  boxShadow: currentHoleResult?.winner === 'halved'
-                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--ink-tertiary)'
-                    : undefined,
-                }}
-              >
-                <span className="score-btn-label">Halve</span>
-                <span className="score-btn-hint">tie hole</span>
-              </button>
+                        {/* Actions */}
+                        <div className="flex items-center gap-1">
+                            {/* Photo */}
+                            <button
+                                onClick={() => { }}
+                                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Photo capture"
+                            >
+                                <Camera size={18} style={{ color: 'var(--ink-secondary)' }} />
+                            </button>
 
-              <button
-                onClick={() => handleScore('teamB')}
-                disabled={isSaving}
-                className="score-btn"
-                style={{
-                  background: 'var(--team-europe)',
-                  color: 'white',
-                  opacity: isSaving ? 0.5 : 1,
-                  boxShadow: currentHoleResult?.winner === 'teamB'
-                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--team-europe)'
-                    : undefined,
-                }}
-              >
-                <span className="score-btn-label">{teamBName}</span>
-                <span className="score-btn-hint">wins hole</span>
-              </button>
-            </div>
+                            {/* Voice */}
+                            <button
+                                onClick={() => setShowVoiceModal(true)}
+                                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Voice scoring"
+                            >
+                                <Mic size={18} style={{ color: 'var(--ink-secondary)' }} />
+                            </button>
 
-            {/* Press Tracker */}
-            <PressTracker
-              currentHole={currentHole}
-              mainMatchScore={matchState.currentScore}
-              holesRemaining={matchState.holesRemaining}
-              presses={presses}
-              onPress={handlePress}
-              teamAName={teamAName}
-              teamBName={teamBName}
-              betAmount={10} // Would come from bet configuration
-              autoPress={false}
-            />
-          </section>
-        ) : (
-          /* Match Complete */
-          <section className="section text-center" style={{ paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-10)' }}>
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                margin: '0 auto var(--space-4)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(0, 103, 71, 0.1)',
-              }}
-            >
-              <Check size={24} style={{ color: 'var(--masters)' }} />
-            </div>
+                            {/* Undo */}
+                            <button
+                                onClick={handleUndo}
+                                disabled={undoStack.length === 0}
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-xl transition-colors"
+                                style={{
+                                    color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
+                                    opacity: undoStack.length === 0 ? 0.5 : 1,
+                                    background: undoStack.length > 0 ? 'rgba(0, 103, 71, 0.1)' : 'transparent',
+                                }}
+                            >
+                                <Undo2 size={14} />
+                                <span className="text-xs font-medium">Undo</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-            <p className="type-headline" style={{ marginBottom: 'var(--space-2)' }}>
-              {matchState.currentScore > 0 ? teamAName :
-                matchState.currentScore < 0 ? teamBName : 'Match Halved'}
-            </p>
+            <main className="container-editorial">
+                {/* Score Hero */}
+                <section className="py-6 text-center">
+                    <div className="flex items-center justify-center gap-6">
+                        {/* Team A */}
+                        <div className="flex-1 text-right">
+                            <p
+                                className="text-sm font-semibold uppercase tracking-wide"
+                                style={{ color: teamAColor }}
+                            >
+                                {teamAName}
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                                {matchState.teamAHolesWon} holes
+                            </p>
+                        </div>
 
-            <p className="score-large" style={{ color: 'var(--masters)', marginBottom: 'var(--space-1)' }}>
-              {matchState.displayScore}
-            </p>
+                        {/* Score Display */}
+                        <motion.div
+                            key={matchState.displayScore}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="text-center"
+                        >
+                            <p
+                                className="text-4xl font-bold"
+                                style={{
+                                    color: matchState.currentScore > 0 ? teamAColor :
+                                        matchState.currentScore < 0 ? teamBColor : 'var(--ink-tertiary)'
+                                }}
+                            >
+                                {matchState.displayScore}
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                                thru {matchState.holesPlayed}
+                            </p>
+                            {matchState.isDormie && (
+                                <p className="text-xs mt-1 flex items-center justify-center gap-1" style={{ color: 'var(--warning)' }}>
+                                    <AlertCircle size={12} />
+                                    Dormie
+                                </p>
+                            )}
+                        </motion.div>
 
-            {matchState.currentScore !== 0 && (
-              <p className="type-meta">wins</p>
+                        {/* Team B */}
+                        <div className="flex-1 text-left">
+                            <p
+                                className="text-sm font-semibold uppercase tracking-wide"
+                                style={{ color: teamBColor }}
+                            >
+                                {teamBName}
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                                {matchState.teamBHolesWon} holes
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Hole Mini-Map */}
+                <section className="mb-4">
+                    <HoleMiniMap
+                        currentHole={currentHole}
+                        holeResults={matchState.holeResults}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        teamAColor={teamAColor}
+                        teamBColor={teamBColor}
+                        onHoleSelect={goToHole}
+                        isComplete={isMatchComplete}
+                    />
+                </section>
+
+                {/* Scoring Area */}
+                {!isMatchComplete ? (
+                    <section className="space-y-4">
+                        {/* Hole Navigation Header */}
+                        <div className="flex items-center justify-between px-2">
+                            <button
+                                onClick={prevHole}
+                                disabled={currentHole <= 1}
+                                className="p-3 rounded-xl transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                                style={{ opacity: currentHole <= 1 ? 0.3 : 1 }}
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+
+                            <div className="text-center">
+                                <p className="text-2xl font-bold">Hole {currentHole}</p>
+                                {currentHoleResult && currentHoleResult.winner !== 'none' && (
+                                    <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+                                        {currentHoleResult.winner === 'halved' ? 'Halved' :
+                                            currentHoleResult.winner === 'teamA' ? `${teamAName} won` : `${teamBName} won`}
+                                    </p>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={nextHole}
+                                disabled={currentHole >= 18}
+                                className="p-3 rounded-xl transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                                style={{ opacity: currentHole >= 18 ? 0.3 : 1 }}
+                            >
+                                <ChevronRight size={24} />
+                            </button>
+                        </div>
+
+                        {/* Handicap Strokes */}
+                        {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
+                            <button
+                                onClick={() => setShowHandicapDetails(!showHandicapDetails)}
+                                className="w-full"
+                            >
+                                <HandicapStrokeIndicator
+                                    currentHole={currentHole}
+                                    teamAStrokes={activeMatch.teamAHandicapAllowance}
+                                    teamBStrokes={activeMatch.teamBHandicapAllowance}
+                                    holeHandicaps={holeHandicaps}
+                                    teamAName={teamAName}
+                                    teamBName={teamBName}
+                                    showAllHoles={showHandicapDetails}
+                                />
+                            </button>
+                        )}
+
+                        {/* Swipe Score Panel */}
+                        <AnimatePresence mode="wait">
+                            {scoringMode === 'swipe' ? (
+                                <motion.div
+                                    key="swipe"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                >
+                                    <SwipeScorePanel
+                                        holeNumber={currentHole}
+                                        teamAName={teamAName}
+                                        teamBName={teamBName}
+                                        teamAColor={teamAColor}
+                                        teamBColor={teamBColor}
+                                        currentScore={matchState.currentScore}
+                                        existingResult={currentHoleResult?.winner}
+                                        onScore={handleScore}
+                                        disabled={isSaving}
+                                    />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="buttons"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-3"
+                                >
+                                    {/* Traditional Buttons */}
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <button
+                                            onClick={() => handleScore('teamA')}
+                                            disabled={isSaving}
+                                            className="py-4 px-4 rounded-xl font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                            style={{
+                                                background: teamAColor,
+                                                opacity: isSaving ? 0.5 : 1,
+                                                boxShadow: currentHoleResult?.winner === 'teamA'
+                                                    ? `0 0 0 3px var(--canvas), 0 0 0 5px ${teamAColor}`
+                                                    : undefined,
+                                            }}
+                                        >
+                                            <span className="block text-lg">{teamAName}</span>
+                                            <span className="block text-xs opacity-80 mt-0.5">wins hole</span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleScore('halved')}
+                                            disabled={isSaving}
+                                            className="py-4 px-4 rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                            style={{
+                                                background: 'var(--canvas-raised)',
+                                                border: '2px solid var(--rule-strong)',
+                                                opacity: isSaving ? 0.5 : 1,
+                                                boxShadow: currentHoleResult?.winner === 'halved'
+                                                    ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--ink-tertiary)'
+                                                    : undefined,
+                                            }}
+                                        >
+                                            <span className="block text-lg">Halve</span>
+                                            <span className="block text-xs opacity-60 mt-0.5">tie hole</span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleScore('teamB')}
+                                            disabled={isSaving}
+                                            className="py-4 px-4 rounded-xl font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                            style={{
+                                                background: teamBColor,
+                                                opacity: isSaving ? 0.5 : 1,
+                                                boxShadow: currentHoleResult?.winner === 'teamB'
+                                                    ? `0 0 0 3px var(--canvas), 0 0 0 5px ${teamBColor}`
+                                                    : undefined,
+                                            }}
+                                        >
+                                            <span className="block text-lg">{teamBName}</span>
+                                            <span className="block text-xs opacity-80 mt-0.5">wins hole</span>
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Press Tracker */}
+                        <PressTracker
+                            currentHole={currentHole}
+                            mainMatchScore={matchState.currentScore}
+                            holesRemaining={matchState.holesRemaining}
+                            presses={presses}
+                            onPress={handlePress}
+                            teamAName={teamAName}
+                            teamBName={teamBName}
+                            betAmount={10}
+                            autoPress={false}
+                        />
+
+                        {/* Side Bet Reminders */}
+                        <SideBetReminder
+                            currentHole={currentHole}
+                            bets={DEMO_SIDE_BETS}
+                            currentPlayerId={teamAPlayers[0]?.id}
+                        />
+
+                        {/* Scoring Mode Toggle */}
+                        <div className="flex justify-center pt-2">
+                            <div
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
+                                style={{ background: 'var(--canvas-sunken)' }}
+                            >
+                                <button
+                                    onClick={() => setScoringMode('swipe')}
+                                    className="px-3 py-1 rounded-full transition-all"
+                                    style={{
+                                        background: scoringMode === 'swipe' ? 'var(--canvas)' : 'transparent',
+                                        color: scoringMode === 'swipe' ? 'var(--ink)' : 'var(--ink-tertiary)',
+                                        boxShadow: scoringMode === 'swipe' ? 'var(--shadow-sm)' : 'none',
+                                    }}
+                                >
+                                    Swipe
+                                </button>
+                                <button
+                                    onClick={() => setScoringMode('buttons')}
+                                    className="px-3 py-1 rounded-full transition-all"
+                                    style={{
+                                        background: scoringMode === 'buttons' ? 'var(--canvas)' : 'transparent',
+                                        color: scoringMode === 'buttons' ? 'var(--ink)' : 'var(--ink-tertiary)',
+                                        boxShadow: scoringMode === 'buttons' ? 'var(--shadow-sm)' : 'none',
+                                    }}
+                                >
+                                    Buttons
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                ) : (
+                    /* Match Complete State */
+                    <section className="py-12 text-center">
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: 'spring', damping: 15 }}
+                        >
+                            <div
+                                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+                                style={{
+                                    background: matchState.winningTeam === 'teamA' ? teamAColor
+                                        : matchState.winningTeam === 'teamB' ? teamBColor
+                                            : '#666'
+                                }}
+                            >
+                                <Trophy className="w-10 h-10 text-white" />
+                            </div>
+
+                            <h2 className="text-2xl font-bold mb-2">
+                                {matchState.winningTeam === 'halved'
+                                    ? 'Match Halved'
+                                    : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} Wins!`
+                                }
+                            </h2>
+
+                            <p
+                                className="text-xl font-semibold"
+                                style={{
+                                    color: matchState.winningTeam === 'teamA' ? teamAColor
+                                        : matchState.winningTeam === 'teamB' ? teamBColor
+                                            : 'var(--ink-secondary)'
+                                }}
+                            >
+                                {matchState.displayScore}
+                            </p>
+
+                            <button
+                                onClick={() => router.push('/score')}
+                                className="mt-6 px-6 py-3 rounded-xl font-medium"
+                                style={{ background: 'var(--masters)', color: 'white' }}
+                            >
+                                Back to Matches
+                            </button>
+                        </motion.div>
+                    </section>
+                )}
+
+                {/* Weather Alerts */}
+                <section className="mt-4">
+                    <WeatherAlerts showWeatherBar={true} />
+                </section>
+            </main>
+
+            {/* Quick Photo Capture - Fixed position */}
+            {!isMatchComplete && (
+                <div className="fixed bottom-24 left-4 z-40">
+                    <QuickPhotoCapture
+                        matchId={matchId}
+                        holeNumber={currentHole}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        onCapture={handlePhotoCapture}
+                    />
+                </div>
             )}
 
-            <button
-              onClick={() => router.push('/score')}
-              className="btn btn-secondary"
-              style={{ marginTop: 'var(--space-8)' }}
-            >
-              Back to Matches
-            </button>
-          </section>
-        )}
-
-        {/* Side Bet Reminders */}
-        {!isMatchComplete && (
-          <section className="section" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
-            <SideBetReminder
-              currentHole={currentHole}
-              bets={DEMO_SIDE_BETS}
-              currentPlayerId={teamAPlayers[0]?.id}
-            />
-          </section>
-        )}
-
-        {/* Weather Alerts */}
-        <section className="section" style={{ paddingBottom: 'var(--space-4)' }}>
-          <WeatherAlerts showWeatherBar={true} />
-        </section>
-      </main>
-
-      {/* Quick Photo Capture - Fixed position */}
-      {
-        !isMatchComplete && (
-          <div className="fixed bottom-24 left-4 z-40">
-            <QuickPhotoCapture
-              matchId={matchId}
-              holeNumber={currentHole}
-              teamAName={teamAName}
-              teamBName={teamBName}
-              onCapture={handlePhotoCapture}
-            />
-          </div>
-        )
-      }
-
-      {/* Voice Scoring - Fixed position */}
-      {
-        !isMatchComplete && (
-          <VoiceScoring
-            teamAName={teamAName}
-            teamBName={teamBName}
-            currentHole={currentHole}
-            onScoreConfirmed={handleVoiceScore}
-            floating={true}
-            position={{ bottom: 160, right: 16 }}
-          />
-        )
-      }
-
-      {/* Sticky Undo Banner */}
-      <StickyUndoBanner
-        action={undoAction}
-        duration={5000}
-        bottomOffset={80}
-        onDismiss={() => setUndoAction(null)}
-      />
-
-      {/* Stroke Alert Banner */}
-      {!isMatchComplete && (activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
-        <StrokeAlertBanner
-          currentHole={currentHole}
-          teamAStrokes={activeMatch.teamAHandicapAllowance}
-          teamBStrokes={activeMatch.teamBHandicapAllowance}
-          holeHandicaps={holeHandicaps}
-          teamAName={teamAName}
-          teamBName={teamBName}
-          autoDismissMs={5000}
-          onAlertShown={(hole, aStrokes, bStrokes) => {
-            if (aStrokes > 0 || bStrokes > 0) {
-              haptic.tap();
-            }
-          }}
-          position="top"
-        />
-      )}
-    </div >
-  );
+            {/* Voice Scoring FAB - Fixed position */}
+            {!isMatchComplete && (
+                <div className="fixed bottom-24 right-4 z-40">
+                    <button
+                        onClick={() => setShowVoiceModal(true)}
+                        className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+                        style={{ background: 'var(--masters)', color: 'white' }}
+                        aria-label="Voice scoring"
+                    >
+                        <Mic size={24} />
+                    </button>
+                </div>
+            )}
+        </div>
+    );
 }

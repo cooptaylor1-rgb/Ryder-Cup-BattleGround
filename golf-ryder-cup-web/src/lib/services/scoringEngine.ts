@@ -18,6 +18,7 @@ import type {
     MatchStatus,
     MatchResultType,
     TeamMember,
+    HoleResultEdit,
 } from '../types/models';
 import { ScoringEventType, type ScoringEvent, type HoleScoredPayload, type HoleEditedPayload, type HoleUndonePayload } from '../types/events';
 import type { MatchState } from '../types/computed';
@@ -189,6 +190,8 @@ function determineWinningTeam(
  * @param teamAScore - Optional Team A stroke score
  * @param teamBScore - Optional Team B stroke score
  * @param scoredBy - ID of the user recording the score
+ * @param editReason - Optional reason for edit (required for captain overrides)
+ * @param isCaptainOverride - Whether this is a captain override (P0-4)
  * @returns The created hole result
  */
 export async function recordHoleResult(
@@ -197,7 +200,9 @@ export async function recordHoleResult(
     winner: HoleWinner,
     teamAScore?: number,
     teamBScore?: number,
-    scoredBy?: string
+    scoredBy?: string,
+    editReason?: string,
+    isCaptainOverride?: boolean
 ): Promise<HoleResult> {
     // Check for existing result
     const existing = await db.holeResults
@@ -205,6 +210,21 @@ export async function recordHoleResult(
         .first();
 
     const now = new Date().toISOString();
+
+    // P0-4: Build audit trail for edits
+    let editHistory: HoleResultEdit[] = existing?.editHistory || [];
+    if (existing && existing.winner !== winner) {
+        const editEntry: HoleResultEdit = {
+            editedAt: now,
+            editedBy: scoredBy || 'unknown',
+            previousWinner: existing.winner,
+            newWinner: winner,
+            reason: editReason,
+            isCaptainOverride,
+        };
+        editHistory = [...editHistory, editEntry];
+    }
+
     const result: HoleResult = {
         id: existing?.id || crypto.randomUUID(),
         matchId,
@@ -212,8 +232,13 @@ export async function recordHoleResult(
         winner,
         teamAScore,
         teamBScore,
-        scoredBy,
-        timestamp: now,
+        scoredBy: existing ? existing.scoredBy : scoredBy, // Keep original scorer
+        timestamp: existing?.timestamp || now, // Keep original timestamp
+        // P0-4: Audit fields
+        lastEditedBy: existing ? scoredBy : undefined,
+        lastEditedAt: existing ? now : undefined,
+        editReason: existing ? editReason : undefined,
+        editHistory: editHistory.length > 0 ? editHistory : undefined,
     };
 
     // Save to database

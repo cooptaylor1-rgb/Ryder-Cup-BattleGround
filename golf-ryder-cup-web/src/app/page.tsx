@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { useTripStore } from '@/lib/stores';
+import { useTripStore, useAuthStore } from '@/lib/stores';
 import {
   ChevronRight,
   MapPin,
@@ -22,15 +22,19 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
-import type { TeamStandings } from '@/lib/types/computed';
+import type { TeamStandings, MatchState } from '@/lib/types/computed';
+import type { Match, RyderCupSession } from '@/lib/types/models';
+import { calculateMatchState } from '@/lib/services/scoringEngine';
 import {
   NoTournamentsEmpty,
   LiveMatchBanner,
   WhatsNew,
   QuickStartWizard,
   FeatureCard,
+  YourMatchCard,
+  CaptainToggle,
 } from '@/components/ui';
 import { BottomNav, type NavBadges } from '@/components/layout';
 import { WeatherWidget } from '@/components/course';
@@ -46,7 +50,8 @@ import { WeatherWidget } from '@/components/course';
  */
 export default function HomePage() {
   const router = useRouter();
-  const { loadTrip, currentTrip } = useTripStore();
+  const { loadTrip, currentTrip, players, teams, sessions } = useTripStore();
+  const { currentUser, isAuthenticated } = useAuthStore();
   const [standings, setStandings] = useState<TeamStandings | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [, setShowWhatsNew] = useState(false);
@@ -73,10 +78,84 @@ export default function HomePage() {
     }
   }, [activeTrip, loadTrip]);
 
+  // Find the current user's player record (P0-1)
+  const currentUserPlayer = useMemo(() => {
+    if (!isAuthenticated || !currentUser) return null;
+    return players.find(
+      p =>
+        (p.email && currentUser.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
+          p.lastName.toLowerCase() === currentUser.lastName.toLowerCase())
+    );
+  }, [currentUser, isAuthenticated, players]);
+
+  // Find the current user's match (scheduled or in progress) (P0-1)
+  const userMatchData = useLiveQuery(async (): Promise<{
+    match: Match;
+    session: RyderCupSession;
+    matchState: MatchState | null;
+  } | null> => {
+    if (!activeTrip || !currentUserPlayer) return null;
+
+    // Get sessions for this trip
+    const tripSessions = await db.sessions
+      .where('tripId')
+      .equals(activeTrip.id)
+      .toArray();
+
+    if (tripSessions.length === 0) return null;
+
+    // Find matches where user is playing
+    const sessionIds = tripSessions.map(s => s.id);
+    const allMatches = await db.matches
+      .where('sessionId')
+      .anyOf(sessionIds)
+      .toArray();
+
+    // Find user's match (prefer inProgress, then scheduled)
+    const userMatches = allMatches.filter(
+      m => m.teamAPlayerIds.includes(currentUserPlayer.id) ||
+        m.teamBPlayerIds.includes(currentUserPlayer.id)
+    );
+
+    // Prioritize: inProgress > scheduled
+    const userMatch = userMatches.find(m => m.status === 'inProgress') ||
+      userMatches.find(m => m.status === 'scheduled');
+
+    if (!userMatch) return null;
+
+    const session = tripSessions.find(s => s.id === userMatch.sessionId);
+    if (!session) return null;
+
+    // Get match state if in progress
+    let matchState: MatchState | null = null;
+    if (userMatch.status === 'inProgress') {
+      const holeResults = await db.holeResults
+        .where('matchId')
+        .equals(userMatch.id)
+        .toArray();
+      matchState = calculateMatchState(userMatch, holeResults);
+    }
+
+    return { match: userMatch, session, matchState };
+  }, [activeTrip?.id, currentUserPlayer?.id]);
+
+  // Get team names
+  const teamA = teams.find(t => t.color === 'usa');
+  const teamB = teams.find(t => t.color === 'europe');
+  const teamAName = teamA?.name || 'USA';
+  const teamBName = teamB?.name || 'Europe';
+
   const handleSelectTrip = async (tripId: string) => {
     await loadTrip(tripId);
     router.push('/standings');
   };
+
+  const handleEnterScore = useCallback(() => {
+    if (userMatchData?.match) {
+      router.push(`/score/${userMatchData.match.id}`);
+    }
+  }, [router, userMatchData]);
 
   const handleQuickStartComplete = useCallback(async (tripData: {
     name: string;
@@ -152,7 +231,7 @@ export default function HomePage() {
       {/* What's New Modal (auto-shows for returning users) */}
       <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
 
-      {/* Premium Header */}
+      {/* Premium Header with Captain Toggle (P0-2) */}
       <header className="header-premium">
         <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
@@ -172,31 +251,50 @@ export default function HomePage() {
             </div>
             <span className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--ink)' }}>Ryder Cup Tracker</span>
           </div>
-          {hasTrips && (
-            <button
-              onClick={() => setShowWhatsNew(true)}
-              className="press-scale"
-              style={{
-                padding: 'var(--space-2)',
-                marginRight: 'calc(-1 * var(--space-2))',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--masters)',
-                background: 'rgba(var(--masters-rgb), 0.1)',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              aria-label="What's new"
-            >
-              <Sparkles className="w-5 h-5" />
-            </button>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+            {/* Captain Mode Toggle (P0-2) */}
+            {hasTrips && <CaptainToggle />}
+            {hasTrips && (
+              <button
+                onClick={() => setShowWhatsNew(true)}
+                className="press-scale"
+                style={{
+                  padding: 'var(--space-2)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--masters)',
+                  background: 'rgba(var(--masters-rgb), 0.1)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                aria-label="What's new"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
       <main className="container-editorial">
-        {/* LIVE MATCH BANNER — Top priority when matches are happening */}
-        {activeTrip && liveMatchesCount > 0 && liveMatches && liveMatches[0] && (
+        {/* YOUR MATCH HERO CARD (P0-1) — Top priority for participants */}
+        {activeTrip && userMatchData && currentUserPlayer && (
+          <section className="section-sm">
+            <YourMatchCard
+              match={userMatchData.match}
+              matchState={userMatchData.matchState || undefined}
+              session={userMatchData.session}
+              currentUserPlayer={currentUserPlayer}
+              allPlayers={players}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              onEnterScore={handleEnterScore}
+            />
+          </section>
+        )}
+
+        {/* LIVE MATCH BANNER — Show when there are live matches (but user not in one) */}
+        {activeTrip && liveMatchesCount > 0 && liveMatches && liveMatches[0] && !userMatchData && (
           <section className="section-sm">
             <LiveMatchBanner
               matchCount={liveMatchesCount}

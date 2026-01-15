@@ -1,4 +1,5 @@
 # UX Audit Report: Ryder Cup Tracker App
+
 ## Executive Summary
 
 **Overall Grade: B-** — Functional foundation with significant flow friction. The app has solid technical bones and good visual polish, but suffers from navigation complexity, unclear hierarchy, and missing "in-the-moment" optimizations critical for on-course use.
@@ -20,7 +21,7 @@
 | **Entering Score** | Score page → select session → select match → score holes | 🟡 **Confusion**: Session selector is hidden below fold. Match list unclear which is "mine" |
 | **Checking Standings** | Bottom nav → Standings | 🟢 **Delight**: Beautiful score display, team colors clear |
 
-#### Friction Points Identified:
+#### Friction Points Identified
 
 1. **🔴 P0: No "My Match" shortcut** — Participant must navigate 3-4 screens to find their match
 2. **🔴 P0: Identity not connected** — Schedule "My" tab is empty if email doesn't match player record exactly
@@ -45,7 +46,7 @@
 | **Resolve Disputes** | Captain Manage page exists but buried | 🔴 **Friction**: No quick access from score page |
 | **Lock Events** | Not implemented | 🔴 **Missing**: No session/match lock functionality |
 
-#### Friction Points Identified:
+#### Friction Points Identified
 
 1. **🔴 P0: Captain mode toggle buried** — Must navigate to More, scroll to find toggle
 2. **🔴 P0: No tournament setup wizard** — Captain must visit 3-4 pages to fully configure
@@ -148,6 +149,7 @@
 **Current State**: No audit trail. Scores can be changed silently.
 
 **Needed**:
+
 ```
 Hole 3: USA Won
   Scored by Cooper T. at 2:34 PM
@@ -266,6 +268,7 @@ IDEAL (Guided wizard):
 **Location**: Home page, below Live Banner, above team score
 
 **Design**:
+
 ```
 ┌─────────────────────────────────────────────┐
 │ 🏌️ YOUR MATCH                              │
@@ -286,6 +289,7 @@ IDEAL (Guided wizard):
 **Location**: Header, right side
 
 **Design**:
+
 ```
 Current:  [Logo] Ryder Cup Tracker    [sparkles]
 Proposed: [Logo] Ryder Cup Tracker    [shield 🔒]
@@ -300,6 +304,7 @@ Proposed: [Logo] Ryder Cup Tracker    [shield 🔒]
 **Location**: Score page match rows
 
 **Design**:
+
 ```
 Match 3   Cooper & Mike vs Dan & Steve   A/S
           ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -309,6 +314,7 @@ Match 3   Cooper & Mike vs Dan & Steve   A/S
 ### Change 4: Score Edit Audit (P0-4)
 
 **Data Model Addition**:
+
 ```typescript
 interface HoleResultAudit {
   editedAt: ISODateString;
@@ -366,6 +372,7 @@ MORE ACTIONS (collapsed by default):
 This app has strong bones: the scoring UI is excellent, the visual design is premium, and the offline-first architecture is correct. The core problems are **navigation complexity** and **missing in-the-moment shortcuts**.
 
 The highest-impact fixes require minimal code:
+
 1. Add "Your Match" card to Home
 2. Surface captain toggle
 3. Badge "your match" in lists

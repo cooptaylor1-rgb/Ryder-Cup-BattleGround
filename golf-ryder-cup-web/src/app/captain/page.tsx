@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
@@ -16,6 +16,7 @@ import {
   Settings,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   Plus,
   AlertTriangle,
   CheckCircle2,
@@ -54,25 +55,12 @@ interface QuickAction {
   href: string;
   color: string;
   badge?: number;
+  priority?: boolean; // P0-7: Top 4 priority actions shown by default
 }
 
+// P0-7: Reorganized with top 4 priority actions first
 const QUICK_ACTIONS: QuickAction[] = [
-  {
-    id: 'manage',
-    label: 'Manage Trip',
-    description: 'Edit matches & strokes',
-    icon: Sliders,
-    href: '/captain/manage',
-    color: '#ef4444',
-  },
-  {
-    id: 'bets',
-    label: 'Side Bets',
-    description: 'Create & manage bets',
-    icon: DollarSign,
-    href: '/captain/bets',
-    color: '#10b981',
-  },
+  // Priority Actions (always visible)
   {
     id: 'lineup',
     label: 'Create Lineup',
@@ -80,6 +68,43 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: Users,
     href: '/lineup/new',
     color: 'var(--masters)',
+    priority: true,
+  },
+  {
+    id: 'manage',
+    label: 'Manage Trip',
+    description: 'Edit matches & strokes',
+    icon: Sliders,
+    href: '/captain/manage',
+    color: '#ef4444',
+    priority: true,
+  },
+  {
+    id: 'checklist',
+    label: 'Pre-Flight',
+    description: 'Review checklist',
+    icon: ClipboardCheck,
+    href: '/captain/checklist',
+    color: '#3b82f6',
+    priority: true,
+  },
+  {
+    id: 'messages',
+    label: 'Messages',
+    description: 'Send announcements',
+    icon: MessageSquare,
+    href: '/captain/messages',
+    color: '#f59e0b',
+    priority: true,
+  },
+  // Secondary Actions (expandable)
+  {
+    id: 'bets',
+    label: 'Side Bets',
+    description: 'Create & manage bets',
+    icon: DollarSign,
+    href: '/captain/bets',
+    color: '#10b981',
   },
   {
     id: 'availability',
@@ -90,28 +115,12 @@ const QUICK_ACTIONS: QuickAction[] = [
     color: '#22c55e',
   },
   {
-    id: 'checklist',
-    label: 'Pre-Flight',
-    description: 'Review checklist',
-    icon: ClipboardCheck,
-    href: '/captain/checklist',
-    color: '#3b82f6',
-  },
-  {
     id: 'draft',
     label: 'Team Draft',
     description: 'Assign players to teams',
     icon: Shuffle,
     href: '/captain/draft',
     color: '#8b5cf6',
-  },
-  {
-    id: 'messages',
-    label: 'Messages',
-    description: 'Send announcements',
-    icon: MessageSquare,
-    href: '/captain/messages',
-    color: '#f59e0b',
   },
   {
     id: 'invites',
@@ -143,6 +152,9 @@ export default function CaptainPage() {
   const router = useRouter();
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore();
   const { isCaptainMode } = useUIStore();
+
+  // P0-7: State for expandable quick actions grid
+  const [showAllActions, setShowAllActions] = useState(false);
 
   useEffect(() => {
     if (!currentTrip) {
@@ -312,13 +324,15 @@ export default function CaptainPage() {
           </div>
         </section>
 
-        {/* Quick Actions Grid */}
+        {/* Quick Actions Grid - P0-7: Simplified with expandable section */}
         <section className="section">
           <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
             Quick Actions
           </h2>
+
+          {/* Priority Actions (always visible) */}
           <div className="grid grid-cols-2 gap-3">
-            {QUICK_ACTIONS.map(action => (
+            {QUICK_ACTIONS.filter(a => a.priority).map(action => (
               <Link
                 key={action.id}
                 href={action.href}
@@ -337,6 +351,48 @@ export default function CaptainPage() {
                 </p>
               </Link>
             ))}
+          </div>
+
+          {/* Expandable Secondary Actions */}
+          <div className="mt-3">
+            <button
+              onClick={() => setShowAllActions(!showAllActions)}
+              className="w-full py-3 flex items-center justify-center gap-2 text-sm font-medium
+                       rounded-lg border border-gray-200 dark:border-gray-700
+                       hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              style={{ color: 'var(--ink-secondary)' }}
+            >
+              <span>{showAllActions ? 'Show Less' : 'Show More Actions'}</span>
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-200 ${showAllActions ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {/* Secondary Actions (collapsible) */}
+            {showAllActions && (
+              <div className="grid grid-cols-2 gap-3 mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                {QUICK_ACTIONS.filter(a => !a.priority).map(action => (
+                  <Link
+                    key={action.id}
+                    href={action.href}
+                    className="card press-scale"
+                    style={{ padding: 'var(--space-4)' }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                      style={{ background: `${action.color}15`, color: action.color }}
+                    >
+                      <action.icon size={20} />
+                    </div>
+                    <p className="type-title-sm">{action.label}</p>
+                    <p className="type-micro" style={{ marginTop: '2px' }}>
+                      {action.description}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

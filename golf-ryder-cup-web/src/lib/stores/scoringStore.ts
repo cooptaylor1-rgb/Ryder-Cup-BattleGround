@@ -10,6 +10,7 @@ import type {
     Match,
     HoleResult,
     HoleWinner,
+    RyderCupSession,
 } from '../types/models';
 import type { MatchState } from '../types/computed';
 import { db } from '../db';
@@ -29,6 +30,7 @@ interface ScoringState {
     // Active scoring context
     activeMatch: Match | null;
     activeMatchState: MatchState | null;
+    activeSession: RyderCupSession | null; // P0-6: Track session for lock status
     currentHole: number;
 
     // All matches for current session
@@ -47,6 +49,9 @@ interface ScoringState {
         holeNumber: number;
         previousResult: HoleResult | null;
     }>;
+
+    // P0-6: Session lock helpers
+    isSessionLocked: () => boolean;
 
     // Actions
     loadSessionMatches: (sessionId: string) => Promise<void>;
@@ -73,6 +78,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
     // Initial state
     activeMatch: null,
     activeMatchState: null,
+    activeSession: null,
     currentHole: 1,
     sessionMatches: [],
     matchStates: new Map(),
@@ -81,6 +87,11 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
     error: null,
     lastSavedAt: null,
     undoStack: [],
+
+    // P0-6: Check if session is locked
+    isSessionLocked: () => {
+        return get().activeSession?.isLocked ?? false;
+    },
 
     // Load all matches for a session
     loadSessionMatches: async (sessionId: string) => {
@@ -138,6 +149,9 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 throw new Error('Match not found');
             }
 
+            // P0-6: Load session for lock status
+            const session = await db.sessions.get(match.sessionId);
+
             const holeResults = await db.holeResults
                 .where('matchId')
                 .equals(matchId)
@@ -178,6 +192,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
             set({
                 activeMatch: match,
                 activeMatchState: matchState,
+                activeSession: session || null,
                 currentHole: nextHole || 18, // Default to 18 if complete
                 isLoading: false,
                 undoStack,
@@ -194,6 +209,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
         set({
             activeMatch: null,
             activeMatchState: null,
+            activeSession: null,
             currentHole: 1,
             undoStack: [],
         });
@@ -201,8 +217,14 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
 
     // Score a hole
     scoreHole: async (winner: HoleWinner, teamAScore?: number, teamBScore?: number) => {
-        const { activeMatch, currentHole } = get();
+        const { activeMatch, currentHole, isSessionLocked } = get();
         if (!activeMatch) return;
+
+        // P0-6: Block scoring if session is locked
+        if (isSessionLocked()) {
+            set({ error: 'Session is finalized. Unlock to make changes.' });
+            return;
+        }
 
         set({ isSaving: true, error: null });
 
@@ -262,8 +284,14 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
 
     // Undo the last scoring action
     undoLastHole: async () => {
-        const { activeMatch, undoStack } = get();
+        const { activeMatch, undoStack, isSessionLocked } = get();
         if (!activeMatch || undoStack.length === 0) return;
+
+        // P0-6: Block undo if session is locked
+        if (isSessionLocked()) {
+            set({ error: 'Session is finalized. Unlock to make changes.' });
+            return;
+        }
 
         set({ isSaving: true, error: null });
 
