@@ -53,18 +53,18 @@ export default function CaptainManagePage() {
 
     // Load sessions for current trip
     const sessions = useLiveQuery(
-        () => currentTrip
-            ? db.sessions.where('tripId').equals(currentTrip.id).toArray()
-            : Promise.resolve([]),
+        async () => currentTrip
+            ? await db.sessions.where('tripId').equals(currentTrip.id).toArray()
+            : [],
         [currentTrip?.id],
-        []
+        [] as RyderCupSession[]
     );
 
     // Load all matches
     const matches = useLiveQuery(
         () => db.matches.toArray(),
         [],
-        []
+        [] as Match[]
     );
 
     useEffect(() => {
