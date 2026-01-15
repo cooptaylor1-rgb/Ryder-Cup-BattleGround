@@ -72,10 +72,15 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
                     // Interactive states - refined hover with gold accent
                     interactive && [
                         'cursor-pointer',
-                        'hover:shadow-card-lg',
-                        'hover:border-gold/20',
-                        'active:scale-[0.995]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50',
+                        // Enhanced hover feedback
+                        'hover:scale-[1.01] hover:shadow-card-lg',
+                        'hover:border-gold/30',
+                        // Satisfying press feedback
+                        'active:scale-[0.98] active:shadow-card-sm',
+                        // Consistent gold focus ring
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2',
+                        // Transition for smoothness
+                        'transition-transform duration-150 ease-out',
                     ],
 
                     // Selected state - gold highlight

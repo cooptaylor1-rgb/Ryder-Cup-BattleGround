@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
+import { NoPhotosEmpty } from '@/components/ui';
 import {
   ChevronLeft,
   Home,
@@ -204,20 +205,7 @@ export default function PhotosPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <Camera size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">No photos yet</p>
-            <p className="type-caption mt-2">
-              Start capturing memories from your trip!
-            </p>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="btn btn-primary mt-4"
-            >
-              <Plus size={18} />
-              Add Photos
-            </button>
-          </div>
+          <NoPhotosEmpty onUploadPhoto={() => fileInputRef.current?.click()} />
         )}
       </main>
 

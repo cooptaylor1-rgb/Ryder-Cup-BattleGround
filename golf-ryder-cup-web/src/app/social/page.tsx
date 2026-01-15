@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
+import { NoMessagesEmpty } from '@/components/ui';
 import {
   ChevronLeft,
   Home,
@@ -16,10 +17,7 @@ import {
   Send,
   Smile,
   Image,
-  Heart,
-  ThumbsUp,
   Flame,
-  Trophy as TrophyIcon,
 } from 'lucide-react';
 import type { Player } from '@/lib/types/models';
 
@@ -156,11 +154,7 @@ export default function SocialPage() {
         </div>
 
         {comments.length === 0 && (
-          <div className="text-center py-20">
-            <MessageCircle size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">No messages yet</p>
-            <p className="type-caption mt-2">Be the first to talk some trash!</p>
-          </div>
+          <NoMessagesEmpty />
         )}
       </main>
 

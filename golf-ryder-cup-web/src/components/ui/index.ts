@@ -77,7 +77,16 @@ export {
   TournamentCompleteEmpty,
   OfflineEmpty,
   ErrorEmpty,
+  // New premium empty states
+  NoBetsEmpty,
+  NoMessagesEmpty,
+  NoPhotosEmpty,
+  NoActivityEmpty,
+  LoadingEmpty,
 } from './EmptyState';
+
+// Navigation components
+export { Breadcrumb, SimpleBreadcrumb, type BreadcrumbItem, type BreadcrumbProps } from './Breadcrumb';
 
 // Legacy aliases for backwards compatibility
 export { NoTripsEmpty as NoTournamentsEmpty } from './EmptyState';

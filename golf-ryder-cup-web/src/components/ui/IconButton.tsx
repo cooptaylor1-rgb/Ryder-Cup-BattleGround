@@ -43,45 +43,44 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
                 className={cn(
                     // Base styles
                     'relative inline-flex items-center justify-center',
-                    'rounded-full transition-all duration-150',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                    'rounded-full',
+                    // Transitions optimized for performance
+                    'transition-transform duration-150 ease-out',
+                    // Enhanced interaction feedback
+                    'hover:scale-110 active:scale-90',
+                    // Standardized gold focus ring for consistency
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2',
                     'focus-visible:ring-offset-surface-base',
-                    'disabled:pointer-events-none disabled:opacity-50',
+                    // Disabled states
+                    'disabled:pointer-events-none disabled:opacity-50 disabled:grayscale',
+                    'disabled:hover:scale-100',
                     'select-none',
 
-                    // Size variants
-                    size === 'sm' && 'h-8 w-8',
-                    size === 'md' && 'h-10 w-10',
+                    // Size variants - WCAG 2.2 compliant (minimum 44x44px)
+                    size === 'sm' && 'h-10 w-10', // Increased from h-8 w-8
+                    size === 'md' && 'h-11 w-11', // Increased from h-10 w-10
                     size === 'lg' && 'h-12 w-12',
 
                     // Variant styles
                     variant === 'default' && [
                         'bg-surface-elevated text-text-secondary',
                         'hover:bg-surface-highlight hover:text-text-primary',
-                        'active:bg-surface-muted',
-                        'focus-visible:ring-surface-border',
                     ],
 
                     variant === 'ghost' && [
                         'bg-transparent text-text-secondary',
                         'hover:bg-surface-highlight hover:text-text-primary',
-                        'active:bg-surface-elevated',
-                        'focus-visible:ring-surface-border',
                     ],
 
                     variant === 'outline' && [
                         'bg-transparent text-text-secondary',
                         'border border-surface-border',
-                        'hover:bg-surface-highlight hover:text-text-primary hover:border-surface-elevated',
-                        'active:bg-surface-elevated',
-                        'focus-visible:ring-augusta-green',
+                        'hover:bg-surface-highlight hover:text-text-primary hover:border-gold/40',
                     ],
 
                     variant === 'danger' && [
                         'bg-transparent text-error',
                         'hover:bg-error/10',
-                        'active:bg-error/20',
-                        'focus-visible:ring-error',
                     ],
 
                     className

@@ -50,10 +50,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 className={cn(
                     // Base styles
                     'relative inline-flex items-center justify-center gap-2',
-                    'font-semibold transition-all duration-200',
+                    'font-semibold',
+                    // Transitions - separate for performance
+                    'transition-transform duration-150 ease-out',
+                    // Enhanced interaction feedback
+                    'hover:scale-[1.02] active:scale-[0.96]',
+                    // Focus ring - standardized gold for consistency
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                    'focus-visible:ring-offset-surface-base',
-                    'disabled:pointer-events-none disabled:opacity-50',
+                    'focus-visible:ring-gold focus-visible:ring-offset-surface-base',
+                    // Disabled states with grayscale for better visibility
+                    'disabled:pointer-events-none disabled:opacity-50 disabled:grayscale',
+                    'disabled:hover:scale-100',
                     'select-none',
 
                     // Size variants
@@ -65,38 +72,34 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     // Variant styles - Masters elegance
                     variant === 'primary' && [
                         'bg-masters-green text-magnolia',
-                        'hover:bg-masters-green-light active:bg-masters-green',
-                        'focus-visible:ring-masters-green',
-                        'shadow-sm hover:shadow-md',
+                        'hover:bg-masters-green-light',
+                        'shadow-sm hover:shadow-lg',
+                        'active:shadow-inner',
                     ],
 
                     variant === 'secondary' && [
                         'bg-surface-elevated text-magnolia',
                         'border border-surface-border',
-                        'hover:bg-surface-highlight hover:border-gold/30 active:bg-surface-muted',
-                        'focus-visible:ring-gold',
+                        'hover:bg-surface-highlight hover:border-gold/40',
+                        'shadow-sm hover:shadow-md',
                     ],
 
                     variant === 'ghost' && [
                         'bg-transparent text-text-secondary',
                         'hover:bg-surface-highlight hover:text-magnolia',
-                        'active:bg-surface-elevated',
-                        'focus-visible:ring-gold/50',
                     ],
 
                     variant === 'danger' && [
                         'bg-azalea text-white',
-                        'hover:bg-azalea/90 active:bg-azalea/80',
-                        'focus-visible:ring-azalea',
-                        'shadow-sm hover:shadow-md',
+                        'hover:bg-azalea/90',
+                        'shadow-sm hover:shadow-lg',
+                        'active:shadow-inner',
                     ],
 
                     variant === 'outline' && [
                         'bg-transparent text-magnolia',
                         'border border-surface-border',
-                        'hover:bg-surface-highlight hover:border-gold/30',
-                        'active:bg-surface-elevated',
-                        'focus-visible:ring-gold',
+                        'hover:bg-surface-highlight hover:border-gold/40',
                     ],
 
                     // Full width

@@ -26,6 +26,12 @@ export {
   TournamentCompleteEmpty,
   OfflineEmpty,
   ErrorEmpty,
+  // New premium empty states
+  NoBetsEmpty,
+  NoMessagesEmpty,
+  NoPhotosEmpty,
+  NoActivityEmpty,
+  LoadingEmpty,
 } from './EmptyStatePremium';
 
 // Simple EmptyState for basic use cases (when you don't need illustrations)
