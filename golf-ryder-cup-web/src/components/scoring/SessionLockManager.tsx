@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { Lock, Unlock, AlertTriangle, Check, Shield } from 'lucide-react';
-import { Button, Card, CardContent, Modal, ModalContent } from '@/components/ui';
+import { Button, Card, CardContent, Modal } from '@/components/ui';
 import type { RyderCupSession } from '@/lib/types/models';
 import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores/tripStore';
@@ -100,132 +100,132 @@ export function SessionLockManager({
             </Button>
 
             {/* Lock Confirmation Modal */}
-            <Modal open={showLockModal} onOpenChange={setShowLockModal}>
-                <ModalContent className="max-w-sm">
-                    <div className="p-6">
-                        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-900/30">
-                            <Lock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                        </div>
-
-                        <h2 className="text-lg font-semibold text-center mb-2">
-                            Finalize Session?
-                        </h2>
-
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
-                            Locking this session will prevent any score changes.
-                            Only the Captain can unlock it with the PIN.
-                        </p>
-
-                        <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 mb-4">
-                            <CardContent className="p-3">
-                                <div className="flex items-start gap-2">
-                                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                                    <p className="text-xs text-amber-800 dark:text-amber-300">
-                                        Make sure all scores have been verified before finalizing.
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <div className="flex gap-3">
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => setShowLockModal(false)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                className="flex-1 bg-amber-600 hover:bg-amber-700"
-                                onClick={handleLockSession}
-                                disabled={isProcessing}
-                            >
-                                {isProcessing ? (
-                                    <span className="animate-pulse">Locking...</span>
-                                ) : (
-                                    <>
-                                        <Check className="w-4 h-4 mr-1" />
-                                        Lock Session
-                                    </>
-                                )}
-                            </Button>
-                        </div>
+            <Modal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+                title="Finalize Session?"
+            >
+                <div className="space-y-4">
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-amber-100 dark:bg-amber-900/30">
+                        <Lock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                     </div>
-                </ModalContent>
+
+                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                        Locking this session will prevent any score changes.
+                        Only the Captain can unlock it with the PIN.
+                    </p>
+
+                    <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+                        <CardContent className="p-3">
+                            <div className="flex items-start gap-2">
+                                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                                <p className="text-xs text-amber-800 dark:text-amber-300">
+                                    Make sure all scores have been verified before finalizing.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex gap-3">
+                        <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => setShowLockModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="flex-1 bg-amber-600 hover:bg-amber-700"
+                            onClick={handleLockSession}
+                            disabled={isProcessing}
+                        >
+                            {isProcessing ? (
+                                <span className="animate-pulse">Locking...</span>
+                            ) : (
+                                <>
+                                    <Check className="w-4 h-4 mr-1" />
+                                    Lock Session
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </div>
             </Modal>
 
             {/* Unlock Modal with PIN */}
-            <Modal open={showUnlockModal} onOpenChange={setShowUnlockModal}>
-                <ModalContent className="max-w-sm">
-                    <div className="p-6">
-                        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-
-                        <h2 className="text-lg font-semibold text-center mb-2">
-                            Unlock Session
-                        </h2>
-
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
-                            Enter the Captain PIN to unlock this session for editing.
-                        </p>
-
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Captain PIN
-                            </label>
-                            <input
-                                type="password"
-                                inputMode="numeric"
-                                maxLength={6}
-                                value={pinInput}
-                                onChange={(e) => {
-                                    setPinInput(e.target.value.replace(/\D/g, ''));
-                                    setError(null);
-                                }}
-                                className="w-full px-4 py-3 text-center text-2xl tracking-widest border rounded-lg
-                                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                         dark:bg-gray-800 dark:border-gray-700"
-                                placeholder="••••"
-                                autoFocus
-                            />
-                        </div>
-
-                        {error && (
-                            <p className="text-sm text-red-600 dark:text-red-400 text-center mb-4">
-                                {error}
-                            </p>
-                        )}
-
-                        <div className="flex gap-3">
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => {
-                                    setShowUnlockModal(false);
-                                    setPinInput('');
-                                    setError(null);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                className="flex-1"
-                                onClick={handleUnlockSession}
-                                disabled={isProcessing || pinInput.length < 4}
-                            >
-                                {isProcessing ? (
-                                    <span className="animate-pulse">Unlocking...</span>
-                                ) : (
-                                    <>
-                                        <Unlock className="w-4 h-4 mr-1" />
-                                        Unlock
-                                    </>
-                                )}
-                            </Button>
-                        </div>
+            <Modal 
+                isOpen={showUnlockModal} 
+                onClose={() => {
+                    setShowUnlockModal(false);
+                    setPinInput('');
+                    setError(null);
+                }}
+                title="Unlock Session"
+            >
+                <div className="space-y-4">
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                </ModalContent>
+
+                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                        Enter the Captain PIN to unlock this session for editing.
+                    </p>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Captain PIN
+                        </label>
+                        <input
+                            type="password"
+                            inputMode="numeric"
+                            maxLength={6}
+                            value={pinInput}
+                            onChange={(e) => {
+                                setPinInput(e.target.value.replace(/\D/g, ''));
+                                setError(null);
+                            }}
+                            className="w-full px-4 py-3 text-center text-2xl tracking-widest border rounded-lg
+                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                     dark:bg-gray-800 dark:border-gray-700"
+                            placeholder="••••"
+                            autoFocus
+                        />
+                    </div>
+
+                    {error && (
+                        <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                            {error}
+                        </p>
+                    )}
+
+                    <div className="flex gap-3">
+                        <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => {
+                                setShowUnlockModal(false);
+                                setPinInput('');
+                                setError(null);
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="flex-1"
+                            onClick={handleUnlockSession}
+                            disabled={isProcessing || pinInput.length < 4}
+                        >
+                            {isProcessing ? (
+                                <span className="animate-pulse">Unlocking...</span>
+                            ) : (
+                                <>
+                                    <Unlock className="w-4 h-4 mr-1" />
+                                    Unlock
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </div>
             </Modal>
         </>
     );
