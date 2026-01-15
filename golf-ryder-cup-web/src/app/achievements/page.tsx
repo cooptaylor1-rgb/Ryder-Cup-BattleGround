@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
-import { calculatePlayerStats, computeAwards } from '@/lib/services/awardsService';
+import { calculatePlayerStats } from '@/lib/services/awardsService';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
   ChevronLeft,
@@ -79,7 +79,7 @@ export default function AchievementsPage() {
       }
     }
     loadStats();
-  }, [currentTrip?.id]);
+  }, [currentTrip]);
 
   // Calculate achievements based on real player stats
   const achievements = useMemo((): Achievement[] => {

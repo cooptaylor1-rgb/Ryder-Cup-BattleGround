@@ -8,6 +8,7 @@
  */
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface ErrorPageProps {
@@ -31,9 +32,9 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
             {/* Icon */}
             <div
                 className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
-                style={{ background: 'rgba(220, 38, 38, 0.1)' }}
+                style={{ background: 'rgba(239, 68, 68, 0.1)' }}
             >
-                <AlertTriangle size={40} style={{ color: '#DC2626' }} />
+                <AlertTriangle size={40} style={{ color: 'var(--error)' }} />
             </div>
 
             {/* Title */}
@@ -106,7 +107,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
                     Try Again
                 </button>
 
-                <a
+                <Link
                     href="/"
                     className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90"
                     style={{
@@ -117,7 +118,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
                 >
                     <Home size={18} />
                     Go Home
-                </a>
+                </Link>
             </div>
         </div>
     );

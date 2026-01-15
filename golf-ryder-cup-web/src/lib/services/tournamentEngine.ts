@@ -28,6 +28,7 @@ import type {
     FairnessScore,
     MatchState,
 } from '../types/computed';
+import { FORMAT_CONFIGS, type MatchFormat } from '../types/matchFormats';
 import { db } from '../db';
 import { calculateMatchState, calculateMatchPoints } from './scoringEngine';
 
@@ -521,9 +522,7 @@ export function getExtendedFormatConfig(format: string, totalPlayers?: number): 
     category: string;
     scoringType: string;
 } {
-    // Import dynamically to avoid circular deps
-    const { FORMAT_CONFIGS } = require('../types/matchFormats');
-    const config = FORMAT_CONFIGS[format];
+    const config = FORMAT_CONFIGS[format as MatchFormat];
 
     if (!config) {
         // Fallback to legacy session type config
@@ -581,8 +580,7 @@ export function getExtendedFormatConfig(format: string, totalPlayers?: number): 
  * @returns Calculated team handicap
  */
 export function calculateFormatHandicap(handicaps: number[], format: string): number {
-    const { FORMAT_CONFIGS } = require('../types/matchFormats');
-    const config = FORMAT_CONFIGS[format];
+    const config = FORMAT_CONFIGS[format as MatchFormat];
 
     if (!config || handicaps.length === 0) return 0;
 

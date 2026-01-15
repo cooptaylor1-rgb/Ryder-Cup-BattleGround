@@ -14,7 +14,6 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { db } from '@/lib/db';
 import { useUIStore } from '@/lib/stores';
 
 // ============================================
@@ -276,30 +275,7 @@ export function useSyncQueue() {
   const [isSyncing, setIsSyncing] = useState(false);
   const { isOnline } = useUIStore();
 
-  // Update pending count on mount and changes
-  useEffect(() => {
-    const updateCount = () => {
-      setPendingCount(getPendingOperationsCount());
-    };
-    updateCount();
-
-    // Listen for storage events
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === PENDING_OPS_KEY) {
-        updateCount();
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
-
-  // Process queue when coming online
-  useEffect(() => {
-    if (isOnline && pendingCount > 0) {
-      processQueue();
-    }
-  }, [isOnline, pendingCount]);
-
+  // Define processQueue first before using it in useEffect
   const processQueue = useCallback(async () => {
     if (isSyncing) return;
 
@@ -327,6 +303,30 @@ export function useSyncQueue() {
     setIsSyncing(false);
     setPendingCount(getPendingOperationsCount());
   }, [isSyncing]);
+
+  // Update pending count on mount and changes
+  useEffect(() => {
+    const updateCount = () => {
+      setPendingCount(getPendingOperationsCount());
+    };
+    updateCount();
+
+    // Listen for storage events
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === PENDING_OPS_KEY) {
+        updateCount();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  // Process queue when coming online
+  useEffect(() => {
+    if (isOnline && pendingCount > 0) {
+      processQueue();
+    }
+  }, [isOnline, pendingCount, processQueue]);
 
   const clearQueue = useCallback(() => {
     savePendingOperations([]);
