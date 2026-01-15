@@ -28,6 +28,7 @@ import {
   Zap,
   Car,
   Phone,
+  Sliders,
 } from 'lucide-react';
 
 /**
@@ -55,6 +56,14 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
+  {
+    id: 'manage',
+    label: 'Manage Trip',
+    description: 'Edit matches & strokes',
+    icon: Sliders,
+    href: '/captain/manage',
+    color: '#ef4444',
+  },
   {
     id: 'lineup',
     label: 'Create Lineup',
