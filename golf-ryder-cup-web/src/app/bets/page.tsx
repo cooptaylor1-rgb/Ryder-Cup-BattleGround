@@ -169,50 +169,42 @@ export default function BetsPage() {
         </div>
       </header>
 
-      <main className="container-editorial py-4">
+      <main className="container-editorial" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
         {/* Pot Summary */}
         <div
-          className="p-6 rounded-2xl mb-6 text-center"
+          className="card text-center"
           style={{
-            background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+            background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
             color: 'white',
+            padding: 'var(--space-6)',
+            marginBottom: 'var(--space-6)',
           }}
         >
-          <DollarSign size={32} className="mx-auto mb-2 opacity-90" />
-          <h2 className="text-4xl font-bold mb-1">${totalPot}</h2>
-          <p className="opacity-80">Total in Play</p>
+          <DollarSign size={32} style={{ margin: '0 auto var(--space-2)', opacity: 0.9 }} />
+          <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>${totalPot}</h2>
+          <p className="type-body" style={{ opacity: 0.8 }}>Total in Play</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
           <button
             onClick={() => setSelectedTab('active')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-              selectedTab === 'active' ? 'text-white' : ''
-            }`}
-            style={{
-              background: selectedTab === 'active' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'active' ? 'none' : '1px solid var(--rule)',
-            }}
+            className={selectedTab === 'active' ? 'btn btn-primary' : 'btn btn-secondary'}
+            style={{ flex: 1 }}
           >
             Active ({activeBets.length})
           </button>
           <button
             onClick={() => setSelectedTab('completed')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-              selectedTab === 'completed' ? 'text-white' : ''
-            }`}
-            style={{
-              background: selectedTab === 'completed' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'completed' ? 'none' : '1px solid var(--rule)',
-            }}
+            className={selectedTab === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'}
+            style={{ flex: 1 }}
           >
             Completed ({completedBets.length})
           </button>
         </div>
 
         {/* Bets List */}
-        <div className="space-y-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           {(selectedTab === 'active' ? activeBets : completedBets).map((bet) => (
             <BetCard
               key={bet.id}
@@ -231,28 +223,28 @@ export default function BetsPage() {
         {/* Quick Add Section */}
         {selectedTab === 'active' && (
           <>
-            <hr className="divider-lg my-6" />
-            <h3 className="type-overline mb-4">Quick Add</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <hr className="divider-lg" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-6)' }} />
+            <h3 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Quick Add</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
               <QuickAddButton
                 icon={<Zap size={20} />}
                 label="Skins Game"
-                color="#f59e0b"
+                color="var(--warning)"
               />
               <QuickAddButton
                 icon={<Target size={20} />}
                 label="Closest to Pin"
-                color="#3b82f6"
+                color="var(--team-usa)"
               />
               <QuickAddButton
                 icon={<TrendingUp size={20} />}
                 label="Long Drive"
-                color="#8b5cf6"
+                color="var(--team-europe)"
               />
               <QuickAddButton
                 icon={<DollarSign size={20} />}
                 label="Nassau"
-                color="#16a34a"
+                color="var(--masters)"
               />
             </div>
           </>
@@ -301,18 +293,17 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
   const winner = bet.winner ? getPlayer(bet.winner) : null;
 
   return (
-    <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
-    >
-      <div className="flex items-start gap-3">
+    <div className="card" style={{ padding: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
         {/* Icon */}
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center"
           style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             background: bet.status === 'completed' ? 'var(--success)' : 'var(--masters)',
             color: 'white',
           }}
@@ -321,30 +312,30 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">{bet.name}</h3>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 className="type-title-sm">{bet.name}</h3>
             {bet.pot && (
-              <span className="font-bold" style={{ color: 'var(--success)' }}>
+              <span className="type-title-sm" style={{ color: 'var(--success)' }}>
                 ${bet.pot}
               </span>
             )}
           </div>
-          <p className="type-caption mt-0.5">{bet.description}</p>
+          <p className="type-caption" style={{ marginTop: 'var(--space-1)' }}>{bet.description}</p>
 
           {/* Status / Winner */}
-          <div className="flex items-center gap-2 mt-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
             {bet.status === 'active' ? (
               <>
                 <Clock size={14} style={{ color: 'var(--warning)' }} />
-                <span className="text-xs" style={{ color: 'var(--warning)' }}>
+                <span className="type-micro" style={{ color: 'var(--warning)' }}>
                   In Progress
                 </span>
               </>
             ) : winner ? (
               <>
                 <Crown size={14} style={{ color: 'var(--success)' }} />
-                <span className="text-xs" style={{ color: 'var(--success)' }}>
+                <span className="type-micro" style={{ color: 'var(--success)' }}>
                   Won by {winner.firstName} {winner.lastName}
                 </span>
               </>
@@ -352,8 +343,8 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
           </div>
 
           {/* Participants */}
-          <div className="flex items-center gap-1 mt-2">
-            <span className="text-xs opacity-50">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginTop: 'var(--space-2)' }}>
+            <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
               {bet.participants.length} player{bet.participants.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -375,19 +366,33 @@ interface QuickAddButtonProps {
 function QuickAddButton({ icon, label, color }: QuickAddButtonProps) {
   return (
     <button
-      className="p-4 rounded-xl flex items-center gap-3 transition-all press-scale"
+      className="card press-scale"
       style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--space-3)',
+        padding: 'var(--space-4)',
+        cursor: 'pointer',
+        border: 'none',
+        textAlign: 'left',
+        width: '100%',
       }}
     >
       <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center"
-        style={{ background: `${color}20`, color }}
+        style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: 'var(--radius-md)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: `color-mix(in srgb, ${color} 15%, transparent)`,
+          color,
+        }}
       >
         {icon}
       </div>
-      <span className="font-medium text-sm">{label}</span>
+      <span className="type-body-sm">{label}</span>
     </button>
   );
 }

@@ -95,11 +95,11 @@ export default function MorePage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+        <div className="pb-nav" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
             {/* Header */}
             <header className="header">
-                <div className="container-editorial flex items-center gap-3">
-                    <button onClick={() => router.back()} className="nav-item p-1" aria-label="Back">
+                <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                    <button onClick={() => router.back()} className="press-scale" style={{ padding: 'var(--space-1)', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-secondary)' }} aria-label="Back">
                         <ChevronLeft size={20} />
                     </button>
                     <span className="type-overline">More</span>
@@ -113,10 +113,13 @@ export default function MorePage() {
                     {isAuthenticated && currentUser ? (
                         <Link href="/profile" className="match-row">
                             <div
-                                className="flex items-center justify-center rounded-full"
                                 style={{
                                     width: '32px',
                                     height: '32px',
+                                    borderRadius: 'var(--radius-full)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     background: 'var(--masters)',
                                     color: 'white',
                                     fontWeight: 600,
@@ -125,7 +128,7 @@ export default function MorePage() {
                             >
                                 {currentUser.firstName?.[0] || '?'}{currentUser.lastName?.[0] || '?'}
                             </div>
-                            <div className="flex-1">
+                            <div style={{ flex: 1 }}>
                                 <p style={{ fontWeight: 500 }}>{currentUser.firstName} {currentUser.lastName}</p>
                                 <p className="type-meta">{currentUser.email}</p>
                             </div>
@@ -135,7 +138,7 @@ export default function MorePage() {
                         <>
                             <Link href="/login" className="match-row">
                                 <LogIn size={18} style={{ color: 'var(--masters)' }} />
-                                <div className="flex-1">
+                                <div style={{ flex: 1 }}>
                                     <p style={{ fontWeight: 500 }}>Sign In</p>
                                     <p className="type-meta">Access your profile and sync data</p>
                                 </div>
@@ -143,7 +146,7 @@ export default function MorePage() {
                             </Link>
                             <Link href="/profile/create" className="match-row">
                                 <User size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                                <div className="flex-1">
+                                <div style={{ flex: 1 }}>
                                     <p style={{ fontWeight: 500 }}>Create Profile</p>
                                     <p className="type-meta">Set up your golf profile for trips</p>
                                 </div>
@@ -159,7 +162,7 @@ export default function MorePage() {
                 {currentTrip && (
                     <section className="section" style={{ paddingTop: 'var(--space-6)' }}>
                         <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Current Trip</h2>
-                        <div className="flex items-center justify-between">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>
                                 <p style={{ fontWeight: 500 }}>{currentTrip.name}</p>
                                 <p className="type-meta">
@@ -168,8 +171,8 @@ export default function MorePage() {
                             </div>
                             <button
                                 onClick={() => setShowExitTripConfirm(true)}
-                                className="flex items-center gap-1 type-meta"
-                                style={{ color: 'var(--error)' }}
+                                className="type-meta"
+                                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--error)', background: 'transparent', border: 'none', cursor: 'pointer' }}
                             >
                                 <LogOut size={14} />
                                 Exit
@@ -185,10 +188,11 @@ export default function MorePage() {
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Captain Mode</h2>
                     <button
                         onClick={() => isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         {isCaptainMode ? <Unlock size={18} /> : <Lock size={18} />}
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Captain Mode</p>
                             <p className="type-meta">{isCaptainMode ? 'Enabled – can edit lineups' : 'Disabled – view only'}</p>
                         </div>
@@ -215,12 +219,12 @@ export default function MorePage() {
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Manage</h2>
                     <Link href="/players" className="match-row">
                         <Users size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <span className="flex-1">Players</span>
+                        <span style={{ flex: 1 }}>Players</span>
                         <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
                     </Link>
                     <Link href="/courses" className="match-row">
                         <MapPin size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <span className="flex-1">Courses</span>
+                        <span style={{ flex: 1 }}>Courses</span>
                         <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
                     </Link>
                 </section>
@@ -233,10 +237,11 @@ export default function MorePage() {
 
                     <button
                         onClick={() => updateScoringPreference('hapticFeedback', !scoringPreferences.hapticFeedback)}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         <Vibrate size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Haptic Feedback</p>
                             <p className="type-meta">Vibrate on score entry</p>
                         </div>
@@ -245,10 +250,11 @@ export default function MorePage() {
 
                     <button
                         onClick={() => updateScoringPreference('autoAdvance', !scoringPreferences.autoAdvance)}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Auto-Advance</p>
                             <p className="type-meta">Move to next hole after scoring</p>
                         </div>
@@ -257,10 +263,11 @@ export default function MorePage() {
 
                     <button
                         onClick={() => updateScoringPreference('confirmCloseout', !scoringPreferences.confirmCloseout)}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         <Shield size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Confirm Match End</p>
                             <p className="type-meta">Ask before recording closeout</p>
                         </div>
@@ -277,10 +284,11 @@ export default function MorePage() {
                     <button
                         onClick={handleSeedData}
                         disabled={isSeeding}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         <Database size={18} style={{ color: 'var(--ink-tertiary)' }} />
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Load Demo Data</p>
                             <p className="type-meta">Create sample trip with players</p>
                         </div>
@@ -289,10 +297,11 @@ export default function MorePage() {
 
                     <button
                         onClick={() => setShowClearConfirm(true)}
-                        className="match-row w-full text-left"
+                        className="match-row"
+                        style={{ width: '100%', textAlign: 'left' }}
                     >
                         <Trash2 size={18} style={{ color: 'var(--error)' }} />
-                        <div className="flex-1">
+                        <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500, color: 'var(--error)' }}>Clear All Data</p>
                             <p className="type-meta">Delete everything and start fresh</p>
                         </div>
@@ -304,11 +313,11 @@ export default function MorePage() {
                 {/* About */}
                 <section className="section">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>About</h2>
-                    <div className="flex items-center gap-4">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                         <div style={{
                             width: '48px',
                             height: '48px',
-                            borderRadius: '12px',
+                            borderRadius: 'var(--radius-lg)',
                             background: 'var(--masters)',
                             display: 'flex',
                             alignItems: 'center',
@@ -362,9 +371,9 @@ export default function MorePage() {
             {showCaptainModal && (
                 <div className="modal-backdrop" onClick={() => setShowCaptainModal(false)}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
                             <h2 className="type-headline">Enable Captain Mode</h2>
-                            <button onClick={() => setShowCaptainModal(false)}>
+                            <button onClick={() => setShowCaptainModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                                 <X size={20} style={{ color: 'var(--ink-tertiary)' }} />
                             </button>
                         </div>
@@ -380,17 +389,19 @@ export default function MorePage() {
                             className="input"
                             style={{ marginBottom: 'var(--space-4)' }}
                         />
-                        <div className="flex gap-3">
+                        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                             <button
                                 onClick={() => { setShowCaptainModal(false); setCaptainPin(''); }}
-                                className="btn btn-secondary flex-1"
+                                className="btn btn-secondary"
+                                style={{ flex: 1 }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleEnableCaptainMode}
                                 disabled={captainPin.length < 4}
-                                className="btn btn-primary flex-1"
+                                className="btn btn-primary"
+                                style={{ flex: 1 }}
                             >
                                 Enable
                             </button>
@@ -407,11 +418,11 @@ export default function MorePage() {
                         <p className="type-body" style={{ marginBottom: 'var(--space-4)' }}>
                             This will permanently delete all trips, players, matches, and scores. This action cannot be undone.
                         </p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setShowClearConfirm(false)} className="btn btn-secondary flex-1">
+                        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                            <button onClick={() => setShowClearConfirm(false)} className="btn btn-secondary" style={{ flex: 1 }}>
                                 Cancel
                             </button>
-                            <button onClick={handleClearData} className="btn btn-danger flex-1">
+                            <button onClick={handleClearData} className="btn btn-danger" style={{ flex: 1 }}>
                                 Clear All Data
                             </button>
                         </div>
@@ -427,11 +438,11 @@ export default function MorePage() {
                         <p className="type-body" style={{ marginBottom: 'var(--space-4)' }}>
                             You&apos;ll be taken back to the trip selector. Your data will be saved and you can return to this trip anytime.
                         </p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setShowExitTripConfirm(false)} className="btn btn-secondary flex-1">
+                        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                            <button onClick={() => setShowExitTripConfirm(false)} className="btn btn-secondary" style={{ flex: 1 }}>
                                 Cancel
                             </button>
-                            <button onClick={handleExitTrip} className="btn btn-primary flex-1">
+                            <button onClick={handleExitTrip} className="btn btn-primary" style={{ flex: 1 }}>
                                 Exit Trip
                             </button>
                         </div>

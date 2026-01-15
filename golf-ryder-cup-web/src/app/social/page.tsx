@@ -102,15 +102,15 @@ export default function SocialPage() {
   if (!currentTrip) return null;
 
   return (
-    <div className="min-h-screen pb-nav flex flex-col" style={{ background: 'var(--canvas)' }}>
+    <div className="pb-nav" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--canvas)' }}>
       {/* Header */}
       <header className="header">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <button
               onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)' }}
+              className="press-scale"
+              style={{ padding: 'var(--space-2)', marginLeft: 'calc(-1 * var(--space-2))', color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
               aria-label="Back"
             >
               <ChevronLeft size={22} />
@@ -122,8 +122,7 @@ export default function SocialPage() {
           </div>
           <Link
             href="/social/photos"
-            className="p-2 rounded-lg"
-            style={{ color: 'var(--masters)' }}
+            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', color: 'var(--masters)' }}
           >
             <Camera size={22} />
           </Link>
@@ -131,8 +130,8 @@ export default function SocialPage() {
       </header>
 
       {/* Quick Tabs */}
-      <div className="container-editorial py-3">
-        <div className="flex gap-2">
+      <div className="container-editorial" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <TabButton active label="All" icon={<MessageCircle size={16} />} />
           <TabButton label="Photos" icon={<Image size={16} />} href="/social/photos" />
           <TabButton label="Highlights" icon={<Flame size={16} />} />
@@ -140,8 +139,8 @@ export default function SocialPage() {
       </div>
 
       {/* Comments Feed */}
-      <main className="flex-1 overflow-y-auto container-editorial pb-4">
-        <div className="space-y-4">
+      <main className="container-editorial" style={{ flex: 1, overflowY: 'auto', paddingBottom: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           {comments.map((comment) => {
             const player = getPlayer(comment.playerId);
             return (
@@ -161,12 +160,18 @@ export default function SocialPage() {
 
       {/* Message Input */}
       <div
-        className="sticky bottom-nav-height left-0 right-0 border-t"
-        style={{ background: 'var(--surface)', borderColor: 'var(--rule)' }}
+        style={{
+          position: 'sticky',
+          bottom: 'var(--nav-height)',
+          left: 0,
+          right: 0,
+          background: 'var(--canvas-raised)',
+          borderTop: '1px solid var(--rule)',
+        }}
       >
         {/* Quick Reactions */}
         {showEmojis && (
-          <div className="flex gap-2 p-3 border-b" style={{ borderColor: 'var(--rule)' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-3)', borderBottom: '1px solid var(--rule)' }}>
             {quickReactions.map((emoji) => (
               <button
                 key={emoji}
@@ -174,7 +179,15 @@ export default function SocialPage() {
                   setMessage(message + emoji);
                   setShowEmojis(false);
                 }}
-                className="text-2xl p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="press-scale"
+                style={{
+                  fontSize: '1.5rem',
+                  padding: 'var(--space-2)',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
               >
                 {emoji}
               </button>
@@ -182,11 +195,17 @@ export default function SocialPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-2 p-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3)' }}>
           <button
             onClick={() => setShowEmojis(!showEmojis)}
-            className="p-2 rounded-lg"
-            style={{ color: 'var(--ink-tertiary)' }}
+            style={{
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--ink-tertiary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
             <Smile size={22} />
           </button>
@@ -196,8 +215,10 @@ export default function SocialPage() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Talk some trash..."
-            className="flex-1 px-4 py-2 rounded-full"
             style={{
+              flex: 1,
+              padding: 'var(--space-2) var(--space-4)',
+              borderRadius: 'var(--radius-full)',
               background: 'var(--canvas)',
               border: '1px solid var(--rule)',
               outline: 'none',
@@ -206,10 +227,14 @@ export default function SocialPage() {
           <button
             onClick={handleSend}
             disabled={!message.trim()}
-            className="p-2 rounded-full transition-colors"
             style={{
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-full)',
               background: message.trim() ? 'var(--masters)' : 'var(--rule)',
               color: message.trim() ? 'white' : 'var(--ink-tertiary)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
             }}
           >
             <Send size={20} />
@@ -257,15 +282,25 @@ interface TabButtonProps {
 }
 
 function TabButton({ label, icon, active, href }: TabButtonProps) {
-  const className = `flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-    active
-      ? 'bg-masters text-white'
-      : 'bg-surface border border-rule'
-  }`;
+  const baseStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-2)',
+    padding: 'var(--space-2) var(--space-4)',
+    borderRadius: 'var(--radius-full)',
+    fontSize: 'var(--font-sm)',
+    fontWeight: 500,
+    transition: 'all 0.2s ease',
+    background: active ? 'var(--masters)' : 'var(--canvas-raised)',
+    color: active ? 'white' : 'var(--ink)',
+    border: active ? 'none' : '1px solid var(--rule)',
+    cursor: 'pointer',
+    textDecoration: 'none',
+  };
 
   if (href) {
     return (
-      <Link href={href} className={className} style={{ background: active ? 'var(--masters)' : 'var(--surface)' }}>
+      <Link href={href} style={baseStyle}>
         {icon}
         {label}
       </Link>
@@ -273,7 +308,7 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
   }
 
   return (
-    <button className={className} style={{ background: active ? 'var(--masters)' : 'var(--surface)' }}>
+    <button style={baseStyle}>
       {icon}
       {label}
     </button>
@@ -299,24 +334,28 @@ function CommentCard({ comment, player }: CommentCardProps) {
 
   return (
     <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
+      className="card"
+      style={{ padding: 'var(--space-4)' }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
           style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: 'var(--radius-full)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 700,
             background: 'linear-gradient(135deg, var(--team-usa), var(--team-europe))',
           }}
         >
           {player?.firstName?.[0] || '?'}
         </div>
-        <div className="flex-1">
-          <p className="font-medium">
+        <div style={{ flex: 1 }}>
+          <p className="type-body-sm" style={{ fontWeight: 500 }}>
             {player ? `${player.firstName} ${player.lastName}` : 'Unknown Player'}
           </p>
           <p className="type-caption">{timeAgo(comment.createdAt)}</p>
@@ -324,27 +363,39 @@ function CommentCard({ comment, player }: CommentCardProps) {
       </div>
 
       {/* Content */}
-      <p className="text-base mb-3">{comment.content}</p>
+      <p className="type-body" style={{ marginBottom: 'var(--space-3)' }}>{comment.content}</p>
 
       {/* Reactions */}
       {comment.reactions.length > 0 && (
-        <div className="flex items-center gap-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           {comment.reactions.map((reaction, idx) => (
             <button
               key={idx}
-              className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-1)',
+                padding: 'var(--space-1) var(--space-2)',
+                borderRadius: 'var(--radius-full)',
+                fontSize: 'var(--font-sm)',
                 background: 'var(--canvas)',
                 border: '1px solid var(--rule)',
+                cursor: 'pointer',
               }}
             >
               <span>{reaction.emoji}</span>
-              <span className="text-xs opacity-70">{reaction.count}</span>
+              <span className="type-micro" style={{ opacity: 0.7 }}>{reaction.count}</span>
             </button>
           ))}
           <button
-            className="p-1.5 rounded-full"
-            style={{ color: 'var(--ink-tertiary)' }}
+            style={{
+              padding: 'var(--space-1)',
+              borderRadius: 'var(--radius-full)',
+              color: 'var(--ink-tertiary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
             <Smile size={16} />
           </button>
