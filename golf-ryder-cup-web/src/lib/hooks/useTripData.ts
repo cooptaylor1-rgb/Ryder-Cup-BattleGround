@@ -366,11 +366,23 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
             setError(null);
             try {
                 const id = `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                // Map TripSession format to RyderCupSession format
+                const formatToSessionType: Record<string, 'foursomes' | 'fourball' | 'singles'> = {
+                    foursomes: 'foursomes',
+                    fourball: 'fourball',
+                    singles: 'singles',
+                    mixed: 'fourball', // default mixed to fourball
+                };
+                
                 await db.sessions.add({
-                    ...session,
                     id,
                     tripId,
+                    name: session.name,
+                    sessionNumber: 1, // Would be calculated from existing sessions
+                    sessionType: formatToSessionType[session.format] || 'singles',
+                    scheduledDate: session.date,
                     status: 'scheduled',
+                    createdAt: new Date().toISOString(),
                 });
                 haptic.tap();
                 return id;
