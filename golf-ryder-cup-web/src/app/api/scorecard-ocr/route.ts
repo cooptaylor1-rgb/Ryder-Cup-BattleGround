@@ -152,6 +152,26 @@ Return complete JSON data.`,
           },
         ],
         max_tokens: 4000,
+        temperature: 0.1,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('OpenAI API error:', error);
+      return NextResponse.json(
+        { error: 'Failed to analyze scorecard', details: error },
+        { status: 500 }
+      );
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content;
+
+    if (!content) {
+      return NextResponse.json(
+        { error: 'No response from AI' },
+        { status: 500 }
       );
     }
 
