@@ -499,7 +499,7 @@ export default function CaptainBetsPage() {
                                                     fontSize: 'var(--text-xs)',
                                                 }}
                                             >
-                                                {player.name}
+                                                {player.firstName}
                                             </button>
                                         ))}
                                     </div>
@@ -662,7 +662,7 @@ function BetManagementCard({
                             <>
                                 <Crown size={14} style={{ color: 'var(--success)' }} />
                                 <span className="type-micro" style={{ color: 'var(--success)' }}>
-                                    Won by {winner.name}
+                                    Won by {winner.firstName}
                                 </span>
                             </>
                         ) : (
@@ -769,7 +769,7 @@ function BetManagementCard({
                                         fontSize: 'var(--text-sm)',
                                     }}
                                 >
-                                    {player.name}
+                                    {player.firstName}
                                 </button>
                             );
                         })}
