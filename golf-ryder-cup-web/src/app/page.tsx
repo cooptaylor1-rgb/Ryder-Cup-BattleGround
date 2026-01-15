@@ -592,19 +592,7 @@ function QuickActionButton({ icon, label, href, badge, color }: QuickActionButto
   return (
     <Link
       href={href}
-      className="press-scale"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 'var(--space-2)',
-        padding: 'var(--space-3)',
-        borderRadius: 'var(--radius-xl)',
-        background: 'var(--canvas-raised)',
-        border: '1px solid var(--rule)',
-        transition: 'all 0.2s ease',
-        textDecoration: 'none',
-      }}
+      className="press-scale quick-action-btn"
     >
       <div style={{ position: 'relative' }}>
         <div style={{ color: color || 'var(--ink-secondary)' }}>{icon}</div>
