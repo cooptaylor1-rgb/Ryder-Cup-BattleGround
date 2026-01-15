@@ -240,7 +240,7 @@ function MatchPreviewCard({
             )}
             style={{
                 background: 'var(--surface)',
-                ringColor: '#F59E0B',
+                ['--tw-ring-color' as string]: '#F59E0B',
             }}
         >
             <div className="flex items-center gap-2 mb-2">

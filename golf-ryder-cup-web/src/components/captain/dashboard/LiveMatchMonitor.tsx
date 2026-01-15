@@ -215,7 +215,7 @@ function LiveMatchCard({
             style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--rule)',
-                ringColor: match.alertType === 'error' ? '#EF4444' : '#F59E0B',
+                ['--tw-ring-color' as string]: match.alertType === 'error' ? '#EF4444' : '#F59E0B',
             }}
         >
             {/* Status Indicator */}

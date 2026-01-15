@@ -160,7 +160,7 @@ export function HoleMiniMap({
                             style={{
                                 background: getHoleColor(status, true),
                                 color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status),
-                                ringColor: isCurrent ? 'var(--masters)' : undefined,
+                                ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
                             }}
                             aria-label={`Hole ${hole}${status !== 'unscored' ? `, ${status}` : ''}`}
                         >
@@ -199,7 +199,7 @@ export function HoleMiniMap({
                             style={{
                                 background: getHoleColor(status, true),
                                 color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status),
-                                ringColor: isCurrent ? 'var(--masters)' : undefined,
+                                ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
                             }}
                             aria-label={`Hole ${hole}${status !== 'unscored' ? `, ${status}` : ''}`}
                         >
@@ -254,7 +254,7 @@ export function HoleMiniMap({
                   `}
                                     style={{
                                         background: getHoleColor(status, true),
-                                        ringColor: isCurrent ? 'var(--masters)' : undefined,
+                                        ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
                                     }}
                                 >
                                     <span
@@ -302,7 +302,7 @@ export function HoleMiniMap({
                   `}
                                     style={{
                                         background: getHoleColor(status, true),
-                                        ringColor: isCurrent ? 'var(--masters)' : undefined,
+                                        ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
                                     }}
                                 >
                                     <span

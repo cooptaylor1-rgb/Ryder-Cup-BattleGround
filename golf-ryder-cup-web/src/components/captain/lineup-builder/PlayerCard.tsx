@@ -227,7 +227,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                     style={{
                         background: isDragging ? 'var(--canvas)' : 'var(--surface)',
                         borderLeft: `3px solid ${teamColor}`,
-                        ringColor: isDragging ? teamColor : undefined,
+                        ['--tw-ring-color' as string]: isDragging ? teamColor : undefined,
                     }}
                 >
                     {/* Drag Handle */}

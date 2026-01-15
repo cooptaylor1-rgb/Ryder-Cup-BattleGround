@@ -343,7 +343,7 @@ function PhotoPreview({
                                 )}
                                 style={{
                                     background: context.momentType === type ? color : undefined,
-                                    ringColor: color,
+                                    ['--tw-ring-color' as string]: color,
                                 }}
                             >
                                 <Icon size={14} />

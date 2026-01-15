@@ -201,7 +201,7 @@ function HoleScoreEditor({
             )}
             style={{
                 background: 'var(--surface)',
-                ringColor: '#F59E0B',
+                ['--tw-ring-color' as string]: '#F59E0B',
             }}
         >
             <div className="flex items-center justify-between mb-3">
@@ -646,7 +646,7 @@ export function OverrideModal({
                                                     color: hole.winner === 'teamA' ? matchScore.teamAColor :
                                                         hole.winner === 'teamB' ? matchScore.teamBColor :
                                                             'var(--ink)',
-                                                    ringColor: 'var(--masters)',
+                                                    ['--tw-ring-color' as string]: 'var(--masters)',
                                                 }}
                                             >
                                                 {hole.hole}
@@ -710,7 +710,7 @@ export function OverrideModal({
                                                     )}
                                                     style={{
                                                         background: reason === r.value ? 'rgba(0, 103, 71, 0.1)' : 'var(--surface)',
-                                                        ringColor: 'var(--masters)',
+                                                        ['--tw-ring-color' as string]: 'var(--masters)',
                                                     }}
                                                 >
                                                     <span className="text-sm font-medium block" style={{ color: 'var(--ink)' }}>

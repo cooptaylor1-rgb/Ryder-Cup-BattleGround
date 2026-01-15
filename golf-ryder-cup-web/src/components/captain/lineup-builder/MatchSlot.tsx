@@ -157,7 +157,7 @@ function TeamColumn({
             )}
             style={{
                 background: isOver ? `${teamColor}10` : 'var(--surface)',
-                ringColor: teamColor,
+                ['--tw-ring-color' as string]: teamColor,
             }}
         >
             {/* Team Header */}
@@ -337,7 +337,7 @@ export function MatchSlot({
             style={{
                 background: 'var(--canvas)',
                 border: '1px solid var(--rule)',
-                ringColor: 'var(--masters)',
+                ['--tw-ring-color' as string]: 'var(--masters)',
             }}
         >
             {/* Match Header */}
