@@ -23,6 +23,7 @@ import type {
     ScheduleItem,
     AuditLogEntry,
     BanterPost,
+    SideBet,
     SyncMetadata,
 } from '@/lib/types/models';
 import type { ScoringEvent } from '@/lib/types/events';
@@ -60,6 +61,9 @@ export class GolfTripDB extends Dexie {
     // Audit & social
     auditLog!: Table<AuditLogEntry>;
     banterPosts!: Table<BanterPost>;
+
+    // Side bets
+    sideBets!: Table<SideBet>;
 
     // Event sourcing for scoring (append-only)
     scoringEvents!: Table<ScoringEvent>;
@@ -113,6 +117,12 @@ export class GolfTripDB extends Dexie {
             // Course Library tables (v1.2)
             courseProfiles: 'id, name',
             teeSetProfiles: 'id, courseProfileId, [courseProfileId+name]',
+        });
+
+        // Schema version 3 - Side Bets
+        this.version(3).stores({
+            // Side bets table
+            sideBets: 'id, tripId, status, [tripId+status]',
         });
     }
 }

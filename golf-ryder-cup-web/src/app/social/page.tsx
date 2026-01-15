@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
 import { NoMessagesEmpty } from '@/components/ui';
 import {
@@ -20,7 +22,7 @@ import {
   Flame,
   CalendarDays,
 } from 'lucide-react';
-import type { Player } from '@/lib/types/models';
+import type { Player, BanterPost } from '@/lib/types/models';
 
 /**
  * SOCIAL PAGE — Trash Talk & Team Banter
@@ -29,20 +31,10 @@ import type { Player } from '@/lib/types/models';
  * celebrate wins, and keep the competition fun!
  */
 
-interface Comment {
-  id: string;
-  playerId: string;
-  content: string;
-  emoji?: string;
-  createdAt: string;
-  reactions: { emoji: string; count: number }[];
-}
-
 export default function SocialPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
   const [message, setMessage] = useState('');
-  const [comments, setComments] = useState<Comment[]>([]);
   const [showEmojis, setShowEmojis] = useState(false);
 
   useEffect(() => {
@@ -51,49 +43,41 @@ export default function SocialPage() {
     }
   }, [currentTrip, router]);
 
-  // Demo comments
-  useEffect(() => {
-    if (players.length > 0) {
-      setComments([
-        {
-          id: '1',
-          playerId: players[0]?.id || '',
-          content: "Let's go USA! 🇺🇸",
-          createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-          reactions: [{ emoji: '🔥', count: 3 }, { emoji: '👍', count: 2 }],
-        },
-        {
-          id: '2',
-          playerId: players[1]?.id || '',
-          content: "Europe is coming for that cup! 🏆",
-          createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-          reactions: [{ emoji: '💪', count: 4 }],
-        },
-        {
-          id: '3',
-          playerId: players[2]?.id || '',
-          content: "What a putt on 7! Did you see that?",
-          createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-          reactions: [{ emoji: '⛳', count: 5 }, { emoji: '🎯', count: 2 }],
-        },
-      ]);
-    }
-  }, [players]);
+  // Get real banter posts from database
+  const banterPosts = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      return db.banterPosts
+        .where('tripId')
+        .equals(currentTrip.id)
+        .reverse()
+        .sortBy('timestamp');
+    },
+    [currentTrip?.id],
+    []
+  );
 
   const getPlayer = (id: string): Player | undefined => {
     return players.find(p => p.id === id);
   };
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    const newComment: Comment = {
+  const handleSend = async () => {
+    if (!message.trim() || !currentTrip) return;
+
+    // Get first player as default author (in real app, would use auth context)
+    const author = players[0];
+
+    const newPost: BanterPost = {
       id: crypto.randomUUID(),
-      playerId: players[0]?.id || '',
+      tripId: currentTrip.id,
       content: message,
-      createdAt: new Date().toISOString(),
-      reactions: [],
+      authorId: author?.id,
+      authorName: author ? `${author.firstName} ${author.lastName}` : 'Anonymous',
+      postType: 'message',
+      timestamp: new Date().toISOString(),
     };
-    setComments([newComment, ...comments]);
+
+    await db.banterPosts.add(newPost);
     setMessage('');
   };
 
@@ -141,19 +125,19 @@ export default function SocialPage() {
       {/* Comments Feed */}
       <main className="container-editorial" style={{ flex: 1, overflowY: 'auto', paddingBottom: 'var(--space-4)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {comments.map((comment) => {
-            const player = getPlayer(comment.playerId);
+          {banterPosts.map((post) => {
+            const player = post.authorId ? getPlayer(post.authorId) : undefined;
             return (
-              <CommentCard
-                key={comment.id}
-                comment={comment}
+              <PostCard
+                key={post.id}
+                post={post}
                 player={player}
               />
             );
           })}
         </div>
 
-        {comments.length === 0 && (
+        {banterPosts.length === 0 && (
           <NoMessagesEmpty />
         )}
       </main>
@@ -315,13 +299,13 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
   );
 }
 
-/* Comment Card Component */
-interface CommentCardProps {
-  comment: Comment;
+/* Post Card Component */
+interface PostCardProps {
+  post: BanterPost;
   player?: Player;
 }
 
-function CommentCard({ comment, player }: CommentCardProps) {
+function PostCard({ post, player }: PostCardProps) {
   const timeAgo = (date: string) => {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
     if (seconds < 60) return 'Just now';
@@ -331,6 +315,13 @@ function CommentCard({ comment, player }: CommentCardProps) {
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
   };
+
+  // Get display name - prefer player name, fall back to authorName
+  const displayName = player
+    ? `${player.firstName} ${player.lastName}`
+    : post.authorName || 'Unknown';
+
+  const initials = displayName.charAt(0).toUpperCase();
 
   return (
     <div
@@ -352,53 +343,36 @@ function CommentCard({ comment, player }: CommentCardProps) {
             background: 'linear-gradient(135deg, var(--team-usa), var(--team-europe))',
           }}
         >
-          {player?.firstName?.[0] || '?'}
+          {initials}
         </div>
         <div style={{ flex: 1 }}>
           <p className="type-body-sm" style={{ fontWeight: 500 }}>
-            {player ? `${player.firstName} ${player.lastName}` : 'Unknown Player'}
+            {displayName}
           </p>
-          <p className="type-caption">{timeAgo(comment.createdAt)}</p>
+          <p className="type-caption">{timeAgo(post.timestamp)}</p>
         </div>
+        {post.postType !== 'message' && (
+          <span
+            className="type-micro"
+            style={{
+              padding: 'var(--space-1) var(--space-2)',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--canvas-sunken)',
+              textTransform: 'capitalize',
+            }}
+          >
+            {post.postType}
+          </span>
+        )}
       </div>
 
       {/* Content */}
-      <p className="type-body" style={{ marginBottom: 'var(--space-3)' }}>{comment.content}</p>
+      <p className="type-body">{post.content}</p>
 
-      {/* Reactions */}
-      {comment.reactions.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          {comment.reactions.map((reaction, idx) => (
-            <button
-              key={idx}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-1)',
-                padding: 'var(--space-1) var(--space-2)',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 'var(--font-sm)',
-                background: 'var(--canvas)',
-                border: '1px solid var(--rule)',
-                cursor: 'pointer',
-              }}
-            >
-              <span>{reaction.emoji}</span>
-              <span className="type-micro" style={{ opacity: 0.7 }}>{reaction.count}</span>
-            </button>
-          ))}
-          <button
-            style={{
-              padding: 'var(--space-1)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--ink-tertiary)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <Smile size={16} />
-          </button>
+      {/* Emoji if present */}
+      {post.emoji && (
+        <div style={{ marginTop: 'var(--space-2)' }}>
+          <span style={{ fontSize: '1.5rem' }}>{post.emoji}</span>
         </div>
       )}
     </div>

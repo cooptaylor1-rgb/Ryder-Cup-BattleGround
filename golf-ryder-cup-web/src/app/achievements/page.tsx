@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore } from '@/lib/stores';
+import { calculatePlayerStats, computeAwards } from '@/lib/services/awardsService';
+import type { PlayerStats } from '@/lib/types/awards';
 import {
   ChevronLeft,
   Home,
@@ -53,6 +55,8 @@ export default function AchievementsPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'unlocked' | 'locked'>('all');
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!currentTrip) {
@@ -60,97 +64,135 @@ export default function AchievementsPage() {
     }
   }, [currentTrip, router]);
 
-  // Demo achievements
-  const achievements: Achievement[] = [
-    {
-      id: '1',
-      name: 'First Blood',
-      description: 'Win your first hole',
-      icon: <Zap size={24} />,
-      rarity: 'common',
-      unlocked: true,
-      unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    },
-    {
-      id: '2',
-      name: 'Hat Trick',
-      description: 'Win 3 holes in a row',
-      icon: <Flame size={24} />,
-      rarity: 'rare',
-      unlocked: true,
-      unlockedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-    },
-    {
-      id: '3',
-      name: 'Eagle Eye',
-      description: 'Make an eagle',
-      icon: <Star size={24} />,
-      rarity: 'epic',
-      unlocked: false,
-      progress: 0,
-      maxProgress: 1,
-    },
-    {
-      id: '4',
-      name: 'Closer',
-      description: 'Close out a match',
-      icon: <Trophy size={24} />,
-      rarity: 'common',
-      unlocked: true,
-      unlockedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    },
-    {
-      id: '5',
-      name: 'Comeback Kid',
-      description: 'Win a match after being 3 down',
-      icon: <TrendingUp size={24} />,
-      rarity: 'epic',
-      unlocked: false,
-    },
-    {
-      id: '6',
-      name: 'Perfect Round',
-      description: 'Win every hole in a match',
-      icon: <Crown size={24} />,
-      rarity: 'legendary',
-      unlocked: false,
-    },
-    {
-      id: '7',
-      name: 'Iron Man',
-      description: 'Play in 5 matches',
-      icon: <Medal size={24} />,
-      rarity: 'rare',
-      unlocked: false,
-      progress: 3,
-      maxProgress: 5,
-    },
-    {
-      id: '8',
-      name: 'Money Player',
-      description: 'Win a skins pot',
-      icon: <Zap size={24} />,
-      rarity: 'rare',
-      unlocked: false,
-    },
-    {
-      id: '9',
-      name: 'Team Player',
-      description: 'Contribute 3 points to your team',
-      icon: <Users size={24} />,
-      rarity: 'common',
-      unlocked: true,
-      unlockedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    },
-    {
-      id: '10',
-      name: 'MVP',
-      description: 'Top individual scorer of the trip',
-      icon: <Award size={24} />,
-      rarity: 'legendary',
-      unlocked: false,
-    },
-  ];
+  // Load real player stats from the database
+  useEffect(() => {
+    async function loadStats() {
+      if (!currentTrip) return;
+      try {
+        setIsLoading(true);
+        const stats = await calculatePlayerStats(currentTrip.id);
+        setPlayerStats(stats);
+      } catch (error) {
+        console.error('Failed to load player stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadStats();
+  }, [currentTrip?.id]);
+
+  // Calculate achievements based on real player stats
+  const achievements = useMemo((): Achievement[] => {
+    // Aggregate stats across all players
+    const totalHolesWon = playerStats.reduce((sum, s) => sum + s.holesWon, 0);
+    const totalMatchesPlayed = playerStats.reduce((sum, s) => sum + s.matchesPlayed, 0);
+    const maxMatchesPlayed = Math.max(0, ...playerStats.map(s => s.matchesPlayed));
+    const maxWins = Math.max(0, ...playerStats.map(s => s.wins));
+    const maxPoints = Math.max(0, ...playerStats.map(s => s.points));
+    const maxStreak = Math.max(0, ...playerStats.map(s => s.longestWinStreak));
+    const maxBiggestWin = Math.max(0, ...playerStats.map(s => s.biggestWin));
+
+    return [
+      {
+        id: '1',
+        name: 'First Blood',
+        description: 'Win your first hole',
+        icon: <Zap size={24} />,
+        rarity: 'common',
+        unlocked: totalHolesWon > 0,
+      },
+      {
+        id: '2',
+        name: 'Hat Trick',
+        description: 'Win 3 holes in a row',
+        icon: <Flame size={24} />,
+        rarity: 'rare',
+        unlocked: maxStreak >= 3,
+        progress: maxStreak,
+        maxProgress: 3,
+      },
+      {
+        id: '3',
+        name: 'Dominant Force',
+        description: 'Win a match by 5+ holes',
+        icon: <Star size={24} />,
+        rarity: 'epic',
+        unlocked: maxBiggestWin >= 5,
+        progress: maxBiggestWin,
+        maxProgress: 5,
+      },
+      {
+        id: '4',
+        name: 'Closer',
+        description: 'Win a match',
+        icon: <Trophy size={24} />,
+        rarity: 'common',
+        unlocked: maxWins > 0,
+        progress: maxWins,
+        maxProgress: 1,
+      },
+      {
+        id: '5',
+        name: 'On Fire',
+        description: 'Win 3 matches in a row',
+        icon: <TrendingUp size={24} />,
+        rarity: 'epic',
+        unlocked: maxStreak >= 3,
+        progress: maxStreak,
+        maxProgress: 3,
+      },
+      {
+        id: '6',
+        name: 'Perfect Record',
+        description: 'Win 5 matches without a loss',
+        icon: <Crown size={24} />,
+        rarity: 'legendary',
+        unlocked: maxWins >= 5 && playerStats.some(s => s.wins >= 5 && s.losses === 0),
+        progress: maxWins,
+        maxProgress: 5,
+      },
+      {
+        id: '7',
+        name: 'Iron Man',
+        description: 'Play in 5 matches',
+        icon: <Medal size={24} />,
+        rarity: 'rare',
+        unlocked: maxMatchesPlayed >= 5,
+        progress: maxMatchesPlayed,
+        maxProgress: 5,
+      },
+      {
+        id: '8',
+        name: 'Match Machine',
+        description: 'Play in 10 matches',
+        icon: <Zap size={24} />,
+        rarity: 'epic',
+        unlocked: maxMatchesPlayed >= 10,
+        progress: maxMatchesPlayed,
+        maxProgress: 10,
+      },
+      {
+        id: '9',
+        name: 'Team Player',
+        description: 'Contribute 3 points to your team',
+        icon: <Users size={24} />,
+        rarity: 'common',
+        unlocked: maxPoints >= 3,
+        progress: maxPoints,
+        maxProgress: 3,
+      },
+      {
+        id: '10',
+        name: 'MVP',
+        description: 'Score 5+ points in a trip',
+        icon: <Award size={24} />,
+        rarity: 'legendary',
+        unlocked: maxPoints >= 5,
+        progress: maxPoints,
+        maxProgress: 5,
+      },
+    ];
+  }, [playerStats]);
 
   const filteredAchievements = achievements.filter((a) => {
     if (selectedCategory === 'unlocked') return a.unlocked;

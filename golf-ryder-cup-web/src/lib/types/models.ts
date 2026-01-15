@@ -400,6 +400,31 @@ export interface BanterPost {
 }
 
 // ============================================
+// SIDE BETS
+// ============================================
+
+export type SideBetType = 'skins' | 'nassau' | 'ctp' | 'longdrive' | 'custom';
+export type SideBetStatus = 'active' | 'completed' | 'pending';
+
+/**
+ * Side bet for tracking skins, CTP, long drive, nassau, and custom bets.
+ */
+export interface SideBet {
+    id: UUID;
+    tripId: UUID;
+    type: SideBetType;
+    name: string;
+    description: string;
+    status: SideBetStatus;
+    pot?: number;
+    winnerId?: UUID;
+    hole?: number;
+    participantIds: UUID[];
+    createdAt: ISODateString;
+    completedAt?: ISODateString;
+}
+
+// ============================================
 // HELPER TYPES
 // ============================================
 
