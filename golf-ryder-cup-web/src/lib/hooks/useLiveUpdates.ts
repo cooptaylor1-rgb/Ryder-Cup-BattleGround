@@ -155,7 +155,8 @@ export function useLiveUpdates({
 
     // Handle incoming update
     const handleUpdate = useCallback(
-        (update: LiveUpdate) => {
+        (data: unknown) => {
+            const update = data as LiveUpdate;
             // Filter by subscribed types
             if (subscribedTypes.size > 0 && !subscribedTypes.has(update.type)) {
                 return;
