@@ -313,7 +313,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
                 const nameParts = player.name.trim().split(/\s+/);
                 const firstName = nameParts[0] || '';
                 const lastName = nameParts.slice(1).join(' ') || '';
-                
+
                 await db.players.add({
                     id,
                     tripId,
