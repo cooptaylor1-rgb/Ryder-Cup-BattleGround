@@ -553,6 +553,7 @@ matches → tee_sets (tee_set_id)
 ### 3.4 Real-time Subscriptions
 
 Tables enabled for real-time:
+
 - `matches`
 - `hole_results`
 - `sessions`
@@ -799,28 +800,28 @@ interface UserProfile extends Omit<Player, 'createdAt' | 'updatedAt'> {
 interface UIState {
     // Navigation
     activeTab: 'score' | 'matchups' | 'standings' | 'more';
-    
+
     // Theme
     theme: 'light' | 'dark' | 'outdoor';
     isDarkMode: boolean;
-    
+
     // Captain Mode
     isCaptainMode: boolean;
     captainPin: string | null;
-    
+
     // Toasts
     toasts: Toast[];
-    
+
     // Modals
     activeModal: Modal | null;
-    
+
     // Connectivity
     isOnline: boolean;
-    
+
     // Loading
     isGlobalLoading: boolean;
     globalLoadingMessage: string | null;
-    
+
     // Scoring preferences
     scoringPreferences: ScoringPreferences;
 }
@@ -841,6 +842,7 @@ interface Modal {
 #### Persisted State
 
 The following state is persisted to localStorage:
+
 - `theme`
 - `isDarkMode`
 - `isCaptainMode`

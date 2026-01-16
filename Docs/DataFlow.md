@@ -1,6 +1,6 @@
 # Data Flow Architecture
 
-**Golf Ryder Cup Web App**  
+**Golf Ryder Cup Web App**
 *Comprehensive documentation of data flow patterns*
 
 ---
@@ -60,6 +60,7 @@ Primary store for trip context. Manages:
 | `courses`, `teeSets` | Golf course data | Ephemeral |
 
 **Persistence Strategy:**
+
 ```typescript
 // Only the trip ID is persisted to localStorage
 partialize: (state) => ({
@@ -94,6 +95,7 @@ Handles user authentication:
 | `isAuthenticated` | Auth status | LocalStorage |
 
 **Persistence Strategy:**
+
 ```typescript
 // Full user profile persisted
 partialize: (state) => ({
@@ -199,6 +201,7 @@ class GolfTripDB extends Dexie {
 ```
 
 **Schema Indexes:**
+
 ```typescript
 // Key indexes for efficient queries
 trips: 'id, name, startDate'
@@ -258,6 +261,7 @@ interface QueuedAction {
 ```
 
 **Queue Persistence:**
+
 ```typescript
 // Queue persisted to localStorage
 localStorage.setItem('offline_queue', JSON.stringify(items));
@@ -270,16 +274,16 @@ The `SyncService` class handles bidirectional sync with Supabase:
 ```typescript
 class SyncService {
     private pendingChanges: PendingChange[];
-    
+
     // Add change for later sync
     addPendingChange(table, operation, data) { ... }
-    
+
     // Sync all pending to cloud
     async syncPendingChanges(): Promise<SyncResult> { ... }
-    
+
     // Full trip sync
     async syncTripToCloud(tripId: string) { ... }
-    
+
     // Fetch updates from cloud
     async pullTripFromCloud(tripId: string) { ... }
 }
@@ -407,22 +411,22 @@ Match state is computed (not stored) from hole results:
 function calculateMatchState(match: Match, holeResults: HoleResult[]): MatchState {
     // Count holes won by each team
     let teamAHolesWon = 0, teamBHolesWon = 0, holesPlayed = 0;
-    
+
     for (const result of sortedResults) {
         if (result.winner === 'teamA') teamAHolesWon++;
         else if (result.winner === 'teamB') teamBHolesWon++;
         if (result.winner !== 'none') holesPlayed++;
     }
-    
+
     const currentScore = teamAHolesWon - teamBHolesWon;
     const holesRemaining = 18 - holesPlayed;
-    
+
     // Dormie: ahead by exactly holes remaining
     const isDormie = Math.abs(currentScore) === holesRemaining && currentScore !== 0;
-    
+
     // Closed out: lead greater than holes remaining
     const isClosedOut = Math.abs(currentScore) > holesRemaining;
-    
+
     return {
         currentScore,
         teamAHolesWon,
@@ -826,20 +830,20 @@ sequenceDiagram
     Store->>Store: Check session lock
     Store->>DB: Get previous result
     Store->>Engine: recordHoleResult()
-    
+
     Engine->>DB: db.holeResults.put(result)
     Engine->>Events: db.scoringEvents.add(event)
-    
+
     Engine-->>Store: Return result
-    
+
     Store->>DB: Fetch all holeResults
     Store->>Engine: calculateMatchState()
     Engine-->>Store: MatchState
-    
+
     Store->>Store: Update undoStack
     Store->>Store: Auto-advance hole
     Store-->>UI: Re-render
-    
+
     alt Online
         Store->>Sync: syncPendingChanges()
         Sync->>Cloud: Upsert hole_results
