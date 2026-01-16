@@ -48,16 +48,16 @@ export function useSyncQueue() {
     const pendingResults = useLiveQuery(async () => {
         // Check for hole results that may need syncing
         // (simplified - real implementation would check sync status)
-        const recentResults = await db.holeResults
-            .orderBy('timestamp')
-            .reverse()
-            .limit(50)
-            .toArray();
-        return recentResults.filter(r => {
-            const timestamp = new Date(r.timestamp).getTime();
-            const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-            return timestamp > fiveMinutesAgo;
-        });
+        // Note: Can't orderBy timestamp since it's not indexed, so we filter instead
+        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+        const recentResults = await db.holeResults.toArray();
+        return recentResults
+            .filter(r => {
+                const timestamp = new Date(r.timestamp).getTime();
+                return timestamp > fiveMinutesAgo;
+            })
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, 50);
     }, [], []);
 
     const pendingPosts = useLiveQuery(async () => {
