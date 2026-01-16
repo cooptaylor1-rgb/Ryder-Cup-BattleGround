@@ -520,7 +520,8 @@ OR: Score Tab → "Your Match" auto-selected
 
 ### 5. Join Trip Flow ✅
 
-**Files:** 
+**Files:**
+
 - `/components/ui/EmptyStatePremium.tsx`
 - `/src/app/page.tsx`
 
@@ -538,6 +539,7 @@ OR: Score Tab → "Your Match" auto-selected
 - Home page wired up with `JoinTripModal` state
 
 **Flow:**
+
 ```
 App Launch → Empty State → "Join a Trip" → Enter 6-char code → Trip loads
 ```
@@ -574,8 +576,9 @@ App Launch → Empty State → "Join a Trip" → Enter 6-char code → Trip load
 1. ✅ Document current flows (this doc)
 2. ✅ Implement P0-P1 changes
 3. ✅ Implement P2 changes (Join Trip Flow, Bulk Player Add)
-4. 📋 User testing with both personas
-5. 📋 Iterate based on feedback
+4. ✅ Polish pass: Copy tightening, section anchors, link destinations
+5. 📋 User testing with both personas
+6. 📋 Iterate based on feedback
 
 ---
 
@@ -590,3 +593,34 @@ App Launch → Empty State → "Join a Trip" → Enter 6-char code → Trip load
 | `src/components/ui/EmptyStatePremium.tsx` | Join Trip option in NoTournamentsEmpty |
 | `src/app/page.tsx` | JoinTripModal integration |
 | `src/app/players/page.tsx` | Bulk player add mode |
+| `src/app/settings/page.tsx` | Clearer descriptions, anchor links |
+| `src/app/more/page.tsx` | Section IDs, tighter copy |
+
+---
+
+## Polish Pass (2026-01-16)
+
+### Copy Tightening
+
+| Location | Before | After |
+|----------|--------|-------|
+| More → Captain Mode | "Enabled – can edit lineups" | "On — Full editing access" |
+| More → Captain Mode | "Disabled – view only" | "Off — Read-only view" |
+| More → Captain Center | "Manage lineups, attendance, and more" | "Lineups, attendance, settings" |
+| More → Display | "Choose a theme optimized for your environment" | "Choose a theme for your environment" |
+| Settings → Scoring | "Configure match play scoring" | "Match play point values" |
+| Settings → Theme | "Dark mode, outdoor mode" | "Light, dark, or outdoor mode" |
+| Settings → Data | "Manage offline data" | "Demo data, clear cache" |
+
+### Link Improvements
+
+Settings page links now use anchor fragments to scroll to the right section on More page:
+- Theme & Display → `/more#display`
+- Notifications → `/more#preferences`  
+- Data & Storage → `/more#data`
+
+More page sections now have IDs for anchor navigation:
+- `id="captain"` on Captain Mode section
+- `id="display"` on Display section
+- `id="preferences"` on Scoring Preferences section
+- `id="data"` on Data section
