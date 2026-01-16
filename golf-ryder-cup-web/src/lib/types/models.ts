@@ -59,6 +59,7 @@ export type ExtendedSessionType =
     | 'bloodsome'
     | 'modified-alternate'
     // Team Scramble Formats
+    | 'scramble'
     | 'scramble-2'
     | 'scramble-3'
     | 'scramble-4'
@@ -69,11 +70,14 @@ export type ExtendedSessionType =
     | 'stableford'
     | 'modified-stableford'
     | 'stroke-play'
+    | 'net-stroke-play'
     | 'medal'
     | 'par-competition'
+    | 'bogey-golf'
     // Multi-Player Games
     | 'better-ball-3'
     | 'better-ball-4'
+    | 'best-2-of-4'
     | 'worst-ball'
     | 'aggregate'
     // Betting/Side Games
