@@ -120,21 +120,21 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex items-end justify-center',
-        'bg-black/60 backdrop-blur-sm',
+        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'bg-black/40 backdrop-blur-sm',
         isExiting ? 'animate-fade-out' : 'animate-fade-in'
       )}
       onClick={handleDismiss}
     >
       <div
         className={cn(
-          'w-full max-w-lg mx-4 mb-4 rounded-2xl overflow-hidden',
+          'w-full max-w-md rounded-2xl overflow-hidden shadow-xl',
           isExiting ? 'animate-slide-down' : 'animate-slide-up'
         )}
         style={{
-          background: 'var(--surface, #1A1814)',
-          border: '1px solid var(--rule, #3A3530)',
-          maxHeight: '80vh',
+          background: 'var(--canvas-raised)',
+          border: '1px solid var(--stroke-light)',
+          maxHeight: '85vh',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -142,32 +142,34 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
         <div
           className="relative p-6 text-center"
           style={{
-            background: 'linear-gradient(180deg, var(--masters, #006747) 0%, transparent 100%)',
+            background: 'linear-gradient(180deg, var(--masters) 0%, var(--masters-deep) 50%, var(--canvas-warm) 100%)',
           }}
         >
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-2 rounded-full transition-colors bg-white/10 hover:bg-white/20"
+            className="absolute top-4 right-4 p-2 rounded-full transition-colors"
+            style={{ background: 'rgba(255,255,255,0.15)', color: 'var(--cream)' }}
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-white/80" />
+            <X className="w-5 h-5" />
           </button>
 
           <div
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-white/15"
+            className="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)' }}
           >
-            <Sparkles className="w-8 h-8 text-white" />
+            <Sparkles className="w-7 h-7" />
           </div>
 
           <h2
-            className="text-xl font-bold mb-2"
-            style={{ color: 'var(--ink, #F5F1E8)' }}
+            className="text-xl font-semibold mb-1"
+            style={{ fontFamily: "'Instrument Serif', Georgia, serif", color: 'var(--cream)' }}
           >
-            What's New
+            What&apos;s New
           </h2>
           <p
             className="text-sm"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+            style={{ color: 'rgba(255,255,255,0.8)' }}
           >
             Check out the latest features and improvements
           </p>
@@ -176,24 +178,26 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
         {/* Features List */}
         <div
           className="p-4 space-y-2 overflow-y-auto"
-          style={{ maxHeight: 'calc(80vh - 200px)' }}
+          style={{ maxHeight: 'calc(85vh - 220px)', background: 'var(--canvas)' }}
         >
           {latestFeatures.map((feature, index) => (
             <div
               key={feature.id}
-              className="flex items-start gap-4 p-4 rounded-xl transition-colors"
+              className="flex items-start gap-3 p-3 rounded-xl transition-colors"
               style={{
-                background: 'var(--surface-raised, #1E1C18)',
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--stroke-light)',
                 animationDelay: `${index * 50}ms`,
               }}
             >
               <div
-                className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{
                   background: feature.isNew
-                    ? 'rgba(0, 103, 71, 0.2)'
-                    : 'var(--surface, #1A1814)',
-                  color: feature.isNew ? 'var(--masters, #006747)' : 'var(--ink-secondary, #B8B0A0)',
+                    ? 'linear-gradient(135deg, var(--masters-soft) 0%, var(--canvas-warm) 100%)'
+                    : 'var(--canvas)',
+                  color: feature.isNew ? 'var(--masters)' : 'var(--ink-tertiary)',
+                  border: feature.isNew ? 'none' : '1px solid var(--stroke-light)',
                 }}
               >
                 {feature.icon}
@@ -202,8 +206,8 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3
-                    className="font-semibold text-sm"
-                    style={{ color: 'var(--ink, #F5F1E8)' }}
+                    className="font-medium text-sm"
+                    style={{ color: 'var(--ink)' }}
                   >
                     {feature.title}
                   </h3>
@@ -211,8 +215,8 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
                     <span
                       className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase"
                       style={{
-                        background: 'var(--masters, #006747)',
-                        color: 'white',
+                        background: 'var(--masters)',
+                        color: 'var(--cream)',
                       }}
                     >
                       New
@@ -220,8 +224,8 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
                   )}
                 </div>
                 <p
-                  className="text-xs"
-                  style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+                  className="text-xs leading-relaxed"
+                  style={{ color: 'var(--ink-secondary)' }}
                 >
                   {feature.description}
                 </p>
@@ -231,16 +235,17 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t" style={{ borderColor: 'var(--rule, #3A3530)' }}>
+        <div className="p-4 border-t" style={{ borderColor: 'var(--stroke-light)', background: 'var(--canvas-raised)' }}>
           <button
             onClick={handleDismiss}
-            className="w-full py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 press-scale"
             style={{
-              background: 'var(--masters, #006747)',
-              color: 'white',
+              background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+              color: 'var(--cream)',
+              boxShadow: '0 4px 14px rgba(22, 101, 52, 0.3)',
             }}
           >
-            Got it, let's go!
+            Got it, let&apos;s go!
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -274,15 +279,15 @@ export function FeatureCard({
     <div
       className="relative p-4 rounded-xl"
       style={{
-        background: 'linear-gradient(135deg, rgba(0,103,71,0.15) 0%, rgba(0,103,71,0.05) 100%)',
-        border: '1px solid rgba(0,103,71,0.3)',
+        background: 'linear-gradient(135deg, var(--masters-soft) 0%, var(--canvas-warm) 100%)',
+        border: '1px solid var(--stroke-light)',
       }}
     >
       {onDismiss && (
         <button
           onClick={onDismiss}
           className="absolute top-2 right-2 p-1 rounded-full transition-colors"
-          style={{ color: 'var(--ink-tertiary, #807868)' }}
+          style={{ color: 'var(--ink-tertiary)' }}
           aria-label="Dismiss"
         >
           <X className="w-4 h-4" />
@@ -293,8 +298,8 @@ export function FeatureCard({
         <div
           className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
           style={{
-            background: 'rgba(0,103,71,0.2)',
-            color: 'var(--masters, #006747)',
+            background: 'var(--masters)',
+            color: 'var(--cream)',
           }}
         >
           {icon}
@@ -302,14 +307,14 @@ export function FeatureCard({
 
         <div className="flex-1 min-w-0 pr-6">
           <h3
-            className="font-semibold text-sm mb-1"
-            style={{ color: 'var(--ink, #F5F1E8)' }}
+            className="font-medium text-sm mb-1"
+            style={{ color: 'var(--ink)' }}
           >
             {title}
           </h3>
           <p
-            className="text-xs mb-3"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+            className="text-xs mb-3 leading-relaxed"
+            style={{ color: 'var(--ink-secondary)' }}
           >
             {description}
           </p>
@@ -317,7 +322,7 @@ export function FeatureCard({
             <button
               onClick={action.onClick}
               className="text-xs font-semibold flex items-center gap-1"
-              style={{ color: 'var(--masters, #006747)' }}
+              style={{ color: 'var(--masters)' }}
             >
               {action.label}
               <ChevronRight className="w-4 h-4" />

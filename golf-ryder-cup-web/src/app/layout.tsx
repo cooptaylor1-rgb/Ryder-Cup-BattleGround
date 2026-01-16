@@ -46,9 +46,35 @@ export default function RootLayout({
   return (
     <html lang="en" className="outdoor">
       <head>
+        {/* iOS App Icons */}
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
+
+        {/* iOS Splash Screens - Generated for common device sizes */}
+        {/* iPhone SE, 8, 7, 6s, 6 - 750x1334 @2x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
+        {/* iPhone 8 Plus, 7 Plus, 6s Plus, 6 Plus - 1242x2208 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone X, Xs, 11 Pro - 1125x2436 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone Xr, 11 - 828x1792 @2x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
+        {/* iPhone Xs Max, 11 Pro Max - 1242x2688 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone 12 mini, 13 mini - 1080x2340 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1080x2340.png" media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone 12, 12 Pro, 13, 13 Pro, 14 - 1170x2532 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone 12 Pro Max, 13 Pro Max, 14 Plus - 1284x2778 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone 14 Pro - 1179x2556 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" />
+        {/* iPhone 14 Pro Max, 15 Pro Max - 1290x2796 @3x */}
+        <link rel="apple-touch-startup-image" href="/splash/splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" />
+
+        {/* iOS Status Bar Style */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="font-sans antialiased">
         {/* Skip link for accessibility - keyboard users can skip to main content */}

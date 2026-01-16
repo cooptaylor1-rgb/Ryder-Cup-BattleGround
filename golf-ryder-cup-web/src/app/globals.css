@@ -199,6 +199,8 @@ html {
   scroll-behavior: smooth;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  /* Prevent iOS overscroll bounce */
+  overscroll-behavior: none;
 }
 
 body {
@@ -210,6 +212,9 @@ body {
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* iOS: Prevent pull-to-refresh and overscroll */
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Remove intrusive defaults */
@@ -217,6 +222,8 @@ button,
 a,
 [role="button"] {
   -webkit-tap-highlight-color: transparent;
+  /* Prevent iOS text selection callout */
+  -webkit-touch-callout: none;
 }
 
 /* Focused but not intrusive */
