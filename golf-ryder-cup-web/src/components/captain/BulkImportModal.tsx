@@ -295,7 +295,7 @@ export function BulkImportModal({
             // Method Selection
             <div className="space-y-6">
               <p className="text-gray-600 dark:text-gray-300">
-                Choose how you'd like to import players:
+                Choose how you&apos;d like to import players:
               </p>
 
               <div className="grid grid-cols-2 gap-4">

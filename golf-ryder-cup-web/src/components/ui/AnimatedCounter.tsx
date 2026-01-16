@@ -62,6 +62,7 @@ export function AnimatedCounter({
   const [displayValue, setDisplayValue] = useState(previousValue ?? value);
   const [isAnimating, setIsAnimating] = useState(false);
   const [changeDirection, setChangeDirection] = useState<'up' | 'down' | null>(null);
+  const [animationStartValue, setAnimationStartValue] = useState(previousValue ?? value);
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const startValueRef = useRef(previousValue ?? value);
@@ -85,6 +86,7 @@ export function AnimatedCounter({
 
     setIsAnimating(true);
     setChangeDirection(diff > 0 ? 'up' : 'down');
+    setAnimationStartValue(startValue);
 
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
@@ -153,7 +155,7 @@ export function AnimatedCounter({
           )}
         >
           {changeDirection === 'up' ? '+' : '−'}
-          {Math.abs(value - (previousValue ?? startValueRef.current))}
+          {Math.abs(value - (previousValue ?? animationStartValue))}
         </span>
       )}
     </div>

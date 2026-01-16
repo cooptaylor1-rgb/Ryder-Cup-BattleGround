@@ -412,7 +412,7 @@ export function VoiceScoring({
                         {/* Live transcript */}
                         {transcript && (
                             <p className="text-white/80 text-sm italic text-center">
-                                "{transcript}"
+                                &quot;{transcript}&quot;
                             </p>
                         )}
 
@@ -475,7 +475,7 @@ export function VoiceScoring({
                                 {getWinnerDisplay(recognizedScore.winner)}
                             </p>
                             <p className="text-white/40 text-xs mt-2 italic">
-                                "{recognizedScore.rawTranscript}"
+                                &quot;{recognizedScore.rawTranscript}&quot;
                             </p>
                         </div>
 

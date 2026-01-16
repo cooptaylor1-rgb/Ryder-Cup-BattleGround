@@ -264,7 +264,7 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
 
                                 {/* Cart Type */}
                                 <div className="mb-4">
-                                    <label className="text-sm mb-2 block">What's on the cart?</label>
+                                    <label className="text-sm mb-2 block">What&apos;s on the cart?</label>
                                     <div className="flex gap-2">
                                         {[
                                             { type: 'beverage' as const, icon: Beer, label: 'Drinks' },

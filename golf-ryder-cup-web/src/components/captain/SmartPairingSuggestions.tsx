@@ -43,18 +43,9 @@ export function SmartPairingSuggestions({
   // Get current trip ID from first session
   const tripId = sessions[0]?.tripId;
 
-  // Early return if no trip ID
-  if (!tripId) {
-    return (
-      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-        No active trip found. Please create a trip first.
-      </div>
-    );
-  }
-
-  // Split players by team
+  // Split players by team - MUST be called unconditionally
   const { teamAPlayers, teamBPlayers } = useMemo(() => {
-    if (teams.length < 2) {
+    if (!tripId || teams.length < 2) {
       // Default split if no teams defined - use stable player order
       const sortedPlayers = [...players].sort((a, b) => a.id.localeCompare(b.id));
       const half = Math.ceil(sortedPlayers.length / 2);
@@ -85,18 +76,19 @@ export function SmartPairingSuggestions({
       teamAPlayers: players.filter(p => teamAIds.has(p.id) || unassignedToA.has(p.id)),
       teamBPlayers: players.filter(p => teamBIds.has(p.id) || (!teamAIds.has(p.id) && !unassignedToA.has(p.id))),
     };
-  }, [players, teams, matches]);
+  }, [players, teams, matches, tripId]);
 
-  // Extract pairing history from past matches
+  // Extract pairing history from past matches - MUST be called unconditionally
   const pairingHistory = useMemo(() => {
     if (!tripId) return [];
     return extractPairingHistory(matches, sessions, tripId);
   }, [matches, sessions, tripId]);
 
-  // Get or create current session
+  // Get or create current session - MUST be called unconditionally
   const currentSession = useMemo(() => {
+    if (!tripId) return null;
     if (currentSessionId) {
-      return sessions.find(s => s.id === currentSessionId);
+      return sessions.find(s => s.id === currentSessionId) || null;
     }
     // Create a mock session for suggestions
     return sessions[0] || {
@@ -111,9 +103,9 @@ export function SmartPairingSuggestions({
     };
   }, [currentSessionId, sessions, tripId, selectedFormat]);
 
-  // Generate suggestions
+  // Generate suggestions - MUST be called unconditionally
   const suggestions = useMemo(() => {
-    if (!currentSession || teamAPlayers.length === 0 || teamBPlayers.length === 0) {
+    if (!currentSession || !tripId || teamAPlayers.length === 0 || teamBPlayers.length === 0) {
       return [];
     }
 
@@ -136,11 +128,11 @@ export function SmartPairingSuggestions({
       [], // No constraints for now
       matchCount
     );
-  }, [currentSession, teamAPlayers, teamBPlayers, pairingHistory, selectedFormat]);
+  }, [currentSession, teamAPlayers, teamBPlayers, pairingHistory, selectedFormat, tripId]);
 
-  // Analyze current session if provided
+  // Analyze current session if provided - MUST be called unconditionally
   const currentSessionAnalysis = useMemo(() => {
-    if (!currentSessionId || !currentSession) return null;
+    if (!currentSessionId || !currentSession || !tripId) return null;
     const sessionMatches = matches.filter(m => m.sessionId === currentSessionId);
     if (sessionMatches.length === 0) return null;
     return analyzeSessionPairings(
@@ -151,14 +143,23 @@ export function SmartPairingSuggestions({
       pairingHistory,
       []
     );
-  }, [currentSessionId, currentSession, matches, teamAPlayers, teamBPlayers, pairingHistory]);
+  }, [currentSessionId, currentSession, matches, teamAPlayers, teamBPlayers, pairingHistory, tripId]);
 
-  // Calculate overall fairness from suggestions average
+  // Calculate overall fairness from suggestions average - MUST be called unconditionally
   const overallFairness = useMemo(() => {
     if (suggestions.length === 0) return 0.7; // Default
     const avgScore = suggestions.reduce((sum, s) => sum + s.fairnessScore, 0) / suggestions.length;
     return avgScore / 100;
   }, [suggestions]);
+
+  // Early return AFTER all hooks
+  if (!tripId) {
+    return (
+      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+        No active trip found. Please create a trip first.
+      </div>
+    );
+  }
 
   const getPlayerName = (playerId: string) => {
     const player = players.find(p => p.id === playerId);
