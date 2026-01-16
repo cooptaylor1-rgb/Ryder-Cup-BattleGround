@@ -105,31 +105,91 @@ export function WeatherWidget({
     // Compact mode
     if (compact) {
         return (
-            <button
-                onClick={() => setShowForecast(!showForecast)}
-                className={cn(
-                    'flex items-center gap-3 p-3 rounded-xl bg-surface-card',
-                    'hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors',
-                    'w-full text-left',
-                    className
+            <div className={cn('space-y-2', className)}>
+                <button
+                    onClick={() => setShowForecast(!showForecast)}
+                    className={cn(
+                        'flex items-center gap-3 p-3 rounded-xl bg-surface-card',
+                        'hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors',
+                        'w-full text-left'
+                    )}
+                >
+                    <WeatherIcon condition={current.condition.icon} size="sm" isDay={current.isDay} />
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl font-bold">{current.temperature}°</span>
+                            <span className="text-sm text-surface-500">{current.condition.description}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-surface-500">
+                            <span className="flex items-center gap-1">
+                                <Wind className="w-3 h-3" />
+                                {current.windSpeed} mph
+                            </span>
+                            <span>{getWindDirection(current.windDirection)}</span>
+                        </div>
+                    </div>
+                    <ChevronRight className={cn('w-5 h-5 text-surface-400 transition-transform', showForecast && 'rotate-90')} />
+                </button>
+
+                {/* Expanded forecast panel */}
+                {showForecast && (
+                    <div className="space-y-3 p-3 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+                        {/* Golf Conditions */}
+                        <div className="flex items-center justify-between pb-2 border-b border-surface-200 dark:border-surface-700">
+                            <span className="text-sm font-medium">Golf Conditions</span>
+                            <GolfConditionBadge overall={golfConditions.overall} showLabel />
+                        </div>
+
+                        {/* Additional stats */}
+                        <div className="grid grid-cols-3 gap-3 text-center">
+                            <div>
+                                <div className="text-xs text-surface-500">Feels Like</div>
+                                <div className="font-medium">{current.feelsLike}°</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-surface-500">Humidity</div>
+                                <div className="font-medium">{current.humidity}%</div>
+                            </div>
+                            <div>
+                                <div className="text-xs text-surface-500">UV Index</div>
+                                <div className="font-medium">{current.uvIndex}</div>
+                            </div>
+                        </div>
+
+                        {/* Hourly mini forecast */}
+                        <div>
+                            <div className="text-xs text-surface-500 mb-2">Next Hours</div>
+                            <div className="flex gap-3 overflow-x-auto pb-1">
+                                {weather.hourly.slice(0, 6).map((hour, i) => (
+                                    <div key={i} className="flex flex-col items-center gap-1 min-w-[45px]">
+                                        <span className="text-xs text-surface-500">
+                                            {i === 0 ? 'Now' : format(hour.time, 'ha')}
+                                        </span>
+                                        <WeatherIcon condition={hour.condition.icon} size="sm" isDay={hour.time.getHours() > 6 && hour.time.getHours() < 20} />
+                                        <span className="text-sm font-medium">{hour.temperature}°</span>
+                                        {hour.precipitationProbability > 20 && (
+                                            <span className="text-xs text-blue-500">{hour.precipitationProbability}%</span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Recommendations */}
+                        {golfConditions.recommendations.length > 0 && (
+                            <div className="pt-2 border-t border-surface-200 dark:border-surface-700">
+                                <div className="text-xs text-surface-500 mb-1">Tips</div>
+                                {golfConditions.recommendations.slice(0, 2).map((rec, i) => (
+                                    <div key={i} className="flex items-start gap-1 text-xs text-surface-600 dark:text-surface-400">
+                                        <span className="text-masters-primary">•</span>
+                                        <span>{rec}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
-            >
-                <WeatherIcon condition={current.condition.icon} size="sm" isDay={current.isDay} />
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold">{current.temperature}°</span>
-                        <span className="text-sm text-surface-500">{current.condition.description}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-surface-500">
-                        <span className="flex items-center gap-1">
-                            <Wind className="w-3 h-3" />
-                            {current.windSpeed} mph
-                        </span>
-                        <GolfConditionBadge overall={golfConditions.overall} />
-                    </div>
-                </div>
-                <ChevronRight className={cn('w-5 h-5 text-surface-400 transition-transform', showForecast && 'rotate-90')} />
-            </button>
+            </div>
         );
     }
 
