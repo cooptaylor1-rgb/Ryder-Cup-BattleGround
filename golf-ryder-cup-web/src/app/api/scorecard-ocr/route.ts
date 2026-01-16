@@ -99,7 +99,7 @@ Extract and return this JSON:
 
 CRITICAL RULES:
 1. MUST return exactly 18 holes - scan the ENTIRE image for both front and back 9
-2. MUST include ALL tee sets visible - don't skip any rows of yardages
+2. MUST include ALL tee sets visible - expect 4-6 different tees, don't skip any
 3. Each tee set MUST have exactly 18 yardages (one per hole)
 4. Par values: only 3, 4, or 5
 5. Handicap: 1-18, each number used exactly once
@@ -108,27 +108,40 @@ CRITICAL RULES:
 
 Return ONLY the JSON object, no other text.`;
 
-const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have MULTIPLE images of the same scorecard.
+const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have 2 images of the SAME scorecard:
 
-TASK: Combine ALL information from ALL images to build a COMPLETE dataset:
-- Image 1 might show: Front 9 hole data (holes 1-9)
-- Image 2 might show: Back 9 hole data (holes 10-18)
-- Another image might show: Course ratings, slopes, tee information
+IMAGE 1 (FRONT - Holes & Yardages):
+This image shows ALL 18 holes in a table format with:
+- Hole numbers 1-9 (Front/OUT) and 10-18 (Back/IN)
+- 4-6 ROWS of yardages (one row per tee: Black, Blue, White, Gold, Red, etc.)
+- PAR row (values: 3, 4, or 5 for each hole)
+- HANDICAP row (values 1-18, ranking difficulty)
 
-SCORECARD ELEMENTS TO FIND:
-1. Course Name (usually at top)
-2. TEE BOXES: Multiple rows of yardages - Black, Blue, White, Gold, Red, etc.
-3. PAR: Row showing 3, 4, or 5 for each hole
-4. HANDICAP: Difficulty ranking 1-18 for each hole
-5. RATINGS & SLOPES: Near tee names, e.g., "72.4/128"
+IMAGE 2 (BACK - Ratings & Information):
+This image typically shows:
+- Course name and logo
+- TEE SET information with RATINGS and SLOPES
+- Format often like: "Black Tees - Rating: 74.2 / Slope: 138"
+- May have separate Men's and Women's ratings
 
-From ALL images combined, extract:
+YOUR TASK - Combine BOTH images:
+1. From Image 1: Extract ALL 18 holes (par, handicap) and ALL yardages for EACH tee set (4-6 tees)
+2. From Image 2: Get the course name, AND rating/slope for EACH tee set
+3. MERGE: Match the yardages from Image 1 with the ratings/slopes from Image 2 by tee name/color
+
+CRITICAL - TEE SET EXTRACTION:
+- Count the rows of yardages in Image 1 - there should be 4-6 different tee rows
+- Each row is a different tee (Black, Blue, White, Gold, Red, etc.)
+- The first/top row is usually the longest (Championship/Black)
+- The last/bottom row is usually the shortest (Forward/Red)
+- INCLUDE ALL ROWS - don't skip any!
+
+Return this JSON:
 {
-  "courseName": "Full course name",
+  "courseName": "Full course name from Image 2",
   "holes": [
     {"par": 4, "handicap": 7, "yardage": 385},
-    {"par": 3, "handicap": 15, "yardage": 165},
-    ... ALL 18 holes in order
+    ... (ALL 18 holes with par, handicap, and yardage from primary tee)
   ],
   "teeSets": [
     {
@@ -136,17 +149,23 @@ From ALL images combined, extract:
       "color": "black",
       "rating": 74.2,
       "slope": 138,
-      "yardages": [18 yardages, one per hole]
+      "yardages": [385, 165, 520, 410, 195, 545, 340, 180, 430, 395, 155, 510, 425, 185, 560, 365, 170, 445]
     },
-    ... ALL tee sets from ALL images
+    {
+      "name": "Blue",
+      "color": "blue",
+      "rating": 72.1,
+      "slope": 131,
+      "yardages": [365, 150, 495, 385, 175, 520, 320, 165, 410, 375, 140, 485, 400, 170, 535, 345, 155, 420]
+    },
+    ... (INCLUDE ALL 4-6 TEE SETS)
   ]
 }
 
-CRITICAL:
-1. Return EXACTLY 18 holes by combining data from all images
-2. Include EVERY tee set visible across all images
-3. Each tee needs 18 yardages AND rating/slope if visible
-4. Don't duplicate - merge intelligently
+VALIDATION:
+- holes array must have exactly 18 items
+- teeSets array should have 4-6 items (one per tee row visible)
+- Each tee's yardages array must have exactly 18 numbers
 
 Return ONLY the JSON object.`;
 
@@ -342,13 +361,13 @@ async function extractWithOpenAI(
   apiKey: string
 ): Promise<ScorecardData | null> {
   try {
-    const imageUrl = `data:${mimeType};base64,${imageBase64}`;
+    const imageUrl = `data:${mimeType}; base64, ${imageBase64} `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey} `,
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -390,7 +409,7 @@ async function extractWithOpenAI(
     if (!content) return null;
 
     // Parse JSON from response (handle markdown code blocks)
-    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*\}/);
+    const jsonMatch = content.match(/```(?: json) ?\s * ([\s\S] *?)```/) || content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 
     const jsonStr = Array.isArray(jsonMatch) && jsonMatch[1] ? jsonMatch[1].trim() : jsonMatch[0];
@@ -406,11 +425,14 @@ async function extractWithClaudeMultiple(
   images: ImageData[],
   apiKey: string
 ): Promise<ScorecardData | null> {
+  console.log(`[OCR] Multi - image extraction with ${images.length} images`);
+
   try {
     // Build content array with all images
     const content: Array<{ type: string; source?: { type: string; media_type: string; data: string }; text?: string }> = [];
 
     images.forEach((img, index) => {
+      console.log(`[OCR] Adding image ${index + 1}: ${img.label || 'unlabeled'}, type: ${img.mimeType} `);
       content.push({
         type: 'image',
         source: {
@@ -443,7 +465,7 @@ async function extractWithClaudeMultiple(
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
+        max_tokens: 8192, // Increased for larger response with all tee sets
         messages: [
           {
             role: 'user',
@@ -454,22 +476,44 @@ async function extractWithClaudeMultiple(
     });
 
     if (!response.ok) {
-      console.error('Claude API error:', await response.text());
+      const errorText = await response.text();
+      console.error('[OCR] Claude multi-image API error:', errorText);
       return null;
     }
 
     const data = await response.json();
     const responseContent = data.content?.[0]?.text;
 
-    if (!responseContent) return null;
+    if (!responseContent) {
+      console.error('[OCR] Claude multi-image returned no content');
+      return null;
+    }
+
+    console.log('[OCR] Claude multi-image response length:', responseContent.length);
 
     // Parse JSON from response
     const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+    if (!jsonMatch) {
+      console.error('[OCR] Could not extract JSON from multi-image response:', responseContent.slice(0, 500));
+      return null;
+    }
 
-    return JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonMatch[0]);
+    console.log('[OCR] Multi-image extracted:', {
+      courseName: parsed.courseName,
+      holesCount: parsed.holes?.length,
+      teeSetsCount: parsed.teeSets?.length,
+      teeSetDetails: parsed.teeSets?.map((t: TeeSetData) => ({
+        name: t.name,
+        rating: t.rating,
+        slope: t.slope,
+        yardagesCount: t.yardages?.length,
+      })),
+    });
+
+    return parsed;
   } catch (error) {
-    console.error('Claude multi-image extraction error:', error);
+    console.error('[OCR] Claude multi-image extraction error:', error);
     return null;
   }
 }
@@ -489,7 +533,7 @@ async function extractWithOpenAIMultiple(
     ];
 
     images.forEach((img, index) => {
-      const imageUrl = `data:${img.mimeType};base64,${img.image}`;
+      const imageUrl = `data:${img.mimeType}; base64, ${img.image} `;
       userContent.push({
         type: 'image_url',
         image_url: {
@@ -509,7 +553,7 @@ async function extractWithOpenAIMultiple(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey} `,
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -539,7 +583,7 @@ async function extractWithOpenAIMultiple(
     if (!responseContent) return null;
 
     // Parse JSON from response (handle markdown code blocks)
-    const jsonMatch = responseContent.match(/```(?:json)?\s*([\s\S]*?)```/) || responseContent.match(/\{[\s\S]*\}/);
+    const jsonMatch = responseContent.match(/```(?: json) ?\s * ([\s\S] *?)```/) || responseContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 
     const jsonStr = Array.isArray(jsonMatch) && jsonMatch[1] ? jsonMatch[1].trim() : jsonMatch[0];
