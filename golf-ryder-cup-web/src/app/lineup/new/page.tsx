@@ -155,15 +155,44 @@ const FORMAT_CATEGORIES: { value: FormatCategory; label: string; description: st
 
 type Step = 'setup' | 'lineup';
 
+// Helper to generate smart session name
+function generateSessionName(tripStartDate: string | undefined, existingSessions: number): string {
+  const sessionNum = existingSessions + 1;
+  const dayNum = sessionNum <= 3 ? sessionNum : Math.ceil(sessionNum / 2);
+  const timeSlot = sessionNum % 2 === 1 ? 'AM' : 'PM';
+  return `Day ${dayNum} ${timeSlot}`;
+}
+
+// Helper to get today's date in YYYY-MM-DD format
+function getTodayDate(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 export default function NewLineupPage() {
   const router = useRouter();
-  const { currentTrip, teams, players, teamMembers, addSession } = useTripStore();
+  const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
+  // Smart defaults based on existing trip data
+  const defaultSessionName = useMemo(() =>
+    generateSessionName(currentTrip?.startDate, sessions.length),
+    [currentTrip?.startDate, sessions.length]
+  );
+
+  const defaultDate = useMemo(() => {
+    // Default to trip start date if trip exists and hasn't started, otherwise today
+    if (currentTrip?.startDate) {
+      const tripStart = new Date(currentTrip.startDate);
+      const today = new Date();
+      return tripStart > today ? currentTrip.startDate : getTodayDate();
+    }
+    return getTodayDate();
+  }, [currentTrip?.startDate]);
+
   const [step, setStep] = useState<Step>('setup');
-  const [sessionName, setSessionName] = useState('');
-  const [sessionType, setSessionType] = useState<SessionType>('fourball');
-  const [scheduledDate, setScheduledDate] = useState('');
+  const [sessionName, setSessionName] = useState(defaultSessionName);
+  const [sessionType, setSessionType] = useState<SessionType>('fourball'); // Most common format
+  const [scheduledDate, setScheduledDate] = useState(defaultDate);
   const [firstTeeTime, setFirstTeeTime] = useState('08:00');
   const [teeTimeInterval, setTeeTimeInterval] = useState(10); // minutes between matches
   const [matchCount, setMatchCount] = useState(4);
@@ -230,7 +259,7 @@ export default function NewLineupPage() {
     pointsPerMatch,
   }), [sessionName, sessionType, selectedType, matchCount, pointsPerMatch]);
 
-  // Validation
+  // Validation - session name is pre-filled with smart default, so it's always valid
   const canProceedToLineup = sessionName.trim().length > 0;
   const hasEnoughPlayers = teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
     teamBPlayers.length >= selectedType.playersPerTeam * matchCount;

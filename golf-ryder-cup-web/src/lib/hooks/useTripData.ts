@@ -13,10 +13,11 @@
 
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useHaptic } from './useHaptic';
+import type { Match } from '../types/models';
 
 // ============================================
 // TYPES
@@ -274,12 +275,12 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
     // Calculate standings
     const standings = useMemo(() => {
         const totalMatches = trip?.settings?.totalMatches || 28;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return calculateStandings(
-            (matches || []).map((m: any) => ({
-                winner: m.winnerId as 'team1' | 'team2' | 'halved',
-                team1Id: m.team1PlayerIds?.[0] || '',
-                team2Id: m.team2PlayerIds?.[0] || '',
+            (matches || []).map((m: Match) => ({
+                winner: m.result === 'teamAWin' ? 'team1' as const :
+                    m.result === 'teamBWin' ? 'team2' as const : 'halved' as const,
+                team1Id: m.teamAPlayerIds?.[0] || '',
+                team2Id: m.teamBPlayerIds?.[0] || '',
             })),
             players,
             totalMatches

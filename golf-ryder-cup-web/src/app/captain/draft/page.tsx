@@ -44,16 +44,37 @@ export default function DraftPage() {
 
   const handleDraftComplete = useCallback(async (assignments: Map<string, string>) => {
     // Apply the draft results to the trip store
-    for (const [playerId, teamId] of assignments.entries()) {
-      // Check if player is already assigned
-      const existingMembership = teamMembers.find(tm => tm.playerId === playerId);
-      if (!existingMembership) {
-        await assignPlayerToTeam(playerId, teamId);
-      }
-    }
+    let successCount = 0;
+    let failedCount = 0;
 
-    showToast('success', `Draft complete! ${assignments.size} players assigned to teams.`);
-    router.push('/captain');
+    try {
+      for (const [playerId, teamId] of assignments.entries()) {
+        // Check if player is already assigned
+        const existingMembership = teamMembers.find(tm => tm.playerId === playerId);
+        if (!existingMembership) {
+          try {
+            await assignPlayerToTeam(playerId, teamId);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to assign player ${playerId} to team ${teamId}:`, error);
+            failedCount++;
+          }
+        }
+      }
+
+      if (failedCount > 0) {
+        showToast('warning', `Draft partially complete: ${successCount} assigned, ${failedCount} failed. Please retry.`);
+      } else if (successCount > 0) {
+        showToast('success', `Draft complete! ${successCount} players assigned to teams.`);
+        router.push('/captain');
+      } else {
+        showToast('info', 'All players were already assigned.');
+        router.push('/captain');
+      }
+    } catch (error) {
+      console.error('Draft failed:', error);
+      showToast('error', 'Draft failed. Please try again.');
+    }
   }, [assignPlayerToTeam, teamMembers, showToast, router]);
 
   if (!currentTrip || !isCaptainMode) {

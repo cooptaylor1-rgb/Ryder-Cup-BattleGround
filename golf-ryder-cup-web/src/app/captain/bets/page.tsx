@@ -56,6 +56,7 @@ export default function CaptainBetsPage() {
     const [newBetPot, setNewBetPot] = useState(20);
     const [newBetHole, setNewBetHole] = useState<number | undefined>();
     const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!currentTrip) {
@@ -107,49 +108,87 @@ export default function CaptainBetsPage() {
     };
 
     const handleCreateBet = async () => {
-        if (!currentTrip) return;
+        if (!currentTrip || isSubmitting) return;
         if (!newBetName.trim()) {
             showToast('error', 'Please enter a bet name');
             return;
         }
 
-        const newBet: SideBet = {
-            id: crypto.randomUUID(),
-            tripId: currentTrip.id,
-            type: newBetType,
-            name: newBetName,
-            description: newBetDescription,
-            status: 'active',
-            pot: newBetPot,
-            participantIds: selectedParticipants,
-            hole: newBetHole,
-            createdAt: new Date().toISOString(),
-        };
+        setIsSubmitting(true);
 
-        await db.sideBets.add(newBet);
-        showToast('success', `${newBetName} created!`);
-        setShowCreateModal(false);
-        resetForm();
+        try {
+            const newBet: SideBet = {
+                id: crypto.randomUUID(),
+                tripId: currentTrip.id,
+                type: newBetType,
+                name: newBetName,
+                description: newBetDescription,
+                status: 'active',
+                pot: newBetPot,
+                participantIds: selectedParticipants,
+                hole: newBetHole,
+                createdAt: new Date().toISOString(),
+            };
+
+            await db.sideBets.add(newBet);
+            showToast('success', `${newBetName} created!`);
+            setShowCreateModal(false);
+            resetForm();
+        } catch (error) {
+            console.error('Failed to create bet:', error);
+            showToast('error', 'Failed to create bet. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleUpdateBet = async (betId: string, updates: Partial<SideBet>) => {
-        await db.sideBets.update(betId, updates);
-        showToast('success', 'Bet updated');
-        setEditingBet(null);
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        try {
+            await db.sideBets.update(betId, updates);
+            showToast('success', 'Bet updated');
+            setEditingBet(null);
+        } catch (error) {
+            console.error('Failed to update bet:', error);
+            showToast('error', 'Failed to update bet. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleDeleteBet = async (betId: string) => {
-        if (!confirm('Delete this bet?')) return;
-        await db.sideBets.delete(betId);
-        showToast('success', 'Bet deleted');
+        if (!confirm('Delete this bet?') || isSubmitting) return;
+        setIsSubmitting(true);
+
+        try {
+            await db.sideBets.delete(betId);
+            showToast('success', 'Bet deleted');
+        } catch (error) {
+            console.error('Failed to delete bet:', error);
+            showToast('error', 'Failed to delete bet. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleCompleteBet = async (betId: string, winnerId?: string) => {
-        await db.sideBets.update(betId, {
-            status: 'completed',
-            winnerId,
-        });
-        showToast('success', 'Bet completed!');
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        try {
+            await db.sideBets.update(betId, {
+                status: 'completed',
+                winnerId,
+            });
+            showToast('success', 'Bet completed!');
+        } catch (error) {
+            console.error('Failed to complete bet:', error);
+            showToast('error', 'Failed to complete bet. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const getPlayer = (id: string) => players.find(p => p.id === id);

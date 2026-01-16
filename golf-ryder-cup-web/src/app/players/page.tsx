@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
-import { Edit2, Trash2, UserPlus, Users, X, ChevronLeft } from 'lucide-react';
+import { Edit2, Trash2, UserPlus, Users, X, ChevronLeft, UsersRound, Plus, Check } from 'lucide-react';
 import { NoPlayersPremiumEmpty } from '@/components/ui';
+
+// Bulk player entry row type
+interface BulkPlayerRow {
+    id: string;
+    firstName: string;
+    lastName: string;
+    handicapIndex: string;
+    teamId: string;
+}
 
 /**
  * PLAYERS PAGE - Editorial Design
@@ -20,6 +29,7 @@ export default function PlayersPage() {
     const { isCaptainMode, showToast } = useUIStore();
 
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showBulkAdd, setShowBulkAdd] = useState(false);
     const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
     const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
     const [formData, setFormData] = useState({
@@ -29,6 +39,18 @@ export default function PlayersPage() {
         email: '',
         teamId: '',
     });
+
+    // Bulk add state - start with 4 empty rows
+    const createEmptyRow = (): BulkPlayerRow => ({
+        id: crypto.randomUUID(),
+        firstName: '',
+        lastName: '',
+        handicapIndex: '',
+        teamId: '',
+    });
+    const [bulkRows, setBulkRows] = useState<BulkPlayerRow[]>(() =>
+        Array(4).fill(null).map(createEmptyRow)
+    );
 
     useEffect(() => {
         if (!currentTrip) {
@@ -110,6 +132,55 @@ export default function PlayersPage() {
         }
     };
 
+    // Bulk add handlers
+    const updateBulkRow = useCallback((id: string, field: keyof BulkPlayerRow, value: string) => {
+        setBulkRows(prev => prev.map(row =>
+            row.id === id ? { ...row, [field]: value } : row
+        ));
+    }, []);
+
+    const addBulkRow = useCallback(() => {
+        setBulkRows(prev => [...prev, createEmptyRow()]);
+    }, []);
+
+    const removeBulkRow = useCallback((id: string) => {
+        setBulkRows(prev => prev.filter(row => row.id !== id));
+    }, []);
+
+    const handleBulkSave = async () => {
+        // Filter rows that have at least first AND last name
+        const validRows = bulkRows.filter(row => row.firstName.trim() && row.lastName.trim());
+
+        if (validRows.length === 0) {
+            showToast('error', 'Add at least one player with first and last name');
+            return;
+        }
+
+        try {
+            let addedCount = 0;
+            for (const row of validRows) {
+                const playerData = {
+                    firstName: row.firstName.trim(),
+                    lastName: row.lastName.trim(),
+                    handicapIndex: row.handicapIndex ? parseFloat(row.handicapIndex) : undefined,
+                };
+                const newPlayer = await addPlayer(playerData);
+                if (row.teamId) {
+                    await assignPlayerToTeam(newPlayer.id, row.teamId);
+                }
+                addedCount++;
+            }
+            showToast('success', `Added ${addedCount} player${addedCount > 1 ? 's' : ''}`);
+            setShowBulkAdd(false);
+            setBulkRows(Array(4).fill(null).map(createEmptyRow));
+        } catch (error) {
+            console.error('Failed to bulk add players:', error);
+            showToast('error', 'Failed to add some players');
+        }
+    };
+
+    const validBulkCount = bulkRows.filter(row => row.firstName.trim() && row.lastName.trim()).length;
+
     if (!currentTrip) return null;
 
     const teamA = teams.find(t => t.color === 'usa');
@@ -149,10 +220,32 @@ export default function PlayersPage() {
                         </div>
                     </div>
                     {isCaptainMode && (
-                        <button onClick={() => setShowAddModal(true)} className="btn-premium" style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                            <UserPlus size={16} />
-                            Add
-                        </button>
+                        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                            <button
+                                onClick={() => setShowBulkAdd(true)}
+                                className="btn-secondary press-scale"
+                                style={{
+                                    padding: 'var(--space-2) var(--space-3)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-2)',
+                                    background: 'var(--surface-card)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius-md)',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                }}
+                                title="Add multiple players at once"
+                            >
+                                <UsersRound size={16} />
+                                Bulk
+                            </button>
+                            <button onClick={() => setShowAddModal(true)} className="btn-premium" style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                <UserPlus size={16} />
+                                Add
+                            </button>
+                        </div>
                     )}
                 </div>
             </header>
@@ -318,6 +411,157 @@ export default function PlayersPage() {
                         <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                             <button onClick={() => setPlayerToDelete(null)} className="btn btn-secondary" style={{ flex: 1 }}>Cancel</button>
                             <button onClick={handleDelete} className="btn btn-danger" style={{ flex: 1 }}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Bulk Add Modal */}
+            {showBulkAdd && (
+                <div className="modal-backdrop" onClick={() => setShowBulkAdd(false)}>
+                    <div
+                        className="modal"
+                        onClick={e => e.stopPropagation()}
+                        style={{ maxWidth: '600px', width: '95vw', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexShrink: 0 }}>
+                            <div>
+                                <h2 className="type-headline">Add Multiple Players</h2>
+                                <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
+                                    Fill in names to add players quickly
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowBulkAdd(false)}
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 'var(--space-2)' }}
+                            >
+                                <X size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                            </button>
+                        </div>
+
+                        {/* Column headers */}
+                        <div
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr 80px 100px 32px',
+                                gap: 'var(--space-2)',
+                                marginBottom: 'var(--space-2)',
+                                paddingRight: '8px',
+                                flexShrink: 0,
+                            }}
+                        >
+                            <span className="type-meta" style={{ fontWeight: 600 }}>First Name *</span>
+                            <span className="type-meta" style={{ fontWeight: 600 }}>Last Name *</span>
+                            <span className="type-meta" style={{ fontWeight: 600 }}>HCP</span>
+                            <span className="type-meta" style={{ fontWeight: 600 }}>Team</span>
+                            <span></span>
+                        </div>
+
+                        {/* Scrollable rows container */}
+                        <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--space-4)' }}>
+                            {bulkRows.map((row, index) => (
+                                <div
+                                    key={row.id}
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr 1fr 80px 100px 32px',
+                                        gap: 'var(--space-2)',
+                                        marginBottom: 'var(--space-2)',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={row.firstName}
+                                        onChange={(e) => updateBulkRow(row.id, 'firstName', e.target.value)}
+                                        placeholder="John"
+                                        style={{ padding: 'var(--space-2)', fontSize: '14px' }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        value={row.lastName}
+                                        onChange={(e) => updateBulkRow(row.id, 'lastName', e.target.value)}
+                                        placeholder="Smith"
+                                        style={{ padding: 'var(--space-2)', fontSize: '14px' }}
+                                    />
+                                    <input
+                                        type="number"
+                                        className="input"
+                                        value={row.handicapIndex}
+                                        onChange={(e) => updateBulkRow(row.id, 'handicapIndex', e.target.value)}
+                                        placeholder="12"
+                                        style={{ padding: 'var(--space-2)', fontSize: '14px' }}
+                                    />
+                                    <select
+                                        value={row.teamId}
+                                        onChange={(e) => updateBulkRow(row.id, 'teamId', e.target.value)}
+                                        className="input"
+                                        style={{ padding: 'var(--space-2)', fontSize: '14px' }}
+                                    >
+                                        <option value="">—</option>
+                                        {teamA && <option value={teamA.id}>{teamA.name?.slice(0, 6) || 'USA'}</option>}
+                                        {teamB && <option value={teamB.id}>{teamB.name?.slice(0, 6) || 'EUR'}</option>}
+                                    </select>
+                                    <button
+                                        onClick={() => removeBulkRow(row.id)}
+                                        disabled={bulkRows.length <= 1}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: bulkRows.length <= 1 ? 'not-allowed' : 'pointer',
+                                            padding: 'var(--space-1)',
+                                            opacity: bulkRows.length <= 1 ? 0.3 : 0.6,
+                                        }}
+                                        title="Remove row"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Add row button */}
+                        <button
+                            onClick={addBulkRow}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 'var(--space-2)',
+                                padding: 'var(--space-2)',
+                                border: '1px dashed var(--border)',
+                                borderRadius: 'var(--radius-md)',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                marginBottom: 'var(--space-4)',
+                                width: '100%',
+                                flexShrink: 0,
+                            }}
+                        >
+                            <Plus size={16} style={{ color: 'var(--ink-tertiary)' }} />
+                            <span className="type-meta">Add another row</span>
+                        </button>
+
+                        {/* Footer */}
+                        <div style={{ display: 'flex', gap: 'var(--space-3)', flexShrink: 0 }}>
+                            <button
+                                onClick={() => setShowBulkAdd(false)}
+                                className="btn btn-secondary"
+                                style={{ flex: 1 }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleBulkSave}
+                                className="btn btn-primary"
+                                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}
+                                disabled={validBulkCount === 0}
+                            >
+                                <Check size={16} />
+                                Add {validBulkCount > 0 ? `${validBulkCount} Player${validBulkCount > 1 ? 's' : ''}` : 'Players'}
+                            </button>
                         </div>
                     </div>
                 </div>

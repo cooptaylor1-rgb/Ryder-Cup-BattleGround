@@ -50,6 +50,7 @@ export default function CaptainManagePage() {
     const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
     const [editingMatch, setEditingMatch] = useState<string | null>(null);
     const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Load sessions for current trip
     const sessions = useLiveQuery(
@@ -107,52 +108,74 @@ export default function CaptainManagePage() {
     };
 
     const handleUpdateSession = async (sessionId: string, updates: Partial<RyderCupSession>) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await db.sessions.update(sessionId, { ...updates, updatedAt: new Date().toISOString() });
             showToast('success', 'Session updated');
-        } catch {
+        } catch (error) {
+            console.error('Failed to update session:', error);
             showToast('error', 'Failed to update session');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleUpdateMatch = async (matchId: string, updates: Partial<Match>) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await db.matches.update(matchId, { ...updates, updatedAt: new Date().toISOString() });
             showToast('success', 'Match updated');
             setEditingMatch(null);
-        } catch {
+        } catch (error) {
+            console.error('Failed to update match:', error);
             showToast('error', 'Failed to update match');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleDeleteMatch = async (matchId: string) => {
         if (!confirm('Are you sure you want to delete this match? All scores will be lost.')) return;
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
-            // Delete hole results first
+            // Delete hole results first, then the match
             await db.holeResults.where('matchId').equals(matchId).delete();
             await db.matches.delete(matchId);
             showToast('success', 'Match deleted');
-        } catch {
+        } catch (error) {
+            console.error('Failed to delete match:', error);
             showToast('error', 'Failed to delete match');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleUpdatePlayer = async (playerId: string, updates: Partial<Player>) => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await db.players.update(playerId, updates);
             showToast('success', 'Player updated');
             setEditingPlayer(null);
-        } catch {
+        } catch (error) {
+            console.error('Failed to update player:', error);
             showToast('error', 'Failed to update player');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleDeleteSession = async (sessionId: string) => {
         if (!confirm('Are you sure you want to delete this session? All matches and scores will be lost.')) return;
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         try {
             // Get all matches in session
             const sessionMatches = matches.filter(m => m.sessionId === sessionId);
-            // Delete hole results for all matches
+            // Delete hole results for all matches first
             for (const match of sessionMatches) {
                 await db.holeResults.where('matchId').equals(match.id).delete();
             }
@@ -161,8 +184,11 @@ export default function CaptainManagePage() {
             // Delete session
             await db.sessions.delete(sessionId);
             showToast('success', 'Session deleted');
-        } catch {
-            showToast('error', 'Failed to delete session');
+        } catch (error) {
+            console.error('Failed to delete session:', error);
+            showToast('error', 'Failed to delete session. Some data may be partially deleted.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 

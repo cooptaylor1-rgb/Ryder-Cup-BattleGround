@@ -42,6 +42,7 @@ export default function CaptainSettingsPage() {
   const [location, setLocation] = useState(currentTrip?.location || '');
   const [teamAName, setTeamAName] = useState('');
   const [teamBName, setTeamBName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Fetch teams for this trip
   const teams = useLiveQuery(
@@ -81,24 +82,38 @@ export default function CaptainSettingsPage() {
   }, [teamA, teamB]);
 
   const handleSave = async () => {
-    if (!currentTrip) return;
+    if (!currentTrip || isSaving) return;
 
-    await updateTrip(currentTrip.id, {
-      name: tripName,
-      startDate,
-      endDate,
-      location,
-    });
-
-    // Update team names if changed
-    if (teamA && teamAName !== teamA.name) {
-      await db.teams.update(teamA.id, { name: teamAName, updatedAt: new Date().toISOString() });
-    }
-    if (teamB && teamBName !== teamB.name) {
-      await db.teams.update(teamB.id, { name: teamBName, updatedAt: new Date().toISOString() });
+    if (!tripName.trim()) {
+      showToast('error', 'Trip name is required');
+      return;
     }
 
-    showToast('success', 'Trip settings saved');
+    setIsSaving(true);
+
+    try {
+      await updateTrip(currentTrip.id, {
+        name: tripName.trim(),
+        startDate,
+        endDate,
+        location,
+      });
+
+      // Update team names if changed
+      if (teamA && teamAName !== teamA.name) {
+        await db.teams.update(teamA.id, { name: teamAName, updatedAt: new Date().toISOString() });
+      }
+      if (teamB && teamBName !== teamB.name) {
+        await db.teams.update(teamB.id, { name: teamBName, updatedAt: new Date().toISOString() });
+      }
+
+      showToast('success', 'Trip settings saved');
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      showToast('error', 'Failed to save settings. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!currentTrip || !isCaptainMode) {
@@ -144,11 +159,19 @@ export default function CaptainSettingsPage() {
           </div>
           <button
             onClick={handleSave}
+            disabled={isSaving}
             className="btn-premium"
-            style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+            style={{
+              padding: 'var(--space-2) var(--space-3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              opacity: isSaving ? 0.6 : 1,
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+            }}
           >
             <Save size={16} />
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </header>

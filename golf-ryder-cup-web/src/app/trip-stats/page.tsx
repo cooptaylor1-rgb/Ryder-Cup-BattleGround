@@ -66,7 +66,7 @@ function CategoryTabs({
               text-sm font-medium transition-all
               ${isActive
                                 ? 'bg-masters-green text-white shadow-md'
-                                : 'bg-canvas-secondary text-ink-secondary hover:bg-canvas-tertiary'
+                                : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight'
                             }
             `}
                     >
@@ -107,21 +107,21 @@ function StatCard({
         <div className="card-surface rounded-xl overflow-hidden">
             <button
                 onClick={() => setExpanded(!expanded)}
-                className="w-full p-4 flex items-center justify-between hover:bg-canvas-secondary/50 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
             >
                 <div className="flex items-center gap-3">
                     <span className="text-2xl">{definition.emoji}</span>
                     <div className="text-left">
-                        <div className="font-medium text-ink-primary">{definition.label}</div>
-                        <div className="text-sm text-ink-tertiary">{definition.description}</div>
+                        <div className="font-medium text-text-primary">{definition.label}</div>
+                        <div className="text-sm text-text-tertiary">{definition.description}</div>
                     </div>
                 </div>
                 <div className="text-right">
-                    <div className="text-xl font-bold text-ink-primary">
+                    <div className="text-xl font-bold text-text-primary">
                         {formatStatValue(total, definition.unit)}
                     </div>
                     {leaderPlayer && leader && leader[1] > 0 && (
-                        <div className="text-xs text-ink-tertiary">
+                        <div className="text-xs text-text-tertiary">
                             👑 {leaderPlayer.firstName}
                         </div>
                     )}
@@ -129,7 +129,7 @@ function StatCard({
             </button>
 
             {expanded && (
-                <div className="border-t border-canvas-tertiary p-4 space-y-3">
+                <div className="border-t border-surface-border p-4 space-y-3">
                     {players.map(player => {
                         const value = playerStats.get(player.id) ?? 0;
                         return (
@@ -138,7 +138,7 @@ function StatCard({
                                 className="flex items-center justify-between gap-4"
                             >
                                 <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-ink-primary truncate">
+                                    <div className="font-medium text-text-primary truncate">
                                         {getPlayerName(player)}
                                     </div>
                                 </div>
@@ -146,14 +146,14 @@ function StatCard({
                                     <button
                                         onClick={(e) => { e.stopPropagation(); onDecrement(player.id); }}
                                         disabled={value === 0}
-                                        className="w-10 h-10 rounded-full bg-canvas-secondary text-ink-primary
+                                        className="w-10 h-10 rounded-full bg-surface-elevated text-text-primary
                              flex items-center justify-center text-xl font-bold
                              disabled:opacity-30 disabled:cursor-not-allowed
-                             hover:bg-canvas-tertiary active:scale-95 transition-all"
+                             hover:bg-surface-highlight active:scale-95 transition-all"
                                     >
                                         −
                                     </button>
-                                    <div className="w-16 text-center font-bold text-lg text-ink-primary">
+                                    <div className="w-16 text-center font-bold text-lg text-text-primary">
                                         {formatStatValue(value, definition.unit)}
                                     </div>
                                     <button
@@ -209,7 +209,7 @@ function QuickTrack({
 
     return (
         <div className="card-elevated rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-ink-secondary mb-3">⚡ Quick Track</h3>
+            <h3 className="text-sm font-semibold text-text-secondary mb-3">⚡ Quick Track</h3>
 
             <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
                 {players.map(player => (
@@ -220,7 +220,7 @@ function QuickTrack({
               px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
               ${selectedPlayer === player.id
                                 ? 'bg-masters-green text-white'
-                                : 'bg-canvas-secondary text-ink-secondary hover:bg-canvas-tertiary'
+                                : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight'
                             }
             `}
                     >
@@ -236,8 +236,8 @@ function QuickTrack({
                         onClick={() => handleQuickTrack(action.statType)}
                         disabled={!selectedPlayer}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-lg
-                     bg-canvas-secondary text-ink-primary
-                     hover:bg-canvas-tertiary active:scale-95
+                     bg-surface-elevated text-text-primary
+                     hover:bg-surface-highlight active:scale-95
                      disabled:opacity-40 disabled:cursor-not-allowed
                      transition-all"
                     >
@@ -248,7 +248,7 @@ function QuickTrack({
             </div>
 
             {!selectedPlayer && (
-                <p className="text-xs text-ink-tertiary mt-3 text-center">
+                <p className="text-xs text-text-tertiary mt-3 text-center">
                     Select a player to quick-track stats
                 </p>
             )}
@@ -298,7 +298,7 @@ function CategoryLeaderboard({
 
     return (
         <div className="card-surface rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-ink-secondary mb-3">
+            <h3 className="text-sm font-semibold text-text-secondary mb-3">
                 {categoryDef.emoji} {categoryDef.label} Leaders
             </h3>
             <div className="space-y-2">
@@ -308,13 +308,13 @@ function CategoryLeaderboard({
 
                     return (
                         <div key={playerId} className="flex items-center gap-3">
-                            <div className="w-6 text-center font-bold text-ink-tertiary">
+                            <div className="w-6 text-center font-bold text-text-tertiary">
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
                             </div>
-                            <div className="flex-1 font-medium text-ink-primary">
+                            <div className="flex-1 font-medium text-text-primary">
                                 {getPlayerName(player)}
                             </div>
-                            <div className="font-bold text-ink-secondary">
+                            <div className="font-bold text-text-secondary">
                                 {total}
                             </div>
                         </div>
@@ -394,7 +394,7 @@ export default function TripStatsPage() {
                     <div className="card-surface rounded-xl p-8 text-center">
                         <div className="text-4xl mb-4">📊</div>
                         <h2 className="type-h3 mb-2">No Active Trip</h2>
-                        <p className="text-ink-secondary">
+                        <p className="text-text-secondary">
                             Start or join a trip to track fun stats!
                         </p>
                     </div>
@@ -411,7 +411,7 @@ export default function TripStatsPage() {
         <main className="page-container">
             <header className="header-premium">
                 <h1 className="type-h2">Trip Stats</h1>
-                <p className="type-body text-ink-secondary">Fun tracking beyond scores</p>
+                <p className="type-body text-text-secondary">Fun tracking beyond scores</p>
             </header>
 
             <div className="content-area space-y-6">
@@ -446,35 +446,35 @@ export default function TripStatsPage() {
                 />
 
                 <div className="card-surface rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-ink-secondary mb-3">📊 Trip Totals</h3>
+                    <h3 className="text-sm font-semibold text-text-secondary mb-3">📊 Trip Totals</h3>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="text-center">
                             <div className="text-2xl">🍺</div>
-                            <div className="text-xl font-bold text-ink-primary">{totalBeers}</div>
-                            <div className="text-xs text-ink-tertiary">Beers</div>
+                            <div className="text-xl font-bold text-text-primary">{totalBeers}</div>
+                            <div className="text-xs text-text-tertiary">Beers</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl">⚪</div>
-                            <div className="text-xl font-bold text-ink-primary">{totalBallsLost}</div>
-                            <div className="text-xs text-ink-tertiary">Balls Lost</div>
+                            <div className="text-xl font-bold text-text-primary">{totalBallsLost}</div>
+                            <div className="text-xs text-text-tertiary">Balls Lost</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl">🔄</div>
-                            <div className="text-xl font-bold text-ink-primary">{totalMulligans}</div>
-                            <div className="text-xs text-ink-tertiary">Mulligans</div>
+                            <div className="text-xl font-bold text-text-primary">{totalMulligans}</div>
+                            <div className="text-xs text-text-tertiary">Mulligans</div>
                         </div>
                     </div>
                 </div>
 
-                <Link href="/trip-stats/awards" className="card-elevated rounded-xl p-4 flex items-center gap-4 hover:bg-canvas-secondary/50 transition-colors">
+                <Link href="/trip-stats/awards" className="card-elevated rounded-xl p-4 flex items-center gap-4 hover:bg-surface-highlight transition-colors">
                     <div className="w-12 h-12 rounded-full bg-masters/10 flex items-center justify-center">
                         <Trophy size={24} className="text-masters" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-semibold text-ink-primary">Trip Awards</h3>
-                        <p className="text-sm text-ink-secondary">Vote for superlatives: MVP, best dressed, and more!</p>
+                        <h3 className="font-semibold text-text-primary">Trip Awards</h3>
+                        <p className="text-sm text-text-secondary">Vote for superlatives: MVP, best dressed, and more!</p>
                     </div>
-                    <ChevronRight size={20} className="text-ink-tertiary" />
+                    <ChevronRight size={20} className="text-text-tertiary" />
                 </Link>
             </div>
         </main>

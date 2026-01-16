@@ -55,7 +55,7 @@ export default function ScoringError({ error, reset }: ErrorPageProps) {
                 className="text-center max-w-md mb-8 text-sm"
                 style={{ color: 'var(--ink-tertiary)' }}
             >
-                Don't worry - your scores are saved locally. Try again to continue scoring.
+                Don&apos;t worry - your scores are saved locally. Try again to continue scoring.
             </p>
 
             {/* Error Details (Development only) */}

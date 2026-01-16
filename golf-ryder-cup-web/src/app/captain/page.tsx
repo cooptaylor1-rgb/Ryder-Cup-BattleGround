@@ -58,9 +58,18 @@ interface QuickAction {
   priority?: boolean; // P0-7: Top 4 priority actions shown by default
 }
 
-// P0-7: Reorganized with top 4 priority actions first
+// P0-7: Reorganized with day-of priority actions first
 const QUICK_ACTIONS: QuickAction[] = [
-  // Priority Actions (always visible)
+  // DAY-OF Priority Actions (always visible) - things captains need when players are arriving
+  {
+    id: 'attendance',
+    label: 'Attendance',
+    description: 'Track who\'s here',
+    icon: UserCheck,
+    href: '/captain/availability',
+    color: '#22c55e',
+    priority: true,
+  },
   {
     id: 'lineup',
     label: 'Create Lineup',
@@ -72,8 +81,8 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'manage',
-    label: 'Manage Trip',
-    description: 'Edit matches & strokes',
+    label: 'Quick Swap',
+    description: 'Edit matches & players',
     icon: Sliders,
     href: '/captain/manage',
     color: '#ef4444',
@@ -82,11 +91,20 @@ const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'checklist',
     label: 'Pre-Flight',
-    description: 'Review checklist',
+    description: 'Verify everything\'s ready',
     icon: ClipboardCheck,
     href: '/captain/checklist',
     color: '#3b82f6',
     priority: true,
+  },
+  // Setup Actions (typically done before day-of)
+  {
+    id: 'draft',
+    label: 'Team Draft',
+    description: 'Assign players to teams',
+    icon: Shuffle,
+    href: '/captain/draft',
+    color: '#8b5cf6',
   },
   {
     id: 'messages',
@@ -95,9 +113,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: MessageSquare,
     href: '/captain/messages',
     color: '#f59e0b',
-    priority: true,
   },
-  // Secondary Actions (expandable)
   {
     id: 'bets',
     label: 'Side Bets',
@@ -105,22 +121,6 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: DollarSign,
     href: '/captain/bets',
     color: '#10b981',
-  },
-  {
-    id: 'availability',
-    label: 'Attendance',
-    description: 'Track player arrivals',
-    icon: UserCheck,
-    href: '/captain/availability',
-    color: '#22c55e',
-  },
-  {
-    id: 'draft',
-    label: 'Team Draft',
-    description: 'Assign players to teams',
-    icon: Shuffle,
-    href: '/captain/draft',
-    color: '#8b5cf6',
   },
   {
     id: 'invites',

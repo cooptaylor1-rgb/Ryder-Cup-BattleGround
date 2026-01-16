@@ -181,12 +181,18 @@ export function EmptyStatePremium({
  * No Tournaments Yet
  * First thing users see - make it inviting!
  */
-export function NoTournamentsEmpty({ onCreateTrip }: { onCreateTrip: () => void }) {
+export function NoTournamentsEmpty({
+    onCreateTrip,
+    onJoinTrip
+}: {
+    onCreateTrip: () => void;
+    onJoinTrip?: () => void;
+}) {
     return (
         <EmptyStatePremium
             illustration="trophy"
             title="Your golf adventure awaits"
-            description="Create your first trip to start tracking Ryder Cup style matches with your buddies."
+            description="Create a new trip or join one your captain has set up."
             features={[
                 { text: 'Track match play scoring' },
                 { text: 'See live leaderboards' },
@@ -197,7 +203,11 @@ export function NoTournamentsEmpty({ onCreateTrip }: { onCreateTrip: () => void 
                 onClick: onCreateTrip,
                 icon: <Plus className="w-5 h-5" />,
             }}
-            hint="It only takes a minute to set up"
+            secondaryAction={onJoinTrip ? {
+                label: 'Join a Trip',
+                onClick: onJoinTrip,
+            } : undefined}
+            hint="Got an invite code? Tap 'Join a Trip'"
             variant="large"
         />
     );

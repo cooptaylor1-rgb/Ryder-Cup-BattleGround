@@ -10,8 +10,8 @@ import {
   balanceTeamsByHandicap,
   DraftConfig,
   DraftState,
-  DraftPick,
 } from '@/lib/services/draftService';
+import { useTripStore } from '@/lib/stores/tripStore';
 import { Player, Team } from '@/lib/types';
 import {
   Trophy,
@@ -37,6 +37,7 @@ interface DraftBoardProps {
 type DraftMode = 'snake' | 'auction' | 'random' | 'balanced';
 
 export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps) {
+  const { currentTrip } = useTripStore();
   const [mode, setMode] = useState<DraftMode | null>(null);
   const [config, setConfig] = useState<DraftConfig | null>(null);
   const [draftState, setDraftState] = useState<DraftState | null>(null);
@@ -81,8 +82,9 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
 
     // Initialize draft for snake or auction
     const captainIds = teams.map(t => t.id);
+    const tripId = currentTrip?.id || crypto.randomUUID();
     const draftConfig = createDraftConfig(
-      'draft-trip', // Using placeholder trip ID
+      tripId,
       selectedMode === 'auction' ? 'auction' : 'snake',
       captainIds,
       players.length,

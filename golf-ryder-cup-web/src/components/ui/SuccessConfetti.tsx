@@ -31,6 +31,10 @@ interface ConfettiPiece {
     shape: ConfettiShape;
     rotation: number;
     delay: number;
+    // Pre-computed random values for animation
+    animRotation: number;
+    animDuration: number;
+    animDrift: number;
 }
 
 interface SuccessConfettiProps {
@@ -164,6 +168,10 @@ export function SuccessConfetti({
             shape: shapes[Math.floor(Math.random() * shapes.length)],
             rotation: Math.random() * 360,
             delay: Math.random() * 0.3,
+            // Pre-compute random values for animation
+            animRotation: Math.random() * 720,
+            animDuration: 2 + Math.random() * 1.5,
+            animDrift: (Math.random() - 0.5) * 100,
         }));
     }, [pieceCount, colors, shapes, spread, origin]);
 
@@ -201,11 +209,11 @@ export function SuccessConfetti({
                         animate={{
                             y: '120vh',
                             scale: 1,
-                            rotate: piece.rotation + Math.random() * 720,
+                            rotate: piece.rotation + piece.animRotation,
                             opacity: [1, 1, 0],
                         }}
                         transition={{
-                            duration: 2 + Math.random() * 1.5,
+                            duration: piece.animDuration,
                             delay: piece.delay,
                             ease: [0.25, 0.46, 0.45, 0.94],
                         }}
@@ -317,7 +325,7 @@ export function ConfettiCannon({
                                 opacity: 1,
                             }}
                             animate={{
-                                x: [piece.x, endX, endX + (Math.random() - 0.5) * 100],
+                                x: [piece.x, endX, endX + piece.animDrift],
                                 y: [piece.y, endY, endY + 500], // Gravity
                                 scale: [0, 1, 0.5],
                                 rotate: piece.rotation + 720,

@@ -281,7 +281,7 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
                 color: 'var(--ink-secondary)',
               }}
             >
-              "{activity.data.comment}"
+              &quot;{activity.data.comment}&quot;
             </p>
           )}
 

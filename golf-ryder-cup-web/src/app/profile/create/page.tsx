@@ -114,19 +114,8 @@ export default function CreateProfilePage() {
     };
 
     const validateStep2 = (): boolean => {
-        const errors: Partial<Record<keyof FormData, string>> = {};
-
-        if (!formData.handicapIndex.trim()) {
-            errors.handicapIndex = 'Handicap is required';
-        } else {
-            const hcp = parseFloat(formData.handicapIndex);
-            if (isNaN(hcp) || hcp < -10 || hcp > 54) {
-                errors.handicapIndex = 'Enter a valid handicap (-10 to 54)';
-            }
-        }
-
-        setValidationErrors(errors);
-        return Object.keys(errors).length === 0;
+        // Step 2 is now optional - no validation required
+        return true;
     };
 
     const handleNext = () => {
@@ -135,6 +124,11 @@ export default function CreateProfilePage() {
         } else if (step === 2 && validateStep2()) {
             setStep(3);
         }
+    };
+
+    const handleSkipToEnd = async () => {
+        // Skip remaining steps and submit with defaults
+        await handleSubmit();
     };
 
     const handleBack = () => {
@@ -149,13 +143,18 @@ export default function CreateProfilePage() {
         setIsSubmitting(true);
 
         try {
+            // Parse handicap, defaulting to undefined if empty or invalid
+            const handicapValue = formData.handicapIndex.trim()
+                ? parseFloat(formData.handicapIndex)
+                : undefined;
+
             const profileData: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete'> = {
                 firstName: formData.firstName.trim(),
                 lastName: formData.lastName.trim(),
                 nickname: formData.nickname.trim() || undefined,
                 email: formData.email.trim(),
                 phoneNumber: formData.phoneNumber.trim() || undefined,
-                handicapIndex: parseFloat(formData.handicapIndex),
+                handicapIndex: handicapValue !== undefined && !isNaN(handicapValue) ? handicapValue : undefined,
                 ghin: formData.ghin.trim() || undefined,
                 homeCourse: formData.homeCourse.trim() || undefined,
                 preferredTees: formData.preferredTees || undefined,
@@ -303,7 +302,7 @@ export default function CreateProfilePage() {
                                     Your golf profile
                                 </h2>
                                 <p className="text-body-sm text-surface-600 mt-1">
-                                    Help us set up fair matches
+                                    Optional — helps set up fair matches
                                 </p>
                             </div>
 
@@ -316,9 +315,8 @@ export default function CreateProfilePage() {
                                     placeholder="12.5"
                                     type="number"
                                     error={validationErrors.handicapIndex}
-                                    required
                                     icon={<Hash className="w-5 h-5" />}
-                                    hint="Your official USGA handicap"
+                                    hint="Your official USGA handicap (optional)"
                                 />
 
                                 {/* GHIN Number */}
@@ -463,51 +461,64 @@ export default function CreateProfilePage() {
 
             {/* Fixed Bottom Actions */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 p-4 pb-safe-area-inset-bottom">
-                <div className="max-w-md mx-auto flex gap-3">
+                <div className="max-w-md mx-auto">
+                    {/* Skip option for steps 2 and 3 */}
                     {step > 1 && (
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            onClick={handleBack}
-                            className="flex-shrink-0"
+                        <button
+                            onClick={handleSkipToEnd}
+                            disabled={isSubmitting || isLoading}
+                            className="w-full mb-3 py-2 text-sm text-surface-500 hover:text-masters transition-colors"
                         >
-                            <ArrowLeft className="w-4 h-4" />
-                        </Button>
+                            Skip for now — you can complete this later
+                        </button>
                     )}
 
-                    {step < 3 ? (
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            onClick={handleNext}
-                            className="flex-1"
-                        >
-                            <span className="flex items-center justify-center gap-2">
-                                Continue
-                                <ChevronRight className="w-4 h-4" />
-                            </span>
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            onClick={handleSubmit}
-                            disabled={isSubmitting || isLoading}
-                            className="flex-1"
-                        >
-                            {isSubmitting || isLoading ? (
+                    <div className="flex gap-3">
+                        {step > 1 && (
+                            <Button
+                                variant="secondary"
+                                size="lg"
+                                onClick={handleBack}
+                                className="flex-shrink-0"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                            </Button>
+                        )}
+
+                        {step < 3 ? (
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={handleNext}
+                                className="flex-1"
+                            >
                                 <span className="flex items-center justify-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Creating Profile...
+                                    Continue
+                                    <ChevronRight className="w-4 h-4" />
                                 </span>
-                            ) : (
-                                <span className="flex items-center justify-center gap-2">
-                                    <Check className="w-4 h-4" />
-                                    Complete Profile
-                                </span>
-                            )}
-                        </Button>
-                    )}
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={handleSubmit}
+                                disabled={isSubmitting || isLoading}
+                                className="flex-1"
+                            >
+                                {isSubmitting || isLoading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Creating Profile...
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Check className="w-4 h-4" />
+                                        Complete Profile
+                                    </span>
+                                )}
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -275,7 +275,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
 
             {results.length === 0 && query && !isSearching && !error && (
                 <div className="text-center py-8 text-gray-500">
-                    <p>No courses found for "{query}"</p>
+                    <p>No courses found for &quot;{query}&quot;</p>
                     <p className="text-sm mt-1">Try a different search term</p>
                 </div>
             )}

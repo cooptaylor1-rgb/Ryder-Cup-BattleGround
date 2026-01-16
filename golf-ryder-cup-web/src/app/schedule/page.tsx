@@ -278,13 +278,15 @@ export default function SchedulePage() {
       </header>
 
       {/* Tab Selector */}
-      <div className="container-editorial py-4">
+      <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">
         <div className="flex gap-2">
           <button
             onClick={() => setSelectedTab('my')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'my' ? 'text-white' : ''
-            }`}
+            role="tab"
+            aria-selected={selectedTab === 'my'}
+            aria-controls="schedule-content"
+            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${selectedTab === 'my' ? 'text-white' : ''
+              }`}
             style={{
               background: selectedTab === 'my' ? 'var(--masters)' : 'var(--surface)',
               border: selectedTab === 'my' ? 'none' : '1px solid var(--rule)',
@@ -295,9 +297,11 @@ export default function SchedulePage() {
           </button>
           <button
             onClick={() => setSelectedTab('all')}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'all' ? 'text-white' : ''
-            }`}
+            role="tab"
+            aria-selected={selectedTab === 'all'}
+            aria-controls="schedule-content"
+            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${selectedTab === 'all' ? 'text-white' : ''
+              }`}
             style={{
               background: selectedTab === 'all' ? 'var(--masters)' : 'var(--surface)',
               border: selectedTab === 'all' ? 'none' : '1px solid var(--rule)',
@@ -310,9 +314,25 @@ export default function SchedulePage() {
       </div>
 
       {/* Main Content */}
-      <main className="container-editorial pb-8">
+      <main className="container-editorial pb-8" id="schedule-content" role="tabpanel">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <div
+                key={i}
+                className="animate-pulse rounded-xl p-4"
+                style={{ background: 'var(--surface-card)' }}
+              >
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-3"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* No Profile Warning */}
-        {selectedTab === 'my' && !currentUserPlayer && (
+        {!isLoading && selectedTab === 'my' && !currentUserPlayer && (
           <div
             className="p-4 rounded-xl mb-6 flex items-start gap-3"
             style={{
@@ -341,18 +361,26 @@ export default function SchedulePage() {
         )}
 
         {/* No Matches for User */}
-        {selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
-          <div className="text-center py-16">
+        {!isLoading && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
+          <div className="text-center py-12">
             <Calendar size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">No tee times scheduled</p>
-            <p className="type-caption mt-2">
-              You haven't been assigned to any matches yet.
+            <p className="type-title-sm">No tee times yet</p>
+            <p className="type-caption mt-2 max-w-xs mx-auto">
+              You haven&apos;t been assigned to any matches. Check the &quot;Full Schedule&quot; tab or ask your captain.
             </p>
+            <button
+              onClick={() => setSelectedTab('all')}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
+              style={{ background: 'var(--masters)', color: 'white' }}
+            >
+              <Calendar size={16} />
+              View Full Schedule
+            </button>
           </div>
         )}
 
         {/* Schedule Days */}
-        {displaySchedule.map((day) => (
+        {!isLoading && displaySchedule.map((day) => (
           <div key={day.date} className="mb-8">
             {/* Day Header */}
             <div className="flex items-center gap-3 mb-4">
@@ -464,13 +492,13 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
         background: isSession
           ? 'var(--masters-subtle, rgba(0, 103, 68, 0.1))'
           : isUserMatch
-          ? 'rgba(212, 175, 55, 0.1)'
-          : 'var(--surface)',
+            ? 'rgba(212, 175, 55, 0.1)'
+            : 'var(--surface)',
         border: isSession
           ? '1px solid var(--masters-glow)'
           : isUserMatch
-          ? '1px solid rgba(212, 175, 55, 0.3)'
-          : '1px solid var(--rule)',
+            ? '1px solid rgba(212, 175, 55, 0.3)'
+            : '1px solid var(--rule)',
       }}
     >
       <div className="flex items-start gap-3">

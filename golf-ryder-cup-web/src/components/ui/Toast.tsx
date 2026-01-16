@@ -40,7 +40,7 @@ function ToastProgress({
   onComplete: () => void;
 }) {
   const [progress, setProgress] = useState(100);
-  const startTimeRef = useRef(Date.now());
+  const startTimeRef = useRef<number | null>(null);
   const remainingRef = useRef(duration);
 
   useEffect(() => {
@@ -50,12 +50,12 @@ function ToastProgress({
       return;
     }
 
-    // Resume countdown
+    // Initialize start time on first run
     startTimeRef.current = Date.now();
     const startProgress = progress;
 
     const animate = () => {
-      const elapsed = Date.now() - startTimeRef.current;
+      const elapsed = Date.now() - (startTimeRef.current ?? Date.now());
       const newProgress = Math.max(0, startProgress - (elapsed / duration) * 100);
 
       if (newProgress <= 0) {

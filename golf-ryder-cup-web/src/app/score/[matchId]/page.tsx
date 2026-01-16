@@ -29,7 +29,6 @@ import {
     ChevronRight,
     AlertCircle,
     Mic,
-    Camera,
     Trophy,
     X,
     Flag,
@@ -439,15 +438,6 @@ export default function EnhancedMatchScoringPage() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-1">
-                            {/* Photo */}
-                            <button
-                                onClick={() => { }}
-                                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                aria-label="Photo capture"
-                            >
-                                <Camera size={18} style={{ color: 'var(--ink-secondary)' }} />
-                            </button>
-
                             {/* Voice */}
                             <button
                                 onClick={() => setShowVoiceModal(true)}

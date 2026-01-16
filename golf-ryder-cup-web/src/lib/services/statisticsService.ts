@@ -400,8 +400,8 @@ export function buildCareerStats(
     let totalLosses = 0;
     let totalHalves = 0;
     let totalPoints = 0;
-    let cupWins = 0;
-    let mvpAwards = 0;
+    const cupWins = 0;
+    const mvpAwards = 0;
 
     const byYear = tripStats.map(({ tripId, year, stats }) => {
         totalMatches += stats.matchesPlayed;

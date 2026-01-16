@@ -56,7 +56,6 @@ export function QuickStartWizard({
   onCancel,
   className,
 }: QuickStartWizardProps) {
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<Step>('basics');
   const [isExiting, setIsExiting] = useState(false);
   const [tripData, setTripData] = useState<TripData>({
@@ -253,7 +252,7 @@ function StepBasics({ tripData, updateField }: StepProps) {
           className="text-sm max-w-xs mx-auto"
           style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
         >
-          Give your trip a memorable name. This is what you'll see on the leaderboard.
+          Give your trip a memorable name. This is what you&apos;ll see on the leaderboard.
         </p>
       </div>
 
@@ -325,7 +324,7 @@ function StepDates({ tripData, updateField }: StepProps) {
           className="text-2xl font-bold mb-2"
           style={{ color: 'var(--ink, #F5F1E8)' }}
         >
-          When's the Trip?
+          When&apos;s the Trip?
         </h1>
         <p
           className="text-sm max-w-xs mx-auto"
@@ -521,7 +520,7 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
           className="text-sm max-w-xs mx-auto"
           style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
         >
-          Here's a summary of your tournament. You can add players and matches after creating it.
+          Here&apos;s a summary of your tournament. You can add players and matches after creating it.
         </p>
       </div>
 

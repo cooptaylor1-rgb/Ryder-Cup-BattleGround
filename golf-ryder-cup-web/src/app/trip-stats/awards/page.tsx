@@ -52,37 +52,37 @@ function AwardCard({
     return (
         <div className={`
       card-surface rounded-xl overflow-hidden
-      ${def.isPositive ? 'ring-1 ring-masters/20' : 'ring-1 ring-ink-tertiary/10'}
+      ${def.isPositive ? 'ring-1 ring-masters/20' : 'ring-1 ring-surface-border/30'}
     `}>
             <button
                 onClick={() => setExpanded(!expanded)}
-                className="w-full p-4 flex items-center justify-between hover:bg-canvas-secondary/50 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
             >
                 <div className="flex items-center gap-3">
                     <span className="text-3xl">{def.emoji}</span>
                     <div className="text-left">
-                        <div className="font-semibold text-ink-primary">{def.label}</div>
-                        <div className="text-sm text-ink-tertiary">{def.description}</div>
+                        <div className="font-semibold text-text-primary">{def.label}</div>
+                        <div className="text-sm text-text-tertiary">{def.description}</div>
                     </div>
                 </div>
                 {winnerPlayer ? (
                     <div className="text-right">
                         <div className="font-bold text-masters">{winnerPlayer.firstName}</div>
-                        <div className="text-xs text-ink-tertiary">Winner</div>
+                        <div className="text-xs text-text-tertiary">Winner</div>
                     </div>
                 ) : suggestedPlayer ? (
                     <div className="text-right">
-                        <div className="text-sm text-ink-secondary">{suggestedPlayer.firstName}</div>
-                        <div className="text-xs text-ink-tertiary">Suggested</div>
+                        <div className="text-sm text-text-secondary">{suggestedPlayer.firstName}</div>
+                        <div className="text-xs text-text-tertiary">Suggested</div>
                     </div>
                 ) : (
-                    <div className="text-sm text-ink-tertiary">Tap to vote</div>
+                    <div className="text-sm text-text-tertiary">Tap to vote</div>
                 )}
             </button>
 
             {expanded && (
-                <div className="border-t border-canvas-tertiary p-4">
-                    <p className="text-sm text-ink-secondary mb-3">Select a winner:</p>
+                <div className="border-t border-surface-border p-4">
+                    <p className="text-sm text-text-secondary mb-3">Select a winner:</p>
                     <div className="flex flex-wrap gap-2">
                         {players.map(player => {
                             const isWinner = currentWinner?.winnerId === player.id;
@@ -98,7 +98,7 @@ function AwardCard({
                                             ? 'bg-masters text-white shadow-md'
                                             : isSuggested
                                                 ? 'bg-masters/20 text-masters border border-masters/30'
-                                                : 'bg-canvas-secondary text-ink-primary hover:bg-canvas-tertiary'
+                                                : 'bg-surface-elevated text-text-primary hover:bg-surface-highlight'
                                         }
                   `}
                                 >
@@ -143,8 +143,8 @@ function WinnerShowcase({
                         <div key={award.id} className="flex items-center gap-3">
                             <span className="text-2xl">{def.emoji}</span>
                             <div>
-                                <div className="text-xs text-ink-tertiary">{def.label}</div>
-                                <div className="font-semibold text-ink-primary">
+                                <div className="text-xs text-text-tertiary">{def.label}</div>
+                                <div className="font-semibold text-text-primary">
                                     {winner.firstName}
                                 </div>
                             </div>
@@ -206,7 +206,7 @@ export default function TripAwardsPage() {
         return (
             <main className="page-container">
                 <header className="header-premium">
-                    <button onClick={() => router.back()} className="p-1 text-ink-secondary">
+                    <button onClick={() => router.back()} className="p-1 text-text-secondary">
                         <ChevronLeft size={20} />
                     </button>
                     <h1 className="type-h2">Trip Awards</h1>
@@ -215,7 +215,7 @@ export default function TripAwardsPage() {
                     <div className="card-surface rounded-xl p-8 text-center">
                         <div className="text-4xl mb-4">🏆</div>
                         <h2 className="type-h3 mb-2">No Active Trip</h2>
-                        <p className="text-ink-secondary">
+                        <p className="text-text-secondary">
                             Start or join a trip to give awards!
                         </p>
                     </div>
@@ -227,12 +227,12 @@ export default function TripAwardsPage() {
     return (
         <main className="page-container">
             <header className="header-premium flex items-center gap-3">
-                <button onClick={() => router.back()} className="p-1 text-ink-secondary">
+                <button onClick={() => router.back()} className="p-1 text-text-secondary">
                     <ChevronLeft size={20} />
                 </button>
                 <div>
                     <h1 className="type-h2">Trip Awards</h1>
-                    <p className="type-body text-ink-secondary">End-of-trip superlatives</p>
+                    <p className="type-body text-text-secondary">End-of-trip superlatives</p>
                 </div>
             </header>
 
@@ -242,10 +242,10 @@ export default function TripAwardsPage() {
                 <div className="card-surface rounded-xl p-4 flex items-start gap-3">
                     <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm text-ink-primary font-medium">
+                        <p className="text-sm text-text-primary font-medium">
                             Vote for trip superlatives!
                         </p>
-                        <p className="text-xs text-ink-secondary mt-1">
+                        <p className="text-xs text-text-secondary mt-1">
                             Some awards have auto-suggestions based on trip stats.
                             Tap any award to select a winner.
                         </p>
@@ -253,7 +253,7 @@ export default function TripAwardsPage() {
                 </div>
 
                 <section>
-                    <h2 className="type-overline text-ink-secondary mb-3">🌟 Positive Vibes</h2>
+                    <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
                     <div className="space-y-3">
                         {positiveAwards.map(awardType => (
                             <AwardCard
@@ -269,7 +269,7 @@ export default function TripAwardsPage() {
                 </section>
 
                 <section>
-                    <h2 className="type-overline text-ink-secondary mb-3">😂 Dubious Honors</h2>
+                    <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
                     <div className="space-y-3">
                         {funnyAwards.map(awardType => (
                             <AwardCard

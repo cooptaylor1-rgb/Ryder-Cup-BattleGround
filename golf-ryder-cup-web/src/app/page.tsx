@@ -40,6 +40,7 @@ import {
   YourMatchCard,
   CaptainToggle,
 } from '@/components/ui';
+import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { BottomNav, type NavBadges } from '@/components/layout';
 import { WeatherWidget } from '@/components/course';
 
@@ -59,6 +60,7 @@ export default function HomePage() {
   const { isCaptainMode } = useUIStore();
   const [standings, setStandings] = useState<TeamStandings | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
+  const [showJoinTrip, setShowJoinTrip] = useState(false);
   const [, setShowWhatsNew] = useState(false);
   const [dismissedFeatureCard, setDismissedFeatureCard] = useState(false);
 
@@ -250,6 +252,16 @@ export default function HomePage() {
           onCancel={() => setShowQuickStart(false)}
         />
       )}
+
+      {/* Join Trip Modal */}
+      <JoinTripModal
+        isOpen={showJoinTrip}
+        onClose={() => setShowJoinTrip(false)}
+        onSuccess={(tripId) => {
+          setShowJoinTrip(false);
+          router.push('/');
+        }}
+      />
 
       {/* What's New Modal (auto-shows for returning users) */}
       <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
@@ -778,7 +790,10 @@ export default function HomePage() {
             </div>
           ) : !activeTrip ? (
             /* Premium Empty State with Quick Start option */
-            <NoTournamentsEmpty onCreateTrip={() => setShowQuickStart(true)} />
+            <NoTournamentsEmpty
+              onCreateTrip={() => setShowQuickStart(true)}
+              onJoinTrip={() => setShowJoinTrip(true)}
+            />
           ) : null}
         </section>
       </main>

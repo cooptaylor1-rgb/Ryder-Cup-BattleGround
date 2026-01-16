@@ -206,7 +206,7 @@ export default function MorePage() {
                 {currentTrip && <hr className="divider" />}
 
                 {/* Captain Mode */}
-                <section className="section">
+                <section className="section" id="captain">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Captain Mode</h2>
                     <button
                         onClick={() => isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)}
@@ -216,7 +216,7 @@ export default function MorePage() {
                         {isCaptainMode ? <Unlock size={18} /> : <Lock size={18} />}
                         <div style={{ flex: 1 }}>
                             <p style={{ fontWeight: 500 }}>Captain Mode</p>
-                            <p className="type-meta">{isCaptainMode ? 'Enabled – can edit lineups' : 'Disabled – view only'}</p>
+                            <p className="type-meta">{isCaptainMode ? 'On — Full editing access' : 'Off — Read-only view'}</p>
                         </div>
                         <Toggle enabled={isCaptainMode} />
                     </button>
@@ -227,7 +227,7 @@ export default function MorePage() {
                             <Shield size={18} style={{ color: 'var(--masters)' }} />
                             <div className="flex-1">
                                 <p style={{ fontWeight: 500 }}>Captain Command Center</p>
-                                <p className="type-meta">Manage lineups, attendance, and more</p>
+                                <p className="type-meta">Lineups, attendance, settings</p>
                             </div>
                             <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
                         </Link>
@@ -237,10 +237,10 @@ export default function MorePage() {
                 <hr className="divider" />
 
                 {/* Display / Theme */}
-                <section className="section">
+                <section className="section" id="display">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Display</h2>
                     <p className="type-meta" style={{ marginBottom: 'var(--space-3)' }}>
-                        Choose a theme optimized for your environment
+                        Choose a theme for your environment
                     </p>
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                         <button
@@ -319,7 +319,7 @@ export default function MorePage() {
                 <hr className="divider" />
 
                 {/* Scoring Preferences */}
-                <section className="section">
+                <section className="section" id="preferences">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Scoring</h2>
 
                     <button
@@ -365,7 +365,7 @@ export default function MorePage() {
                 <hr className="divider" />
 
                 {/* Data */}
-                <section className="section">
+                <section className="section" id="data">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Data</h2>
 
                     <button

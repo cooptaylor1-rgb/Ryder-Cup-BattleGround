@@ -147,6 +147,7 @@ export function useLiveUpdates({
     const socketRef = useRef<MockWebSocket | null>(null);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const onUpdateRef = useRef(onUpdate);
+    const connectRef = useRef<(() => void) | null>(null);
 
     // Keep callback ref updated
     useEffect(() => {
@@ -206,7 +207,7 @@ export function useLiveUpdates({
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         setConnectionAttempts((c: number) => c + 1);
-                        connect();
+                        connectRef.current?.();
                     }, delay);
                 }
             });
@@ -218,6 +219,11 @@ export function useLiveUpdates({
             setIsConnected(false);
         }
     }, [enabled, isOnline, handleUpdate, connectionAttempts]);
+
+    // Keep connect ref updated
+    useEffect(() => {
+        connectRef.current = connect;
+    }, [connect]);
 
     // Disconnect
     const disconnect = useCallback(() => {

@@ -166,7 +166,7 @@ export function OfflineIndicator() {
                                     <>
                                         <WifiOff size={16} className="text-white" />
                                         <span className="text-sm font-medium text-white">
-                                            You're offline
+                                            You&apos;re offline
                                         </span>
                                         {pendingCount > 0 && (
                                             <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white">
@@ -236,7 +236,7 @@ export function OfflineIndicator() {
                                             )}
                                         </div>
                                         <p className="text-xs text-white/70 text-center mt-2">
-                                            Changes will sync when you're back online
+                                            Changes will sync when you&apos;re back online
                                         </p>
                                     </motion.div>
                                 )}

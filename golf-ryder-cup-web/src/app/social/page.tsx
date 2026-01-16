@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { useTripStore } from '@/lib/stores';
+import { useTripStore, useUIStore } from '@/lib/stores';
 import { NoMessagesEmpty } from '@/components/ui';
 import {
   ChevronLeft,
@@ -34,6 +34,7 @@ import type { Player, BanterPost } from '@/lib/types/models';
 export default function SocialPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
+  const { showToast } = useUIStore();
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
 
@@ -67,18 +68,28 @@ export default function SocialPage() {
     // Get first player as default author (in real app, would use auth context)
     const author = players[0];
 
+    if (!author) {
+      showToast('error', 'Unable to post: No player profile found');
+      return;
+    }
+
     const newPost: BanterPost = {
       id: crypto.randomUUID(),
       tripId: currentTrip.id,
       content: message,
-      authorId: author?.id,
-      authorName: author ? `${author.firstName} ${author.lastName}` : 'Anonymous',
+      authorId: author.id,
+      authorName: `${author.firstName} ${author.lastName}`,
       postType: 'message',
       timestamp: new Date().toISOString(),
     };
 
-    await db.banterPosts.add(newPost);
-    setMessage('');
+    try {
+      await db.banterPosts.add(newPost);
+      setMessage('');
+    } catch (error) {
+      console.error('Failed to post message:', error);
+      showToast('error', 'Failed to post message. Please try again.');
+    }
   };
 
   const quickReactions = ['🔥', '👏', '😂', '💪', '⛳', '🎯'];

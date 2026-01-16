@@ -384,7 +384,7 @@ function AuditHistoryPanel({ history }: AuditHistoryPanelProps) {
                                     )}
                                     {entry.notes && (
                                         <p className="mt-1 italic" style={{ color: 'var(--ink-tertiary)' }}>
-                                            "{entry.notes}"
+                                            &quot;{entry.notes}&quot;
                                         </p>
                                     )}
                                 </div>
