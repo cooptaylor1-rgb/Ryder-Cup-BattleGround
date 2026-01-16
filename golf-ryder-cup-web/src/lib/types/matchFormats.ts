@@ -34,6 +34,7 @@ export type MatchFormat =
     | 'modified-alternate'// Each hits tee & approach, choose for short game
 
     // Team Scramble Formats
+    | 'scramble'          // Generic scramble
     | 'scramble-2'        // 2-person scramble
     | 'scramble-3'        // 3-person scramble
     | 'scramble-4'        // 4-person scramble
@@ -45,12 +46,15 @@ export type MatchFormat =
     | 'stableford'        // Standard stableford points
     | 'modified-stableford'// Aggressive point distribution
     | 'stroke-play'       // Traditional gross/net
+    | 'net-stroke-play'   // Net stroke play with handicap
     | 'medal'             // Low gross and net medals
     | 'par-competition'   // Score vs par each hole (+1, 0, -1)
+    | 'bogey-golf'        // Alias for par-competition
 
     // Multi-Player Games
     | 'better-ball-3'     // 3-player best ball
     | 'better-ball-4'     // 4-player best ball
+    | 'best-2-of-4'       // Best 2 of 4 scores count
     | 'worst-ball'        // Must hole out with worst score
     | 'aggregate'         // Combined team scores count
 
@@ -1006,6 +1010,110 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         popularity: 2,
         complexity: 'intermediate',
         tags: ['pattern', 'trio', 'creative'],
+    },
+
+    // ========== ADDITIONAL FORMATS ==========
+    scramble: {
+        id: 'scramble',
+        name: 'Scramble',
+        shortName: 'Scramble',
+        category: 'teamPlay',
+        description: 'All players hit, choose best shot, everyone plays from there.',
+        rules: [
+            'All players tee off',
+            'Team selects best shot',
+            'All players hit from that spot',
+            'Repeat until ball is holed',
+            'Low pressure, fun format',
+        ],
+        playersPerTeam: [2, 4],
+        teamsRequired: 0,
+        handicapMethod: 'combined',
+        scoringType: 'strokePlay',
+        holesPerMatch: 18,
+        requiresCourse: true,
+        icon: 'Users',
+        color: 'bg-emerald-500',
+        popularity: 5,
+        complexity: 'beginner',
+        tags: ['scramble', 'team', 'popular'],
+    },
+
+    'net-stroke-play': {
+        id: 'net-stroke-play',
+        name: 'Net Stroke Play',
+        shortName: 'Net Stroke',
+        category: 'strokePlay',
+        description: 'Stroke play with full handicap applied. Lowest net score wins.',
+        rules: [
+            'Count every stroke',
+            'Apply full course handicap',
+            'Net score = Gross - Handicap strokes',
+            'Lowest net score wins',
+        ],
+        playersPerTeam: 1,
+        teamsRequired: 0,
+        handicapMethod: 'full',
+        scoringType: 'strokePlay',
+        holesPerMatch: 18,
+        requiresCourse: true,
+        icon: 'TrendingDown',
+        color: 'bg-blue-500',
+        popularity: 5,
+        complexity: 'beginner',
+        tags: ['handicap', 'net', 'fair'],
+    },
+
+    'bogey-golf': {
+        id: 'bogey-golf',
+        name: 'Bogey Golf (Par Competition)',
+        shortName: 'Bogey',
+        category: 'pointsGame',
+        description: 'Play against par on each hole. Beat it (+1), match it (0), lose (-1).',
+        rules: [
+            'Beat par (net): +1 point',
+            'Match par (net): 0 points',
+            'Lose to par (net): -1 point',
+            'Highest total points wins',
+            'Quick and simple scoring',
+        ],
+        playersPerTeam: 1,
+        teamsRequired: 0,
+        handicapMethod: 'full',
+        scoringType: 'points',
+        holesPerMatch: 18,
+        requiresCourse: true,
+        icon: 'Target',
+        color: 'bg-green-600',
+        popularity: 3,
+        complexity: 'beginner',
+        tags: ['par', 'simple', 'quick'],
+    },
+
+    'best-2-of-4': {
+        id: 'best-2-of-4',
+        name: 'Best 2 of 4',
+        shortName: 'Best 2/4',
+        category: 'teamPlay',
+        description: 'Four players, best 2 net scores count on each hole.',
+        rules: [
+            'Four players play their own ball',
+            'Best 2 net scores count for team',
+            'Discards worst 2 scores each hole',
+            'Full handicap strokes apply',
+            'Great for mixed skill levels',
+        ],
+        playersPerTeam: 4,
+        teamsRequired: 0,
+        handicapMethod: 'full',
+        scoringType: 'strokePlay',
+        holesPerMatch: 18,
+        requiresCourse: true,
+        icon: 'Users',
+        color: 'bg-blue-600',
+        popularity: 4,
+        complexity: 'beginner',
+        tags: ['team', 'forgiving', 'quartet'],
     },
 
     // ========== CUSTOM ==========
