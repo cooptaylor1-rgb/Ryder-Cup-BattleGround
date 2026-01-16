@@ -28,6 +28,7 @@ import {
     Sun,
     Moon,
     SunDim,
+    BarChart3,
 } from 'lucide-react';
 
 /**
@@ -295,6 +296,14 @@ export default function MorePage() {
                 {/* Manage */}
                 <section className="section">
                     <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Manage</h2>
+                    <Link href="/trip-stats" className="match-row">
+                        <BarChart3 size={18} style={{ color: 'var(--masters)' }} />
+                        <div style={{ flex: 1 }}>
+                            <span style={{ fontWeight: 500 }}>Trip Stats</span>
+                            <p className="type-meta">Beverages, mishaps, and fun tracking</p>
+                        </div>
+                        <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                    </Link>
                     <Link href="/players" className="match-row">
                         <Users size={18} style={{ color: 'var(--ink-tertiary)' }} />
                         <span style={{ flex: 1 }}>Players</span>

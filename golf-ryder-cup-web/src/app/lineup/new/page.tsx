@@ -164,10 +164,27 @@ export default function NewLineupPage() {
   const [sessionName, setSessionName] = useState('');
   const [sessionType, setSessionType] = useState<SessionType>('fourball');
   const [scheduledDate, setScheduledDate] = useState('');
-  const [timeSlot, setTimeSlot] = useState<'AM' | 'PM'>('AM');
+  const [firstTeeTime, setFirstTeeTime] = useState('08:00');
+  const [teeTimeInterval, setTeeTimeInterval] = useState(10); // minutes between matches
   const [matchCount, setMatchCount] = useState(4);
   const [pointsPerMatch, setPointsPerMatch] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Generate tee times based on first tee time and interval
+  const teeTimes = useMemo(() => {
+    const times: string[] = [];
+    if (!firstTeeTime) return times;
+
+    const [hours, minutes] = firstTeeTime.split(':').map(Number);
+    const baseTime = new Date();
+    baseTime.setHours(hours, minutes, 0, 0);
+
+    for (let i = 0; i < matchCount; i++) {
+      const matchTime = new Date(baseTime.getTime() + i * teeTimeInterval * 60 * 1000);
+      times.push(matchTime.toTimeString().slice(0, 5));
+    }
+    return times;
+  }, [firstTeeTime, teeTimeInterval, matchCount]);
 
   // Get team players
   const getTeamPlayers = useCallback((teamId: string) => {
@@ -278,6 +295,10 @@ export default function NewLineupPage() {
 
     setIsCreating(true);
     try {
+      // Derive AM/PM from first tee time for session record
+      const [hours] = firstTeeTime.split(':').map(Number);
+      const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
+
       // Create the session
       const session = await addSession({
         tripId: currentTrip.id,
@@ -285,11 +306,14 @@ export default function NewLineupPage() {
         sessionNumber: 1, // Will be calculated by store
         sessionType,
         scheduledDate: scheduledDate || undefined,
-        timeSlot,
+        timeSlot: derivedTimeSlot,
         pointsPerMatch,
         status: 'scheduled',
         isLocked: true,
       });
+
+      // Note: Match tee times (teeTimes array) can be stored on individual matches
+      // when the matches are created during lineup building
 
       showToast('success', 'Session created and lineup published!');
 
@@ -303,7 +327,7 @@ export default function NewLineupPage() {
     } finally {
       setIsCreating(false);
     }
-  }, [currentTrip, sessionName, sessionType, scheduledDate, timeSlot, pointsPerMatch, addSession, showToast, router]);
+  }, [currentTrip, sessionName, sessionType, scheduledDate, firstTeeTime, pointsPerMatch, addSession, showToast, router]);
 
   if (!currentTrip || !isCaptainMode) {
     return null;
@@ -497,35 +521,76 @@ export default function NewLineupPage() {
               <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-4)' }}>
                 Schedule (Optional)
               </label>
-              <div className="grid grid-cols-2 gap-3">
+
+              {/* Date picker */}
+              <div className="mb-4">
+                <label className="type-micro block mb-2">Date</label>
+                <input
+                  type="date"
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
+                  className="input-field w-full"
+                  style={{ padding: 'var(--space-3)' }}
+                />
+              </div>
+
+              {/* First Tee Time and Interval */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                  <label className="type-micro block mb-2">Date</label>
+                  <label className="type-micro block mb-2">First Tee Time</label>
                   <input
-                    type="date"
-                    value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
+                    type="time"
+                    value={firstTeeTime}
+                    onChange={(e) => setFirstTeeTime(e.target.value)}
                     className="input-field w-full"
                     style={{ padding: 'var(--space-3)' }}
                   />
                 </div>
                 <div>
-                  <label className="type-micro block mb-2">Time Slot</label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setTimeSlot('AM')}
-                      className={`flex-1 py-3 rounded-lg font-medium transition-all ${timeSlot === 'AM' ? 'bg-masters text-white' : 'bg-surface border border-rule'}`}
-                    >
-                      AM
-                    </button>
-                    <button
-                      onClick={() => setTimeSlot('PM')}
-                      className={`flex-1 py-3 rounded-lg font-medium transition-all ${timeSlot === 'PM' ? 'bg-masters text-white' : 'bg-surface border border-rule'}`}
-                    >
-                      PM
-                    </button>
-                  </div>
+                  <label className="type-micro block mb-2">Interval (min)</label>
+                  <input
+                    type="number"
+                    min={5}
+                    max={30}
+                    value={teeTimeInterval}
+                    onChange={(e) => setTeeTimeInterval(parseInt(e.target.value) || 10)}
+                    className="input-field w-full text-center"
+                    style={{ padding: 'var(--space-3)' }}
+                  />
                 </div>
               </div>
+
+              {/* Tee Time Preview */}
+              {firstTeeTime && matchCount > 0 && (
+                <div
+                  className="card"
+                  style={{
+                    padding: 'var(--space-3)',
+                    background: 'var(--canvas-sunken)',
+                  }}
+                >
+                  <label className="type-micro block mb-2" style={{ color: 'var(--ink-tertiary)' }}>
+                    Tee Times Preview
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {teeTimes.map((time, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{
+                          background: 'var(--surface)',
+                          border: '1px solid var(--rule)',
+                        }}
+                      >
+                        <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                          M{index + 1}
+                        </span>
+                        <span className="type-caption font-medium">{time}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* Points */}

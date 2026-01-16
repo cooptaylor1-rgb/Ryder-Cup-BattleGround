@@ -28,6 +28,7 @@ import type {
 } from '@/lib/types/models';
 import type { ScoringEvent } from '@/lib/types/events';
 import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
+import type { PlayerTripStat, TripAward } from '@/lib/types/tripStats';
 
 /**
  * Golf Trip Database
@@ -57,6 +58,10 @@ export class GolfTripDB extends Dexie {
     // Schedule entities
     scheduleDays!: Table<ScheduleDay>;
     scheduleItems!: Table<ScheduleItem>;
+
+    // Trip Stats (v1.3)
+    tripStats!: Table<PlayerTripStat>;
+    tripAwards!: Table<TripAward>;
 
     // Audit & social
     auditLog!: Table<AuditLogEntry>;
@@ -123,6 +128,13 @@ export class GolfTripDB extends Dexie {
         this.version(3).stores({
             // Side bets table
             sideBets: 'id, tripId, status, [tripId+status]',
+        });
+
+        // Schema version 4 - Trip Stats
+        this.version(4).stores({
+            // Trip stats and awards tables
+            tripStats: 'id, tripId, playerId, sessionId, statType, [tripId+playerId], [tripId+statType], [playerId+statType]',
+            tripAwards: 'id, tripId, awardType, winnerId, [tripId+awardType]',
         });
     }
 }
