@@ -129,7 +129,10 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const response = await fetch(request);
-        await putInCache(CACHE_NAME, request, response);
+        // Clone before caching since body can only be consumed once
+        if (response.ok) {
+            putInCache(CACHE_NAME, request, response.clone());
+        }
         return response;
     } catch (error) {
         console.log('[SW] Network failed, trying cache...');
@@ -152,7 +155,10 @@ async function staleWhileRevalidate(request) {
     const cached = await caches.match(request);
 
     const fetchPromise = fetch(request).then((response) => {
-        putInCache(CACHE_NAME, request, response);
+        // Clone before caching since body can only be consumed once
+        if (response.ok) {
+            putInCache(CACHE_NAME, request, response.clone());
+        }
         return response;
     }).catch((error) => {
         console.log('[SW] Revalidation failed:', error);
@@ -201,18 +207,15 @@ async function networkFirstNoCache(request) {
  * Safely cache responses
  */
 async function putInCache(cacheName, request, response) {
+    // Response should already be cloned before calling this function
     if (!response || !response.ok) {
-        return;
-    }
-
-    if (response.bodyUsed) {
-        console.warn('[SW] Skip caching used response:', request.url);
         return;
     }
 
     try {
         const cache = await caches.open(cacheName);
-        await cache.put(request, response.clone());
+        // Response passed in should already be a clone
+        await cache.put(request, response);
     } catch (error) {
         console.warn('[SW] Cache put failed:', error);
     }
