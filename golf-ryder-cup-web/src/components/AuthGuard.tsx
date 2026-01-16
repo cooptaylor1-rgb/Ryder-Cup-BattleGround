@@ -30,9 +30,22 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, currentUser } = useAuthStore();
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 
+  // Wait for Zustand hydration from localStorage
   useEffect(() => {
+    // Give Zustand a moment to hydrate from localStorage
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Don't check until hydration is complete
+    if (!isHydrated) return;
+
     // Allow public routes without authentication
     const isPublicRoute = PUBLIC_ROUTES.some(route =>
       pathname === route || pathname?.startsWith(route + '/')
@@ -51,10 +64,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     // User is authenticated, allow access
     setIsChecking(false);
-  }, [isAuthenticated, currentUser, pathname, router]);
+  }, [isHydrated, isAuthenticated, currentUser, pathname, router]);
 
   // Show nothing while checking authentication (prevents flash)
-  if (isChecking) {
+  if (!isHydrated || isChecking) {
     // Check if this is a public route - if so, don't block
     const isPublicRoute = PUBLIC_ROUTES.some(route =>
       pathname === route || pathname?.startsWith(route + '/')
