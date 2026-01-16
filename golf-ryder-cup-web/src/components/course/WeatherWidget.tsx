@@ -160,7 +160,7 @@ export function WeatherWidget({
                         <div>
                             <div className="text-xs text-surface-500 mb-2">Next Hours</div>
                             <div className="flex gap-3 overflow-x-auto pb-1">
-                                {weather.hourly.slice(0, 6).map((hour, i) => (
+                                {weather.hourly.slice(0, 12).map((hour, i) => (
                                     <div key={i} className="flex flex-col items-center gap-1 min-w-[45px]">
                                         <span className="text-xs text-surface-500">
                                             {i === 0 ? 'Now' : format(hour.time, 'ha')}
