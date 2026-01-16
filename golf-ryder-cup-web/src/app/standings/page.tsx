@@ -547,11 +547,11 @@ function FunStatsTab({
       {hasAnyStats ? (
         categories.map((category) => {
           const categoryStats = category.types
-            .map((type) => {
-              const data = statTotals.get(type as TripStatType);
+            .map((statType) => {
+              const data = statTotals.get(statType as TripStatType);
               if (!data || data.total === 0) return null;
-              const def = STAT_DEFINITIONS[type as TripStatType];
-              return { type, ...def, ...data };
+              const def = STAT_DEFINITIONS[statType as TripStatType];
+              return { statType, ...def, ...data };
             })
             .filter(Boolean);
 
@@ -574,7 +574,7 @@ function FunStatsTab({
               <div className="space-y-2">
                 {categoryStats.map((stat) => stat && (
                   <div
-                    key={stat.type}
+                    key={stat.statType}
                     className="card"
                     style={{
                       padding: 'var(--space-3) var(--space-4)',
