@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { createCourseProfile } from '@/lib/services/courseLibraryService';
 import { useUIStore } from '@/lib/stores';
-import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData } from '@/components/course';
+import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
 
 /**
  * NEW COURSE PAGE
@@ -98,36 +98,69 @@ export default function NewCoursePage() {
     }));
   }, []);
 
-  const handleScorecardData = useCallback((data: {
-    courseName?: string;
-    teeName?: string;
-    rating?: number;
-    slope?: number;
-    holes: HoleData[];
-  }) => {
+  const handleScorecardData = useCallback((data: ScorecardData) => {
     // Update course name if provided and empty
     if (data.courseName && !courseName) {
       setCourseName(data.courseName);
     }
 
-    // Create a new tee set with the extracted data
-    const totalPar = data.holes.reduce((sum, h) => sum + h.par, 0);
-    const totalYardage = data.holes.reduce((sum, h) => sum + (h.yardage || 0), 0);
+    // Get par/handicap info from the base holes array
+    const baseHoles = data.holes;
 
-    const newTeeSet: TeeSetInput = {
-      id: crypto.randomUUID(),
-      name: data.teeName || 'Scanned Tees',
-      color: '#2563eb',
-      rating: data.rating ? String(data.rating) : '',
-      slope: data.slope ? String(data.slope) : '',
-      par: String(totalPar),
-      totalYardage: totalYardage > 0 ? String(totalYardage) : '',
-      holes: data.holes,
-    };
+    // If teeSets array is provided, create a tee set for each one
+    if (data.teeSets && data.teeSets.length > 0) {
+      const newTeeSets: TeeSetInput[] = data.teeSets.map((tee: TeeSetData) => {
+        // Merge the yardages from the tee set with par/handicap from base holes
+        const holes: HoleData[] = baseHoles.map((hole, index) => ({
+          par: hole.par,
+          handicap: hole.handicap,
+          yardage: tee.yardages[index] ?? null,
+        }));
 
-    setTeeSets(prev => [...prev, newTeeSet]);
+        const totalPar = holes.reduce((sum, h) => sum + h.par, 0);
+        const totalYardage = tee.yardages.reduce((sum: number, y) => sum + (y || 0), 0);
+
+        // Map tee color name to hex color
+        const colorHex = TEE_COLORS.find(c =>
+          c.name.toLowerCase() === (tee.name || '').toLowerCase() ||
+          c.name.toLowerCase() === (tee.color || '').toLowerCase()
+        )?.color || tee.color || '#2563eb';
+
+        return {
+          id: crypto.randomUUID(),
+          name: tee.name || 'Unknown Tees',
+          color: colorHex,
+          rating: tee.rating ? String(tee.rating) : '',
+          slope: tee.slope ? String(tee.slope) : '',
+          par: String(totalPar),
+          totalYardage: totalYardage > 0 ? String(totalYardage) : '',
+          holes,
+        };
+      });
+
+      setTeeSets(prev => [...prev, ...newTeeSets]);
+      showToast('success', `Imported ${newTeeSets.length} tee set${newTeeSets.length > 1 ? 's' : ''} from scorecard!`);
+    } else {
+      // Legacy single tee set handling (backward compatibility)
+      const totalPar = baseHoles.reduce((sum, h) => sum + h.par, 0);
+      const totalYardage = baseHoles.reduce((sum, h) => sum + (h.yardage || 0), 0);
+
+      const newTeeSet: TeeSetInput = {
+        id: crypto.randomUUID(),
+        name: data.teeName || 'Scanned Tees',
+        color: '#2563eb',
+        rating: data.rating ? String(data.rating) : '',
+        slope: data.slope ? String(data.slope) : '',
+        par: String(totalPar),
+        totalYardage: totalYardage > 0 ? String(totalYardage) : '',
+        holes: baseHoles,
+      };
+
+      setTeeSets(prev => [...prev, newTeeSet]);
+      showToast('success', 'Scorecard data imported!');
+    }
+
     setShowScorecardUpload(false);
-    showToast('success', 'Scorecard data imported!');
   }, [courseName, showToast]);
 
   const handleSubmit = async () => {

@@ -11,12 +11,21 @@ import type { HoleData } from './HoleDataEditor';
  * extract hole data using AI vision.
  */
 
-interface ScorecardData {
+export interface TeeSetData {
+  name: string;
+  color?: string;
+  rating?: number;
+  slope?: number;
+  yardages: (number | null)[];
+}
+
+export interface ScorecardData {
   courseName?: string;
   teeName?: string;
   rating?: number;
   slope?: number;
   holes: HoleData[];
+  teeSets?: TeeSetData[];
 }
 
 interface ScorecardUploadProps {
