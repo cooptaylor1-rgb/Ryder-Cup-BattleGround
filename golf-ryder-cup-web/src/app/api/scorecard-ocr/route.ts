@@ -37,9 +37,16 @@ interface ScorecardData {
   teeSets?: TeeSetData[];
 }
 
-interface RequestBody {
+interface ImageData {
   image: string; // Base64 encoded image data
   mimeType: string; // image/jpeg, image/png, etc.
+  label?: string; // Optional label: 'front', 'back', 'ratings', etc.
+}
+
+interface RequestBody {
+  image?: string; // Single image (backward compatible)
+  mimeType?: string; // Single image mime type
+  images?: ImageData[]; // Multiple images for front/back of scorecard
   provider?: 'claude' | 'openai' | 'auto'; // AI provider preference
 }
 
@@ -87,16 +94,72 @@ RULES:
 
 Return ONLY valid JSON, no explanation.`;
 
+const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You are being given MULTIPLE images of the same scorecard (front and back, or different sections).
+
+Combine ALL information from ALL images to build a complete picture:
+- One image may show hole-by-hole data (par, yardages, handicaps)
+- Another image may show course rating, slope, and tee information
+- Look for: Course name, all tee sets, ratings, slopes, yardages per hole
+
+CRITICAL: Golf scorecards show:
+- FRONT 9 (holes 1-9) and BACK 9 (holes 10-18) - extract ALL 18 holes
+- Multiple tee boxes shown as rows (e.g., Black, Blue/Green, White, Gold/Yellow, Red)
+- Each tee has different yardages per hole
+- PAR row shows par for each hole (3, 4, or 5)
+- HANDICAP/HCP row shows hole difficulty ranking (1-18, 1 is hardest)
+- Rating/Slope info is often on the back or in a separate section
+
+Return this EXACT JSON format:
+{
+  "courseName": "string or null",
+  "holes": [
+    {"par": 4, "handicap": 7, "yardage": 430},
+    ... (EXACTLY 18 holes in order 1-18)
+  ],
+  "teeSets": [
+    {
+      "name": "Black",
+      "color": "black",
+      "rating": 74.2,
+      "slope": 138,
+      "yardages": [430, 210, 601, ...] (18 yardages for this tee)
+    },
+    ... (ALL tee sets visible - usually 4-6 different tees)
+  ]
+}
+
+RULES:
+1. Return EXACTLY 18 holes - combine front and back 9 from all images
+2. Par must be 3, 4, or 5
+3. Handicap is 1-18 (each number used once, 1=hardest hole)
+4. Extract ALL tee sets with their ratings and slopes
+5. Yardages range from ~100 (short par 3) to ~600+ (long par 5)
+6. Rating is typically 67-77, Slope is typically 100-155
+7. Merge data from all images - don't miss any tee sets or ratings
+
+Return ONLY valid JSON, no explanation.`;
+
 export async function POST(request: NextRequest) {
   try {
     const body: RequestBody = await request.json();
 
-    if (!body.image) {
+    // Support both single image and multiple images
+    const images: ImageData[] = [];
+
+    if (body.images && body.images.length > 0) {
+      // Multiple images provided
+      images.push(...body.images);
+    } else if (body.image) {
+      // Single image (backward compatible)
+      images.push({ image: body.image, mimeType: body.mimeType || 'image/jpeg' });
+    }
+
+    if (images.length === 0) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 });
     }
 
-    // Check if PDF
-    if (body.mimeType === 'application/pdf') {
+    // Check for PDFs
+    if (images.some(img => img.mimeType === 'application/pdf')) {
       return NextResponse.json(
         {
           error: 'PDF files are not supported. Please take a photo or convert to image.',
@@ -116,13 +179,21 @@ export async function POST(request: NextRequest) {
 
     // Try Claude first (better at structured data extraction)
     if ((preferredProvider === 'claude' || preferredProvider === 'auto') && anthropicKey) {
-      result = await extractWithClaude(body.image, body.mimeType, anthropicKey);
+      if (images.length > 1) {
+        result = await extractWithClaudeMultiple(images, anthropicKey);
+      } else {
+        result = await extractWithClaude(images[0].image, images[0].mimeType, anthropicKey);
+      }
       usedProvider = 'claude';
     }
 
     // Fall back to OpenAI if Claude fails or not available
     if (!result && openaiKey) {
-      result = await extractWithOpenAI(body.image, body.mimeType, openaiKey);
+      if (images.length > 1) {
+        result = await extractWithOpenAIMultiple(images, openaiKey);
+      } else {
+        result = await extractWithOpenAI(images[0].image, images[0].mimeType, openaiKey);
+      }
       usedProvider = 'openai';
     }
 
@@ -280,6 +351,155 @@ async function extractWithOpenAI(
     return JSON.parse(jsonStr);
   } catch (error) {
     console.error('OpenAI extraction error:', error);
+    return null;
+  }
+}
+
+// Extract from MULTIPLE images using Claude (front/back of scorecard)
+async function extractWithClaudeMultiple(
+  images: ImageData[],
+  apiKey: string
+): Promise<ScorecardData | null> {
+  try {
+    // Build content array with all images
+    const content: Array<{ type: string; source?: { type: string; media_type: string; data: string }; text?: string }> = [];
+
+    images.forEach((img, index) => {
+      content.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: img.mimeType,
+          data: img.image,
+        },
+      });
+      // Add label if provided
+      if (img.label) {
+        content.push({
+          type: 'text',
+          text: `[Image ${index + 1}: ${img.label}]`,
+        });
+      }
+    });
+
+    // Add the extraction prompt
+    content.push({
+      type: 'text',
+      text: MULTI_IMAGE_PROMPT,
+    });
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        messages: [
+          {
+            role: 'user',
+            content,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Claude API error:', await response.text());
+      return null;
+    }
+
+    const data = await response.json();
+    const responseContent = data.content?.[0]?.text;
+
+    if (!responseContent) return null;
+
+    // Parse JSON from response
+    const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error('Claude multi-image extraction error:', error);
+    return null;
+  }
+}
+
+// Extract from MULTIPLE images using OpenAI (front/back of scorecard)
+async function extractWithOpenAIMultiple(
+  images: ImageData[],
+  apiKey: string
+): Promise<ScorecardData | null> {
+  try {
+    // Build content array with all images
+    const userContent: Array<{ type: string; text?: string; image_url?: { url: string; detail: string } }> = [
+      {
+        type: 'text',
+        text: 'Analyze these golf scorecard images (front and back, or multiple sections). Combine ALL data from ALL images. Extract ALL 18 holes, ALL tee sets with ratings and slopes. Return complete JSON.',
+      },
+    ];
+
+    images.forEach((img, index) => {
+      const imageUrl = `data:${img.mimeType};base64,${img.image}`;
+      userContent.push({
+        type: 'image_url',
+        image_url: {
+          url: imageUrl,
+          detail: 'high',
+        },
+      });
+      if (img.label) {
+        userContent.push({
+          type: 'text',
+          text: `[Image ${index + 1}: ${img.label}]`,
+        });
+      }
+    });
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: MULTI_IMAGE_PROMPT,
+          },
+          {
+            role: 'user',
+            content: userContent,
+          },
+        ],
+        max_tokens: 4000,
+        temperature: 0.1,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', await response.text());
+      return null;
+    }
+
+    const result = await response.json();
+    const responseContent = result.choices?.[0]?.message?.content;
+
+    if (!responseContent) return null;
+
+    // Parse JSON from response (handle markdown code blocks)
+    const jsonMatch = responseContent.match(/```(?:json)?\s*([\s\S]*?)```/) || responseContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    const jsonStr = Array.isArray(jsonMatch) && jsonMatch[1] ? jsonMatch[1].trim() : jsonMatch[0];
+    return JSON.parse(jsonStr);
+  } catch (error) {
+    console.error('OpenAI multi-image extraction error:', error);
     return null;
   }
 }

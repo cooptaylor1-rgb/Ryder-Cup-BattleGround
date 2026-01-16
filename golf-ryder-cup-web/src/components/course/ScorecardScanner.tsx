@@ -57,13 +57,19 @@ interface ScorecardScannerProps {
     onCancel?: () => void;
 }
 
+interface CapturedImage {
+    dataUrl: string;
+    mimeType: string;
+    label: string;
+}
+
 export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerProps) {
     const { showToast } = useUIStore();
     const { trigger } = useHaptic();
 
     const [mode, setMode] = useState<'select' | 'camera' | 'preview' | 'processing' | 'result'>('select');
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
-    const [mimeType, setMimeType] = useState<string>('image/jpeg');
+    const [capturedImages, setCapturedImages] = useState<CapturedImage[]>([]);
+    const [currentCapture, setCurrentCapture] = useState<'front' | 'back'>('front');
     const [scanResult, setScanResult] = useState<ScorecardData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +77,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const multiFileInputRef = useRef<HTMLInputElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
 
     // Start camera
@@ -117,15 +124,19 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
         if (ctx) {
             ctx.drawImage(video, 0, 0);
             const imageData = canvas.toDataURL('image/jpeg', 0.9);
-            setCapturedImage(imageData);
-            setMimeType('image/jpeg');
+            const newImage: CapturedImage = {
+                dataUrl: imageData,
+                mimeType: 'image/jpeg',
+                label: currentCapture === 'front' ? 'Front (Holes & Yardages)' : 'Back (Ratings & Slope)',
+            };
+            setCapturedImages(prev => [...prev, newImage]);
             stopCamera();
             setMode('preview');
             trigger('success');
         }
-    }, [stopCamera, trigger]);
+    }, [stopCamera, trigger, currentCapture]);
 
-    // Handle file upload
+    // Handle single file upload
     const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -138,34 +149,91 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
         const reader = new FileReader();
         reader.onload = () => {
-            setCapturedImage(reader.result as string);
-            setMimeType(file.type);
+            const newImage: CapturedImage = {
+                dataUrl: reader.result as string,
+                mimeType: file.type,
+                label: capturedImages.length === 0 ? 'Front (Holes & Yardages)' : 'Back (Ratings & Slope)',
+            };
+            setCapturedImages(prev => [...prev, newImage]);
             setMode('preview');
         };
         reader.readAsDataURL(file);
+    }, [showToast, capturedImages.length]);
+
+    // Handle multiple file upload
+    const handleMultiFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        if (validFiles.length === 0) {
+            showToast('error', 'Please upload image files (JPG, PNG, etc.)');
+            return;
+        }
+
+        const labels = ['Front (Holes & Yardages)', 'Back (Ratings & Slope)', 'Additional'];
+        const newImages: CapturedImage[] = [];
+
+        validFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                newImages.push({
+                    dataUrl: reader.result as string,
+                    mimeType: file.type,
+                    label: labels[index] || `Image ${index + 1}`,
+                });
+
+                // When all files are read, update state
+                if (newImages.length === validFiles.length) {
+                    setCapturedImages(newImages);
+                    setMode('preview');
+                }
+            };
+            reader.readAsDataURL(file);
+        });
     }, [showToast]);
 
-    // Process image with OCR
+    // Add another image
+    const addAnotherImage = useCallback(() => {
+        setCurrentCapture('back');
+        setMode('select');
+    }, []);
+
+    // Process image(s) with OCR
     const processImage = useCallback(async () => {
-        if (!capturedImage) return;
+        if (capturedImages.length === 0) return;
 
         setIsLoading(true);
         setMode('processing');
         setError(null);
 
         try {
-            // Extract base64 data (remove data URL prefix)
-            const base64Data = capturedImage.split(',')[1];
+            // Build request body based on number of images
+            let requestBody;
+
+            if (capturedImages.length === 1) {
+                // Single image (backward compatible)
+                const base64Data = capturedImages[0].dataUrl.split(',')[1];
+                requestBody = {
+                    image: base64Data,
+                    mimeType: capturedImages[0].mimeType,
+                };
+            } else {
+                // Multiple images
+                const images = capturedImages.map(img => ({
+                    image: img.dataUrl.split(',')[1],
+                    mimeType: img.mimeType,
+                    label: img.label,
+                }));
+                requestBody = { images };
+            }
 
             const response = await fetch('/api/scorecard-ocr', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    image: base64Data,
-                    mimeType: mimeType,
-                }),
+                body: JSON.stringify(requestBody),
             });
 
             const result = await response.json();
@@ -185,16 +253,22 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
             console.error('OCR error:', err);
             setError(err instanceof Error ? err.message : 'Failed to process scorecard');
             setMode('preview');
-            showToast('error', 'Failed to read scorecard. Try a clearer image.');
+            showToast('error', 'Failed to read scorecard. Try clearer images.');
         } finally {
             setIsLoading(false);
         }
-    }, [capturedImage, mimeType, trigger, showToast]);
+    }, [capturedImages, trigger, showToast]);
+
+    // Remove an image from the list
+    const removeImage = useCallback((index: number) => {
+        setCapturedImages(prev => prev.filter((_, i) => i !== index));
+    }, []);
 
     // Reset scanner
     const reset = useCallback(() => {
         stopCamera();
-        setCapturedImage(null);
+        setCapturedImages([]);
+        setCurrentCapture('front');
         setScanResult(null);
         setError(null);
         setMode('select');
@@ -241,12 +315,26 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             </div>
 
                             <div className="text-center">
-                                <h2 className="text-xl font-bold mb-2">Quick Course Setup</h2>
+                                <h2 className="text-xl font-bold mb-2">
+                                    {capturedImages.length === 0 ? 'Quick Course Setup' : 'Add Back Side'}
+                                </h2>
                                 <p className="text-muted-foreground">
-                                    Take a photo of a scorecard to auto-populate
-                                    par, handicap, and yardage for all 18 holes
+                                    {capturedImages.length === 0
+                                        ? 'Capture both sides of the scorecard for complete data (holes, yardages, ratings, and slope)'
+                                        : 'Add the back of the scorecard for ratings and slope information'
+                                    }
                                 </p>
                             </div>
+
+                            {/* Show captured images count */}
+                            {capturedImages.length > 0 && (
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-600">
+                                    <Check size={16} />
+                                    <span className="text-sm font-medium">
+                                        {capturedImages.length} image{capturedImages.length > 1 ? 's' : ''} captured
+                                    </span>
+                                </div>
+                            )}
 
                             <div className="w-full max-w-sm space-y-3">
                                 <button
@@ -255,7 +343,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     style={{ background: 'var(--masters)', color: 'white' }}
                                 >
                                     <Camera size={20} />
-                                    Take Photo
+                                    {capturedImages.length === 0 ? 'Take Photo' : 'Take Another Photo'}
                                 </button>
 
                                 <button
@@ -266,6 +354,16 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     Upload Image
                                 </button>
 
+                                {capturedImages.length === 0 && (
+                                    <button
+                                        onClick={() => multiFileInputRef.current?.click()}
+                                        className="w-full py-3 rounded-xl flex items-center justify-center gap-3 text-sm bg-muted/50 hover:bg-muted/80"
+                                    >
+                                        <ImageIcon size={18} />
+                                        Upload Multiple Images
+                                    </button>
+                                )}
+
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -274,10 +372,28 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     className="hidden"
                                     onChange={handleFileUpload}
                                 />
+
+                                <input
+                                    ref={multiFileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={handleMultiFileUpload}
+                                />
                             </div>
 
+                            {capturedImages.length > 0 && (
+                                <button
+                                    onClick={() => setMode('preview')}
+                                    className="text-sm underline text-muted-foreground hover:text-foreground"
+                                >
+                                    Continue with {capturedImages.length} image{capturedImages.length > 1 ? 's' : ''}
+                                </button>
+                            )}
+
                             <p className="text-xs text-muted-foreground text-center max-w-xs">
-                                Works best with clear, well-lit photos of printed scorecards
+                                💡 Tip: Capture front (holes/yardages) and back (ratings/slope) for best results
                             </p>
                         </motion.div>
                     )}
@@ -326,7 +442,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                     )}
 
                     {/* Mode: Preview */}
-                    {mode === 'preview' && capturedImage && (
+                    {mode === 'preview' && capturedImages.length > 0 && (
                         <motion.div
                             key="preview"
                             initial={{ opacity: 0 }}
@@ -334,17 +450,45 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             exit={{ opacity: 0 }}
                             className="h-full flex flex-col"
                         >
-                            {/* Image preview */}
-                            <div className="flex-1 relative bg-black overflow-hidden">
-                                <img
-                                    src={capturedImage}
-                                    alt="Captured scorecard"
-                                    className="w-full h-full object-contain"
-                                />
+                            {/* Image preview - scrollable for multiple images */}
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                {capturedImages.map((img, index) => (
+                                    <div key={index} className="relative bg-black rounded-xl overflow-hidden">
+                                        <div className="absolute top-2 left-2 right-2 flex justify-between items-start z-10">
+                                            <span className="px-2 py-1 text-xs font-medium bg-black/60 text-white rounded">
+                                                {img.label}
+                                            </span>
+                                            <button
+                                                onClick={() => removeImage(index)}
+                                                className="p-1.5 bg-red-500/80 rounded-full hover:bg-red-500"
+                                            >
+                                                <X size={14} className="text-white" />
+                                            </button>
+                                        </div>
+                                        <img
+                                            src={img.dataUrl}
+                                            alt={img.label}
+                                            className="w-full max-h-64 object-contain"
+                                        />
+                                    </div>
+                                ))}
+
+                                {/* Add another image button */}
+                                {capturedImages.length < 3 && (
+                                    <button
+                                        onClick={addAnotherImage}
+                                        className="w-full py-4 border-2 border-dashed border-muted-foreground/30 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-muted-foreground/50 transition-colors"
+                                    >
+                                        <ImageIcon size={24} className="text-muted-foreground" />
+                                        <span className="text-sm text-muted-foreground">
+                                            Add {capturedImages.length === 1 ? 'back side' : 'another'} image
+                                        </span>
+                                    </button>
+                                )}
                             </div>
 
                             {/* Actions */}
-                            <div className="p-4 space-y-3">
+                            <div className="p-4 border-t border-border space-y-3">
                                 {error && (
                                     <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 text-red-500">
                                         <AlertCircle size={16} />
@@ -363,7 +507,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     ) : (
                                         <ZoomIn size={20} />
                                     )}
-                                    Extract Course Data
+                                    Extract Course Data ({capturedImages.length} image{capturedImages.length > 1 ? 's' : ''})
                                 </button>
 
                                 <button
@@ -371,7 +515,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     className="w-full py-3 rounded-xl flex items-center justify-center gap-2 bg-muted hover:bg-muted/80"
                                 >
                                     <RotateCcw size={18} />
-                                    Retake Photo
+                                    Start Over
                                 </button>
                             </div>
                         </motion.div>
