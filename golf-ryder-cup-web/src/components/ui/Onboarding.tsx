@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
-    GolfSwingIllustration,
+    RyderCupTrophyIllustration,
     TrophyIllustration,
     GolfersIllustration,
     ScorecardIllustration,
@@ -41,7 +41,7 @@ interface OnboardingProps {
 
 const steps: OnboardingStep[] = [
     {
-        illustration: <GolfSwingIllustration size="xl" animated />,
+        illustration: <RyderCupTrophyIllustration size="xl" animated />,
         title: "Welcome to Ryder Cup Tracker",
         subtitle: "The best way to track your golf buddies trip. Compete, score, and crown champions.",
     },
@@ -264,7 +264,7 @@ export function WelcomeBack({
         <div className="onboarding-overlay">
             <div className="onboarding-content">
                 <div className="onboarding-illustration">
-                    <GolfSwingIllustration size="xl" animated />
+                    <RyderCupTrophyIllustration size="xl" animated />
                 </div>
 
                 <h1 className="onboarding-title">

@@ -118,6 +118,7 @@ export {
   PodiumIllustration,
   GolfSwingIllustration,
   CelebrationIllustration,
+  RyderCupTrophyIllustration,
 } from './illustrations';
 
 // Onboarding & Discovery

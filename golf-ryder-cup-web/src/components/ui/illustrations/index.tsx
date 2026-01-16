@@ -601,6 +601,136 @@ export function CelebrationIllustration({ className, size = 'lg', animated = tru
     );
 }
 
+/**
+ * Ryder Cup Trophy
+ * For: Welcome screen, champions, main branding
+ * The iconic Ryder Cup trophy with golfer figure on top
+ */
+export function RyderCupTrophyIllustration({ className, size = 'lg', animated = true }: IllustrationProps) {
+    return (
+        <svg
+            viewBox="0 0 100 120"
+            className={cn(sizeClasses[size], className)}
+            aria-hidden="true"
+        >
+            {/* Background glow */}
+            <defs>
+                <radialGradient id="ryder-glow" cx="50%" cy="40%" r="50%">
+                    <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700" />
+                    <stop offset="50%" stopColor="#FFC107" />
+                    <stop offset="100%" stopColor="#B8860B" />
+                </linearGradient>
+                <linearGradient id="gold-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#FFF8DC" />
+                    <stop offset="50%" stopColor="#FFD700" />
+                    <stop offset="100%" stopColor="#B8860B" />
+                </linearGradient>
+            </defs>
+
+            <circle cx="50" cy="50" r="45" fill="url(#ryder-glow)" />
+
+            {/* Main cup body */}
+            <g className={cn(animated && 'animate-trophy-shine')}>
+                {/* Cup bowl */}
+                <path
+                    d="M25 45 L25 60 Q25 80 50 85 Q75 80 75 60 L75 45 Q75 35 50 32 Q25 35 25 45 Z"
+                    fill="url(#gold-gradient)"
+                    stroke="#B8860B"
+                    strokeWidth="1"
+                />
+
+                {/* Cup rim */}
+                <ellipse cx="50" cy="45" rx="25" ry="8" fill="url(#gold-shine)" stroke="#B8860B" strokeWidth="1" />
+
+                {/* Left handle */}
+                <path
+                    d="M25 50 Q10 50 10 62 Q10 74 25 74"
+                    fill="none"
+                    stroke="url(#gold-gradient)"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                />
+
+                {/* Right handle */}
+                <path
+                    d="M75 50 Q90 50 90 62 Q90 74 75 74"
+                    fill="none"
+                    stroke="url(#gold-gradient)"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                />
+
+                {/* Stem */}
+                <path
+                    d="M44 85 L44 95 L56 95 L56 85"
+                    fill="url(#gold-gradient)"
+                />
+
+                {/* Base platform */}
+                <ellipse cx="50" cy="97" rx="14" ry="4" fill="url(#gold-gradient)" stroke="#B8860B" strokeWidth="1" />
+
+                {/* Base */}
+                <path
+                    d="M30 100 L70 100 Q72 110 70 115 L30 115 Q28 110 30 100 Z"
+                    fill="url(#gold-gradient)"
+                    stroke="#B8860B"
+                    strokeWidth="1"
+                />
+
+                {/* Base bottom */}
+                <ellipse cx="50" cy="115" rx="20" ry="5" fill="#B8860B" />
+
+                {/* Golfer figure on top */}
+                <g transform="translate(50, 28) scale(0.4)">
+                    {/* Head */}
+                    <circle cx="0" cy="-15" r="8" fill="#B8860B" />
+                    {/* Body */}
+                    <path d="M0 -7 L-5 15 L5 15 Z" fill="#B8860B" />
+                    {/* Back arm with club */}
+                    <path d="M-3 0 Q-20 -10 -15 -30" stroke="#B8860B" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    {/* Club */}
+                    <path d="M-15 -30 L-10 -45" stroke="#B8860B" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <rect x="-14" y="-50" width="8" height="5" rx="1" fill="#B8860B" transform="rotate(20 -10 -47)" />
+                    {/* Front arm */}
+                    <path d="M3 0 Q15 5 10 15" stroke="#B8860B" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    {/* Legs */}
+                    <path d="M-3 15 L-8 35" stroke="#B8860B" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    <path d="M3 15 L8 35" stroke="#B8860B" strokeWidth="3" fill="none" strokeLinecap="round" />
+                </g>
+
+                {/* Decorative band on cup */}
+                <path
+                    d="M28 60 Q50 65 72 60"
+                    fill="none"
+                    stroke="#FFF8DC"
+                    strokeWidth="2"
+                    opacity="0.6"
+                />
+
+                {/* USA text area (left) */}
+                <text x="35" y="72" fontSize="6" fontWeight="bold" fill="#B8860B" opacity="0.7">USA</text>
+
+                {/* EUR text area (right) */}
+                <text x="57" y="72" fontSize="6" fontWeight="bold" fill="#B8860B" opacity="0.7">EUR</text>
+
+                {/* Shine effect */}
+                <path
+                    d="M30 50 Q35 55 30 65"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    opacity="0.4"
+                />
+            </g>
+        </svg>
+    );
+}
+
 export default {
     GolfBallTee,
     TrophyIllustration,
@@ -611,4 +741,5 @@ export default {
     PodiumIllustration,
     GolfSwingIllustration,
     CelebrationIllustration,
+    RyderCupTrophyIllustration,
 };
