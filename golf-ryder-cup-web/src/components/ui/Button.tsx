@@ -71,11 +71,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
                     // Variant styles - Masters elegance
                     variant === 'primary' && [
-                        'bg-masters-green text-white font-semibold',
-                        'hover:bg-masters-green-light',
+                        'bg-[#006747] text-white font-semibold',
+                        'hover:bg-[#1B8F6A]',
                         'shadow-md hover:shadow-lg',
-                        'active:shadow-inner active:bg-masters-green-dark',
-                        'border border-masters-green-dark/20',
+                        'active:shadow-inner active:bg-[#004D35]',
+                        'border border-[#004D35]/20',
                     ],
 
                     variant === 'secondary' && [
