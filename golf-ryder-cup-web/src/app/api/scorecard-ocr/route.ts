@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit, addRateLimitHeaders, requireJson, validateBodySize } from '@/lib/utils/apiMiddleware';
 
 /**
  * SCORECARD OCR API
@@ -13,6 +14,15 @@ import { NextRequest, NextResponse } from 'next/server';
  * Note: PDF files are not directly supported.
  * For PDFs, users should convert to image or use image capture.
  */
+
+// Rate limiting: 10 requests per minute per IP (more restrictive due to AI API costs)
+const RATE_LIMIT_CONFIG = {
+  windowMs: 60 * 1000,
+  maxRequests: 10,
+};
+
+// Max body size: 10MB for image uploads
+const MAX_BODY_SIZE = 10 * 1024 * 1024;
 
 interface HoleData {
   par: number;
@@ -170,6 +180,24 @@ VALIDATION:
 Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting (more restrictive due to AI API costs)
+  const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  if (rateLimitError) {
+    return rateLimitError;
+  }
+
+  // Validate body size (10MB max for images)
+  const bodySizeError = await validateBodySize(request, MAX_BODY_SIZE);
+  if (bodySizeError) {
+    return bodySizeError;
+  }
+
+  // Require JSON content type
+  const jsonError = requireJson(request);
+  if (jsonError) {
+    return jsonError;
+  }
+
   // Debug logging only in development
   const isDev = process.env.NODE_ENV === 'development';
 
@@ -248,7 +276,7 @@ export async function POST(request: NextRequest) {
     // Validate and clean the data
     const cleanedData = validateAndCleanData(result);
 
-    return NextResponse.json({
+    let res = NextResponse.json({
       success: true,
       data: cleanedData,
       provider: usedProvider,
@@ -259,6 +287,8 @@ export async function POST(request: NextRequest) {
         hasSlopes: cleanedData.teeSets?.some(t => t.slope) || false,
       },
     });
+    res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
+    return res;
   } catch (error) {
     console.error('Scorecard OCR error:', error);
     return NextResponse.json(

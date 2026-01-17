@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
+import { getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import {
   CalendarDays,
   Users,
@@ -19,6 +20,7 @@ import {
   Flag,
   User,
   AlertCircle,
+  Clock,
 } from 'lucide-react';
 import type { Match, RyderCupSession } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
@@ -39,6 +41,8 @@ interface ScheduleEntry {
   subtitle?: string;
   time?: string;
   date: string;
+  /** Full datetime for countdown calculation */
+  datetime?: Date;
   sessionType?: string;
   matchId?: string;
   isUserMatch?: boolean;
@@ -197,6 +201,7 @@ export default function SchedulePage() {
             title: `Match ${match.matchOrder}`,
             subtitle: `${playerNames.teamA} vs ${playerNames.teamB}`,
             time: matchTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+            datetime: new Date(matchTime), // For countdown calculation
             date: dateStr,
             matchId: match.id,
             isUserMatch: userInMatch,
@@ -477,6 +482,15 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
   const isSession = entry.type === 'session';
   const isUserMatch = entry.isUserMatch;
 
+  // Calculate countdown for upcoming tee times (P1: Show countdown)
+  const countdown = useMemo(() => {
+    if (!entry.datetime || entry.status !== 'upcoming') return null;
+    return getCountdown(entry.datetime);
+  }, [entry.datetime, entry.status]);
+
+  // Check if this is today's entry
+  const entryIsToday = isToday(entry.date);
+
   const statusColors = {
     upcoming: 'var(--ink-tertiary)',
     inProgress: 'var(--warning)',
@@ -509,7 +523,20 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
               {entry.time}
             </div>
           )}
-          {isSession && (
+          {/* Countdown badge for upcoming user matches (P1) */}
+          {countdown && !countdown.isPast && isUserMatch && entryIsToday && (
+            <div
+              className="flex items-center gap-1 mt-1 text-xs font-medium px-1.5 py-0.5 rounded"
+              style={{
+                background: `${getCountdownColor(countdown.urgency)}15`,
+                color: getCountdownColor(countdown.urgency),
+              }}
+            >
+              <Clock size={10} />
+              {countdown.display}
+            </div>
+          )}
+          {isSession && !countdown && (
             <div className="flex items-center gap-1 mt-1">
               {entry.time?.includes('AM') ? (
                 <Sunrise size={12} style={{ color: 'var(--masters)' }} />

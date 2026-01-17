@@ -7,7 +7,7 @@
  */
 
 import Link from 'next/link';
-import { MapPin, Home, Search, ArrowLeft } from 'lucide-react';
+import { MapPin, Home, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function NotFound() {

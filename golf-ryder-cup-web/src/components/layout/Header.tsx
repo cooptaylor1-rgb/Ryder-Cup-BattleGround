@@ -3,6 +3,9 @@
  *
  * Refined top app bar with clear hierarchy.
  * Masters-inspired: confident, quiet, purposeful.
+ *
+ * Updated: Captain toggle now available in header (P0-2)
+ * - Quick access for captains without navigating to More page
  */
 
 'use client';
@@ -11,9 +14,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore, useTripStore } from '@/lib/stores';
 import { IconButton } from '@/components/ui/IconButton';
+import { CaptainToggle } from '@/components/ui/CaptainToggle';
 import {
   ChevronLeft,
-  Shield,
   Menu,
   WifiOff,
 } from 'lucide-react';
@@ -24,6 +27,7 @@ interface HeaderProps {
   showBack?: boolean;
   rightAction?: React.ReactNode;
   onMenuClick?: () => void;
+  showCaptainToggle?: boolean;
 }
 
 export function Header({
@@ -32,10 +36,11 @@ export function Header({
   showBack,
   rightAction,
   onMenuClick,
+  showCaptainToggle = true,
 }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isCaptainMode, disableCaptainMode, isOnline } = useUIStore();
+  const { isOnline } = useUIStore();
   const { currentTrip } = useTripStore();
 
   // Determine title based on route if not provided
@@ -123,20 +128,9 @@ export function Header({
           </div>
         )}
 
-        {/* Captain mode indicator */}
-        {isCaptainMode && (
-          <button
-            onClick={disableCaptainMode}
-            className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors"
-            style={{
-              background: 'rgba(0, 103, 71, 0.1)',
-              color: 'var(--masters, #006747)',
-            }}
-            title="Captain Mode enabled. Tap to disable."
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Captain</span>
-          </button>
+        {/* Captain toggle - Quick access from header (P0-2) */}
+        {showCaptainToggle && currentTrip && (
+          <CaptainToggle />
         )}
 
         {rightAction}

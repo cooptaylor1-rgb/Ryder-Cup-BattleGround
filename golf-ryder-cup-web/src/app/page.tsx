@@ -234,10 +234,17 @@ export default function HomePage() {
     return db.banterPosts.where('tripId').equals(activeTrip.id).toArray();
   }, [activeTrip?.id]);
 
+  // Get real side bets data (P1: Progressive disclosure)
+  const sideBets = useLiveQuery(async () => {
+    if (!activeTrip) return [];
+    return db.sideBets.where('tripId').equals(activeTrip.id).toArray();
+  }, [activeTrip?.id]);
+
   // Calculate real counts
   const liveMatchesCount = liveMatches?.length || 0;
   const recentPhotosCount = 0; // Photos not implemented yet
   const unreadMessages = banterPosts?.length || 0;
+  const activeSideBetsCount = sideBets?.filter(b => b.status === 'active').length || 0;
 
   // Navigation badges
   const navBadges: NavBadges = {
@@ -673,24 +680,45 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Side Bets Quick View */}
-            <section className="section-sm">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
-                <h2 className="type-overline">Side Bets</h2>
-                <Link
-                  href="/bets"
-                  className="type-caption"
-                  style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--masters)' }}
-                >
-                  View All <ChevronRight size={14} />
-                </Link>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                <SideBetRow type="Skins" status="$45 in pot" icon={<Zap size={16} />} />
-                <SideBetRow type="Closest to Pin" status="Hole 7 - Open" icon={<Target size={16} />} />
-                <SideBetRow type="Long Drive" status="Hole 12 - Open" icon={<TrendingUp size={16} />} />
-              </div>
-            </section>
+            {/* Side Bets Quick View — Progressive Disclosure (P1) */}
+            {/* Only show when there are active side bets or captain mode is on */}
+            {(activeSideBetsCount > 0 || isCaptainMode) && (
+              <section className="section-sm">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
+                  <h2 className="type-overline">Side Bets</h2>
+                  <Link
+                    href="/bets"
+                    className="type-caption"
+                    style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--masters)' }}
+                  >
+                    {activeSideBetsCount > 0 ? 'View All' : 'Create'} <ChevronRight size={14} />
+                  </Link>
+                </div>
+                {activeSideBetsCount > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {sideBets?.filter(b => b.status === 'active').slice(0, 3).map(bet => (
+                      <SideBetRow
+                        key={bet.id}
+                        type={bet.betType || 'Custom'}
+                        status={bet.status === 'active' ? 'In Progress' : 'Complete'}
+                        icon={<Zap size={16} />}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    className="text-center py-6"
+                    style={{ color: 'var(--ink-tertiary)' }}
+                  >
+                    <Zap size={24} style={{ margin: '0 auto var(--space-2)' }} />
+                    <p className="type-caption">No active side bets</p>
+                    <p className="type-caption" style={{ marginTop: 'var(--space-1)' }}>
+                      Add skins, KP, or custom bets
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
 
             <hr className="divider-lg" />
           </>

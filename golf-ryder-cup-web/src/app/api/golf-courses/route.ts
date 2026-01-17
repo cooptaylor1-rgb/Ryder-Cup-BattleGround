@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
+import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 
 const API_BASE_URL = 'https://api.golfcourseapi.com/v1';
 const logger = createLogger('api:golf-courses');
@@ -15,12 +16,24 @@ const logger = createLogger('api:golf-courses');
 const CACHE_MAX_AGE = 3600;
 const CACHE_STALE_WHILE_REVALIDATE = 86400; // 24 hours
 
+// Rate limit: 30 requests per minute for golf course API
+const RATE_LIMIT_CONFIG = {
+    windowMs: 60 * 1000,
+    maxRequests: 30,
+};
+
 function getApiKey(): string | null {
     // Server-side env vars (no NEXT_PUBLIC_ prefix needed)
     return process.env.GOLF_COURSE_API_KEY || process.env.NEXT_PUBLIC_GOLF_COURSE_API_KEY || null;
 }
 
 export async function GET(request: NextRequest) {
+    // Apply rate limiting
+    const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+    if (rateLimitError) {
+        return rateLimitError;
+    }
+
     const apiKey = getApiKey();
 
     if (!apiKey) {
@@ -80,12 +93,13 @@ export async function GET(request: NextRequest) {
 
         const data = await response.json();
 
-        // Add cache headers for successful responses
-        const res = NextResponse.json(data);
+        // Add cache headers and rate limit headers for successful responses
+        let res = NextResponse.json(data);
         res.headers.set(
             'Cache-Control',
             `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=${CACHE_STALE_WHILE_REVALIDATE}`
         );
+        res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
         return res;
     } catch (error) {
         logger.error('Golf Course API error', { error });

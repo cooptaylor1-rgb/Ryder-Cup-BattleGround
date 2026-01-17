@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import type { SideBet, SideBetResult, Player, Match } from '@/lib/types/models';
+import type { SideBet, SideBetResult, Player } from '@/lib/types/models';
 import {
     ChevronLeft,
     DollarSign,
@@ -16,11 +16,9 @@ import {
     Trophy,
     Users,
     Check,
-    Clock,
     Crown,
     Edit2,
     Trash2,
-    Plus,
     Flag,
     X,
 } from 'lucide-react';
@@ -38,7 +36,7 @@ export default function BetDetailPage() {
     const { currentTrip, players } = useTripStore();
     const { showToast } = useUIStore();
 
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [_showEditModal, setShowEditModal] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showRecordWinner, setShowRecordWinner] = useState(false);
     const [selectedHole, setSelectedHole] = useState<number | null>(null);

@@ -510,7 +510,7 @@ export default function PlayersPage() {
 
                         {/* Scrollable rows container */}
                         <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--space-4)' }}>
-                            {bulkRows.map((row, index) => (
+                            {bulkRows.map((row, _index) => (
                                 <div
                                     key={row.id}
                                     style={{

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 
 /**
  * Golf Course Details API
@@ -12,6 +13,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * Primary source: GHIN (USGA) database
  * Fallback: Web scraping from public course pages
  */
+
+// Rate limiting: 30 requests per minute per IP
+const RATE_LIMIT_CONFIG = {
+    windowMs: 60 * 1000,
+    maxRequests: 30,
+};
 
 interface HoleData {
     par: number;
@@ -46,6 +53,12 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ courseId: string }> }
 ) {
+    // Apply rate limiting
+    const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+    if (rateLimitError) {
+        return rateLimitError;
+    }
+
     const { courseId } = await params;
 
     if (!courseId) {
@@ -79,10 +92,12 @@ export async function GET(
             courseData = generatePlaceholderCourse(courseId);
         }
 
-        return NextResponse.json({
+        let res = NextResponse.json({
             success: true,
             data: courseData,
         });
+        res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
+        return res;
     } catch (error) {
         console.error('Course details error:', error);
         return NextResponse.json(

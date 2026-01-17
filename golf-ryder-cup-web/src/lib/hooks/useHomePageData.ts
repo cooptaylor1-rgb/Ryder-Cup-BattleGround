@@ -42,7 +42,7 @@ export function useHomePageData({
     const data = useLiveQuery(
         async () => {
             // Batch fetch all data in parallel
-            const [trips, tripSessions, tripMatches, banterPosts] = await Promise.all([
+            const [trips, tripSessions, _tripMatches, banterPosts] = await Promise.all([
                 // Get all trips
                 db.trips.orderBy('startDate').reverse().toArray(),
 
@@ -62,7 +62,7 @@ export function useHomePageData({
 
             // Now fetch matches if we have sessions
             let allMatches: Match[] = [];
-            let holeResultsMap = new Map<string, HoleResult[]>();
+            const holeResultsMap = new Map<string, HoleResult[]>();
 
             if (tripSessions.length > 0) {
                 const sessionIds = tripSessions.map(s => s.id);
