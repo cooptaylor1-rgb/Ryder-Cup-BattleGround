@@ -16,6 +16,7 @@ import {
     Shirt,
     Home,
     AlertCircle,
+    Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,8 @@ interface FormData {
     nickname: string;
     email: string;
     phoneNumber: string;
+    pin: string;
+    confirmPin: string;
 
     // Step 2: Golf Info
     handicapIndex: string;
@@ -56,6 +59,8 @@ const initialFormData: FormData = {
     nickname: '',
     email: '',
     phoneNumber: '',
+    pin: '',
+    confirmPin: '',
     handicapIndex: '',
     ghin: '',
     homeCourse: '',
@@ -107,6 +112,14 @@ export default function CreateProfilePage() {
             errors.email = 'Email is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             errors.email = 'Please enter a valid email';
+        }
+        if (!formData.pin.trim()) {
+            errors.pin = 'PIN is required';
+        } else if (!/^\d{4}$/.test(formData.pin)) {
+            errors.pin = 'PIN must be exactly 4 digits';
+        }
+        if (formData.pin !== formData.confirmPin) {
+            errors.confirmPin = 'PINs do not match';
         }
 
         setValidationErrors(errors);
@@ -169,7 +182,7 @@ export default function CreateProfilePage() {
                     : undefined,
             };
 
-            await createProfile(profileData);
+            await createProfile(profileData, formData.pin);
             router.push('/');
         } catch (err) {
             console.error('Failed to create profile:', err);
@@ -287,6 +300,45 @@ export default function CreateProfilePage() {
                                     icon={<Phone className="w-5 h-5" />}
                                     hint="For trip communications"
                                 />
+
+                                {/* PIN Section */}
+                                <div className="pt-4 border-t border-surface-200">
+                                    <h3 className="text-label-lg font-semibold text-surface-800 mb-2 flex items-center gap-2">
+                                        <Lock className="w-4 h-4 text-surface-500" />
+                                        Create Your PIN
+                                    </h3>
+                                    <p className="text-caption text-surface-500 mb-4">
+                                        You&apos;ll use this 4-digit PIN to log in
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        {/* PIN */}
+                                        <InputField
+                                            label="4-Digit PIN"
+                                            value={formData.pin}
+                                            onChange={(v) => updateField('pin', v.replace(/\D/g, '').slice(0, 4))}
+                                            placeholder="••••"
+                                            error={validationErrors.pin}
+                                            required
+                                            icon={<Lock className="w-5 h-5" />}
+                                            inputMode="numeric"
+                                            maxLength={4}
+                                        />
+
+                                        {/* Confirm PIN */}
+                                        <InputField
+                                            label="Confirm PIN"
+                                            value={formData.confirmPin}
+                                            onChange={(v) => updateField('confirmPin', v.replace(/\D/g, '').slice(0, 4))}
+                                            placeholder="••••"
+                                            error={validationErrors.confirmPin}
+                                            required
+                                            icon={<Lock className="w-5 h-5" />}
+                                            inputMode="numeric"
+                                            maxLength={4}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -540,6 +592,8 @@ interface InputFieldProps {
     required?: boolean;
     autoFocus?: boolean;
     icon?: React.ReactNode;
+    inputMode?: 'text' | 'numeric' | 'tel' | 'email';
+    maxLength?: number;
 }
 
 function InputField({
@@ -553,6 +607,8 @@ function InputField({
     required,
     autoFocus,
     icon,
+    inputMode,
+    maxLength,
 }: InputFieldProps) {
     return (
         <div className="space-y-1.5">
@@ -572,6 +628,8 @@ function InputField({
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     autoFocus={autoFocus}
+                    inputMode={inputMode}
+                    maxLength={maxLength}
                     className={cn(
                         "w-full py-3 rounded-xl border bg-white",
                         "text-body-md placeholder:text-surface-400",

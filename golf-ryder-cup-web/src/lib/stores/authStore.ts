@@ -43,7 +43,7 @@ interface AuthState {
     login: (email: string, pin: string) => Promise<boolean>;
     loginWithProfile: (profile: UserProfile) => void;
     logout: () => void;
-    createProfile: (profile: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete'>) => Promise<UserProfile>;
+    createProfile: (profile: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete'>, pin: string) => Promise<UserProfile>;
     updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
     checkExistingUser: (email: string) => Promise<UserProfile | null>;
     clearError: () => void;
@@ -143,13 +143,12 @@ export const useAuthStore = create<AuthState>()(
             },
 
             // Create new profile
-            createProfile: async (profileData) => {
+            createProfile: async (profileData, pin: string) => {
                 set({ isLoading: true, error: null });
 
                 try {
                     const now = new Date().toISOString();
                     const id = generateId();
-                    const pin = generatePin();
 
                     const profile: UserProfile = {
                         ...profileData,
@@ -207,10 +206,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
 
-                    // Return the PIN so it can be shown to the user
-                    // Note: authLogger.log is silent in production - PIN only shows in dev
-                    authLogger.log(`New user PIN: ${pin}`);
-                    alert(`Your PIN is: ${pin}\n\nSave this PIN to log in again!`);
+                    authLogger.log(`New user created: ${profile.email}`);
 
                     return profile;
                 } catch (error) {
