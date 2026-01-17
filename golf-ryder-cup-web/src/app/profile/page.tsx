@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
 import { Button, Card, CardContent } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
@@ -23,6 +24,9 @@ import { cn } from '@/lib/utils';
 
 /**
  * PROFILE PAGE
+ */
+
+const logger = createLogger('profile');
  *
  * View and edit user profile.
  * Accessible from settings or user menu.
@@ -58,7 +62,7 @@ export default function ProfilePage() {
             setIsEditing(false);
             showToast('success', 'Profile updated');
         } catch (err) {
-            console.error('Failed to save profile:', err);
+            logger.error('Failed to save profile', { error: err });
             showToast('error', 'Failed to save profile');
         } finally {
             setIsSaving(false);

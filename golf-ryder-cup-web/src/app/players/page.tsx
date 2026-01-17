@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 import { Edit2, Trash2, UserPlus, Users, X, ChevronLeft, UsersRound, Plus, Check } from 'lucide-react';
@@ -22,6 +23,8 @@ interface BulkPlayerRow {
  *
  * Player management with clean typography and minimal chrome
  */
+
+const logger = createLogger('players');
 
 export default function PlayersPage() {
     const router = useRouter();
@@ -133,7 +136,7 @@ export default function PlayersPage() {
             }
             resetForm();
         } catch (error) {
-            console.error('Failed to save player:', error);
+            logger.error('Failed to save player', { error });
             showToast('error', 'Failed to save player');
         } finally {
             setIsSaving(false);
@@ -148,7 +151,7 @@ export default function PlayersPage() {
             setPlayerToDelete(null);
             showToast('info', 'Player deleted');
         } catch (error) {
-            console.error('Failed to delete player:', error);
+            logger.error('Failed to delete player', { error });
             showToast('error', 'Failed to delete player');
         } finally {
             setIsDeleting(false);
@@ -208,7 +211,7 @@ export default function PlayersPage() {
             setShowBulkAdd(false);
             setBulkRows(Array(4).fill(null).map(createEmptyRow));
         } catch (error) {
-            console.error('Failed to bulk add players:', error);
+            logger.error('Failed to bulk add players', { error });
             showToast('error', 'Failed to add some players');
         }
     };

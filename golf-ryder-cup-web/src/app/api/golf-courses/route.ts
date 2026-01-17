@@ -6,8 +6,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createLogger } from '@/lib/utils/logger';
 
 const API_BASE_URL = 'https://api.golfcourseapi.com/v1';
+const logger = createLogger('api:golf-courses');
+
+// Cache duration: 1 hour for course data (rarely changes)
+const CACHE_MAX_AGE = 3600;
+const CACHE_STALE_WHILE_REVALIDATE = 86400; // 24 hours
 
 function getApiKey(): string | null {
     // Server-side env vars (no NEXT_PUBLIC_ prefix needed)
@@ -73,9 +79,16 @@ export async function GET(request: NextRequest) {
         }
 
         const data = await response.json();
-        return NextResponse.json(data);
+
+        // Add cache headers for successful responses
+        const res = NextResponse.json(data);
+        res.headers.set(
+            'Cache-Control',
+            `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=${CACHE_STALE_WHILE_REVALIDATE}`
+        );
+        return res;
     } catch (error) {
-        console.error('Golf Course API error:', error);
+        logger.error('Golf Course API error', { error });
         return NextResponse.json(
             { error: 'Failed to fetch from Golf Course API' },
             { status: 500 }

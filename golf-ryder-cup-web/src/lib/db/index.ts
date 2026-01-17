@@ -141,6 +141,13 @@ export class GolfTripDB extends Dexie {
         this.version(5).stores({
             players: 'id, tripId, name, handicapIndex',
         });
+
+        // Schema version 6 - Add compound index for efficient sync queries
+        this.version(6).stores({
+            // Add [matchId+synced] compound index for sync queue queries
+            scoringEvents:
+                '++localId, id, matchId, timestamp, synced, [matchId+timestamp], [matchId+synced]',
+        });
     }
 }
 

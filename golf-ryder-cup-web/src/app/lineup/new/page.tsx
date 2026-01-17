@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
 import {
   LineupBuilder,
   calculateFairnessScore,
@@ -42,6 +43,8 @@ import type { ScoringMode } from '@/lib/types/scoringFormats';
  */
 
 type FormatCategory = 'match_play' | 'side_game' | 'individual';
+
+const logger = createLogger('lineup');
 
 interface FormatOption {
   value: string;
@@ -508,7 +511,7 @@ export default function NewLineupPage() {
         router.push(`/lineup/${session.id}`);
       }, 1500);
     } catch (error) {
-      console.error('Failed to create session:', error);
+      logger.error('Failed to create session', { error });
       showToast('error', 'Failed to create session');
     } finally {
       setIsCreating(false);
@@ -516,7 +519,27 @@ export default function NewLineupPage() {
   }, [currentTrip, sessionName, sessionType, scheduledDate, firstTeeTime, pointsPerMatch, addSession, showToast, router]);
 
   if (!currentTrip || !isCaptainMode) {
-    return null;
+    return (
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <header className="header-premium">
+          <div className="container-editorial flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg skeleton-pulse" />
+            <div>
+              <div className="w-32 h-3 rounded skeleton-pulse mb-1" />
+              <div className="w-20 h-2 rounded skeleton-pulse" />
+            </div>
+          </div>
+        </header>
+        <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
+          <div className="card-luxury p-6 mb-4">
+            <div className="w-40 h-5 rounded skeleton-pulse mb-4" />
+            <div className="w-full h-10 rounded skeleton-pulse mb-3" />
+            <div className="w-full h-10 rounded skeleton-pulse" />
+          </div>
+          <div className="card-luxury p-4 h-48 skeleton-pulse" />
+        </main>
+      </div>
+    );
   }
 
   return (

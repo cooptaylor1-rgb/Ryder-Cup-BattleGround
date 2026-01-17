@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
+import { createLogger } from '@/lib/utils/logger';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
   ChevronLeft,
@@ -51,6 +52,8 @@ const RARITY_COLORS = {
   legendary: { bg: 'var(--color-accent)', text: 'var(--warning)' },
 };
 
+const logger = createLogger('achievements');
+
 export default function AchievementsPage() {
   const router = useRouter();
   const { currentTrip } = useTripStore();
@@ -77,7 +80,7 @@ export default function AchievementsPage() {
         const stats = await calculatePlayerStats(currentTrip.id);
         setPlayerStats(stats);
       } catch (error) {
-        console.error('Failed to load player stats:', error);
+        logger.error('Failed to load player stats', { error });
         showToast('error', 'Failed to load achievements');
       } finally {
         setIsLoading(false);
@@ -207,7 +210,33 @@ export default function AchievementsPage() {
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const totalCount = achievements.length;
 
-  if (!currentTrip) return null;
+  // Show loading state while redirecting or loading data
+  if (!currentTrip || isLoading) {
+    return (
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <header className="header-premium">
+          <div className="container-editorial flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg skeleton-pulse" />
+            <div>
+              <div className="w-24 h-3 rounded skeleton-pulse mb-1" />
+              <div className="w-16 h-2 rounded skeleton-pulse" />
+            </div>
+          </div>
+        </header>
+        <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
+          <div className="card-luxury p-6 mb-4">
+            <div className="w-32 h-5 rounded skeleton-pulse mb-3" />
+            <div className="w-full h-4 rounded-full skeleton-pulse" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="card-luxury p-4 h-32 skeleton-pulse" />
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>

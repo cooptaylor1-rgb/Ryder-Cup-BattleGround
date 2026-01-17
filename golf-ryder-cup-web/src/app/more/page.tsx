@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore, useAuthStore } from '@/lib/stores';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
+import { createLogger } from '@/lib/utils/logger';
 import {
     Users,
     MapPin,
@@ -74,7 +75,7 @@ export default function MorePage() {
             await loadTrip(tripId);
             showToast('success', 'Demo data loaded');
         } catch (error) {
-            console.error('Failed to seed data:', error);
+            createLogger('more').error('Failed to seed data', { error });
             showToast('error', 'Could not load demo data');
         } finally {
             setIsSeeding(false);
@@ -89,7 +90,7 @@ export default function MorePage() {
             showToast('info', 'Data cleared');
             router.push('/');
         } catch (error) {
-            console.error('Failed to clear data:', error);
+            createLogger('more').error('Failed to clear data', { error });
             showToast('error', 'Could not clear data');
         }
     };

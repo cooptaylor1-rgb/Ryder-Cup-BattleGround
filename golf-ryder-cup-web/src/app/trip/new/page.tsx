@@ -9,6 +9,7 @@ import {
     previewTemplateTrip,
 } from '@/lib/services/tripTemplateService';
 import { useUIStore } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
 import {
     Trophy,
@@ -105,7 +106,7 @@ export default function NewTripPage() {
             showToast('success', `${tripName} created`);
             router.push(`/?tripId=${result.trip.id}`);
         } catch (error) {
-            console.error('Failed to create trip:', error);
+            createLogger('trip').error('Failed to create trip', { error });
             showToast('error', 'Could not create trip');
         } finally {
             setIsCreating(false);

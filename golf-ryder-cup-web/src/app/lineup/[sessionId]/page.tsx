@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
+import { createLogger } from '@/lib/utils/logger';
 import {
   LineupBuilder,
   calculateFairnessScore,
@@ -72,7 +73,7 @@ export default function SessionPage() {
         const loadedMatches = await getSessionMatches(sessionId);
         setMatches(loadedMatches);
       } catch (error) {
-        console.error('Failed to load matches:', error);
+        createLogger('lineup').error('Failed to load matches', { sessionId, error });
         showToast('error', 'Failed to load matches');
       } finally {
         setIsLoading(false);

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
 import { Button } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
@@ -28,6 +29,8 @@ import { cn } from '@/lib/utils';
  */
 
 type Step = 1 | 2 | 3;
+
+const logger = createLogger('profile');
 
 interface FormData {
     // Step 1: Basic Info
@@ -186,7 +189,7 @@ export default function CreateProfilePage() {
             await createProfile(profileData, formData.pin);
             router.push('/');
         } catch (err) {
-            console.error('Failed to create profile:', err);
+            logger.error('Failed to create profile', { error: err });
             showToast('error', 'Failed to create profile');
         } finally {
             setIsSubmitting(false);

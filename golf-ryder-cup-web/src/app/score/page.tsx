@@ -7,6 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useScoringStore, useAuthStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
+import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
 import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal, CalendarDays } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
@@ -22,6 +23,8 @@ import { NoScoresPremiumEmpty, PageSkeleton, MatchCardSkeleton } from '@/compone
  * - Team colors identify sides at a glance
  * - Status is clear without visual clutter
  */
+
+const logger = createLogger('score');
 
 export default function ScorePage() {
     const router = useRouter();
@@ -106,7 +109,7 @@ export default function ScorePage() {
             await selectMatch(matchId);
             router.push(`/score/${matchId}`);
         } catch (error) {
-            console.error('Failed to select match:', error);
+            logger.error('Failed to select match', { matchId, error });
         }
     };
 

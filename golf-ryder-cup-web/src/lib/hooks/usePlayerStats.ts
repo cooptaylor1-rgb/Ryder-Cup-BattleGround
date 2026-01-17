@@ -280,11 +280,8 @@ function calculateHeadToHead(
 // ============================================
 
 export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): UsePlayerStatsReturn {
-    const [_error, setError] = useState<Error | null>(null);
-
-    // Error setter for potential async error handling
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleError = (err: Error) => setError(err);
+    // Error state for potential async error handling
+    const [, setError] = useState<Error | null>(null);
 
     // Fetch player
     const player = useLiveQuery(

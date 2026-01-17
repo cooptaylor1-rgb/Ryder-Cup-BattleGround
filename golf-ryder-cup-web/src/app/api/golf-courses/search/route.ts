@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createLogger } from '@/lib/utils/logger';
 
 /**
  * Golf Course Search API
@@ -11,6 +12,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * 2. Golf Course API (RapidAPI) - backup source
  * 3. OpenStreetMap/Overpass - for location data
  */
+
+const logger = createLogger('api:golf-courses-search');
+
+// Cache duration: 1 hour for search results
+const CACHE_MAX_AGE = 3600;
+const CACHE_STALE_WHILE_REVALIDATE = 86400;
 
 interface CourseSearchResult {
     id: string;
@@ -87,13 +94,19 @@ export async function GET(request: NextRequest) {
             results.push(...osmResults);
         }
 
-        return NextResponse.json({
+        const res = NextResponse.json({
             success: true,
             results: results.slice(0, limit),
             total: results.length,
         });
+        // Add cache headers for successful responses
+        res.headers.set(
+            'Cache-Control',
+            `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=${CACHE_STALE_WHILE_REVALIDATE}`
+        );
+        return res;
     } catch (error) {
-        console.error('Course search error:', error);
+        logger.error('Course search error', { query, state, error });
         return NextResponse.json(
             { error: 'Failed to search courses', details: String(error) },
             { status: 500 }
