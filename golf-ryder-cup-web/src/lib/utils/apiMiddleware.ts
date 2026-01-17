@@ -127,11 +127,11 @@ export function applyRateLimit(
 /**
  * Add rate limit headers to a response
  */
-export function addRateLimitHeaders(
-    response: NextResponse,
+export function addRateLimitHeaders<T>(
+    response: NextResponse<T>,
     req: NextRequest,
     config?: Partial<RateLimitConfig>
-): NextResponse {
+): NextResponse<T> {
     const { remaining, resetTime } = checkRateLimit(req, config);
     const limit = config?.maxRequests || DEFAULT_RATE_LIMIT_CONFIG.maxRequests;
 

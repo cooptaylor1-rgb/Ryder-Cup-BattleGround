@@ -187,7 +187,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate body size (10MB max for images)
-  const bodySizeError = await validateBodySize(request, MAX_BODY_SIZE);
+  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  const bodySizeError = validateBodySize(contentLength, MAX_BODY_SIZE);
   if (bodySizeError) {
     return bodySizeError;
   }

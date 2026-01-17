@@ -699,7 +699,7 @@ export default function HomePage() {
                     {sideBets?.filter(b => b.status === 'active').slice(0, 3).map(bet => (
                       <SideBetRow
                         key={bet.id}
-                        type={bet.betType || 'Custom'}
+                        type={bet.type || 'Custom'}
                         status={bet.status === 'active' ? 'In Progress' : 'Complete'}
                         icon={<Zap size={16} />}
                       />
