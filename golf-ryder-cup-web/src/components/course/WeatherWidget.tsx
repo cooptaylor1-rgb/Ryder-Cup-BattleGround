@@ -21,6 +21,7 @@ import {
 } from '@/lib/services/weatherService';
 import {
     Sun,
+    Moon,
     Cloud,
     CloudRain,
     CloudSnow,
@@ -28,6 +29,7 @@ import {
     CloudFog,
     CloudDrizzle,
     CloudSun,
+    CloudMoon,
     Wind,
     Droplets,
     Thermometer,
@@ -371,9 +373,15 @@ function WeatherIcon({ condition, size = 'md', isDay = true }: WeatherIconProps)
 
     switch (condition) {
         case 'sun':
-            return <Sun className={cn(iconClass, 'text-yellow-400')} />;
+            // Show moon at night for clear conditions
+            return isDay
+                ? <Sun className={cn(iconClass, 'text-yellow-400')} />
+                : <Moon className={cn(iconClass, 'text-slate-300')} />;
         case 'cloud-sun':
-            return <CloudSun className={cn(iconClass, isDay ? 'text-yellow-300' : 'text-gray-300')} />;
+            // Show cloud-moon at night for partly cloudy
+            return isDay
+                ? <CloudSun className={cn(iconClass, 'text-yellow-300')} />
+                : <CloudMoon className={cn(iconClass, 'text-slate-300')} />;
         case 'cloud':
             return <Cloud className={cn(iconClass, 'text-gray-300')} />;
         case 'cloud-rain':

@@ -194,18 +194,35 @@ export async function getWeather(
         updatedAt: new Date(),
     };
 
-    // Parse hourly forecast (next 24 hours)
+    // Parse hourly forecast (next 24 hours from current hour)
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    // Find the index of the current hour in the API response
+    const hourlyStartIndex = data.hourly.time.findIndex((time: string) => {
+        const hourTime = new Date(time);
+        return hourTime.getHours() >= currentHour &&
+            hourTime.getDate() === now.getDate() &&
+            hourTime.getMonth() === now.getMonth();
+    });
+
+    // If we found the current hour, start from there; otherwise start from 0
+    const startIdx = hourlyStartIndex >= 0 ? hourlyStartIndex : 0;
+
     const hourly: HourlyForecast[] = data.hourly.time
-        .slice(0, 24)
-        .map((time: string, i: number) => ({
-            time: new Date(time),
-            temperature: Math.round(data.hourly.temperature_2m[i]),
-            precipitation: data.hourly.precipitation[i],
-            precipitationProbability: data.hourly.precipitation_probability[i],
-            condition: getWeatherCondition(data.hourly.weather_code[i]),
-            windSpeed: Math.round(data.hourly.wind_speed_10m[i]),
-            windGust: Math.round(data.hourly.wind_gusts_10m[i]),
-        }));
+        .slice(startIdx, startIdx + 24)
+        .map((time: string, i: number) => {
+            const actualIndex = startIdx + i;
+            return {
+                time: new Date(time),
+                temperature: Math.round(data.hourly.temperature_2m[actualIndex]),
+                precipitation: data.hourly.precipitation[actualIndex],
+                precipitationProbability: data.hourly.precipitation_probability[actualIndex],
+                condition: getWeatherCondition(data.hourly.weather_code[actualIndex]),
+                windSpeed: Math.round(data.hourly.wind_speed_10m[actualIndex]),
+                windGust: Math.round(data.hourly.wind_gusts_10m[actualIndex]),
+            };
+        });
 
     // Parse daily forecast
     const daily: DailyForecast[] = data.daily.time.map((date: string, i: number) => ({
