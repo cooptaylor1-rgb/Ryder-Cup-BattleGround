@@ -82,10 +82,10 @@ export function PWAProvider({ children }: PWAProviderProps) {
     const updateApp = () => {
         if (registration?.waiting) {
             skipWaiting();
-            // Reload once the new SW takes over
+            // Reload once the new SW takes over - use once to avoid leak
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 window.location.reload();
-            });
+            }, { once: true });
         }
     };
 

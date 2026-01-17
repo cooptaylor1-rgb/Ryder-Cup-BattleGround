@@ -150,12 +150,19 @@ export function VoiceScoring({
 }: VoiceScoringProps) {
     // Use the globally declared SpeechRecognition type from speech-recognition.d.ts
     const recognitionRef = useRef<InstanceType<NonNullable<typeof window.SpeechRecognition>> | null>(null);
+    // Track state in ref to avoid stale closure in event handlers
+    const stateRef = useRef<ListeningState>('idle');
 
     const [state, setState] = useState<ListeningState>('idle');
     const [recognizedScore, setRecognizedScore] = useState<RecognizedScore | null>(null);
     const [transcript, setTranscript] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSupported, setIsSupported] = useState(true);
+
+    // Keep stateRef in sync with state
+    useEffect(() => {
+        stateRef.current = state;
+    }, [state]);
 
     // Check for speech recognition support
     useEffect(() => {
@@ -267,14 +274,15 @@ export function VoiceScoring({
         };
 
         recognition.onend = () => {
-            if (state === 'listening') {
+            // Use stateRef to get current state, avoiding stale closure
+            if (stateRef.current === 'listening') {
                 setState('idle');
             }
         };
 
         recognitionRef.current = recognition;
         recognition.start();
-    }, [parseTranscript, state]);
+    }, [parseTranscript]);
 
     // Stop listening
     const stopListening = useCallback(() => {

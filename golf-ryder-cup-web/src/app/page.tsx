@@ -172,47 +172,52 @@ export default function HomePage() {
     teamAName: string;
     teamBName: string;
   }) => {
-    // Create the trip using db
-    const tripId = crypto.randomUUID();
-    const now = new Date().toISOString();
+    try {
+      // Create the trip using db
+      const tripId = crypto.randomUUID();
+      const now = new Date().toISOString();
 
-    await db.trips.add({
-      id: tripId,
-      name: tripData.name,
-      location: tripData.location || undefined,
-      startDate: tripData.startDate,
-      endDate: tripData.endDate,
-      isCaptainModeEnabled: false,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Create teams with custom names
-    const teamAId = crypto.randomUUID();
-    const teamBId = crypto.randomUUID();
-
-    await db.teams.bulkAdd([
-      {
-        id: teamAId,
-        tripId,
-        name: tripData.teamAName || 'USA',
-        color: 'usa' as const,
-        mode: 'ryderCup' as const,
+      await db.trips.add({
+        id: tripId,
+        name: tripData.name,
+        location: tripData.location || undefined,
+        startDate: tripData.startDate,
+        endDate: tripData.endDate,
+        isCaptainModeEnabled: false,
         createdAt: now,
-      },
-      {
-        id: teamBId,
-        tripId,
-        name: tripData.teamBName || 'Europe',
-        color: 'europe' as const,
-        mode: 'ryderCup' as const,
-        createdAt: now,
-      },
-    ]);
+        updatedAt: now,
+      });
 
-    setShowQuickStart(false);
-    await loadTrip(tripId);
-    router.push('/players');
+      // Create teams with custom names
+      const teamAId = crypto.randomUUID();
+      const teamBId = crypto.randomUUID();
+
+      await db.teams.bulkAdd([
+        {
+          id: teamAId,
+          tripId,
+          name: tripData.teamAName || 'USA',
+          color: 'usa' as const,
+          mode: 'ryderCup' as const,
+          createdAt: now,
+        },
+        {
+          id: teamBId,
+          tripId,
+          name: tripData.teamBName || 'Europe',
+          color: 'europe' as const,
+          mode: 'ryderCup' as const,
+          createdAt: now,
+        },
+      ]);
+
+      setShowQuickStart(false);
+      await loadTrip(tripId);
+      router.push('/players');
+    } catch (error) {
+      console.error('Failed to create trip:', error);
+      // Could add toast notification here
+    }
   }, [loadTrip, router]);
 
   const hasTrips = trips && trips.length > 0;

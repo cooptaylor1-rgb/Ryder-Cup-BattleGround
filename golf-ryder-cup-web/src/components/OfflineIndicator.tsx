@@ -84,7 +84,7 @@ export function useSyncQueue() {
         ...(pendingPosts || []).map(p => ({
             id: p.id,
             type: 'banter' as const,
-            description: p.content?.slice(0, 30) + '...' || 'Post',
+            description: p.content ? `${p.content.slice(0, 30)}...` : 'Post',
             timestamp: new Date(p.timestamp).getTime(),
             retryCount: 0,
         })),
