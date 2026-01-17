@@ -1,12 +1,8 @@
 /**
  * EmptyStateIllustrations Component — Phase 4: Polish & Delight
  *
- * Beautiful empty state illustrations for various contexts:
- * - No matches yet
- * - No players added
- * - No scores recorded
- * - No photos taken
- * - Search no results
+ * Beautiful empty state illustrations for various contexts.
+ * Consolidates with core illustrations library where possible.
  *
  * Turns empty into engaging with helpful CTAs.
  */
@@ -33,6 +29,15 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
+
+// Import shared illustrations from core library
+import {
+    TrophyIllustration as SharedTrophy,
+    GolfFlagIllustration as SharedGolfFlag,
+    ScorecardIllustration as SharedScorecard,
+    GolfersIllustration as SharedGolfers,
+    CalendarIllustration as SharedCalendar,
+} from '@/components/ui/illustrations';
 
 // ============================================
 // TYPES
@@ -65,6 +70,24 @@ interface EmptyStateProps {
 }
 
 // ============================================
+// WRAPPER FOR SHARED ILLUSTRATIONS
+// (Adds empty-state animation wrapper)
+// ============================================
+
+function AnimatedIllustrationWrapper({ children }: { children: ReactNode }) {
+    return (
+        <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', duration: 0.5 }}
+            className="w-full h-full flex items-center justify-center"
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+// ============================================
 // ILLUSTRATIONS CONFIG
 // ============================================
 
@@ -81,21 +104,33 @@ const EMPTY_STATE_CONFIG: Record<EmptyStateType, EmptyStateConfig> = {
         icon: Flag,
         defaultTitle: 'No matches yet',
         defaultDescription: 'Create your first match to get the competition started!',
-        illustration: <GolfFlagIllustration />,
+        illustration: (
+            <AnimatedIllustrationWrapper>
+                <SharedGolfFlag size="lg" animated />
+            </AnimatedIllustrationWrapper>
+        ),
         color: 'var(--masters)',
     },
     'no-players': {
         icon: Users,
         defaultTitle: 'No players added',
         defaultDescription: 'Invite your golf buddies to join the trip.',
-        illustration: <PlayersIllustration />,
+        illustration: (
+            <AnimatedIllustrationWrapper>
+                <SharedGolfers size="lg" animated />
+            </AnimatedIllustrationWrapper>
+        ),
         color: '#3B82F6',
     },
     'no-scores': {
         icon: Target,
         defaultTitle: 'No scores recorded',
         defaultDescription: 'Start scoring your round to track performance.',
-        illustration: <ScorecardIllustration />,
+        illustration: (
+            <AnimatedIllustrationWrapper>
+                <SharedScorecard size="lg" animated />
+            </AnimatedIllustrationWrapper>
+        ),
         color: '#22C55E',
     },
     'no-photos': {
@@ -123,7 +158,11 @@ const EMPTY_STATE_CONFIG: Record<EmptyStateType, EmptyStateConfig> = {
         icon: Trophy,
         defaultTitle: 'No standings yet',
         defaultDescription: 'Complete some matches to see the leaderboard.',
-        illustration: <TrophyIllustration />,
+        illustration: (
+            <AnimatedIllustrationWrapper>
+                <SharedTrophy size="lg" animated />
+            </AnimatedIllustrationWrapper>
+        ),
         color: '#FFD700',
     },
     'no-activity': {
@@ -178,242 +217,99 @@ const EMPTY_STATE_CONFIG: Record<EmptyStateType, EmptyStateConfig> = {
 };
 
 // ============================================
-// ILLUSTRATIONS
+// UNIQUE ILLUSTRATIONS (not in core library)
+// Refined for visual clarity and premium feel
 // ============================================
-
-function GolfFlagIllustration() {
-    return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Ground */}
-            <ellipse cx="100" cy="140" rx="80" ry="12" fill="var(--masters)" opacity="0.2" />
-
-            {/* Flag pole */}
-            <motion.line
-                x1="100" y1="30" x2="100" y2="130"
-                stroke="var(--ink-tertiary)"
-                strokeWidth="3"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.5 }}
-            />
-
-            {/* Flag */}
-            <motion.path
-                d="M 100 30 L 140 45 L 100 60 Z"
-                fill="var(--masters)"
-                initial={{ scale: 0, originX: '100px', originY: '45px' }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: 'spring' }}
-            />
-
-            {/* Hole */}
-            <motion.ellipse
-                cx="100" cy="132" rx="12" ry="4"
-                fill="var(--ink)"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5 }}
-            />
-
-            {/* Golf ball */}
-            <motion.circle
-                cx="130" cy="128" r="8"
-                fill="white"
-                stroke="var(--rule)"
-                strokeWidth="1"
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-            />
-        </svg>
-    );
-}
-
-function PlayersIllustration() {
-    return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Background circle */}
-            <circle cx="100" cy="80" r="50" fill="#3B82F6" opacity="0.1" />
-
-            {/* Person outlines */}
-            {[70, 100, 130].map((cx, i) => (
-                <motion.g
-                    key={cx}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.15 }}
-                >
-                    <circle cx={cx} cy="60" r="15" fill={i === 1 ? '#3B82F6' : 'var(--rule)'} />
-                    <ellipse cx={cx} cy="100" rx="20" ry="25" fill={i === 1 ? '#3B82F6' : 'var(--rule)'} />
-                </motion.g>
-            ))}
-
-            {/* Plus icon */}
-            <motion.g
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5, type: 'spring' }}
-            >
-                <circle cx="155" cy="90" r="15" fill="#22C55E" />
-                <line x1="155" y1="82" x2="155" y2="98" stroke="white" strokeWidth="3" />
-                <line x1="147" y1="90" x2="163" y2="90" stroke="white" strokeWidth="3" />
-            </motion.g>
-        </svg>
-    );
-}
-
-function ScorecardIllustration() {
-    return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Card background */}
-            <motion.rect
-                x="40" y="30" width="120" height="100" rx="8"
-                fill="white"
-                stroke="var(--rule)"
-                strokeWidth="2"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-            />
-
-            {/* Header */}
-            <rect x="40" y="30" width="120" height="25" rx="8" fill="var(--masters)" opacity="0.2" />
-
-            {/* Score boxes */}
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <motion.rect
-                    key={i}
-                    x={50 + (i % 9) * 12}
-                    y={65 + Math.floor(i / 9) * 20}
-                    width="10"
-                    height="14"
-                    rx="2"
-                    fill="var(--rule)"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 + i * 0.05 }}
-                />
-            ))}
-
-            {/* Pencil */}
-            <motion.g
-                initial={{ x: 30, y: -20, rotate: -45 }}
-                animate={{ x: 0, y: 0, rotate: 0 }}
-                transition={{ delay: 0.8, type: 'spring' }}
-            >
-                <rect x="145" y="85" width="30" height="6" rx="1" fill="#F59E0B" />
-                <polygon points="175,88 185,88 180,85" fill="#FFD700" />
-            </motion.g>
-        </svg>
-    );
-}
 
 function CameraIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Camera body */}
             <motion.rect
-                x="50" y="50" width="100" height="70" rx="10"
+                x="20" y="25" width="60" height="40" rx="6"
                 fill="var(--ink)"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: 'spring' }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
-            {/* Flash */}
+            {/* Flash bump */}
             <motion.rect
-                x="65" y="40" width="25" height="15" rx="3"
+                x="28" y="18" width="16" height="10" rx="2"
                 fill="var(--ink-secondary)"
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.15 }}
             />
 
             {/* Lens */}
             <motion.circle
-                cx="100" cy="85" r="25"
+                cx="50" cy="45" r="14"
                 fill="#1F2937"
                 stroke="var(--ink-secondary)"
-                strokeWidth="4"
+                strokeWidth="3"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: 'spring' }}
+                transition={{ delay: 0.2, type: 'spring' }}
             />
 
             {/* Inner lens */}
             <motion.circle
-                cx="100" cy="85" r="15"
+                cx="50" cy="45" r="8"
                 fill="#374151"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.3 }}
             />
 
             {/* Shutter button */}
             <motion.circle
-                cx="130" cy="55" r="8"
+                cx="68" cy="30" r="5"
                 fill="#8B5CF6"
                 initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.2, 1] }}
-                transition={{ delay: 0.5 }}
+                animate={{ scale: [0, 1.15, 1] }}
+                transition={{ delay: 0.35 }}
             />
-
-            {/* Photo cards */}
-            {[0, 1].map((i) => (
-                <motion.rect
-                    key={i}
-                    x={160 - i * 8}
-                    y={70 + i * 5}
-                    width="35"
-                    height="45"
-                    rx="3"
-                    fill="white"
-                    stroke="var(--rule)"
-                    initial={{ x: -30, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 + i * 0.1 }}
-                    style={{ transformOrigin: 'center' }}
-                />
-            ))}
         </svg>
     );
 }
 
 function SearchIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Magnifying glass */}
+        <svg viewBox="0 0 100 80" className="w-full h-full">
+            {/* Magnifying glass circle */}
             <motion.circle
-                cx="85" cy="70" r="35"
+                cx="40" cy="35" r="20"
                 fill="none"
                 stroke="var(--rule)"
-                strokeWidth="8"
+                strokeWidth="5"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: 'spring' }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
             {/* Handle */}
             <motion.line
-                x1="112" y1="97"
-                x2="145" y2="130"
+                x1="54" y1="49"
+                x2="72" y2="67"
                 stroke="var(--rule)"
-                strokeWidth="10"
+                strokeWidth="6"
                 strokeLinecap="round"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.25 }}
             />
 
             {/* Question mark */}
             <motion.text
-                x="85" y="80"
-                fontSize="30"
+                x="40" y="42"
+                fontSize="18"
                 fill="var(--ink-tertiary)"
                 textAnchor="middle"
                 fontWeight="bold"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.4 }}
             >
                 ?
             </motion.text>
@@ -423,144 +319,82 @@ function SearchIllustration() {
 
 function TripIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Suitcase */}
+        <svg viewBox="0 0 100 80" className="w-full h-full">
+            {/* Suitcase body */}
             <motion.rect
-                x="60" y="60" width="80" height="60" rx="8"
+                x="25" y="30" width="50" height="38" rx="5"
                 fill="var(--masters)"
-                initial={{ y: 30, opacity: 0 }}
+                initial={{ y: 15, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
             {/* Handle */}
             <motion.path
-                d="M 85 60 L 85 45 Q 85 40 90 40 L 110 40 Q 115 40 115 45 L 115 60"
+                d="M 38 30 L 38 22 Q 38 18 42 18 L 58 18 Q 62 18 62 22 L 62 30"
                 fill="none"
                 stroke="var(--masters)"
-                strokeWidth="4"
+                strokeWidth="3"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.2 }}
             />
 
             {/* Straps */}
-            <rect x="60" y="80" width="80" height="4" fill="#006040" />
-            <rect x="60" y="100" width="80" height="4" fill="#006040" />
+            <rect x="25" y="42" width="50" height="3" fill="#006040" />
+            <rect x="25" y="55" width="50" height="3" fill="#006040" />
 
             {/* Golf clubs sticking out */}
             <motion.g
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 12, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.35 }}
             >
-                <line x1="75" y1="60" x2="70" y2="30" stroke="var(--ink-secondary)" strokeWidth="3" />
-                <line x1="85" y1="60" x2="82" y2="28" stroke="var(--ink-secondary)" strokeWidth="3" />
-                <circle cx="70" cy="28" r="6" fill="var(--ink-secondary)" />
-                <rect x="78" y="22" width="8" height="10" fill="var(--ink-secondary)" />
+                <line x1="33" y1="30" x2="30" y2="12" stroke="var(--ink-secondary)" strokeWidth="2" />
+                <line x1="40" y1="30" x2="38" y2="10" stroke="var(--ink-secondary)" strokeWidth="2" />
+                <circle cx="30" cy="10" r="4" fill="var(--ink-secondary)" />
+                <rect x="35" y="6" width="6" height="7" rx="1" fill="var(--ink-secondary)" />
             </motion.g>
-        </svg>
-    );
-}
-
-function TrophyIllustration() {
-    return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Trophy cup */}
-            <motion.path
-                d="M 70 40 L 70 80 Q 70 100 100 100 Q 130 100 130 80 L 130 40 Z"
-                fill="#FFD700"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring' }}
-            />
-
-            {/* Handles */}
-            <motion.path
-                d="M 70 50 Q 50 50 50 70 Q 50 85 70 85"
-                fill="none"
-                stroke="#FFD700"
-                strokeWidth="8"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ delay: 0.3 }}
-            />
-            <motion.path
-                d="M 130 50 Q 150 50 150 70 Q 150 85 130 85"
-                fill="none"
-                stroke="#FFD700"
-                strokeWidth="8"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ delay: 0.3 }}
-            />
-
-            {/* Base */}
-            <motion.rect
-                x="85" y="100" width="30" height="15"
-                fill="#F59E0B"
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ delay: 0.4 }}
-            />
-            <motion.rect
-                x="75" y="115" width="50" height="10" rx="2"
-                fill="#D97706"
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ delay: 0.5 }}
-            />
-
-            {/* Star */}
-            <motion.text
-                x="100" y="75"
-                fontSize="24"
-                textAnchor="middle"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 }}
-            >
-                ⭐
-            </motion.text>
         </svg>
     );
 }
 
 function ActivityIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Graph line */}
             <motion.path
-                d="M 30 120 L 60 100 L 90 110 L 120 60 L 150 80 L 180 40"
+                d="M 10 60 L 25 48 L 45 54 L 60 28 L 80 38 L 95 18"
                 fill="none"
                 stroke="#F59E0B"
-                strokeWidth="4"
+                strokeWidth="3"
                 strokeLinecap="round"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 0.8 }}
             />
 
             {/* Dots */}
-            {[[60, 100], [90, 110], [120, 60], [150, 80]].map(([cx, cy], i) => (
+            {[[25, 48], [45, 54], [60, 28], [80, 38]].map(([cx, cy], i) => (
                 <motion.circle
                     key={i}
                     cx={cx}
                     cy={cy}
-                    r="6"
+                    r="4"
                     fill="#F59E0B"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + i * 0.1, type: 'spring' }}
+                    transition={{ delay: 0.4 + i * 0.08, type: 'spring' }}
                 />
             ))}
 
-            {/* Arrow */}
+            {/* Arrow tip */}
             <motion.polygon
-                points="175,35 185,40 175,55"
+                points="92,14 98,18 92,28"
                 fill="#F59E0B"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
+                transition={{ delay: 0.8 }}
             />
         </svg>
     );
@@ -568,35 +402,37 @@ function ActivityIllustration() {
 
 function CommentsIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Chat bubbles */}
+        <svg viewBox="0 0 100 80" className="w-full h-full">
+            {/* Back bubble */}
             <motion.path
-                d="M 40 50 L 120 50 Q 130 50 130 60 L 130 90 Q 130 100 120 100 L 60 100 L 50 115 L 50 100 L 50 100 Q 40 100 40 90 L 40 60 Q 40 50 50 50 Z"
+                d="M 15 25 L 60 25 Q 68 25 68 33 L 68 50 Q 68 58 60 58 L 28 58 L 20 68 L 20 58 Q 15 58 15 50 L 15 33 Q 15 25 23 25 Z"
                 fill="var(--rule)"
-                initial={{ scale: 0, originX: '85px', originY: '80px' }}
+                initial={{ scale: 0, originX: '42px', originY: '45px' }}
                 animate={{ scale: 1 }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
+            {/* Front bubble */}
             <motion.path
-                d="M 70 70 L 150 70 Q 160 70 160 80 L 160 110 Q 160 120 150 120 L 150 135 L 140 120 L 80 120 Q 70 120 70 110 L 70 80 Q 70 70 80 70 Z"
+                d="M 32 38 L 77 38 Q 85 38 85 46 L 85 58 Q 85 66 77 66 L 77 76 L 70 66 L 40 66 Q 32 66 32 58 L 32 46 Q 32 38 40 38 Z"
                 fill="#EC4899"
-                opacity="0.8"
-                initial={{ scale: 0, originX: '115px', originY: '100px' }}
+                opacity="0.85"
+                initial={{ scale: 0, originX: '58px', originY: '55px' }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.2, type: 'spring' }}
             />
 
-            {/* Dots */}
-            {[85, 100, 115].map((cx, i) => (
+            {/* Typing dots */}
+            {[48, 58, 68].map((cx, i) => (
                 <motion.circle
                     key={cx}
                     cx={cx}
-                    cy="95"
-                    r="4"
+                    cy="52"
+                    r="3"
                     fill="white"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 + i * 0.1 }}
+                    transition={{ delay: 0.4 + i * 0.08 }}
                 />
             ))}
         </svg>
@@ -605,45 +441,45 @@ function CommentsIllustration() {
 
 function NotificationsIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Bell */}
+        <svg viewBox="0 0 100 80" className="w-full h-full">
+            {/* Bell body */}
             <motion.path
-                d="M 100 30 Q 100 30 100 30 Q 65 40 65 80 L 65 100 L 135 100 L 135 80 Q 135 40 100 30 Z"
+                d="M 50 12 Q 28 18 28 42 L 28 52 L 72 52 L 72 42 Q 72 18 50 12 Z"
                 fill="#22C55E"
-                initial={{ y: -20, opacity: 0 }}
+                initial={{ y: -12, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ type: 'spring' }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
-            {/* Bell bottom */}
+            {/* Bell bottom band */}
             <motion.rect
-                x="55" y="100" width="90" height="12" rx="6"
+                x="22" y="52" width="56" height="8" rx="4"
                 fill="#22C55E"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.15 }}
             />
 
             {/* Clapper */}
             <motion.circle
-                cx="100" cy="120" r="10"
+                cx="50" cy="65" r="6"
                 fill="#16A34A"
-                initial={{ y: -20 }}
+                initial={{ y: -12 }}
                 animate={{ y: 0 }}
-                transition={{ delay: 0.3, type: 'spring' }}
+                transition={{ delay: 0.25, type: 'spring' }}
             />
 
             {/* Check mark */}
             <motion.path
-                d="M 90 80 L 98 90 L 115 70"
+                d="M 43 40 L 48 46 L 58 34"
                 fill="none"
                 stroke="white"
-                strokeWidth="5"
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ delay: 0.5, duration: 0.3 }}
+                transition={{ delay: 0.4, duration: 0.25 }}
             />
         </svg>
     );
@@ -651,40 +487,40 @@ function NotificationsIllustration() {
 
 function CourseIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Ground */}
-            <ellipse cx="100" cy="130" rx="90" ry="20" fill="var(--masters)" opacity="0.2" />
+            <ellipse cx="50" cy="68" rx="45" ry="10" fill="var(--masters)" opacity="0.2" />
 
             {/* Trees */}
-            {[40, 160].map((cx, i) => (
+            {[15, 85].map((cx, i) => (
                 <motion.g
                     key={cx}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: i * 0.2 }}
+                    transition={{ delay: i * 0.12 }}
                 >
-                    <polygon points={`${cx},40 ${cx - 20},100 ${cx + 20},100`} fill="#22C55E" opacity="0.8" />
-                    <rect x={cx - 5} y="100" width="10" height="25" fill="#8B4513" />
+                    <polygon points={`${cx},18 ${cx - 10},55 ${cx + 10},55`} fill="#22C55E" opacity="0.8" />
+                    <rect x={cx - 3} y="55" width="6" height="12" fill="#8B4513" />
                 </motion.g>
             ))}
 
             {/* Flag */}
             <motion.g
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 12, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.25 }}
             >
-                <line x1="100" y1="40" x2="100" y2="120" stroke="var(--ink-tertiary)" strokeWidth="3" />
-                <polygon points="100,40 130,55 100,70" fill="var(--masters)" />
+                <line x1="50" y1="20" x2="50" y2="62" stroke="var(--ink-tertiary)" strokeWidth="2" />
+                <polygon points="50,20 68,30 50,40" fill="var(--masters)" />
             </motion.g>
 
             {/* Hole */}
             <motion.ellipse
-                cx="100" cy="122" rx="10" ry="4"
+                cx="50" cy="64" rx="6" ry="2.5"
                 fill="var(--ink)"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.4 }}
             />
         </svg>
     );
@@ -692,43 +528,44 @@ function CourseIllustration() {
 
 function ChecklistIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Clipboard */}
             <motion.rect
-                x="50" y="30" width="100" height="120" rx="8"
+                x="20" y="12" width="60" height="65" rx="5"
                 fill="white"
                 stroke="var(--rule)"
                 strokeWidth="2"
-                initial={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', duration: 0.4 }}
             />
 
             {/* Clip */}
             <motion.rect
-                x="75" y="20" width="50" height="25" rx="4"
+                x="35" y="6" width="30" height="14" rx="3"
                 fill="var(--ink-secondary)"
-                initial={{ y: 20, opacity: 0 }}
+                initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.15 }}
             />
 
             {/* Checkboxes */}
             {[0, 1, 2, 3].map((i) => (
                 <motion.g
                     key={i}
-                    initial={{ x: -20, opacity: 0 }}
+                    initial={{ x: -12, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 + i * 0.1 }}
+                    transition={{ delay: 0.25 + i * 0.08 }}
                 >
-                    <rect x="65" y={55 + i * 25} width="16" height="16" rx="3" fill="#22C55E" />
+                    <rect x="28" y={26 + i * 14} width="10" height="10" rx="2" fill="#22C55E" />
                     <path
-                        d={`M ${69} ${63 + i * 25} L ${73} ${67 + i * 25} L ${79} ${59 + i * 25}`}
+                        d={`M 30 ${31 + i * 14} L 33 ${34 + i * 14} L 37 ${29 + i * 14}`}
                         fill="none"
                         stroke="white"
-                        strokeWidth="2"
+                        strokeWidth="1.5"
                         strokeLinecap="round"
                     />
-                    <rect x="90" y={57 + i * 25} width="50" height="10" rx="2" fill="var(--rule)" />
+                    <rect x="44" y={28 + i * 14} width="28" height="6" rx="1.5" fill="var(--rule)" />
                 </motion.g>
             ))}
         </svg>
@@ -737,51 +574,51 @@ function ChecklistIllustration() {
 
 function StatsIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Bar chart */}
             {[
-                { x: 40, h: 60, color: '#3B82F6' },
-                { x: 70, h: 80, color: '#22C55E' },
-                { x: 100, h: 50, color: '#F59E0B' },
-                { x: 130, h: 90, color: '#8B5CF6' },
-                { x: 160, h: 70, color: '#EC4899' },
+                { x: 15, h: 30, color: '#3B82F6' },
+                { x: 32, h: 42, color: '#22C55E' },
+                { x: 49, h: 25, color: '#F59E0B' },
+                { x: 66, h: 48, color: '#8B5CF6' },
+                { x: 83, h: 36, color: '#EC4899' },
             ].map((bar, i) => (
                 <motion.rect
                     key={bar.x}
-                    x={bar.x - 12}
-                    y={130 - bar.h}
-                    width="24"
+                    x={bar.x - 6}
+                    y={68 - bar.h}
+                    width="12"
                     height={bar.h}
-                    rx="4"
+                    rx="2"
                     fill={bar.color}
-                    initial={{ scaleY: 0, originY: '130px' }}
+                    initial={{ scaleY: 0, originY: '68px' }}
                     animate={{ scaleY: 1 }}
-                    transition={{ delay: i * 0.1 }}
+                    transition={{ delay: i * 0.08 }}
                 />
             ))}
 
             {/* Baseline */}
-            <line x1="25" y1="130" x2="175" y2="130" stroke="var(--rule)" strokeWidth="2" />
+            <line x1="5" y1="68" x2="95" y2="68" stroke="var(--rule)" strokeWidth="1.5" />
         </svg>
     );
 }
 
 function ReactionsIllustration() {
     return (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+        <svg viewBox="0 0 100 80" className="w-full h-full">
             {/* Emoji reactions */}
             {[
-                { emoji: '❤️', x: 60, y: 80, delay: 0 },
-                { emoji: '🔥', x: 100, y: 60, delay: 0.1 },
-                { emoji: '👏', x: 140, y: 80, delay: 0.2 },
-                { emoji: '😂', x: 80, y: 110, delay: 0.3 },
-                { emoji: '⛳', x: 120, y: 110, delay: 0.4 },
+                { emoji: '❤️', x: 25, y: 42, delay: 0 },
+                { emoji: '🔥', x: 50, y: 28, delay: 0.08 },
+                { emoji: '👏', x: 75, y: 42, delay: 0.16 },
+                { emoji: '😂', x: 35, y: 58, delay: 0.24 },
+                { emoji: '⛳', x: 65, y: 58, delay: 0.32 },
             ].map((item, i) => (
                 <motion.text
                     key={i}
                     x={item.x}
                     y={item.y}
-                    fontSize="30"
+                    fontSize="18"
                     textAnchor="middle"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -795,11 +632,11 @@ function ReactionsIllustration() {
             <motion.g
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.6, type: 'spring' }}
+                transition={{ delay: 0.45, type: 'spring' }}
             >
-                <circle cx="165" cy="95" r="15" fill="var(--rule)" />
-                <line x1="165" y1="87" x2="165" y2="103" stroke="var(--ink-tertiary)" strokeWidth="2" />
-                <line x1="157" y1="95" x2="173" y2="95" stroke="var(--ink-tertiary)" strokeWidth="2" />
+                <circle cx="88" cy="50" r="8" fill="var(--rule)" />
+                <line x1="88" y1="45" x2="88" y2="55" stroke="var(--ink-tertiary)" strokeWidth="1.5" />
+                <line x1="83" y1="50" x2="93" y2="50" stroke="var(--ink-tertiary)" strokeWidth="1.5" />
             </motion.g>
         </svg>
     );
