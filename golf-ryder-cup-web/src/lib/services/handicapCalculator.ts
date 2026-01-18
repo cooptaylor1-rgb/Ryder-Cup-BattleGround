@@ -332,6 +332,157 @@ export function calculateFoursomesStrokes(
 }
 
 // ============================================
+// TEAM FORMAT HANDICAP CALCULATIONS
+// ============================================
+
+/**
+ * Handicap allowance percentages for different team formats.
+ * These apply to ONE-BALL formats where the team shares a single ball.
+ */
+export const TEAM_FORMAT_ALLOWANCES = {
+    foursomes: 0.5,      // 50% of combined
+    greensomes: 0.5,     // 60% low + 40% high, simplified to ~50%
+    pinehurst: 0.5,      // 60% low + 40% high, simplified to ~50%
+    bloodsome: 0.5,      // 50% of combined
+    'modified-alternate': 0.5,
+    scramble: 0.35,      // Generic scramble
+    'scramble-2': 0.35,  // 2-person: 35%
+    'scramble-3': 0.25,  // 3-person: 25%
+    'scramble-4': 0.20,  // 4-person: 20%
+    'texas-scramble': 0.20,
+    'florida-scramble': 0.20,
+} as const;
+
+export type OneBallFormat = keyof typeof TEAM_FORMAT_ALLOWANCES;
+
+/**
+ * Calculate team strokes for one-ball formats (scramble, alt-shot, etc.).
+ *
+ * In these formats, only ONE ball is in play per team, so the team
+ * receives a single handicap stroke allowance, NOT individual player strokes.
+ *
+ * @param teamACourseHandicaps - Array of Team A player course handicaps
+ * @param teamBCourseHandicaps - Array of Team B player course handicaps
+ * @param format - The one-ball format being played
+ * @returns Team strokes (one will be 0 unless equal)
+ */
+export function calculateOneBallFormatStrokes(
+    teamACourseHandicaps: number[],
+    teamBCourseHandicaps: number[],
+    format: OneBallFormat | string
+): { teamAStrokes: number; teamBStrokes: number } {
+    const allowance = TEAM_FORMAT_ALLOWANCES[format as OneBallFormat] ?? 0.5;
+
+    const teamATotal = teamACourseHandicaps.reduce((a, b) => a + b, 0);
+    const teamBTotal = teamBCourseHandicaps.reduce((a, b) => a + b, 0);
+
+    const teamACombined = Math.round(teamATotal * allowance);
+    const teamBCombined = Math.round(teamBTotal * allowance);
+
+    const difference = teamACombined - teamBCombined;
+
+    if (difference > 0) {
+        return { teamAStrokes: Math.abs(difference), teamBStrokes: 0 };
+    } else if (difference < 0) {
+        return { teamAStrokes: 0, teamBStrokes: Math.abs(difference) };
+    }
+    return { teamAStrokes: 0, teamBStrokes: 0 };
+}
+
+/**
+ * Calculate greensomes/pinehurst team handicap.
+ *
+ * Standard method: 60% of lower handicap + 40% of higher handicap.
+ * This gives more weight to the better player.
+ *
+ * @param playerHandicaps - Array of 2 player handicaps
+ * @returns Combined team handicap
+ */
+export function calculateGreensomesHandicap(playerHandicaps: number[]): number {
+    if (playerHandicaps.length !== 2) {
+        console.warn('Greensomes requires exactly 2 players');
+        return 0;
+    }
+
+    const [low, high] = playerHandicaps.sort((a, b) => a - b);
+    return Math.round(low * 0.6 + high * 0.4);
+}
+
+/**
+ * Calculate scramble team handicap.
+ *
+ * Percentage varies by team size:
+ * - 2-person: 35% of combined
+ * - 3-person: 25% of combined
+ * - 4-person: 20% of combined
+ *
+ * @param playerHandicaps - Array of player handicaps
+ * @param customPercentage - Optional override percentage
+ * @returns Team handicap
+ */
+export function calculateScrambleTeamHandicap(
+    playerHandicaps: number[],
+    customPercentage?: number
+): number {
+    const defaultPercentages: Record<number, number> = {
+        2: 0.35,
+        3: 0.25,
+        4: 0.20,
+    };
+
+    const percentage = customPercentage ?? defaultPercentages[playerHandicaps.length] ?? 0.25;
+    const combined = playerHandicaps.reduce((sum, h) => sum + h, 0);
+    return Math.round(combined * percentage);
+}
+
+/**
+ * Determine if a format uses one ball per team (team strokes)
+ * vs multiple balls (individual strokes).
+ *
+ * @param format - The match format
+ * @returns true if one ball in play per team
+ */
+export function isOneBallFormat(format: string): boolean {
+    const oneBallFormats = [
+        'foursomes',
+        'greensomes',
+        'pinehurst',
+        'bloodsome',
+        'modified-alternate',
+        'scramble',
+        'scramble-2',
+        'scramble-3',
+        'scramble-4',
+        'texas-scramble',
+        'florida-scramble',
+    ];
+    return oneBallFormats.includes(format);
+}
+
+/**
+ * Determine if a format uses individual player strokes (multiple balls).
+ *
+ * @param format - The match format
+ * @returns true if each player has their own ball
+ */
+export function isIndividualBallFormat(format: string): boolean {
+    const individualFormats = [
+        'singles',
+        'fourball',
+        'best-ball',
+        'better-ball-3',
+        'better-ball-4',
+        'best-2-of-4',
+        'shamble', // After the tee shot selection, each plays their own ball
+        'stableford',
+        'stroke-play',
+        'net-stroke-play',
+        'medal',
+    ];
+    return individualFormats.includes(format);
+}
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -410,6 +561,7 @@ export function validateHoleHandicaps(holeHandicaps: number[]): {
  * Groups all functions for easier importing.
  */
 export const HandicapCalculator = {
+    // Core calculations
     calculateCourseHandicap,
     allocateStrokes,
     getStrokesOnHole,
@@ -417,9 +569,21 @@ export const HandicapCalculator = {
     calculateNetTotal,
     calculateStablefordPoints,
     calculateTotalStablefordPoints,
+
+    // Match play strokes
     calculateSinglesStrokes,
     calculateFourballStrokes,
     calculateFoursomesStrokes,
+
+    // Team format strokes (one-ball formats)
+    calculateOneBallFormatStrokes,
+    calculateGreensomesHandicap,
+    calculateScrambleTeamHandicap,
+    isOneBallFormat,
+    isIndividualBallFormat,
+    TEAM_FORMAT_ALLOWANCES,
+
+    // Utilities
     formatHandicapIndex,
     validateHoleHandicaps,
 };

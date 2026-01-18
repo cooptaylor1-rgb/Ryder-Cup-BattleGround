@@ -20,6 +20,12 @@ import {
     calculateTotalStablefordPoints,
     calculateSinglesStrokes,
     calculateFourballStrokes,
+    calculateOneBallFormatStrokes,
+    calculateGreensomesHandicap,
+    calculateScrambleTeamHandicap,
+    isOneBallFormat,
+    isIndividualBallFormat,
+    TEAM_FORMAT_ALLOWANCES,
 } from '@/lib/services/handicapCalculator';
 import {
     calculateStrokesPerHole,
@@ -532,5 +538,117 @@ describe('Gross to Net Integration', () => {
         const totalPoints = calculateTotalStablefordPoints(netScores, holePars);
 
         expect(totalPoints).toBe(28);
+    });
+});
+// ============================================
+// ONE-BALL FORMAT HANDICAP TESTS
+// ============================================
+
+describe('One-Ball Format Handicap Calculations', () => {
+    describe('calculateOneBallFormatStrokes', () => {
+        it('should calculate foursomes (alt-shot) strokes at 50%', () => {
+            // Team A: [10, 14] = 24 combined → 12 at 50%
+            // Team B: [8, 16] = 24 combined → 12 at 50%
+            // Equal, so no strokes given
+            const result = calculateOneBallFormatStrokes([10, 14], [8, 16], 'foursomes');
+            expect(result.teamAStrokes).toBe(0);
+            expect(result.teamBStrokes).toBe(0);
+        });
+
+        it('should give strokes to higher combined team', () => {
+            // Team A: [15, 15] = 30 → 15 at 50%
+            // Team B: [5, 5] = 10 → 5 at 50%
+            // Difference = 10, Team A gets strokes
+            const result = calculateOneBallFormatStrokes([15, 15], [5, 5], 'foursomes');
+            expect(result.teamAStrokes).toBe(10);
+            expect(result.teamBStrokes).toBe(0);
+        });
+
+        it('should apply correct scramble percentages', () => {
+            // 2-person scramble: 35%
+            // Team A: [10, 20] = 30 → 11 at 35%
+            // Team B: [5, 5] = 10 → 4 at 35%
+            // Difference = 7
+            const result2 = calculateOneBallFormatStrokes([10, 20], [5, 5], 'scramble-2');
+            expect(result2.teamAStrokes).toBe(7);
+
+            // 4-person scramble: 20%
+            // Team A: [10, 10, 10, 10] = 40 → 8 at 20%
+            // Team B: [5, 5, 5, 5] = 20 → 4 at 20%
+            // Difference = 4
+            const result4 = calculateOneBallFormatStrokes([10, 10, 10, 10], [5, 5, 5, 5], 'scramble-4');
+            expect(result4.teamAStrokes).toBe(4);
+        });
+    });
+
+    describe('calculateGreensomesHandicap', () => {
+        it('should weight 60% low + 40% high', () => {
+            // Low = 5, High = 15
+            // 5 * 0.6 + 15 * 0.4 = 3 + 6 = 9
+            const result = calculateGreensomesHandicap([5, 15]);
+            expect(result).toBe(9);
+        });
+
+        it('should handle equal handicaps', () => {
+            const result = calculateGreensomesHandicap([10, 10]);
+            expect(result).toBe(10);
+        });
+    });
+
+    describe('calculateScrambleTeamHandicap', () => {
+        it('should use 35% for 2-person teams', () => {
+            // [10, 20] = 30 → 30 * 0.35 = 10.5 → 11
+            const result = calculateScrambleTeamHandicap([10, 20]);
+            expect(result).toBe(11);
+        });
+
+        it('should use 25% for 3-person teams', () => {
+            // [10, 15, 20] = 45 → 45 * 0.25 = 11.25 → 11
+            const result = calculateScrambleTeamHandicap([10, 15, 20]);
+            expect(result).toBe(11);
+        });
+
+        it('should use 20% for 4-person teams', () => {
+            // [10, 15, 20, 25] = 70 → 70 * 0.20 = 14
+            const result = calculateScrambleTeamHandicap([10, 15, 20, 25]);
+            expect(result).toBe(14);
+        });
+
+        it('should accept custom percentage', () => {
+            const result = calculateScrambleTeamHandicap([10, 20], 0.5);
+            expect(result).toBe(15); // 30 * 0.5 = 15
+        });
+    });
+
+    describe('isOneBallFormat', () => {
+        it('should identify one-ball formats', () => {
+            expect(isOneBallFormat('foursomes')).toBe(true);
+            expect(isOneBallFormat('greensomes')).toBe(true);
+            expect(isOneBallFormat('pinehurst')).toBe(true);
+            expect(isOneBallFormat('scramble')).toBe(true);
+            expect(isOneBallFormat('scramble-2')).toBe(true);
+            expect(isOneBallFormat('scramble-4')).toBe(true);
+            expect(isOneBallFormat('bloodsome')).toBe(true);
+        });
+
+        it('should not identify individual formats as one-ball', () => {
+            expect(isOneBallFormat('fourball')).toBe(false);
+            expect(isOneBallFormat('singles')).toBe(false);
+            expect(isOneBallFormat('stableford')).toBe(false);
+        });
+    });
+
+    describe('isIndividualBallFormat', () => {
+        it('should identify individual ball formats', () => {
+            expect(isIndividualBallFormat('fourball')).toBe(true);
+            expect(isIndividualBallFormat('singles')).toBe(true);
+            expect(isIndividualBallFormat('shamble')).toBe(true);
+            expect(isIndividualBallFormat('stableford')).toBe(true);
+        });
+
+        it('should not identify one-ball formats as individual', () => {
+            expect(isIndividualBallFormat('foursomes')).toBe(false);
+            expect(isIndividualBallFormat('scramble')).toBe(false);
+        });
     });
 });

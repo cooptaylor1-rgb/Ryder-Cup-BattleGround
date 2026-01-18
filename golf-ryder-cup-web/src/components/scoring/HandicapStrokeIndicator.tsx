@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Circle, CircleDot, Info } from 'lucide-react';
-import { allocateStrokes } from '@/lib/services/handicapCalculator';
+import { allocateStrokes, isOneBallFormat } from '@/lib/services/handicapCalculator';
 
 /**
  * HANDICAP STROKE INDICATOR
@@ -15,6 +15,10 @@ import { allocateStrokes } from '@/lib/services/handicapCalculator';
  * - Dot indicators for strokes (filled = stroke given)
  * - Clear team color coding
  * - Compact display for outdoor use
+ *
+ * Format Awareness:
+ * - For one-ball formats (scramble, foursomes, etc.): Shows TEAM strokes
+ * - For individual formats (fourball): Shows individual player strokes
  */
 
 export interface HandicapStrokeIndicatorProps {
@@ -24,6 +28,8 @@ export interface HandicapStrokeIndicatorProps {
   holeHandicaps: number[]; // 18-element array of hole handicap rankings
   teamAName: string;
   teamBName: string;
+  /** Match format - determines if strokes are team or individual */
+  format?: string;
   showAllHoles?: boolean;
   className?: string;
 }
@@ -35,9 +41,13 @@ export function HandicapStrokeIndicator({
   holeHandicaps,
   teamAName,
   teamBName,
+  format,
   showAllHoles = false,
   className,
 }: HandicapStrokeIndicatorProps) {
+  // Determine if this is a one-ball format (team strokes vs individual)
+  const isTeamStrokesFormat = format ? isOneBallFormat(format) : false;
+
   // Calculate stroke allocation for each team
   const teamAStrokeAllocation = useMemo(() => {
     if (holeHandicaps.length !== 18) return Array(18).fill(0);
@@ -116,11 +126,22 @@ export function HandicapStrokeIndicator({
           style={{ color: 'var(--ink-tertiary)' }}
         >
           <span>
-            {teamAStrokes > 0 ? `${teamAName}: ${teamAStrokes} strokes total` : ''}
+            {teamAStrokes > 0 ? `${teamAName}: ${teamAStrokes} ${isTeamStrokesFormat ? 'team ' : ''}stroke${teamAStrokes !== 1 ? 's' : ''}` : ''}
           </span>
           <span>
-            {teamBStrokes > 0 ? `${teamBName}: ${teamBStrokes} strokes total` : ''}
+            {teamBStrokes > 0 ? `${teamBName}: ${teamBStrokes} ${isTeamStrokesFormat ? 'team ' : ''}stroke${teamBStrokes !== 1 ? 's' : ''}` : ''}
           </span>
+        </div>
+      )}
+
+      {/* Format hint for one-ball formats */}
+      {isTeamStrokesFormat && (teamAStrokes > 0 || teamBStrokes > 0) && (
+        <div
+          className="flex items-center gap-1 mt-1 px-2"
+          style={{ color: 'var(--ink-muted)' }}
+        >
+          <Info size={10} />
+          <span className="text-[10px]">One ball in play — strokes apply to team</span>
         </div>
       )}
 

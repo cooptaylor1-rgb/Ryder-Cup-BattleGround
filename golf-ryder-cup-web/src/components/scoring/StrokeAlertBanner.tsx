@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { CircleDot, Award, AlertCircle, X, ChevronUp } from 'lucide-react';
-import { allocateStrokes } from '@/lib/services/handicapCalculator';
+import { allocateStrokes, isOneBallFormat } from '@/lib/services/handicapCalculator';
 
 /**
  * STROKE ALERT BANNER
@@ -17,6 +17,7 @@ import { allocateStrokes } from '@/lib/services/handicapCalculator';
  * - Shows which team(s) get strokes
  * - Dismissible with timeout
  * - Haptic feedback option
+ * - Format-aware (team strokes vs individual strokes)
  */
 
 export interface StrokeAlertBannerProps {
@@ -26,6 +27,8 @@ export interface StrokeAlertBannerProps {
   holeHandicaps: number[];
   teamAName: string;
   teamBName: string;
+  /** Match format - affects stroke display (team vs individual) */
+  format?: string;
   /** Auto-dismiss after N milliseconds (0 = manual dismiss only) */
   autoDismissMs?: number;
   /** Callback when alert is shown */
@@ -42,6 +45,7 @@ export function StrokeAlertBanner({
   holeHandicaps,
   teamAName,
   teamBName,
+  format,
   autoDismissMs = 4000,
   onAlertShown,
   position = 'top',
@@ -50,6 +54,9 @@ export function StrokeAlertBanner({
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [lastAlertedHole, setLastAlertedHole] = useState<number | null>(null);
+
+  // Determine if this is a one-ball format (team strokes vs individual)
+  const isTeamStrokesFormat = format ? isOneBallFormat(format) : false;
 
   // Calculate stroke allocations
   const teamAStrokeAllocation = useMemo(() => {
@@ -176,13 +183,18 @@ export function StrokeAlertBanner({
               >
                 <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
                   {currentHoleTeamAStrokes > 0 && currentHoleTeamBStrokes > 0 ? (
-                    <>Both teams receive strokes on this hole</>
+                    <>Both teams receive {isTeamStrokesFormat ? 'team ' : ''}strokes on this hole</>
                   ) : currentHoleTeamAStrokes > 0 ? (
-                    <><strong style={{ color: 'var(--team-usa)' }}>{teamAName}</strong> receives {currentHoleTeamAStrokes} stroke{currentHoleTeamAStrokes > 1 ? 's' : ''}</>
+                    <><strong style={{ color: 'var(--team-usa)' }}>{teamAName}</strong> receives {currentHoleTeamAStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamAStrokes > 1 ? 's' : ''}</>
                   ) : (
-                    <><strong style={{ color: 'var(--team-europe)' }}>{teamBName}</strong> receives {currentHoleTeamBStrokes} stroke{currentHoleTeamBStrokes > 1 ? 's' : ''}</>
+                    <><strong style={{ color: 'var(--team-europe)' }}>{teamBName}</strong> receives {currentHoleTeamBStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamBStrokes > 1 ? 's' : ''}</>
                   )}
                 </p>
+                {isTeamStrokesFormat && (
+                  <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>
+                    One ball in play — stroke applies to the team
+                  </p>
+                )}
               </div>
             </div>
           </div>
