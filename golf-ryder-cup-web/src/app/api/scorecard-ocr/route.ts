@@ -62,31 +62,43 @@ interface RequestBody {
 
 const EXTRACTION_PROMPT = `You are an expert golf scorecard data extractor. Your job is to extract EVERY piece of data visible on this scorecard image.
 
-SCORECARD LAYOUT - Look for these sections:
-1. HOLE NUMBERS: Row showing 1-9 (Front) and 10-18 (Back), usually at top
-2. TEE BOXES: Multiple rows of yardages, each row is a different tee (Black, Blue, White, Gold, Red, etc.)
-3. PAR: Row showing par for each hole (values: 3, 4, or 5)
-4. HANDICAP/HCP: Row showing difficulty ranking 1-18 (1=hardest, 18=easiest)
-5. TOTALS: "OUT" (front 9 total), "IN" (back 9 total), "TOTAL" (all 18)
-6. RATINGS: Course rating (e.g., 72.4) and Slope (e.g., 128) - often near tee names
+SCORECARD LAYOUT - Carefully examine ALL rows and columns:
 
-IMPORTANT: The scorecard likely shows BOTH front 9 and back 9:
-- Front 9: Holes 1-9, ends with "OUT" total
-- Back 9: Holes 10-18, ends with "IN" total
-- These may be side-by-side OR stacked vertically
+1. HOLE NUMBERS: Usually two separate tables or sections:
+   - Front 9: Holes 1-9 with "OUT" total
+   - Back 9: Holes 10-18 with "IN" total
+   - These are often STACKED VERTICALLY (front on top, back below) or side by side
 
-TEE SET IDENTIFICATION:
-- Look for colored boxes/circles next to row labels (Black, Blue, White, Gold, Red)
-- Or text labels like "Championship", "Men's", "Ladies", "Forward"
-- Each tee row has 18 yardages PLUS rating/slope info
+2. TEE BOXES: Look for MULTIPLE ROWS of yardages - each row is a different tee:
+   - Common tee names: Black, Blue, White, Gold, Red, Green, Championship, Men's, Ladies, Forward, Senior, Tangerine, Silver
+   - Count ALL yardage rows - there are typically 4-6 different tees
+   - The longest yardages are championship/back tees (top row usually)
+   - The shortest yardages are forward tees (bottom row usually)
 
-Extract and return this JSON:
+3. PAR: Row labeled "Par" or "PAR" showing 3, 4, or 5 for each hole
+
+4. HANDICAP: Look for rows labeled:
+   - "Handicap", "HCP", "HDCP", "M Handicap" (Men's), "W Handicap" (Women's)
+   - Values 1-18, ranking hole difficulty (1=hardest, 18=easiest)
+   - Use Men's handicap (M HANDICAP) if both are shown
+
+5. TOTALS: "OUT" (holes 1-9), "IN" (holes 10-18), "TOTAL" (all 18)
+
+CRITICAL RULES:
+1. Return EXACTLY 18 holes - check BOTH front 9 AND back 9 sections
+2. Return ALL tee sets visible - count the yardage rows carefully (usually 4-6 tees)
+3. Each tee MUST have 18 yardages - combine front 9 + back 9 yardages
+4. Par values: only 3, 4, or 5
+5. Handicap: 1-18, each number used exactly once
+6. Typical yardages: Par 3 = 100-250, Par 4 = 280-470, Par 5 = 450-650
+
+Return this JSON (and ONLY this JSON, no other text):
 {
-  "courseName": "Name of the golf course if visible",
+  "courseName": "Name of course if visible",
   "holes": [
-    {"par": 4, "handicap": 7, "yardage": 385},
-    {"par": 3, "handicap": 15, "yardage": 165},
-    ... continue for ALL 18 holes in order
+    {"par": 4, "handicap": 3, "yardage": 430},
+    {"par": 3, "handicap": 15, "yardage": 210},
+    ... ALL 18 holes in order (1-18)
   ],
   "teeSets": [
     {
@@ -94,31 +106,18 @@ Extract and return this JSON:
       "color": "black",
       "rating": 74.2,
       "slope": 138,
-      "yardages": [385, 165, 520, 410, 195, 545, 340, 180, 430, 395, 155, 510, 425, 185, 560, 365, 170, 445]
+      "yardages": [430, 210, 601, 420, 460, 330, 418, 231, 585, 371, 616, 537, 478, 165, 437, 510, 206, 538]
     },
     {
-      "name": "Blue",
-      "color": "blue",
-      "rating": 72.1,
-      "slope": 131,
-      "yardages": [365, 150, 495, 385, 175, 520, 320, 165, 410, 375, 140, 485, 400, 170, 535, 345, 155, 420]
+      "name": "Green",
+      "color": "green",
+      "yardages": [420, 190, 542, 387, 440, 308, 388, 206, 540, 332, 568, 467, 429, 149, 383, 494, 178, 510]
     },
-    ... include ALL tee sets visible (typically 4-6 tees)
+    ... include ALL visible tee sets (4-6 typically)
   ]
-}
+}`;
 
-CRITICAL RULES:
-1. MUST return exactly 18 holes - scan the ENTIRE image for both front and back 9
-2. MUST include ALL tee sets visible - expect 4-6 different tees, don't skip any
-3. Each tee set MUST have exactly 18 yardages (one per hole)
-4. Par values: only 3, 4, or 5
-5. Handicap: 1-18, each number used exactly once
-6. If rating/slope is shown near a tee name, include it
-7. Yardages typically: Par 3 = 100-250, Par 4 = 280-470, Par 5 = 450-650
-
-Return ONLY the JSON object, no other text.`;
-
-const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have 2 images of the SAME scorecard:
+const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have multiple images of a golf scorecard.
 
 IMAGE 1 (FRONT - Holes & Yardages):
 This image shows ALL 18 holes in a table format with:

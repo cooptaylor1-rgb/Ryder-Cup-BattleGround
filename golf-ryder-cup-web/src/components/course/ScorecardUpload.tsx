@@ -293,26 +293,61 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 {extractedData.courseName && (
                   <p className="type-title-sm mb-2">{extractedData.courseName}</p>
                 )}
-                <div className="flex flex-wrap gap-3 mb-3">
-                  {extractedData.teeName && (
+
+                {/* Tee Sets Summary */}
+                {extractedData.teeSets && extractedData.teeSets.length > 0 ? (
+                  <div className="mb-3">
+                    <p className="type-meta font-medium mb-2" style={{ color: 'var(--ink-secondary)' }}>
+                      {extractedData.teeSets.length} Tee Set{extractedData.teeSets.length > 1 ? 's' : ''} Found:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {extractedData.teeSets.map((tee, i) => (
+                        <span
+                          key={i}
+                          className="type-meta px-2 py-1 rounded flex items-center gap-1"
+                          style={{ background: 'var(--surface-card)' }}
+                        >
+                          {tee.color && (
+                            <span
+                              style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: tee.color.startsWith('#') ? tee.color : `var(--${tee.color}, ${tee.color})`,
+                                border: tee.color?.toLowerCase() === 'white' || tee.color === '#FFFFFF' ? '1px solid var(--rule)' : 'none'
+                              }}
+                            />
+                          )}
+                          {tee.name}
+                          {tee.rating && tee.slope && (
+                            <span style={{ color: 'var(--ink-tertiary)', fontSize: '10px' }}>
+                              ({tee.rating}/{tee.slope})
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : extractedData.teeName && (
+                  <div className="flex flex-wrap gap-3 mb-3">
                     <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
                       {extractedData.teeName} Tees
                     </span>
-                  )}
-                  {extractedData.rating && (
-                    <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
-                      Rating: {extractedData.rating}
-                    </span>
-                  )}
-                  {extractedData.slope && (
-                    <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
-                      Slope: {extractedData.slope}
-                    </span>
-                  )}
-                </div>
+                    {extractedData.rating && (
+                      <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
+                        Rating: {extractedData.rating}
+                      </span>
+                    )}
+                    {extractedData.slope && (
+                      <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
+                        Slope: {extractedData.slope}
+                      </span>
+                    )}
+                  </div>
+                )}
 
-                {/* Hole summary */}
-                <div className="overflow-x-auto">
+                {/* Front 9 */}
+                <div className="overflow-x-auto mb-2">
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr style={{ background: 'var(--surface-card)' }}>
@@ -333,15 +368,60 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                           {extractedData.holes.slice(0, 9).reduce((s, h) => s + h.par, 0)}
                         </td>
                       </tr>
+                      {extractedData.holes.some(h => h.handicap) && (
+                        <tr style={{ color: 'var(--ink-secondary)' }}>
+                          <td style={{ padding: '4px', fontWeight: 500 }}>Hcp</td>
+                          {extractedData.holes.slice(0, 9).map((h, i) => (
+                            <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.handicap || '-'}</td>
+                          ))}
+                          <td style={{ padding: '4px' }}></td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
 
+                {/* Back 9 - only show if we have 18 holes */}
+                {extractedData.holes.length > 9 && (
+                  <div className="overflow-x-auto">
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--surface-card)' }}>
+                          <th style={{ padding: '4px', textAlign: 'center' }}>Hole</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={i} style={{ padding: '4px', textAlign: 'center' }}>{i + 10}</th>
+                          ))}
+                          <th style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>In</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '4px', fontWeight: 500 }}>Par</td>
+                          {extractedData.holes.slice(9, 18).map((h, i) => (
+                            <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.par}</td>
+                          ))}
+                          <td style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>
+                            {extractedData.holes.slice(9, 18).reduce((s, h) => s + h.par, 0)}
+                          </td>
+                        </tr>
+                        {extractedData.holes.some(h => h.handicap) && (
+                          <tr style={{ color: 'var(--ink-secondary)' }}>
+                            <td style={{ padding: '4px', fontWeight: 500 }}>Hcp</td>
+                            {extractedData.holes.slice(9, 18).map((h, i) => (
+                              <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.handicap || '-'}</td>
+                            ))}
+                            <td style={{ padding: '4px' }}></td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
                 <p className="type-caption mt-3 text-center" style={{ color: 'var(--ink-tertiary)' }}>
                   Total Par: {extractedData.holes.reduce((s, h) => s + h.par, 0)} |
-                  {' '}{extractedData.holes.filter(h => h.yardage).length > 0
-                    ? `${extractedData.holes.reduce((s, h) => s + (h.yardage || 0), 0)} yards`
-                    : 'No yardage data'}
+                  {' '}{extractedData.teeSets?.[0]?.yardages?.reduce((s: number, y) => s + (y || 0), 0) ||
+                    extractedData.holes.reduce((s, h) => s + (h.yardage || 0), 0)} yards
                 </p>
               </div>
 
