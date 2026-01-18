@@ -31,10 +31,12 @@ import {
     X,
     RefreshCw,
     MapPin,
+    Droplets,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useTripStore } from '@/lib/stores';
+import { getWeather, getWindDirection, formatTime, type GolfWeather } from '@/lib/services/weatherService';
 
 // ============================================
 // TYPES
@@ -93,34 +95,33 @@ interface WeatherAlertsProps {
     onAlert?: (alert: WeatherAlert) => void;
     /** Custom class name */
     className?: string;
+    /** Optional latitude override (uses trip course location by default) */
+    latitude?: number;
+    /** Optional longitude override (uses trip course location by default) */
+    longitude?: number;
 }
 
+// Default coordinates (Augusta National as fallback)
+const DEFAULT_COORDS = { lat: 33.5021, lng: -82.0241 };
+
 // ============================================
-// MOCK WEATHER SERVICE (Replace with real API)
+// WEATHER ICON MAPPING
 // ============================================
 
-async function fetchWeatherConditions(lat?: number, lng?: number): Promise<WeatherConditions> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Mock data - in production, call OpenWeather, Weather.gov, etc.
-    const now = new Date();
-    const hour = now.getHours();
-
-    return {
-        temperature: 72 + Math.random() * 10,
-        feelsLike: 74 + Math.random() * 8,
-        humidity: 45 + Math.random() * 20,
-        windSpeed: 5 + Math.random() * 15,
-        windDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)],
-        precipitation: Math.random() * 30,
-        visibility: 8 + Math.random() * 4,
-        uvIndex: hour >= 10 && hour <= 16 ? 6 + Math.random() * 4 : 2,
-        conditions: Math.random() > 0.7 ? 'Partly Cloudy' : 'Sunny',
-        icon: Math.random() > 0.7 ? '⛅' : '☀️',
-        sunrise: '6:45 AM',
-        sunset: '7:30 PM',
+function getWeatherIcon(iconName: string, isDay: boolean = true): string {
+    const iconMap: Record<string, string> = {
+        'sun': isDay ? '☀️' : '🌙',
+        'cloud-sun': isDay ? '⛅' : '☁️',
+        'cloud-moon': '🌙',
+        'cloud': '☁️',
+        'cloud-rain': '🌧️',
+        'cloud-drizzle': '🌦️',
+        'cloud-snow': '❄️',
+        'cloud-lightning': '⛈️',
+        'cloud-fog': '🌫️',
+        'cloud-hail': '🌨️',
     };
+    return iconMap[iconName] || '☁️';
 }
 
 // ============================================
@@ -132,15 +133,29 @@ export function WeatherAlerts({
     showWeatherBar = true,
     onAlert,
     className,
+    latitude,
+    longitude,
 }: WeatherAlertsProps) {
     const { trigger } = useHaptic();
     const { currentTrip } = useTripStore();
 
     const [weather, setWeather] = useState<WeatherConditions | null>(null);
+    const [golfWeatherData, setGolfWeatherData] = useState<GolfWeather | null>(null);
     const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
+
+    // Get coordinates from trip course or props or default
+    const coords = useMemo(() => {
+        // First check if explicit coordinates were provided
+        if (latitude !== undefined && longitude !== undefined) {
+            return { lat: latitude, lng: longitude };
+        }
+        // Try to get from trip's course (if available)
+        // For now, use default coordinates
+        return DEFAULT_COORDS;
+    }, [latitude, longitude]);
 
     // Generate alerts from weather conditions
     const generateAlerts = useCallback((conditions: WeatherConditions): WeatherAlert[] => {
@@ -260,13 +275,38 @@ export function WeatherAlerts({
         return newAlerts;
     }, []);
 
-    // Fetch weather and update alerts
+    // Fetch weather and update alerts using real API
     const updateWeather = useCallback(async () => {
-        if (!currentTrip) return;
-
         setIsLoading(true);
         try {
-            const conditions = await fetchWeatherConditions();
+            // Fetch real weather data from Open-Meteo API
+            const golfWeather = await getWeather(coords.lat, coords.lng);
+            setGolfWeatherData(golfWeather);
+
+            // Map GolfWeather to our WeatherConditions interface
+            const { current, daily } = golfWeather;
+            const today = daily[0];
+
+            // Get precipitation probability from hourly data (next few hours)
+            const nextHoursPrecipProb = golfWeather.hourly
+                .slice(0, 6)
+                .reduce((max, h) => Math.max(max, h.precipitationProbability), 0);
+
+            const conditions: WeatherConditions = {
+                temperature: current.temperature,
+                feelsLike: current.feelsLike,
+                humidity: current.humidity,
+                windSpeed: current.windSpeed,
+                windDirection: getWindDirection(current.windDirection),
+                precipitation: nextHoursPrecipProb,
+                visibility: current.visibility,
+                uvIndex: current.uvIndex,
+                conditions: current.condition.description,
+                icon: getWeatherIcon(current.condition.icon, current.isDay),
+                sunrise: formatTime(today.sunrise),
+                sunset: formatTime(today.sunset),
+            };
+
             setWeather(conditions);
             setLastUpdate(new Date());
 
@@ -290,7 +330,7 @@ export function WeatherAlerts({
         } finally {
             setIsLoading(false);
         }
-    }, [currentTrip, generateAlerts, dismissedAlerts, onAlert, trigger]);
+    }, [coords, generateAlerts, dismissedAlerts, onAlert, trigger]);
 
     // Initial fetch and interval
     useEffect(() => {
@@ -362,8 +402,6 @@ export function WeatherAlerts({
     // Active (non-dismissed) alerts
     const activeAlerts = alerts.filter(a => !dismissedAlerts.has(a.id));
 
-    if (!currentTrip) return null;
-
     return (
         <div className={cn('space-y-2', className)}>
             {/* Weather bar */}
@@ -398,8 +436,8 @@ export function WeatherAlerts({
                             {Math.round(weather.windSpeed)} mph
                         </div>
                         <div className="flex items-center gap-1">
-                            <CloudRain className="w-3 h-3" />
-                            {Math.round(weather.precipitation)}%
+                            <Droplets className="w-3 h-3" />
+                            {Math.round(weather.humidity)}%
                         </div>
                         <div className="flex items-center gap-1">
                             <Sunset className="w-3 h-3" />
