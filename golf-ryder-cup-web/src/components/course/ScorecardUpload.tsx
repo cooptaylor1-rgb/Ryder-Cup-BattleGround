@@ -348,33 +348,33 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
                 {/* Front 9 */}
                 <div className="overflow-x-auto mb-2">
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', tableLayout: 'fixed' }}>
                     <thead>
                       <tr style={{ background: 'var(--surface-card)' }}>
-                        <th style={{ padding: '4px', textAlign: 'center' }}>Hole</th>
+                        <th style={{ padding: '4px 2px', textAlign: 'left', width: '36px' }}>Hole</th>
                         {Array.from({ length: 9 }, (_, i) => (
-                          <th key={i} style={{ padding: '4px', textAlign: 'center' }}>{i + 1}</th>
+                          <th key={i} style={{ padding: '4px 2px', textAlign: 'center', width: '28px' }}>{i + 1}</th>
                         ))}
-                        <th style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>Out</th>
+                        <th style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600, width: '32px' }}>Out</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '4px', fontWeight: 500 }}>Par</td>
+                        <td style={{ padding: '4px 2px', fontWeight: 500 }}>Par</td>
                         {extractedData.holes.slice(0, 9).map((h, i) => (
-                          <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.par}</td>
+                          <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.par}</td>
                         ))}
-                        <td style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>
+                        <td style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600 }}>
                           {extractedData.holes.slice(0, 9).reduce((s, h) => s + h.par, 0)}
                         </td>
                       </tr>
                       {extractedData.holes.some(h => h.handicap) && (
                         <tr style={{ color: 'var(--ink-secondary)' }}>
-                          <td style={{ padding: '4px', fontWeight: 500 }}>Hcp</td>
+                          <td style={{ padding: '4px 2px', fontWeight: 500 }}>Hcp</td>
                           {extractedData.holes.slice(0, 9).map((h, i) => (
-                            <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.handicap || '-'}</td>
+                            <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.handicap || '-'}</td>
                           ))}
-                          <td style={{ padding: '4px' }}></td>
+                          <td style={{ padding: '4px 2px' }}></td>
                         </tr>
                       )}
                     </tbody>
@@ -384,33 +384,33 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 {/* Back 9 - only show if we have 18 holes */}
                 {extractedData.holes.length > 9 && (
                   <div className="overflow-x-auto">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', tableLayout: 'fixed' }}>
                       <thead>
                         <tr style={{ background: 'var(--surface-card)' }}>
-                          <th style={{ padding: '4px', textAlign: 'center' }}>Hole</th>
+                          <th style={{ padding: '4px 2px', textAlign: 'left', width: '36px' }}>Hole</th>
                           {Array.from({ length: 9 }, (_, i) => (
-                            <th key={i} style={{ padding: '4px', textAlign: 'center' }}>{i + 10}</th>
+                            <th key={i} style={{ padding: '4px 2px', textAlign: 'center', width: '28px' }}>{i + 10}</th>
                           ))}
-                          <th style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>In</th>
+                          <th style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600, width: '32px' }}>In</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td style={{ padding: '4px', fontWeight: 500 }}>Par</td>
+                          <td style={{ padding: '4px 2px', fontWeight: 500 }}>Par</td>
                           {extractedData.holes.slice(9, 18).map((h, i) => (
-                            <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.par}</td>
+                            <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.par}</td>
                           ))}
-                          <td style={{ padding: '4px', textAlign: 'center', fontWeight: 600 }}>
+                          <td style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600 }}>
                             {extractedData.holes.slice(9, 18).reduce((s, h) => s + h.par, 0)}
                           </td>
                         </tr>
                         {extractedData.holes.some(h => h.handicap) && (
                           <tr style={{ color: 'var(--ink-secondary)' }}>
-                            <td style={{ padding: '4px', fontWeight: 500 }}>Hcp</td>
+                            <td style={{ padding: '4px 2px', fontWeight: 500 }}>Hcp</td>
                             {extractedData.holes.slice(9, 18).map((h, i) => (
-                              <td key={i} style={{ padding: '4px', textAlign: 'center' }}>{h.handicap || '-'}</td>
+                              <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.handicap || '-'}</td>
                             ))}
-                            <td style={{ padding: '4px' }}></td>
+                            <td style={{ padding: '4px 2px' }}></td>
                           </tr>
                         )}
                       </tbody>

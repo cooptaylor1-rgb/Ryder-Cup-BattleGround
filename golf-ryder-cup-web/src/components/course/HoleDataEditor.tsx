@@ -99,8 +99,9 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
         disabled={readonly}
         style={{
           width: '100%',
-          padding: 'var(--space-1) var(--space-2)',
-          fontSize: '12px',
+          minWidth: field === 'yardage' ? '48px' : '36px',
+          padding: '4px 2px',
+          fontSize: '13px',
           textAlign: 'center',
         }}
       />
@@ -156,14 +157,14 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
           <div className="mb-4">
             <h4 className="type-overline mb-2" style={{ color: 'var(--ink-tertiary)' }}>Front Nine</h4>
             <div className="overflow-x-auto">
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', tableLayout: 'fixed' }}>
                 <thead>
                   <tr style={{ background: 'var(--surface-card)' }}>
-                    <th style={{ padding: '8px 4px', textAlign: 'left', fontWeight: 500 }}>Hole</th>
+                    <th style={{ padding: '8px 4px', textAlign: 'left', fontWeight: 500, width: '50px' }}>Hole</th>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
-                      <th key={n} style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 500, minWidth: '45px' }}>{n}</th>
+                      <th key={n} style={{ padding: '8px 2px', textAlign: 'center', fontWeight: 500, width: '40px' }}>{n}</th>
                     ))}
-                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--masters-soft)' }}>Out</th>
+                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--masters-soft)', width: '45px' }}>Out</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,15 +208,15 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
           <div>
             <h4 className="type-overline mb-2" style={{ color: 'var(--ink-tertiary)' }}>Back Nine</h4>
             <div className="overflow-x-auto">
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', tableLayout: 'fixed' }}>
                 <thead>
                   <tr style={{ background: 'var(--surface-card)' }}>
-                    <th style={{ padding: '8px 4px', textAlign: 'left', fontWeight: 500 }}>Hole</th>
+                    <th style={{ padding: '8px 4px', textAlign: 'left', fontWeight: 500, width: '50px' }}>Hole</th>
                     {[10, 11, 12, 13, 14, 15, 16, 17, 18].map(n => (
-                      <th key={n} style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 500, minWidth: '45px' }}>{n}</th>
+                      <th key={n} style={{ padding: '8px 2px', textAlign: 'center', fontWeight: 500, width: '40px' }}>{n}</th>
                     ))}
-                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--masters-soft)' }}>In</th>
-                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--color-accent)', color: 'var(--masters-deep)' }}>Tot</th>
+                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--masters-soft)', width: '45px' }}>In</th>
+                    <th style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 600, background: 'var(--color-accent)', color: 'var(--masters-deep)', width: '45px' }}>Tot</th>
                   </tr>
                 </thead>
                 <tbody>
