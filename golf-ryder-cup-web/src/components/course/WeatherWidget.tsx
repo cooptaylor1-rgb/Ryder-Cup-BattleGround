@@ -163,8 +163,12 @@ export function WeatherWidget({
                                         <span className="text-xs text-surface-500">
                                             {i === 0 ? 'Now' : format(hour.time, 'ha')}
                                         </span>
-                                        <WeatherIcon condition={hour.condition.icon} size="sm" isDay={hour.time.getHours() > 6 && hour.time.getHours() < 20} />
-                                        <span className="text-sm font-medium">{hour.temperature}°</span>
+                                        <WeatherIcon 
+                                            condition={i === 0 ? current.condition.icon : hour.condition.icon} 
+                                            size="sm" 
+                                            isDay={i === 0 ? current.isDay : (hour.time.getHours() > 6 && hour.time.getHours() < 20)} 
+                                        />
+                                        <span className="text-sm font-medium">{i === 0 ? current.temperature : hour.temperature}°</span>
                                         {hour.precipitationProbability > 20 && (
                                             <span className="text-xs text-blue-500">{hour.precipitationProbability}%</span>
                                         )}
@@ -292,8 +296,12 @@ export function WeatherWidget({
                             <span className="text-xs text-surface-500">
                                 {i === 0 ? 'Now' : format(hour.time, 'ha')}
                             </span>
-                            <WeatherIcon condition={hour.condition.icon} size="sm" isDay={hour.time.getHours() > 6 && hour.time.getHours() < 20} />
-                            <span className="font-medium">{hour.temperature}°</span>
+                            <WeatherIcon 
+                                condition={i === 0 ? current.condition.icon : hour.condition.icon} 
+                                size="sm" 
+                                isDay={i === 0 ? current.isDay : (hour.time.getHours() > 6 && hour.time.getHours() < 20)} 
+                            />
+                            <span className="font-medium">{i === 0 ? current.temperature : hour.temperature}°</span>
                             {hour.precipitationProbability > 20 && (
                                 <span className="text-xs text-blue-500">{hour.precipitationProbability}%</span>
                             )}
