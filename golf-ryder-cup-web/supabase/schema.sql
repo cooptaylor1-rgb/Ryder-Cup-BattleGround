@@ -144,6 +144,90 @@ CREATE TABLE IF NOT EXISTS tee_sets (
 CREATE INDEX idx_tee_sets_course_id ON tee_sets(course_id);
 
 -- ============================================
+-- COURSE LIBRARY (Global Course Database)
+-- ============================================
+-- These tables store reusable course data that persists across trips
+-- and can be shared among all users
+
+CREATE TABLE IF NOT EXISTS course_library (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    location TEXT,
+    city TEXT,
+    state TEXT,
+    country TEXT DEFAULT 'USA',
+    latitude DECIMAL(10, 7),
+    longitude DECIMAL(10, 7),
+    phone TEXT,
+    website TEXT,
+    notes TEXT,
+    -- Source tracking
+    source TEXT DEFAULT 'user' CHECK (source IN ('user', 'ocr', 'api', 'import')),
+    api_course_id TEXT,
+    -- Verification
+    is_verified BOOLEAN DEFAULT FALSE,
+    verified_by TEXT,
+    verified_at TIMESTAMPTZ,
+    -- Usage tracking
+    usage_count INTEGER DEFAULT 0,
+    last_used_at TIMESTAMPTZ,
+    -- Timestamps
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    created_by TEXT  -- User/device identifier
+);
+
+CREATE INDEX idx_course_library_name ON course_library(name);
+CREATE INDEX idx_course_library_location ON course_library(location);
+CREATE INDEX idx_course_library_state ON course_library(state);
+
+-- ============================================
+-- COURSE LIBRARY TEE SETS
+-- ============================================
+CREATE TABLE IF NOT EXISTS course_library_tee_sets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    course_library_id UUID NOT NULL REFERENCES course_library(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    color TEXT,
+    color_hex TEXT,
+    gender TEXT DEFAULT 'mens' CHECK (gender IN ('mens', 'womens', 'unisex')),
+    rating DECIMAL(4, 1),
+    slope INTEGER,
+    par INTEGER NOT NULL,
+    total_yardage INTEGER,
+    -- Per-hole data (arrays of 18 values)
+    hole_pars INTEGER[] NOT NULL,
+    hole_handicaps INTEGER[],
+    hole_yardages INTEGER[],
+    -- Timestamps
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_course_library_tee_sets_course ON course_library_tee_sets(course_library_id);
+
+-- Trigger to update course usage count
+CREATE OR REPLACE FUNCTION update_course_usage()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE course_library
+    SET usage_count = usage_count + 1,
+        last_used_at = NOW()
+    WHERE id = NEW.course_library_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger for updated_at on course library
+CREATE TRIGGER update_course_library_updated_at
+    BEFORE UPDATE ON course_library
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_course_library_tee_sets_updated_at
+    BEFORE UPDATE ON course_library_tee_sets
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
 -- MATCHES
 -- ============================================
 CREATE TABLE IF NOT EXISTS matches (

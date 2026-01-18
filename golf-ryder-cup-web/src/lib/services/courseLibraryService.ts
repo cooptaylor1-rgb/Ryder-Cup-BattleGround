@@ -3,12 +3,15 @@
  *
  * Manages reusable course profiles stored independently from trips.
  * Allows saving and reusing course data across multiple trips.
+ *
+ * NOTE: All courses are automatically synced to Supabase when online.
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db';
 import type { Course, TeeSet } from '../types/models';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
+import { syncCourseToCloud } from './courseLibrarySyncService';
 
 /**
  * Get all course profiles
@@ -46,10 +49,12 @@ export async function searchCourseProfiles(query: string): Promise<CourseProfile
 
 /**
  * Create a new course profile
+ * Automatically syncs to Supabase cloud database
  */
 export async function createCourseProfile(
     data: Omit<CourseProfile, 'id' | 'createdAt' | 'updatedAt'>,
-    teeSets?: Omit<TeeSetProfile, 'id' | 'courseProfileId' | 'createdAt' | 'updatedAt'>[]
+    teeSets?: Omit<TeeSetProfile, 'id' | 'courseProfileId' | 'createdAt' | 'updatedAt'>[],
+    source: 'user' | 'ocr' | 'api' | 'import' = 'user'
 ): Promise<CourseProfile> {
     const now = new Date().toISOString();
     const profileId = uuidv4();
@@ -79,11 +84,17 @@ export async function createCourseProfile(
         updatedAt: now,
     }));
 
+    // Save locally first
     await db.transaction('rw', [db.courseProfiles, db.teeSetProfiles], async () => {
         await db.courseProfiles.add(profile);
         if (teeSetProfiles.length > 0) {
             await db.teeSetProfiles.bulkAdd(teeSetProfiles);
         }
+    });
+
+    // Sync to cloud in background (don't block UI)
+    syncCourseToCloud(profile, teeSetProfiles, source).catch((err) => {
+        console.error('[CourseLibrary] Background sync to cloud failed:', err);
     });
 
     return profile;
@@ -162,6 +173,7 @@ export async function deleteTeeSetProfile(id: string): Promise<void> {
 
 /**
  * Save a course from a trip to the library
+ * Automatically syncs to Supabase cloud database
  */
 export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Promise<CourseProfile> {
     const now = new Date().toISOString();
@@ -191,11 +203,17 @@ export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Pr
         updatedAt: now,
     }));
 
+    // Save locally first
     await db.transaction('rw', [db.courseProfiles, db.teeSetProfiles], async () => {
         await db.courseProfiles.add(profile);
         if (teeSetProfiles.length > 0) {
             await db.teeSetProfiles.bulkAdd(teeSetProfiles);
         }
+    });
+
+    // Sync to cloud in background
+    syncCourseToCloud(profile, teeSetProfiles, 'user').catch((err) => {
+        console.error('[CourseLibrary] Background sync to cloud failed:', err);
     });
 
     return profile;

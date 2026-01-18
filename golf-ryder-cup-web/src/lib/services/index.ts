@@ -25,6 +25,7 @@ export * from './sessionLockService';
 // Data services
 export * from './awardsService';
 export * from './courseLibraryService';
+export * from './courseLibrarySyncService';
 export * from './exportImportService';
 
 export { default as HandicapCalculator } from './handicapCalculator';
