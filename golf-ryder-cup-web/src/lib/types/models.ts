@@ -471,8 +471,23 @@ export interface SideBet {
     hole?: number;
     participantIds: UUID[];
     results?: SideBetResult[];  // Track hole-by-hole results for skins
+
+    // Nassau-specific fields (2v2 match format)
+    nassauTeamA?: UUID[];  // 2 player IDs for Team A
+    nassauTeamB?: UUID[];  // 2 player IDs for Team B
+    nassauResults?: NassauResults;  // Front 9, Back 9, Overall results
+
     createdAt: ISODateString;
     completedAt?: ISODateString;
+}
+
+/**
+ * Nassau bet results - tracks winner of each segment
+ */
+export interface NassauResults {
+    front9Winner?: 'teamA' | 'teamB' | 'push';
+    back9Winner?: 'teamA' | 'teamB' | 'push';
+    overallWinner?: 'teamA' | 'teamB' | 'push';
 }
 
 /**

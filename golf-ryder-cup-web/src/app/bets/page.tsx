@@ -48,6 +48,9 @@ export default function BetsPage() {
   const [newBetPot, setNewBetPot] = useState('20');
   const [newBetPerHole, setNewBetPerHole] = useState('5');
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+  // Nassau-specific state for 2v2 team selection
+  const [nassauTeamA, setNassauTeamA] = useState<string[]>([]);
+  const [nassauTeamB, setNassauTeamB] = useState<string[]>([]);
 
   useEffect(() => {
     if (!currentTrip) {
@@ -152,6 +155,8 @@ export default function BetsPage() {
     setNewBetPerHole('5');
     setSelectedMatch(null);
     setSelectedParticipants(players.map(p => p.id));
+    setNassauTeamA([]);
+    setNassauTeamB([]);
     setShowCreateModal(true);
   };
 
@@ -159,6 +164,41 @@ export default function BetsPage() {
     if (!currentTrip) return;
 
     const name = newBetName.trim() || betNames[newBetType];
+
+    // Handle Nassau separately - requires exactly 2 players per team
+    if (newBetType === 'nassau') {
+      if (nassauTeamA.length !== 2 || nassauTeamB.length !== 2) {
+        showToast('error', 'Nassau requires exactly 2 players per team');
+        return;
+      }
+      const participantIds = [...nassauTeamA, ...nassauTeamB];
+      const teamANames = nassauTeamA.map(id => players.find(p => p.id === id)?.lastName).filter(Boolean).join(' & ');
+      const teamBNames = nassauTeamB.map(id => players.find(p => p.id === id)?.lastName).filter(Boolean).join(' & ');
+
+      const newBet: SideBet = {
+        id: crypto.randomUUID(),
+        tripId: currentTrip.id,
+        matchId: selectedMatch?.id,
+        type: 'nassau',
+        name,
+        description: `${teamANames} vs ${teamBNames}`,
+        status: 'active',
+        pot: parseInt(newBetPot) || 20,
+        participantIds,
+        nassauTeamA,
+        nassauTeamB,
+        nassauResults: {},
+        createdAt: new Date().toISOString(),
+      };
+
+      await db.sideBets.add(newBet);
+      showToast('success', `${name} created!`);
+      setShowCreateModal(false);
+      router.push(`/bets/${newBet.id}`);
+      return;
+    }
+
+    // Non-Nassau bets
     const participantIds = selectedMatch
       ? [...selectedMatch.teamAPlayerIds, ...selectedMatch.teamBPlayerIds]
       : selectedParticipants;
@@ -478,7 +518,7 @@ export default function BetsPage() {
             </div>
 
             {/* Link to Match */}
-            {matches && matches.length > 0 && (
+            {matches && matches.length > 0 && newBetType !== 'nassau' && (
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
                   Link to Match (Inside Game)
@@ -526,6 +566,91 @@ export default function BetsPage() {
               </div>
             )}
 
+            {/* Nassau Team Selection (2v2) */}
+            {newBetType === 'nassau' && (
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <div
+                  className="p-3 rounded-lg"
+                  style={{ background: 'var(--info-light)', marginBottom: 'var(--space-3)' }}
+                >
+                  <p className="type-caption" style={{ color: 'var(--info)' }}>
+                    Nassau is a 2v2 match bet with 3 wagers: Front 9, Back 9, and Overall.
+                    Select exactly 2 players for each team.
+                  </p>
+                </div>
+
+                {/* Team A Selection */}
+                <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                  Team A ({nassauTeamA.length}/2)
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                  {players.map(player => {
+                    const isSelected = nassauTeamA.includes(player.id);
+                    const isOnOtherTeam = nassauTeamB.includes(player.id);
+                    return (
+                      <button
+                        key={player.id}
+                        onClick={() => {
+                          if (isOnOtherTeam) return;
+                          if (isSelected) {
+                            setNassauTeamA(nassauTeamA.filter(id => id !== player.id));
+                          } else if (nassauTeamA.length < 2) {
+                            setNassauTeamA([...nassauTeamA, player.id]);
+                          }
+                        }}
+                        disabled={isOnOtherTeam}
+                        className="px-3 py-2 rounded-lg transition-all"
+                        style={{
+                          background: isSelected ? 'var(--team-usa)' : isOnOtherTeam ? 'var(--muted)' : 'var(--surface)',
+                          color: isSelected ? 'white' : isOnOtherTeam ? 'var(--ink-tertiary)' : 'var(--ink)',
+                          border: isSelected ? '2px solid var(--team-usa)' : '1px solid var(--rule)',
+                          cursor: isOnOtherTeam ? 'not-allowed' : 'pointer',
+                          opacity: isOnOtherTeam ? 0.5 : 1,
+                        }}
+                      >
+                        {player.firstName} {player.lastName}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Team B Selection */}
+                <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                  Team B ({nassauTeamB.length}/2)
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  {players.map(player => {
+                    const isSelected = nassauTeamB.includes(player.id);
+                    const isOnOtherTeam = nassauTeamA.includes(player.id);
+                    return (
+                      <button
+                        key={player.id}
+                        onClick={() => {
+                          if (isOnOtherTeam) return;
+                          if (isSelected) {
+                            setNassauTeamB(nassauTeamB.filter(id => id !== player.id));
+                          } else if (nassauTeamB.length < 2) {
+                            setNassauTeamB([...nassauTeamB, player.id]);
+                          }
+                        }}
+                        disabled={isOnOtherTeam}
+                        className="px-3 py-2 rounded-lg transition-all"
+                        style={{
+                          background: isSelected ? 'var(--team-europe)' : isOnOtherTeam ? 'var(--muted)' : 'var(--surface)',
+                          color: isSelected ? 'white' : isOnOtherTeam ? 'var(--ink-tertiary)' : 'var(--ink)',
+                          border: isSelected ? '2px solid var(--team-europe)' : '1px solid var(--rule)',
+                          cursor: isOnOtherTeam ? 'not-allowed' : 'pointer',
+                          opacity: isOnOtherTeam ? 0.5 : 1,
+                        }}
+                      >
+                        {player.firstName} {player.lastName}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Create Button */}
             <button
               onClick={createCustomBet}
@@ -551,6 +676,25 @@ interface BetCardProps {
 function BetCard({ bet, icon, getPlayer }: BetCardProps) {
   const router = useRouter();
   const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
+  const isNassau = bet.type === 'nassau';
+
+  // Calculate Nassau summary
+  const getNassauSummary = () => {
+    if (!isNassau || !bet.nassauResults) return null;
+    const r = bet.nassauResults;
+    let teamAWins = 0;
+    let teamBWins = 0;
+    if (r.front9Winner === 'teamA') teamAWins++;
+    else if (r.front9Winner === 'teamB') teamBWins++;
+    if (r.back9Winner === 'teamA') teamAWins++;
+    else if (r.back9Winner === 'teamB') teamBWins++;
+    if (r.overallWinner === 'teamA') teamAWins++;
+    else if (r.overallWinner === 'teamB') teamBWins++;
+    const completed = (r.front9Winner ? 1 : 0) + (r.back9Winner ? 1 : 0) + (r.overallWinner ? 1 : 0);
+    return { teamAWins, teamBWins, completed };
+  };
+
+  const nassauSummary = getNassauSummary();
 
   return (
     <button
@@ -597,11 +741,25 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
 
           {/* Status / Winner */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
-            {bet.status === 'active' ? (
+            {bet.status === 'active' && isNassau && nassauSummary ? (
+              <>
+                <Trophy size={14} style={{ color: 'var(--warning)' }} />
+                <span className="type-micro" style={{ color: 'var(--warning)' }}>
+                  {nassauSummary.completed}/3 segments • {nassauSummary.teamAWins}-{nassauSummary.teamBWins}
+                </span>
+              </>
+            ) : bet.status === 'active' ? (
               <>
                 <Clock size={14} style={{ color: 'var(--warning)' }} />
                 <span className="type-micro" style={{ color: 'var(--warning)' }}>
                   In Progress
+                </span>
+              </>
+            ) : isNassau && nassauSummary ? (
+              <>
+                <Trophy size={14} style={{ color: 'var(--success)' }} />
+                <span className="type-micro" style={{ color: 'var(--success)' }}>
+                  Final: {nassauSummary.teamAWins}-{nassauSummary.teamBWins}
                 </span>
               </>
             ) : winner ? (
@@ -617,7 +775,7 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
           {/* Participants */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginTop: 'var(--space-2)' }}>
             <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
-              {bet.participantIds.length} player{bet.participantIds.length !== 1 ? 's' : ''}
+              {isNassau ? '2v2 Match' : `${bet.participantIds.length} player${bet.participantIds.length !== 1 ? 's' : ''}`}
             </span>
           </div>
         </div>

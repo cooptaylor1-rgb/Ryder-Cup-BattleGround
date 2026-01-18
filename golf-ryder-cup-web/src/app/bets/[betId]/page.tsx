@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import type { SideBet, SideBetResult, Player } from '@/lib/types/models';
+import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
     ChevronLeft,
     DollarSign,
@@ -153,9 +153,42 @@ export default function BetDetailPage() {
     const participants = bet.participantIds.map(id => getPlayer(id)).filter(Boolean) as Player[];
     const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
     const isSkins = bet.type === 'skins';
+    const isNassau = bet.type === 'nassau';
+
+    // Get Nassau team players
+    const teamAPlayers = isNassau && bet.nassauTeamA
+        ? bet.nassauTeamA.map(id => getPlayer(id)).filter(Boolean) as Player[]
+        : [];
+    const teamBPlayers = isNassau && bet.nassauTeamB
+        ? bet.nassauTeamB.map(id => getPlayer(id)).filter(Boolean) as Player[]
+        : [];
 
     // Calculate skins standings
     const skinsStandings = isSkins ? calculateSkinsStandings(bet, participants) : [];
+
+    // Handle Nassau segment winner
+    const handleSetNassauWinner = async (
+        segment: 'front9Winner' | 'back9Winner' | 'overallWinner',
+        winner: 'teamA' | 'teamB' | 'push'
+    ) => {
+        if (!bet) return;
+
+        const newResults: NassauResults = {
+            ...(bet.nassauResults || {}),
+            [segment]: winner,
+        };
+
+        // Check if all segments are complete
+        const isComplete = newResults.front9Winner && newResults.back9Winner && newResults.overallWinner;
+
+        await db.sideBets.update(bet.id, {
+            nassauResults: newResults,
+            status: isComplete ? 'completed' : 'active',
+            completedAt: isComplete ? new Date().toISOString() : undefined,
+        });
+
+        showToast('success', 'Result recorded!');
+    };
 
     return (
         <div className="min-h-screen pb-24 page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
@@ -234,12 +267,25 @@ export default function BetDetailPage() {
                             </h2>
                             <p className="score-large">${bet.pot || 0}</p>
                         </>
+                    ) : bet.status === 'completed' && isNassau ? (
+                        <>
+                            <Trophy size={32} style={{ margin: '0 auto var(--space-2)' }} />
+                            <h2 className="type-title-lg" style={{ marginBottom: 'var(--space-1)' }}>
+                                Nassau Complete!
+                            </h2>
+                            <p className="score-large">${bet.pot || 0}</p>
+                        </>
                     ) : (
                         <>
                             <DollarSign size={32} style={{ margin: '0 auto var(--space-2)', opacity: 0.9 }} />
                             <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>${bet.pot || 0}</h2>
                             <p className="type-body" style={{ opacity: 0.8 }}>
-                                {isSkins ? `$${bet.perHole || 5} per hole` : 'Total Pot'}
+                                {isSkins
+                                    ? `$${bet.perHole || 5} per hole`
+                                    : isNassau
+                                        ? `$${Math.round((bet.pot || 20) / 3)} per segment`
+                                        : 'Total Pot'
+                                }
                             </p>
                         </>
                     )}
@@ -267,8 +313,168 @@ export default function BetDetailPage() {
                     </div>
                 )}
 
-                {/* Status Actions */}
-                {bet.status === 'active' && !isSkins && (
+                {/* Nassau Scorecard (2v2 match format) */}
+                {isNassau && (
+                    <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+                        <h3 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Nassau Results</h3>
+
+                        {/* Teams Display */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                            <div className="text-center">
+                                <div
+                                    className="p-3 rounded-lg"
+                                    style={{ background: 'var(--team-usa)', color: 'white' }}
+                                >
+                                    <p className="type-overline" style={{ marginBottom: 'var(--space-1)', opacity: 0.9 }}>Team A</p>
+                                    {teamAPlayers.map(p => (
+                                        <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-center">
+                                <span className="type-title-lg" style={{ color: 'var(--ink-tertiary)' }}>vs</span>
+                            </div>
+                            <div className="text-center">
+                                <div
+                                    className="p-3 rounded-lg"
+                                    style={{ background: 'var(--team-europe)', color: 'white' }}
+                                >
+                                    <p className="type-overline" style={{ marginBottom: 'var(--space-1)', opacity: 0.9 }}>Team B</p>
+                                    {teamBPlayers.map(p => (
+                                        <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Segment Results */}
+                        {(['front9', 'back9', 'overall'] as const).map(segment => {
+                            const segmentKey = `${segment}Winner` as 'front9Winner' | 'back9Winner' | 'overallWinner';
+                            const result = bet.nassauResults?.[segmentKey];
+                            const segmentLabel = segment === 'front9' ? 'Front 9' : segment === 'back9' ? 'Back 9' : 'Overall';
+                            const potPerSegment = Math.round((bet.pot || 20) / 3);
+
+                            return (
+                                <div
+                                    key={segment}
+                                    className="p-3 rounded-lg"
+                                    style={{
+                                        background: 'var(--surface)',
+                                        marginBottom: 'var(--space-3)',
+                                        border: '1px solid var(--rule)',
+                                    }}
+                                >
+                                    <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
+                                        <span className="type-body-sm font-medium">{segmentLabel}</span>
+                                        <span className="type-caption" style={{ color: 'var(--success)' }}>${potPerSegment}</span>
+                                    </div>
+
+                                    {result ? (
+                                        <div
+                                            className="p-2 rounded text-center"
+                                            style={{
+                                                background: result === 'push'
+                                                    ? 'var(--warning)'
+                                                    : result === 'teamA'
+                                                        ? 'var(--team-usa)'
+                                                        : 'var(--team-europe)',
+                                                color: 'white',
+                                            }}
+                                        >
+                                            <span className="type-body-sm font-medium">
+                                                {result === 'push'
+                                                    ? 'Push (Tied)'
+                                                    : result === 'teamA'
+                                                        ? `Team A Wins`
+                                                        : `Team B Wins`
+                                                }
+                                            </span>
+                                        </div>
+                                    ) : bet.status === 'active' ? (
+                                        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                                            <button
+                                                onClick={() => handleSetNassauWinner(segmentKey, 'teamA')}
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90"
+                                                style={{ background: 'var(--team-usa)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                            >
+                                                Team A
+                                            </button>
+                                            <button
+                                                onClick={() => handleSetNassauWinner(segmentKey, 'push')}
+                                                className="px-3 py-2 rounded-lg transition-all hover:opacity-90"
+                                                style={{ background: 'var(--warning)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                            >
+                                                Push
+                                            </button>
+                                            <button
+                                                onClick={() => handleSetNassauWinner(segmentKey, 'teamB')}
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90"
+                                                style={{ background: 'var(--team-europe)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                            >
+                                                Team B
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="p-2 rounded text-center" style={{ background: 'var(--muted)' }}>
+                                            <span className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>No result</span>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        {/* Summary */}
+                        {bet.nassauResults && (
+                            (() => {
+                                const results = bet.nassauResults;
+                                let teamAWins = 0;
+                                let teamBWins = 0;
+                                const potPerSegment = Math.round((bet.pot || 20) / 3);
+
+                                if (results.front9Winner === 'teamA') teamAWins++;
+                                else if (results.front9Winner === 'teamB') teamBWins++;
+
+                                if (results.back9Winner === 'teamA') teamAWins++;
+                                else if (results.back9Winner === 'teamB') teamBWins++;
+
+                                if (results.overallWinner === 'teamA') teamAWins++;
+                                else if (results.overallWinner === 'teamB') teamBWins++;
+
+                                if (teamAWins > 0 || teamBWins > 0) {
+                                    return (
+                                        <>
+                                            <hr className="divider-lg" style={{ margin: 'var(--space-3) 0' }} />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div className="text-center" style={{ flex: 1 }}>
+                                                    <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>Team A</p>
+                                                    <p className="type-title" style={{ color: 'var(--team-usa)' }}>
+                                                        {teamAWins} win{teamAWins !== 1 ? 's' : ''}
+                                                    </p>
+                                                    <p className="type-body-sm" style={{ color: 'var(--success)' }}>
+                                                        ${teamAWins * potPerSegment}
+                                                    </p>
+                                                </div>
+                                                <div className="text-center" style={{ flex: 1 }}>
+                                                    <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>Team B</p>
+                                                    <p className="type-title" style={{ color: 'var(--team-europe)' }}>
+                                                        {teamBWins} win{teamBWins !== 1 ? 's' : ''}
+                                                    </p>
+                                                    <p className="type-body-sm" style={{ color: 'var(--success)' }}>
+                                                        ${teamBWins * potPerSegment}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                }
+                                return null;
+                            })()
+                        )}
+                    </div>
+                )}
+
+                {/* Status Actions (for CTP, Long Drive, Custom - not Skins or Nassau) */}
+                {bet.status === 'active' && !isSkins && !isNassau && (
                     <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
                         <h3 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Set Winner</h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
