@@ -213,12 +213,19 @@ export async function getWeather(
         .slice(startIdx, startIdx + 24)
         .map((time: string, i: number) => {
             const actualIndex = startIdx + i;
+            // For the first entry ("Now"), use current temperature for consistency
+            const temperature = i === 0 
+                ? Math.round(data.current.temperature_2m)
+                : Math.round(data.hourly.temperature_2m[actualIndex]);
+            const condition = i === 0
+                ? getWeatherCondition(data.current.weather_code)
+                : getWeatherCondition(data.hourly.weather_code[actualIndex]);
             return {
                 time: new Date(time),
-                temperature: Math.round(data.hourly.temperature_2m[actualIndex]),
+                temperature,
                 precipitation: data.hourly.precipitation[actualIndex],
                 precipitationProbability: data.hourly.precipitation_probability[actualIndex],
-                condition: getWeatherCondition(data.hourly.weather_code[actualIndex]),
+                condition,
                 windSpeed: Math.round(data.hourly.wind_speed_10m[actualIndex]),
                 windGust: Math.round(data.hourly.wind_gusts_10m[actualIndex]),
             };
