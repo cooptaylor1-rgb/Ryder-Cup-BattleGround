@@ -3,6 +3,8 @@
  *
  * State management for active scoring sessions.
  * Handles match scoring, undo stack, and optimistic updates.
+ *
+ * Integrates with cloud sync for real-time score updates.
  */
 
 import { create } from 'zustand';
@@ -21,6 +23,7 @@ import {
     getCurrentHole,
 } from '../services/scoringEngine';
 import { ScoringEventType } from '../types/events';
+import { queueSyncOperation } from '../services/tripSyncService';
 
 // ============================================
 // TYPES
@@ -250,6 +253,28 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 .toArray();
 
             const newMatchState = calculateMatchState(activeMatch, holeResults);
+
+            // Get the latest hole result for cloud sync
+            const latestResult = holeResults.find(r => r.holeNumber === currentHole);
+            if (latestResult) {
+                // Get session to find trip ID
+                const session = await db.sessions.get(activeMatch.sessionId);
+                if (session) {
+                    queueSyncOperation('holeResult', latestResult.id, 'update', session.tripId, latestResult);
+                    // Calculate fields from match state for syncing
+                    const matchToSync = {
+                        ...activeMatch,
+                        currentHole: Math.min(currentHole + 1, 18),
+                        result: newMatchState.isClosedOut
+                            ? (newMatchState.winningTeam === 'teamA' ? 'teamAWin' : 'teamBWin')
+                            : 'notFinished',
+                        margin: Math.abs(newMatchState.currentScore),
+                        holesRemaining: newMatchState.holesRemaining,
+                        updatedAt: new Date().toISOString(),
+                    };
+                    queueSyncOperation('match', activeMatch.id, 'update', session.tripId, matchToSync);
+                }
+            }
 
             // Update undo stack
             const undoStack = [

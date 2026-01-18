@@ -3,6 +3,8 @@
  *
  * Global state for the current trip context.
  * Manages active trip, teams, players, and sessions.
+ *
+ * Integrates with cloud sync for offline-first persistence.
  */
 
 import { create } from 'zustand';
@@ -18,6 +20,12 @@ import type {
     TeeSet,
 } from '../types/models';
 import { db } from '../db';
+import {
+    queueSyncOperation,
+    syncTripToCloudFull,
+    getTripSyncStatus,
+    type SyncStatus,
+} from '../services/tripSyncService';
 
 // ============================================
 // TYPES
@@ -36,10 +44,13 @@ interface TripState {
     // Loading states
     isLoading: boolean;
     error: string | null;
+    syncStatus: SyncStatus;
 
     // Actions
     loadTrip: (tripId: string) => Promise<void>;
     clearTrip: () => void;
+    syncToCloud: () => Promise<void>;
+    getSyncStatus: () => SyncStatus;
 
     // Trip CRUD
     createTrip: (trip: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Trip>;
@@ -83,6 +94,7 @@ export const useTripStore = create<TripState>()(
             teeSets: [],
             isLoading: false,
             error: null,
+            syncStatus: 'unknown' as SyncStatus,
 
             // Load a trip with all related data
             loadTrip: async (tripId: string) => {
@@ -130,6 +142,7 @@ export const useTripStore = create<TripState>()(
                         courses,
                         teeSets,
                         isLoading: false,
+                        syncStatus: getTripSyncStatus(tripId),
                     });
                 } catch (error) {
                     set({
@@ -147,7 +160,30 @@ export const useTripStore = create<TripState>()(
                     players: [],
                     sessions: [],
                     error: null,
+                    syncStatus: 'unknown',
                 });
+            },
+
+            // Sync current trip to cloud
+            syncToCloud: async () => {
+                const { currentTrip } = get();
+                if (!currentTrip) return;
+
+                set({ syncStatus: 'syncing' });
+
+                try {
+                    const result = await syncTripToCloudFull(currentTrip.id);
+                    set({ syncStatus: result.success ? 'synced' : 'failed' });
+                } catch (error) {
+                    console.error('[TripStore] Sync failed:', error);
+                    set({ syncStatus: 'failed' });
+                }
+            },
+
+            getSyncStatus: () => {
+                const { currentTrip } = get();
+                if (!currentTrip) return 'unknown';
+                return getTripSyncStatus(currentTrip.id);
             },
 
             // Trip CRUD
@@ -183,12 +219,18 @@ export const useTripStore = create<TripState>()(
 
                 await db.teams.bulkAdd([teamA, teamB]);
 
+                // Queue sync operations
+                queueSyncOperation('trip', trip.id, 'create', trip.id, trip);
+                queueSyncOperation('team', teamA.id, 'create', trip.id, teamA);
+                queueSyncOperation('team', teamB.id, 'create', trip.id, teamB);
+
                 set({
                     currentTrip: trip,
                     teams: [teamA, teamB],
                     teamMembers: [],
                     players: [],
                     sessions: [],
+                    syncStatus: 'pending',
                 });
 
                 return trip;
@@ -203,8 +245,11 @@ export const useTripStore = create<TripState>()(
 
                 const { currentTrip } = get();
                 if (currentTrip?.id === tripId) {
+                    const updatedTrip = { ...currentTrip, ...updates, updatedAt: now };
+                    queueSyncOperation('trip', tripId, 'update', tripId, updatedTrip);
                     set({
-                        currentTrip: { ...currentTrip, ...updates, updatedAt: now },
+                        currentTrip: updatedTrip,
+                        syncStatus: 'pending',
                     });
                 }
             },
@@ -241,6 +286,9 @@ export const useTripStore = create<TripState>()(
                 await db.teams.where('tripId').equals(tripId).delete();
                 await db.trips.delete(tripId);
 
+                // Queue cloud delete
+                queueSyncOperation('trip', tripId, 'delete', tripId);
+
                 const { currentTrip } = get();
                 if (currentTrip?.id === tripId) {
                     get().clearTrip();
@@ -256,8 +304,15 @@ export const useTripStore = create<TripState>()(
 
                 await db.players.add(player);
 
+                // Queue sync
+                const { currentTrip } = get();
+                if (currentTrip) {
+                    queueSyncOperation('player', player.id, 'create', currentTrip.id, player);
+                }
+
                 set(state => ({
                     players: [...state.players, player],
+                    syncStatus: 'pending',
                 }));
 
                 return player;
@@ -266,10 +321,17 @@ export const useTripStore = create<TripState>()(
             updatePlayer: async (playerId, updates) => {
                 await db.players.update(playerId, updates);
 
+                const { currentTrip, players } = get();
+                const updatedPlayer = players.find(p => p.id === playerId);
+                if (updatedPlayer && currentTrip) {
+                    queueSyncOperation('player', playerId, 'update', currentTrip.id, { ...updatedPlayer, ...updates });
+                }
+
                 set(state => ({
                     players: state.players.map(p =>
                         p.id === playerId ? { ...p, ...updates } : p
                     ),
+                    syncStatus: 'pending',
                 }));
             },
 
@@ -278,9 +340,15 @@ export const useTripStore = create<TripState>()(
                 await db.teamMembers.where('playerId').equals(playerId).delete();
                 await db.players.delete(playerId);
 
+                const { currentTrip } = get();
+                if (currentTrip) {
+                    queueSyncOperation('player', playerId, 'delete', currentTrip.id);
+                }
+
                 set(state => ({
                     players: state.players.filter(p => p.id !== playerId),
                     teamMembers: state.teamMembers.filter(tm => tm.playerId !== playerId),
+                    syncStatus: 'pending',
                 }));
             },
 
@@ -300,23 +368,38 @@ export const useTripStore = create<TripState>()(
 
                 await db.teamMembers.add(teamMember);
 
+                // Queue sync
+                const { currentTrip } = get();
+                if (currentTrip) {
+                    queueSyncOperation('teamMember', teamMember.id, 'create', currentTrip.id, teamMember);
+                }
+
                 set(state => ({
                     teamMembers: [
                         ...state.teamMembers.filter(tm => tm.playerId !== playerId),
                         teamMember,
                     ],
+                    syncStatus: 'pending',
                 }));
             },
 
             removePlayerFromTeam: async (playerId, teamId) => {
+                const { currentTrip, teamMembers } = get();
+                const teamMember = teamMembers.find(tm => tm.playerId === playerId && tm.teamId === teamId);
+
                 await db.teamMembers
                     .where({ playerId, teamId })
                     .delete();
+
+                if (currentTrip && teamMember) {
+                    queueSyncOperation('teamMember', teamMember.id, 'delete', currentTrip.id);
+                }
 
                 set(state => ({
                     teamMembers: state.teamMembers.filter(
                         tm => !(tm.playerId === playerId && tm.teamId === teamId)
                     ),
+                    syncStatus: 'pending',
                 }));
             },
 
@@ -332,10 +415,17 @@ export const useTripStore = create<TripState>()(
 
                 await db.sessions.add(session);
 
+                // Queue sync
+                const { currentTrip } = get();
+                if (currentTrip) {
+                    queueSyncOperation('session', session.id, 'create', currentTrip.id, session);
+                }
+
                 set(state => ({
                     sessions: [...state.sessions, session].sort(
                         (a, b) => a.sessionNumber - b.sessionNumber
                     ),
+                    syncStatus: 'pending',
                 }));
 
                 return session;
@@ -348,10 +438,21 @@ export const useTripStore = create<TripState>()(
                     updatedAt: now,
                 });
 
+                const { currentTrip, sessions } = get();
+                const updatedSession = sessions.find(s => s.id === sessionId);
+                if (currentTrip && updatedSession) {
+                    queueSyncOperation('session', sessionId, 'update', currentTrip.id, {
+                        ...updatedSession,
+                        ...updates,
+                        updatedAt: now,
+                    });
+                }
+
                 set(state => ({
                     sessions: state.sessions.map(s =>
                         s.id === sessionId ? { ...s, ...updates, updatedAt: now } : s
                     ),
+                    syncStatus: 'pending',
                 }));
             },
 
