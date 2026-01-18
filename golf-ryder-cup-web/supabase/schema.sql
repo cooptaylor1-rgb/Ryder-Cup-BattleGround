@@ -206,6 +206,17 @@ CREATE TABLE IF NOT EXISTS course_library_tee_sets (
 
 CREATE INDEX idx_course_library_tee_sets_course ON course_library_tee_sets(course_library_id);
 
+-- Function to atomically increment course usage count
+CREATE OR REPLACE FUNCTION increment_course_usage(course_id UUID)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE course_library
+    SET usage_count = usage_count + 1,
+        last_used_at = NOW()
+    WHERE id = course_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Trigger to update course usage count
 CREATE OR REPLACE FUNCTION update_course_usage()
 RETURNS TRIGGER AS $$
@@ -396,7 +407,63 @@ ALTER PUBLICATION supabase_realtime ADD TABLE photos;
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================
--- Enable RLS on all tables (optional - uncomment if using Supabase Auth)
+
+-- Enable RLS on course library tables
+ALTER TABLE course_library ENABLE ROW LEVEL SECURITY;
+ALTER TABLE course_library_tee_sets ENABLE ROW LEVEL SECURITY;
+
+-- Course Library RLS Policies
+-- Anyone can read courses (shared library)
+CREATE POLICY "course_library_select_all"
+    ON course_library FOR SELECT
+    USING (true);
+
+-- Anyone can insert new courses (device-based tracking via created_by)
+CREATE POLICY "course_library_insert_all"
+    ON course_library FOR INSERT
+    WITH CHECK (true);
+
+-- Users can only update courses they created (by device id)
+-- If created_by is null, anyone can update (legacy data)
+CREATE POLICY "course_library_update_own"
+    ON course_library FOR UPDATE
+    USING (created_by IS NULL OR created_by = current_setting('app.device_id', true));
+
+-- Users can only delete courses they created
+CREATE POLICY "course_library_delete_own"
+    ON course_library FOR DELETE
+    USING (created_by IS NULL OR created_by = current_setting('app.device_id', true));
+
+-- Tee Sets: inherit course permissions
+CREATE POLICY "course_library_tee_sets_select_all"
+    ON course_library_tee_sets FOR SELECT
+    USING (true);
+
+CREATE POLICY "course_library_tee_sets_insert_all"
+    ON course_library_tee_sets FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "course_library_tee_sets_update_course_owner"
+    ON course_library_tee_sets FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM course_library
+            WHERE id = course_library_tee_sets.course_library_id
+            AND (created_by IS NULL OR created_by = current_setting('app.device_id', true))
+        )
+    );
+
+CREATE POLICY "course_library_tee_sets_delete_course_owner"
+    ON course_library_tee_sets FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM course_library
+            WHERE id = course_library_tee_sets.course_library_id
+            AND (created_by IS NULL OR created_by = current_setting('app.device_id', true))
+        )
+    );
+
+-- Optional: Enable RLS on other tables (uncomment if using Supabase Auth)
 -- ALTER TABLE trips ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE players ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE teams ENABLE ROW LEVEL SECURITY;

@@ -1,17 +1,32 @@
 /**
- * Course Library Sync Service
+ * Course Library Sync Service (Production Quality)
  *
  * Synchronizes the local course library (IndexedDB) with Supabase.
- * Provides:
- * - Automatic sync when courses are created/updated locally
- * - Pull from cloud to get shared courses
- * - Deduplication based on course name/location
+ *
+ * Features:
+ * - Offline-first with queue-based sync
+ * - Exponential backoff retry (up to 5 attempts)
+ * - Batch upsert operations (reduces N+1 queries)
+ * - Network reconnection detection
+ * - Device ID tracking for RLS
+ * - Sync status tracking per course
+ * - Deduplication based on course name
  */
 
 import { v4 as uuidv4 } from 'uuid';
 import { supabase, isSupabaseConfigured } from '../supabase/client';
-import { db } from '../db';
+import { db, type CourseSyncQueueEntry } from '../db';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
+
+// ============================================
+// CONSTANTS
+// ============================================
+
+const MAX_RETRY_COUNT = 5;
+const BASE_RETRY_DELAY_MS = 1000;
+const MAX_RETRY_DELAY_MS = 30000;
+const BATCH_SIZE = 50;
+const SYNC_DEBOUNCE_MS = 2000;
 
 // ============================================
 // TYPES
@@ -62,59 +77,400 @@ export interface CourseSyncResult {
     courseId: string;
     cloudId?: string;
     error?: string;
+    queued?: boolean;
 }
 
 export interface BulkSyncResult {
     success: boolean;
     synced: number;
     failed: number;
+    queued: number;
     errors: string[];
 }
 
-// Helper to access tables with any typing (Supabase types may not include our new tables)
+export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'failed' | 'offline';
+
+// ============================================
+// DEVICE ID MANAGEMENT
+// ============================================
+
+const DEVICE_ID_KEY = 'golf_ryder_cup_device_id';
+
+/**
+ * Get or create a persistent device ID for tracking course ownership
+ */
+export function getDeviceId(): string {
+    if (typeof window === 'undefined') return 'server';
+
+    let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+    if (!deviceId) {
+        deviceId = uuidv4();
+        localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    }
+    return deviceId;
+}
+
+// ============================================
+// NETWORK STATUS
+// ============================================
+
+let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+let syncInProgress = false;
+let syncDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Initialize network listeners for automatic sync on reconnect
+ */
+export function initNetworkListeners(): void {
+    if (typeof window === 'undefined') return;
+
+    window.addEventListener('online', () => {
+        isOnline = true;
+        console.log('[CourseSync] Network online - triggering sync');
+        debouncedProcessQueue();
+    });
+
+    window.addEventListener('offline', () => {
+        isOnline = false;
+        console.log('[CourseSync] Network offline - queuing syncs');
+    });
+
+    // Initial check
+    isOnline = navigator.onLine;
+}
+
+/**
+ * Check if we're online and Supabase is configured
+ */
+function canSync(): boolean {
+    return isOnline && isSupabaseConfigured && !!supabase;
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getTable(name: string): any {
     if (!supabase) throw new Error('Supabase not configured');
     return supabase.from(name);
 }
 
+/**
+ * Calculate exponential backoff delay
+ */
+function getRetryDelay(retryCount: number): number {
+    const delay = Math.min(
+        BASE_RETRY_DELAY_MS * Math.pow(2, retryCount),
+        MAX_RETRY_DELAY_MS
+    );
+    // Add jitter (±20%)
+    return delay * (0.8 + Math.random() * 0.4);
+}
+
+/**
+ * Sleep for specified milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // ============================================
-// SYNC TO CLOUD
+// SYNC QUEUE MANAGEMENT
 // ============================================
 
 /**
- * Save a course to the cloud database
- * Called automatically when a course is added to the local library
+ * Add a course to the sync queue
  */
-export async function syncCourseToCloud(
+export async function queueCourseSync(
+    courseProfileId: string,
+    source: 'user' | 'ocr' | 'api' | 'import' = 'user'
+): Promise<void> {
+    // Check if already queued
+    const existing = await db.courseSyncQueue
+        .where('courseProfileId')
+        .equals(courseProfileId)
+        .and((item) => item.status === 'pending' || item.status === 'syncing')
+        .first();
+
+    if (existing) {
+        console.log(`[CourseSync] Course ${courseProfileId} already in queue`);
+        return;
+    }
+
+    const entry: CourseSyncQueueEntry = {
+        courseProfileId,
+        source,
+        status: 'pending',
+        retryCount: 0,
+        createdAt: new Date().toISOString(),
+    };
+
+    await db.courseSyncQueue.add(entry);
+    console.log(`[CourseSync] Queued course ${courseProfileId} for sync`);
+
+    // Trigger sync if online
+    if (canSync()) {
+        debouncedProcessQueue();
+    }
+}
+
+/**
+ * Debounced queue processor to batch nearby sync requests
+ */
+function debouncedProcessQueue(): void {
+    if (syncDebounceTimer) {
+        clearTimeout(syncDebounceTimer);
+    }
+    syncDebounceTimer = setTimeout(() => {
+        processQueue().catch((err) => {
+            console.error('[CourseSync] Queue processing error:', err);
+        });
+    }, SYNC_DEBOUNCE_MS);
+}
+
+/**
+ * Process the sync queue
+ */
+export async function processQueue(): Promise<BulkSyncResult> {
+    if (!canSync()) {
+        return {
+            success: false,
+            synced: 0,
+            failed: 0,
+            queued: 0,
+            errors: ['Offline or Supabase not configured'],
+        };
+    }
+
+    if (syncInProgress) {
+        console.log('[CourseSync] Sync already in progress');
+        return { success: true, synced: 0, failed: 0, queued: 0, errors: [] };
+    }
+
+    syncInProgress = true;
+    let synced = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    try {
+        // Get pending items (limit batch size)
+        const pendingItems = await db.courseSyncQueue
+            .where('status')
+            .equals('pending')
+            .limit(BATCH_SIZE)
+            .toArray();
+
+        // Also retry failed items that haven't exceeded max retries
+        const failedItems = await db.courseSyncQueue
+            .where('status')
+            .equals('failed')
+            .and((item) => item.retryCount < MAX_RETRY_COUNT)
+            .limit(BATCH_SIZE - pendingItems.length)
+            .toArray();
+
+        const itemsToProcess = [...pendingItems, ...failedItems];
+
+        if (itemsToProcess.length === 0) {
+            return { success: true, synced: 0, failed: 0, queued: 0, errors: [] };
+        }
+
+        console.log(`[CourseSync] Processing ${itemsToProcess.length} queued items`);
+
+        for (const item of itemsToProcess) {
+            // Mark as syncing
+            await db.courseSyncQueue.update(item.queueId!, {
+                status: 'syncing',
+                lastAttemptAt: new Date().toISOString(),
+            });
+
+            // Get course and tee sets from local DB
+            const course = await db.courseProfiles.get(item.courseProfileId);
+            if (!course) {
+                await db.courseSyncQueue.update(item.queueId!, {
+                    status: 'failed',
+                    lastError: 'Course not found in local database',
+                    retryCount: MAX_RETRY_COUNT, // Don't retry
+                });
+                failed++;
+                errors.push(`Course ${item.courseProfileId}: Not found locally`);
+                continue;
+            }
+
+            const teeSets = await db.teeSetProfiles
+                .where('courseProfileId')
+                .equals(item.courseProfileId)
+                .toArray();
+
+            // Attempt sync with retry
+            const result = await syncCourseToCloudWithRetry(
+                course,
+                teeSets,
+                item.source,
+                item.retryCount
+            );
+
+            if (result.success) {
+                await db.courseSyncQueue.update(item.queueId!, {
+                    status: 'completed',
+                    completedAt: new Date().toISOString(),
+                });
+                synced++;
+            } else {
+                const newRetryCount = item.retryCount + 1;
+                await db.courseSyncQueue.update(item.queueId!, {
+                    status: newRetryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending',
+                    lastError: result.error,
+                    retryCount: newRetryCount,
+                });
+
+                if (newRetryCount >= MAX_RETRY_COUNT) {
+                    failed++;
+                    errors.push(`${course.name}: ${result.error} (max retries exceeded)`);
+                }
+            }
+        }
+
+        // Clean up old completed entries (keep last 100)
+        const completedCount = await db.courseSyncQueue.where('status').equals('completed').count();
+
+        if (completedCount > 100) {
+            const oldCompleted = await db.courseSyncQueue
+                .where('status')
+                .equals('completed')
+                .sortBy('completedAt');
+
+            const toDelete = oldCompleted.slice(0, completedCount - 100);
+            await db.courseSyncQueue.bulkDelete(toDelete.map((e) => e.queueId!));
+        }
+
+        const remainingQueued = await db.courseSyncQueue
+            .where('status')
+            .anyOf(['pending', 'syncing'])
+            .count();
+
+        return { success: errors.length === 0, synced, failed, queued: remainingQueued, errors };
+    } finally {
+        syncInProgress = false;
+    }
+}
+
+/**
+ * Get sync status for a course
+ */
+export async function getCourseSyncStatus(courseProfileId: string): Promise<SyncStatus> {
+    if (!isOnline) return 'offline';
+
+    const queueEntry = await db.courseSyncQueue
+        .where('courseProfileId')
+        .equals(courseProfileId)
+        .last();
+
+    if (!queueEntry) return 'synced'; // Never queued = assume synced or local-only
+
+    switch (queueEntry.status) {
+        case 'completed':
+            return 'synced';
+        case 'syncing':
+            return 'syncing';
+        case 'pending':
+            return 'pending';
+        case 'failed':
+            return queueEntry.retryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending';
+        default:
+            return 'synced';
+    }
+}
+
+/**
+ * Get counts for sync queue by status
+ */
+export async function getSyncQueueStats(): Promise<{
+    pending: number;
+    syncing: number;
+    failed: number;
+    completed: number;
+}> {
+    const [pending, syncing, failed, completed] = await Promise.all([
+        db.courseSyncQueue.where('status').equals('pending').count(),
+        db.courseSyncQueue.where('status').equals('syncing').count(),
+        db.courseSyncQueue
+            .where('status')
+            .equals('failed')
+            .and((e) => e.retryCount >= MAX_RETRY_COUNT)
+            .count(),
+        db.courseSyncQueue.where('status').equals('completed').count(),
+    ]);
+    return { pending, syncing, failed, completed };
+}
+
+// ============================================
+// SYNC TO CLOUD (with retry)
+// ============================================
+
+/**
+ * Sync a course to cloud with exponential backoff retry
+ */
+async function syncCourseToCloudWithRetry(
     courseProfile: CourseProfile,
     teeSetProfiles: TeeSetProfile[],
-    source: 'user' | 'ocr' | 'api' | 'import' = 'user'
+    source: 'user' | 'ocr' | 'api' | 'import',
+    currentRetry: number
 ): Promise<CourseSyncResult> {
-    if (!isSupabaseConfigured || !supabase) {
-        // Store locally only - will sync when online
-        return { success: true, courseId: courseProfile.id };
+    // Wait with exponential backoff if this is a retry
+    if (currentRetry > 0) {
+        const delay = getRetryDelay(currentRetry - 1);
+        console.log(
+            `[CourseSync] Retry ${currentRetry} for ${courseProfile.name}, waiting ${Math.round(delay)}ms`
+        );
+        await sleep(delay);
     }
+
+    return syncCourseToCloudInternal(courseProfile, teeSetProfiles, source);
+}
+
+/**
+ * Internal sync implementation with batch upsert
+ */
+async function syncCourseToCloudInternal(
+    courseProfile: CourseProfile,
+    teeSetProfiles: TeeSetProfile[],
+    source: 'user' | 'ocr' | 'api' | 'import'
+): Promise<CourseSyncResult> {
+    if (!canSync()) {
+        return { success: false, courseId: courseProfile.id, error: 'Offline', queued: true };
+    }
+
+    const deviceId = getDeviceId();
 
     try {
         // Check if course already exists in cloud by name (case-insensitive)
-        const { data: existing } = await getTable('course_library')
-            .select('id')
+        const { data: existing, error: searchError } = await getTable('course_library')
+            .select('id, created_by')
             .ilike('name', courseProfile.name)
             .maybeSingle();
+
+        if (searchError) {
+            throw new Error(`Search failed: ${searchError.message}`);
+        }
 
         let cloudCourseId: string;
 
         if (existing) {
             // Course exists - update it
             cloudCourseId = existing.id;
-            await getTable('course_library')
+
+            const { error: updateError } = await getTable('course_library')
                 .update({
                     location: courseProfile.location || null,
                     notes: courseProfile.notes || null,
                     updated_at: new Date().toISOString(),
                 })
                 .eq('id', cloudCourseId);
+
+            if (updateError) {
+                throw new Error(`Update failed: ${updateError.message}`);
+            }
         } else {
             // Insert new course
             cloudCourseId = courseProfile.id;
@@ -124,6 +480,7 @@ export async function syncCourseToCloud(
                 location: courseProfile.location || null,
                 notes: courseProfile.notes || null,
                 source,
+                created_by: deviceId,
                 created_at: courseProfile.createdAt,
                 updated_at: new Date().toISOString(),
             };
@@ -131,21 +488,14 @@ export async function syncCourseToCloud(
             const { error: insertError } = await getTable('course_library').insert(courseData);
 
             if (insertError) {
-                throw new Error(`Failed to insert course: ${insertError.message}`);
+                throw new Error(`Insert failed: ${insertError.message}`);
             }
         }
 
-        // Sync tee sets
-        for (const teeSet of teeSetProfiles) {
-            // Check if tee set exists
-            const { data: existingTee } = await getTable('course_library_tee_sets')
-                .select('id')
-                .eq('course_library_id', cloudCourseId)
-                .ilike('name', teeSet.name)
-                .maybeSingle();
-
-            const teeSetData = {
-                id: existingTee?.id || teeSet.id,
+        // Batch upsert tee sets
+        if (teeSetProfiles.length > 0) {
+            const teeSetData = teeSetProfiles.map((teeSet) => ({
+                id: teeSet.id,
                 course_library_id: cloudCourseId,
                 name: teeSet.name,
                 color: teeSet.color || null,
@@ -156,64 +506,96 @@ export async function syncCourseToCloud(
                 hole_pars: teeSet.holePars || [],
                 hole_handicaps: teeSet.holeHandicaps || null,
                 hole_yardages: teeSet.yardages || null,
-            };
+                updated_at: new Date().toISOString(),
+            }));
 
-            if (existingTee) {
-                await getTable('course_library_tee_sets')
-                    .update(teeSetData)
-                    .eq('id', existingTee.id);
-            } else {
-                await getTable('course_library_tee_sets').insert(teeSetData);
+            const { error: upsertError } = await getTable('course_library_tee_sets').upsert(
+                teeSetData,
+                { onConflict: 'id' }
+            );
+
+            if (upsertError) {
+                throw new Error(`Tee set upsert failed: ${upsertError.message}`);
             }
         }
 
         return { success: true, courseId: courseProfile.id, cloudId: cloudCourseId };
     } catch (error) {
-        console.error('[CourseSync] Error syncing course to cloud:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[CourseSync] Error syncing course to cloud:', errorMessage);
         return {
             success: false,
             courseId: courseProfile.id,
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: errorMessage,
         };
     }
+}
+
+// ============================================
+// PUBLIC API
+// ============================================
+
+/**
+ * Save a course to the cloud database (queued)
+ * Called automatically when a course is added to the local library
+ */
+export async function syncCourseToCloud(
+    courseProfile: CourseProfile,
+    teeSetProfiles: TeeSetProfile[],
+    source: 'user' | 'ocr' | 'api' | 'import' = 'user'
+): Promise<CourseSyncResult> {
+    // Always queue the sync (even if online) for reliability
+    await queueCourseSync(courseProfile.id, source);
+
+    // If online, also try immediate sync
+    if (canSync()) {
+        const result = await syncCourseToCloudInternal(courseProfile, teeSetProfiles, source);
+        if (result.success) {
+            // Mark queue entry as completed
+            const queueEntry = await db.courseSyncQueue
+                .where('courseProfileId')
+                .equals(courseProfile.id)
+                .last();
+            if (queueEntry) {
+                await db.courseSyncQueue.update(queueEntry.queueId!, {
+                    status: 'completed',
+                    completedAt: new Date().toISOString(),
+                });
+            }
+        }
+        return result;
+    }
+
+    return { success: true, courseId: courseProfile.id, queued: true };
 }
 
 /**
  * Sync all local courses to cloud
  */
 export async function syncAllCoursesToCloud(): Promise<BulkSyncResult> {
-    if (!isSupabaseConfigured) {
-        return { success: false, synced: 0, failed: 0, errors: ['Supabase not configured'] };
-    }
-
     const errors: string[] = [];
-    let synced = 0;
-    let failed = 0;
+    let queued = 0;
 
     try {
         const courses = await db.courseProfiles.toArray();
 
         for (const course of courses) {
-            const teeSets = await db.teeSetProfiles
-                .where('courseProfileId')
-                .equals(course.id)
-                .toArray();
-
-            const result = await syncCourseToCloud(course, teeSets);
-            if (result.success) {
-                synced++;
-            } else {
-                failed++;
-                errors.push(`${course.name}: ${result.error}`);
-            }
+            await queueCourseSync(course.id, 'user');
+            queued++;
         }
 
-        return { success: errors.length === 0, synced, failed, errors };
+        // Process queue
+        if (canSync()) {
+            return await processQueue();
+        }
+
+        return { success: true, synced: 0, failed: 0, queued, errors: [] };
     } catch (error) {
         return {
             success: false,
-            synced,
-            failed,
+            synced: 0,
+            failed: 0,
+            queued,
             errors: [...errors, error instanceof Error ? error.message : 'Unknown error'],
         };
     }
@@ -227,8 +609,14 @@ export async function syncAllCoursesToCloud(): Promise<BulkSyncResult> {
  * Fetch all courses from cloud and merge into local database
  */
 export async function pullCoursesFromCloud(): Promise<BulkSyncResult> {
-    if (!isSupabaseConfigured || !supabase) {
-        return { success: false, synced: 0, failed: 0, errors: ['Supabase not configured'] };
+    if (!canSync()) {
+        return {
+            success: false,
+            synced: 0,
+            failed: 0,
+            queued: 0,
+            errors: ['Offline or Supabase not configured'],
+        };
     }
 
     const errors: string[] = [];
@@ -236,53 +624,52 @@ export async function pullCoursesFromCloud(): Promise<BulkSyncResult> {
     let failed = 0;
 
     try {
-        // Fetch all courses from cloud
+        // Fetch all courses with their tee sets in one query (batch)
         const { data: cloudCourses, error: coursesError } = await getTable('course_library')
-            .select('*')
+            .select(
+                `
+                *,
+                course_library_tee_sets (*)
+            `
+            )
             .order('name');
 
         if (coursesError) {
             throw new Error(`Failed to fetch courses: ${coursesError.message}`);
         }
 
-        if (!cloudCourses) {
-            return { success: true, synced: 0, failed: 0, errors: [] };
+        if (!cloudCourses || cloudCourses.length === 0) {
+            return { success: true, synced: 0, failed: 0, queued: 0, errors: [] };
         }
 
-        for (const cloudCourse of cloudCourses as CourseLibraryRecord[]) {
-            try {
-                // Check if course exists locally
-                const localCourse = await db.courseProfiles
-                    .where('id')
-                    .equals(cloudCourse.id)
-                    .first();
+        // Process in transaction for consistency
+        await db.transaction('rw', [db.courseProfiles, db.teeSetProfiles], async () => {
+            for (const cloudCourse of cloudCourses) {
+                try {
+                    const courseProfile: CourseProfile = {
+                        id: cloudCourse.id,
+                        name: cloudCourse.name,
+                        location: cloudCourse.location || undefined,
+                        notes: cloudCourse.notes || undefined,
+                        createdAt: cloudCourse.created_at,
+                        updatedAt: cloudCourse.updated_at,
+                    };
 
-                const courseProfile: CourseProfile = {
-                    id: cloudCourse.id,
-                    name: cloudCourse.name,
-                    location: cloudCourse.location || undefined,
-                    notes: cloudCourse.notes || undefined,
-                    createdAt: cloudCourse.created_at,
-                    updatedAt: cloudCourse.updated_at,
-                };
+                    // Check if course exists locally
+                    const localCourse = await db.courseProfiles.get(cloudCourse.id);
 
-                if (localCourse) {
-                    // Update if cloud is newer
-                    if (new Date(cloudCourse.updated_at) > new Date(localCourse.updatedAt)) {
-                        await db.courseProfiles.update(cloudCourse.id, courseProfile);
+                    if (localCourse) {
+                        // Update if cloud is newer
+                        if (new Date(cloudCourse.updated_at) > new Date(localCourse.updatedAt)) {
+                            await db.courseProfiles.put(courseProfile);
+                        }
+                    } else {
+                        await db.courseProfiles.add(courseProfile);
                     }
-                } else {
-                    // Insert new course
-                    await db.courseProfiles.add(courseProfile);
-                }
 
-                // Fetch and sync tee sets
-                const { data: cloudTeeSets } = await getTable('course_library_tee_sets')
-                    .select('*')
-                    .eq('course_library_id', cloudCourse.id);
-
-                if (cloudTeeSets) {
-                    for (const cloudTee of cloudTeeSets as CourseLibraryTeeSetRecord[]) {
+                    // Process tee sets
+                    const cloudTeeSets = cloudCourse.course_library_tee_sets || [];
+                    for (const cloudTee of cloudTeeSets) {
                         const teeSetProfile: TeeSetProfile = {
                             id: cloudTee.id,
                             courseProfileId: cloudCourse.id,
@@ -299,32 +686,24 @@ export async function pullCoursesFromCloud(): Promise<BulkSyncResult> {
                             updatedAt: cloudTee.updated_at,
                         };
 
-                        const existingTee = await db.teeSetProfiles
-                            .where('id')
-                            .equals(cloudTee.id)
-                            .first();
-
-                        if (existingTee) {
-                            await db.teeSetProfiles.put(teeSetProfile);
-                        } else {
-                            await db.teeSetProfiles.add(teeSetProfile);
-                        }
+                        await db.teeSetProfiles.put(teeSetProfile);
                     }
+
+                    synced++;
+                } catch (err) {
+                    failed++;
+                    errors.push(`${cloudCourse.name}: ${err}`);
                 }
-
-                synced++;
-            } catch (err) {
-                failed++;
-                errors.push(`${cloudCourse.name}: ${err}`);
             }
-        }
+        });
 
-        return { success: errors.length === 0, synced, failed, errors };
+        return { success: errors.length === 0, synced, failed, queued: 0, errors };
     } catch (error) {
         return {
             success: false,
             synced,
             failed,
+            queued: 0,
             errors: [...errors, error instanceof Error ? error.message : 'Unknown error'],
         };
     }
@@ -334,7 +713,7 @@ export async function pullCoursesFromCloud(): Promise<BulkSyncResult> {
  * Search cloud course library by name
  */
 export async function searchCloudCourses(query: string): Promise<CourseLibraryRecord[]> {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!canSync()) {
         return [];
     }
 
@@ -363,27 +742,28 @@ export async function getCloudCourse(courseId: string): Promise<{
     course: CourseLibraryRecord;
     teeSets: CourseLibraryTeeSetRecord[];
 } | null> {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!canSync()) {
         return null;
     }
 
     try {
-        const { data: course, error: courseError } = await getTable('course_library')
-            .select('*')
+        const { data: course, error } = await getTable('course_library')
+            .select(
+                `
+                *,
+                course_library_tee_sets (*)
+            `
+            )
             .eq('id', courseId)
             .single();
 
-        if (courseError || !course) {
+        if (error || !course) {
             return null;
         }
 
-        const { data: teeSets } = await getTable('course_library_tee_sets')
-            .select('*')
-            .eq('course_library_id', courseId);
-
         return {
             course: course as CourseLibraryRecord,
-            teeSets: (teeSets || []) as CourseLibraryTeeSetRecord[]
+            teeSets: (course.course_library_tee_sets || []) as CourseLibraryTeeSetRecord[],
         };
     } catch {
         return null;
@@ -394,12 +774,27 @@ export async function getCloudCourse(courseId: string): Promise<{
  * Increment usage count when a course is used
  */
 export async function incrementCourseUsage(courseId: string): Promise<void> {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!canSync()) {
         return;
     }
 
     try {
-        // Get current count and increment
+        // First try RPC for atomic increment (if available)
+        if (supabase?.rpc) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: rpcError } = await (supabase.rpc as any)('increment_course_usage', {
+                course_id: courseId,
+            });
+
+            // If RPC succeeded, we're done
+            if (!rpcError) {
+                return;
+            }
+            // If RPC failed (e.g., function doesn't exist), fall back to update
+            console.log('[CourseSync] RPC not available, using update fallback');
+        }
+
+        // Fallback: manual update
         const { data: course } = await getTable('course_library')
             .select('usage_count')
             .eq('id', courseId)
@@ -416,6 +811,23 @@ export async function incrementCourseUsage(courseId: string): Promise<void> {
     } catch {
         // Silently fail - not critical
     }
+}
+
+/**
+ * Force retry all failed syncs
+ */
+export async function retryFailedSyncs(): Promise<BulkSyncResult> {
+    // Reset failed items to pending
+    const failedItems = await db.courseSyncQueue.where('status').equals('failed').toArray();
+
+    for (const item of failedItems) {
+        await db.courseSyncQueue.update(item.queueId!, {
+            status: 'pending',
+            retryCount: 0,
+        });
+    }
+
+    return processQueue();
 }
 
 // ============================================
@@ -459,7 +871,7 @@ export async function createAndSyncCourseProfile(
         updatedAt: now,
     }));
 
-    // Save locally
+    // Save locally first (offline-first)
     await db.transaction('rw', [db.courseProfiles, db.teeSetProfiles], async () => {
         await db.courseProfiles.add(profile);
         if (teeSetProfiles.length > 0) {
@@ -467,10 +879,31 @@ export async function createAndSyncCourseProfile(
         }
     });
 
-    // Sync to cloud (async, don't wait)
+    // Queue for cloud sync (non-blocking)
     syncCourseToCloud(profile, teeSetProfiles, source).catch((err) => {
         console.error('[CourseSync] Background sync failed:', err);
     });
 
     return profile;
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+/**
+ * Initialize the sync service
+ * Call this on app startup
+ */
+export function initCourseSyncService(): void {
+    initNetworkListeners();
+
+    // Process any pending items on startup (if online)
+    if (canSync()) {
+        setTimeout(() => {
+            processQueue().catch((err) => {
+                console.error('[CourseSync] Startup queue processing error:', err);
+            });
+        }, 3000); // Delay to let app initialize
+    }
 }

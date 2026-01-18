@@ -11,6 +11,7 @@ import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { TripRehydrationProvider } from '@/components/TripRehydrationProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthGuard } from '@/components/AuthGuard';
+import { CourseSyncInitializer } from '@/components/CourseSyncInitializer';
 
 export const metadata: Metadata = {
   title: 'Ryder Cup Tracker',
@@ -101,6 +102,7 @@ export default function RootLayout({
             </ErrorBoundary>
             <QuickScoreFAB />
             <OfflineIndicator />
+            <CourseSyncInitializer />
             <ToastContainer />
             <PWABanners />
           </ThemeProvider>

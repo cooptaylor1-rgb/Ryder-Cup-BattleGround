@@ -48,6 +48,22 @@ import type {
 } from '@/lib/types/sideGames';
 
 /**
+ * Course Library Sync Queue Entry
+ * Tracks pending cloud syncs with retry support
+ */
+export interface CourseSyncQueueEntry {
+    queueId?: number; // Auto-increment
+    courseProfileId: string;
+    source: 'user' | 'ocr' | 'api' | 'import';
+    status: 'pending' | 'syncing' | 'failed' | 'completed';
+    retryCount: number;
+    lastError?: string;
+    createdAt: string;
+    lastAttemptAt?: string;
+    completedAt?: string;
+}
+
+/**
  * Golf Trip Database
  *
  * Extends Dexie with typed tables for all domain models.
@@ -109,6 +125,9 @@ export class GolfTripDB extends Dexie {
 
     // Sync metadata (Phase 2)
     syncMeta!: Table<SyncMetadata>;
+
+    // Course Library Sync Queue (v8)
+    courseSyncQueue!: Table<CourseSyncQueueEntry>;
 
     constructor() {
         super('GolfTripDB');
@@ -211,6 +230,12 @@ export class GolfTripDB extends Dexie {
 
             // Trip archive
             tripArchives: 'id, tripId, archivedAt',
+        });
+
+        // Schema version 8 - Course Library Sync Queue
+        this.version(8).stores({
+            // Offline sync queue for course library
+            courseSyncQueue: '++queueId, courseProfileId, status, retryCount, createdAt, [status+retryCount]',
         });
     }
 }
