@@ -18,21 +18,17 @@ import {
     Upload,
     FileJson,
     CheckCircle,
-    AlertTriangle,
     XCircle,
     HardDrive,
-    Clock,
     Users,
     Trophy,
     Calendar,
     RefreshCw,
-    FileText,
-    Share2,
     Copy,
     ExternalLink,
 } from 'lucide-react';
-import { colors } from '@/lib/design-system/tokens';
 import { useTripStore } from '@/lib/stores';
+import { tripLogger } from '@/lib/utils/logger';
 import { db } from '@/lib/db';
 import {
     exportTripToFile,
@@ -151,7 +147,7 @@ export default function BackupRestorePage() {
             // Clear success message after 3 seconds
             setTimeout(() => setExportSuccess(null), 3000);
         } catch (error) {
-            console.error('[Backup] Export failed:', error);
+            tripLogger.error('Export failed:', error);
         } finally {
             setIsExporting(false);
         }
@@ -161,7 +157,7 @@ export default function BackupRestorePage() {
         try {
             await shareTripSummary(tripId);
         } catch (error) {
-            console.error('[Backup] Share failed:', error);
+            tripLogger.error('Share failed:', error);
         }
     };
 
@@ -226,9 +222,7 @@ export default function BackupRestorePage() {
                     tripId: result.tripId,
                 });
 
-                // Refresh trips list
-                const allTrips = await db.trips.toArray();
-                // Re-load...
+                // Reload to refresh trips list
                 window.location.reload();
             } else {
                 setImportResult({
@@ -236,7 +230,7 @@ export default function BackupRestorePage() {
                     message: 'Import failed. Please check the file and try again.',
                 });
             }
-        } catch (error) {
+        } catch {
             setImportResult({
                 success: false,
                 message: 'An error occurred during import.',

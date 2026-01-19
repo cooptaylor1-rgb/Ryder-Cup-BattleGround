@@ -1,12 +1,14 @@
 'use client';
 
 /**
- * Global Error Page
+ * Route Error Page
  *
  * Next.js 13+ error boundary for route-level error handling.
  * This catches errors in the route tree and displays a recovery UI.
+ * Reports errors to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -16,12 +18,10 @@ interface ErrorPageProps {
     reset: () => void;
 }
 
-export default function GlobalError({ error, reset }: ErrorPageProps) {
+export default function RouteError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        // Log the error to an error reporting service
-        if (process.env.NODE_ENV === 'production') {
-            // TODO: Send to error tracking service (Sentry, etc.)
-        }
+        // Report error to Sentry for monitoring
+        Sentry.captureException(error);
     }, [error]);
 
     return (

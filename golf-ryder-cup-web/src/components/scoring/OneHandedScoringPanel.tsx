@@ -114,7 +114,7 @@ export function OneHandedScoringPanel({
         setConfirmingResult(winner);
     }, [disabled]);
 
-    const isRightHanded = preferredHand === 'right';
+    const _isRightHanded = preferredHand === 'right';
     const scoreColor = currentScore > 0 ? teamAColor : currentScore < 0 ? teamBColor : COLORS.textSecondary;
 
     return (

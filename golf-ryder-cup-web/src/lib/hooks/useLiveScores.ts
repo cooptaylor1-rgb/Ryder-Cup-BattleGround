@@ -15,6 +15,7 @@ import {
     type ChangeEvent,
 } from '../services/liveUpdatesService';
 import { db } from '../db';
+import { liveLogger } from '../utils/logger';
 import type { Match, HoleResult, RyderCupSession } from '../types/models';
 
 // ============================================
@@ -103,7 +104,7 @@ export function useLiveScores(options: UseLiveScoresOptions): LiveScoresState & 
                 }));
             }
         } catch (err) {
-            console.error('[useLiveScores] Error loading data:', err);
+            liveLogger.error('Error loading data:', err);
             if (mountedRef.current) {
                 setState((prev) => ({
                     ...prev,
@@ -214,7 +215,7 @@ export function useLiveScores(options: UseLiveScoresOptions): LiveScoresState & 
 
     const handleError = useCallback((error: Error) => {
         if (!mountedRef.current) return;
-        console.error('[useLiveScores] Error:', error);
+        liveLogger.error('Error:', error);
         setState((prev) => ({ ...prev, error: error.message }));
     }, []);
 

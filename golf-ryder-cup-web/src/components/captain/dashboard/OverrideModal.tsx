@@ -15,6 +15,7 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { captainLogger } from '@/lib/utils/logger';
 import {
     X,
     Edit3,
@@ -576,7 +577,7 @@ export function OverrideModal({
             });
             handleClose();
         } catch (error) {
-            console.error('Override failed:', error);
+            captainLogger.error('Override failed:', error);
         } finally {
             setIsSubmitting(false);
         }

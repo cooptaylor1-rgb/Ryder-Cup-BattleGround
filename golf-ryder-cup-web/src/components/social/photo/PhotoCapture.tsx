@@ -36,6 +36,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('PhotoCapture');
 
 // ============================================
 // TYPES
@@ -143,7 +146,7 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
                 await videoRef.current.play();
             }
         } catch (err) {
-            console.error('Camera error:', err);
+            logger.error('Camera error:', err);
             setError('Could not access camera. Please check permissions.');
         } finally {
             setIsLoading(false);

@@ -14,6 +14,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useOnlineStatus } from './useOnlineStatus';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('LiveUpdates');
 
 // ============================================
 // TYPES
@@ -215,7 +218,7 @@ export function useLiveUpdates({
             // Simulate connected
             setIsConnected(true);
         } catch (err) {
-            console.error('Socket connection error:', err);
+            logger.error('Socket connection error:', err);
             setIsConnected(false);
         }
     }, [enabled, isOnline, handleUpdate, connectionAttempts]);

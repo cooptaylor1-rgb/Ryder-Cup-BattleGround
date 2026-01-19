@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { captainLogger } from '@/lib/utils/logger';
 import {
     ChevronLeft,
     Settings,
@@ -123,7 +124,7 @@ export default function CaptainManagePage() {
             await db.sessions.update(sessionId, { ...updates, updatedAt: new Date().toISOString() });
             showToast('success', 'Session updated');
         } catch (error) {
-            console.error('Failed to update session:', error);
+            captainLogger.error('Failed to update session:', error);
             showToast('error', 'Failed to update session');
         } finally {
             setIsSubmitting(false);
@@ -138,7 +139,7 @@ export default function CaptainManagePage() {
             showToast('success', 'Match updated');
             setEditingMatch(null);
         } catch (error) {
-            console.error('Failed to update match:', error);
+            captainLogger.error('Failed to update match:', error);
             showToast('error', 'Failed to update match');
         } finally {
             setIsSubmitting(false);
@@ -155,7 +156,7 @@ export default function CaptainManagePage() {
             await db.matches.delete(matchId);
             showToast('success', 'Match deleted');
         } catch (error) {
-            console.error('Failed to delete match:', error);
+            captainLogger.error('Failed to delete match:', error);
             showToast('error', 'Failed to delete match');
         } finally {
             setIsSubmitting(false);
@@ -170,7 +171,7 @@ export default function CaptainManagePage() {
             showToast('success', 'Player updated');
             setEditingPlayer(null);
         } catch (error) {
-            console.error('Failed to update player:', error);
+            captainLogger.error('Failed to update player:', error);
             showToast('error', 'Failed to update player');
         } finally {
             setIsSubmitting(false);
@@ -194,7 +195,7 @@ export default function CaptainManagePage() {
             await db.sessions.delete(sessionId);
             showToast('success', 'Session deleted');
         } catch (error) {
-            console.error('Failed to delete session:', error);
+            captainLogger.error('Failed to delete session:', error);
             showToast('error', 'Failed to delete session. Some data may be partially deleted.');
         } finally {
             setIsSubmitting(false);

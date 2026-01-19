@@ -10,7 +10,7 @@
  * - Lineup announcements
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
     ChevronLeft,
@@ -25,7 +25,6 @@ import {
     Home,
     CalendarDays,
     Target,
-    Users,
     MoreHorizontal,
 } from 'lucide-react';
 import {
@@ -41,17 +40,15 @@ import { useTripStore } from '@/lib/stores';
 export default function NotificationSettingsPage() {
     const { currentTrip } = useTripStore();
     const [preferences, setPreferences] = useState<NotificationPreferences>(getPreferences());
-    const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default');
-    const [isRequesting, setIsRequesting] = useState(false);
-    const [pendingCount, setPendingCount] = useState(0);
-    const [savedMessage, setSavedMessage] = useState<string | null>(null);
-
-    useEffect(() => {
+    const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>(() => {
         if (typeof window !== 'undefined' && 'Notification' in window) {
-            setPermissionStatus(Notification.permission);
+            return Notification.permission;
         }
-        setPendingCount(getPendingNotificationCount());
-    }, []);
+        return 'default';
+    });
+    const [isRequesting, setIsRequesting] = useState(false);
+    const [pendingCount, setPendingCount] = useState(() => getPendingNotificationCount());
+    const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
     const handleEnableNotifications = async () => {
         setIsRequesting(true);

@@ -111,7 +111,7 @@ function TeamScoreInput({
     const grossColor = getScoreColor(grossScore, par);
     const netColor = getScoreColor(netScore, par);
     const grossLabel = getScoreLabel(grossScore, par);
-    const netLabel = getScoreLabel(netScore, par);
+    const _netLabel = getScoreLabel(netScore, par);
 
     const handleIncrement = () => {
         haptic.tap();

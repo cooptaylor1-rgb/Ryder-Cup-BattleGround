@@ -13,9 +13,6 @@ import type {
     UUID,
     Player,
     Match,
-    RyderCupSession,
-    Team,
-    TeamMember,
 } from '../types/models';
 
 // ============================================
@@ -570,7 +567,7 @@ export async function getPairingHistory(
  */
 export async function saveLineup(
     state: LineupState,
-    tripId: UUID
+    _tripId: UUID
 ): Promise<{ success: boolean; matchIds: UUID[] }> {
     const session = await db.sessions.get(state.sessionId);
     if (!session) {

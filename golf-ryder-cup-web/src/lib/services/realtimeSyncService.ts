@@ -7,6 +7,7 @@
 
 import type { UUID, Match, HoleResult } from '@/lib/types/models';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { syncLogger } from '@/lib/utils/logger';
 
 // Type for Supabase client - imported dynamically to avoid circular deps
 type SupabaseClient = {
@@ -185,7 +186,7 @@ export async function broadcastScoreUpdate(
             });
         }
     } catch (error) {
-        console.error('Failed to broadcast score update:', error);
+        syncLogger.error('Failed to broadcast score update:', error);
     }
 }
 
@@ -207,7 +208,7 @@ export async function broadcastMatchUpdate(
             });
         }
     } catch (error) {
-        console.error('Failed to broadcast match update:', error);
+        syncLogger.error('Failed to broadcast match update:', error);
     }
 }
 
@@ -237,7 +238,7 @@ export async function trackPresence(
             lastSeen: new Date().toISOString(),
         });
     } catch (error) {
-        console.error('Failed to track presence:', error);
+        syncLogger.error('Failed to track presence:', error);
     }
 }
 
@@ -265,7 +266,7 @@ export async function updatePresenceStatus(
             });
         }
     } catch (error) {
-        console.error('Failed to update presence status:', error);
+        syncLogger.error('Failed to update presence status:', error);
     }
 }
 

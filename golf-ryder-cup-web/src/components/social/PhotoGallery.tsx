@@ -11,6 +11,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { isSupabaseConfigured, getSupabase, insertRecord } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Camera, X, Upload, Image, Loader2, MapPin, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('PhotoGallery');
 
 interface Photo {
     id: string;
@@ -138,7 +141,7 @@ export function PhotoGallery({
                 onPhotoUpload?.(photo);
             }
         } catch (error) {
-            console.error('Failed to upload photo:', error);
+            logger.error('Failed to upload photo:', error);
             alert('Failed to upload photo. Please try again.');
         } finally {
             setIsUploading(false);

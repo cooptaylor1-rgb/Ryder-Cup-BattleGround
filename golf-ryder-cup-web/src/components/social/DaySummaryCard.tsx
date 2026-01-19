@@ -28,6 +28,9 @@ import {
     Copy,
     Check,
 } from 'lucide-react';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('DaySummary');
 import { useTripStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -257,7 +260,7 @@ export function useDaySummary(date?: string) {
             setIsLoading(false);
             return daySummary;
         } catch (error) {
-            console.error('Failed to generate summary:', error);
+            logger.error('Failed to generate summary:', error);
             setIsLoading(false);
             return null;
         }
@@ -441,7 +444,7 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
                 handleDownload();
             }
         } catch (error) {
-            console.error('Share failed:', error);
+            logger.error('Share failed:', error);
         }
     };
 

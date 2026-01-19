@@ -26,6 +26,9 @@ import {
     getTripSyncStatus,
     type SyncStatus,
 } from '../services/tripSyncService';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('TripStore');
 
 // ============================================
 // TYPES
@@ -175,7 +178,7 @@ export const useTripStore = create<TripState>()(
                     const result = await syncTripToCloudFull(currentTrip.id);
                     set({ syncStatus: result.success ? 'synced' : 'failed' });
                 } catch (error) {
-                    console.error('[TripStore] Sync failed:', error);
+                    logger.error('Sync failed:', error);
                     set({ syncStatus: 'failed' });
                 }
             },

@@ -17,6 +17,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUIStore } from '@/lib/stores';
 import { getWeather, type GolfWeather } from '@/lib/services/weatherService';
 import { sendNotification, requestNotificationPermission } from './liveScoreNotifications';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('WeatherAlerts');
 
 export type WeatherAlertSeverity = 'info' | 'warning' | 'danger' | 'emergency';
 
@@ -206,7 +209,7 @@ export function useWeatherAlerts(options: WeatherAlertOptions) {
             setAlerts(newAlerts);
             setLastCheck(new Date());
         } catch (error) {
-            console.error('Failed to check weather:', error);
+            logger.error('Failed to check weather:', error);
         } finally {
             setIsLoading(false);
         }

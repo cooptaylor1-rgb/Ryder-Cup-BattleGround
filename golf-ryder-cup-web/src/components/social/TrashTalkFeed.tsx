@@ -13,6 +13,9 @@ import { cn, formatPlayerName } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Send, Smile, Trophy, MessageCircle, Loader2 } from 'lucide-react';
 import type { Player } from '@/lib/types/models';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('TrashTalk');
 
 interface Comment {
     id: string;
@@ -84,7 +87,7 @@ export function TrashTalkFeed({
             onCommentSubmit?.(comment);
             setMessage('');
         } catch (error) {
-            console.error('Failed to post comment:', error);
+            logger.error('Failed to post comment:', error);
         } finally {
             setIsSubmitting(false);
         }
@@ -238,15 +241,15 @@ export function TrashTalkFeed({
                                 {['😀', '😂', '🤣', '😎', '🔥', '💪', '👏', '🙌',
                                     '🏌️', '⛳', '🎯', '🏆', '💀', '😱', '🤯', '👀',
                                     '💯', '🎉', '🍺', '☀️', '🌧️', '💨', '🐦', '🦅'].map((emoji) => (
-                                    <button
-                                        key={emoji}
-                                        type="button"
-                                        onClick={() => handleEmojiClick(emoji)}
-                                        className="text-xl p-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded"
-                                    >
-                                        {emoji}
-                                    </button>
-                                ))}
+                                        <button
+                                            key={emoji}
+                                            type="button"
+                                            onClick={() => handleEmojiClick(emoji)}
+                                            className="text-xl p-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded"
+                                        >
+                                            {emoji}
+                                        </button>
+                                    ))}
                             </div>
                         )}
                     </div>
@@ -315,8 +318,8 @@ export function MatchResultAnnouncement({
                 winnerTeam === 'usa'
                     ? 'bg-team-usa/5 border-team-usa/30'
                     : winnerTeam === 'europe'
-                    ? 'bg-team-europe/5 border-team-europe/30'
-                    : 'bg-secondary-gold/5 border-secondary-gold/30',
+                        ? 'bg-team-europe/5 border-team-europe/30'
+                        : 'bg-secondary-gold/5 border-secondary-gold/30',
                 className
             )}
         >
@@ -327,8 +330,8 @@ export function MatchResultAnnouncement({
                         winnerTeam === 'usa'
                             ? 'text-team-usa'
                             : winnerTeam === 'europe'
-                            ? 'text-team-europe'
-                            : 'text-secondary-gold'
+                                ? 'text-team-europe'
+                                : 'text-secondary-gold'
                     )}
                 />
                 <span className="text-sm text-surface-500">Match {matchNumber} Complete</span>

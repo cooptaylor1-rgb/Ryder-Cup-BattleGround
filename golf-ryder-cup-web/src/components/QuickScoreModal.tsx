@@ -22,6 +22,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { calculateMatchState, recordHoleResult } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
+import { scoringLogger } from '@/lib/utils/logger';
 import type { Match, Player, HoleResult, HoleWinner } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 
@@ -139,7 +140,7 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                 }, 600);
 
             } catch (err) {
-                console.error('Failed to save score:', err);
+                scoringLogger.error('Failed to save score:', err);
                 setError(err instanceof Error ? err.message : 'Failed to save score');
                 trigger('error');
             } finally {

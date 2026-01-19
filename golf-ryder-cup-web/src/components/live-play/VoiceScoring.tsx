@@ -27,6 +27,7 @@ import {
     AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { scoringLogger } from '@/lib/utils/logger';
 // Speech recognition types are global from speech-recognition.d.ts
 
 // Simple haptic feedback helper
@@ -263,7 +264,7 @@ export function VoiceScoring({
         recognition.onerror = (event) => {
             // Event type is SpeechRecognitionErrorEvent from our d.ts
             const errorEvent = event as unknown as { error: string };
-            console.error('Speech recognition error:', errorEvent.error);
+            scoringLogger.error('Speech recognition error:', errorEvent.error);
             triggerHaptic('error');
             setErrorMessage(
                 errorEvent.error === 'no-speech'

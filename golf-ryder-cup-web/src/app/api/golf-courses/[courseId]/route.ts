@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { apiLogger } from '@/lib/utils/logger';
 
 /**
  * Golf Course Details API
@@ -99,7 +100,7 @@ export async function GET(
         res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
         return res;
     } catch (error) {
-        console.error('Course details error:', error);
+        apiLogger.error('Course details error:', error);
         return NextResponse.json(
             { error: 'Failed to fetch course details', details: String(error) },
             { status: 500 }
@@ -174,7 +175,7 @@ async function fetchFromGHIN(
             source: 'ghin',
         };
     } catch (error) {
-        console.error('GHIN fetch error:', error);
+        apiLogger.error('GHIN fetch error:', error);
         return null;
     }
 }

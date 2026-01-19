@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { uiLogger } from '@/lib/utils/logger';
 import { NoMessagesEmpty } from '@/components/ui';
 import {
   ChevronLeft,
@@ -87,7 +88,7 @@ export default function SocialPage() {
       await db.banterPosts.add(newPost);
       setMessage('');
     } catch (error) {
-      console.error('Failed to post message:', error);
+      uiLogger.error('Failed to post message:', error);
       showToast('error', 'Failed to post message. Please try again.');
     }
   };

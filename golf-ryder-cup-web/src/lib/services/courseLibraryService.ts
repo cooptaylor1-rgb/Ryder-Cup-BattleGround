@@ -12,6 +12,9 @@ import { db } from '../db';
 import type { Course, TeeSet } from '../types/models';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
 import { syncCourseToCloud } from './courseLibrarySyncService';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('CourseLibrary');
 
 /**
  * Get all course profiles
@@ -94,7 +97,7 @@ export async function createCourseProfile(
 
     // Sync to cloud in background (don't block UI)
     syncCourseToCloud(profile, teeSetProfiles, source).catch((err) => {
-        console.error('[CourseLibrary] Background sync to cloud failed:', err);
+        logger.error('Background sync to cloud failed:', err);
     });
 
     return profile;
@@ -213,7 +216,7 @@ export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Pr
 
     // Sync to cloud in background
     syncCourseToCloud(profile, teeSetProfiles, 'user').catch((err) => {
-        console.error('[CourseLibrary] Background sync to cloud failed:', err);
+        logger.error('Background sync to cloud failed:', err);
     });
 
     return profile;

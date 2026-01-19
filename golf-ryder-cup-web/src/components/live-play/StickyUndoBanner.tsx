@@ -22,6 +22,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from '
 import { Undo2, X, Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
+import { scoringLogger } from '@/lib/utils/logger';
 
 // ============================================
 // TYPES
@@ -119,7 +120,7 @@ export function StickyUndoBanner({
         try {
             await action.onUndo();
         } catch (error) {
-            console.error('Undo failed:', error);
+            scoringLogger.error('Undo failed:', error);
             trigger('error');
         } finally {
             setIsUndoing(false);

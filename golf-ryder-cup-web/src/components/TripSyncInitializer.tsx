@@ -9,6 +9,7 @@
 
 import { useEffect, useRef } from 'react';
 import { initTripSyncService, processSyncQueue, getSyncQueueStatus } from '@/lib/services/tripSyncService';
+import { syncLogger } from '@/lib/utils/logger';
 
 interface TripSyncInitializerProps {
     /** Enable debug logging */
@@ -26,13 +27,13 @@ export function TripSyncInitializer({ debug = false }: TripSyncInitializerProps)
         initTripSyncService();
 
         if (debug) {
-            console.log('[TripSyncInitializer] Initialized');
+            syncLogger.log('TripSyncInitializer initialized');
 
             // Log queue status periodically in debug mode
             const statusInterval = setInterval(() => {
                 const status = getSyncQueueStatus();
                 if (status.pending > 0 || status.failed > 0) {
-                    console.log('[TripSyncInitializer] Queue status:', status);
+                    syncLogger.log('Queue status:', status);
                 }
             }, 30000);
 
@@ -44,7 +45,7 @@ export function TripSyncInitializer({ debug = false }: TripSyncInitializerProps)
     useEffect(() => {
         const timer = setTimeout(() => {
             processSyncQueue().catch((err) => {
-                console.error('[TripSyncInitializer] Queue processing error:', err);
+                syncLogger.error('Queue processing error:', err);
             });
         }, 5000);
 

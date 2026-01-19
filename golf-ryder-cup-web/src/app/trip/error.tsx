@@ -4,8 +4,10 @@
  * Trip Error Boundary
  *
  * Handles errors in trip routes with context-specific messaging.
+ * Reports to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -17,7 +19,7 @@ interface ErrorPageProps {
 
 export default function TripError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        console.error('Trip route error:', error);
+        Sentry.captureException(error, { tags: { feature: 'trip' } });
     }, [error]);
 
     return (

@@ -8,7 +8,7 @@
  * - Elimination scenarios
  */
 
-import type { TeamStandings, MagicNumber } from '@/lib/types/computed';
+import type { TeamStandings } from '@/lib/types/computed';
 
 // ============================================
 // TYPES
@@ -294,7 +294,7 @@ export function detectDramaticMoment(pathToVictory: PathToVictory): {
     headline: string;
     subtext: string;
 } | null {
-    const { teamA, teamB, remainingMatches, pointsToWin } = pathToVictory;
+    const { teamA, teamB, remainingMatches, pointsToWin: _pointsToWin } = pathToVictory;
 
     // One team about to clinch
     if (teamA.pointsNeeded === 0.5 || teamA.pointsNeeded === 1) {
@@ -325,7 +325,7 @@ export function detectDramaticMoment(pathToVictory: PathToVictory): {
     // Comeback territory
     const margin = Math.abs(teamA.currentPoints - teamB.currentPoints);
     const trailing = teamA.currentPoints < teamB.currentPoints ? teamA : teamB;
-    const leading = teamA.currentPoints < teamB.currentPoints ? teamB : teamA;
+    const _leading = teamA.currentPoints < teamB.currentPoints ? teamB : teamA;
 
     if (margin >= 3 && trailing.canClinch && remainingMatches >= margin) {
         return {

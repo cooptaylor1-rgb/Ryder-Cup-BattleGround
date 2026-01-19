@@ -4,8 +4,10 @@
  * Captain Error Boundary
  *
  * Handles errors in captain routes with context-specific messaging.
+ * Reports to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -17,7 +19,7 @@ interface ErrorPageProps {
 
 export default function CaptainError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        console.error('Captain route error:', error);
+        Sentry.captureException(error, { tags: { feature: 'captain' } });
     }, [error]);
 
     return (

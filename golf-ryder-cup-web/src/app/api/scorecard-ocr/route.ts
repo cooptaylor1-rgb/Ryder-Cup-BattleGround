@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit, addRateLimitHeaders, requireJson, validateBodySize } from '@/lib/utils/apiMiddleware';
+import { ocrLogger } from '@/lib/utils/logger';
 
 /**
  * SCORECARD OCR API
@@ -284,7 +285,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!result) {
-      console.error('[OCR] All extraction attempts failed');
+      ocrLogger.error('All extraction attempts failed');
       return NextResponse.json({ error: 'Failed to extract scorecard data' }, { status: 500 });
     }
 
@@ -305,7 +306,7 @@ export async function POST(request: NextRequest) {
     res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
     return res;
   } catch (error) {
-    console.error('Scorecard OCR error:', error);
+    ocrLogger.error('Scorecard OCR error:', error);
     return NextResponse.json(
       { error: 'Internal server error', details: String(error) },
       { status: 500 }
@@ -354,7 +355,7 @@ async function extractWithClaude(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[OCR] Claude API error:', errorText);
+      ocrLogger.error('Claude API error:', errorText);
       return null;
     }
 
@@ -362,16 +363,16 @@ async function extractWithClaude(
     const content = data.content?.[0]?.text;
 
     if (!content) {
-      console.error('[OCR] Claude returned no content');
+      ocrLogger.error('Claude returned no content');
       return null;
     }
 
-    console.log('[OCR] Claude raw response length:', content.length);
+    ocrLogger.log('Claude raw response length:', content.length);
 
     // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('[OCR] Could not extract JSON from Claude response:', content.slice(0, 500));
+      ocrLogger.error('Could not extract JSON from Claude response:', content.slice(0, 500));
       return null;
     }
 
@@ -379,7 +380,7 @@ async function extractWithClaude(
 
     return parsed;
   } catch (error) {
-    console.error('[OCR] Claude extraction error:', error);
+    ocrLogger.error('Claude extraction error:', error);
     return null;
   }
 }
@@ -429,7 +430,7 @@ async function extractWithOpenAI(
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error:', await response.text());
+      ocrLogger.error('OpenAI API error:', await response.text());
       return null;
     }
 
@@ -445,7 +446,7 @@ async function extractWithOpenAI(
     const jsonStr = Array.isArray(jsonMatch) && jsonMatch[1] ? jsonMatch[1].trim() : jsonMatch[0];
     return JSON.parse(jsonStr);
   } catch (error) {
-    console.error('OpenAI extraction error:', error);
+    ocrLogger.error('OpenAI extraction error:', error);
     return null;
   }
 }
@@ -504,7 +505,7 @@ async function extractWithClaudeMultiple(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[OCR] Claude multi-image API error:', errorText);
+      ocrLogger.error('Claude multi-image API error:', errorText);
       return null;
     }
 
@@ -512,16 +513,16 @@ async function extractWithClaudeMultiple(
     const responseContent = data.content?.[0]?.text;
 
     if (!responseContent) {
-      console.error('[OCR] Claude multi-image returned no content');
+      ocrLogger.error('Claude multi-image returned no content');
       return null;
     }
 
-    console.log('[OCR] Claude multi-image response length:', responseContent.length);
+    ocrLogger.log('Claude multi-image response length:', responseContent.length);
 
     // Parse JSON from response
     const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('[OCR] Could not extract JSON from multi-image response:', responseContent.slice(0, 500));
+      ocrLogger.error('Could not extract JSON from multi-image response:', responseContent.slice(0, 500));
       return null;
     }
 
@@ -529,7 +530,7 @@ async function extractWithClaudeMultiple(
 
     return parsed;
   } catch (error) {
-    console.error('[OCR] Claude multi-image extraction error:', error);
+    ocrLogger.error('Claude multi-image extraction error:', error);
     return null;
   }
 }
@@ -589,7 +590,7 @@ async function extractWithOpenAIMultiple(
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error:', await response.text());
+      ocrLogger.error('OpenAI multi-image API error:', await response.text());
       return null;
     }
 
@@ -605,7 +606,7 @@ async function extractWithOpenAIMultiple(
     const jsonStr = Array.isArray(jsonMatch) && jsonMatch[1] ? jsonMatch[1].trim() : jsonMatch[0];
     return JSON.parse(jsonStr);
   } catch (error) {
-    console.error('OpenAI multi-image extraction error:', error);
+    ocrLogger.error('OpenAI multi-image extraction error:', error);
     return null;
   }
 }

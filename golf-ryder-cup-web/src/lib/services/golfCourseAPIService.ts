@@ -8,6 +8,10 @@
  * API Documentation: https://golfcourseapi.com
  */
 
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('GolfCourseAPI');
+
 /**
  * API Response Types
  */
@@ -136,7 +140,7 @@ export async function getCourseById(courseId: number): Promise<GolfCourseAPICour
         const data = await response.json();
         return data.course || null;
     } catch (error) {
-        console.error('Failed to fetch course:', error);
+        logger.error('Failed to fetch course:', error);
         return null;
     }
 }

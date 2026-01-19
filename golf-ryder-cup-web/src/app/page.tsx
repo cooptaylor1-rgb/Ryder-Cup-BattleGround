@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useAuthStore, useUIStore } from '@/lib/stores';
+import { tripLogger } from '@/lib/utils/logger';
 import {
   ChevronRight,
   MapPin,
@@ -218,7 +219,7 @@ export default function HomePage() {
       await loadTrip(tripId);
       router.push('/players');
     } catch (error) {
-      console.error('Failed to create trip:', error);
+      tripLogger.error('Failed to create trip:', error);
       // Could add toast notification here
     }
   }, [loadTrip, router]);

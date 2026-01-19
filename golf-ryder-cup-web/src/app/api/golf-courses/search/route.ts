@@ -174,7 +174,7 @@ async function searchGHIN(
             source: 'ghin' as const,
         }));
     } catch (error) {
-        console.error('GHIN search error:', error);
+        logger.error('GHIN search error:', error);
         return [];
     }
 }
@@ -217,7 +217,7 @@ async function searchRapidAPI(
             source: 'rapidapi' as const,
         }));
     } catch (error) {
-        console.error('RapidAPI search error:', error);
+        logger.error('RapidAPI search error:', error);
         return [];
     }
 }
@@ -273,7 +273,7 @@ async function searchOpenStreetMap(
                 source: 'osm' as const,
             }));
     } catch (error) {
-        console.error('OSM search error:', error);
+        logger.error('OSM search error:', error);
         return [];
     }
 }

@@ -16,6 +16,7 @@ import {
     formatTime,
     type GolfWeather,
 } from '@/lib/services/weatherService';
+import { weatherLogger } from '@/lib/utils/logger';
 import {
     Sun,
     Moon,
@@ -66,7 +67,7 @@ export function WeatherWidget({
             setWeather(data);
         } catch (err) {
             setError('Failed to load weather data');
-            console.error('Weather error:', err);
+            weatherLogger.error('Failed to load weather:', err);
         } finally {
             setIsLoading(false);
         }

@@ -4,8 +4,10 @@
  * Live Error Boundary
  *
  * Handles errors in live/jumbotron routes with context-specific messaging.
+ * Reports to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -17,7 +19,7 @@ interface ErrorPageProps {
 
 export default function LiveError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        console.error('Live route error:', error);
+        Sentry.captureException(error, { tags: { feature: 'live' } });
     }, [error]);
 
     return (

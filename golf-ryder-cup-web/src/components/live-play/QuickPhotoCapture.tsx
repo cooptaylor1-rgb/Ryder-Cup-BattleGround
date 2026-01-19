@@ -31,6 +31,7 @@ import {
     Hash,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { mediaLogger } from '@/lib/utils/logger';
 // Speech recognition types are global from speech-recognition.d.ts
 
 // Simple haptic feedback helper
@@ -136,7 +137,7 @@ export function QuickPhotoCapture({
                 streamRef.current = stream;
             }
         } catch (err) {
-            console.error('Camera access error:', err);
+            mediaLogger.error('Camera access error:', err);
             setError('Could not access camera. Please check permissions.');
             trigger('error');
         }
@@ -246,7 +247,7 @@ export function QuickPhotoCapture({
             existing.push(photo);
             localStorage.setItem('tripPhotos', JSON.stringify(existing));
         } catch (e) {
-            console.error('Failed to save photo locally:', e);
+            mediaLogger.error('Failed to save photo locally:', e);
         }
 
         onCapture?.(photo);

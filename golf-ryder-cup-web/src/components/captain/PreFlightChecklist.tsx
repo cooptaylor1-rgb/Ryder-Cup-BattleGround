@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { runPreFlightCheck, getPreFlightSummary, type PreFlightCheckResult } from '@/lib/services/preFlightValidationService';
 import type { Trip, Player, Team, TeamMember, RyderCupSession, Match, Course, TeeSet } from '@/lib/types';
 import { CheckCircle, XCircle, AlertTriangle, ChevronDown, ChevronUp, Loader2, RefreshCw, Rocket } from 'lucide-react';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('PreFlight');
 
 interface PreFlightChecklistProps {
   tripId: string;
@@ -72,7 +75,7 @@ export function PreFlightChecklist({
         onAllClear();
       }
     } catch (error) {
-      console.error('Pre-flight check failed:', error);
+      logger.error('Pre-flight check failed:', error);
     } finally {
       setLoading(false);
     }

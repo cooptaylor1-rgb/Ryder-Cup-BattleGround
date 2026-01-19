@@ -15,6 +15,7 @@
 
 import { useState, useRef, useCallback, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { uiLogger } from '@/lib/utils/logger';
 import { RefreshCw, ArrowDown } from 'lucide-react';
 
 interface PullToRefreshProps {
@@ -114,7 +115,7 @@ export function PullToRefresh({
       try {
         await onRefresh();
       } catch (error) {
-        console.error('Refresh failed:', error);
+        uiLogger.error('Refresh failed:', error);
       }
 
       // Animate back

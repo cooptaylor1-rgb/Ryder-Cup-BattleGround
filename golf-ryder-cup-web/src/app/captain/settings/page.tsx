@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { captainLogger } from '@/lib/utils/logger';
 import {
   ChevronLeft,
   Settings,
@@ -109,7 +110,7 @@ export default function CaptainSettingsPage() {
 
       showToast('success', 'Trip settings saved');
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      captainLogger.error('Failed to save settings:', error);
       showToast('error', 'Failed to save settings. Please try again.');
     } finally {
       setIsSaving(false);

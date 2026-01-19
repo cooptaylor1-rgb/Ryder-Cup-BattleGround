@@ -7,7 +7,7 @@
 'use client';
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { db } from '@/lib/db';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
@@ -56,7 +56,7 @@ interface HomeData {
 }
 
 export function useHomeData(): HomeData {
-    const { loadTrip, currentTrip, players, teams, sessions } = useTripStore();
+    const { loadTrip, currentTrip, players, teams, sessions: _sessions } = useTripStore();
     const { currentUser, isAuthenticated } = useAuthStore();
 
     // Single consolidated query for all trip-related data
@@ -172,11 +172,12 @@ export function useHomeData(): HomeData {
     }, [consolidatedData?.activeTrip?.id]);
 
     // Load trip when active trip changes
-    useMemo(() => {
+    // Using useEffect instead of useMemo for side effects
+    useEffect(() => {
         if (consolidatedData?.activeTrip && consolidatedData.activeTrip.id !== currentTrip?.id) {
             loadTrip(consolidatedData.activeTrip.id);
         }
-    }, [consolidatedData?.activeTrip?.id, currentTrip?.id, loadTrip]);
+    }, [consolidatedData?.activeTrip, currentTrip?.id, loadTrip]);
 
     // Get team names
     const teamA = teams.find(t => t.color === 'usa');

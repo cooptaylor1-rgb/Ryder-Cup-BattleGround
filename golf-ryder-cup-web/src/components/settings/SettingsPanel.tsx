@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { syncService, useSyncStatus, isSupabaseConfigured } from '@/lib/supabase';
 import {
@@ -102,7 +103,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
             a.click();
             URL.revokeObjectURL(url);
         } catch (error) {
-            console.error('Export failed:', error);
+            logger.error('Export failed:', error);
             alert('Failed to export data');
         }
     };
@@ -123,7 +124,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                 alert('Data imported successfully!');
                 window.location.reload();
             } catch (error) {
-                console.error('Import failed:', error);
+                logger.error('Import failed:', error);
                 alert('Failed to import data. Make sure the file is a valid backup.');
             }
         };
@@ -145,7 +146,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
             alert('All data cleared');
             window.location.reload();
         } catch (error) {
-            console.error('Clear failed:', error);
+            logger.error('Clear failed:', error);
             alert('Failed to clear data');
         }
     };

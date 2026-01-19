@@ -21,6 +21,9 @@ import {
     RotateCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('ProfilePhoto');
 
 // ============================================
 // TYPES
@@ -96,14 +99,14 @@ export function ProfilePhotoUpload({
             const reader = new FileReader();
 
             reader.onerror = () => {
-                console.error('Failed to read file');
+                logger.error('Failed to read file');
                 setIsProcessing(false);
             };
 
             reader.onload = async (event) => {
                 const dataUrl = event.target?.result as string;
                 if (!dataUrl) {
-                    console.error('Failed to read file data');
+                    logger.error('Failed to read file data');
                     setIsProcessing(false);
                     return;
                 }
@@ -112,7 +115,7 @@ export function ProfilePhotoUpload({
                 const img = new Image();
 
                 img.onerror = () => {
-                    console.error('Failed to load image');
+                    logger.error('Failed to load image');
                     setIsProcessing(false);
                 };
 
@@ -141,7 +144,7 @@ export function ProfilePhotoUpload({
 
                     const ctx = canvas.getContext('2d');
                     if (!ctx) {
-                        console.error('Failed to get canvas context');
+                        logger.error('Failed to get canvas context');
                         setIsProcessing(false);
                         return;
                     }
@@ -160,7 +163,7 @@ export function ProfilePhotoUpload({
             };
             reader.readAsDataURL(file);
         } catch (error) {
-            console.error('Failed to process image:', error);
+            logger.error('Failed to process image:', error);
             setIsProcessing(false);
         }
 

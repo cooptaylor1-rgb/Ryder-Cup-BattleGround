@@ -17,6 +17,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useOnlineStatus } from './useOnlineStatus';
 import { db } from '../db';
 import { useHaptic } from './useHaptic';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('OfflineQueue');
 
 // ============================================
 // TYPES
@@ -113,7 +116,7 @@ const queueStore = {
         try {
             localStorage.setItem('offline_queue', JSON.stringify(this.items));
         } catch (e) {
-            console.warn('Failed to persist queue:', e);
+            logger.warn('Failed to persist queue:', e);
         }
     },
 
@@ -124,7 +127,7 @@ const queueStore = {
                 this.items = JSON.parse(stored);
             }
         } catch (e) {
-            console.warn('Failed to restore queue:', e);
+            logger.warn('Failed to restore queue:', e);
         }
     },
 };

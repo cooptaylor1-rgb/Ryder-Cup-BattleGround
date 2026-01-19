@@ -10,6 +10,10 @@
  * Ported from Swift: HandicapCalculator.swift
  */
 
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Handicap');
+
 // ============================================
 // COURSE HANDICAP CALCULATION
 // ============================================
@@ -71,7 +75,7 @@ export function allocateStrokes(
 ): number[] {
     // Validate input
     if (holeHandicaps.length !== 18) {
-        console.warn('Invalid hole handicaps array length, expected 18');
+        logger.warn('Invalid hole handicaps array length, expected 18');
         return Array(18).fill(0);
     }
 
@@ -400,7 +404,7 @@ export function calculateOneBallFormatStrokes(
  */
 export function calculateGreensomesHandicap(playerHandicaps: number[]): number {
     if (playerHandicaps.length !== 2) {
-        console.warn('Greensomes requires exactly 2 players');
+        logger.warn('Greensomes requires exactly 2 players');
         return 0;
     }
 

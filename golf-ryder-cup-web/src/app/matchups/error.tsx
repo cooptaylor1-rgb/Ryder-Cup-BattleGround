@@ -4,8 +4,10 @@
  * Matchups Error Boundary
  *
  * Handles errors in matchups routes with context-specific messaging.
+ * Reports to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -17,7 +19,7 @@ interface ErrorPageProps {
 
 export default function MatchupsError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        console.error('Matchups route error:', error);
+        Sentry.captureException(error, { tags: { feature: 'matchups' } });
     }, [error]);
 
     return (

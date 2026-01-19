@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Upload, FileImage, Loader2, Check, AlertCircle, X, Camera } from 'lucide-react';
+import { ocrLogger } from '@/lib/utils/logger';
 import type { HoleData } from './HoleDataEditor';
 
 /**
@@ -115,10 +116,10 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
       if (result.message) {
         // Demo mode notice
-        console.log(result.message);
+        ocrLogger.info(result.message);
       }
     } catch (err) {
-      console.error('Error processing scorecard:', err);
+      ocrLogger.error('Error processing scorecard:', err);
       setStatus('error');
       setError(err instanceof Error ? err.message : 'Failed to process scorecard');
     }

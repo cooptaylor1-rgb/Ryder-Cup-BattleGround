@@ -13,12 +13,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     Trophy,
     Clock,
-    Users,
-    ChevronRight,
     RefreshCw,
     Tv,
     ArrowLeft,
@@ -30,6 +28,7 @@ import {
 import { colors } from '@/lib/design-system/tokens';
 import { db } from '@/lib/db';
 import { buildSpectatorView } from '@/lib/services/spectatorService';
+import { tripLogger } from '@/lib/utils/logger';
 import type { SpectatorView, SpectatorMatch } from '@/lib/types/captain';
 
 // ============================================
@@ -45,7 +44,7 @@ export default function SpectatorPage() {
     const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isOnline, setIsOnline] = useState(true);
-    const [fullscreen, setFullscreen] = useState(false);
+    const [_fullscreen, setFullscreen] = useState(false);
 
     // ============================================
     // LOAD DATA
@@ -70,7 +69,8 @@ export default function SpectatorPage() {
             const teamIds = teams.map((t) => t.id);
             const teamMembers = await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
             const playerIds = [...new Set(teamMembers.map((tm) => tm.playerId))];
-            const players = (await db.players.bulkGet(playerIds)).filter(Boolean);
+            const playersData = await db.players.bulkGet(playerIds);
+            const players = playersData.filter((p): p is NonNullable<typeof p> => p !== undefined);
 
             const view = buildSpectatorView(
                 trip,
@@ -78,14 +78,14 @@ export default function SpectatorPage() {
                 sessions,
                 matches,
                 holeResults,
-                players as any,
+                players,
                 trip.settings?.pointsToWin || 14.5
             );
 
             setSpectatorView(view);
             setLastUpdated(new Date());
         } catch (error) {
-            console.error('[Spectator] Failed to load data:', error);
+            tripLogger.error('Spectator view load failed:', error);
         } finally {
             setLoading(false);
         }
@@ -149,7 +149,7 @@ export default function SpectatorPage() {
                 <div className="text-center">
                     <Trophy className="w-16 h-16 text-[#505050] mx-auto mb-4" />
                     <h2 className="text-2xl font-bold text-white mb-2">Tournament Not Found</h2>
-                    <p className="text-[#A0A0A0] mb-6">This tournament doesn't exist or has been removed.</p>
+                    <p className="text-[#A0A0A0] mb-6">This tournament doesn&apos;t exist or has been removed.</p>
                     <button
                         onClick={() => router.push('/')}
                         className="px-6 py-3 bg-[#004225] text-white rounded-xl"
@@ -275,7 +275,7 @@ export default function SpectatorPage() {
                 {spectatorView.liveMatches.length === 0 && spectatorView.recentResults.length === 0 && (
                     <div className="text-center py-16">
                         <Clock className="w-16 h-16 text-[#505050] mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-white mb-2">Tournament Hasn't Started</h3>
+                        <h3 className="text-xl font-semibold text-white mb-2">Tournament Hasn&apos;t Started</h3>
                         <p className="text-[#A0A0A0]">Check back when matches begin!</p>
                     </div>
                 )}

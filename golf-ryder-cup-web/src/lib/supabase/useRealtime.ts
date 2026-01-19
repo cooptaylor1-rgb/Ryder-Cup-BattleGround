@@ -19,6 +19,9 @@ import {
 import { db } from '../db';
 import { useScoringStore } from '../stores/scoringStore';
 import type { HoleResult, Match } from '../types/models';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Realtime');
 
 // ============================================
 // TYPES
@@ -72,7 +75,7 @@ export function useRealtime(
                 // Refresh store state
                 await refreshMatchState(matchData.id);
             } catch (err) {
-                console.error('Failed to process match update:', err);
+                logger.error('Failed to process match update:', err);
             }
         },
         [refreshMatchState]
@@ -94,7 +97,7 @@ export function useRealtime(
                 // Refresh store state for this match
                 await refreshMatchState(holeResultData.matchId);
             } catch (err) {
-                console.error('Failed to process hole result update:', err);
+                logger.error('Failed to process hole result update:', err);
             }
         },
         [refreshMatchState]
@@ -304,7 +307,7 @@ export function useLiveScores(tripId: string | null): {
                     setScores(newScores);
                 }
             } catch (err) {
-                console.error('Failed to fetch live scores:', err);
+                logger.error('Failed to fetch live scores:', err);
             } finally {
                 setIsLoading(false);
             }

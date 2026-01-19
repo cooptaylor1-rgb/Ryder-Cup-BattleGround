@@ -28,6 +28,7 @@ import {
     ArrowRight,
 } from 'lucide-react';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { uiLogger } from '@/lib/utils/logger';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -122,7 +123,7 @@ export function useCartTracker() {
             trigger('success');
             showToast('success', `Cart location shared! Hole ${holeNumber}`);
         } catch (error) {
-            console.error('Failed to report cart sighting:', error);
+            uiLogger.error('Failed to report cart sighting:', error);
             showToast('error', 'Failed to share cart location');
         }
     }, [currentTrip, players, trigger, showToast]);

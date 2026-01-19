@@ -5,8 +5,10 @@
  *
  * Specialized error boundary for scoring routes.
  * Ensures users don't lose their scoring progress.
+ * Reports to Sentry with scoring context.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import { RefreshCw, ArrowLeft, Target } from 'lucide-react';
 
@@ -17,10 +19,10 @@ interface ErrorPageProps {
 
 export default function ScoringError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        // Log scoring errors specifically
-        if (process.env.NODE_ENV === 'production') {
-            // TODO: Track scoring-specific errors
-        }
+        // Report scoring errors with context
+        Sentry.captureException(error, {
+            tags: { feature: 'scoring' },
+        });
     }, [error]);
 
     return (

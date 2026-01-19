@@ -14,6 +14,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { uiLogger } from '@/lib/utils/logger';
 import {
     Trophy,
     Target,
@@ -156,7 +157,7 @@ export function usePredictions() {
             trigger('success');
             showToast('success', 'Prediction locked in!');
         } catch (error) {
-            console.error('Failed to save prediction:', error);
+            uiLogger.error('Failed to save prediction:', error);
             showToast('error', 'Failed to save prediction');
         }
     }, [currentTrip, players, predictions, trigger, showToast]);

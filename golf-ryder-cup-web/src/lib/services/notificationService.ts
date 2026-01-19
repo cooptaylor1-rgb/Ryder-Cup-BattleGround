@@ -11,7 +11,8 @@
  */
 
 import { db } from '../db';
-import type { RyderCupSession, Match } from '../types/models';
+import type { RyderCupSession } from '../types/models';
+import { notifyLogger } from '@/lib/utils/logger';
 
 // ============================================
 // TYPES
@@ -78,7 +79,7 @@ let checkInterval: ReturnType<typeof setInterval> | null = null;
  */
 export function initNotificationService(): void {
     if (typeof window === 'undefined' || !('Notification' in window)) {
-        console.log('[Notifications] Not supported in this browser');
+        notifyLogger.log('Not supported in this browser');
         return;
     }
 
@@ -86,7 +87,7 @@ export function initNotificationService(): void {
     loadScheduledNotifications();
     startNotificationChecker();
 
-    console.log('[Notifications] Service initialized, permission:', notificationPermission);
+    notifyLogger.log('Service initialized, permission:', notificationPermission);
 }
 
 /**
@@ -121,7 +122,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
 
         return false;
     } catch (error) {
-        console.error('[Notifications] Permission request failed:', error);
+        notifyLogger.error('Permission request failed:', error);
         return false;
     }
 }
@@ -169,7 +170,7 @@ export function savePreferences(prefs: NotificationPreferences): void {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
     } catch (error) {
-        console.error('[Notifications] Failed to save preferences:', error);
+        notifyLogger.error('Failed to save preferences:', error);
     }
 }
 
@@ -197,7 +198,7 @@ export async function sendNotification(
     options?: NotificationOptions & { type?: NotificationType }
 ): Promise<boolean> {
     if (!canSendNotifications()) {
-        console.log('[Notifications] Cannot send - not enabled or permitted');
+        notifyLogger.log('Cannot send - not enabled or permitted');
         return false;
     }
 
@@ -230,7 +231,7 @@ export async function sendNotification(
 
         return true;
     } catch (error) {
-        console.error('[Notifications] Failed to send:', error);
+        notifyLogger.error('Failed to send:', error);
         return false;
     }
 }
@@ -258,7 +259,7 @@ function saveScheduledNotifications(): void {
     try {
         localStorage.setItem(SCHEDULED_KEY, JSON.stringify(scheduledNotifications));
     } catch (error) {
-        console.error('[Notifications] Failed to save scheduled:', error);
+        notifyLogger.error('Failed to save scheduled:', error);
     }
 }
 
@@ -418,7 +419,7 @@ export async function scheduleAllTeeTimeReminders(tripId: string): Promise<numbe
         }
     }
 
-    console.log(`[Notifications] Scheduled ${scheduled} tee time reminders`);
+    notifyLogger.log(`Scheduled ${scheduled} tee time reminders`);
     return scheduled;
 }
 

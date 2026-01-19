@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
+import { tripLogger } from '@/lib/utils/logger';
 import { getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import {
   CalendarDays,
@@ -88,7 +89,7 @@ export default function SchedulePage() {
 
         setMatches(allMatches);
       } catch (error) {
-        console.error('Error loading matches:', error);
+        tripLogger.error('Error loading matches:', error);
       } finally {
         setIsLoading(false);
       }

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { betsLogger } from '@/lib/utils/logger';
 import type { SideBet, SideBetType, Player } from '@/lib/types/models';
 import {
     ChevronLeft,
@@ -144,7 +145,7 @@ export default function CaptainBetsPage() {
             setShowCreateModal(false);
             resetForm();
         } catch (error) {
-            console.error('Failed to create bet:', error);
+            betsLogger.error('Failed to create bet:', error);
             showToast('error', 'Failed to create bet. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -160,7 +161,7 @@ export default function CaptainBetsPage() {
             showToast('success', 'Bet updated');
             setEditingBet(null);
         } catch (error) {
-            console.error('Failed to update bet:', error);
+            betsLogger.error('Failed to update bet:', error);
             showToast('error', 'Failed to update bet. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -175,7 +176,7 @@ export default function CaptainBetsPage() {
             await db.sideBets.delete(betId);
             showToast('success', 'Bet deleted');
         } catch (error) {
-            console.error('Failed to delete bet:', error);
+            betsLogger.error('Failed to delete bet:', error);
             showToast('error', 'Failed to delete bet. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -193,7 +194,7 @@ export default function CaptainBetsPage() {
             });
             showToast('success', 'Bet completed!');
         } catch (error) {
-            console.error('Failed to complete bet:', error);
+            betsLogger.error('Failed to complete bet:', error);
             showToast('error', 'Failed to complete bet. Please try again.');
         } finally {
             setIsSubmitting(false);

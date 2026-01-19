@@ -4,8 +4,10 @@
  * Courses Error Boundary
  *
  * Handles errors in courses routes with context-specific messaging.
+ * Reports to Sentry for monitoring.
  */
 
+import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
@@ -17,7 +19,7 @@ interface ErrorPageProps {
 
 export default function CoursesError({ error, reset }: ErrorPageProps) {
     useEffect(() => {
-        console.error('Courses route error:', error);
+        Sentry.captureException(error, { tags: { feature: 'courses' } });
     }, [error]);
 
     return (

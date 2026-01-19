@@ -45,7 +45,7 @@ const COLORS = {
 // ============================================
 
 // Extend the base template with UI-specific fields
-type TemplateWithUI = TripTemplate & {
+type _TemplateWithUI = TripTemplate & {
     recommended?: boolean;
     difficulty?: 'casual' | 'standard' | 'competitive';
 };

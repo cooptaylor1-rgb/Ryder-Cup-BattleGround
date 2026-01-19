@@ -19,6 +19,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { calculateTeamStandings, calculateMagicNumber } from '@/lib/services/tournamentEngine';
 import type { TeamStandings } from '@/lib/types/computed';
+import { notifyLogger } from '@/lib/utils/logger';
 
 interface ScoreNotificationOptions {
     enablePush?: boolean;
@@ -43,7 +44,7 @@ const DEFAULT_OPTIONS: ScoreNotificationOptions = {
 // Request push notification permission
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
-        console.log('This browser does not support notifications');
+        notifyLogger.log('This browser does not support notifications');
         return 'denied';
     }
 
@@ -198,7 +199,7 @@ export function useLiveScoreNotifications(
 
             previousStandings.current = standings;
         } catch (error) {
-            console.error('Failed to check standings:', error);
+            notifyLogger.error('Failed to check standings:', error);
         }
     }, [currentTrip, options, teamAName, teamBName, showToast]);
 
@@ -288,7 +289,7 @@ function playNotificationSound(type: 'lead-change' | 'match-complete' | 'your-ma
                 break;
         }
     } catch (error) {
-        console.error('Failed to play notification sound:', error);
+        notifyLogger.error('Failed to play notification sound:', error);
     }
 }
 

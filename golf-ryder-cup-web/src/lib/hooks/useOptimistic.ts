@@ -15,6 +15,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useUIStore } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('Optimistic');
 
 // ============================================
 // TYPES
@@ -78,7 +81,7 @@ function savePendingOperations(ops: PendingOperation[]): void {
   try {
     localStorage.setItem(PENDING_OPS_KEY, JSON.stringify(ops));
   } catch {
-    console.error('Failed to save pending operations');
+    logger.error('Failed to save pending operations');
   }
 }
 

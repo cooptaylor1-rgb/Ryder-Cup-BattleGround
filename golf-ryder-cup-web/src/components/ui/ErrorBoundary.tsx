@@ -8,6 +8,7 @@
 'use client';
 
 import React, { Component, type ReactNode, type ErrorInfo } from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, RefreshCw, Home, ChevronRight } from 'lucide-react';
 
@@ -48,11 +49,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       this.props.onError(error, errorInfo);
     }
 
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error);
-      console.error('Component stack:', errorInfo.componentStack);
-    }
+    // Report to Sentry
+    Sentry.withScope((scope) => {
+      scope.setTag('errorBoundary', 'true');
+      scope.setExtra('componentStack', errorInfo.componentStack);
+      Sentry.captureException(error);
+    });
   }
 
   componentDidUpdate(prevProps: ErrorBoundaryProps): void {

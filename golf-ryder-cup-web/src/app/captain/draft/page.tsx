@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { draftLogger } from '@/lib/utils/logger';
 import { DraftBoard } from '@/components/captain';
 import {
   ChevronLeft,
@@ -56,7 +57,7 @@ export default function DraftPage() {
             await assignPlayerToTeam(playerId, teamId);
             successCount++;
           } catch (error) {
-            console.error(`Failed to assign player ${playerId} to team ${teamId}:`, error);
+            draftLogger.error(`Failed to assign player ${playerId} to team ${teamId}:`, error);
             failedCount++;
           }
         }
@@ -72,7 +73,7 @@ export default function DraftPage() {
         router.push('/captain');
       }
     } catch (error) {
-      console.error('Draft failed:', error);
+      draftLogger.error('Draft failed:', error);
       showToast('error', 'Draft failed. Please try again.');
     }
   }, [assignPlayerToTeam, teamMembers, showToast, router]);

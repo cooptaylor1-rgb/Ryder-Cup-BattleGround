@@ -21,6 +21,7 @@ import {
     copyCardToClipboard,
     downloadBlob,
 } from '@/lib/services/shareCardService';
+import { shareLogger } from '@/lib/utils/logger';
 import type { TeamStandings, PlayerLeaderboard } from '@/lib/types/computed';
 import type { Award } from '@/lib/types/awards';
 import type { RyderCupSession, Match } from '@/lib/types/models';
@@ -126,7 +127,7 @@ export function ShareButton(props: ShareButtonProps) {
                 setShowMenu(false);
             }
         } catch (error) {
-            console.error('[ShareButton] Share failed:', error);
+            shareLogger.error('Share failed:', error);
         } finally {
             setIsSharing(false);
         }
@@ -174,7 +175,7 @@ export function ShareButton(props: ShareButtonProps) {
                 setTimeout(() => setCopied(false), 2000);
             }
         } catch (error) {
-            console.error('[ShareButton] Copy failed:', error);
+            shareLogger.error('Copy failed:', error);
         } finally {
             setIsSharing(false);
         }
@@ -224,7 +225,7 @@ export function ShareButton(props: ShareButtonProps) {
             downloadBlob(blob, filename);
             setShowMenu(false);
         } catch (error) {
-            console.error('[ShareButton] Download failed:', error);
+            shareLogger.error('Download failed:', error);
         } finally {
             setIsSharing(false);
         }

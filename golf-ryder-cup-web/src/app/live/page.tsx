@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import { uiLogger } from '@/lib/utils/logger';
 import {
   ChevronLeft,
   Home,
@@ -123,7 +124,7 @@ export default function LivePage() {
       }
     } catch (error) {
       // Fullscreen may not be supported or user denied permission
-      console.warn('Fullscreen toggle failed:', error);
+      uiLogger.warn('Fullscreen toggle failed:', error);
     }
   };
 

@@ -11,8 +11,9 @@
  */
 
 import type { TeamStandings, PlayerLeaderboard } from '../types/computed';
-import type { Award, PlayerStats } from '../types/awards';
+import type { Award } from '../types/awards';
 import type { RyderCupSession, Match } from '../types/models';
+import { shareLogger } from '@/lib/utils/logger';
 
 // ============================================
 // TYPES
@@ -506,7 +507,7 @@ export async function shareCard(blob: Blob, filename: string, title: string): Pr
         } catch (err) {
             // User cancelled or share failed
             if ((err as Error).name !== 'AbortError') {
-                console.error('[ShareCard] Share failed:', err);
+                shareLogger.error('Share failed:', err);
             }
         }
     }
@@ -542,7 +543,7 @@ export async function copyCardToClipboard(blob: Blob): Promise<boolean> {
         ]);
         return true;
     } catch (err) {
-        console.error('[ShareCard] Clipboard copy failed:', err);
+        shareLogger.error('Clipboard copy failed:', err);
         return false;
     }
 }

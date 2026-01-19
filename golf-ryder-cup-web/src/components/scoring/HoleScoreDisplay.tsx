@@ -16,8 +16,8 @@
 
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { Circle, CircleDot, Minus, ArrowDown } from 'lucide-react';
-import { allocateStrokes, getStrokesOnHole } from '@/lib/services/handicapCalculator';
+import { CircleDot, Minus, ArrowDown } from 'lucide-react';
+import { getStrokesOnHole } from '@/lib/services/handicapCalculator';
 
 interface TeamScoreProps {
     teamName: string;

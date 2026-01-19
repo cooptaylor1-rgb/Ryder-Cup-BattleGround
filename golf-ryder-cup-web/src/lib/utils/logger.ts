@@ -81,3 +81,58 @@ export const apiLogger = createLogger('API');
  * Captain toolkit logger
  */
 export const captainLogger = createLogger('Captain');
+
+/**
+ * Sync/Realtime logger
+ */
+export const syncLogger = createLogger('Sync');
+
+/**
+ * OCR logger
+ */
+export const ocrLogger = createLogger('OCR');
+
+/**
+ * Notifications logger
+ */
+export const notifyLogger = createLogger('Notify');
+
+/**
+ * Sharing logger
+ */
+export const shareLogger = createLogger('Share');
+
+/**
+ * UI components logger
+ */
+export const uiLogger = createLogger('UI');
+
+/**
+ * Weather logger
+ */
+export const weatherLogger = createLogger('Weather');
+
+/**
+ * Live scores logger
+ */
+export const liveLogger = createLogger('Live');
+
+/**
+ * Trip/session logger
+ */
+export const tripLogger = createLogger('Trip');
+
+/**
+ * Draft/team building logger
+ */
+export const draftLogger = createLogger('Draft');
+
+/**
+ * Bets logger
+ */
+export const betsLogger = createLogger('Bets');
+
+/**
+ * Media (camera/photos) logger
+ */
+export const mediaLogger = createLogger('Media');

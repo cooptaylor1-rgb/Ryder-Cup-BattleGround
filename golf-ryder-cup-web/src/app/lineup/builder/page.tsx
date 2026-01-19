@@ -21,10 +21,7 @@ import {
     AlertTriangle,
     Check,
     ChevronRight,
-    Info,
-    Shuffle,
     Lock,
-    Unlock,
     GripVertical,
 } from 'lucide-react';
 import { colors } from '@/lib/design-system/tokens';
@@ -41,6 +38,9 @@ import {
     type LineupMatch,
     type FairnessScore,
 } from '@/lib/services/lineupBuilderService';
+
+// Extended type for drag operations
+type DraggedPlayer = LineupPlayer & { matchNumber?: number };
 import { useTripStore } from '@/lib/stores';
 
 // ============================================
@@ -141,7 +141,7 @@ export default function LineupBuilderPage() {
     // ============================================
 
     const handleDragStart = (player: LineupPlayer, fromMatch?: number) => {
-        setDraggedPlayer({ ...player, matchNumber: fromMatch } as any);
+        setDraggedPlayer({ ...player, matchNumber: fromMatch } as DraggedPlayer);
     };
 
     const handleDragOver = (
@@ -163,7 +163,7 @@ export default function LineupBuilderPage() {
         let newState = lineupState;
 
         // If coming from a match, remove from there first
-        const fromMatch = (draggedPlayer as any).matchNumber as number | undefined;
+        const fromMatch = (draggedPlayer as DraggedPlayer).matchNumber;
         if (fromMatch !== undefined) {
             newState = removePlayerFromMatch(newState, draggedPlayer.id, fromMatch);
         }
@@ -791,7 +791,7 @@ interface EmptySlotProps {
 }
 
 function EmptySlot({ team, isDropTarget, isSelectTarget }: EmptySlotProps) {
-    const teamColor = team === 'usa' ? colors.team.usa.primary : colors.team.europe.primary;
+    const _teamColor = team === 'usa' ? colors.team.usa.primary : colors.team.europe.primary;
 
     return (
         <div

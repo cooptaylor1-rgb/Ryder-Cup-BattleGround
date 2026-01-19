@@ -41,6 +41,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('BatchScoreGrid');
 
 // ============================================
 // TYPES
@@ -524,7 +527,7 @@ export function BatchScoreGrid({
             setDirtyScores(new Set());
             haptic.success();
         } catch (error) {
-            console.error('Save failed:', error);
+            logger.error('Save failed:', error);
             haptic.error();
         } finally {
             setIsSaving(false);

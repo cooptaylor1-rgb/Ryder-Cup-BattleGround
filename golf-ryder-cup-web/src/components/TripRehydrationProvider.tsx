@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
+import { tripLogger } from '@/lib/utils/logger';
 
 /**
  * Trip Rehydration Provider
@@ -40,7 +41,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
                 loadTrip(persistedTripId);
             }
         } catch (error) {
-            console.error('Failed to rehydrate trip state:', error);
+            tripLogger.error('Failed to rehydrate trip state:', error);
         }
     }, [currentTrip, loadTrip, isLoading]);
 
@@ -93,7 +94,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
 
                 // If there's an active trip, load it
                 if (activeTrip) {
-                    console.log('Auto-loading active trip for user:', activeTrip.name);
+                    tripLogger.info('Auto-loading active trip for user:', activeTrip.name);
                     await loadTrip(activeTrip.id);
                     return;
                 }
@@ -106,7 +107,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
                 });
 
                 if (upcomingTrip) {
-                    console.log('Auto-loading upcoming trip for user:', upcomingTrip.name);
+                    tripLogger.info('Auto-loading upcoming trip for user:', upcomingTrip.name);
                     await loadTrip(upcomingTrip.id);
                     return;
                 }
@@ -117,11 +118,11 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
                 );
 
                 if (sortedTrips[0]) {
-                    console.log('Auto-loading most recent trip for user:', sortedTrips[0].name);
+                    tripLogger.info('Auto-loading most recent trip for user:', sortedTrips[0].name);
                     await loadTrip(sortedTrips[0].id);
                 }
             } catch (error) {
-                console.error('Failed to auto-load user trip:', error);
+                tripLogger.error('Failed to auto-load user trip:', error);
             }
         };
 

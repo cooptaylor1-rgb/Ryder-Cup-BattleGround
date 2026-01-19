@@ -34,6 +34,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('SessionCloner');
 
 // ============================================
 // TYPES
@@ -487,7 +490,7 @@ export function SessionCloner({
                 replacements,
             });
         } catch (error) {
-            console.error('Clone failed:', error);
+            logger.error('Clone failed:', error);
             haptic.error();
         } finally {
             setIsCloning(false);

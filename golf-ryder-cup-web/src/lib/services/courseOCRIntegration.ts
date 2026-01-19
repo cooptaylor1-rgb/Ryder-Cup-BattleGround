@@ -10,6 +10,7 @@
 import { searchCloudCourses, syncCourseToCloud, type CourseLibraryRecord } from './courseLibrarySyncService';
 import { db } from '../db';
 import type { Course, TeeSet } from '../types/models';
+import { ocrLogger } from '@/lib/utils/logger';
 
 // ============================================
 // TYPES
@@ -67,33 +68,33 @@ export async function processOCRCourse(ocrData: OCRScorecardData): Promise<Cours
     }
 
     // Step 1: Search cloud for existing course
-    console.log(`[OCR Integration] Searching for: "${courseName}"`);
+    ocrLogger.log(`Searching for: "${courseName}"`);
     const cloudMatches = await searchCloudCourses(courseName);
 
     // Step 2: Check for high-confidence match
     const bestMatch = findBestMatch(courseName, cloudMatches);
 
     if (bestMatch && bestMatch.confidence >= 0.8) {
-        console.log(`[OCR Integration] Found cloud match: ${bestMatch.course.name} (${bestMatch.confidence})`);
+        ocrLogger.log(`Found cloud match: ${bestMatch.course.name} (${bestMatch.confidence})`);
         return importFromCloud(bestMatch.course);
     }
 
     // Step 3: Check local database for existing course
     const localMatch = await findLocalCourse(courseName);
     if (localMatch) {
-        console.log(`[OCR Integration] Found local match: ${localMatch.name}`);
+        ocrLogger.log(`Found local match: ${localMatch.name}`);
         // Merge OCR data with existing course
         return mergeWithExisting(localMatch, ocrData);
     }
 
     // Step 4: Create new course and sync to cloud
-    console.log(`[OCR Integration] Creating new course: ${courseName}`);
+    ocrLogger.log(`Creating new course: ${courseName}`);
     const result = await createNewCourse(ocrData, courseName);
 
     // Sync to cloud asynchronously for future matching
     if (result.course) {
         syncNewCourseToCloud(result.course, result.teeSets || []).catch((err) => {
-            console.error('[OCR Integration] Failed to sync new course:', err);
+            ocrLogger.error('Failed to sync new course:', err);
         });
     }
 
@@ -250,7 +251,7 @@ async function importFromCloud(cloudCourse: CourseLibraryRecord): Promise<Course
             source: 'cloud',
         };
     } catch (error) {
-        console.error('[OCR Integration] Cloud import failed:', error);
+        ocrLogger.error('Cloud import failed:', error);
         // Fall back to creating new course
         return {
             found: false,

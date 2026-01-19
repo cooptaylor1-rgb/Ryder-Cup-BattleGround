@@ -181,13 +181,13 @@ describe('Rate Limiting', () => {
     });
 
     describe('addRateLimitHeaders', () => {
-        it('adds rate limit headers to response', () => {
+        it('adds rate limit headers to response', async () => {
             const req = createMockRequest('http://localhost:3000/api/test', {
                 ip: '192.168.1.8',
             });
 
             // Dynamic import to avoid issues with Response constructor
-            const { NextResponse } = require('next/server');
+            const { NextResponse } = await import('next/server');
             const response = NextResponse.json({ data: 'test' });
 
             const enhanced = addRateLimitHeaders(response, req, { maxRequests: 100 });

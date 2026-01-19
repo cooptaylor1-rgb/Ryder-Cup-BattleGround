@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchCloudCourses, getCloudCourse, incrementCourseUsage } from '@/lib/services/courseLibrarySyncService';
+import { apiLogger } from '@/lib/utils/logger';
 
 /**
  * COURSE LIBRARY SEARCH API
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
             query,
         });
     } catch (error) {
-        console.error('[Course Search] Error:', error);
+        apiLogger.error('Course search error:', error);
         return NextResponse.json(
             { error: 'Search failed' },
             { status: 500 }
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
 
         // Increment usage count asynchronously
         incrementCourseUsage(courseId).catch((err) => {
-            console.error('[Course Search] Failed to increment usage:', err);
+            apiLogger.error('Failed to increment usage:', err);
         });
 
         // Convert to the format expected by the app
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
             course,
         });
     } catch (error) {
-        console.error('[Course Search] Error:', error);
+        apiLogger.error('Course get error:', error);
         return NextResponse.json(
             { error: 'Failed to get course' },
             { status: 500 }

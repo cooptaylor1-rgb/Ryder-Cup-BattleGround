@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
 import { useHaptic } from '@/lib/hooks/useHaptic';
+import { ocrLogger } from '@/lib/utils/logger';
 
 // Types from the OCR API
 interface HoleData {
@@ -97,7 +98,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
             }
             setMode('camera');
         } catch (err) {
-            console.error('Camera access denied:', err);
+            ocrLogger.error('Camera access denied:', err);
             showToast('error', 'Camera access denied. Please allow camera access or upload an image.');
         }
     }, [showToast]);
@@ -250,7 +251,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                 throw new Error('No data extracted from scorecard');
             }
         } catch (err) {
-            console.error('OCR error:', err);
+            ocrLogger.error('OCR processing error:', err);
             setError(err instanceof Error ? err.message : 'Failed to process scorecard');
             setMode('preview');
             showToast('error', 'Failed to read scorecard. Try clearer images.');

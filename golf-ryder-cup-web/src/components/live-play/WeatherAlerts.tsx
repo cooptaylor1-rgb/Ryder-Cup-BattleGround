@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { weatherLogger } from '@/lib/utils/logger';
 import {
     CloudRain,
     CloudLightning,
@@ -326,7 +327,7 @@ export function WeatherAlerts({
                     }
                 });
         } catch (error) {
-            console.error('Failed to fetch weather:', error);
+            weatherLogger.error('Failed to fetch weather:', error);
         } finally {
             setIsLoading(false);
         }
