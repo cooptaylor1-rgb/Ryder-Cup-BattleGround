@@ -271,6 +271,36 @@ export default function HomePage() {
     }
   };
 
+  // Helper function to format bet type for display
+  const formatBetType = (betType?: string): string => {
+    if (!betType) return 'Custom';
+
+    const type = betType.toLowerCase();
+
+    switch (type) {
+      case 'nassau':
+        return 'Nassau';
+      case 'skins':
+        return 'Skins';
+      case 'longdrive':
+      case 'long_drive':
+      case 'long drive':
+        return 'Long Drive';
+      case 'ctp':
+      case 'closest':
+      case 'closest to pin':
+        return 'Closest to Pin';
+      case 'kp':
+        return 'KP';
+      default:
+        // Capitalize first letter of each word
+        return betType
+          .split(/[_\s]+/)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+    }
+  };
+
   // Calculate real counts
   const liveMatchesCount = liveMatches?.length || 0;
   const recentPhotosCount = 0; // Photos not implemented yet
@@ -730,7 +760,7 @@ export default function HomePage() {
                     {sideBets?.filter(b => b.status === 'active').slice(0, 3).map(bet => (
                       <SideBetRow
                         key={bet.id}
-                        type={bet.type || 'Custom'}
+                        type={formatBetType(bet.type)}
                         status={bet.status === 'active' ? 'In Progress' : 'Complete'}
                         icon={getBetIcon(bet.type)}
                       />

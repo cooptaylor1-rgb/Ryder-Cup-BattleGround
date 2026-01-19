@@ -40,7 +40,7 @@ export function SideBetsSection({ sideBets, isCaptainMode }: SideBetsSectionProp
                     {activeBets.slice(0, 3).map(bet => (
                         <SideBetRow
                             key={bet.id}
-                            type={bet.type || 'Custom'}
+                            type={formatBetType(bet.type)}
                             status={bet.status === 'active' ? 'In Progress' : 'Complete'}
                             icon={getBetIcon(bet.type)}
                         />
@@ -77,6 +77,39 @@ function getBetIcon(betType?: string) {
             return <CircleDot size={16} />;
         default:
             return <Zap size={16} />;
+    }
+}
+
+/**
+ * Format bet type for display
+ * Handles capitalization and special cases
+ */
+function formatBetType(betType?: string): string {
+    if (!betType) return 'Custom';
+
+    const type = betType.toLowerCase();
+
+    switch (type) {
+        case 'nassau':
+            return 'Nassau';
+        case 'skins':
+            return 'Skins';
+        case 'longdrive':
+        case 'long_drive':
+        case 'long drive':
+            return 'Long Drive';
+        case 'ctp':
+        case 'closest':
+        case 'closest to pin':
+            return 'Closest to Pin';
+        case 'kp':
+            return 'KP';
+        default:
+            // Capitalize first letter of each word
+            return betType
+                .split(/[_\s]+/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
     }
 }
 
