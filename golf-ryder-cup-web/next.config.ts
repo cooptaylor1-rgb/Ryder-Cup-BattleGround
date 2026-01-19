@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.weather.gov https://*.openweathermap.org https://*.sentry.io",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.weather.gov https://*.openweathermap.org https://api.open-meteo.com https://*.sentry.io",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

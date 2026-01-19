@@ -7,6 +7,10 @@
  * API: https://open-meteo.com/
  */
 
+import { fetchWithTimeout, fetchWithRetry, FetchError } from '../utils/fetchWithTimeout';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('Weather');
 const WEATHER_API_BASE = 'https://api.open-meteo.com/v1';
 
 // ============================================
@@ -171,13 +175,25 @@ export async function getWeather(
         precipitation_unit: 'inch',
     });
 
-    const response = await fetch(`${WEATHER_API_BASE}/forecast?${params}`);
+    // Use fetchWithRetry for resilient weather fetching
+    const response = await fetchWithRetry(`${WEATHER_API_BASE}/forecast?${params}`, {
+        timeout: 8000, // 8 second timeout
+        retries: 2,
+    });
 
     if (!response.ok) {
-        throw new Error(`Weather API error: ${response.status}`);
+        const error = new Error(`Weather API error: ${response.status}`);
+        logger.error('Weather API returned error status', { status: response.status });
+        throw error;
     }
 
-    const data = await response.json();
+    let data;
+    try {
+        data = await response.json();
+    } catch (parseError) {
+        logger.error('Failed to parse weather API response', { error: parseError });
+        throw new Error('Invalid weather data received');
+    }
 
     // Parse current weather
     const current: CurrentWeather = {
