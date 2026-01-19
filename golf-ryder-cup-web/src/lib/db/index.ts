@@ -434,3 +434,48 @@ export async function getUnsyncedEvents() {
         .equals(0)
         .toArray();
 }
+
+// ============================================
+// AUDIT LOG MANAGEMENT
+// ============================================
+
+/**
+ * Maximum number of audit log entries to retain per trip
+ */
+const MAX_AUDIT_LOG_ENTRIES = 500;
+
+/**
+ * Prune audit log entries to prevent unbounded growth.
+ * Keeps the most recent MAX_AUDIT_LOG_ENTRIES entries per trip.
+ */
+export async function pruneAuditLog(tripId: string): Promise<number> {
+    const entries = await db.auditLog
+        .where('tripId')
+        .equals(tripId)
+        .reverse()
+        .sortBy('timestamp');
+
+    if (entries.length <= MAX_AUDIT_LOG_ENTRIES) {
+        return 0; // Nothing to prune
+    }
+
+    // Get IDs of entries to delete (oldest entries beyond the limit)
+    const entriesToDelete = entries.slice(MAX_AUDIT_LOG_ENTRIES);
+    const idsToDelete = entriesToDelete.map(e => e.id);
+
+    await db.auditLog.bulkDelete(idsToDelete);
+    return idsToDelete.length;
+}
+
+/**
+ * Add an audit log entry with automatic pruning
+ */
+export async function addAuditLogEntry(entry: AuditLogEntry): Promise<void> {
+    await db.auditLog.add(entry);
+
+    // Prune old entries periodically (1 in 10 chance to avoid overhead)
+    if (Math.random() < 0.1) {
+        await pruneAuditLog(entry.tripId);
+    }
+}
+

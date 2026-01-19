@@ -254,3 +254,6 @@ export function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> {
 
 // Re-export countdown utilities
 export * from './countdown';
+
+// Re-export error handling utilities
+export * from './errorHandling';

@@ -192,45 +192,45 @@ export default function MorePage() {
         // Management (Trip-specific)
         ...(currentTrip
             ? [
-                  {
-                      id: 'manage',
-                      title: 'Trip Management',
-                      items: [
-                          {
-                              id: 'captain-center',
-                              label: 'Captain Command',
-                              description: 'Lineups, settings & more',
-                              icon: <Shield size={20} />,
-                              href: '/captain',
-                              requiresCaptain: true,
-                              badge: isCaptainMode ? 'Active' : undefined,
-                              badgeColor: 'var(--success)',
-                          },
-                          {
-                              id: 'players',
-                              label: 'Players',
-                              description: 'Manage roster',
-                              icon: <Users size={20} />,
-                              href: '/players',
-                          },
-                          {
-                              id: 'courses',
-                              label: 'Courses',
-                              description: 'View & add courses',
-                              icon: <MapPin size={20} />,
-                              href: '/courses',
-                          },
-                          {
-                              id: 'spectator',
-                              label: 'Spectator Link',
-                              description: 'Share live scores',
-                              icon: <Eye size={20} />,
-                              href: `/spectator/${currentTrip.id}`,
-                              external: true,
-                          },
-                      ],
-                  },
-              ]
+                {
+                    id: 'manage',
+                    title: 'Trip Management',
+                    items: [
+                        {
+                            id: 'captain-center',
+                            label: 'Captain Command',
+                            description: 'Lineups, settings & more',
+                            icon: <Shield size={20} />,
+                            href: '/captain',
+                            requiresCaptain: true,
+                            badge: isCaptainMode ? 'Active' : undefined,
+                            badgeColor: 'var(--success)',
+                        },
+                        {
+                            id: 'players',
+                            label: 'Players',
+                            description: 'Manage roster',
+                            icon: <Users size={20} />,
+                            href: '/players',
+                        },
+                        {
+                            id: 'courses',
+                            label: 'Courses',
+                            description: 'View & add courses',
+                            icon: <MapPin size={20} />,
+                            href: '/courses',
+                        },
+                        {
+                            id: 'spectator',
+                            label: 'Spectator Link',
+                            description: 'Share live scores',
+                            icon: <Eye size={20} />,
+                            href: `/spectator/${currentTrip.id}`,
+                            external: true,
+                        },
+                    ],
+                },
+            ]
             : []),
         // Settings
         {

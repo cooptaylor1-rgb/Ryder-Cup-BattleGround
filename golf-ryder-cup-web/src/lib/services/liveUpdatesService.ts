@@ -8,10 +8,14 @@
  * - Provides hooks for React components
  */
 
+import { createLogger } from '@/lib/utils/logger';
 import { supabase, isSupabaseConfigured } from '../supabase/client';
+
+const logger = createLogger('LiveUpdates');
 import { db } from '../db';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Match, HoleResult, RyderCupSession } from '../types/models';
+import type { MatchDbRecord, HoleResultDbRecord, SessionDbRecord } from '../types/dbRecords';
 
 // ============================================
 // TYPES
@@ -49,6 +53,10 @@ let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
 const BASE_RECONNECT_DELAY = 1000;
 
+// Page visibility state for pausing updates when tab is hidden
+let isPageVisible = true;
+let visibilityHandler: (() => void) | null = null;
+
 // ============================================
 // HELPERS
 // ============================================
@@ -62,9 +70,52 @@ function getReconnectDelay(): number {
     return delay * (0.8 + Math.random() * 0.4); // Add jitter
 }
 
+/**
+ * Set up page visibility handler to pause/resume updates
+ * This saves resources when the tab is not visible
+ */
+function setupVisibilityHandler(tripId: string, callbacks: LiveUpdateCallbacks): void {
+    if (typeof document === 'undefined') return;
+
+    // Clean up existing handler
+    cleanupVisibilityHandler();
+
+    visibilityHandler = () => {
+        const wasVisible = isPageVisible;
+        isPageVisible = document.visibilityState === 'visible';
+
+        if (wasVisible !== isPageVisible) {
+            if (isPageVisible) {
+                // Tab became visible - reconnect if needed
+                logger.log('Tab visible - resuming live updates');
+                if (!activeSubscription && canSubscribe()) {
+                    subscribeLiveUpdates(tripId, callbacks);
+                }
+            } else {
+                // Tab hidden - pause updates to save resources
+                logger.log('Tab hidden - pausing live updates');
+                // Note: We don't disconnect, just stop processing
+                // The connection will be cleaned up on timeout
+            }
+        }
+    };
+
+    document.addEventListener('visibilitychange', visibilityHandler);
+    isPageVisible = document.visibilityState === 'visible';
+}
+
+/**
+ * Clean up visibility handler
+ */
+function cleanupVisibilityHandler(): void {
+    if (visibilityHandler && typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', visibilityHandler);
+        visibilityHandler = null;
+    }
+}
+
 // Convert snake_case DB record to camelCase
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toMatch(record: any): Match {
+function toMatch(record: MatchDbRecord): Match {
     return {
         id: record.id,
         sessionId: record.session_id,
@@ -76,34 +127,42 @@ function toMatch(record: any): Match {
         currentHole: record.current_hole,
         teamAPlayerIds: record.team_a_player_ids,
         teamBPlayerIds: record.team_b_player_ids,
-        teamAHandicapAllowance: record.team_a_handicap_allowance,
-        teamBHandicapAllowance: record.team_b_handicap_allowance,
-        result: record.result,
-        margin: record.margin,
-        holesRemaining: record.holes_remaining,
+        teamAHandicapAllowance: record.team_a_handicap_allowance ?? 0,
+        teamBHandicapAllowance: record.team_b_handicap_allowance ?? 0,
+        result: record.result ?? 'notFinished',
+        margin: record.margin ?? 0,
+        holesRemaining: record.holes_remaining ?? 18,
         notes: record.notes,
         createdAt: record.created_at,
         updatedAt: record.updated_at,
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toHoleResult(record: any): HoleResult {
+function toHoleResult(record: HoleResultDbRecord): HoleResult {
+    // DB stores strokes as arrays (for multi-player teams), model uses total strokes
+    const teamATotal = record.team_a_strokes?.reduce((sum, s) => sum + s, 0);
+    const teamBTotal = record.team_b_strokes?.reduce((sum, s) => sum + s, 0);
+
     return {
         id: record.id,
         matchId: record.match_id,
         holeNumber: record.hole_number,
         winner: record.winner,
-        teamAStrokes: record.team_a_strokes,
-        teamBStrokes: record.team_b_strokes,
+        teamAStrokes: teamATotal,
+        teamBStrokes: teamBTotal,
         scoredBy: record.scored_by,
         notes: record.notes,
         timestamp: record.timestamp,
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toSession(record: any): RyderCupSession {
+function toSession(record: SessionDbRecord): RyderCupSession {
+    // Map DB time slot format to model format
+    const mapTimeSlot = (slot?: 'morning' | 'afternoon'): 'AM' | 'PM' | undefined => {
+        if (!slot) return undefined;
+        return slot === 'morning' ? 'AM' : 'PM';
+    };
+
     return {
         id: record.id,
         tripId: record.trip_id,
@@ -111,7 +170,7 @@ function toSession(record: any): RyderCupSession {
         sessionNumber: record.session_number,
         sessionType: record.session_type,
         scheduledDate: record.scheduled_date,
-        timeSlot: record.time_slot,
+        timeSlot: mapTimeSlot(record.time_slot),
         pointsPerMatch: record.points_per_match,
         notes: record.notes,
         status: record.status,
@@ -133,7 +192,7 @@ export async function subscribeLiveUpdates(
     callbacks: LiveUpdateCallbacks
 ): Promise<() => void> {
     if (!canSubscribe() || !supabase) {
-        console.warn('[LiveUpdates] Supabase not configured');
+        logger.warn('Supabase not configured');
         return () => { };
     }
 
@@ -147,33 +206,31 @@ export async function subscribeLiveUpdates(
     const channel = supabase
         .channel(`live-updates:${tripId}`)
         // Subscribe to matches table changes
-        .on<Match>(
+        .on<MatchDbRecord>(
             'postgres_changes' as 'system', // Type workaround
             {
                 event: '*',
                 schema: 'public',
                 table: 'matches',
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            async (payload: RealtimePostgresChangesPayload<any>) => {
+            async (payload: RealtimePostgresChangesPayload<MatchDbRecord>) => {
                 await handleMatchChange(payload, tripId, callbacks);
             }
         )
         // Subscribe to hole_results changes
-        .on<HoleResult>(
+        .on<HoleResultDbRecord>(
             'postgres_changes' as 'system',
             {
                 event: '*',
                 schema: 'public',
                 table: 'hole_results',
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            async (payload: RealtimePostgresChangesPayload<any>) => {
+            async (payload: RealtimePostgresChangesPayload<HoleResultDbRecord>) => {
                 await handleHoleResultChange(payload, tripId, callbacks);
             }
         )
         // Subscribe to sessions changes
-        .on<RyderCupSession>(
+        .on<SessionDbRecord>(
             'postgres_changes' as 'system',
             {
                 event: '*',
@@ -181,18 +238,17 @@ export async function subscribeLiveUpdates(
                 table: 'sessions',
                 filter: `trip_id=eq.${tripId}`,
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            async (payload: RealtimePostgresChangesPayload<any>) => {
+            async (payload: RealtimePostgresChangesPayload<SessionDbRecord>) => {
                 await handleSessionChange(payload, callbacks);
             }
         )
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') {
-                console.log('[LiveUpdates] Connected to trip:', tripId);
+                logger.log('Connected to trip:', tripId);
                 reconnectAttempts = 0;
                 callbacks.onConnectionChange?.(true);
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                console.error('[LiveUpdates] Connection error:', status);
+                logger.error('Connection error:', status);
                 callbacks.onConnectionChange?.(false);
                 scheduleReconnect(tripId, callbacks);
             } else if (status === 'CLOSED') {
@@ -201,6 +257,9 @@ export async function subscribeLiveUpdates(
         });
 
     activeSubscription = { channel, tripId, callbacks };
+
+    // Set up page visibility handling to pause/resume updates
+    setupVisibilityHandler(tripId, callbacks);
 
     // Return unsubscribe function
     return () => {
@@ -217,11 +276,14 @@ export async function unsubscribeLiveUpdates(): Promise<void> {
         reconnectTimer = null;
     }
 
+    // Clean up visibility handler
+    cleanupVisibilityHandler();
+
     if (activeSubscription && supabase) {
         try {
             await supabase.removeChannel(activeSubscription.channel);
         } catch (err) {
-            console.error('[LiveUpdates] Error removing channel:', err);
+            logger.error('Error removing channel:', err);
         }
         activeSubscription = null;
     }
@@ -233,7 +295,7 @@ export async function unsubscribeLiveUpdates(): Promise<void> {
 function scheduleReconnect(tripId: string, callbacks: LiveUpdateCallbacks): void {
     if (reconnectTimer) return;
     if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        console.error('[LiveUpdates] Max reconnect attempts reached');
+        logger.error('Max reconnect attempts reached');
         callbacks.onError?.(new Error('Max reconnect attempts reached'));
         return;
     }
@@ -241,7 +303,7 @@ function scheduleReconnect(tripId: string, callbacks: LiveUpdateCallbacks): void
     const delay = getReconnectDelay();
     reconnectAttempts++;
 
-    console.log(`[LiveUpdates] Reconnecting in ${Math.round(delay / 1000)}s (attempt ${reconnectAttempts})`);
+    logger.log(`Reconnecting in ${Math.round(delay / 1000)}s (attempt ${reconnectAttempts})`);
 
     reconnectTimer = setTimeout(async () => {
         reconnectTimer = null;
@@ -254,13 +316,12 @@ function scheduleReconnect(tripId: string, callbacks: LiveUpdateCallbacks): void
 // ============================================
 
 async function handleMatchChange(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload: RealtimePostgresChangesPayload<any>,
+    payload: RealtimePostgresChangesPayload<MatchDbRecord>,
     tripId: string,
     callbacks: LiveUpdateCallbacks
 ): Promise<void> {
     const eventType = payload.eventType as ChangeEvent;
-    const record = payload.new || payload.old;
+    const record = (payload.new || payload.old) as MatchDbRecord | null;
 
     if (!record) return;
 
@@ -280,13 +341,13 @@ async function handleMatchChange(
             // Check if we have a newer version locally
             const local = await db.matches.get(match.id);
             if (local?.updatedAt && match.updatedAt && local.updatedAt > match.updatedAt) {
-                console.log('[LiveUpdates] Skipping older match update');
+                logger.log('Skipping older match update');
                 return;
             }
             await db.matches.put(match);
         }
     } catch (err) {
-        console.error('[LiveUpdates] Error updating local match:', err);
+        logger.error('Error updating local match:', err);
     }
 
     // Notify callback
@@ -294,13 +355,12 @@ async function handleMatchChange(
 }
 
 async function handleHoleResultChange(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload: RealtimePostgresChangesPayload<any>,
+    payload: RealtimePostgresChangesPayload<HoleResultDbRecord>,
     tripId: string,
     callbacks: LiveUpdateCallbacks
 ): Promise<void> {
     const eventType = payload.eventType as ChangeEvent;
-    const record = payload.new || payload.old;
+    const record = (payload.new || payload.old) as HoleResultDbRecord | null;
 
     if (!record) return;
 
@@ -322,13 +382,13 @@ async function handleHoleResultChange(
             // For hole results, newer timestamp wins
             const local = await db.holeResults.get(holeResult.id);
             if (local?.timestamp && holeResult.timestamp && local.timestamp > holeResult.timestamp) {
-                console.log('[LiveUpdates] Skipping older hole result');
+                logger.log('Skipping older hole result');
                 return;
             }
             await db.holeResults.put(holeResult);
         }
     } catch (err) {
-        console.error('[LiveUpdates] Error updating local hole result:', err);
+        logger.error('Error updating local hole result:', err);
     }
 
     // Notify callback
@@ -336,12 +396,11 @@ async function handleHoleResultChange(
 }
 
 async function handleSessionChange(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload: RealtimePostgresChangesPayload<any>,
+    payload: RealtimePostgresChangesPayload<SessionDbRecord>,
     callbacks: LiveUpdateCallbacks
 ): Promise<void> {
     const eventType = payload.eventType as ChangeEvent;
-    const record = payload.new || payload.old;
+    const record = (payload.new || payload.old) as SessionDbRecord | null;
 
     if (!record) return;
 
@@ -354,13 +413,13 @@ async function handleSessionChange(
         } else {
             const local = await db.sessions.get(session.id);
             if (local?.updatedAt && session.updatedAt && local.updatedAt > session.updatedAt) {
-                console.log('[LiveUpdates] Skipping older session update');
+                logger.log('Skipping older session update');
                 return;
             }
             await db.sessions.put(session);
         }
     } catch (err) {
-        console.error('[LiveUpdates] Error updating local session:', err);
+        logger.error('Error updating local session:', err);
     }
 
     // Notify callback

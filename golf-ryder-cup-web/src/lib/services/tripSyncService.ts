@@ -12,7 +12,10 @@
  * - Batch operations for efficiency
  */
 
+import { createLogger } from '@/lib/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
+
+const logger = createLogger('TripSync');
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { db } from '../db';
 import type {
@@ -102,13 +105,13 @@ export function initTripSyncNetworkListeners(): void {
 
     window.addEventListener('online', () => {
         isOnline = true;
-        console.log('[TripSync] Network online - triggering sync');
+        logger.log('Network online - triggering sync');
         debouncedProcessQueue();
     });
 
     window.addEventListener('offline', () => {
         isOnline = false;
-        console.log('[TripSync] Network offline - queuing changes');
+        logger.log('Network offline - queuing changes');
     });
 
     isOnline = navigator.onLine;
@@ -172,7 +175,7 @@ export function queueSyncOperation(
     };
 
     syncQueue.push(item);
-    console.log(`[TripSync] Queued ${operation} for ${entity}:${entityId}`);
+    logger.log(`Queued ${operation} for ${entity}:${entityId}`);
 
     if (canSync()) {
         debouncedProcessQueue();
@@ -185,7 +188,7 @@ function debouncedProcessQueue(): void {
     }
     syncDebounceTimer = setTimeout(() => {
         processSyncQueue().catch((err) => {
-            console.error('[TripSync] Queue processing error:', err);
+            logger.error('Queue processing error:', err);
         });
     }, SYNC_DEBOUNCE_MS);
 }
@@ -607,11 +610,11 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
             await syncHoleResultToCloud(holeResult.id, 'update', holeResult);
         }
 
-        console.log(`[TripSync] Full sync completed for trip ${tripId}`);
+        logger.log(`Full sync completed for trip ${tripId}`);
         return { success: true, tripId, cloudId: tripId };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('[TripSync] Full sync failed:', errorMessage);
+        logger.error('Full sync failed:', errorMessage);
         return { success: false, tripId, error: errorMessage };
     }
 }
@@ -785,11 +788,11 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
             }
         );
 
-        console.log(`[TripSync] Pulled trip ${trip.id} from cloud`);
+        logger.log(`Pulled trip ${trip.id} from cloud`);
         return { success: true, tripId: trip.id, cloudId: trip.id };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('[TripSync] Pull failed:', errorMessage);
+        logger.error('Pull failed:', errorMessage);
         return { success: false, tripId: '', error: errorMessage };
     }
 }
@@ -849,7 +852,7 @@ export function initTripSyncService(): void {
     if (canSync()) {
         setTimeout(() => {
             processSyncQueue().catch((err) => {
-                console.error('[TripSync] Startup sync error:', err);
+                logger.error('Startup sync error:', err);
             });
         }, 3000);
     }

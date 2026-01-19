@@ -10,6 +10,19 @@ export { IconButton, type IconButtonProps, type IconButtonSize, type IconButtonV
 export { Card, CardHeader, CardContent, CardFooter, type CardProps, type CardVariant } from './Card';
 export { Input, type InputProps } from './Input';
 
+// Accessibility & Form validation
+export {
+  FormError,
+  FormHint,
+  FormErrorSummary,
+  LiveRegion,
+  type FormErrorProps,
+  type FormErrorVariant,
+  type FormHintProps,
+  type FormErrorSummaryProps,
+  type LiveRegionProps,
+} from './FormError';
+
 // Feedback & overlays
 export { Modal, ConfirmDialog, type ModalProps, type ConfirmDialogProps } from './Modal';
 export { OfflineIndicator } from './OfflineIndicator';

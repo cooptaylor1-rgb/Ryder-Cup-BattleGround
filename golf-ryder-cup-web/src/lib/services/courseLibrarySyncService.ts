@@ -13,7 +13,10 @@
  * - Deduplication based on course name
  */
 
+import { createLogger } from '@/lib/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
+
+const logger = createLogger('CourseSync');
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { db, type CourseSyncQueueEntry } from '../db';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
@@ -126,13 +129,13 @@ export function initNetworkListeners(): void {
 
     window.addEventListener('online', () => {
         isOnline = true;
-        console.log('[CourseSync] Network online - triggering sync');
+        logger.log('Network online - triggering sync');
         debouncedProcessQueue();
     });
 
     window.addEventListener('offline', () => {
         isOnline = false;
-        console.log('[CourseSync] Network offline - queuing syncs');
+        logger.log('Network offline - queuing syncs');
     });
 
     // Initial check
@@ -194,7 +197,7 @@ export async function queueCourseSync(
         .first();
 
     if (existing) {
-        console.log(`[CourseSync] Course ${courseProfileId} already in queue`);
+        logger.log(`Course ${courseProfileId} already in queue`);
         return;
     }
 
@@ -207,7 +210,7 @@ export async function queueCourseSync(
     };
 
     await db.courseSyncQueue.add(entry);
-    console.log(`[CourseSync] Queued course ${courseProfileId} for sync`);
+    logger.log(`Queued course ${courseProfileId} for sync`);
 
     // Trigger sync if online
     if (canSync()) {
@@ -224,7 +227,7 @@ function debouncedProcessQueue(): void {
     }
     syncDebounceTimer = setTimeout(() => {
         processQueue().catch((err) => {
-            console.error('[CourseSync] Queue processing error:', err);
+            logger.error('Queue processing error:', err);
         });
     }, SYNC_DEBOUNCE_MS);
 }
@@ -244,7 +247,7 @@ export async function processQueue(): Promise<BulkSyncResult> {
     }
 
     if (syncInProgress) {
-        console.log('[CourseSync] Sync already in progress');
+        logger.log('Sync already in progress');
         return { success: true, synced: 0, failed: 0, queued: 0, errors: [] };
     }
 
@@ -275,7 +278,7 @@ export async function processQueue(): Promise<BulkSyncResult> {
             return { success: true, synced: 0, failed: 0, queued: 0, errors: [] };
         }
 
-        console.log(`[CourseSync] Processing ${itemsToProcess.length} queued items`);
+        logger.log(`Processing ${itemsToProcess.length} queued items`);
 
         for (const item of itemsToProcess) {
             // Mark as syncing
@@ -420,8 +423,8 @@ async function syncCourseToCloudWithRetry(
     // Wait with exponential backoff if this is a retry
     if (currentRetry > 0) {
         const delay = getRetryDelay(currentRetry - 1);
-        console.log(
-            `[CourseSync] Retry ${currentRetry} for ${courseProfile.name}, waiting ${Math.round(delay)}ms`
+        logger.log(
+            `Retry ${currentRetry} for ${courseProfile.name}, waiting ${Math.round(delay)}ms`
         );
         await sleep(delay);
     }
@@ -522,7 +525,7 @@ async function syncCourseToCloudInternal(
         return { success: true, courseId: courseProfile.id, cloudId: cloudCourseId };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('[CourseSync] Error syncing course to cloud:', errorMessage);
+        logger.error('Error syncing course to cloud:', errorMessage);
         return {
             success: false,
             courseId: courseProfile.id,
@@ -725,7 +728,7 @@ export async function searchCloudCourses(query: string): Promise<CourseLibraryRe
             .limit(20);
 
         if (error) {
-            console.error('[CourseSync] Search error:', error);
+            logger.error('Search error:', error);
             return [];
         }
 
@@ -791,7 +794,7 @@ export async function incrementCourseUsage(courseId: string): Promise<void> {
                 return;
             }
             // If RPC failed (e.g., function doesn't exist), fall back to update
-            console.log('[CourseSync] RPC not available, using update fallback');
+            logger.log('RPC not available, using update fallback');
         }
 
         // Fallback: manual update
@@ -881,7 +884,7 @@ export async function createAndSyncCourseProfile(
 
     // Queue for cloud sync (non-blocking)
     syncCourseToCloud(profile, teeSetProfiles, source).catch((err) => {
-        console.error('[CourseSync] Background sync failed:', err);
+        logger.error('Background sync failed:', err);
     });
 
     return profile;
@@ -902,7 +905,7 @@ export function initCourseSyncService(): void {
     if (canSync()) {
         setTimeout(() => {
             processQueue().catch((err) => {
-                console.error('[CourseSync] Startup queue processing error:', err);
+                logger.error('Startup queue processing error:', err);
             });
         }, 3000); // Delay to let app initialize
     }
