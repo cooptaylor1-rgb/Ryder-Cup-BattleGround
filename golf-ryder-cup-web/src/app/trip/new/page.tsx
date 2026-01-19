@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout';
+import { TripTemplatePicker } from '@/components/trip-setup';
 import { TRIP_TEMPLATES, type TripTemplate } from '@/lib/types/templates';
 import {
     createTripFromTemplate,
@@ -147,54 +148,10 @@ export default function NewTripPage() {
         >
             {/* Step: Select Template */}
             {step === 'select' && (
-                <div className="p-4 space-y-4">
-                    <p className="text-surface-500 dark:text-surface-400">
-                        Choose a template to get started quickly, or create a custom trip.
-                    </p>
-
-                    <div className="space-y-3">
-                        {TRIP_TEMPLATES.map((template) => (
-                            <button
-                                key={template.id}
-                                onClick={() => handleTemplateSelect(template)}
-                                className={cn(
-                                    'card w-full p-4 text-left',
-                                    'hover:bg-surface-50 dark:hover:bg-surface-800',
-                                    'transition-colors active:scale-[0.99]'
-                                )}
-                            >
-                                <div className="flex gap-4">
-                                    <div className={cn(
-                                        'w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0',
-                                        template.id === 'custom'
-                                            ? 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
-                                            : 'bg-augusta-green/10 text-augusta-green'
-                                    )}>
-                                        {TEMPLATE_ICONS[template.id]}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="font-semibold">{template.name}</h3>
-                                            <ChevronRight className="w-5 h-5 text-surface-400" />
-                                        </div>
-                                        <p className="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
-                                            {template.description}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                            {template.features.map((feature, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="text-xs px-2 py-0.5 rounded-full bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400"
-                                                >
-                                                    {feature}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                <div className="p-4">
+                    <TripTemplatePicker
+                        onSelect={handleTemplateSelect}
+                    />
                 </div>
             )}
 

@@ -20,3 +20,5 @@ export { PlayerRosterImport, type PlayerInfo } from './PlayerRosterImport';
 
 // Enhanced Wizard
 export { EnhancedTripWizard, type TripSetupData } from './EnhancedTripWizard';
+// Template Selection
+export { TripTemplatePicker } from './TripTemplatePicker';

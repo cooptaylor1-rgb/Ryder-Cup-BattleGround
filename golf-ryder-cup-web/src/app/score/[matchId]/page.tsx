@@ -44,6 +44,7 @@ import {
     PressTracker,
     StrokeScoreEntry,
     HoleScoreDisplay,
+    OneHandedScoringPanel,
     type Press,
 } from '@/components/scoring';
 import {
@@ -112,7 +113,9 @@ export default function EnhancedMatchScoringPage() {
     const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
     const [presses, setPresses] = useState<Press[]>([]);
     const [showHandicapDetails, setShowHandicapDetails] = useState(false);
-    const [scoringMode, setScoringMode] = useState<'swipe' | 'buttons' | 'strokes'>('swipe');
+    const [scoringMode, setScoringMode] = useState<'swipe' | 'buttons' | 'strokes' | 'oneHanded'>(
+        scoringPreferences.oneHandedMode ? 'oneHanded' : 'swipe'
+    );
 
     // Celebration state
     const [celebration, setCelebration] = useState<{
@@ -704,6 +707,32 @@ export default function EnhancedMatchScoringPage() {
                                         </div>
                                     )}
                                 </motion.div>
+                            ) : scoringMode === 'oneHanded' ? (
+                                <motion.div
+                                    key="oneHanded"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    style={{ minHeight: '50vh' }}
+                                >
+                                    <OneHandedScoringPanel
+                                        holeNumber={currentHole}
+                                        teamAName={teamAName}
+                                        teamBName={teamBName}
+                                        teamAColor={teamAColor}
+                                        teamBColor={teamBColor}
+                                        existingResult={currentHoleResult?.winner}
+                                        onScore={handleScore}
+                                        onPrevHole={prevHole}
+                                        onNextHole={nextHole}
+                                        onUndo={handleUndo}
+                                        canUndo={undoStack.length > 0}
+                                        disabled={isSaving}
+                                        preferredHand={scoringPreferences.preferredHand}
+                                        currentScore={matchState.currentScore}
+                                        holesPlayed={matchState.holesPlayed}
+                                    />
+                                </motion.div>
                             ) : (
                                 <motion.div
                                     key="buttons"
@@ -825,6 +854,17 @@ export default function EnhancedMatchScoringPage() {
                                     }}
                                 >
                                     Strokes
+                                </button>
+                                <button
+                                    onClick={() => setScoringMode('oneHanded')}
+                                    className="px-3 py-1 rounded-full transition-all"
+                                    style={{
+                                        background: scoringMode === 'oneHanded' ? 'var(--masters)' : 'transparent',
+                                        color: scoringMode === 'oneHanded' ? 'white' : 'var(--ink-tertiary)',
+                                        boxShadow: scoringMode === 'oneHanded' ? 'var(--shadow-sm)' : 'none',
+                                    }}
+                                >
+                                    ✋ One-Hand
                                 </button>
                             </div>
                         </div>

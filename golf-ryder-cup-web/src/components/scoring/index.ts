@@ -80,3 +80,7 @@ export {
 export {
   StrokeScoreEntry,
 } from './StrokeScoreEntry';
+
+export {
+  OneHandedScoringPanel,
+} from './OneHandedScoringPanel';

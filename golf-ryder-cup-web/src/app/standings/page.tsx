@@ -12,6 +12,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { STAT_DEFINITIONS, type TripStatType } from '@/lib/types/tripStats';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
 import type { Award, PlayerStats } from '@/lib/types/awards';
+import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
 import {
   Trophy,
   Home,
@@ -270,6 +271,7 @@ export default function StandingsPage() {
             teamAName={teamAName}
             teamBName={teamBName}
             teamA={teamA}
+            pointsToWin={currentTrip.settings?.pointsToWin || 14.5}
           />
         ) : activeTab === 'stats' ? (
           <FunStatsTab
@@ -366,6 +368,7 @@ function CompetitionTab({
   teamAName,
   teamBName,
   teamA,
+  pointsToWin,
 }: {
   standings: TeamStandings | null;
   magicNumber: MagicNumber | null;
@@ -373,6 +376,7 @@ function CompetitionTab({
   teamAName: string;
   teamBName: string;
   teamA: { id: string } | undefined;
+  pointsToWin: number;
 }) {
   if (!standings || !magicNumber) {
     return <EmptyState />;
@@ -485,6 +489,18 @@ function CompetitionTab({
           {standings.matchesCompleted} of {standings.totalMatches} matches complete
         </p>
       </section>
+
+      {/* Path to Victory */}
+      {standings.remainingMatches > 0 && !magicNumber.hasClinched && (
+        <section className="section-sm" style={{ paddingBottom: 0 }}>
+          <PathToVictoryCard
+            standings={standings}
+            pointsToWin={pointsToWin}
+            teamAName={teamAName}
+            teamBName={teamBName}
+          />
+        </section>
+      )}
 
       <hr className="divider-lg" />
 
