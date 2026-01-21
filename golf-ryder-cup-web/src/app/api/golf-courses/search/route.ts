@@ -180,13 +180,53 @@ async function searchGHIN(
 }
 
 // Search RapidAPI Golf Course Finder Database
+// This API requires location-based search (lat/lng), so we first geocode the query
 async function searchRapidAPI(
     query: string,
     apiKey: string
 ): Promise<CourseSearchResult[]> {
     try {
+        // First, geocode the search query to get coordinates
+        const geocodeResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?` +
+            `q=${encodeURIComponent(query)}&` +
+            `format=json&` +
+            `limit=5`,
+            {
+                headers: {
+                    'User-Agent': 'GolfRyderCupApp/1.0',
+                },
+            }
+        );
+
+        if (!geocodeResponse.ok) return [];
+
+        const geocodeData = await geocodeResponse.json();
+        if (!geocodeData || geocodeData.length === 0) {
+            // Try with "golf" appended if no results
+            const golfGeocodeResponse = await fetch(
+                `https://nominatim.openstreetmap.org/search?` +
+                `q=${encodeURIComponent(query + ' golf')}&` +
+                `format=json&` +
+                `limit=5`,
+                {
+                    headers: {
+                        'User-Agent': 'GolfRyderCupApp/1.0',
+                    },
+                }
+            );
+            if (!golfGeocodeResponse.ok) return [];
+            const golfGeocodeData = await golfGeocodeResponse.json();
+            if (!golfGeocodeData || golfGeocodeData.length === 0) return [];
+            geocodeData.push(...golfGeocodeData);
+        }
+
+        // Use the first geocode result
+        const { lat, lon } = geocodeData[0];
+
+        // Now search RapidAPI with these coordinates (50 mile radius)
         const response = await fetch(
-            `https://golf-course-finder.p.rapidapi.com/api/courses?name=${encodeURIComponent(query)}`,
+            `https://golf-course-finder.p.rapidapi.com/api/golf-clubs/?miles=50&latitude=${lat}&longitude=${lon}`,
             {
                 headers: {
                     'X-RapidAPI-Key': apiKey,
@@ -195,27 +235,72 @@ async function searchRapidAPI(
             }
         );
 
-        if (!response.ok) return [];
+        if (!response.ok) {
+            logger.error('RapidAPI response error:', response.status, response.statusText);
+            return [];
+        }
 
         const data = await response.json();
-        return (data.courses || data || []).slice(0, 100).map((course: {
-            id: string;
-            name: string;
-            city: string;
-            state: string;
-            country: string;
-            lat: number;
-            lng: number;
-        }) => ({
-            id: `rapid-${course.id}`,
-            name: course.name,
-            city: course.city,
-            state: course.state,
-            country: course.country,
-            latitude: course.lat,
-            longitude: course.lng,
-            source: 'rapidapi' as const,
-        }));
+
+        // Check for API error messages
+        if (data.message) {
+            logger.error('RapidAPI error message:', data.message);
+            return [];
+        }
+
+        const results: CourseSearchResult[] = [];
+        const queryLower = query.toLowerCase();
+
+        // Process each club and its courses
+        for (const club of (Array.isArray(data) ? data : [])) {
+            // Check if club name matches query
+            const clubNameMatches = club.club_name?.toLowerCase().includes(queryLower) ||
+                                   queryLower.includes(club.club_name?.toLowerCase());
+
+            // Add individual courses from the club
+            if (club.golf_courses && Array.isArray(club.golf_courses)) {
+                for (const course of club.golf_courses) {
+                    const courseNameMatches = course.course_name?.toLowerCase().includes(queryLower) ||
+                                             queryLower.includes(course.course_name?.toLowerCase());
+
+                    // Include if club or course name matches, or if within search area
+                    if (clubNameMatches || courseNameMatches || results.length < 20) {
+                        results.push({
+                            id: `rapid-${club.place_id}-${course.course_name?.replace(/\s+/g, '-')}`,
+                            name: course.course_name || club.club_name,
+                            city: club.city,
+                            state: club.state,
+                            country: club.country,
+                            latitude: club.latitude,
+                            longitude: club.longitude,
+                            source: 'rapidapi' as const,
+                        });
+                    }
+                }
+            } else {
+                // Club without individual course data
+                if (clubNameMatches || results.length < 20) {
+                    results.push({
+                        id: `rapid-${club.place_id}`,
+                        name: club.club_name,
+                        city: club.city,
+                        state: club.state,
+                        country: club.country,
+                        latitude: club.latitude,
+                        longitude: club.longitude,
+                        source: 'rapidapi' as const,
+                    });
+                }
+            }
+        }
+
+        // Sort results: exact/partial matches first, then by distance implied by order
+        return results.sort((a, b) => {
+            const aMatches = a.name?.toLowerCase().includes(queryLower) ? 0 : 1;
+            const bMatches = b.name?.toLowerCase().includes(queryLower) ? 0 : 1;
+            return aMatches - bMatches;
+        }).slice(0, 100);
+
     } catch (error) {
         logger.error('RapidAPI search error:', error);
         return [];
