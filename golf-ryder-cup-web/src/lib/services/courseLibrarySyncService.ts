@@ -725,7 +725,7 @@ export async function searchCloudCourses(query: string): Promise<CourseLibraryRe
             .select('*')
             .ilike('name', `%${query}%`)
             .order('usage_count', { ascending: false })
-            .limit(20);
+            .limit(100);
 
         if (error) {
             logger.error('Search error:', error);

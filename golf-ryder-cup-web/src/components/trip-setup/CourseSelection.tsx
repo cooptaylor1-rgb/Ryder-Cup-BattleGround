@@ -20,6 +20,12 @@ import {
     TreePine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+    searchCourses as searchCoursesAPI,
+    checkGolfCourseAPIConfigured,
+    formatCourseLocation,
+    type GolfCourseAPICourse,
+} from '@/lib/services/golfCourseAPIService';
 
 export interface CourseInfo {
     id: string;
@@ -116,8 +122,14 @@ export function CourseSelection({
     const [searchResults, setSearchResults] = useState<CourseInfo[]>([]);
     const [showSearch, setShowSearch] = useState(false);
     const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+    const [isApiConfigured, setIsApiConfigured] = useState<boolean | null>(null);
 
-    // Simulated search with debounce
+    // Check if API is configured on mount
+    useEffect(() => {
+        checkGolfCourseAPIConfigured().then(setIsApiConfigured);
+    }, []);
+
+    // Search with debounce - uses real API when configured, falls back to demo
     useEffect(() => {
         if (!searchQuery.trim()) {
             setSearchResults([]);
@@ -125,21 +137,54 @@ export function CourseSelection({
         }
 
         setIsSearching(true);
-        const timer = setTimeout(() => {
-            // Filter demo courses or call API
-            const query = searchQuery.toLowerCase();
-            const results = DEMO_COURSES.filter(
-                c =>
-                    c.name.toLowerCase().includes(query) ||
-                    c.city.toLowerCase().includes(query) ||
-                    c.state.toLowerCase().includes(query)
-            );
-            setSearchResults(results);
-            setIsSearching(false);
+        const timer = setTimeout(async () => {
+            try {
+                // Try real API first if configured
+                if (isApiConfigured) {
+                    const apiResults = await searchCoursesAPI(searchQuery);
+                    const convertedResults: CourseInfo[] = apiResults.map((course: GolfCourseAPICourse) => ({
+                        id: `api-${course.id}`,
+                        name: course.course_name || course.club_name,
+                        address: course.location.address || '',
+                        city: course.location.city || '',
+                        state: course.location.state || '',
+                        country: course.location.country || 'USA',
+                        rating: course.tees?.male?.[0]?.course_rating,
+                        slope: course.tees?.male?.[0]?.slope_rating,
+                        par: course.tees?.male?.[0]?.par_total,
+                        yardage: course.tees?.male?.[0]?.total_yards,
+                        holes: 18,
+                    }));
+                    setSearchResults(convertedResults);
+                } else {
+                    // Fallback to demo courses
+                    const query = searchQuery.toLowerCase();
+                    const results = DEMO_COURSES.filter(
+                        c =>
+                            c.name.toLowerCase().includes(query) ||
+                            c.city.toLowerCase().includes(query) ||
+                            c.state.toLowerCase().includes(query)
+                    );
+                    setSearchResults(results);
+                }
+            } catch (error) {
+                console.error('Course search error:', error);
+                // Fallback to demo on error
+                const query = searchQuery.toLowerCase();
+                const results = DEMO_COURSES.filter(
+                    c =>
+                        c.name.toLowerCase().includes(query) ||
+                        c.city.toLowerCase().includes(query) ||
+                        c.state.toLowerCase().includes(query)
+                );
+                setSearchResults(results);
+            } finally {
+                setIsSearching(false);
+            }
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, isApiConfigured]);
 
     const addCourse = useCallback((course: CourseInfo) => {
         if (selectedCourses.length >= maxCourses) return;

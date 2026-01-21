@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');
     const state = searchParams.get('state');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '50');
 
     if (!query || query.length < 2) {
         return NextResponse.json(
@@ -139,7 +139,7 @@ async function searchGHIN(
         const params = new URLSearchParams({
             course_name: query,
             ...(state && { state }),
-            max_results: '20',
+            max_results: '100',
         });
 
         const response = await fetch(
@@ -198,7 +198,7 @@ async function searchRapidAPI(
         if (!response.ok) return [];
 
         const data = await response.json();
-        return (data.courses || data || []).slice(0, 20).map((course: {
+        return (data.courses || data || []).slice(0, 100).map((course: {
             id: string;
             name: string;
             city: string;
@@ -234,7 +234,7 @@ async function searchOpenStreetMap(
             `https://nominatim.openstreetmap.org/search?` +
             `q=${encodeURIComponent(searchQuery)}&` +
             `format=json&` +
-            `limit=20&` +
+            `limit=50&` +
             `addressdetails=1`,
             {
                 headers: {
