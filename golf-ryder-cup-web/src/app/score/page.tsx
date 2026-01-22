@@ -193,7 +193,7 @@ export default function ScorePage() {
                         Matches
                     </h2>
 
-                    <ErrorBoundary variant="inline" showDetails={process.env.NODE_ENV === 'development'}>
+                    <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
                         {isLoading ? (
                             <div className="skeleton-group" style={{ padding: 'var(--space-8) 0' }}>
                                 {[1, 2, 3].map(i => (
