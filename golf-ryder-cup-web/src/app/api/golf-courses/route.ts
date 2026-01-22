@@ -70,6 +70,8 @@ export async function GET(request: NextRequest) {
                 'Authorization': `Key ${apiKey}`,
                 'Accept': 'application/json',
             },
+            // Disable Next.js fetch caching - each search query needs a fresh response
+            cache: 'no-store',
         });
 
         if (!response.ok) {
