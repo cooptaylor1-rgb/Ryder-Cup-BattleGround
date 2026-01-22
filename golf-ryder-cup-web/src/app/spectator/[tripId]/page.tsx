@@ -79,7 +79,7 @@ export default function SpectatorPage() {
                 matches,
                 holeResults,
                 players,
-                trip.settings?.pointsToWin || 14.5
+                trip.settings?.pointsToWin ?? 14.5
             );
 
             setSpectatorView(view);

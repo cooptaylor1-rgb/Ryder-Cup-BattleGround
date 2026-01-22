@@ -985,16 +985,15 @@ function QuickActionButton({ icon, label, href, badge, color }: QuickActionButto
   );
 }
 
-/* Momentum Card Component - Reserved for future use (BUG-020) */
-interface _MomentumCardProps {
+/* Momentum Card Component */
+interface MomentumCardProps {
   team: string;
   streak: number;
   trend: 'up' | 'down' | 'neutral';
   color: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function _MomentumCard({ team, streak, trend, color }: _MomentumCardProps) {
+function MomentumCard({ team, streak, trend, color }: MomentumCardProps) {
   return (
     <div
       className="card"
