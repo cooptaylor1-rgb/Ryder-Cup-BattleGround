@@ -337,9 +337,14 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                     // BUG-007 FIX: Persist match status to local database (not just sync queue)
                     // Update local match record with new status when closeout occurs
                     if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
+                        // Determine the proper result type for the database
+                        const dbResult: 'teamAWin' | 'teamBWin' | 'halved' =
+                            newMatchState.currentScore > 0 ? 'teamAWin' :
+                            newMatchState.currentScore < 0 ? 'teamBWin' : 'halved';
+
                         await db.matches.update(activeMatch.id, {
                             status: 'completed' as const,
-                            result: matchToSync.result,
+                            result: dbResult,
                             margin: matchToSync.margin,
                             holesRemaining: matchToSync.holesRemaining,
                             updatedAt: matchToSync.updatedAt,
