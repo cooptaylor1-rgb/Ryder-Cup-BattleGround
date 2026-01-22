@@ -203,6 +203,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                         winner: payload.winner,
                         teamAScore: payload.teamAStrokes,
                         teamBScore: payload.teamBStrokes,
+                        timestamp: event.timestamp,
                     });
                 } else if (event.eventType === ScoringEventType.HoleEdited) {
                     const payload = event.payload as {
@@ -225,6 +226,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                             winner: payload.previousWinner,
                             teamAScore: payload.previousTeamAStrokes,
                             teamBScore: payload.previousTeamBStrokes,
+                            timestamp: event.timestamp,
                         },
                     });
                     // Update tracked state with new values
@@ -235,6 +237,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                         winner: payload.newWinner,
                         teamAScore: payload.newTeamAStrokes,
                         teamBScore: payload.newTeamBStrokes,
+                        timestamp: event.timestamp,
                     });
                 } else if (event.eventType === ScoringEventType.HoleUndone) {
                     // An undo event means we should pop from the stack and revert state
