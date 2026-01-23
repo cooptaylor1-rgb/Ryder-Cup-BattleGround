@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 /**
  * Shared E2E Test Utilities
@@ -34,6 +34,51 @@ export async function waitForStableDOM(page: Page, timeout = 10000): Promise<voi
     }
 
     await page.waitForTimeout(300); // Allow React to settle
+}
+
+/**
+ * Robust page ready check - verifies page is loaded and functional
+ * This replaces unreliable body.toBeVisible() checks that can fail due to
+ * CSS hydration timing issues
+ */
+export async function expectPageReady(page: Page, timeout = 10000): Promise<void> {
+    // First, wait for basic DOM ready state
+    await page.waitForLoadState('domcontentloaded', { timeout });
+
+    // Try to find a visible content container
+    const contentSelectors = [
+        'main',
+        '#__next',
+        '[role="main"]',
+        '.container',
+        'div[class*="layout"]',
+        'div[class*="content"]',
+        'div[class*="page"]',
+    ];
+
+    let foundContent = false;
+
+    for (const selector of contentSelectors) {
+        try {
+            const element = page.locator(selector).first();
+            await expect(element).toBeVisible({ timeout: 2000 });
+            foundContent = true;
+            break;
+        } catch {
+            // Try next selector
+        }
+    }
+
+    // Fallback: just wait for body to have content
+    if (!foundContent) {
+        await page.waitForFunction(() => {
+            const body = document.querySelector('body');
+            return body && body.textContent && body.textContent.trim().length > 10;
+        }, { timeout: 5000 });
+    }
+
+    // Additional stabilization
+    await page.waitForTimeout(200);
 }
 
 /**

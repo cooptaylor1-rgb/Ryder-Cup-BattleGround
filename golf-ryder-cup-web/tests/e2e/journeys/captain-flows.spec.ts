@@ -16,11 +16,11 @@
 
 import { test, expect } from '../fixtures/test-fixtures';
 import {
-    navigateAndSetup,
     waitForStableDOM,
     dismissAllBlockingModals,
     measureTime,
     TEST_CONFIG,
+    expectPageReady,
 } from '../utils/test-helpers';
 
 // ============================================================================
@@ -97,8 +97,7 @@ test.describe('Captain Journey: Create Trip', () => {
         }
 
         // Verify trip was created or wizard advanced
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should prevent duplicate trip names @regression', async ({ page }) => {
@@ -149,8 +148,7 @@ test.describe('Captain Journey: Manage Players', () => {
         await page.goto('/players');
         await waitForStableDOM(page);
 
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
 
         // Should show player-related content
         const pageContent = await page.textContent('body');
@@ -193,8 +191,7 @@ test.describe('Captain Journey: Manage Players', () => {
         }
 
         // Page should respond without error
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should prevent duplicate player entries @regression', async ({ page }) => {
@@ -222,8 +219,7 @@ test.describe('Captain Journey: Manage Players', () => {
         }
 
         // Verify page handles gracefully (either success or validation error)
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 });
 
@@ -246,8 +242,7 @@ test.describe('Captain Journey: Team Assignment', () => {
         await page.goto('/captain/teams');
         await waitForStableDOM(page);
 
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should show both teams with player counts @regression', async ({ page }) => {
@@ -262,8 +257,7 @@ test.describe('Captain Journey: Team Assignment', () => {
         const hasEurope = await europeTeam.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // At least team structure should be visible
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should verify team persistence after page reload @regression', async ({ page }) => {
@@ -323,8 +317,7 @@ test.describe('Captain Journey: Session Configuration', () => {
         const hasFormats = await formatOptions.count() > 0;
 
         // Page should render
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 });
 
@@ -406,8 +399,7 @@ test.describe('Captain Journey: Score Entry', () => {
         await page.goto('/score');
         await waitForStableDOM(page);
 
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should display scoring interface @regression', async ({ page }) => {
@@ -482,8 +474,7 @@ test.describe('Captain Journey: Score Editing', () => {
         const hasEdit = await editButton.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // Page should load regardless
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should verify score totals recalculate correctly @regression @nightly', async ({ page }) => {
@@ -500,8 +491,7 @@ test.describe('Captain Journey: Score Editing', () => {
         }
 
         // Verify no duplicate or corrupted entries
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 });
 
@@ -528,8 +518,7 @@ test.describe('Captain Journey: Session Locking', () => {
         const hasLockControls = await lockControls.count() > 0;
 
         // Page should render
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should prevent scoring when session is locked @regression', async ({ page }) => {
@@ -550,8 +539,7 @@ test.describe('Captain Journey: Session Locking', () => {
         await waitForStableDOM(page);
 
         // Score entry should be disabled or show locked state
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 
     test('should show audit trail for lock changes @regression @nightly', async ({ page }) => {
@@ -563,7 +551,6 @@ test.describe('Captain Journey: Session Locking', () => {
         const entryCount = await auditEntries.count();
 
         // Page should render
-        const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expectPageReady(page);
     });
 });

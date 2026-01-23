@@ -1,5 +1,5 @@
 import { test, expect, Page, BrowserContext } from '@playwright/test';
-import { dismissOnboardingModal, waitForStableDOM, clearIndexedDBSafe } from './test-utils';
+import { dismissOnboardingModal, waitForStableDOM, clearIndexedDBSafe, expectPageReady } from './test-utils';
 
 /**
  * QA Simulation Suite - 500 Sessions
@@ -94,8 +94,7 @@ test.describe('S01: New User Signup Flow', () => {
             await waitForStableDOM(page);
             await page.waitForTimeout(500); // Allow redirect to complete
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible({ timeout: 10000 });
+            await expectPageReady(page);
 
             // Look for trip creation form elements (template selection, inputs, etc.)
             const formInputs = page.locator('input, button, [role="button"]');
@@ -206,8 +205,7 @@ test.describe('S03: Session Persistence', () => {
             await waitForStableDOM(page);
 
             // Check if session maintained
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Should not redirect to login after reload if was authenticated
             const currentUrl = page.url();
@@ -354,8 +352,7 @@ test.describe('S06: Live Scoring', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for scoring UI elements
             const pageContent = await page.textContent('body');
@@ -473,8 +470,7 @@ test.describe('S08: Lineup Builder', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for error states
             const errorIndicator = page.locator('text=/error|went wrong|failed/i');
@@ -506,8 +502,7 @@ test.describe('S09: Schedule Management', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for schedule content
             const pageContent = await page.textContent('body');
@@ -545,8 +540,7 @@ test.describe('S10: Matchups View', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check page loads without critical errors
             const pageContent = await page.textContent('body');
@@ -581,8 +575,7 @@ test.describe('S11: Players Directory', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for player list or empty state
             const pageContent = await page.textContent('body');
@@ -620,8 +613,7 @@ test.describe('S12: Captain Dashboard', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for captain controls
             const captainControls = page.locator('button, a').filter({
@@ -663,8 +655,7 @@ test.describe('S13: Captain Lineup Builder', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for drag-drop elements
             const dragHandles = page.locator('[draggable="true"], [data-dnd-draggable]');
@@ -706,8 +697,7 @@ test.describe('S14: Draft Board', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for draft UI elements
             const pageContent = await page.textContent('body');
@@ -745,8 +735,7 @@ test.describe('S15: Session Locking', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for lock/unlock controls
             const lockControls = page.locator('button, [role="switch"]').filter({
@@ -788,8 +777,7 @@ test.describe('S16: Social Banter Feed', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for social UI elements
             const postInput = page.locator('textarea, input[placeholder*="post" i], input[placeholder*="message" i]');
@@ -829,8 +817,7 @@ test.describe('S17: Photo Gallery', () => {
             await waitForStableDOM(page);
             await dismissOnboardingModal(page);
 
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Check for photo gallery elements
             const images = page.locator('img');
@@ -882,8 +869,7 @@ test.describe('S18: Offline Mode Basic', () => {
                 await page.goto('/standings', { timeout: 5000 });
                 await waitForStableDOM(page);
 
-                const body = page.locator('body');
-                await expect(body).toBeVisible();
+                await expectPageReady(page);
 
                 const pageContent = await page.textContent('body');
                 const hasContent = pageContent && pageContent.length > 50;
@@ -1037,8 +1023,7 @@ test.describe('S21: Connection Drop Recovery', () => {
             await page.waitForTimeout(2000);
 
             // Check for reconnection indicator or auto-retry
-            const body = page.locator('body');
-            await expect(body).toBeVisible();
+            await expectPageReady(page);
 
             // Try to navigate after reconnection
             await page.goto('/standings');
