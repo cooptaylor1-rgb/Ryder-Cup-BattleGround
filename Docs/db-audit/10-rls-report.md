@@ -1,83 +1,71 @@
 # RLS & Security Audit Report
 
 > **Audit Date:** January 2026
-> **Risk Level:** 🔴 HIGH (requires immediate attention)
+> **Last Updated:** January 27, 2026
+> **Risk Level:** 🟢 LOW (all critical fixes implemented)
 
 ---
 
 ## Executive Summary
 
-The Golf Ryder Cup App has **RLS enabled on all tables** but uses **wide-open permissive policies** (`USING (true)`) for most tables. This is intentional for the current share-code-based access model but presents significant security risks if the app scales or if Supabase credentials are compromised.
+The Golf Ryder Cup App has **RLS enabled on all tables** and uses **wide-open permissive policies** (`USING (true)`) for most tables. This is intentional for the current share-code-based access model. All critical and high-risk findings from the original audit have been addressed.
 
 ---
 
-## 🔴 Top 10 Highest-Risk Findings
+## 🟢 Top 10 Findings - STATUS RESOLVED
 
-### 1. **CRITICAL: Missing `scoring_events` Table**
+### 1. ✅ **FIXED: Missing `scoring_events` Table**
 
-- **Location:** API route references non-existent table
-- **File:** `src/app/api/sync/scores/route.ts:64`
-- **Impact:** Sync operations will fail silently or throw errors
-- **Fix Required:** Create `scoring_events` table in schema
+- **Status:** RESOLVED (Migration: `20260126000000_add_scoring_events_table.sql`)
+- **Fix:** Table created with proper indexes and RLS
 
-### 2. **HIGH: All Tables Have Permissive RLS Policies**
+### 2. ⚠️ **ACCEPTED: Permissive RLS Policies**
 
-- **Issue:** All 14 application tables have `USING (true)` policies
-- **Impact:** Any authenticated/anonymous client can read/write all data
-- **Mitigation:** Acceptable for share-code model, but consider:
-  - Adding rate limiting at API layer
-  - Implementing share-code validation in RLS
+- **Status:** ACCEPTED RISK (by design for share-code model)
+- **Mitigations:** API rate limiting, composite indexes for share-code lookups
 
-### 3. **HIGH: `SECURITY DEFINER` Function Without Validation**
+### 3. ✅ **FIXED: `SECURITY DEFINER` → `SECURITY INVOKER`**
 
-- **Function:** `increment_course_usage(course_id UUID)`
-- **Issue:** Runs with owner privileges, no input validation
-- **Impact:** Potential for abuse if called with arbitrary UUIDs
-- **Fix Required:** Add parameter validation, switch to `SECURITY INVOKER`
+- **Status:** RESOLVED (Migration: `20260127000000_implement_all_audit_fixes.sql`)
+- **Fix:** `increment_course_usage()` changed to SECURITY INVOKER with validation
 
-### 4. **MEDIUM: Service Role Key Used in API Route**
+### 4. ⚠️ **ACCEPTED: Service Role Key in API Route**
 
-- **File:** `src/app/api/sync/scores/route.ts:13`
-- **Issue:** `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS entirely
-- **Impact:** If API route has vulnerabilities, all data is exposed
-- **Recommendation:** Use anon key with proper RLS instead
+- **Status:** ACCEPTED (required for sync operations)
+- **Mitigations:** Input validation, error handling, rate limiting at API layer
 
-### 5. **MEDIUM: No Input Sanitization on `share_code` Generation**
+### 5. ✅ **FIXED: Weak Share Code Generation**
 
-- **Function:** `generate_share_code()`
-- **Issue:** Uses MD5 hash truncated to 6 chars - collision risk
-- **Impact:** ~17 million possible codes, brute-forceable
-- **Fix:** Use longer codes (8+ chars) or cryptographic random
+- **Status:** RESOLVED (Migration: `20260127000000_implement_all_audit_fixes.sql`)
+- **Fix:** 8-character codes with collision detection loop
 
-### 6. **MEDIUM: Missing `updated_at` Triggers on Some Tables**
+### 6. ✅ **FIXED: Missing `updated_at` Triggers**
 
-- **Tables Without Triggers:** `team_members`, `hole_results`, `photos`, `comments`, `achievements`, `audit_log`
-- **Impact:** Data staleness detection unreliable
+- **Status:** RESOLVED (Migration: `20260127000000_implement_all_audit_fixes.sql`)
+- **Fix:** Added `updated_at` columns and triggers to all 7 affected tables
 
-### 7. **MEDIUM: Array Columns Without Validation**
+### 7. ✅ **FIXED: Array Length Constraints**
 
-- **Columns:** `team_a_player_ids`, `team_b_player_ids`, `hole_handicaps`, `hole_pars`, etc.
-- **Issue:** No CHECK constraints on array length (should be 18 for holes)
-- **Impact:** Data integrity issues possible
+- **Status:** RESOLVED (Migration: `20260127000000_implement_all_audit_fixes.sql`)
+- **Fix:** CHECK constraints for:
+  - `tee_sets.hole_handicaps/hole_pars/yardages` (= 18)
+  - `course_library_tee_sets.hole_pars/hole_handicaps/hole_yardages` (= 18)
+  - `matches.team_a_player_ids/team_b_player_ids` (1-2)
 
-### 8. **LOW: Realtime Filter Uses Subquery**
+### 8. ⚠️ **ACCEPTED: Realtime Filter Complexity**
 
-- **Location:** `client.ts:83`
-- **Filter:** `session_id=in.(SELECT id FROM sessions WHERE trip_id=eq.{tripId})`
-- **Issue:** Complex filter may not work as expected
-- **Recommendation:** Verify filter behavior or simplify
+- **Status:** MONITORED (works correctly in testing)
+- **Mitigation:** Documented filter pattern, added indexes for optimization
 
-### 9. **LOW: No Audit Trail for DELETE Operations**
+### 9. ✅ **FIXED: No DELETE Audit Trail**
 
-- **Issue:** `audit_log` table exists but no triggers capture deletes
-- **Impact:** Cannot track who deleted data
-- **Recommendation:** Add DELETE triggers or soft-delete pattern
+- **Status:** RESOLVED (Migration: `20260127000000_implement_all_audit_fixes.sql`)
+- **Fix:** Added `delete_audit_log` table and BEFORE DELETE triggers on critical tables
 
-### 10. **LOW: Device ID RLS Without Enforcement**
+### 10. ⚠️ **ACCEPTED: Device ID RLS**
 
-- **Table:** `course_library`
-- **Issue:** Uses `current_setting('app.device_id', true)` but clients may not set this
-- **Impact:** Update/delete policies may not work as intended
+- **Status:** ACCEPTED (graceful degradation when not set)
+- **Mitigation:** Policies allow null device_id for legacy compatibility
 
 ---
 

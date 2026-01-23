@@ -21,12 +21,30 @@ CREATE TABLE IF NOT EXISTS trips (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Generate unique share codes for trips
+-- Generate unique share codes for trips (8-character alphanumeric)
 CREATE OR REPLACE FUNCTION generate_share_code()
 RETURNS TRIGGER AS $$
+DECLARE
+    new_code TEXT;
+    code_exists BOOLEAN;
 BEGIN
     IF NEW.share_code IS NULL THEN
-        NEW.share_code := UPPER(SUBSTRING(MD5(NEW.id::TEXT || NOW()::TEXT) FROM 1 FOR 6));
+        LOOP
+            -- Generate 8-character alphanumeric code using gen_random_bytes
+            new_code := UPPER(ENCODE(gen_random_bytes(6), 'base64'));
+            -- Remove non-alphanumeric characters and take first 8
+            new_code := SUBSTRING(REGEXP_REPLACE(new_code, '[^A-Z0-9]', '', 'g') FROM 1 FOR 8);
+
+            -- Fallback if not enough characters
+            IF LENGTH(new_code) < 8 THEN
+                new_code := UPPER(SUBSTRING(MD5(NEW.id::TEXT || NOW()::TEXT || random()::TEXT) FROM 1 FOR 8));
+            END IF;
+
+            -- Check for collision
+            SELECT EXISTS(SELECT 1 FROM trips WHERE share_code = new_code) INTO code_exists;
+            EXIT WHEN NOT code_exists;
+        END LOOP;
+        NEW.share_code := new_code;
     END IF;
     RETURN NEW;
 END;
@@ -81,6 +99,7 @@ CREATE TABLE IF NOT EXISTS team_members (
     sort_order INTEGER DEFAULT 0,
     is_captain BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(team_id, player_id)
 );
 
@@ -133,9 +152,9 @@ CREATE TABLE IF NOT EXISTS tee_sets (
     rating DECIMAL(4, 1) NOT NULL,
     slope INTEGER NOT NULL,
     par INTEGER NOT NULL,
-    hole_handicaps INTEGER[] NOT NULL,
-    hole_pars INTEGER[],
-    yardages INTEGER[],
+    hole_handicaps INTEGER[] NOT NULL CHECK (array_length(hole_handicaps, 1) = 18),
+    hole_pars INTEGER[] CHECK (hole_pars IS NULL OR array_length(hole_pars, 1) = 18),
+    yardages INTEGER[] CHECK (yardages IS NULL OR array_length(yardages, 1) = 18),
     total_yardage INTEGER,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -196,9 +215,9 @@ CREATE TABLE IF NOT EXISTS course_library_tee_sets (
     par INTEGER NOT NULL,
     total_yardage INTEGER,
     -- Per-hole data (arrays of 18 values)
-    hole_pars INTEGER[] NOT NULL,
-    hole_handicaps INTEGER[],
-    hole_yardages INTEGER[],
+    hole_pars INTEGER[] NOT NULL CHECK (array_length(hole_pars, 1) = 18),
+    hole_handicaps INTEGER[] CHECK (hole_handicaps IS NULL OR array_length(hole_handicaps, 1) = 18),
+    hole_yardages INTEGER[] CHECK (hole_yardages IS NULL OR array_length(hole_yardages, 1) = 18),
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -206,16 +225,21 @@ CREATE TABLE IF NOT EXISTS course_library_tee_sets (
 
 CREATE INDEX idx_course_library_tee_sets_course ON course_library_tee_sets(course_library_id);
 
--- Function to atomically increment course usage count
-CREATE OR REPLACE FUNCTION increment_course_usage(course_id UUID)
+-- Function to atomically increment course usage count (with validation)
+CREATE OR REPLACE FUNCTION increment_course_usage(p_course_id UUID)
 RETURNS VOID AS $$
 BEGIN
+    -- Validate that the course exists
+    IF NOT EXISTS (SELECT 1 FROM course_library WHERE id = p_course_id) THEN
+        RAISE EXCEPTION 'Course with ID % not found', p_course_id;
+    END IF;
+
     UPDATE course_library
     SET usage_count = usage_count + 1,
         last_used_at = NOW()
-    WHERE id = course_id;
+    WHERE id = p_course_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY INVOKER;
 
 -- Trigger to update course usage count
 CREATE OR REPLACE FUNCTION update_course_usage()
@@ -250,8 +274,8 @@ CREATE TABLE IF NOT EXISTS matches (
     status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'inProgress', 'completed', 'cancelled')),
     start_time TIMESTAMPTZ,
     current_hole INTEGER DEFAULT 1,
-    team_a_player_ids UUID[] NOT NULL,
-    team_b_player_ids UUID[] NOT NULL,
+    team_a_player_ids UUID[] NOT NULL CHECK (array_length(team_a_player_ids, 1) BETWEEN 1 AND 2),
+    team_b_player_ids UUID[] NOT NULL CHECK (array_length(team_b_player_ids, 1) BETWEEN 1 AND 2),
     team_a_handicap_allowance INTEGER DEFAULT 0,
     team_b_handicap_allowance INTEGER DEFAULT 0,
     result TEXT DEFAULT 'notFinished',
@@ -278,6 +302,7 @@ CREATE TABLE IF NOT EXISTS hole_results (
     scored_by UUID REFERENCES players(id),
     notes TEXT,
     timestamp TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(match_id, hole_number)
 );
 
@@ -295,7 +320,8 @@ CREATE TABLE IF NOT EXISTS photos (
     url TEXT NOT NULL,
     thumbnail_url TEXT,
     caption TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_photos_trip_id ON photos(trip_id);
@@ -311,7 +337,8 @@ CREATE TABLE IF NOT EXISTS comments (
     player_id UUID NOT NULL REFERENCES players(id),
     content TEXT NOT NULL,
     emoji TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_comments_trip_id ON comments(trip_id);
@@ -350,6 +377,7 @@ CREATE TABLE IF NOT EXISTS achievements (
     description TEXT NOT NULL,
     icon TEXT NOT NULL,
     earned_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(player_id, trip_id, achievement_type)
 );
 
@@ -368,7 +396,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
     summary TEXT NOT NULL,
     details JSONB,
     related_entity_id TEXT,
-    related_entity_type TEXT
+    related_entity_type TEXT,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_audit_log_trip_id ON audit_log(trip_id);
@@ -387,7 +416,8 @@ CREATE TABLE IF NOT EXISTS scoring_events (
     created_at TIMESTAMPTZ NOT NULL,
     synced_at TIMESTAMPTZ DEFAULT NOW(),
     device_id TEXT,
-    processed BOOLEAN DEFAULT FALSE
+    processed BOOLEAN DEFAULT FALSE,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_scoring_events_match_id ON scoring_events(match_id);
@@ -413,6 +443,64 @@ CREATE TRIGGER update_courses_updated_at BEFORE UPDATE ON courses FOR EACH ROW E
 CREATE TRIGGER update_tee_sets_updated_at BEFORE UPDATE ON tee_sets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_matches_updated_at BEFORE UPDATE ON matches FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_side_bets_updated_at BEFORE UPDATE ON side_bets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_team_members_updated_at BEFORE UPDATE ON team_members FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_hole_results_updated_at BEFORE UPDATE ON hole_results FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_photos_updated_at BEFORE UPDATE ON photos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_comments_updated_at BEFORE UPDATE ON comments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_achievements_updated_at BEFORE UPDATE ON achievements FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_audit_log_updated_at BEFORE UPDATE ON audit_log FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_scoring_events_updated_at BEFORE UPDATE ON scoring_events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_course_library_updated_at BEFORE UPDATE ON course_library FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_course_library_tee_sets_updated_at BEFORE UPDATE ON course_library_tee_sets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- DELETE AUDIT TRAIL
+-- ============================================
+-- Logs all DELETE operations for compliance and debugging
+CREATE TABLE IF NOT EXISTS delete_audit_log (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    table_name TEXT NOT NULL,
+    record_id UUID NOT NULL,
+    deleted_data JSONB NOT NULL,
+    deleted_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_by TEXT -- Device/user identifier
+);
+
+CREATE INDEX idx_delete_audit_log_table ON delete_audit_log(table_name);
+CREATE INDEX idx_delete_audit_log_deleted_at ON delete_audit_log(deleted_at DESC);
+
+-- Enable RLS on delete_audit_log
+ALTER TABLE delete_audit_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "delete_audit_log_select_all"
+    ON delete_audit_log FOR SELECT
+    USING (true);
+
+CREATE POLICY "delete_audit_log_insert_all"
+    ON delete_audit_log FOR INSERT
+    WITH CHECK (true);
+
+-- Generic function to log DELETE operations
+CREATE OR REPLACE FUNCTION log_delete_operation()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO delete_audit_log (table_name, record_id, deleted_data, deleted_by)
+    VALUES (
+        TG_TABLE_NAME,
+        OLD.id,
+        row_to_json(OLD)::jsonb,
+        current_setting('app.device_id', true)
+    );
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY INVOKER;
+
+-- DELETE audit triggers for critical tables
+CREATE TRIGGER audit_trips_delete BEFORE DELETE ON trips FOR EACH ROW EXECUTE FUNCTION log_delete_operation();
+CREATE TRIGGER audit_players_delete BEFORE DELETE ON players FOR EACH ROW EXECUTE FUNCTION log_delete_operation();
+CREATE TRIGGER audit_matches_delete BEFORE DELETE ON matches FOR EACH ROW EXECUTE FUNCTION log_delete_operation();
+CREATE TRIGGER audit_hole_results_delete BEFORE DELETE ON hole_results FOR EACH ROW EXECUTE FUNCTION log_delete_operation();
+CREATE TRIGGER audit_sessions_delete BEFORE DELETE ON sessions FOR EACH ROW EXECUTE FUNCTION log_delete_operation();
 
 -- ============================================
 -- REAL-TIME SUBSCRIPTIONS
@@ -638,3 +726,25 @@ SELECT
 FROM matches m
 JOIN sessions s ON m.session_id = s.id
 WHERE m.status = 'inProgress';
+
+-- ============================================
+-- COMPOSITE INDEXES (Performance)
+-- ============================================
+-- Optimize common query patterns
+
+-- Trip + status queries (common dashboard pattern)
+CREATE INDEX IF NOT EXISTS idx_sessions_trip_status ON sessions(trip_id, status);
+CREATE INDEX IF NOT EXISTS idx_matches_session_status ON matches(session_id, status);
+
+-- Player statistics queries
+CREATE INDEX IF NOT EXISTS idx_achievements_player_trip ON achievements(player_id, trip_id);
+
+-- Timeline queries
+CREATE INDEX IF NOT EXISTS idx_photos_trip_created ON photos(trip_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_comments_trip_created ON comments(trip_id, created_at DESC);
+
+-- Sync optimization
+CREATE INDEX IF NOT EXISTS idx_scoring_events_match_processed ON scoring_events(match_id, processed);
+
+-- Share code lookup (case-insensitive)
+CREATE INDEX IF NOT EXISTS idx_trips_share_code_lower ON trips(LOWER(share_code));
