@@ -70,21 +70,24 @@ let configuredCache: boolean | null = null;
 
 /**
  * Check if the Golf Course API is configured (via server-side API route)
+ * 
+ * Note: We always return true because we have a free OSM-based fallback
+ * that works even without the paid API key.
  */
 export async function checkGolfCourseAPIConfigured(): Promise<boolean> {
-    if (configuredCache !== null) {
-        return configuredCache;
+    // Always return true - we have a free fallback
+    // Still check the paid API to cache the result for optimization
+    if (configuredCache === null) {
+        try {
+            const response = await fetch('/api/golf-courses?action=check');
+            const data = await response.json();
+            configuredCache = data.configured === true;
+        } catch {
+            configuredCache = false;
+        }
     }
-
-    try {
-        const response = await fetch('/api/golf-courses?action=check');
-        const data = await response.json();
-        configuredCache = data.configured === true;
-        return configuredCache;
-    } catch {
-        configuredCache = false;
-        return false;
-    }
+    // Always return true since we have OSM fallback
+    return true;
 }
 
 /**
@@ -104,25 +107,79 @@ export function isGolfCourseAPIConfigured(): boolean {
 
 /**
  * Search for golf courses by name or location
+ * 
+ * Falls back to free OSM-based search if the paid API is not configured.
  */
 export async function searchCourses(query: string): Promise<GolfCourseAPICourse[]> {
     if (!query || query.trim().length < 2) {
         return [];
     }
 
-    const response = await fetch(`/api/golf-courses?action=search&q=${encodeURIComponent(query.trim())}`);
+    // First try the paid API if we believe it's configured
+    if (configuredCache !== false) {
+        const response = await fetch(`/api/golf-courses?action=search&q=${encodeURIComponent(query.trim())}`);
 
-    if (!response.ok) {
+        if (response.ok) {
+            const data = await response.json();
+            return data.courses || [];
+        }
+
         const error = await response.json();
         if (error.configured === false) {
             configuredCache = false;
-            throw new Error('Golf Course API not configured');
+            // Fall through to free search
+        } else {
+            throw new Error(error.error || 'Search failed');
         }
-        throw new Error(error.error || 'Search failed');
     }
 
-    const data = await response.json();
-    return data.courses || [];
+    // Fall back to free search API (OSM-based)
+    return searchCoursesFree(query);
+}
+
+/**
+ * Search for golf courses using free OSM-based API
+ * This is the fallback when the paid API is not configured.
+ */
+async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> {
+    try {
+        const response = await fetch(`/api/golf-courses/search?q=${encodeURIComponent(query.trim())}`);
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Search failed');
+        }
+
+        const data = await response.json();
+        
+        // Convert free API results to GolfCourseAPICourse format
+        return (data.results || []).map((result: {
+            id: string;
+            name: string;
+            city?: string;
+            state?: string;
+            country?: string;
+            latitude?: number;
+            longitude?: number;
+            source: string;
+        }) => ({
+            id: parseInt(result.id.replace(/\D/g, '')) || Math.random() * 1000000,
+            club_name: result.name,
+            course_name: result.name,
+            location: {
+                city: result.city,
+                state: result.state,
+                country: result.country,
+                latitude: result.latitude,
+                longitude: result.longitude,
+            },
+            // Free API doesn't provide tee data
+            tees: undefined,
+        }));
+    } catch (error) {
+        logger.error('Free course search failed:', error);
+        throw error;
+    }
 }
 
 /**

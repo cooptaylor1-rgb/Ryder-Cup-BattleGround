@@ -1,0 +1,54 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "Open Next.js Dev Tools" [ref=e8] [cursor=pointer]:
+    - img [ref=e9]
+  - alert [ref=e12]
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e16]:
+        - img [ref=e18]
+        - heading "Golf Buddies" [level=1] [ref=e30]
+        - paragraph [ref=e31]: Your ultimate trip companion
+      - main [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - button "Sign In" [ref=e36]:
+                - img [ref=e37]
+                - text: Sign In
+              - button "New Account" [ref=e40]:
+                - img [ref=e41]
+                - text: New Account
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e46]:
+                  - generic [ref=e47]: Email Address
+                  - generic [ref=e48]:
+                    - img [ref=e49]
+                    - textbox "Email Address" [ref=e52]:
+                      - /placeholder: you@example.com
+                - generic [ref=e53]:
+                  - generic [ref=e54]: 4-Digit PIN
+                  - generic [ref=e55]:
+                    - img [ref=e56]
+                    - textbox "4-Digit PIN" [ref=e59]:
+                      - /placeholder: ••••
+                    - button [ref=e60]:
+                      - img [ref=e61]
+                - button "Sign In" [disabled]:
+                  - generic:
+                    - generic:
+                      - text: Sign In
+                      - img
+              - generic [ref=e68]: New to Golf Buddies?
+              - button "Create Your Profile" [ref=e69]:
+                - img [ref=e70]
+                - text: Create Your Profile
+          - paragraph [ref=e73]:
+            - text: Your data stays on your device.
+            - text: No account required to browse trips.
+```

@@ -1,0 +1,467 @@
+{
+  "seed": "fuzz-1769131324729",
+  "timestamp": "2026-01-23T01:23:55.299Z",
+  "actionCount": 50,
+  "failedActions": 10,
+  "actions": [
+    {
+      "type": "click_button",
+      "timestamp": 1769131329613,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131330287,
+      "details": {
+        "inputIndex": 5,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769131330649,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131331905,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131332616,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131333316,
+      "details": {
+        "inputIndex": 4,
+        "value": "12345",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131333675,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131342002,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131342659,
+      "details": {
+        "inputIndex": 0,
+        "value": "test@example.com",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131342985,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131343654,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769131344318,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131344968,
+      "details": {
+        "inputIndex": 3,
+        "value": "Test",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769131345310,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769131346203,
+      "details": {
+        "direction": "up",
+        "amount": 182
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131346714,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131355031,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131355669,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131363989,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131372317,
+      "details": {
+        "inputIndex": 5,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131372644,
+      "details": {
+        "inputIndex": 2,
+        "value": "Pebble Beach",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131372975,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131373615,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131374254,
+      "details": {
+        "inputIndex": 5,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131374581,
+      "details": {
+        "inputIndex": 6,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131374909,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131375532,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131376166,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131384480,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769131385126,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131385542,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769131386175,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131387001,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131387638,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131395956,
+      "details": {
+        "inputIndex": 1,
+        "value": "!@#$%^&*()",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769131396277,
+      "details": {
+        "direction": "down",
+        "amount": 254
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131396798,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769131397454,
+      "details": {
+        "direction": "down",
+        "amount": 231
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769131397962,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769131398597,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769131399320,
+      "details": {
+        "direction": "up",
+        "amount": 58
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131399845,
+      "details": {
+        "inputIndex": 0,
+        "value": "John Smith",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131400171,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Sign In"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:visible').nth(3)\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" class=\"relative inline-flex items-center justify-center gap-2 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gold focus-visible:ring-offset-surface-base disabled:pointer-events-none disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 select-none h-14 px-6 text-lg rounded-xl min-w-[100px] bg-[#006747] text-white font-semibold hover:…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769131408485,
+      "details": {
+        "direction": "down",
+        "amount": 285
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131409013,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769131417330,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131417992,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769131426325,
+      "details": {
+        "linkIndex": 0,
+        "href": "#main-content"
+      },
+      "success": false,
+      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131434641,
+      "details": {
+        "inputIndex": 0,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769131434970,
+      "details": {
+        "inputIndex": 1,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    }
+  ]
+}
