@@ -16,9 +16,7 @@ import {
     Target,
     Trophy,
     Zap,
-    Sparkles,
     Info,
-    ChevronDown,
     ChevronUp,
     AlertCircle,
 } from 'lucide-react';

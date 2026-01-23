@@ -7,7 +7,7 @@
  * API: https://open-meteo.com/
  */
 
-import { fetchWithTimeout, fetchWithRetry, FetchError } from '../utils/fetchWithTimeout';
+import { fetchWithRetry } from '../utils/fetchWithTimeout';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Weather');
@@ -412,7 +412,7 @@ export function getDaylightHours(sunrise: Date, sunset: Date): number {
 // ============================================
 
 import type { SessionWeather, WeatherForecast, WeatherAlert } from '@/lib/types/captain';
-import type { RyderCupSession, UUID } from '@/lib/types/models';
+import type { RyderCupSession } from '@/lib/types/models';
 
 /**
  * Get weather forecast for a specific session
@@ -522,7 +522,7 @@ export async function getSessionWeather(
             recommendation,
             lastUpdated: new Date().toISOString(),
         };
-    } catch (error) {
+    } catch {
         // Return default/empty weather on error
         return {
             sessionId: session.id,

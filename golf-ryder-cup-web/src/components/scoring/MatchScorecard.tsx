@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, Eye, EyeOff, CircleDot } from 'lucide-react';
+import { ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import { GrossNetScoreDisplay, ScoreLegend } from './GrossNetScoreDisplay';
 import { allocateStrokes } from '@/lib/services/handicapCalculator';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
@@ -47,7 +47,7 @@ export interface MatchScorecardProps {
 }
 
 export function MatchScorecard({
-  matchId,
+  _matchId,
   teamAName,
   teamBName,
   teamAPlayers,
@@ -59,7 +59,7 @@ export function MatchScorecard({
   matchScore = 0,
   scoringMode = 'net',
   showNetScores = true,
-  compact = false,
+  _compact = false,
   className,
 }: MatchScorecardProps) {
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);

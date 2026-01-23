@@ -7,7 +7,7 @@
  * - Provides consistent formatting
  */
 
-type LogLevel = 'debug' | 'info' | 'log' | 'warn' | 'error';
+type _LogLevel = 'debug' | 'info' | 'log' | 'warn' | 'error';
 
 interface Logger {
     debug: (...args: unknown[]) => void;

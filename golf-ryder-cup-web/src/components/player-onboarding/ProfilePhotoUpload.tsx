@@ -11,11 +11,8 @@ import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
-    Upload,
     Image as ImageIcon,
-    User,
     Sparkles,
-    X,
     Check,
     Trash2,
     RotateCw,
@@ -35,8 +32,6 @@ interface ProfilePhotoUploadProps {
     userName?: string;
     className?: string;
 }
-
-type UploadSource = 'camera' | 'gallery' | null;
 
 // ============================================
 // AVATAR COLORS (for fallback)

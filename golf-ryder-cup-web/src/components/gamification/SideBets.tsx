@@ -13,7 +13,6 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import {
     DollarSign,
     Target,
@@ -21,8 +20,6 @@ import {
     Trophy,
     Plus,
     Trash2,
-    Check,
-    Edit2,
     ChevronDown,
     ChevronUp,
     Crown,
@@ -88,7 +85,7 @@ export function SideBets({
 
     // Calculate totals
     const totalPot = bets.reduce((sum, bet) => sum + (bet.amount || 0), 0);
-    const totalWon = bets
+    const _totalWon = bets
         .filter((bet) => bet.winnerPlayerId)
         .reduce((sum, bet) => sum + (bet.amount || 0), 0);
 
@@ -256,7 +253,7 @@ interface BetCategoryProps {
 }
 
 function BetCategory({
-    type,
+    type: _type,
     title,
     icon,
     bets,
@@ -411,7 +408,7 @@ interface AddBetFormProps {
     onCancel: () => void;
 }
 
-function AddBetForm({ tripId, matchId, players, onSubmit, onCancel }: AddBetFormProps) {
+function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: AddBetFormProps) {
     const [betType, setBetType] = useState<SideBetType>('closest_to_pin');
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');

@@ -197,7 +197,7 @@ function validateTeams(
 function validateSessions(
     sessions: RyderCupSession[],
     matches: Match[],
-    config: PreFlightChecklistConfig
+    _config: PreFlightChecklistConfig
 ): ValidationItem[] {
     const items: ValidationItem[] = [];
 

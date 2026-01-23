@@ -11,7 +11,7 @@ import { cn, formatPlayerName } from '@/lib/utils';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 import { HoleStrip } from './HoleIndicator';
-import { ChevronRight, Users } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 interface MatchCardProps {
     matchState: MatchState;
@@ -28,7 +28,7 @@ export function MatchCard({
     matchNumber,
     onClick,
 }: MatchCardProps) {
-    const { currentScore, holesPlayed, isClosedOut, isDormie, displayScore, status } = matchState;
+    const { currentScore, holesPlayed, isClosedOut: _isClosedOut, isDormie, displayScore, status } = matchState;
 
     const getStatusBadge = () => {
         if (status === 'completed') {

@@ -34,9 +34,6 @@ import {
   UserPlus,
   ClipboardList,
   Share2,
-  Lock,
-  Unlock,
-  BarChart3,
 } from 'lucide-react';
 
 // ============================================
@@ -445,7 +442,7 @@ interface AttentionCardProps {
   tripId: string;
 }
 
-function AttentionCard({ title, description, sessions, tripId }: AttentionCardProps) {
+function AttentionCard({ title, description, sessions, tripId: _tripId }: AttentionCardProps) {
   return (
     <div
       className="p-4 rounded-2xl"
@@ -616,7 +613,7 @@ interface SessionsOverviewProps {
   onCreateSession?: () => void;
 }
 
-function SessionsOverview({ sessions, tripId, onCreateSession }: SessionsOverviewProps) {
+function SessionsOverview({ sessions, tripId: _tripId, onCreateSession }: SessionsOverviewProps) {
   const statusConfig = {
     needs_lineup: { label: 'Needs Lineup', color: 'var(--warning)', icon: ClipboardList },
     lineup_set: { label: 'Ready', color: 'var(--success)', icon: CheckCircle2 },

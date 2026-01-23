@@ -69,7 +69,7 @@ test.describe('Chaos: Offline Scenarios', () => {
 
             // Should show offline indicator or queue message
             const offlineIndicator = page.locator('text=/offline|no connection|queued/i');
-            const hasIndicator = await offlineIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+            const _hasIndicator = await offlineIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
             // Go back online
             await context.setOffline(false);
@@ -104,7 +104,7 @@ test.describe('Chaos: Offline Scenarios', () => {
 
         // Check for queue indicator
         const queueIndicator = page.locator('text=/pending|queued|\\d+ change/i');
-        const hasQueue = await queueIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasQueue = await queueIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // Go back online
         await context.setOffline(false);
@@ -141,7 +141,7 @@ test.describe('Chaos: Offline Scenarios', () => {
         // Get initial state
         await page.goto('/standings');
         await waitForStableDOM(page);
-        const initialContent = await page.textContent('body');
+        const _initialContent = await page.textContent('body');
 
         // Go offline and reload
         await context.setOffline(true);
@@ -211,7 +211,7 @@ test.describe('Chaos: Latency Injection', () => {
 
         // Should show loading state
         const loadingIndicator = page.locator('text=/loading|fetching/i, [role="progressbar"], .loading');
-        const showsLoading = await loadingIndicator.isVisible({ timeout: 2000 }).catch(() => false);
+        const _showsLoading = await loadingIndicator.isVisible({ timeout: 2000 }).catch(() => false);
 
         // Wait for load to complete
         await waitForStableDOM(page);
@@ -258,12 +258,12 @@ test.describe('Chaos: Transient Errors', () => {
     });
 
     test('should handle 500 errors gracefully @chaos', async ({ page }) => {
-        let errorCount = 0;
+        let _errorCount = 0;
 
         // Intercept API calls with occasional 500
         await page.route('**/api/**', async (route) => {
             if (Math.random() < CHAOS_CONFIG.errorRate) {
-                errorCount++;
+                _errorCount++;
                 await route.fulfill({
                     status: 500,
                     contentType: 'application/json',
@@ -283,7 +283,7 @@ test.describe('Chaos: Transient Errors', () => {
 
         // Should not show raw error to user
         const rawError = page.locator('text=/500|Internal Server Error/');
-        const hasRawError = await rawError.isVisible({ timeout: 1000 }).catch(() => false);
+        const _hasRawError = await rawError.isVisible({ timeout: 1000 }).catch(() => false);
 
         // Raw technical errors should be hidden from users
         // (actual error display depends on app error handling)
@@ -448,7 +448,7 @@ test.describe('Chaos: Recovery Scenarios', () => {
 
         // Check for pending indicator
         const pendingIndicator = page.locator('text=/pending|offline|queued/i');
-        const hasPending = await pendingIndicator.isVisible({ timeout: 2000 }).catch(() => false);
+        const _hasPending = await pendingIndicator.isVisible({ timeout: 2000 }).catch(() => false);
 
         // Go online
         await context.setOffline(false);

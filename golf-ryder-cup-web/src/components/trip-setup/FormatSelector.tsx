@@ -56,7 +56,6 @@ import {
     FORMAT_CONFIGS,
     getAllCategoriesWithFormats,
     getPopularFormats,
-    getFormatsByTag,
 } from '@/lib/types/matchFormats';
 
 // Icon mapping for formats
@@ -80,7 +79,7 @@ interface FormatSelectorProps {
 export function FormatSelector({
     value,
     onChange,
-    playerCount,
+    playerCount: _playerCount,
     showPopular = true,
     showSearch = true,
     showFilters = true,

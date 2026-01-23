@@ -12,12 +12,6 @@
  */
 
 import type {
-    Trip,
-    Team,
-    TeamMember,
-    Player,
-    RyderCupSession,
-    Match,
     HoleResult,
     SessionType,
 } from '../types/models';
@@ -26,7 +20,6 @@ import type {
     PlayerLeaderboard,
     MagicNumber,
     FairnessScore,
-    MatchState,
 } from '../types/computed';
 import { FORMAT_CONFIGS, type MatchFormat } from '../types/matchFormats';
 import { db } from '../db';
@@ -264,9 +257,17 @@ export async function calculatePlayerRecord(
             if (matchState.currentScore === 0) {
                 halves++;
             } else if (matchState.currentScore > 0) {
-                playerOnTeamA ? wins++ : losses++;
+                if (playerOnTeamA) {
+                    wins++;
+                } else {
+                    losses++;
+                }
             } else {
-                playerOnTeamA ? losses++ : wins++;
+                if (playerOnTeamA) {
+                    losses++;
+                } else {
+                    wins++;
+                }
             }
         }
     }

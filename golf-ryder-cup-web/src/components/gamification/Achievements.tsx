@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { format } from 'date-fns';
 import {
@@ -22,7 +22,6 @@ import {
     Heart,
     Mountain,
     Lock,
-    ChevronRight,
 } from 'lucide-react';
 import type { Player } from '@/lib/types/models';
 

@@ -20,14 +20,12 @@ import {
     Phone,
     MessageSquare,
     Search,
-    AlertTriangle,
     MapPin,
-    Users,
     Clock,
     Star,
     ChevronDown,
-    Heart,
     Shield,
+    AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

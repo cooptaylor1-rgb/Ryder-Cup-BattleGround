@@ -13,15 +13,11 @@
 
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import {
     Trophy,
-    Camera,
     Star,
-    Award,
-    Users,
-    Flag,
     TrendingUp,
     TrendingDown,
     Flame,
@@ -32,14 +28,11 @@ import {
     Download,
     ChevronLeft,
     ChevronRight,
-    Play,
-    Pause,
     Medal,
     Crown,
-    Heart,
     Zap,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+// cn import removed - unused
 import { useHaptic } from '@/lib/hooks';
 
 // ============================================

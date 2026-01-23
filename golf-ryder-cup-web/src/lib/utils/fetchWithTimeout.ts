@@ -93,8 +93,8 @@ export async function fetchWithTimeout(
 ): Promise<Response> {
     const {
         timeout = 10000,
-        retries = 0,
-        retryDelay = 1000,
+        _retries = 0,
+        _retryDelay = 1000,
         circuitKey,
         ...fetchOptions
     } = options;

@@ -16,7 +16,6 @@ import {
     HelpCircle,
     Sun,
     Sunset,
-    ChevronLeft,
     ChevronRight,
     AlertCircle,
 } from 'lucide-react';
@@ -74,7 +73,7 @@ const formatDayOfMonth = (date: Date): number => {
     return date.getDate();
 };
 
-const formatMonthYear = (date: Date): string => {
+const _formatMonthYear = (date: Date): string => {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 };
 
@@ -115,7 +114,7 @@ export function AvailabilityCalendar({
         };
     };
 
-    const toggleStatus = (sessionId: string) => {
+    const _toggleStatus = (sessionId: string) => {
         const current = getAvailability(sessionId);
         const statusOrder: AvailabilityStatus['status'][] = ['available', 'unavailable', 'maybe'];
         const currentIndex = statusOrder.indexOf(current.status);

@@ -22,9 +22,7 @@ import {
     CheckCircle2,
     Trophy,
     Clock,
-    MoreVertical,
     ChevronDown,
-    ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlayerCard, EmptyPlayerSlot, type PlayerCardData } from './PlayerCard';
@@ -293,7 +291,7 @@ export function MatchSlot({
     isLocked = false,
     onToggleExpand,
     onRemovePlayer,
-    onSetTeeTime,
+    _onSetTeeTime,
     className,
 }: MatchSlotProps) {
     const teamAHandicap = useMemo(

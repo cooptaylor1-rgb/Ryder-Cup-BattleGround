@@ -20,14 +20,11 @@ import type { GolfCourseAPICourse, GolfCourseAPITee } from '@/lib/services/golfC
 import { formatCourseLocation, getAllTees } from '@/lib/services/golfCourseAPIService';
 import {
     MapPin,
-    Flag,
-    Ruler,
     Target,
     ChevronDown,
     ChevronUp,
     ExternalLink,
     Navigation,
-    Star,
     Info,
 } from 'lucide-react';
 

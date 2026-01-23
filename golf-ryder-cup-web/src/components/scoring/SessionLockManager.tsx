@@ -46,7 +46,7 @@ export function SessionLockManager({
             });
             onLockChange?.(true);
             setShowLockModal(false);
-        } catch (err) {
+        } catch {
             setError('Failed to lock session. Please try again.');
         } finally {
             setIsProcessing(false);
@@ -70,7 +70,7 @@ export function SessionLockManager({
             onLockChange?.(false);
             setShowUnlockModal(false);
             setPinInput('');
-        } catch (err) {
+        } catch {
             setError('Failed to unlock session. Please try again.');
         } finally {
             setIsProcessing(false);

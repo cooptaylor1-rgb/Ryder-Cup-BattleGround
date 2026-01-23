@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   generatePairingSuggestions,
   extractPairingHistory,
   analyzeSessionPairings,
-  type PairingHistoryEntry,
   type PairingSuggestion,
 } from '@/lib/services/smartPairingService';
 import { Player, Team, RyderCupSession, Match } from '@/lib/types';

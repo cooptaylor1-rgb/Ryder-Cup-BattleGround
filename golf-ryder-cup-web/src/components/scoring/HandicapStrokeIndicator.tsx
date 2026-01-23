@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { Circle, CircleDot, Info } from 'lucide-react';
+import { CircleDot, Info } from 'lucide-react';
 import { allocateStrokes, isOneBallFormat } from '@/lib/services/handicapCalculator';
 
 /**

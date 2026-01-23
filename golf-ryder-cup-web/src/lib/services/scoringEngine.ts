@@ -17,7 +17,6 @@ import type {
     HoleWinner,
     MatchStatus,
     MatchResultType,
-    TeamMember,
     HoleResultEdit,
 } from '../types/models';
 import { ScoringEventType, type ScoringEvent, type HoleScoredPayload, type HoleEditedPayload, type HoleUndonePayload } from '../types/events';
@@ -605,7 +604,7 @@ export async function finalizeMatch(matchId: string): Promise<void> {
     const matchState = calculateMatchState(match, holeResults);
 
     if (matchState.isClosedOut || matchState.holesRemaining === 0) {
-        const points = calculateMatchPoints(matchState);
+        const _points = calculateMatchPoints(matchState);
         const resultType = calculateMatchResult(matchState);
 
         await db.matches.update(matchId, {

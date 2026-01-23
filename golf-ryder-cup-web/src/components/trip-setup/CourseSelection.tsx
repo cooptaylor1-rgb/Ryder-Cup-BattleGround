@@ -6,8 +6,6 @@ import {
     Search,
     MapPin,
     Star,
-    Phone,
-    Globe,
     ChevronDown,
     ChevronUp,
     Loader2,
@@ -15,7 +13,6 @@ import {
     Plus,
     Check,
     Mountain,
-    Wind,
     Compass,
     TreePine,
 } from 'lucide-react';
@@ -24,7 +21,6 @@ import { createLogger } from '@/lib/utils/logger';
 import {
     searchCourses as searchCoursesAPI,
     checkGolfCourseAPIConfigured,
-    formatCourseLocation,
     type GolfCourseAPICourse,
 } from '@/lib/services/golfCourseAPIService';
 
@@ -124,7 +120,7 @@ export function CourseSelection({
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<CourseInfo[]>([]);
     const [showSearch, setShowSearch] = useState(false);
-    const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+    const [_expandedCourse, _setExpandedCourse] = useState<string | null>(null);
     const [isApiConfigured, setIsApiConfigured] = useState<boolean | null>(null);
 
     // Check if API is configured on mount

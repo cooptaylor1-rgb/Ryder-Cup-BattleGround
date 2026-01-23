@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
@@ -8,10 +8,6 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  DollarSign,
   AlertCircle,
 } from 'lucide-react';
 
@@ -73,7 +69,7 @@ export function PressTracker({
 
   // Calculate active presses
   const activePresses = presses.filter(p => p.status === 'active');
-  const closedPresses = presses.filter(p => p.status === 'closed');
+  const _closedPresses = presses.filter(p => p.status === 'closed');
 
   // Calculate total exposure
   const totalPresses = presses.length;
@@ -87,8 +83,8 @@ export function PressTracker({
     return { total: teamPresses.length, winning: winning.length, losing: losing.length };
   };
 
-  const teamAPressStatus = getTeamPressStatus('teamA');
-  const teamBPressStatus = getTeamPressStatus('teamB');
+  const _teamAPressStatus = getTeamPressStatus('teamA');
+  const _teamBPressStatus = getTeamPressStatus('teamB');
 
   if (betAmount === 0 && presses.length === 0) {
     return null; // Don't show if no bets configured
@@ -260,7 +256,7 @@ function PressCard({
   pressNumber,
   teamAName,
   teamBName,
-  betAmount,
+  _betAmount,
   currentHole,
 }: PressCardProps) {
   const isTeamALeading = press.score > 0;

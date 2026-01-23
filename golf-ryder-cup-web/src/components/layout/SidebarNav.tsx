@@ -15,12 +15,9 @@ import {
     Target,
     Users,
     Trophy,
-    MoreHorizontal,
     Shield,
     Settings,
     Home,
-    Calendar,
-    BarChart3,
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';

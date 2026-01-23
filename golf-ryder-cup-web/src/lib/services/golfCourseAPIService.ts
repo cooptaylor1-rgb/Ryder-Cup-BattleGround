@@ -228,7 +228,7 @@ export async function searchCoursesByLocation(
  */
 export function convertAPITeeToTeeSet(
     apiTee: GolfCourseAPITee,
-    courseId: string
+    _courseId: string
 ): {
     name: string;
     color: string;

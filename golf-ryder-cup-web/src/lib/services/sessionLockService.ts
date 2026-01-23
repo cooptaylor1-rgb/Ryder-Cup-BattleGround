@@ -19,7 +19,6 @@ import type {
     RyderCupSession,
     Match,
     UUID,
-    ISODateString,
 } from '@/lib/types/models';
 
 // ============================================
@@ -105,8 +104,8 @@ export function isEditAllowed(
  */
 export function requestUnlock(
     lock: SessionLock,
-    requestedBy: UUID,
-    reason: string
+    _requestedBy: UUID,
+    _reason: string
 ): { requiresConfirmation: boolean; warning?: string } {
     if (!lock.isLocked) {
         return { requiresConfirmation: false };

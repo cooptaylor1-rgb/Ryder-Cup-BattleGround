@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Target,
     Mic,
@@ -26,8 +26,6 @@ import {
     X,
     Trophy,
     Minus,
-    Volume2,
-    VolumeX,
 } from 'lucide-react';
 import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -51,12 +49,12 @@ export function QuickScoreFABv2({
     const router = useRouter();
     const haptic = useHaptic();
     const { currentTrip } = useTripStore();
-    const { scoreHole, selectMatch, activeMatch, currentHole } = useScoringStore();
-    const { scoringPreferences } = useUIStore();
+    const { scoreHole, selectMatch, activeMatch, currentHole: _currentHole } = useScoringStore();
+    const { scoringPreferences: _scoringPreferences } = useUIStore();
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isVoiceMode, setIsVoiceMode] = useState(false);
-    const [isListening, setIsListening] = useState(false);
+    const [isListening, _setIsListening] = useState(false);
     const [activeMatchData, setActiveMatchData] = useState<{
         match: Match;
         displayScore: string;

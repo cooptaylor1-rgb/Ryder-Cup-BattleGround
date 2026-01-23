@@ -9,7 +9,7 @@
 
 import { useRef, useState } from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
-import { Download, Share2, Copy, Check, Trophy, Flag } from 'lucide-react';
+import { Download, Share2, Check, Trophy } from 'lucide-react';
 import type { Player } from '@/lib/types/models';
 
 // ============================================
@@ -108,8 +108,8 @@ export function MatchResultCard({
                     winnerTeam === 'usa'
                         ? 'from-[#1E3A5F] to-[#0D1F35]'
                         : winnerTeam === 'europe'
-                        ? 'from-[#722F37] to-[#3D181C]'
-                        : 'from-[#C4A747] to-[#8B7432]'
+                            ? 'from-[#722F37] to-[#3D181C]'
+                            : 'from-[#C4A747] to-[#8B7432]'
                 )}
             >
                 {/* Background pattern */}

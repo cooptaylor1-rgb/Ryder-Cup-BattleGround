@@ -14,18 +14,14 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Heart,
     MessageCircle,
     Share2,
     Flag,
     Trophy,
-    MapPin,
-    MoreHorizontal,
     Clock,
-    Users,
     ChevronRight,
     Bookmark,
     BookmarkCheck,
@@ -204,8 +200,8 @@ export function MomentCard({
     moment,
     teamAColor = '#0047AB',
     teamBColor = '#8B0000',
-    teamAName = 'USA',
-    teamBName = 'Europe',
+    _teamAName = 'USA',
+    _teamBName = 'Europe',
     onReact,
     onComment,
     onShare,

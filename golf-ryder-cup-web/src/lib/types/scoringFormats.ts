@@ -8,7 +8,7 @@
  * - Scramble (team best ball)
  */
 
-import type { UUID, ISODateString } from './models';
+import type { UUID } from './models';
 
 // ============================================
 // SCORING MODE

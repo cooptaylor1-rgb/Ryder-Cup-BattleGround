@@ -7,10 +7,10 @@
 
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { isSupabaseConfigured, getSupabase, insertRecord } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
-import { Camera, X, Upload, Image, Loader2, MapPin, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, X, Image as ImageIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
 
 const logger = createLogger('PhotoGallery');
@@ -240,7 +240,7 @@ export function PhotoGallery({
                 </div>
             ) : (
                 <div className="text-center py-12 bg-surface-50 dark:bg-surface-800/50 rounded-xl">
-                    <Image className="w-12 h-12 mx-auto mb-3 text-surface-400" />
+                    <ImageIcon className="w-12 h-12 mx-auto mb-3 text-surface-400" />
                     <p className="text-surface-500">No photos yet</p>
                     {canUpload && (
                         <p className="text-sm text-surface-400 mt-1">

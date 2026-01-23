@@ -19,7 +19,7 @@ import {
   Camera,
   Send,
   Smile,
-  Image,
+  Image as ImageIcon,
   Flame,
   CalendarDays,
 } from 'lucide-react';
@@ -163,7 +163,7 @@ export default function SocialPage() {
       <div className="container-editorial" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <TabButton active label="All" icon={<MessageCircle size={16} />} />
-          <TabButton label="Photos" icon={<Image size={16} />} href="/social/photos" />
+          <TabButton label="Photos" icon={<ImageIcon size={16} />} href="/social/photos" />
           <TabButton label="Highlights" icon={<Flame size={16} />} />
         </div>
       </div>

@@ -13,18 +13,14 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
     Clock,
-    Trophy,
     AlertTriangle,
     CheckCircle2,
-    ChevronRight,
-    Eye,
     Edit3,
-    Flag,
     Users,
     Zap,
     TrendingUp,
@@ -34,7 +30,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
-import type { MatchState } from '@/lib/types/computed';
 
 // ============================================
 // TYPES

@@ -331,7 +331,7 @@ export function useLiveMatchScores(tripId: string, matchId: string) {
 export function useMatchCompletions(tripId: string) {
     const [completedMatches, setCompletedMatches] = useState<MatchCompletePayload[]>([]);
 
-    const { updates } = useLiveUpdates({
+    const { updates: _updates } = useLiveUpdates({
         tripId,
         onUpdate: (update) => {
             if (update.type === 'match_complete') {

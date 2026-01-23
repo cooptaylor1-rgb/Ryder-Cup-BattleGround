@@ -10,7 +10,6 @@
 import type {
     TripArchive,
     PlayerCareerStats,
-    RivalryRecord,
     TripAward,
     PlayerStatistics,
 } from '@/lib/types/captain';
@@ -20,7 +19,6 @@ import type {
     Player,
     Match,
     HoleResult,
-    RyderCupSession,
     UUID,
 } from '@/lib/types/models';
 
@@ -70,7 +68,7 @@ export function createTripArchive(
 
     // Find MVP
     const mvpAward = awards.find(a => a.type === 'mvp');
-    const mvpPlayer = mvpAward ? players.find(p => p.id === mvpAward.playerId) : null;
+    const _mvpPlayer = mvpAward ? players.find(p => p.id === mvpAward.playerId) : null;
 
     // Generate highlights
     const highlights = generateHighlights(

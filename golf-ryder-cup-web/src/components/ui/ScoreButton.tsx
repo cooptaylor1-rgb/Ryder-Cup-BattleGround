@@ -34,7 +34,11 @@ export function ScoreButton({
 
     const handleClick = () => {
         if (disabled) return;
-        isSelected ? haptic.tap() : haptic.press();
+        if (isSelected) {
+            haptic.tap();
+        } else {
+            haptic.press();
+        }
         onClick();
     };
 

@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUIStore } from '@/lib/stores';
 import { getWeather, type GolfWeather } from '@/lib/services/weatherService';
-import { sendNotification, requestNotificationPermission } from './liveScoreNotifications';
+import { sendNotification } from './liveScoreNotifications';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('WeatherAlerts');
@@ -322,7 +322,7 @@ export function WeatherAlertFloating({
     latitude: number;
     longitude: number;
 }) {
-    const { alerts, dismissAlert, hasDangerousAlerts } = useWeatherAlerts({
+    const { alerts, dismissAlert, hasDangerousAlerts: _hasDangerousAlerts } = useWeatherAlerts({
         latitude,
         longitude,
     });

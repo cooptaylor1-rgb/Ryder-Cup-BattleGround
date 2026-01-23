@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { CircleDot, Circle, Minus, TrendingDown, TrendingUp } from 'lucide-react';
-import type { HoleScoreData, ScoringMode } from '@/lib/types/scoringFormats';
+import { CircleDot, Minus } from 'lucide-react';
+import type { ScoringMode } from '@/lib/types/scoringFormats';
 import { getScoreClass } from '@/lib/types/scoringFormats';
 
 /**

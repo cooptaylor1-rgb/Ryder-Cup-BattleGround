@@ -53,7 +53,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess }: JoinTripModalProps
             } else {
                 setError(result.errors[0] || 'Failed to join trip. Please check the code and try again.');
             }
-        } catch (err) {
+        } catch {
             setError('Failed to join trip. Please check your connection and try again.');
         } finally {
             setIsJoining(false);

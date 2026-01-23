@@ -24,13 +24,11 @@ import {
     Target,
     Trophy,
     ArrowRight,
-    X,
     Clock,
     MapPin,
     Ruler,
     Crown,
     Flame,
-    Bell,
     BellOff,
     Check,
 } from 'lucide-react';

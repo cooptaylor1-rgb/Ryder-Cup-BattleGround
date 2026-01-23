@@ -8,7 +8,7 @@
  * cross-browser compatibility, and reliable page state verification.
  */
 
-import { Page, BrowserContext, expect, Locator } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 // ============================================================================
 // CONFIGURATION

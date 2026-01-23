@@ -76,7 +76,7 @@ export function getPickOrderForRound(
 export function initializeDraftState(
     config: DraftConfig,
     availablePlayers: Player[],
-    teamIds: { teamA: UUID; teamB: UUID }
+    _teamIds: { teamA: UUID; teamB: UUID }
 ): DraftState {
     return {
         config,

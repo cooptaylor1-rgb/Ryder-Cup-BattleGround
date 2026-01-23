@@ -18,8 +18,6 @@ import type {
     Match,
     HoleResult,
     Player,
-    MatchStatus,
-    UUID,
 } from '@/lib/types/models';
 
 /**

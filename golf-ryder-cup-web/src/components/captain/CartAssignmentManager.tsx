@@ -18,8 +18,6 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Car,
-    Users,
-    Shuffle,
     Printer,
     Check,
     X,
@@ -132,7 +130,7 @@ function CartCard({
                 <div className="flex items-center gap-2">
                     {cart.players.length > 0 && (
                         <div className="flex -space-x-2">
-                            {cart.players.slice(0, 2).map((player, idx) => (
+                            {cart.players.slice(0, 2).map((player, _idx) => (
                                 <div
                                     key={player.id}
                                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2"

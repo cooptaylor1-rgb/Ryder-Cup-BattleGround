@@ -13,22 +13,19 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Copy,
     Calendar,
     Clock,
-    Users,
     ArrowRight,
     RefreshCw,
     CheckCircle2,
-    AlertTriangle,
     ChevronRight,
     Shuffle,
     UserMinus,
     UserPlus,
-    Edit3,
     X,
     Zap,
 } from 'lucide-react';
@@ -93,7 +90,7 @@ interface SessionClonerProps {
 // HELPER FUNCTIONS
 // ============================================
 
-function getPlayersPerTeam(type: SessionTemplate['type']): number {
+function _getPlayersPerTeam(type: SessionTemplate['type']): number {
     switch (type) {
         case 'foursomes': return 2;
         case 'fourball': return 2;
@@ -405,7 +402,7 @@ export function SessionCloner({
     const [newName, setNewName] = useState(`${sourceSession.name} (Copy)`);
     const [newDate, setNewDate] = useState(getDefaultNewDate());
     const [newStartTime, setNewStartTime] = useState(sourceSession.startTime || '08:00');
-    const [shufflePairings, setShufflePairings] = useState(false);
+    const [shufflePairings, _setShufflePairings] = useState(false);
     const [swapTeams, setSwapTeams] = useState(false);
     const [excludedPlayerIds, setExcludedPlayerIds] = useState<Set<string>>(new Set());
     const [replacements, setReplacements] = useState<Record<string, string>>({});

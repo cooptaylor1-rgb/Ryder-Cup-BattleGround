@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell,
@@ -22,18 +22,11 @@ import {
     Info,
     CheckCircle2,
     X,
-    ChevronRight,
-    Clock,
     User,
-    Users,
-    MessageSquare,
     Flag,
     Edit3,
     Eye,
     RefreshCw,
-    MapPin,
-    Phone,
-    Ban,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';

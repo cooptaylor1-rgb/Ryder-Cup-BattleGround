@@ -89,6 +89,7 @@ let exportConfig: NextConfig = process.env.NEXT_PUBLIC_SENTRY_DSN
 // Add bundle analyzer if ANALYZE env is set
 if (process.env.ANALYZE === 'true') {
   // Dynamic import for optional dependency
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

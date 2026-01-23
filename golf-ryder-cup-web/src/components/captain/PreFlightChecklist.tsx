@@ -97,7 +97,7 @@ export function PreFlightChecklist({
     });
   };
 
-  const getStatusIcon = (status: 'pass' | 'warning' | 'fail') => {
+  const _getStatusIcon = (status: 'pass' | 'warning' | 'fail') => {
     switch (status) {
       case 'pass':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -108,7 +108,7 @@ export function PreFlightChecklist({
     }
   };
 
-  const getStatusColor = (status: 'pass' | 'warning' | 'fail') => {
+  const _getStatusColor = (status: 'pass' | 'warning' | 'fail') => {
     switch (status) {
       case 'pass':
         return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800';
@@ -138,7 +138,7 @@ export function PreFlightChecklist({
 
   const summary = getPreFlightSummary(result);
   const allItems = [...result.errors, ...result.warnings, ...result.info];
-  const categories = [...new Set(allItems.map(item => item.category))];
+  const _categories = [...new Set(allItems.map(item => item.category))];
 
   return (
     <div className="space-y-4">

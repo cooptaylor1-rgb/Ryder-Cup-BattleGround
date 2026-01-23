@@ -5,13 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Calculator,
     Percent,
-    Info,
     ChevronDown,
     Check,
     Lightbulb,
-    Scale,
     TrendingDown,
-    TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

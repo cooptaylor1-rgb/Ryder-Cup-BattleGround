@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   createDraftConfig,
   initializeDraftState,
@@ -15,17 +15,14 @@ import { useTripStore } from '@/lib/stores/tripStore';
 import { Player, Team } from '@/lib/types';
 import {
   Trophy,
-  Users,
   Shuffle,
   Scale,
   Play,
   Pause,
   RotateCcw,
-  Clock,
   Gavel,
-  DollarSign,
   User,
-  Check,
+  Users,
 } from 'lucide-react';
 
 interface DraftBoardProps {
@@ -102,7 +99,7 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
   const handlePick = (playerId: string, teamId?: string) => {
     if (!draftState || !config) return;
 
-    const pickTeam = teamId || config.draftOrder[draftState.currentPick % config.draftOrder.length];
+    const _pickTeam = teamId || config.draftOrder[draftState.currentPick % config.draftOrder.length];
     const auctionPrice = mode === 'auction' ? currentBid : undefined;
 
     const { newState } = makeDraftPick(draftState, playerId, auctionPrice);

@@ -90,7 +90,7 @@ export function allocateStrokes(
     }
 
     // Validate that hole handicaps are valid numbers (1-18)
-    const invalidHoles = holeHandicaps.filter((h, i) => !Number.isFinite(h) || h < 1 || h > 18);
+    const invalidHoles = holeHandicaps.filter((h, _i) => !Number.isFinite(h) || h < 1 || h > 18);
     if (invalidHoles.length > 0) {
         logger.warn(`Invalid hole handicap values detected: ${JSON.stringify(invalidHoles)}. ` +
             'Some strokes may be incorrectly allocated.');
@@ -202,7 +202,7 @@ export function calculateNetTotal(
 /**
  * Stableford point values relative to par.
  */
-const STABLEFORD_POINTS: Record<number, number> = {
+const _STABLEFORD_POINTS: Record<number, number> = {
     '-3': 5, // Albatross (double eagle)
     '-2': 4, // Eagle
     '-1': 3, // Birdie

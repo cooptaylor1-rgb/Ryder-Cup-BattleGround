@@ -18,21 +18,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { captainLogger } from '@/lib/utils/logger';
 import {
     X,
-    Edit3,
     AlertTriangle,
-    CheckCircle2,
-    Clock,
     ChevronDown,
     ChevronUp,
     ChevronRight,
     History,
-    User,
     ArrowRight,
     Shield,
-    FileText,
     Save,
     Undo2,
-    Info,
     Trophy,
     RefreshCw,
 } from 'lucide-react';
@@ -417,7 +411,7 @@ function ImpactPreview({
     teamAColor,
     teamBColor,
     teamAName,
-    teamBName,
+    _teamBName,
 }: ImpactPreviewProps) {
     const hasImpact = originalMatchScore !== newMatchScore;
 

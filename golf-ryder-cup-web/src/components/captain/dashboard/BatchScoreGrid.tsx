@@ -25,19 +25,14 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Grid3X3,
-    Save,
     RefreshCw,
     CheckCircle2,
     AlertTriangle,
     ChevronLeft,
     ChevronRight,
     Keyboard,
-    Eye,
-    EyeOff,
-    Undo2,
     RotateCcw,
     Upload,
-    X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';

@@ -15,7 +15,7 @@ import type {
     BulkImportResult,
     GHINLookupResult,
 } from '@/lib/types/captain';
-import type { Player, UUID } from '@/lib/types/models';
+import type { Player } from '@/lib/types/models';
 
 // Re-export types for convenience
 export type {

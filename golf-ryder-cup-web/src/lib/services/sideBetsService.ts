@@ -121,7 +121,7 @@ export function calculateSkins(
     game: SideGame,
     holeResults: HoleResult[],
     match: Match,
-    players: Player[]
+    _players: Player[]
 ): SideGameEntry[] {
     const entries: SideGameEntry[] = [];
     const config = getSkinsConfig(game);

@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     CheckCircle2,
@@ -25,12 +25,8 @@ import {
     AlertTriangle,
     Phone,
     MessageSquare,
-    MapPin,
-    Navigation,
-    Users,
     RefreshCw,
     Search,
-    Filter,
     ChevronDown,
     X,
     UserCheck,
@@ -149,7 +145,7 @@ export function AttendanceCheckIn({
 }: AttendanceCheckInProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<AttendanceStatus | 'all'>('all');
-    const [sortBy, setSortBy] = useState<'name' | 'team' | 'teeTime' | 'status'>('status');
+    const [sortBy, _setSortBy] = useState<'name' | 'team' | 'teeTime' | 'status'>('status');
     const [selectedPlayer, setSelectedPlayer] = useState<AttendeePlayer | null>(null);
     const [showETAModal, setShowETAModal] = useState(false);
 

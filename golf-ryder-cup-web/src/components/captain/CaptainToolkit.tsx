@@ -160,7 +160,7 @@ export function CaptainToolkit({
     const sessionMatches = matches.filter(m => m.sessionId === currentSession?.id);
     // Find a course from the matches if available
     const firstMatchWithCourse = sessionMatches.find(m => m.courseId);
-    const currentCourse = firstMatchWithCourse
+    const _currentCourse = firstMatchWithCourse
       ? courses.find(c => c.id === firstMatchWithCourse.courseId)
       : courses[0];
 

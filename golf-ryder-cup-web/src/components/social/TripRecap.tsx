@@ -20,8 +20,6 @@ import {
     Star,
     Camera,
     Share2,
-    Download,
-    ChevronRight,
     Award,
     Flame,
     Target,
@@ -97,7 +95,7 @@ export function TripRecap({
 
             const teamAWon = state.currentScore > 0;
             const teamBWon = state.currentScore < 0;
-            const halved = state.currentScore === 0;
+            const _halved = state.currentScore === 0;
 
             // Team A players
             match.teamAPlayerIds.forEach((playerId) => {
@@ -170,8 +168,8 @@ export function TripRecap({
                     winner === 'usa'
                         ? 'from-[#1E3A5F] to-[#0D1F35]'
                         : winner === 'europe'
-                        ? 'from-[#722F37] to-[#3D181C]'
-                        : 'from-[#006747] to-[#004D35]'
+                            ? 'from-[#722F37] to-[#3D181C]'
+                            : 'from-[#006747] to-[#004D35]'
                 )}
             >
                 {/* Trophy icon */}
@@ -383,8 +381,8 @@ export function TripRecap({
                                                 <div className={cn(
                                                     'font-bold',
                                                     state.currentScore > 0 ? 'text-team-usa' :
-                                                    state.currentScore < 0 ? 'text-team-europe' :
-                                                    'text-surface-500'
+                                                        state.currentScore < 0 ? 'text-team-europe' :
+                                                            'text-surface-500'
                                                 )}>
                                                     {state.displayScore}
                                                 </div>

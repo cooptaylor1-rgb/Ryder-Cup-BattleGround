@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSessionWeather } from '@/lib/services/weatherService';
 import { RyderCupSession, Course } from '@/lib/types';
 import { SessionWeather, WeatherForecast } from '@/lib/types/captain';
@@ -109,7 +109,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
       } else {
         setError('Unable to fetch weather data');
       }
-    } catch (err) {
+    } catch {
       setError('Weather service unavailable');
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
     return <Sun className="w-8 h-8 text-yellow-500" />;
   };
 
-  const getPlayabilityColor = (forecast?: WeatherForecast) => {
+  const _getPlayabilityColor = (forecast?: WeatherForecast) => {
     if (!forecast) return 'text-gray-500';
 
     const temp = forecast.temperature?.high || 70;
@@ -282,15 +282,15 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
                 <div
                   key={alert.id}
                   className={`p-3 rounded-lg ${alert.severity === 'severe'
-                      ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                      : alert.severity === 'moderate'
-                        ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
-                        : 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800'
+                    ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                    : alert.severity === 'moderate'
+                      ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
+                      : 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800'
                     }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <AlertTriangle className={`w-4 h-4 ${alert.severity === 'severe' ? 'text-red-600' :
-                        alert.severity === 'moderate' ? 'text-orange-600' : 'text-yellow-600'
+                      alert.severity === 'moderate' ? 'text-orange-600' : 'text-yellow-600'
                       }`} />
                     <span className="font-medium text-sm">{alert.title}</span>
                   </div>

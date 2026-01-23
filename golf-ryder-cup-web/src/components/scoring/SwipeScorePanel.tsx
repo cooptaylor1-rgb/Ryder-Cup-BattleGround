@@ -22,7 +22,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
-import { Check, Minus, ChevronLeft, ChevronRight, ChevronUp, Trophy } from 'lucide-react';
+import { Check, Minus, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 import { useHaptic } from '@/lib/hooks';
 

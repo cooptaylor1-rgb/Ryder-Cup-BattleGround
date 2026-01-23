@@ -52,7 +52,7 @@ interface Particle {
 
 export function ScoreCelebration({
     type,
-    winner,
+    winner: _winner,
     teamName,
     teamColor = 'var(--masters)',
     holeNumber,

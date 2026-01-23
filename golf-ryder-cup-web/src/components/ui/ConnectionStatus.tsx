@@ -11,7 +11,7 @@ import { useOnlineStatus } from '@/lib/hooks';
 import { useSyncStatus, isSupabaseConfigured } from '@/lib/supabase';
 import { Wifi, WifiOff, Cloud, CloudOff, RefreshCw, Check, AlertCircle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface ConnectionStatusProps {
     tripId?: string;
@@ -19,7 +19,7 @@ interface ConnectionStatusProps {
     className?: string;
 }
 
-export function ConnectionStatus({ tripId, showDetails = false, className }: ConnectionStatusProps) {
+export function ConnectionStatus({ tripId: _tripId, showDetails = false, className }: ConnectionStatusProps) {
     const isOnline = useOnlineStatus();
     const syncStatus = useSyncStatus();
     const [showFullStatus, setShowFullStatus] = useState(false);

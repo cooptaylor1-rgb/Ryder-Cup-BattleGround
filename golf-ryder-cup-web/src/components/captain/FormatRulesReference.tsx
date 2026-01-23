@@ -22,14 +22,11 @@ import {
     ChevronDown,
     ChevronRight,
     Share2,
-    Copy,
     Check,
     Target,
     Users,
     Repeat,
-    Award,
     AlertCircle,
-    Calculator,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

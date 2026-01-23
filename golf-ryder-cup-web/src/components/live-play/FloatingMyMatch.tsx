@@ -26,7 +26,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
-import type { Match, HoleResult, Player } from '@/lib/types/models';
+import type { Match, HoleResult } from '@/lib/types/models';
 
 // ============================================
 // TYPES
@@ -68,7 +68,7 @@ export function FloatingMyMatch({
     const { trigger } = useHaptic();
     const { currentTrip, sessions, players } = useTripStore();
     const { selectMatch } = useScoringStore();
-    const { scoringPreferences } = useUIStore();
+    const { scoringPreferences: _scoringPreferences } = useUIStore();
 
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const [hasNewUpdate, setHasNewUpdate] = useState(false);
@@ -137,7 +137,7 @@ export function FloatingMyMatch({
             }).filter(Boolean);
 
         const matchResults = allHoleResults.filter(r => r.matchId === myMatch.id);
-        const matchState = calculateMatchState(myMatch, matchResults);
+        const _matchState = calculateMatchState(myMatch, matchResults);
 
         // Calculate score from my team's perspective
         let teamAWins = 0;

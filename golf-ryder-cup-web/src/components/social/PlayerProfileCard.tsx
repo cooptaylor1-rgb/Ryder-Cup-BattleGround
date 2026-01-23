@@ -16,15 +16,9 @@
 
 import { cn } from '@/lib/utils';
 import {
-  Trophy,
   Flame,
-  Target,
-  TrendingUp,
   TrendingDown,
-  Minus,
-  Award,
   ChevronRight,
-  User,
 } from 'lucide-react';
 
 // ============================================

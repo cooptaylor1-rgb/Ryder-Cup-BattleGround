@@ -20,21 +20,17 @@ import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import {
   UserPlus,
-  Link as LinkIcon,
   Copy,
   Check,
   Clock,
   CheckCircle2,
   XCircle,
   Share2,
-  Mail,
-  MessageCircle,
   MoreHorizontal,
   RefreshCw,
   Trash2,
   QrCode,
   Users,
-  ChevronDown,
   Send,
   ExternalLink,
 } from 'lucide-react';
@@ -502,7 +498,7 @@ function NewInviteModal({ onClose, onSend, tripInfo }: NewInviteModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [team, setTeam] = useState<'A' | 'B' | undefined>();
-  const [sendMethod, setSendMethod] = useState<'email' | 'sms' | 'copy'>('copy');
+  const [_sendMethod, _setSendMethod] = useState<'email' | 'sms' | 'copy'>('copy');
 
   const canSend = name.trim().length > 0;
 
@@ -678,7 +674,7 @@ interface QRCodeCardProps {
   className?: string;
 }
 
-export function QRCodeCard({ shareUrl, shareCode, tripName, className }: QRCodeCardProps) {
+export function QRCodeCard({ shareUrl: _shareUrl, shareCode, tripName, className }: QRCodeCardProps) {
   // Note: In production, you'd use a QR code library like qrcode.react
   // This is a placeholder representation
   return (

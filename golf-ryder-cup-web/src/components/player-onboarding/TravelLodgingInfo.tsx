@@ -16,18 +16,11 @@ import {
     Plane,
     Car,
     Home,
-    Users,
-    Clock,
-    Calendar,
     ChevronDown,
     ChevronUp,
-    Info,
-    Check,
-    AlertCircle,
     Moon,
     Sun,
     Coffee,
-    Wine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -89,7 +82,7 @@ export function TravelLodgingInfo({
     onInfoChange,
     initialInfo,
     tripStartDate,
-    tripEndDate,
+    _tripEndDate,
     teammates = [],
     className,
 }: TravelLodgingInfoProps) {

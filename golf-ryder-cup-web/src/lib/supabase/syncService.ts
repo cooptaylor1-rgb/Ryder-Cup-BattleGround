@@ -24,8 +24,6 @@ import type {
     RyderCupSession,
     Match,
     HoleResult,
-    Course,
-    TeeSet,
 } from '../types/models';
 
 // ============================================

@@ -19,10 +19,7 @@ import {
     Calculator,
     Trophy,
     Target,
-    ArrowRight,
     CheckCircle2,
-    XCircle,
-    Circle,
     ChevronDown,
     ChevronUp,
     Zap,
@@ -84,7 +81,7 @@ function calculatePointsFromOutcome(
     return 0;
 }
 
-function getOutcomeColor(
+function _getOutcomeColor(
     outcome: MatchOutcome,
     teamAColor: string,
     teamBColor: string

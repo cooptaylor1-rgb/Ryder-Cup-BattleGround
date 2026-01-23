@@ -24,7 +24,7 @@ import {
   AlertTriangle,
   Upload,
 } from 'lucide-react';
-import { useSyncQueue, getPendingOperationsCount } from '@/lib/hooks/useOptimistic';
+import { useSyncQueue } from '@/lib/hooks/useOptimistic';
 
 type SyncState = 'synced' | 'pending' | 'syncing' | 'offline' | 'error';
 
@@ -330,12 +330,12 @@ interface FloatingSyncStatusProps {
 
 export function FloatingSyncStatus({ className }: FloatingSyncStatusProps) {
   const { isOnline } = useUIStore();
-  const { pendingCount, isSyncing, processQueue } = useSyncQueue();
+  const { pendingCount, isSyncing, processQueue: _processQueue } = useSyncQueue();
 
   // Don't show if everything is synced
   if (isOnline && pendingCount === 0 && !isSyncing) return null;
 
-  const state: SyncState = !isOnline ? 'offline' : isSyncing ? 'syncing' : 'pending';
+  const _state: SyncState = !isOnline ? 'offline' : isSyncing ? 'syncing' : 'pending';
 
   return (
     <div

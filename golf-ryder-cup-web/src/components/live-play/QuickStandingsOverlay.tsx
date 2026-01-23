@@ -16,17 +16,17 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { Trophy, ChevronDown, Circle, Zap, Target, Flag } from 'lucide-react';
+import { Trophy, ChevronDown, Circle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
-import type { Match, RyderCupSession, Team } from '@/lib/types/models';
+import type { Team } from '@/lib/types/models';
 
 // ============================================
 // TYPES
@@ -70,7 +70,7 @@ export function QuickStandingsOverlay({
     const { currentTrip, teams, players, sessions } = useTripStore();
 
     const [isVisible, setIsVisible] = useState(false);
-    const [isPulling, setIsPulling] = useState(false);
+    const [_isPulling, setIsPulling] = useState(false);
 
     // Motion values for pull gesture
     const pullY = useMotionValue(0);

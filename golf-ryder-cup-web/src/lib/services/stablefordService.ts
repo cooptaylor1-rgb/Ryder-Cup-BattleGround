@@ -8,7 +8,6 @@
 import type { Player, TeeSet } from '../types/models';
 import {
     calculateStablefordPoints,
-    getScoreClass,
     type StablefordHoleScore,
     type StablefordRoundScore,
     type ScoringMode,

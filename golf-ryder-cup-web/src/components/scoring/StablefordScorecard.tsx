@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Target } from 'lucide-react';
-import { type StablefordRoundScore, type StablefordHoleScore } from '@/lib/types/scoringFormats';
+import type { StablefordRoundScore, StablefordHoleScore } from '@/lib/types/scoringFormats';
 import { getPointsDisplay } from '@/lib/services/stablefordService';
 
 interface StablefordScorecardProps {
@@ -122,7 +122,7 @@ export function StablefordScorecard({
                         {[par - 2, par - 1, par, par + 1, par + 2, par + 3].map((value) => {
                             if (value < 1) return null;
                             const isSelected = currentHoleScore?.grossScore === value;
-                            const pointsForScore = getPointsDisplay(
+                            const _pointsForScore = getPointsDisplay(
                                 currentHoleScore?.stablefordPoints || 0
                             );
 

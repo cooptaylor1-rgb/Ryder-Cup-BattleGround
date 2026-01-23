@@ -9,7 +9,6 @@
  */
 
 import type {
-    TeeTimeMode,
     TeeTimeSlot,
     TeeTimeGeneratorConfig,
     GeneratedTeeSheet,
@@ -18,7 +17,6 @@ import type { Match, RyderCupSession, UUID } from '@/lib/types/models';
 
 // Re-export types for convenience
 export type {
-    TeeTimeMode,
     TeeTimeSlot,
     TeeTimeGeneratorConfig,
     GeneratedTeeSheet,
@@ -246,7 +244,7 @@ export function suggestTeeTimeConfig(
 
     // For medium groups (6-11), consider waves
     if (matchCount >= 6) {
-        const halfCount = Math.ceil(matchCount / 2);
+        const _halfCount = Math.ceil(matchCount / 2);
         return {
             mode: 'staggered',
             firstTeeTime: preferredStart,

@@ -6,7 +6,6 @@ import {
     Users,
     Minus,
     Plus,
-    UserPlus,
     AlertCircle,
     Check,
     Lightbulb,
@@ -84,7 +83,7 @@ export function PlayerCountSelector({
 
             {/* Quick select buttons */}
             <div className="grid grid-cols-5 gap-2">
-                {COMMON_COUNTS.map(({ count, label, icon }) => (
+                {COMMON_COUNTS.map(({ count, label: _label, icon }) => (
                     <button
                         key={count}
                         onClick={() => onPlayersPerTeamChange(count)}

@@ -253,8 +253,8 @@ test.describe('Captain Journey: Team Assignment', () => {
         const usaTeam = page.locator('text=/usa|america|team a/i').first();
         const europeTeam = page.locator('text=/europe|team b/i').first();
 
-        const hasUSA = await usaTeam.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
-        const hasEurope = await europeTeam.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasUSA = await usaTeam.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasEurope = await europeTeam.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // At least team structure should be visible
         await expectPageReady(page);
@@ -266,7 +266,7 @@ test.describe('Captain Journey: Team Assignment', () => {
         await waitForStableDOM(page);
 
         // Get current state
-        const initialContent = await page.textContent('body');
+        const _initialContent = await page.textContent('body');
 
         // Reload
         await page.reload();
@@ -314,7 +314,7 @@ test.describe('Captain Journey: Session Configuration', () => {
 
         // Look for format options
         const formatOptions = page.locator('text=/foursomes|fourball|singles|scramble/i');
-        const hasFormats = await formatOptions.count() > 0;
+        const _hasFormats = await formatOptions.count() > 0;
 
         // Page should render
         await expectPageReady(page);
@@ -421,7 +421,7 @@ test.describe('Captain Journey: Score Entry', () => {
         await page.goto('/standings');
         await waitForStableDOM(page);
 
-        const initialContent = await page.textContent('body');
+        const _initialContent = await page.textContent('body');
 
         // Navigate to score entry
         await page.goto('/score');
@@ -471,7 +471,7 @@ test.describe('Captain Journey: Score Editing', () => {
 
         // Look for edit functionality
         const editButton = page.getByRole('button', { name: /edit|modify|change/i }).first();
-        const hasEdit = await editButton.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasEdit = await editButton.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // Page should load regardless
         await expectPageReady(page);
@@ -515,7 +515,7 @@ test.describe('Captain Journey: Session Locking', () => {
 
         // Look for lock/unlock controls
         const lockControls = page.locator('button').filter({ hasText: /lock|unlock/i });
-        const hasLockControls = await lockControls.count() > 0;
+        const _hasLockControls = await lockControls.count() > 0;
 
         // Page should render
         await expectPageReady(page);
@@ -548,7 +548,7 @@ test.describe('Captain Journey: Session Locking', () => {
 
         // Look for audit log entries
         const auditEntries = page.locator('[data-testid*="audit"], [role="row"], li');
-        const entryCount = await auditEntries.count();
+        const _entryCount = await auditEntries.count();
 
         // Page should render
         await expectPageReady(page);

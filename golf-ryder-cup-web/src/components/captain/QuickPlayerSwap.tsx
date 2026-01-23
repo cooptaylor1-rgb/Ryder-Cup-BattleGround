@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowLeftRight,
@@ -30,7 +30,6 @@ import {
     Search,
     History,
     Bell,
-    Undo2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -115,7 +114,7 @@ export function QuickPlayerSwap({
     onSwap,
     onClose,
     onNotifyPlayer,
-    swapHistory = [],
+    swapHistory: _swapHistory = [],
     className,
 }: QuickPlayerSwapProps) {
     const [selectedPlayer, setSelectedPlayer] = useState<SwapPlayer | null>(null);

@@ -17,7 +17,6 @@ import { test, expect, Page } from '@playwright/test';
 import {
     waitForStableDOM,
     dismissAllBlockingModals,
-    TEST_CONFIG,
     expectPageReady,
 } from '../utils/test-helpers';
 import { createSeededRNG } from '../utils/seeder';
@@ -277,7 +276,7 @@ class FuzzRunner {
     /**
      * Go back in history
      */
-    private async goBack(action: FuzzAction): Promise<void> {
+    private async goBack(_action: FuzzAction): Promise<void> {
         await this.page.goBack({ timeout: FUZZ_CONFIG.maxActionTimeMs });
         await waitForStableDOM(this.page);
     }
@@ -285,7 +284,7 @@ class FuzzRunner {
     /**
      * Refresh the page
      */
-    private async refresh(action: FuzzAction): Promise<void> {
+    private async refresh(_action: FuzzAction): Promise<void> {
         await this.page.reload({ timeout: FUZZ_CONFIG.maxActionTimeMs * 2 });
         await waitForStableDOM(this.page);
     }
@@ -374,7 +373,7 @@ test.describe('Fuzz: Monkey Testing', () => {
                         await waitForStableDOM(page);
                         await dismissAllBlockingModals(page);
                         consecutiveErrors = 0;
-                    } catch (recoveryError) {
+                    } catch {
                         // Save state before throwing
                         await runner.saveActions('fuzz-crash-run.json');
                         throw new Error(`Fuzz test crashed after ${i + 1} actions. Unable to recover.`);
@@ -413,7 +412,7 @@ test.describe('Fuzz: Monkey Testing', () => {
     });
 
     test('should not crash on rapid random navigation @fuzz', async ({ page }) => {
-        const localRunner = new FuzzRunner(page, FUZZ_CONFIG.seed + '-nav');
+        const _localRunner = new FuzzRunner(page, FUZZ_CONFIG.seed + '-nav');
 
         // Rapid navigation test
         for (let i = 0; i < 50; i++) {
@@ -429,7 +428,7 @@ test.describe('Fuzz: Monkey Testing', () => {
     });
 
     test('should handle random form inputs @fuzz', async ({ page }) => {
-        const localRunner = new FuzzRunner(page, FUZZ_CONFIG.seed + '-forms');
+        const _localRunner = new FuzzRunner(page, FUZZ_CONFIG.seed + '-forms');
 
         // Navigate to pages with forms
         const formPages = ['/login', '/profile/create', '/trip/new', '/players/add'];

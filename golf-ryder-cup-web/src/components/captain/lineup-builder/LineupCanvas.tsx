@@ -27,33 +27,25 @@ import {
     type DragOverEvent,
 } from '@dnd-kit/core';
 import {
-    SortableContext,
     sortableKeyboardCoordinates,
-    verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Users,
-    Shuffle,
     Save,
-    Send,
     Lock,
-    Unlock,
     AlertTriangle,
     CheckCircle2,
     ChevronDown,
-    ChevronUp,
     Scale,
     Wand2,
     RotateCcw,
-    Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
 import {
     DraggablePlayerCard,
     PlayerCard,
-    PlayerCardSkeleton,
     type PlayerCardData,
 } from './PlayerCard';
 import { MatchSlot, type MatchSlotData } from './MatchSlot';
@@ -132,13 +124,13 @@ interface PlayerPoolProps {
 }
 
 function PlayerPool({
-    team,
+    _team,
     players,
     teamColor,
     teamName,
     isExpanded,
     onToggle,
-    isLocked,
+    _isLocked,
 }: PlayerPoolProps) {
     return (
         <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}>

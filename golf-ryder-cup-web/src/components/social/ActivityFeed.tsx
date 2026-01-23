@@ -31,7 +31,6 @@ import {
   Users,
   Clock,
   ChevronRight,
-  Filter,
 } from 'lucide-react';
 
 // ============================================
@@ -102,7 +101,7 @@ export function ActivityFeed({
   onFilterChange,
   className,
 }: ActivityFeedProps) {
-  const [showFilters, setShowFilters] = useState(false);
+  const [_showFilters, _setShowFilters] = useState(false);
 
   const filteredActivities = useMemo(() => {
     if (filter === 'all') return activities;

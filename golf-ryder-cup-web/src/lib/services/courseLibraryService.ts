@@ -227,7 +227,7 @@ export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Pr
  */
 export async function createCourseFromProfile(
     profileId: string,
-    options?: { tripId?: string }
+    _options?: { tripId?: string }
 ): Promise<{ course: Course; teeSets: TeeSet[] }> {
     const profile = await getCourseProfile(profileId);
     if (!profile) {

@@ -28,7 +28,6 @@ import {
   Heart,
   X,
   Check,
-  ChevronRight,
 } from 'lucide-react';
 
 // ============================================

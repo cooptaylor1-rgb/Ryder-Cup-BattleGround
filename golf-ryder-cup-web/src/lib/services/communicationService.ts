@@ -15,7 +15,7 @@ import type {
     MessageStats,
     MessageTargetType,
 } from '@/lib/types/captain';
-import type { UUID, ISODateString, Player } from '@/lib/types/models';
+import type { UUID, Player } from '@/lib/types/models';
 
 /**
  * Pre-built message templates

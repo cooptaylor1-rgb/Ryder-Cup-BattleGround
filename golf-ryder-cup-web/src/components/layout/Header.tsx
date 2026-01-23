@@ -11,7 +11,6 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import { useUIStore, useTripStore } from '@/lib/stores';
 import { IconButton } from '@/components/ui/IconButton';
 import { CaptainToggle } from '@/components/ui/CaptainToggle';

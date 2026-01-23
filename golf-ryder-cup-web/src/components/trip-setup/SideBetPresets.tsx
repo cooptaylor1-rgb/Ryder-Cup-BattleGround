@@ -8,11 +8,9 @@ import {
     X,
     Trophy,
     Target,
-    MapPin,
     Flame,
     Zap,
     TrendingUp,
-    Edit2,
     Check,
     Lightbulb,
     Crown,
@@ -109,7 +107,7 @@ export function SideBetPresets({
     className,
 }: SideBetPresetsProps) {
     const [showAddModal, setShowAddModal] = useState(false);
-    const [editingBet, setEditingBet] = useState<string | null>(null);
+    const [_editingBet, _setEditingBet] = useState<string | null>(null);
     const [customBet, setCustomBet] = useState<Partial<SideBetConfig>>({
         name: '',
         type: 'custom',

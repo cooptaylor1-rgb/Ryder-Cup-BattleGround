@@ -26,12 +26,10 @@ import {
     CloudLightning,
     Wind,
     Thermometer,
-    Sun,
     Sunset,
     AlertTriangle,
     X,
     RefreshCw,
-    MapPin,
     Droplets,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -138,13 +136,13 @@ export function WeatherAlerts({
     longitude,
 }: WeatherAlertsProps) {
     const { trigger } = useHaptic();
-    const { currentTrip } = useTripStore();
+    const { currentTrip: _currentTrip } = useTripStore();
 
     const [weather, setWeather] = useState<WeatherConditions | null>(null);
-    const [golfWeatherData, setGolfWeatherData] = useState<GolfWeather | null>(null);
+    const [_golfWeatherData, setGolfWeatherData] = useState<GolfWeather | null>(null);
     const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+    const [_lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
 
     // Get coordinates from trip course or props or default

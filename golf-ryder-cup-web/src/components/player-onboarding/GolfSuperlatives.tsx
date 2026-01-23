@@ -15,9 +15,6 @@ import {
     Sparkles,
     ChevronRight,
     ChevronLeft,
-    Check,
-    RefreshCw,
-    Heart,
     MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

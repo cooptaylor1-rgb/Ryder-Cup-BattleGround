@@ -36,7 +36,6 @@ import {
     GolfFlagIllustration as SharedGolfFlag,
     ScorecardIllustration as SharedScorecard,
     GolfersIllustration as SharedGolfers,
-    CalendarIllustration as SharedCalendar,
 } from '@/components/ui/illustrations';
 
 // ============================================

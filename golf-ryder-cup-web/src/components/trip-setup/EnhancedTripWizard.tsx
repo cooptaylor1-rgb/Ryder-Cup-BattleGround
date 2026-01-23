@@ -12,12 +12,7 @@ import {
     Calendar,
     Trophy,
     Settings,
-    DollarSign,
-    Palette,
-    Clock,
-    UserPlus,
     Calculator,
-    FileText,
     Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -200,7 +195,7 @@ export function EnhancedTripWizard({
         };
     }, [data]);
 
-    const canProceed = stepCompletion[currentStep];
+    const _canProceed = stepCompletion[currentStep];
 
     return (
         <div className={cn('flex flex-col h-full', className)}>

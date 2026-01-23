@@ -20,7 +20,7 @@ import type { Player, Match } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 import { db, useLiveQuery } from '@/lib/db';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
-import { Radio, Users, Trophy, Wifi, WifiOff, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { Radio, Users, Trophy, ChevronUp, ChevronDown, Minus, WifiOff } from 'lucide-react';
 
 interface LiveJumbotronProps {
     tripId: string;
@@ -29,7 +29,7 @@ interface LiveJumbotronProps {
 }
 
 export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronProps) {
-    const { isConnected, activeUsers, connectionStatus } = useRealtime(tripId);
+    const { isConnected, activeUsers, connectionStatus: _connectionStatus } = useRealtime(tripId);
     const { scores, isLoading } = useLiveScores(tripId);
 
     // Get matches from local DB
@@ -183,7 +183,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
                         Completed ({completedMatches.length})
                     </h3>
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                        {completedMatches.map((match, idx) => {
+                        {completedMatches.map((match, _idx) => {
                             const state = matchStates.get(match.id);
                             const teamAPlayers = match.teamAPlayerIds.map(id => playerMap.get(id)).filter(Boolean) as Player[];
                             const teamBPlayers = match.teamBPlayerIds.map(id => playerMap.get(id)).filter(Boolean) as Player[];
@@ -254,7 +254,7 @@ interface LiveMatchCardProps {
 }
 
 function LiveMatchCard({
-    match,
+    match: _match,
     matchState,
     teamAPlayers,
     teamBPlayers,
@@ -347,7 +347,7 @@ interface CompletedMatchCardProps {
 }
 
 function CompletedMatchCard({
-    match,
+    match: _match,
     matchState,
     teamAPlayers,
     teamBPlayers,
@@ -366,8 +366,8 @@ function CompletedMatchCard({
                 <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
                     winningTeam === 'usa' ? 'bg-team-usa text-white' :
-                    winningTeam === 'europe' ? 'bg-team-europe text-white' :
-                    'bg-surface-300 dark:bg-surface-600 text-surface-600 dark:text-surface-300'
+                        winningTeam === 'europe' ? 'bg-team-europe text-white' :
+                            'bg-surface-300 dark:bg-surface-600 text-surface-600 dark:text-surface-300'
                 )}>
                     {winningTeam === 'halved' ? '=' : displayScore}
                 </div>
@@ -405,7 +405,7 @@ interface UpcomingMatchCardProps {
 }
 
 function UpcomingMatchCard({
-    match,
+    match: _match,
     teamAPlayers,
     teamBPlayers,
     matchNumber,

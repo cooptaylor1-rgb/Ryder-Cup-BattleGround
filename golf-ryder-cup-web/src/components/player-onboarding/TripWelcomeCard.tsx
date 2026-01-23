@@ -11,7 +11,6 @@ import { motion } from 'framer-motion';
 import {
     Calendar,
     MapPin,
-    Users,
     Crown,
     Trophy,
     Flag,

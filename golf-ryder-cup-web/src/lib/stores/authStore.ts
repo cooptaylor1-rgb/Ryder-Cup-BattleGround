@@ -58,7 +58,7 @@ const generateId = (): string => {
     return crypto.randomUUID();
 };
 
-const generatePin = (): string => {
+const _generatePin = (): string => {
     return Math.floor(1000 + Math.random() * 9000).toString();
 };
 

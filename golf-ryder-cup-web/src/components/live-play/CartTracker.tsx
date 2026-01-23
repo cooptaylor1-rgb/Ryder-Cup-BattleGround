@@ -13,19 +13,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Beer,
     MapPin,
-    Clock,
-    Camera,
-    Send,
     X,
-    ChevronUp,
     Coffee,
     Utensils,
-    ArrowRight,
 } from 'lucide-react';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
@@ -175,7 +170,7 @@ interface CartTrackerPanelProps {
 }
 
 export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
-    const { sightings, reportSighting, latestSighting, timeSinceSighting } = useCartTracker();
+    const { sightings, reportSighting, latestSighting, timeSinceSighting: _timeSinceSighting } = useCartTracker();
     const [selectedHole, setSelectedHole] = useState<number>(1);
     const [selectedType, setSelectedType] = useState<CartSighting['cartType']>('beverage');
     const [note, setNote] = useState('');

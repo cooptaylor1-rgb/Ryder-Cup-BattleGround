@@ -16,14 +16,11 @@
 
 'use client';
 
-import { useState, useCallback, useMemo, type ReactNode } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import {
   Users,
-  Plus,
-  Trash2,
   Lock,
-  Unlock,
   CheckCircle2,
   AlertTriangle,
   ChevronDown,
@@ -107,10 +104,10 @@ export function LineupBuilder({
     initialMatches.length > 0
       ? initialMatches
       : Array.from({ length: session.matchCount }, (_, i) => ({
-          id: `match-${i + 1}`,
-          teamAPlayers: [],
-          teamBPlayers: [],
-        }))
+        id: `match-${i + 1}`,
+        teamAPlayers: [],
+        teamBPlayers: [],
+      }))
   );
   const [draggedPlayer, setDraggedPlayer] = useState<Player | null>(null);
   const [showRoster, setShowRoster] = useState<'A' | 'B' | null>('A');

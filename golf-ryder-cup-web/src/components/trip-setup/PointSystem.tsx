@@ -11,7 +11,6 @@ import {
     Crown,
     Plus,
     Minus,
-    RotateCcw,
     Info,
     Sparkles,
 } from 'lucide-react';
@@ -152,7 +151,7 @@ export function PointSystem({
     // Calculate example points
     const exampleMatches = 12;
     const basePoints = exampleMatches * config.matchWin;
-    const withBonuses = basePoints + config.cleanSweepBonus + config.comebackBonus;
+    const _withBonuses = basePoints + config.cleanSweepBonus + config.comebackBonus;
 
     return (
         <div className={cn('space-y-4', className)}>

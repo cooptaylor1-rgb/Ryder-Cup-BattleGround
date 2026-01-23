@@ -34,11 +34,11 @@ interface BulkImportModalProps {
 type ImportMethod = 'csv' | 'paste' | null;
 
 export function BulkImportModal({
-  tripId,
+  tripId: _tripId,
   isOpen,
   onClose,
   onImportComplete,
-  existingPlayers = [],
+  existingPlayers: _existingPlayers = [],
 }: BulkImportModalProps) {
   const [method, setMethod] = useState<ImportMethod>(null);
   const [pasteText, setPasteText] = useState('');
@@ -75,7 +75,7 @@ export function BulkImportModal({
 
       setParsedRows(rows);
       setValidationErrors(errors);
-    } catch (error) {
+    } catch {
       setValidationErrors(['Failed to parse CSV file']);
     }
   };

@@ -20,11 +20,6 @@ import {
     Share2,
     Download,
     X,
-    Trophy,
-    Users,
-    Star,
-    Flame,
-    Camera,
     Copy,
     Check,
 } from 'lucide-react';
@@ -33,11 +28,9 @@ import { createLogger } from '@/lib/utils/logger';
 const logger = createLogger('DaySummary');
 import { useTripStore } from '@/lib/stores';
 import { db } from '@/lib/db';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
-import type { TeamStandings, MatchState } from '@/lib/types/computed';
-import type { Match, RyderCupSession, Player } from '@/lib/types/models';
+import type { MatchState } from '@/lib/types/computed';
 import { format } from 'date-fns';
 
 interface DaySummary {

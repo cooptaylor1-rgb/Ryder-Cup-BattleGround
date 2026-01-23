@@ -10,8 +10,6 @@ import {
     Edit2,
     Check,
     AlertCircle,
-    FileText,
-    Copy,
     Download,
     Trash2,
     Users,
@@ -54,7 +52,7 @@ export function PlayerRosterImport({
     onPlayersChange,
     teamAName = 'Team A',
     teamBName = 'Team B',
-    playersPerTeam = 8,
+    playersPerTeam: _playersPerTeam = 8,
     className,
 }: PlayerRosterImportProps) {
     const [showImportModal, setShowImportModal] = useState(false);

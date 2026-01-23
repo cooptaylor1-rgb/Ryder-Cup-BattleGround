@@ -12,9 +12,7 @@ import { logger } from '@/lib/utils/logger';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { syncService, useSyncStatus, isSupabaseConfigured } from '@/lib/supabase';
 import {
-    Settings,
     Palette,
-    Bell,
     Vibrate,
     Hand,
     Cloud,

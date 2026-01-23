@@ -13,9 +13,8 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
-import { Target, Clock, ChevronRight, Zap, Users } from 'lucide-react';
+import { Target, Clock, ChevronRight, Zap } from 'lucide-react';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 import { formatPlayerName } from '@/lib/utils';
@@ -41,8 +40,6 @@ export function YourMatchCard({
     teamBName = 'Europe',
     onEnterScore,
 }: YourMatchCardProps) {
-    const router = useRouter();
-
     // Determine which team the user is on
     const userTeam = useMemo(() => {
         if (match.teamAPlayerIds.includes(currentUserPlayer.id)) return 'A';

@@ -13,17 +13,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import {
     Trophy,
     Star,
     Medal,
     Target,
-    Flame,
     Crown,
-    Zap,
-    Award,
     Share2,
     X,
     ChevronRight,
@@ -417,7 +414,7 @@ interface AchievementNotificationProps {
 export function AchievementNotification({
     achievement,
     onView,
-    onDismiss,
+    _onDismiss,
 }: AchievementNotificationProps) {
     const haptic = useHaptic();
     const config = RARITY_CONFIG[achievement.rarity];

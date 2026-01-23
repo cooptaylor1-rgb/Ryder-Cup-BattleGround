@@ -16,10 +16,6 @@ import {
     Match,
     Course,
     TeeSet,
-    TeamMode,
-    SessionType,
-    MatchStatus,
-    MatchResultType,
 } from '@/lib/types/models';
 
 // ============================================
@@ -138,7 +134,7 @@ export async function seedDemoData(): Promise<string> {
     };
 
     // Create players
-    const players: Player[] = DEMO_PLAYERS.map((p, index) => ({
+    const players: Player[] = DEMO_PLAYERS.map((p, _index) => ({
         id: uuidv4(),
         ...p,
         createdAt: now,

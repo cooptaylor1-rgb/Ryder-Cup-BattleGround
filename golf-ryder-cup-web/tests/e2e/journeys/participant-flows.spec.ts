@@ -56,8 +56,8 @@ test.describe('Participant Journey: Join & Login', () => {
         const emailInput = page.getByRole('textbox', { name: /email/i }).first();
         const pinInput = page.locator('input[type="password"], input[type="tel"]').first();
 
-        const hasEmail = await emailInput.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
-        const hasPin = await pinInput.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasEmail = await emailInput.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasPin = await pinInput.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // Page should render
         await expectPageReady(page);
@@ -163,7 +163,7 @@ test.describe('Participant Journey: Quick Match Access', () => {
 
             // Look for success feedback
             const successIndicator = page.locator('text=/saved|recorded|updated|success/i');
-            const hasSuccess = await successIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+            const _hasSuccess = await successIndicator.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
             // Page should respond - use reliable page readiness check
             await expectPageReady(page);
@@ -175,7 +175,7 @@ test.describe('Participant Journey: Quick Match Access', () => {
         await waitForStableDOM(page);
 
         // Get initial state
-        const initialContent = await page.textContent('body');
+        const _initialContent = await page.textContent('body');
 
         // Try score entry
         const scoreButtons = page.locator('button').filter({ hasText: /win|up/i });
@@ -339,7 +339,7 @@ test.describe('Participant Journey: Permission Boundaries', () => {
 
         // Should require captain verification or show read-only
         const pageContent = await page.textContent('body');
-        const isRestricted =
+        const _isRestricted =
             pageContent?.includes('PIN') ||
             pageContent?.includes('verify') ||
             pageContent?.includes('Captain mode');
@@ -374,7 +374,7 @@ test.describe('Participant Journey: Permission Boundaries', () => {
 
         // Look for captain mode toggle/status
         const captainStatus = page.locator('text=/captain/i');
-        const hasCaptainUI = await captainStatus.count() > 0;
+        const _hasCaptainUI = await captainStatus.count() > 0;
 
         // Page should render
         await expectPageReady(page);
@@ -396,7 +396,7 @@ test.describe('Participant Journey: Navigation UX', () => {
         // Bottom nav should be present
         const nav = page.locator('nav[aria-label*="navigation"], nav[role="navigation"]').first();
 
-        const hasNav = await nav.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
+        const _hasNav = await nav.isVisible({ timeout: TEST_CONFIG.timeouts.fast }).catch(() => false);
 
         // At minimum, page should be usable
         await expectPageReady(page);

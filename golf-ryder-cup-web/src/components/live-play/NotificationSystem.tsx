@@ -25,18 +25,15 @@ import {
     Trophy,
     MessageCircle,
     CloudRain,
-    Target,
     Flame,
     DollarSign,
     Camera,
-    AlertTriangle,
     ChevronRight,
     Volume2,
     VolumeX,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
-import { useUIStore } from '@/lib/stores';
 
 // ============================================
 // TYPES
@@ -160,7 +157,7 @@ export function NotificationProvider({
             // Fade out
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
             oscillator.stop(audioContext.currentTime + 0.3);
-        } catch (e) {
+        } catch {
             // Audio not supported
         }
     }, [soundEnabled]);
@@ -272,7 +269,7 @@ interface NotificationToastProps {
 export function NotificationToast({
     notification,
     onDismiss,
-    onAction,
+    _onAction,
     autoHideDuration = 5000,
 }: NotificationToastProps) {
     const { trigger } = useHaptic();

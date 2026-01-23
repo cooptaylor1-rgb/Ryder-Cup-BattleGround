@@ -14,16 +14,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Heart,
-    Flame,
-    ThumbsUp,
-    MessageCircle,
-    Trophy,
-    Star,
-    Zap,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
 
 // ============================================

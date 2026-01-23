@@ -25,13 +25,8 @@ import {
     Trophy,
     Flag,
     Users,
-    Image as ImageIcon,
     Loader2,
-    ZoomIn,
-    ZoomOut,
     FlipHorizontal,
-    Upload,
-    Wifi,
     WifiOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -294,7 +289,7 @@ function PhotoPreview({
     isUploading,
 }: PhotoPreviewProps) {
     const haptic = useHaptic();
-    const [showTagPicker, setShowTagPicker] = useState(false);
+    const [_showTagPicker, _setShowTagPicker] = useState(false);
 
     const handleMomentTypeChange = (type: MomentType) => {
         haptic.tap();
@@ -483,7 +478,7 @@ function PhotoPreview({
 // ============================================
 
 export function PhotoCapture({
-    tripId,
+    _tripId,
     currentMatchId,
     currentMatchNumber,
     currentHole,
@@ -547,7 +542,7 @@ export function PhotoCapture({
                 await onUpload(photo);
                 photo.isUploading = false;
                 photo.isUploaded = true;
-            } catch (error) {
+            } catch {
                 photo.isUploading = false;
                 photo.uploadError = 'Upload failed';
             } finally {

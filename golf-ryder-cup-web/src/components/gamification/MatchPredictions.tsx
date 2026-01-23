@@ -16,22 +16,18 @@ import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { uiLogger } from '@/lib/utils/logger';
 import {
-    Trophy,
     Target,
-    Award,
     Check,
     X,
-    ChevronRight,
     Sparkles,
     Crown,
     Medal,
-    TrendingUp,
 } from 'lucide-react';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useHaptic } from '@/lib/hooks/useHaptic';
-import type { UUID, ISODateString, Player, Match } from '@/lib/types/models';
+import type { UUID, ISODateString, Match } from '@/lib/types/models';
 
 // Prediction types
 export interface MatchPrediction {
@@ -380,7 +376,7 @@ interface PredictionsModalProps {
 
 export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
     const { currentTrip, sessions, players, teams } = useTripStore();
-    const { makePrediction, predictions } = usePredictions();
+    const { makePrediction, predictions: _predictions } = usePredictions();
     const [selectedTab, setSelectedTab] = useState<'predict' | 'leaderboard'>('predict');
     const [matches, setMatches] = useState<Match[]>([]);
 

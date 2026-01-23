@@ -20,14 +20,13 @@ import {
   Medal,
   TrendingUp,
   TrendingDown,
-  Minus,
   Crown,
   Target,
   Percent,
   Users,
   ChevronDown,
 } from 'lucide-react';
-import { PlayerProfileCard, type PlayerProfile, type PlayerStats } from './PlayerProfileCard';
+import { type PlayerProfile, type PlayerStats } from './PlayerProfileCard';
 
 // ============================================
 // TYPES
@@ -91,7 +90,7 @@ export function Leaderboard({
           return b.stats.holesWon - a.stats.holesWon;
         case 'streak':
           return (b.stats.streakType === 'win' ? b.stats.currentStreak : 0) -
-                 (a.stats.streakType === 'win' ? a.stats.currentStreak : 0);
+            (a.stats.streakType === 'win' ? a.stats.currentStreak : 0);
         default:
           return 0;
       }

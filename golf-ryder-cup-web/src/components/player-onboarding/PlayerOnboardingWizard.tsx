@@ -159,7 +159,7 @@ export function PlayerOnboardingWizard({
     teammates,
     invitedBy,
     onComplete,
-    onSkip,
+    _onSkip,
     initialData,
     className,
 }: PlayerOnboardingWizardProps) {
@@ -188,7 +188,7 @@ export function PlayerOnboardingWizard({
     }, []);
 
     // Navigation
-    const goToStep = (step: OnboardingStep) => {
+    const _goToStep = (step: OnboardingStep) => {
         setCurrentStep(step);
     };
 

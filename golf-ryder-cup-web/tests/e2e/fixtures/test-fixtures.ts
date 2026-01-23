@@ -8,12 +8,11 @@
  * - Chaos mode flags
  */
 
-import { test as base, Page, BrowserContext, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import {
     waitForStableDOM,
     dismissAllBlockingModals,
     clearIndexedDB,
-    measureTime,
 } from '../utils/test-helpers';
 import {
     generateTestData,

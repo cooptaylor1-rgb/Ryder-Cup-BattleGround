@@ -17,20 +17,14 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     Printer,
-    Download,
     Share2,
     QrCode,
     Clock,
     Flag,
-    Users,
     ChevronLeft,
     ChevronRight,
-    X,
-    Maximize2,
-    Copy,
     Check,
     FileText,
 } from 'lucide-react';
@@ -234,7 +228,7 @@ export function MatchCardGenerator({
     className,
 }: MatchCardGeneratorProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [showPreview, setShowPreview] = useState(false);
+    const [_showPreview, _setShowPreview] = useState(false);
     const [copied, setCopied] = useState(false);
     const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
     const cardRef = useRef<HTMLDivElement>(null);

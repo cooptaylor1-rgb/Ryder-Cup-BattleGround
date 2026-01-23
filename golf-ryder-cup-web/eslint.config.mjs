@@ -23,24 +23,33 @@ const eslintConfig = defineConfig([
     rules: {
       // setState in effects is valid for animation state machines triggered by prop changes
       "react-hooks/set-state-in-effect": "warn",
-      
+
       // Math.random/Date.now in useMemo/useRef for animations is acceptable
       "react-hooks/purity": "warn",
-      
+
       // Immutability rule has false positives with window.location and browser APIs
       "react-hooks/immutability": "warn",
-      
+
       // React compiler memo preservation - optimization hints not correctness
       "react-hooks/preserve-manual-memoization": "warn",
-      
+
       // Keep rules-of-hooks as error (required for hook correctness)
       "react-hooks/rules-of-hooks": "error",
-      
+
       // Unused variables should be cleaned up but aren't blocking
       "@typescript-eslint/no-unused-vars": ["warn", {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
       }],
+    },
+  },
+  {
+    // Disable React hooks rules for Playwright test files
+    // Playwright fixtures use 'use' as a standard parameter name which conflicts
+    // with React's use() hook name detection
+    files: ["tests/**/*.ts", "e2e/**/*.ts", "**/*.spec.ts", "**/*.test.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
     },
   },
 ]);

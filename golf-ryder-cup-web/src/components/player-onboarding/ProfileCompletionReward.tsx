@@ -7,7 +7,7 @@
  * Shows team assignment preview and next steps.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trophy,
@@ -18,8 +18,6 @@ import {
     Users,
     Calendar,
     ChevronRight,
-    PartyPopper,
-    Heart,
     Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -59,15 +57,19 @@ interface ProfileCompletionRewardProps {
 // ============================================
 
 function Confetti() {
-    const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
-        id: i,
-        color: ['#FFD700', '#32CD32', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB'][Math.floor(Math.random() * 6)],
-        left: Math.random() * 100,
-        delay: Math.random() * 0.5,
-        duration: 2 + Math.random() * 2,
-        rotation: Math.random() * 360,
-        size: 8 + Math.random() * 8,
-    }));
+    // Memoize confetti pieces to avoid regenerating on each render (impure Math.random)
+    const confettiPieces = useMemo(() => {
+        const colors = ['#FFD700', '#32CD32', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB'];
+        return Array.from({ length: 50 }, (_, i) => ({
+            id: i,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            left: Math.random() * 100,
+            delay: Math.random() * 0.5,
+            duration: 2 + Math.random() * 2,
+            rotation: Math.random() * 360,
+            size: 8 + Math.random() * 8,
+        }));
+    }, []);
 
     return (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">

@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Clock,
@@ -23,7 +23,6 @@ import {
     Play,
     Pause,
     RotateCcw,
-    AlertTriangle,
     CheckCircle2,
     Volume2,
     VolumeX,

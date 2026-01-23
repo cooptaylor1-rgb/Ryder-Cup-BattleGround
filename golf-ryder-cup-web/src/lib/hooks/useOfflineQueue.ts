@@ -15,7 +15,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useOnlineStatus } from './useOnlineStatus';
-import { db } from '../db';
 import { useHaptic } from './useHaptic';
 import { createLogger } from '../utils/logger';
 
@@ -136,7 +135,7 @@ const queueStore = {
 // SYNC ENGINE
 // ============================================
 
-async function syncAction(action: QueuedAction): Promise<boolean> {
+async function syncAction(_action: QueuedAction): Promise<boolean> {
     // Simulate API call
     // In production, this would call the actual Supabase API
     await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 500));

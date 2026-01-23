@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   generateTeeSheet,
   suggestTeeTimeConfig,
   formatTeeSheetForDisplay,
   generatePrintableTeeSheet,
-  type TeeTimeSlot,
   type GeneratedTeeSheet,
   type TeeTimeMode,
 } from '@/lib/services/teeTimeService';
@@ -31,7 +30,7 @@ export function TeeTimeGenerator({
   session,
   matches,
   players,
-  teams,
+  _teams,
   onSave,
 }: TeeTimeGeneratorProps) {
   const [teeSheet, setTeeSheet] = useState<GeneratedTeeSheet | null>(null);

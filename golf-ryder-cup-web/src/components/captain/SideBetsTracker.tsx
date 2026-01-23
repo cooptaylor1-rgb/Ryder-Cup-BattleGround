@@ -1,16 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   createSideGame,
-  calculateSideGameStandings,
   createExpense,
   calculatePlayerBalances,
   calculateSettlements,
   SideGame,
   TripExpense,
-  PlayerBalance,
-  Settlement,
 } from '@/lib/services/sideBetsService';
 import { Player } from '@/lib/types';
 import {
@@ -18,7 +15,6 @@ import {
   Trophy,
   Target,
   PlusCircle,
-  Users,
   TrendingUp,
   TrendingDown,
   CreditCard,

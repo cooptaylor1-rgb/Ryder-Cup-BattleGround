@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { CircleDot, Award, AlertCircle, X, ChevronUp } from 'lucide-react';
+import { CircleDot, Award, X } from 'lucide-react';
 import { allocateStrokes, isOneBallFormat } from '@/lib/services/handicapCalculator';
 
 /**
@@ -375,7 +375,7 @@ export function StrokeHolesMiniMap({
 
           let bgColor = 'var(--canvas-sunken)';
           let textColor = 'var(--ink-tertiary)';
-          let borderColor = 'transparent';
+          let _borderColor = 'transparent';
 
           if (aStrokes > 0 && bStrokes > 0) {
             // Both teams get strokes
@@ -389,7 +389,7 @@ export function StrokeHolesMiniMap({
           }
 
           if (isCurrent) {
-            borderColor = 'var(--masters)';
+            _borderColor = 'var(--masters)';
           }
 
           return (

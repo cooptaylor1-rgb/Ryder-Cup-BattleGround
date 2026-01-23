@@ -19,7 +19,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
-import { Undo2, X, Check, Circle } from 'lucide-react';
+import { Undo2, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import { scoringLogger } from '@/lib/utils/logger';

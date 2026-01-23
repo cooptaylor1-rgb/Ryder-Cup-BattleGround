@@ -24,7 +24,6 @@ import {
     Check,
     BarChart3,
     Settings,
-    RefreshCw,
     Zap,
     Info,
 } from 'lucide-react';

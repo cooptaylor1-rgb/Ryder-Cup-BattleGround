@@ -18,7 +18,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Flag } from 'lucide-react';
-import type { HoleResult, HoleWinner } from '@/lib/types/models';
+import type { HoleResult } from '@/lib/types/models';
 import { useHaptic } from '@/lib/hooks';
 
 interface HoleMiniMapProps {

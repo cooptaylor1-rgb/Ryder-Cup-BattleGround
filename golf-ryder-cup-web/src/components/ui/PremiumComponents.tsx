@@ -22,10 +22,8 @@ import {
     Tv,
     ChevronRight,
     X,
-    Play,
     Trophy,
     Target,
-    Flag,
     Circle,
 } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
@@ -228,15 +226,14 @@ export function HoleProgressStrip({
                         hole.winner === 'teamB' && 'team-europe-win',
                         hole.winner === 'halved' && 'halved'
                     )}
-                    title={`Hole ${hole.holeNumber}: ${
-                        hole.winner === 'teamA'
-                            ? 'USA'
-                            : hole.winner === 'teamB'
+                    title={`Hole ${hole.holeNumber}: ${hole.winner === 'teamA'
+                        ? 'USA'
+                        : hole.winner === 'teamB'
                             ? 'Europe'
                             : hole.winner === 'halved'
-                            ? 'Halved'
-                            : 'Not played'
-                    }`}
+                                ? 'Halved'
+                                : 'Not played'
+                        }`}
                 />
             ))}
         </div>
@@ -267,7 +264,7 @@ export function PremiumProgressBar({
     className,
 }: PremiumProgressBarProps) {
     const [displayValue, setDisplayValue] = useState(0);
-    const percentage = (value / max) * 100;
+    const _percentage = (value / max) * 100;
     const targetPercentage = target ? (target / max) * 100 : null;
 
     useEffect(() => {

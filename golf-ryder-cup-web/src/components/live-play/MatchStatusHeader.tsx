@@ -20,13 +20,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Target, Flame, Circle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { ChevronDown, Target, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { useTripStore, useScoringStore } from '@/lib/stores';
-import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
-import type { Match, HoleResult, Player } from '@/lib/types/models';
+import type { Match, Player } from '@/lib/types/models';
 
 // ============================================
 // TYPES
@@ -70,7 +69,7 @@ export function MatchStatusHeader({
     const { selectMatch } = useScoringStore();
 
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-    const [lastUpdate, setLastUpdate] = useState<number>(0);
+    const [_lastUpdate, setLastUpdate] = useState<number>(0);
 
     // Don't show on home page or if no trip
     const shouldHide = pathname === '/' || !currentTrip;

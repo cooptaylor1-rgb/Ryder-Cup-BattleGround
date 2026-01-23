@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { Trophy, Medal, Star, ChevronRight, Share2, X } from 'lucide-react';
 import { ConfettiBurst, GoldShimmer } from './ConfettiCannon';

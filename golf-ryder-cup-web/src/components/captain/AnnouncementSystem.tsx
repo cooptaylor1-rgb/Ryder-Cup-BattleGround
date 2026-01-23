@@ -28,7 +28,6 @@ import {
   ChevronRight,
   Users,
   Calendar,
-  Flag,
   Trophy,
   Cloud,
   MapPin,
