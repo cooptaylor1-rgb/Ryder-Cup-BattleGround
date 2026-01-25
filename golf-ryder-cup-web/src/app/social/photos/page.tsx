@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
 import { NoPhotosEmpty } from '@/components/ui';
 import {
@@ -207,10 +208,12 @@ export default function PhotosPage() {
                   viewMode === 'masonry' && index % 3 === 0 ? 'row-span-2' : ''
                 }`}
               >
-                <img
+                <Image
                   src={photo.url}
                   alt={photo.caption || 'Golf trip photo'}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 33vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-2">
                   <div className="flex items-center gap-2 text-white text-xs">
@@ -244,10 +247,13 @@ export default function PhotosPage() {
             className="max-w-4xl w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
+            <Image
               src={selectedPhoto.url}
               alt={selectedPhoto.caption || 'Golf trip photo'}
+              width={1200}
+              height={800}
               className="w-full rounded-lg"
+              sizes="(max-width: 1024px) 100vw, 1024px"
             />
 
             <div className="mt-4 text-white">

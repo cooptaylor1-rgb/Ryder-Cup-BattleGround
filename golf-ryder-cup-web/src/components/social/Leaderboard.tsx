@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Trophy,
@@ -305,9 +306,11 @@ function PodiumSpot({ entry, rank, height, isWinner, onClick }: PodiumSpotProps)
       {/* Avatar */}
       <div className="relative">
         {entry.avatarUrl ? (
-          <img
+          <Image
             src={entry.avatarUrl}
             alt={entry.firstName}
+            width={isWinner ? 64 : 48}
+            height={isWinner ? 64 : 48}
             className={cn(
               'rounded-full object-cover',
               isWinner ? 'w-16 h-16' : 'w-12 h-12'
@@ -448,9 +451,11 @@ function LeaderboardRow({ entry, rank, sortBy, onClick }: LeaderboardRowProps) {
 
       {/* Avatar */}
       {entry.avatarUrl ? (
-        <img
+        <Image
           src={entry.avatarUrl}
           alt={fullName}
+          width={40}
+          height={40}
           className="w-10 h-10 rounded-full object-cover"
           style={{ border: `2px solid ${teamColor}` }}
         />

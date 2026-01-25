@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Copy,
@@ -149,9 +150,11 @@ function PlayerSwapCard({
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {player.avatarUrl ? (
-                        <img
+                        <Image
                             src={player.avatarUrl}
                             alt={player.name}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover"
                         />
                     ) : (

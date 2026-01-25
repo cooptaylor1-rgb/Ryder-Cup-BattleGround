@@ -11,7 +11,6 @@ import {
     scoreSyncPayloadSchema,
     formatZodError,
     type ScoreSyncPayload,
-    type ScoringEvent,
 } from '@/lib/validations/api';
 
 // Initialize Supabase client

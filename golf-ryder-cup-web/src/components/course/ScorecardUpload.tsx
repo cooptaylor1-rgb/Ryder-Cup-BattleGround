@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { Upload, FileImage, Loader2, Check, AlertCircle, X, Camera } from 'lucide-react';
 import { ocrLogger } from '@/lib/utils/logger';
 import type { HoleData } from './HoleDataEditor';
@@ -256,7 +257,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
               </p>
               {preview && (
                 <div className="mt-4 mx-auto max-w-[200px]">
-                  <img src={preview} alt="Preview" className="rounded-lg w-full" />
+                  <Image src={preview} alt="Preview" className="rounded-lg w-full" width={200} height={150} unoptimized />
                 </div>
               )}
             </div>

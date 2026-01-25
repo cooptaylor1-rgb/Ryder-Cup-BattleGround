@@ -12,6 +12,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { format } from 'date-fns';
 import {
@@ -409,12 +410,14 @@ export function TripRecap({
                             {photos.map((photo) => (
                                 <div
                                     key={photo.id}
-                                    className="aspect-square rounded-lg overflow-hidden bg-surface-100 dark:bg-surface-800"
+                                    className="aspect-square rounded-lg overflow-hidden bg-surface-100 dark:bg-surface-800 relative"
                                 >
-                                    <img
+                                    <Image
                                         src={photo.url}
                                         alt={photo.caption || ''}
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        className="object-cover"
+                                        sizes="33vw"
                                     />
                                 </div>
                             ))}

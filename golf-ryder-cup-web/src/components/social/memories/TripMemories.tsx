@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import {
     Trophy,
@@ -613,16 +614,14 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
                 </span>
 
                 {/* Avatar */}
-                <div className="w-20 h-20 rounded-full mx-auto my-4 bg-white flex items-center justify-center text-3xl overflow-hidden">
+                <div className="w-20 h-20 rounded-full mx-auto my-4 bg-white flex items-center justify-center text-3xl overflow-hidden relative">
                     {mvp.avatarUrl ? (
-                        <img
+                        <Image
                             src={mvp.avatarUrl}
                             alt={mvp.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                            width={80}
-                            height={80}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
                         />
                     ) : (
                         '👑'

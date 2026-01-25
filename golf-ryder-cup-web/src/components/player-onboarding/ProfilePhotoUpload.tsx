@@ -8,6 +8,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
@@ -225,14 +226,17 @@ export function ProfilePhotoUpload({
                         className={cn(
                             'w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-white dark:border-surface-800',
                             'focus:outline-none focus:ring-4 focus:ring-masters/30',
-                            'transition-all duration-200'
+                            'transition-all duration-200',
+                            'relative'
                         )}
                     >
                         {photo ? (
-                            <img
+                            <NextImage
                                 src={photo}
                                 alt="Profile"
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
+                                unoptimized
                             />
                         ) : (
                             <div className={cn(
@@ -390,11 +394,13 @@ export function ProfilePhotoUpload({
 
                             {/* Preview Image */}
                             <div className="p-6 flex justify-center">
-                                <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-surface-700">
-                                    <img
+                                <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-surface-700 relative">
+                                    <NextImage
                                         src={previewPhoto}
                                         alt="Preview"
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
                                     />
                                 </div>
                             </div>

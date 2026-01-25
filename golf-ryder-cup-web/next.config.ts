@@ -5,6 +5,20 @@ const nextConfig: NextConfig = {
   // Output standalone for optimized container deployments
   output: "standalone",
 
+  // Image optimization configuration
+  images: {
+    // Allow images from any HTTPS source (user-uploaded avatars, photos)
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    // Optimize for these device widths
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+  },
+
   // Security headers for production
   async headers() {
     return [

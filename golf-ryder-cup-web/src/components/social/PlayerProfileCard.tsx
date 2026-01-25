@@ -14,6 +14,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Flame,
@@ -137,9 +138,11 @@ export function PlayerProfileCard({
         {/* Avatar */}
         <div className="relative">
           {player.avatarUrl ? (
-            <img
+            <Image
               src={player.avatarUrl}
               alt={fullName}
+              width={48}
+              height={48}
               className="w-12 h-12 rounded-full object-cover"
               style={{ border: `2px solid ${teamColor}` }}
             />
@@ -279,9 +282,11 @@ function MiniProfile({
     >
       <div className="relative">
         {player.avatarUrl ? (
-          <img
+          <Image
             src={player.avatarUrl}
             alt={player.firstName}
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-full object-cover"
             style={{ border: `2px solid ${teamColor}` }}
           />
@@ -351,9 +356,11 @@ function FullProfile({
       >
         <div className="absolute -bottom-8 left-4">
           {player.avatarUrl ? (
-            <img
+            <Image
               src={player.avatarUrl}
               alt={fullName}
+              width={64}
+              height={64}
               className="w-16 h-16 rounded-2xl object-cover shadow-lg"
               style={{ border: `3px solid var(--surface)` }}
             />

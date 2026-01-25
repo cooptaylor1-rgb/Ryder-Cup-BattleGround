@@ -462,10 +462,12 @@ export function suggestSwaps(
     return suggestions.sort((a, b) => b.improvement - a.improvement).slice(0, 5);
 }
 
-export default {
+const AutoBalanceEngine = {
     autoBalanceLineup,
     calculateLineupFairness,
     calculateMatchFairness,
     suggestSwaps,
     DEFAULT_BALANCE_CONFIG,
 };
+
+export default AutoBalanceEngine;

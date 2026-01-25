@@ -7,6 +7,7 @@
  * Displays trip name, dates, location, captain info, and team roster preview.
  */
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
     Calendar,
@@ -202,9 +203,11 @@ export function TripWelcomeCard({
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         {trip.captainAvatar ? (
-                            <img
+                            <Image
                                 src={trip.captainAvatar}
                                 alt={trip.captainName}
+                                width={56}
+                                height={56}
                                 className="w-14 h-14 rounded-full object-cover"
                             />
                         ) : (

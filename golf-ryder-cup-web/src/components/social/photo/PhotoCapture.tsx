@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
@@ -314,10 +315,12 @@ function PhotoPreview({
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
             {/* Photo */}
             <div className="flex-1 relative overflow-hidden">
-                <img
+                <Image
                     src={dataUrl}
                     alt="Captured"
-                    className="w-full h-full object-contain"
+                    fill
+                    className="object-contain"
+                    unoptimized
                 />
             </div>
 
@@ -406,9 +409,11 @@ function PhotoPreview({
                                         )}
                                     >
                                         {player.avatarUrl ? (
-                                            <img
+                                            <Image
                                                 src={player.avatarUrl}
                                                 alt=""
+                                                width={20}
+                                                height={20}
                                                 className="w-5 h-5 rounded-full"
                                             />
                                         ) : (

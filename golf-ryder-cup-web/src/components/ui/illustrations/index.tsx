@@ -759,7 +759,7 @@ export function RyderCupTrophyIllustration({ className, size = 'lg', animated = 
     );
 }
 
-export default {
+const Illustrations = {
     GolfBallTee,
     TrophyIllustration,
     GolfersIllustration,
@@ -771,3 +771,5 @@ export default {
     CelebrationIllustration,
     RyderCupTrophyIllustration,
 };
+
+export default Illustrations;

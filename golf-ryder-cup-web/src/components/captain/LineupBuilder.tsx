@@ -17,6 +17,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Users,
@@ -500,9 +501,11 @@ function PlayerChip({
       )}
 
       {player.avatarUrl ? (
-        <img
+        <Image
           src={player.avatarUrl}
           alt={player.firstName}
+          width={size === 'sm' ? 24 : 32}
+          height={size === 'sm' ? 24 : 32}
           className={cn('rounded-full', size === 'sm' ? 'w-6 h-6' : 'w-8 h-8')}
           style={{ border: `2px solid ${color}` }}
         />

@@ -18,6 +18,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
@@ -261,13 +262,15 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
           {/* Additional Content */}
           {activity.type === 'photo_uploaded' && activity.data.photoUrl && (
             <div
-              className="mt-3 rounded-lg overflow-hidden"
-              style={{ maxHeight: 200 }}
+              className="mt-3 rounded-lg overflow-hidden relative"
+              style={{ maxHeight: 200, minHeight: 150 }}
             >
-              <img
+              <Image
                 src={activity.data.photoUrl}
                 alt="Uploaded photo"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 500px"
               />
             </div>
           )}

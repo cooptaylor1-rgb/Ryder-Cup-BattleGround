@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { isSupabaseConfigured, getSupabase, insertRecord } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Camera, X, Image as ImageIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -225,10 +226,12 @@ export function PhotoGallery({
                             onClick={() => openViewer(photo, index)}
                             className="relative aspect-square rounded-lg overflow-hidden bg-surface-100 dark:bg-surface-800 group"
                         >
-                            <img
+                            <Image
                                 src={photo.thumbnailUrl || photo.url}
                                 alt={photo.caption || 'Trip photo'}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                sizes="33vw"
                             />
                             {photo.holeNumber && (
                                 <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-xs">
@@ -290,11 +293,13 @@ function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount 
             </div>
 
             {/* Image */}
-            <div className="flex-1 flex items-center justify-center p-4">
-                <img
+            <div className="flex-1 flex items-center justify-center p-4 relative">
+                <Image
                     src={photo.url}
                     alt={photo.caption || 'Trip photo'}
-                    className="max-w-full max-h-full object-contain"
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
                 />
             </div>
 
@@ -342,12 +347,14 @@ export function PhotoStrip({ photos, onViewAll, className }: PhotoStripProps) {
             {displayPhotos.map((photo) => (
                 <div
                     key={photo.id}
-                    className="w-10 h-10 rounded overflow-hidden bg-surface-100 dark:bg-surface-800"
+                    className="w-10 h-10 rounded overflow-hidden bg-surface-100 dark:bg-surface-800 relative"
                 >
-                    <img
+                    <Image
                         src={photo.thumbnailUrl || photo.url}
                         alt=""
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="40px"
                     />
                 </div>
             ))}

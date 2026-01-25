@@ -14,6 +14,7 @@
 'use client';
 
 import { forwardRef, useMemo } from 'react';
+import Image from 'next/image';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
@@ -238,14 +239,16 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
 
                     {/* Avatar */}
                     <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 relative overflow-hidden"
                         style={{ background: teamColor }}
                     >
                         {player.avatarUrl ? (
-                            <img
+                            <Image
                                 src={player.avatarUrl}
                                 alt=""
-                                className="w-full h-full rounded-full object-cover"
+                                fill
+                                className="rounded-full object-cover"
+                                sizes="28px"
                             />
                         ) : (
                             getInitials(player.firstName, player.lastName)
@@ -309,14 +312,16 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                     {/* Avatar */}
                     <div className="relative shrink-0">
                         <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm"
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm relative overflow-hidden"
                             style={{ background: teamColor }}
                         >
                             {player.avatarUrl ? (
-                                <img
+                                <Image
                                     src={player.avatarUrl}
                                     alt=""
-                                    className="w-full h-full rounded-full object-cover"
+                                    fill
+                                    className="rounded-full object-cover"
+                                    sizes="48px"
                                 />
                             ) : (
                                 getInitials(player.firstName, player.lastName)

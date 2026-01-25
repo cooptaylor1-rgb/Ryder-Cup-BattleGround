@@ -12,6 +12,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
@@ -466,10 +467,13 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                                 <X size={14} className="text-white" />
                                             </button>
                                         </div>
-                                        <img
+                                        <NextImage
                                             src={img.dataUrl}
                                             alt={img.label}
+                                            width={400}
+                                            height={256}
                                             className="w-full max-h-64 object-contain"
+                                            unoptimized
                                         />
                                     </div>
                                 ))}

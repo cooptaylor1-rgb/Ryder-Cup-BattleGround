@@ -15,6 +15,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MessageCircle,
@@ -256,9 +257,11 @@ export function MomentCard({
                 {/* Author Avatar */}
                 <div className="relative">
                     {moment.author.avatarUrl ? (
-                        <img
+                        <Image
                             src={moment.author.avatarUrl}
                             alt=""
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded-full object-cover"
                         />
                     ) : (
@@ -343,21 +346,19 @@ export function MomentCard({
                                 {moment.taggedPlayers.slice(0, 3).map((player) => (
                                     <div
                                         key={player.id}
-                                        className="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-[10px] font-bold"
+                                        className="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-[10px] font-bold relative overflow-hidden"
                                         style={{
                                             background: player.avatarUrl ? undefined :
                                                 player.team === 'teamA' ? teamAColor : teamBColor,
                                         }}
                                     >
                                         {player.avatarUrl ? (
-                                            <img
+                                            <Image
                                                 src={player.avatarUrl}
                                                 alt=""
-                                                className="w-full h-full rounded-full"
-                                                loading="lazy"
-                                                decoding="async"
-                                                width={24}
-                                                height={24}
+                                                fill
+                                                className="rounded-full object-cover"
+                                                sizes="24px"
                                             />
                                         ) : (
                                             <span className="text-white">{player.name.charAt(0)}</span>
@@ -424,16 +425,14 @@ export function MomentCard({
                         className="w-full text-left"
                     >
                         <div className="flex items-start gap-2 p-2 rounded-lg" style={{ background: 'var(--rule)' }}>
-                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-[10px] font-bold shrink-0">
+                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-[10px] font-bold shrink-0 relative overflow-hidden">
                                 {previewComment.userAvatar ? (
-                                    <img
+                                    <Image
                                         src={previewComment.userAvatar}
                                         alt=""
-                                        className="w-full h-full rounded-full"
-                                        loading="lazy"
-                                        decoding="async"
-                                        width={24}
-                                        height={24}
+                                        fill
+                                        className="rounded-full object-cover"
+                                        sizes="24px"
                                     />
                                 ) : (
                                     previewComment.userName.charAt(0)

@@ -17,6 +17,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Camera,
@@ -367,10 +368,12 @@ export function QuickPhotoCapture({
                                     </div>
                                 </div>
                             ) : capturedImage ? (
-                                <img
+                                <Image
                                     src={capturedImage}
                                     alt="Captured"
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
                                 />
                             ) : (
                                 <video
