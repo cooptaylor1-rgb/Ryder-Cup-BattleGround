@@ -16,6 +16,33 @@ const APP_DESCRIPTION = 'Track your Ryder Cup style golf trips with real-time sc
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://golf-ryder-cup.app';
 
 // ============================================
+// DYNAMIC OG IMAGE GENERATION
+// ============================================
+
+interface OGImageParams {
+  type: 'default' | 'match' | 'standings';
+  team1?: string;
+  team2?: string;
+  score1?: string;
+  score2?: string;
+  status?: string;
+  trip?: string;
+}
+
+/**
+ * Generate dynamic OG image URL
+ */
+export function generateOGImageUrl(params: OGImageParams): string {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      searchParams.set(key, value);
+    }
+  });
+  return `${APP_URL}/api/og?${searchParams.toString()}`;
+}
+
+// ============================================
 // BASE METADATA
 // ============================================
 
@@ -34,9 +61,18 @@ export const baseMetadata: Metadata = {
         type: 'website',
         locale: 'en_US',
         siteName: APP_NAME,
+        images: [
+            {
+                url: generateOGImageUrl({ type: 'default' }),
+                width: 1200,
+                height: 630,
+                alt: 'Golf Ryder Cup - The Ultimate Golf Trip Companion',
+            },
+        ],
     },
     twitter: {
         card: 'summary_large_image',
+        images: [generateOGImageUrl({ type: 'default' })],
     },
     robots: {
         index: true,
