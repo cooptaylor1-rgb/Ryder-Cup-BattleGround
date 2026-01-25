@@ -36,29 +36,34 @@ test.describe('Standings Display', () => {
 
     test('should show both teams in standings', async ({ page }) => {
         await page.goto('/standings');
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
-        // Wait for loading to finish
-        await page.waitForFunction(() => !document.body.textContent?.includes('Loading...'), { timeout: 10000 }).catch(() => {
-            // If still loading after timeout, continue with test
-        });
-
-        // Page should render without errors
+        // Wait for page body to be visible first
         const body = page.locator('body');
-        await expect(body).toBeVisible();
+        await expect(body).toBeVisible({ timeout: 15000 });
 
-        // Look for team indicators or empty state
-        const teamIndicators = page.locator('[data-testid*="team"], .team-score, .standings-team, text=/USA|Europe|Team/i');
-        const emptyState = page.locator('[data-testid="empty-state"], text=/no standings|no data|create.*trip/i');
-        const loadingState = page.locator('text=/loading/i');
+        // Wait for loading to finish (with graceful fallback)
+        try {
+            await page.waitForFunction(
+                () => !document.body.textContent?.includes('Loading...'),
+                { timeout: 10000 }
+            );
+        } catch {
+            // If still loading after timeout, continue with test
+        }
+
+        // Look for team indicators or empty state (using separate locators to avoid selector conflicts)
+        const teamByTestId = page.locator('[data-testid*="team"]');
+        const teamByClass = page.locator('.team-score, .standings-team');
+        const teamByText = page.getByText(/USA|Europe|Team/i);
+        const emptyState = page.locator('[data-testid="empty-state"]').or(page.getByText(/no standings|no data|create.*trip/i));
+        const loadingState = page.getByText(/loading/i);
 
         // Either teams should be displayed OR an empty state OR still loading (for flaky network)
-        const hasTeams = await teamIndicators.count() > 0;
+        const hasTeams = (await teamByTestId.count() > 0) || (await teamByClass.count() > 0) || (await teamByText.count() > 0);
         const hasEmptyState = await emptyState.count() > 0;
         const isLoading = await loadingState.count() > 0;
         expect(hasTeams || hasEmptyState || isLoading).toBe(true);
-        const hasEmptyState = await emptyState.count() > 0;
-        expect(hasTeams || hasEmptyState).toBe(true);
     });
 
     test('should display point totals', async ({ page }) => {

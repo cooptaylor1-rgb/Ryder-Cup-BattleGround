@@ -1,12 +1,20 @@
 {
-  "seed": "fuzz-1769131324729",
-  "timestamp": "2026-01-23T01:23:55.299Z",
-  "actionCount": 50,
-  "failedActions": 10,
+  "seed": "fuzz-1769356575318",
+  "timestamp": "2026-01-25T15:59:11.276Z",
+  "actionCount": 300,
+  "failedActions": 0,
   "actions": [
     {
+      "type": "click_link",
+      "timestamp": 1769356579357,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
       "type": "click_button",
-      "timestamp": 1769131329613,
+      "timestamp": 1769356579688,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -15,190 +23,40 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769131330287,
+      "timestamp": 1769356580430,
       "details": {
         "inputIndex": 5,
-        "value": "!@#$%^&*()",
+        "value": "Test",
         "inputType": "text"
       },
       "success": true
     },
     {
-      "type": "navigate",
-      "timestamp": 1769131330649,
-      "details": {
-        "target": "/more"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131331905,
-      "details": {
-        "buttonIndex": 1,
-        "buttonText": "Continue"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131332616,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769131333316,
-      "details": {
-        "inputIndex": 4,
-        "value": "12345",
-        "inputType": "tel"
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769131333675,
-      "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
-      },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131342002,
-      "details": {
-        "buttonIndex": 0,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769131342659,
-      "details": {
-        "inputIndex": 0,
-        "value": "test@example.com",
-        "inputType": "email"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131342985,
-      "details": {
-        "buttonIndex": 0,
-        "buttonText": "Sign In"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131343654,
-      "details": {
-        "buttonIndex": 0,
-        "buttonText": "Sign In"
-      },
-      "success": true
-    },
-    {
       "type": "back",
-      "timestamp": 1769131344318,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769131344968,
-      "details": {
-        "inputIndex": 3,
-        "value": "Test",
-        "inputType": "email"
-      },
-      "success": true
-    },
-    {
-      "type": "back",
-      "timestamp": 1769131345310,
+      "timestamp": 1769356580776,
       "details": {},
       "success": true
     },
     {
       "type": "scroll",
-      "timestamp": 1769131346203,
+      "timestamp": 1769356581932,
       "details": {
         "direction": "up",
-        "amount": 182
+        "amount": 391
       },
       "success": true
     },
     {
-      "type": "click_link",
-      "timestamp": 1769131346714,
+      "type": "navigate",
+      "timestamp": 1769356582447,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
-      },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131355031,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769131355669,
-      "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
-      },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769131363989,
-      "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
-      },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769131372317,
-      "details": {
-        "inputIndex": 5,
-        "value": "!@#$%^&*()",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769131372644,
-      "details": {
-        "inputIndex": 2,
-        "value": "Pebble Beach",
-        "inputType": "text"
+        "target": "/score"
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769131372975,
+      "timestamp": 1769356583657,
       "details": {
         "buttonIndex": 1,
         "buttonText": "Continue"
@@ -207,7 +65,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769131373615,
+      "timestamp": 1769356584326,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -215,90 +73,173 @@
       "success": true
     },
     {
-      "type": "fill_input",
-      "timestamp": 1769131374254,
+      "type": "scroll",
+      "timestamp": 1769356585004,
       "details": {
-        "inputIndex": 5,
-        "value": "!@#$%^&*()",
-        "inputType": "text"
+        "direction": "down",
+        "amount": 209
       },
       "success": true
     },
     {
-      "type": "fill_input",
-      "timestamp": 1769131374581,
+      "type": "navigate",
+      "timestamp": 1769356585534,
       "details": {
-        "inputIndex": 6,
-        "value": "test@example.com",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131374909,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131375532,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
+        "target": "/matchups"
       },
       "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769131376166,
+      "timestamp": 1769356586811,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
+        "reason": "No visible links"
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356587122,
+      "details": {
+        "inputIndex": 3,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356587515,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769131384480,
+      "timestamp": 1769356587843,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356588517,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356589171,
       "details": {
         "buttonIndex": 1,
         "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356589847,
+      "details": {
+        "direction": "down",
+        "amount": 303
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356590375,
+      "details": {
+        "target": "/matchups"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356592139,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356592792,
+      "details": {
+        "direction": "up",
+        "amount": 466
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356593326,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356594021,
+      "details": {
+        "direction": "down",
+        "amount": 85
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356594564,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356595247,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
       },
       "success": true
     },
     {
       "type": "tab",
-      "timestamp": 1769131385126,
+      "timestamp": 1769356595949,
       "details": {
         "tabCount": 1
       },
       "success": true
     },
     {
-      "type": "click_button",
-      "timestamp": 1769131385542,
+      "type": "navigate",
+      "timestamp": 1769356596375,
       "details": {
-        "buttonIndex": 1,
-        "buttonText": "Continue"
+        "target": "/profile"
       },
       "success": true
     },
     {
-      "type": "tab",
-      "timestamp": 1769131386175,
+      "type": "click_link",
+      "timestamp": 1769356597518,
       "details": {
-        "tabCount": 5
+        "reason": "No visible links"
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769131387001,
+      "timestamp": 1769356597843,
       "details": {
         "buttonIndex": 0,
         "buttonText": ""
@@ -306,18 +247,76 @@
       "success": true
     },
     {
-      "type": "click_link",
-      "timestamp": 1769131387638,
+      "type": "back",
+      "timestamp": 1769356598520,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356599181,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
+        "buttonIndex": 0,
+        "buttonText": ""
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356599908,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356600562,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356600872,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356601560,
+      "details": {
+        "direction": "up",
+        "amount": 397
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356602095,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356602750,
+      "details": {
+        "direction": "down",
+        "amount": 78
+      },
+      "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769131395956,
+      "timestamp": 1769356603275,
       "details": {
         "inputIndex": 1,
         "value": "!@#$%^&*()",
@@ -326,58 +325,358 @@
       "success": true
     },
     {
-      "type": "scroll",
-      "timestamp": 1769131396277,
+      "type": "fill_input",
+      "timestamp": 1769356603596,
       "details": {
-        "direction": "down",
-        "amount": 254
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769131396798,
-      "details": {
-        "buttonIndex": 4,
-        "buttonText": "Create Your Profile"
-      },
-      "success": true
-    },
-    {
-      "type": "scroll",
-      "timestamp": 1769131397454,
-      "details": {
-        "direction": "down",
-        "amount": 231
+        "inputIndex": 0,
+        "value": "",
+        "inputType": "email"
       },
       "success": true
     },
     {
       "type": "back",
-      "timestamp": 1769131397962,
+      "timestamp": 1769356603920,
       "details": {},
       "success": true
     },
     {
-      "type": "tab",
-      "timestamp": 1769131398597,
+      "type": "click_button",
+      "timestamp": 1769356604557,
       "details": {
-        "tabCount": 4
-      },
-      "success": true
-    },
-    {
-      "type": "scroll",
-      "timestamp": 1769131399320,
-      "details": {
-        "direction": "up",
-        "amount": 58
+        "buttonIndex": 1,
+        "buttonText": "Continue"
       },
       "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769131399845,
+      "timestamp": 1769356605202,
+      "details": {
+        "inputIndex": 3,
+        "value": "!@#$%^&*()",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356605534,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356605843,
+      "details": {
+        "inputIndex": 5,
+        "value": "10.5",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356606201,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356606511,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356607144,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356608056,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356608883,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356609530,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356609840,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356610151,
+      "details": {
+        "inputIndex": 2,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356610481,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356611114,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356611765,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356612386,
+      "details": {
+        "direction": "down",
+        "amount": 359
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356612898,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356613539,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356614175,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356615045,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356615355,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356616240,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356616887,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356617529,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356618178,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356618819,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356619467,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356619781,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356620427,
+      "details": {
+        "direction": "down",
+        "amount": 142
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356620941,
+      "details": {
+        "direction": "up",
+        "amount": 443
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356621453,
+      "details": {
+        "direction": "up",
+        "amount": 147
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356621965,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356622599,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356623033,
+      "details": {
+        "direction": "up",
+        "amount": 350
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356623561,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356624218,
+      "details": {
+        "inputIndex": 1,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356624541,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356625231,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356625854,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356626499,
       "details": {
         "inputIndex": 0,
         "value": "John Smith",
@@ -387,36 +686,91 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769131400171,
+      "timestamp": 1769356626831,
       "details": {
         "buttonIndex": 3,
-        "buttonText": "Sign In"
+        "buttonText": "Create Your Profile"
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:visible').nth(3)\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" class=\"relative inline-flex items-center justify-center gap-2 transition-transform duration-150 ease-out hover:scale-[1.02] active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gold focus-visible:ring-offset-surface-base disabled:pointer-events-none disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 select-none h-14 px-6 text-lg rounded-xl min-w-[100px] bg-[#006747] text-white font-semibold hover:…>…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
     },
     {
-      "type": "scroll",
-      "timestamp": 1769131408485,
+      "type": "click_button",
+      "timestamp": 1769356627485,
       "details": {
-        "direction": "down",
-        "amount": 285
+        "buttonIndex": 0,
+        "buttonText": ""
       },
       "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769131409013,
+      "timestamp": 1769356628130,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
+        "reason": "No visible links"
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356628448,
+      "details": {
+        "direction": "down",
+        "amount": 22
+      },
+      "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769131417330,
+      "timestamp": 1769356628970,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356629640,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356630278,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356630797,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356631113,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356631762,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356632401,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -425,27 +779,1122 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769131417992,
+      "timestamp": 1769356633085,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
+        "reason": "No visible links"
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356633407,
+      "details": {
+        "direction": "down",
+        "amount": 180
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356633922,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356634561,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356635218,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356635756,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356636399,
+      "details": {
+        "direction": "up",
+        "amount": 198
+      },
+      "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769131426325,
+      "timestamp": 1769356636933,
       "details": {
-        "linkIndex": 0,
-        "href": "#main-content"
+        "reason": "No visible links"
       },
-      "success": false,
-      "error": "locator.click: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"#main-content\" class=\"sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-3 focus:rounded-xl focus:bg-masters-green focus:text-white focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2\">Skip to main content</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - element is outside of the viewport\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    15 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - element is outside of the viewport\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356637252,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769131434641,
+      "timestamp": 1769356637940,
+      "details": {
+        "inputIndex": 1,
+        "value": "Test",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356638274,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356638928,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356639247,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356639567,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356640208,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356640520,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356640843,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356641498,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356642190,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356642505,
+      "details": {
+        "inputIndex": 2,
+        "value": "10.5",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356642852,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356643496,
+      "details": {
+        "inputIndex": 0,
+        "value": "12345",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356643823,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356644135,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356644810,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356645122,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356645781,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356646095,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356646409,
+      "details": {
+        "target": "/score"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356647767,
+      "details": {
+        "inputIndex": 4,
+        "value": "Test",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356648119,
+      "details": {
+        "inputIndex": 0,
+        "value": "Test",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356648451,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356649096,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356650241,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356650889,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356651201,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356651885,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356652557,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356653199,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356653856,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356654773,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356655404,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356655730,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356656429,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356657495,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356658535,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356659184,
+      "details": {
+        "inputIndex": 1,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356659523,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356660590,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356660905,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356661625,
+      "details": {
+        "direction": "up",
+        "amount": 355
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356662169,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356662841,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356663155,
+      "details": {
+        "direction": "up",
+        "amount": 477
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356663673,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356664307,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356665328,
+      "details": {
+        "inputIndex": 6,
+        "value": "John Smith",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356665730,
+      "details": {
+        "inputIndex": 6,
+        "value": "John Smith",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356666113,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356667287,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356668187,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356668507,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356669543,
+      "details": {
+        "inputIndex": 5,
+        "value": "John Smith",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356669885,
+      "details": {
+        "inputIndex": 1,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356670227,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356671222,
+      "details": {
+        "direction": "down",
+        "amount": 120
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356671756,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356672072,
+      "details": {
+        "direction": "down",
+        "amount": 221
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356672588,
+      "details": {
+        "inputIndex": 3,
+        "value": "Test",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356672922,
+      "details": {
+        "inputIndex": 4,
+        "value": "Pebble Beach",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356673258,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356673584,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356673898,
+      "details": {
+        "direction": "up",
+        "amount": 131
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356674436,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356675098,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356676272,
+      "details": {
+        "direction": "up",
+        "amount": 206
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356676788,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356677107,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356677748,
+      "details": {
+        "direction": "down",
+        "amount": 251
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356678268,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356678908,
+      "details": {
+        "direction": "up",
+        "amount": 454
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356679425,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356679740,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356680601,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356681330,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356681645,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356682329,
+      "details": {
+        "direction": "down",
+        "amount": 494
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356682866,
+      "details": {
+        "direction": "up",
+        "amount": 358
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356683388,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356683704,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356684258,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356684579,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356685236,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356685871,
+      "details": {
+        "inputIndex": 3,
+        "value": "!@#$%^&*()",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356686206,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356686524,
+      "details": {
+        "direction": "down",
+        "amount": 282
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356687059,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356687698,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356688011,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356688745,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356689086,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356689404,
+      "details": {
+        "inputIndex": 3,
+        "value": "John Smith",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356689757,
+      "details": {
+        "direction": "down",
+        "amount": 247
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356690272,
+      "details": {
+        "direction": "down",
+        "amount": 484
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356690790,
+      "details": {
+        "inputIndex": 6,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356691131,
+      "details": {
+        "inputIndex": 6,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356691478,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356692133,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356692451,
+      "details": {
+        "target": "/score"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356693358,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356693905,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356694551,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356695201,
+      "details": {
+        "inputIndex": 2,
+        "value": "10.5",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356695577,
+      "details": {
+        "direction": "up",
+        "amount": 381
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356696103,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356697108,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356698068,
+      "details": {
+        "inputIndex": 2,
+        "value": "Pebble Beach",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356698414,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356699104,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356699882,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356700243,
+      "details": {
+        "target": "/matchups"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356701267,
+      "details": {
+        "inputIndex": 3,
+        "value": "test@example.com",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356701603,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356702255,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356703142,
+      "details": {
+        "inputIndex": 5,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356703494,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356704198,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356704512,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356705450,
+      "details": {
+        "direction": "down",
+        "amount": 297
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356705977,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356706619,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356707269,
       "details": {
         "inputIndex": 0,
         "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -454,12 +1903,662 @@
       "success": true
     },
     {
+      "type": "click_button",
+      "timestamp": 1769356707616,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356708306,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356708963,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356709392,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356709706,
+      "details": {
+        "target": "/schedule"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356710752,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
       "type": "fill_input",
-      "timestamp": 1769131434970,
+      "timestamp": 1769356711067,
+      "details": {
+        "inputIndex": 3,
+        "value": "",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356711414,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356712065,
+      "details": {
+        "target": "/score"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356713057,
+      "details": {
+        "direction": "up",
+        "amount": 479
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356713581,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356714234,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356714884,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356715563,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356716261,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356717149,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356717800,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356718988,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356719859,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356720816,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356721520,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356721867,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356722516,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356723182,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356723878,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356724202,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356724969,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356725285,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356725979,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356726644,
+      "details": {
+        "inputIndex": 2,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356726982,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356727298,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356727615,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356727936,
+      "details": {
+        "inputIndex": 3,
+        "value": "!@#$%^&*()",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356728301,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356728955,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356729620,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356730306,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356730999,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356731327,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356731642,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356732395,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356732713,
+      "details": {
+        "direction": "up",
+        "amount": 85
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356733240,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356733570,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356734225,
+      "details": {
+        "direction": "down",
+        "amount": 124
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356734786,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356735332,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356735997,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356736646,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356737316,
       "details": {
         "inputIndex": 1,
-        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "value": "Pebble Beach",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356737673,
+      "details": {
+        "direction": "down",
+        "amount": 104
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356738206,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356738882,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356739201,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356739629,
+      "details": {
+        "inputIndex": 0,
+        "value": "!@#$%^&*()",
         "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356739999,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356740661,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356740980,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356741691,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769356742008,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356742559,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769356742880,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356743566,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356744231,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769356744552,
+      "details": {
+        "target": "/profile"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356745542,
+      "details": {
+        "direction": "up",
+        "amount": 385
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356746076,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356746400,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356747056,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356747735,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356748053,
+      "details": {
+        "inputIndex": 4,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356748412,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769356748733,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356749052,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769356749720,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769356750388,
+      "details": {
+        "inputIndex": 1,
+        "value": "Pebble Beach",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769356750732,
+      "details": {
+        "direction": "down",
+        "amount": 22
       },
       "success": true
     }
