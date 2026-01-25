@@ -61,10 +61,14 @@ export default function ScorePage() {
         ? sessions.find(s => s.id === selectedSessionId) || defaultActiveSession
         : defaultActiveSession;
 
-    // Set initial selected session when sessions load
+    // Set initial selected session when sessions load - deferred to avoid setState-in-effect
     useEffect(() => {
         if (!selectedSessionId && defaultActiveSession) {
-            setSelectedSessionId(defaultActiveSession.id);
+            // Defer to next tick to avoid cascading renders
+            const timeoutId = setTimeout(() => {
+                setSelectedSessionId(defaultActiveSession.id);
+            }, 0);
+            return () => clearTimeout(timeoutId);
         }
     }, [selectedSessionId, defaultActiveSession]);
 

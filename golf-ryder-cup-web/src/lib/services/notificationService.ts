@@ -486,8 +486,9 @@ export function notifyLineupPublished(sessionName: string, tripName: string): vo
 
 function convertTo24Hour(time12h: string): string {
     const [time, modifier] = time12h.split(' ');
-    // eslint-disable-next-line prefer-const
-    let [hours, minutes] = time.split(':').map(Number);
+    const [hoursStr, minutesStr] = time.split(':');
+    let hours = Number(hoursStr);
+    const minutes = Number(minutesStr);
 
     if (modifier === 'PM' && hours !== 12) {
         hours += 12;

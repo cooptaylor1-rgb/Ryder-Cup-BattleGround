@@ -144,7 +144,8 @@ class SyncService {
             if (stored) {
                 this.pendingChanges = JSON.parse(stored);
             }
-        } catch {
+        } catch (error) {
+            console.warn('Failed to load pending sync changes from localStorage:', error);
             this.pendingChanges = [];
         }
     }
@@ -156,8 +157,8 @@ class SyncService {
         if (typeof window === 'undefined') return;
         try {
             localStorage.setItem('golf-sync-pending', JSON.stringify(this.pendingChanges));
-        } catch {
-            // Storage full or unavailable
+        } catch (error) {
+            console.warn('Failed to save pending sync changes to localStorage (storage may be full):', error);
         }
     }
 
@@ -516,7 +517,8 @@ class SyncService {
             }
 
             return true;
-        } catch {
+        } catch (error) {
+            console.error('Failed to push hole result to Supabase:', error);
             this.addPendingChange('hole_results', 'insert', holeResult);
             return false;
         }
@@ -541,7 +543,8 @@ class SyncService {
             }
 
             return true;
-        } catch {
+        } catch (error) {
+            console.error('Failed to push match update to Supabase:', error);
             this.addPendingChange('matches', 'update', match);
             return false;
         }

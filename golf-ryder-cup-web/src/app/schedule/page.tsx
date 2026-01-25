@@ -221,7 +221,7 @@ export default function SchedulePage() {
     }
 
     return days;
-  }, [currentTrip, sessions, matches, currentUserPlayer, players, getMatchPlayerNames, isUserInMatch]);
+  }, [currentTrip, sessions, matches, getMatchPlayerNames, isUserInMatch]);
 
   // Filter for user's schedule
   const mySchedule = useMemo(() => {

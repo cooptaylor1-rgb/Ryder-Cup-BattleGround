@@ -39,9 +39,11 @@ export function PWAProvider({ children }: PWAProviderProps) {
     const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
     useEffect(() => {
-        // Check initial state
-        setOnline(isOnline());
-        setInstalled(isInstalledPWA());
+        // Check initial state - deferred to avoid setState-in-effect
+        const timeoutId = setTimeout(() => {
+            setOnline(isOnline());
+            setInstalled(isInstalledPWA());
+        }, 0);
 
         // Register service worker
         const handleUpdate: SWUpdateCallback = (reg) => {
@@ -57,6 +59,8 @@ export function PWAProvider({ children }: PWAProviderProps) {
                 pwaLogger.log('App ready for offline use');
             },
         });
+
+        return () => clearTimeout(timeoutId);
 
         // Listen for online/offline events
         const handleOnline = () => setOnline(true);

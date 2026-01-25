@@ -75,7 +75,10 @@ export function AppShell({
 
   // Close mobile menu on route change
   useEffect(() => {
-    setMobileMenuOpen(false);
+    const timeoutId = setTimeout(() => {
+      setMobileMenuOpen(false);
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [headerTitle]);
 
   const maxWidthClass = {

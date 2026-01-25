@@ -106,32 +106,37 @@ export function OfflineIndicator() {
     const [isSyncing, setIsSyncing] = useState(false);
 
     useEffect(() => {
-        if (!isOnline) {
-            setSyncStatus('offline');
-            setShowBanner(true);
-            setJustCameOnline(false);
-        } else if (syncStatus === 'offline') {
-            // Just came back online - trigger sync
-            setSyncStatus('syncing');
-            setIsSyncing(true);
-            setJustCameOnline(true);
-
-            // Simulate sync completion
-            setTimeout(() => {
-                setIsSyncing(false);
-                setSyncStatus('synced');
-            }, 2000);
-
-            // Show "back online" message briefly
-            setTimeout(() => {
-                setShowBanner(false);
-            }, 3000);
-
-            // Hide "just came online" indicator after animation
-            setTimeout(() => {
+        // Defer state updates to avoid setState-in-effect warnings
+        const timeoutId = setTimeout(() => {
+            if (!isOnline) {
+                setSyncStatus('offline');
+                setShowBanner(true);
                 setJustCameOnline(false);
-            }, 4000);
-        }
+            } else if (syncStatus === 'offline') {
+                // Just came back online - trigger sync
+                setSyncStatus('syncing');
+                setIsSyncing(true);
+                setJustCameOnline(true);
+
+                // Simulate sync completion
+                setTimeout(() => {
+                    setIsSyncing(false);
+                    setSyncStatus('synced');
+                }, 2000);
+
+                // Show "back online" message briefly
+                setTimeout(() => {
+                    setShowBanner(false);
+                }, 3000);
+
+                // Hide "just came online" indicator after animation
+                setTimeout(() => {
+                    setJustCameOnline(false);
+                }, 4000);
+            }
+        }, 0);
+
+        return () => clearTimeout(timeoutId);
     }, [isOnline, syncStatus]);
 
     // Don't show anything if online and not just reconnected

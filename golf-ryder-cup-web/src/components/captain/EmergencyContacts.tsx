@@ -247,7 +247,10 @@ export function EmergencyContacts({
         if (onCall) {
             onCall(playerId, phone);
         } else {
-            window.location.href = `tel:${phone}`;
+            // Use standard DOM API for phone call link
+            const link = document.createElement('a');
+            link.href = `tel:${phone}`;
+            link.click();
         }
     };
 
@@ -255,7 +258,10 @@ export function EmergencyContacts({
         if (onText) {
             onText(playerId, phone);
         } else {
-            window.location.href = `sms:${phone}`;
+            // Use standard DOM API for SMS link
+            const link = document.createElement('a');
+            link.href = `sms:${phone}`;
+            link.click();
         }
     };
 

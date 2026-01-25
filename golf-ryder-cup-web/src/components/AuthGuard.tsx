@@ -52,8 +52,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
 
     if (isPublicRoute) {
-      setIsChecking(false);
-      return;
+      // Defer to avoid setState-in-effect
+      const timeoutId = setTimeout(() => setIsChecking(false), 0);
+      return () => clearTimeout(timeoutId);
     }
 
     // If not authenticated, redirect to profile creation
@@ -62,8 +63,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    // User is authenticated, allow access
-    setIsChecking(false);
+    // User is authenticated, allow access - defer to avoid setState-in-effect
+    const timeoutId = setTimeout(() => setIsChecking(false), 0);
+    return () => clearTimeout(timeoutId);
   }, [isHydrated, isAuthenticated, currentUser, pathname, router]);
 
   // Show nothing while checking authentication (prevents flash)

@@ -83,6 +83,7 @@ export function PreFlightChecklist({
 
   useEffect(() => {
     runCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripId]);
 
   const toggleSection = (category: string) => {

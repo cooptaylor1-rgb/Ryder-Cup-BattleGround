@@ -220,19 +220,18 @@ export function PaceSpacing({
 
     // Calculate intervals for all groups
     const scheduledGroups = useMemo(() => {
-        let currentTime = firstTeeTime;
-
-        return groups.map((group, idx) => {
+        return groups.reduce<Array<typeof groups[0] & { suggestedInterval: number; scheduledTeeTime: string }>>((acc, group, idx) => {
             const interval = calculateGroupPace(group, localSettings);
-            const teeTime = idx === 0 ? currentTime : addMinutesToTime(currentTime, interval);
-            currentTime = teeTime;
+            const prevTime = idx === 0 ? firstTeeTime : acc[idx - 1].scheduledTeeTime;
+            const teeTime = idx === 0 ? prevTime : addMinutesToTime(prevTime, interval);
 
-            return {
+            acc.push({
                 ...group,
                 suggestedInterval: interval,
                 scheduledTeeTime: teeTime,
-            };
-        });
+            });
+            return acc;
+        }, []);
     }, [groups, firstTeeTime, localSettings]);
 
     // Calculate total round time

@@ -447,12 +447,19 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     const success = !!subscription;
     setIsSubscribed(success);
 
-    // Send subscription to server if needed
+    // Send subscription to server for server-side push notifications
     if (subscription) {
       const data = subscriptionToData(subscription);
       if (data) {
-        // TODO: Send to server for push notifications
-        console.log('Push subscription:', data);
+        try {
+          await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscription: data }),
+          });
+        } catch (error) {
+          console.error('Failed to register push subscription on server:', error);
+        }
       }
     }
 

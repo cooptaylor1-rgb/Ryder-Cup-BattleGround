@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/.playwright/
+*.test-results
+visual-regression-baseline/
+tests/e2e/artifacts/test-results/
 
 # next.js
 /.next/

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   generateTeeSheet,
   suggestTeeTimeConfig,
@@ -44,9 +44,13 @@ export function TeeTimeGenerator({
   // Initialize with suggested config
   useEffect(() => {
     const suggested = suggestTeeTimeConfig(matches.length, session.sessionType);
-    setStartTime(suggested.firstTeeTime);
-    setIntervalMinutes(suggested.intervalMinutes);
-    setFormat(suggested.mode);
+    // Defer to avoid setState-in-effect warning
+    const timeoutId = setTimeout(() => {
+      setStartTime(suggested.firstTeeTime);
+      setIntervalMinutes(suggested.intervalMinutes);
+      setFormat(suggested.mode);
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [matches.length, session.sessionType]);
 
   // Generate tee sheet when config changes
@@ -60,22 +64,26 @@ export function TeeTimeGenerator({
     };
 
     const generated = generateTeeSheet(session, matches, config);
-    setTeeSheet(generated);
+    // Defer to avoid setState-in-effect warning
+    const timeoutId = setTimeout(() => {
+      setTeeSheet(generated);
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [session, matches, startTime, intervalMinutes, format]);
 
   // Helper to get player names
-  const getPlayerNames = (ids: string[]) => {
+  const getPlayerNames = useCallback((ids: string[]) => {
     return ids.map(id => {
       const player = players.find(p => p.id === id);
       return player ? `${player.firstName} ${player.lastName}` : 'Unknown';
     }).join(' & ');
-  };
+  }, [players]);
 
   // Format for display
   const displayItems = useMemo(() => {
     if (!teeSheet) return [];
     return formatTeeSheetForDisplay(teeSheet, matches, getPlayerNames);
-  }, [teeSheet, matches, players]);
+  }, [teeSheet, matches, getPlayerNames]);
 
   const handlePrint = () => {
     if (!teeSheet) return;

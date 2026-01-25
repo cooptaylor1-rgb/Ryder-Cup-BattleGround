@@ -40,10 +40,67 @@ interface Photo {
   likes: number;
 }
 
+// Demo photos generator (called once during initialization)
+function createDemoPhotos(players: { id?: string }[]): Photo[] {
+  const now = Date.now();
+  return [
+    {
+      id: '1',
+      url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800',
+      caption: 'First tee vibes 🏌️',
+      uploadedBy: players[0]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 30).toISOString(),
+      likes: 8,
+    },
+    {
+      id: '2',
+      url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800',
+      caption: 'Beautiful morning on the course',
+      uploadedBy: players[1]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 60).toISOString(),
+      likes: 12,
+    },
+    {
+      id: '3',
+      url: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=800',
+      caption: 'Eagle on 15! 🦅',
+      uploadedBy: players[2]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 90).toISOString(),
+      likes: 24,
+    },
+    {
+      id: '4',
+      url: 'https://images.unsplash.com/photo-1632170073-b2d67e9b0de4?w=800',
+      caption: 'Sunset round',
+      uploadedBy: players[0]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 120).toISOString(),
+      likes: 15,
+    },
+    {
+      id: '5',
+      url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800',
+      caption: '19th hole celebrations 🍻',
+      uploadedBy: players[1]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 180).toISOString(),
+      likes: 31,
+    },
+    {
+      id: '6',
+      url: 'https://images.unsplash.com/photo-1611374243147-44a702c2d44c?w=800',
+      caption: 'The squad',
+      uploadedBy: players[2]?.id || '',
+      createdAt: new Date(now - 1000 * 60 * 240).toISOString(),
+      likes: 42,
+    },
+  ];
+}
+
 export default function PhotosPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
-  const [photos, setPhotos] = useState<Photo[]>([]);
+
+  // Use lazy initialization for demo photos to avoid Date.now() in render
+  const [photos, setPhotos] = useState<Photo[]>(() => createDemoPhotos(players));
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,60 +110,6 @@ export default function PhotosPage() {
       router.push('/');
     }
   }, [currentTrip, router]);
-
-  // Demo photos
-  useEffect(() => {
-    setPhotos([
-      {
-        id: '1',
-        url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800',
-        caption: 'First tee vibes 🏌️',
-        uploadedBy: players[0]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-        likes: 8,
-      },
-      {
-        id: '2',
-        url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800',
-        caption: 'Beautiful morning on the course',
-        uploadedBy: players[1]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-        likes: 12,
-      },
-      {
-        id: '3',
-        url: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=800',
-        caption: 'Eagle on 15! 🦅',
-        uploadedBy: players[2]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-        likes: 24,
-      },
-      {
-        id: '4',
-        url: 'https://images.unsplash.com/photo-1632170073-b2d67e9b0de4?w=800',
-        caption: 'Sunset round',
-        uploadedBy: players[0]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-        likes: 15,
-      },
-      {
-        id: '5',
-        url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800',
-        caption: '19th hole celebrations 🍻',
-        uploadedBy: players[1]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-        likes: 31,
-      },
-      {
-        id: '6',
-        url: 'https://images.unsplash.com/photo-1611374243147-44a702c2d44c?w=800',
-        caption: 'The squad',
-        uploadedBy: players[2]?.id || '',
-        createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
-        likes: 42,
-      },
-    ]);
-  }, [players]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

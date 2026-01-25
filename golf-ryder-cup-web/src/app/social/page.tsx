@@ -352,17 +352,27 @@ interface PostCardProps {
 }
 
 function PostCard({ post, player }: PostCardProps) {
-  // Memoize time calculation to avoid impure Date.now() during render
+  // Store current time to avoid calling Date.now() during render
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  // Update time periodically for "time ago" display
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate time ago using stored time
   const timeAgo = useMemo(() => {
-    const now = Date.now();
-    const seconds = Math.floor((now - new Date(post.timestamp).getTime()) / 1000);
+    const seconds = Math.floor((currentTime - new Date(post.timestamp).getTime()) / 1000);
     if (seconds < 60) return 'Just now';
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours / 24)}d ago`;
-  }, [post.timestamp]);
+  }, [post.timestamp, currentTime]);
 
   // Get display name - prefer player name, fall back to authorName
   const displayName = player

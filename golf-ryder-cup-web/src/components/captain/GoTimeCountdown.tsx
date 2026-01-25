@@ -210,7 +210,10 @@ export function GoTimeCountdown({
             return Math.max(0, diff);
         };
 
-        setTimeLeft(calculateTimeLeft());
+        // Defer initial setState to avoid cascading renders
+        const initialTimeoutId = setTimeout(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 0);
 
         const interval = setInterval(() => {
             const newTimeLeft = calculateTimeLeft();
@@ -260,12 +263,18 @@ export function GoTimeCountdown({
             }
         }, 1000);
 
-        return () => clearInterval(interval);
+        return () => {
+            clearTimeout(initialTimeoutId);
+            clearInterval(interval);
+        };
     }, [activeSession, isPaused, alerts, soundEnabled, onTimeUp, onAlertTriggered]);
 
     // Reset alerts when session changes
     useEffect(() => {
-        setAlerts(DEFAULT_ALERTS.map(a => ({ ...a, played: false })));
+        const timeoutId = setTimeout(() => {
+            setAlerts(DEFAULT_ALERTS.map(a => ({ ...a, played: false })));
+        }, 0);
+        return () => clearTimeout(timeoutId);
     }, [activeSessionId]);
 
     const { hours, minutes, seconds } = formatTime(timeLeft);

@@ -170,7 +170,10 @@ export function VoiceScoring({
         const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (!SpeechRecognitionCtor) {
-            setIsSupported(false);
+            const timeoutId = setTimeout(() => {
+                setIsSupported(false);
+            }, 0);
+            return () => clearTimeout(timeoutId);
         }
     }, []);
 

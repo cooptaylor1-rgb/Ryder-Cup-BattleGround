@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock PWAProvider hook
 const mockIsOnline = vi.fn();
@@ -73,13 +73,15 @@ describe('OfflineIndicator Component', () => {
     });
 
     describe('Offline State', () => {
-        it('shows offline message when offline', () => {
+        it('shows offline message when offline', async () => {
             mockIsOnline.mockReturnValue(false);
 
             render(<OfflineIndicator />);
 
-            // Should show offline indicator text
-            expect(screen.getByText(/offline/i)).toBeInTheDocument();
+            // Wait for deferred state update
+            await waitFor(() => {
+                expect(screen.getByText(/offline/i)).toBeInTheDocument();
+            });
         });
     });
 });
