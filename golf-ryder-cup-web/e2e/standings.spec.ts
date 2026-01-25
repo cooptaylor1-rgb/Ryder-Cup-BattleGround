@@ -38,14 +38,18 @@ test.describe('Standings Display', () => {
         await page.goto('/standings');
         await page.waitForLoadState('domcontentloaded');
 
-        // Look for team indicators (USA/Europe or Team A/B)
-        const teamIndicators = page.locator('text=/team|usa|europe|america/i');
+        // Page should render without errors
+        const body = page.locator('body');
+        await expect(body).toBeVisible();
 
-        // If a trip exists with teams, they should be displayed
-        const pageContent = await page.textContent('body');
-        if (pageContent?.toLowerCase().includes('team')) {
-            expect(await teamIndicators.count()).toBeGreaterThan(0);
-        }
+        // Look for team indicators or empty state
+        const teamIndicators = page.locator('[data-testid*="team"], .team-score, .standings-team, text=/USA|Europe|Team/i');
+        const emptyState = page.locator('[data-testid="empty-state"], text=/no standings|no data|create.*trip/i');
+
+        // Either teams should be displayed OR an empty state
+        const hasTeams = await teamIndicators.count() > 0;
+        const hasEmptyState = await emptyState.count() > 0;
+        expect(hasTeams || hasEmptyState).toBe(true);
     });
 
     test('should display point totals', async ({ page }) => {

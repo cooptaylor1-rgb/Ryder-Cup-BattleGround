@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
@@ -38,6 +38,7 @@ export default function AvailabilityPage() {
     new Map()
   );
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
+  const sessionInitialized = React.useRef(false);
 
   // Redirect if not captain
   useEffect(() => {
@@ -56,12 +57,13 @@ export default function AvailabilityPage() {
     [sessions]
   );
 
-  // Auto-select first session when none selected - using a ref to avoid setState-in-effect pattern
-  const hasInitializedSession = useRef(false);
+  // Auto-select first session when none selected
   useEffect(() => {
-    if (!hasInitializedSession.current && !selectedSession && activeSessions.length > 0) {
-      hasInitializedSession.current = true;
-      setSelectedSession(activeSessions[0].id);
+    if (!sessionInitialized.current && !selectedSession && activeSessions.length > 0) {
+      sessionInitialized.current = true;
+      // Defer state update to avoid setState-in-effect
+      const timeoutId = setTimeout(() => setSelectedSession(activeSessions[0].id), 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [activeSessions, selectedSession]);
 

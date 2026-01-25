@@ -1,12 +1,47 @@
 {
-  "seed": "fuzz-1769296949681",
-  "timestamp": "2026-01-24T23:25:30.088Z",
-  "actionCount": 18,
+  "seed": "fuzz-1769316661957",
+  "timestamp": "2026-01-25T04:54:02.307Z",
+  "actionCount": 278,
   "failedActions": 0,
   "actions": [
     {
+      "type": "navigate",
+      "timestamp": 1769316664497,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
       "type": "click_button",
-      "timestamp": 1769296956369,
+      "timestamp": 1769316682606,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316684009,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316684654,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316685297,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -14,63 +49,148 @@
       "success": true
     },
     {
+      "type": "click_button",
+      "timestamp": 1769316685943,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316686581,
+      "details": {
+        "inputIndex": 1,
+        "value": "12345",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
       "type": "click_link",
-      "timestamp": 1769296957372,
+      "timestamp": 1769316686933,
       "details": {
         "reason": "No visible links"
       },
       "success": true
     },
     {
-      "type": "scroll",
-      "timestamp": 1769296957905,
+      "type": "click_button",
+      "timestamp": 1769316687244,
       "details": {
-        "direction": "up",
-        "amount": 97
+        "buttonIndex": 4,
+        "buttonText": ""
       },
       "success": true
     },
     {
       "type": "tab",
-      "timestamp": 1769296958666,
+      "timestamp": 1769316687890,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316688304,
+      "details": {
+        "inputIndex": 1,
+        "value": "John Smith",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316688637,
       "details": {
         "tabCount": 3
       },
       "success": true
     },
     {
-      "type": "back",
-      "timestamp": 1769296959504,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769296961216,
+      "type": "scroll",
+      "timestamp": 1769316689259,
       "details": {
-        "inputIndex": 6,
-        "value": "Pebble Beach",
-        "inputType": "text"
+        "direction": "up",
+        "amount": 12
       },
       "success": true
     },
     {
-      "type": "back",
-      "timestamp": 1769296961812,
-      "details": {},
+      "type": "tab",
+      "timestamp": 1769316689784,
+      "details": {
+        "tabCount": 5
+      },
       "success": true
     },
     {
-      "type": "navigate",
-      "timestamp": 1769296992929,
+      "type": "fill_input",
+      "timestamp": 1769316690608,
       "details": {
-        "target": "/schedule"
+        "inputIndex": 0,
+        "value": "Pebble Beach",
+        "inputType": "email"
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769296995002,
+      "timestamp": 1769316690942,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316691598,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316692255,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316693360,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316693671,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316694319,
+      "details": {
+        "target": "/profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316695384,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -79,22 +199,798 @@
     },
     {
       "type": "scroll",
-      "timestamp": 1769296995924,
+      "timestamp": 1769316696045,
       "details": {
-        "direction": "down",
-        "amount": 145
+        "direction": "up",
+        "amount": 47
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316696559,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316697189,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316697825,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316698471,
+      "details": {
+        "inputIndex": 0,
+        "value": "Test",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316698795,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316699776,
+      "details": {
+        "target": "/players"
       },
       "success": true
     },
     {
       "type": "back",
-      "timestamp": 1769296996676,
+      "timestamp": 1769316700631,
       "details": {},
       "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769297027766,
+      "timestamp": 1769316701565,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316701875,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316702515,
+      "details": {
+        "inputIndex": 2,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316702842,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316703152,
+      "details": {
+        "target": "/captain"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316704273,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316704584,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316705227,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316706172,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316707034,
+      "details": {
+        "inputIndex": 4,
+        "value": "12345",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316707363,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316708090,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316708729,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316709372,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316709687,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316710554,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316711384,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316711902,
+      "details": {
+        "inputIndex": 6,
+        "value": "John Smith",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316712228,
+      "details": {
+        "inputIndex": 4,
+        "value": "!@#$%^&*()",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316712556,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316713191,
+      "details": {
+        "inputIndex": 1,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316713510,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316714234,
+      "details": {
+        "direction": "down",
+        "amount": 67
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316714751,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316715391,
+      "details": {
+        "inputIndex": 3,
+        "value": "!@#$%^&*()",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316715722,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316716608,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316717239,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316718097,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316718755,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316719065,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316719711,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316720358,
+      "details": {
+        "direction": "up",
+        "amount": 151
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316720882,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316721526,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316722488,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316722799,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316723109,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316723938,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316724773,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316725421,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316726289,
+      "details": {
+        "target": "/matchups"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316727170,
+      "details": {
+        "target": "/"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316728011,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316728638,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316728948,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316729258,
+      "details": {
+        "target": "/schedule"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316730442,
+      "details": {
+        "inputIndex": 2,
+        "value": "Pebble Beach",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316730773,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316731410,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316732055,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316732700,
+      "details": {
+        "inputIndex": 2,
+        "value": "Test",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316733029,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316733339,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316734195,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316734856,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316735166,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316735579,
+      "details": {
+        "direction": "down",
+        "amount": 205
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316736092,
+      "details": {
+        "inputIndex": 4,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316736420,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316737056,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316737676,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316738503,
+      "details": {
+        "direction": "up",
+        "amount": 37
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316739031,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316739343,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316739990,
+      "details": {
+        "direction": "down",
+        "amount": 204
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316740502,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316740813,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316741230,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316741873,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316742562,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316743430,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316743740,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316744665,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316745322,
+      "details": {
+        "direction": "up",
+        "amount": 445
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316745834,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316746350,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316746997,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316747639,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316747949,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316748260,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316748570,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316749213,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316749862,
+      "details": {
+        "inputIndex": 4,
+        "value": "John Smith",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316750190,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316750502,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316751137,
       "details": {
         "reason": "No visible links"
       },
@@ -102,51 +998,1373 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769297043282,
+      "timestamp": 1769316751448,
       "details": {
-        "reason": "No visible inputs"
+        "inputIndex": 5,
+        "value": "10.5",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316751816,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316752459,
+      "details": {
+        "target": "/captain"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316753379,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316754040,
+      "details": {
+        "inputIndex": 0,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316754376,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316755253,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316755564,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316756220,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316756531,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316757189,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316758015,
+      "details": {
+        "inputIndex": 1,
+        "value": "Pebble Beach",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316758335,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316758647,
+      "details": {
+        "inputIndex": 1,
+        "value": "",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316758966,
+      "details": {
+        "inputIndex": 1,
+        "value": "Test",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316759284,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316759938,
+      "details": {
+        "inputIndex": 0,
+        "value": "10.5",
+        "inputType": "email"
       },
       "success": true
     },
     {
       "type": "scroll",
-      "timestamp": 1769297058801,
+      "timestamp": 1769316760263,
+      "details": {
+        "direction": "up",
+        "amount": 324
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316760784,
+      "details": {
+        "inputIndex": 0,
+        "value": "12345",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316761110,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316761758,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316762399,
+      "details": {
+        "inputIndex": 1,
+        "value": "test@example.com",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316762719,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316763378,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316764037,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316764349,
+      "details": {
+        "direction": "up",
+        "amount": 47
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316764865,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316765519,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316765830,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316766142,
+      "details": {
+        "target": "/more"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316767001,
+      "details": {
+        "inputIndex": 3,
+        "value": "John Smith",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316767332,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316767644,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316768301,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316769159,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316769575,
+      "details": {
+        "target": "/profile"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316770449,
       "details": {
         "direction": "down",
-        "amount": 169
+        "amount": 403
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316770966,
+      "details": {
+        "tabCount": 2
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769297074536,
+      "timestamp": 1769316771487,
       "details": {
-        "reason": "No visible buttons"
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316772122,
+      "details": {
+        "reason": "No visible links"
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769297090053,
+      "timestamp": 1769316772435,
       "details": {
-        "reason": "No visible buttons"
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316773095,
+      "details": {
+        "target": "/matchups"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316774068,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316774380,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316774796,
+      "details": {
+        "tabCount": 3
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769297105568,
+      "timestamp": 1769316775423,
       "details": {
-        "reason": "No visible buttons"
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316776081,
+      "details": {
+        "inputIndex": 4,
+        "value": "test@example.com",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316776411,
+      "details": {
+        "tabCount": 2
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769297121083,
+      "timestamp": 1769316776932,
       "details": {
-        "reason": "No visible buttons"
+        "buttonIndex": 2,
+        "buttonText": ""
       },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316777571,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316778203,
+      "details": {
+        "inputIndex": 3,
+        "value": "",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316778526,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316779177,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316779489,
+      "details": {
+        "inputIndex": 1,
+        "value": "!@#$%^&*()",
+        "inputType": "password"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316779811,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316780457,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316781097,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316781739,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316782049,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316782942,
+      "details": {
+        "inputIndex": 1,
+        "value": "10.5",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316783272,
+      "details": {
+        "inputIndex": 1,
+        "value": "!@#$%^&*()",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316783602,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316784259,
+      "details": {
+        "direction": "up",
+        "amount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316784783,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316785616,
+      "details": {
+        "inputIndex": 0,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316785948,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316786597,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316786910,
+      "details": {
+        "direction": "down",
+        "amount": 186
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316787426,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316788257,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316789138,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316789451,
+      "details": {
+        "direction": "down",
+        "amount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316789984,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316790298,
+      "details": {
+        "inputIndex": 0,
+        "value": "!@#$%^&*()",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316790627,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316791290,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316791604,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316792448,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316793117,
+      "details": {
+        "direction": "up",
+        "amount": 454
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316793631,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316793948,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316794261,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316795103,
+      "details": {
+        "target": "/players"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316796015,
+      "details": {
+        "inputIndex": 4,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316796347,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316796663,
+      "details": {
+        "direction": "up",
+        "amount": 419
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316797177,
+      "details": {
+        "inputIndex": 4,
+        "value": "Test",
+        "inputType": "tel"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316797513,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316798158,
+      "details": {
+        "direction": "up",
+        "amount": 199
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316798681,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316799512,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316800174,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316801032,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316801345,
+      "details": {
+        "target": "/profile"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316802222,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316802746,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316803270,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316804134,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316804778,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316805613,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316806258,
+      "details": {
+        "target": "/profile"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316807121,
+      "details": {
+        "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316807750,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316808397,
+      "details": {
+        "direction": "down",
+        "amount": 62
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316808914,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316809227,
+      "details": {
+        "inputIndex": 6,
+        "value": "test@example.com",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316809563,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316810492,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316810806,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316811447,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316812098,
+      "details": {
+        "target": "/schedule"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316812979,
+      "details": {
+        "inputIndex": 3,
+        "value": "Pebble Beach",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316813311,
+      "details": {
+        "direction": "up",
+        "amount": 299
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316813829,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316814481,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316815322,
+      "details": {
+        "inputIndex": 2,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316815657,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316816307,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316816957,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316817807,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316818464,
+      "details": {
+        "direction": "down",
+        "amount": 160
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316818980,
+      "details": {
+        "target": "/captain"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316819849,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316820163,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316821068,
+      "details": {
+        "direction": "up",
+        "amount": 78
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316821584,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316821899,
+      "details": {
+        "direction": "down",
+        "amount": 295
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316822416,
+      "details": {
+        "direction": "down",
+        "amount": 18
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316822934,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316823247,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316824152,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316824811,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316825125,
+      "details": {
+        "inputIndex": 0,
+        "value": "test@example.com",
+        "inputType": "email"
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316825456,
+      "details": {
+        "direction": "down",
+        "amount": 276
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316825983,
+      "details": {
+        "direction": "down",
+        "amount": 461
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316826516,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316827277,
+      "details": {
+        "inputIndex": 1,
+        "value": "Pebble Beach",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316827604,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316828254,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316828908,
+      "details": {
+        "inputIndex": 5,
+        "value": "Test",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316829240,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316829896,
+      "details": {
+        "direction": "down",
+        "amount": 333
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316830414,
+      "details": {
+        "target": "/schedule"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316831267,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316832125,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "New Account"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316832791,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316833439,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316834075,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316834738,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769316835390,
+      "details": {
+        "target": "/settings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316836234,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316836899,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316837538,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316838203,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769316838730,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "scroll",
+      "timestamp": 1769316839370,
+      "details": {
+        "direction": "down",
+        "amount": 269
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769316839891,
+      "details": {
+        "inputIndex": 6,
+        "value": "Test",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316840226,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769316840542,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769316840856,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769316841378,
+      "details": {},
       "success": true
     }
   ]

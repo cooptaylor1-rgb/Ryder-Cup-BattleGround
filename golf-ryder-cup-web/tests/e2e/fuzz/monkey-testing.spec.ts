@@ -174,10 +174,11 @@ class FuzzRunner {
      * Click a random visible button
      */
     private async clickRandomButton(action: FuzzAction): Promise<void> {
-        const buttons = await this.page.locator('button:visible').all();
+        // Filter out disabled buttons to avoid timeout waiting for them to be enabled
+        const buttons = await this.page.locator('button:visible:not([disabled])').all();
 
         if (buttons.length === 0) {
-            action.details.reason = 'No visible buttons';
+            action.details.reason = 'No enabled visible buttons';
             return;
         }
 
