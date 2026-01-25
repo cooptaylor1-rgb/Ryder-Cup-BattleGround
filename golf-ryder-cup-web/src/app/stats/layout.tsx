@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/utils/metadata';
-import { PageSkeleton } from '@/components/ui';
+import { PageSkeleton, ErrorBoundary } from '@/components/ui';
 
 export const metadata: Metadata = pageMetadata.stats;
 
@@ -11,8 +11,10 @@ export default function StatsLayout({
     children: React.ReactNode;
 }) {
     return (
-        <Suspense fallback={<PageSkeleton />}>
-            {children}
-        </Suspense>
+        <ErrorBoundary variant="compact">
+            <Suspense fallback={<PageSkeleton />}>
+                {children}
+            </Suspense>
+        </ErrorBoundary>
     );
 }

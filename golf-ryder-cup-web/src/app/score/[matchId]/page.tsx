@@ -518,6 +518,7 @@ export default function EnhancedMatchScoringPage() {
                                 onClick={handleUndo}
                                 disabled={undoStack.length === 0}
                                 className="flex items-center gap-1 px-3 py-1.5 rounded-xl transition-colors"
+                                aria-label={`Undo last action${undoStack.length > 0 ? ` (${undoStack.length} available)` : ''}`}
                                 style={{
                                     color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
                                     opacity: undoStack.length === 0 ? 0.5 : 1,

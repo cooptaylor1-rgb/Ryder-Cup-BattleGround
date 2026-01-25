@@ -154,6 +154,11 @@ function canSync(): boolean {
     return isOnline && isSupabaseConfigured && !!supabase;
 }
 
+/**
+ * Get a Supabase table reference.
+ * Using explicit any return type to avoid TypeScript inference issues with
+ * complex query chains. Type safety is maintained at the application level.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getTable(name: string): any {
     if (!supabase) throw new Error('Supabase not configured');
