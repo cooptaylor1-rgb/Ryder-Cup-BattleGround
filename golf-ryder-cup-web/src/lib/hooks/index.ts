@@ -95,3 +95,12 @@ export {
 export {
   useVisibilityPolling,
 } from './useVisibilityPolling';
+
+// Session timeout management
+export {
+  useSessionTimeout,
+  formatTimeRemaining,
+  getWarningSeverity,
+  type SessionTimeoutOptions,
+  type SessionTimeoutState,
+} from './useSessionTimeout';

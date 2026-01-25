@@ -290,3 +290,6 @@ export {
 // Keyboard Shortcuts
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 export { KeyboardShortcutsProvider } from './KeyboardShortcutsProvider';
+
+// Session Management
+export { SessionTimeoutWarning } from './SessionTimeoutWarning';
