@@ -1,12 +1,12 @@
 {
   "seed": "fuzz-sim-beta-2024-round1",
-  "timestamp": "2026-01-26T18:23:58.612Z",
+  "timestamp": "2026-01-26T18:26:29.317Z",
   "actionCount": 50,
   "failedActions": 0,
   "actions": [
     {
       "type": "scroll",
-      "timestamp": 1769451711465,
+      "timestamp": 1769451957568,
       "details": {
         "direction": "up",
         "amount": 99
@@ -15,24 +15,17 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451712131,
+      "timestamp": 1769451958097,
       "details": {
-        "reason": "No visible inputs"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451712463,
-      "details": {
-        "buttonIndex": 0,
-        "buttonText": "Compiling..."
+        "inputIndex": 0,
+        "value": "",
+        "inputType": "text"
       },
       "success": true
     },
     {
       "type": "scroll",
-      "timestamp": 1769451713291,
+      "timestamp": 1769451958420,
       "details": {
         "direction": "down",
         "amount": 325
@@ -41,7 +34,7 @@
     },
     {
       "type": "scroll",
-      "timestamp": 1769451713863,
+      "timestamp": 1769451958940,
       "details": {
         "direction": "up",
         "amount": 157
@@ -50,7 +43,7 @@
     },
     {
       "type": "scroll",
-      "timestamp": 1769451714443,
+      "timestamp": 1769451959458,
       "details": {
         "direction": "up",
         "amount": 221
@@ -59,41 +52,27 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451715036,
+      "timestamp": 1769451959996,
       "details": {
-        "reason": "No visible inputs"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451725522,
-      "details": {
-        "buttonIndex": 5,
-        "buttonText": ""
+        "inputIndex": 1,
+        "value": "10.5",
+        "inputType": "text"
       },
       "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451736223,
+      "timestamp": 1769451960352,
       "details": {
-        "reason": "No visible inputs"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451746535,
-      "details": {
-        "buttonIndex": 4,
-        "buttonText": ""
+        "inputIndex": 0,
+        "value": "Pebble Beach",
+        "inputType": "text"
       },
       "success": true
     },
     {
       "type": "navigate",
-      "timestamp": 1769451757185,
+      "timestamp": 1769451960691,
       "details": {
         "target": "/more"
       },
@@ -101,7 +80,7 @@
     },
     {
       "type": "tab",
-      "timestamp": 1769451768326,
+      "timestamp": 1769451961752,
       "details": {
         "tabCount": 1
       },
@@ -109,7 +88,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451778757,
+      "timestamp": 1769451962188,
       "details": {
         "reason": "No visible links"
       },
@@ -117,22 +96,22 @@
     },
     {
       "type": "back",
-      "timestamp": 1769451789110,
+      "timestamp": 1769451962503,
       "details": {},
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769451800089,
+      "timestamp": 1769451963455,
       "details": {
-        "buttonIndex": 7,
-        "buttonText": "Skip for now"
+        "buttonIndex": 2,
+        "buttonText": ""
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769451800776,
+      "timestamp": 1769451964096,
       "details": {
         "buttonIndex": 1,
         "buttonText": "Continue"
@@ -141,7 +120,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451801421,
+      "timestamp": 1769451964765,
       "details": {
         "target": "/schedule"
       },
@@ -149,7 +128,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451802692,
+      "timestamp": 1769451966669,
       "details": {
         "buttonIndex": 1,
         "buttonText": "Continue"
@@ -158,7 +137,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451803346,
+      "timestamp": 1769451967320,
       "details": {
         "reason": "No visible links"
       },
@@ -166,7 +145,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451803669,
+      "timestamp": 1769451967631,
       "details": {
         "buttonIndex": 0,
         "buttonText": ""
@@ -175,7 +154,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451804388,
+      "timestamp": 1769451968275,
       "details": {
         "reason": "No visible links"
       },
@@ -183,7 +162,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451804831,
+      "timestamp": 1769451968584,
       "details": {
         "target": "/schedule"
       },
@@ -191,7 +170,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451807745,
+      "timestamp": 1769451969435,
       "details": {
         "target": "/more"
       },
@@ -199,7 +178,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451809300,
+      "timestamp": 1769451970305,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -208,7 +187,7 @@
     },
     {
       "type": "scroll",
-      "timestamp": 1769451810040,
+      "timestamp": 1769451970957,
       "details": {
         "direction": "up",
         "amount": 210
@@ -217,7 +196,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451810656,
+      "timestamp": 1769451971469,
       "details": {
         "reason": "No visible links"
       },
@@ -225,7 +204,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451811116,
+      "timestamp": 1769451971781,
       "details": {
         "reason": "No visible links"
       },
@@ -233,7 +212,7 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451811446,
+      "timestamp": 1769451972095,
       "details": {
         "inputIndex": 3,
         "value": "10.5",
@@ -243,7 +222,7 @@
     },
     {
       "type": "scroll",
-      "timestamp": 1769451811812,
+      "timestamp": 1769451972426,
       "details": {
         "direction": "down",
         "amount": 219
@@ -252,7 +231,7 @@
     },
     {
       "type": "tab",
-      "timestamp": 1769451812368,
+      "timestamp": 1769451972939,
       "details": {
         "tabCount": 5
       },
@@ -260,7 +239,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451813251,
+      "timestamp": 1769451973773,
       "details": {
         "target": "/more"
       },
@@ -268,7 +247,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451814925,
+      "timestamp": 1769451974639,
       "details": {
         "target": "/profile"
       },
@@ -276,7 +255,7 @@
     },
     {
       "type": "tab",
-      "timestamp": 1769451819926,
+      "timestamp": 1769451976179,
       "details": {
         "tabCount": 2
       },
@@ -284,7 +263,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451820447,
+      "timestamp": 1769451976698,
       "details": {
         "reason": "No visible links"
       },
@@ -292,19 +271,19 @@
     },
     {
       "type": "back",
-      "timestamp": 1769451820759,
+      "timestamp": 1769451977012,
       "details": {},
       "success": true
     },
     {
       "type": "back",
-      "timestamp": 1769451822227,
+      "timestamp": 1769451977885,
       "details": {},
       "success": true
     },
     {
       "type": "navigate",
-      "timestamp": 1769451823570,
+      "timestamp": 1769451978768,
       "details": {
         "target": "/schedule"
       },
@@ -312,13 +291,13 @@
     },
     {
       "type": "back",
-      "timestamp": 1769451825311,
+      "timestamp": 1769451979612,
       "details": {},
       "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451826697,
+      "timestamp": 1769451980518,
       "details": {
         "inputIndex": 6,
         "value": "test@example.com",
@@ -328,7 +307,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451827188,
+      "timestamp": 1769451980848,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -337,16 +316,16 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451827948,
+      "timestamp": 1769451981506,
       "details": {
         "buttonIndex": 2,
-        "buttonText": "Compiling..."
+        "buttonText": ""
       },
       "success": true
     },
     {
       "type": "tab",
-      "timestamp": 1769451828694,
+      "timestamp": 1769451982141,
       "details": {
         "tabCount": 5
       },
@@ -354,7 +333,7 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451829568,
+      "timestamp": 1769451983010,
       "details": {
         "buttonIndex": 0,
         "buttonText": ""
@@ -363,7 +342,7 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451830311,
+      "timestamp": 1769451983641,
       "details": {
         "reason": "No visible links"
       },
@@ -371,7 +350,7 @@
     },
     {
       "type": "tab",
-      "timestamp": 1769451830622,
+      "timestamp": 1769451983974,
       "details": {
         "tabCount": 3
       },
@@ -379,7 +358,7 @@
     },
     {
       "type": "navigate",
-      "timestamp": 1769451831247,
+      "timestamp": 1769451984596,
       "details": {
         "target": "/standings"
       },
@@ -387,19 +366,19 @@
     },
     {
       "type": "back",
-      "timestamp": 1769451833301,
+      "timestamp": 1769451985555,
       "details": {},
       "success": true
     },
     {
       "type": "back",
-      "timestamp": 1769451836974,
+      "timestamp": 1769451986464,
       "details": {},
       "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769451837635,
+      "timestamp": 1769451987099,
       "details": {
         "reason": "No visible links"
       },
@@ -407,9 +386,34 @@
     },
     {
       "type": "tab",
-      "timestamp": 1769451837944,
+      "timestamp": 1769451987410,
       "details": {
         "tabCount": 3
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769451988033,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769451988344,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769451988654,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
       },
       "success": true
     }
