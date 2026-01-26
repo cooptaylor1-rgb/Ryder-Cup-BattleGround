@@ -75,12 +75,15 @@ export function IOSActionSheet({
   haptics = true,
 }: ActionSheetProps) {
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  // Initialize visibility to match isOpen to avoid setState in useEffect
+  const [isVisible, setIsVisible] = useState(isOpen);
 
   // Handle open/close animations
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
+      if (!isVisible) {
+        setIsVisible(true);
+      }
       requestAnimationFrame(() => {
         setIsAnimating(true);
       });
@@ -91,7 +94,7 @@ export function IOSActionSheet({
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, isVisible]);
 
   // Lock body scroll
   useEffect(() => {

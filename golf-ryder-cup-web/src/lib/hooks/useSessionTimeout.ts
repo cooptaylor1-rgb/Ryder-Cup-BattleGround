@@ -89,7 +89,8 @@ export function useSessionTimeout(options: SessionTimeoutOptions): SessionTimeou
     debounceMs = DEFAULT_DEBOUNCE,
   } = options;
 
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  // Use a callback to avoid calling Date.now() during render
+  const [lastActivity, setLastActivity] = useState(() => Date.now());
   const [timeRemaining, setTimeRemaining] = useState(timeout);
   const [isWarningShown, setIsWarningShown] = useState(false);
   const [isExpired, setIsExpired] = useState(false);

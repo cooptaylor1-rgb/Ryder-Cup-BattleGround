@@ -66,7 +66,7 @@ export type PermissionState = 'default' | 'granted' | 'denied';
 
 const DEFAULT_ICON = '/icons/icon-192.png';
 const DEFAULT_BADGE = '/icons/icon-72.png';
-const DEFAULT_VIBRATE = [200, 100, 200];
+const _DEFAULT_VIBRATE = [200, 100, 200]; // Prefixed with _ to indicate intentionally unused for now
 
 // ============================================
 // CAPABILITY DETECTION
@@ -423,13 +423,12 @@ export interface UsePushNotificationsReturn {
 }
 
 export function usePushNotifications(): UsePushNotificationsReturn {
-  const [permission, setPermission] = useState<PermissionState>('default');
+  // Initialize permission with actual value to avoid setState in useEffect
+  const [permission, setPermission] = useState<PermissionState>(() => getPermission());
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  // Check permission and subscription on mount
+  // Check subscription on mount (permission already initialized)
   useEffect(() => {
-    setPermission(getPermission());
-
     getPushSubscription().then((sub) => {
       setIsSubscribed(!!sub);
     });

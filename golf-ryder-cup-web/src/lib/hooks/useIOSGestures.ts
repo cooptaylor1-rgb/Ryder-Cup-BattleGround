@@ -20,6 +20,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useMemo,
   type RefObject,
 } from 'react';
 
@@ -121,7 +122,12 @@ export function useSwipeGesture(
   callbacks: SwipeCallbacks,
   config: SwipeConfig = {}
 ) {
-  const settings = { ...DEFAULT_SWIPE_CONFIG, ...config };
+  // Memoize settings to avoid recreating on every render
+  const settings = useMemo(
+    () => ({ ...DEFAULT_SWIPE_CONFIG, ...config }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [config.threshold, config.velocityThreshold, config.directions, config.edgeWidth, config.resistance, config.haptics]
+  );
 
   const [gestureState, setGestureState] = useState<GestureState>({
     isActive: false,
@@ -264,7 +270,7 @@ export function useSwipeGesture(
 
       const dx = lastX.current - startX.current;
       const dy = lastY.current - startY.current;
-      const duration = performance.now() - startTime.current;
+      const _duration = performance.now() - startTime.current; // Prefixed as intentionally unused
 
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);

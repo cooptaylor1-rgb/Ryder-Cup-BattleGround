@@ -16,7 +16,6 @@ import React, {
   useRef,
   useState,
   useCallback,
-  useEffect,
   forwardRef,
   type ReactNode,
   type CSSProperties,

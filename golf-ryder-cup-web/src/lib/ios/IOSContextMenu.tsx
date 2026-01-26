@@ -18,7 +18,6 @@ import React, {
   useCallback,
   useEffect,
   createContext,
-  useContext,
   type ReactNode,
   type ReactElement,
 } from 'react';

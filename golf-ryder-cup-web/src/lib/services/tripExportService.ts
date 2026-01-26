@@ -400,10 +400,12 @@ export async function importFromFile(file: File): Promise<ImportResult> {
   });
 }
 
-export default {
+const tripExportService = {
   exportTrip,
   downloadTripExport,
   importTrip,
   importFromFile,
   validateImportData,
 };
+
+export default tripExportService;

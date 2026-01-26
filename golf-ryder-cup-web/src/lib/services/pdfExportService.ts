@@ -662,8 +662,9 @@ function getPDFStyles(): string {
 // UTILITIES
 // ============================================
 
-function printToPDF(html: string, filename: string): void {
+function printToPDF(html: string, _filename: string): void {
   // Create a new window/iframe for printing
+  // Note: filename is currently unused but preserved for future implementation
   const printWindow = window.open('', '_blank');
 
   if (!printWindow) {

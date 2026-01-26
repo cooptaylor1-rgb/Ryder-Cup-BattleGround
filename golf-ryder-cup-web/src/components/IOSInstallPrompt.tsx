@@ -51,13 +51,16 @@ export function IOSInstallPrompt({
   });
 
   useEffect(() => {
-    // Update isIOS on mount (for SSR hydration)
-    const shouldShow = shouldShowIOSPrompt();
-    if (shouldShow !== isIOS) {
-      setIsIOS(shouldShow);
-    }
+    // Check on mount for SSR hydration - only update if actually different
+    // and we're in the browser
+    if (typeof window === 'undefined') return;
 
-    if (!shouldShow) return;
+    const shouldShow = shouldShowIOSPrompt();
+
+    if (!shouldShow) {
+      if (isIOS) setIsIOS(false);
+      return;
+    }
 
     // Check if dismissed recently
     const dismissed = localStorage.getItem(STORAGE_KEY);

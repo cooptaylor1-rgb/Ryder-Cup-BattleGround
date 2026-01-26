@@ -15,7 +15,6 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useCallback,
   type ReactNode,
 } from 'react';
 
@@ -116,30 +115,26 @@ interface SafeAreaProviderProps {
   children: ReactNode;
 }
 
+// Helper functions to initialize state (avoid useEffect setState issues)
+const getInitialIOS = () => typeof window !== 'undefined' && detectIOSDevice();
+const getInitialInsets = () => typeof window !== 'undefined' ? getSafeAreaInsets() : defaultInsets;
+const getInitialDynamicIsland = () => typeof window !== 'undefined' && detectDynamicIsland();
+const getInitialHomeIndicator = () => typeof window !== 'undefined' && detectHomeIndicator();
+
 export function SafeAreaProvider({ children }: SafeAreaProviderProps) {
-  const [insets, setInsets] = useState<SafeAreaInsets>(defaultInsets);
-  const [isIOS, setIsIOS] = useState(false);
-  const [hasDynamicIsland, setHasDynamicIsland] = useState(false);
-  const [hasHomeIndicator, setHasHomeIndicator] = useState(false);
-  const [adjustedBottom, setAdjustedBottom] = useState(0);
+  const [insets, setInsets] = useState<SafeAreaInsets>(getInitialInsets);
+  const [isIOS, setIsIOS] = useState(getInitialIOS);
+  const [hasDynamicIsland, setHasDynamicIsland] = useState(getInitialDynamicIsland);
+  const [hasHomeIndicator, setHasHomeIndicator] = useState(getInitialHomeIndicator);
+  const [adjustedBottom, setAdjustedBottom] = useState(() => getInitialInsets().bottom);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    // Initial detection
-    const ios = detectIOSDevice();
-    setIsIOS(ios);
-
-    if (!ios) {
+    if (!isIOS) {
       // Non-iOS: still get safe area insets (for notched Android, etc.)
       setInsets(getSafeAreaInsets());
       return;
     }
-
-    // iOS-specific detection
-    setHasDynamicIsland(detectDynamicIsland());
-    setHasHomeIndicator(detectHomeIndicator());
-    setInsets(getSafeAreaInsets());
-    setAdjustedBottom(getSafeAreaInsets().bottom);
 
     // Listen for orientation changes
     const handleResize = () => {
