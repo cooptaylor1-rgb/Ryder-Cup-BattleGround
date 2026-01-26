@@ -180,6 +180,19 @@ async function searchGHIN(
     }
 }
 
+// Known golf resort/brand locations for fallback geocoding
+// These are well-known golf destinations where the API can search when normal geocoding fails
+const KNOWN_GOLF_LOCATIONS: Record<string, { lat: number; lon: number; radius: number }> = {
+    'cabot': { lat: 28.95, lon: -81.87, radius: 100 }, // Cabot Citrus Farms area in Florida
+    'pebble': { lat: 36.5668, lon: -121.9497, radius: 50 }, // Pebble Beach area
+    'pinehurst': { lat: 35.1954, lon: -79.4695, radius: 30 }, // Pinehurst, NC
+    'kiawah': { lat: 32.6082, lon: -80.0848, radius: 30 }, // Kiawah Island, SC
+    'bandon': { lat: 43.1189, lon: -124.4134, radius: 30 }, // Bandon Dunes, OR
+    'streamsong': { lat: 27.6522, lon: -81.5156, radius: 30 }, // Streamsong, FL
+    'sand valley': { lat: 44.0821, lon: -89.8826, radius: 30 }, // Sand Valley, WI
+    'whistling straits': { lat: 43.8514, lon: -87.7262, radius: 30 }, // Whistling Straits, WI
+};
+
 // Search RapidAPI Golf Course Finder Database
 // This API requires location-based search (lat/lng), so we first geocode the query
 // IMPORTANT: We filter results by name match, not just proximity
@@ -188,7 +201,9 @@ async function searchRapidAPI(
     apiKey: string
 ): Promise<CourseSearchResult[]> {
     try {
-        // First, try to geocode the search query with "golf" appended to find the actual course
+        let geocodeData: Array<{ lat: string; lon: string; display_name: string }> = [];
+
+        // Strategy 1: Try to geocode the full query with "golf course" appended
         const golfGeocodeResponse = await fetch(
             `https://nominatim.openstreetmap.org/search?` +
             `q=${encodeURIComponent(query + ' golf course')}&` +
@@ -201,13 +216,11 @@ async function searchRapidAPI(
             }
         );
 
-        let geocodeData: Array<{ lat: string; lon: string; display_name: string }> = [];
-
         if (golfGeocodeResponse.ok) {
             geocodeData = await golfGeocodeResponse.json();
         }
 
-        // If no golf-specific results, try generic geocode
+        // Strategy 2: Try generic geocode without "golf course"
         if (!geocodeData || geocodeData.length === 0) {
             const genericGeocodeResponse = await fetch(
                 `https://nominatim.openstreetmap.org/search?` +
@@ -226,16 +239,64 @@ async function searchRapidAPI(
             }
         }
 
+        // Strategy 3: Try geocoding individual words (for multi-word queries)
         if (!geocodeData || geocodeData.length === 0) {
+            const words = query.split(/\s+/).filter(w => w.length > 2);
+            for (const word of words) {
+                // Skip common golf terms
+                if (['golf', 'course', 'club', 'country', 'links', 'farms', 'resort'].includes(word.toLowerCase())) {
+                    continue;
+                }
+                const wordGeocodeResponse = await fetch(
+                    `https://nominatim.openstreetmap.org/search?` +
+                    `q=${encodeURIComponent(word + ' golf')}&` +
+                    `format=json&` +
+                    `limit=3`,
+                    {
+                        headers: {
+                            'User-Agent': 'GolfRyderCupApp/1.0',
+                        },
+                    }
+                );
+                if (wordGeocodeResponse.ok) {
+                    const wordData = await wordGeocodeResponse.json();
+                    if (wordData && wordData.length > 0) {
+                        geocodeData = wordData;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Strategy 4: Check known golf brand/resort locations
+        let searchRadius = 50;
+        if (!geocodeData || geocodeData.length === 0) {
+            const queryLower = query.toLowerCase();
+            for (const [brand, location] of Object.entries(KNOWN_GOLF_LOCATIONS)) {
+                if (queryLower.includes(brand)) {
+                    geocodeData = [{
+                        lat: String(location.lat),
+                        lon: String(location.lon),
+                        display_name: `Known location for ${brand}`
+                    }];
+                    searchRadius = location.radius;
+                    logger.info(`Using known location for brand "${brand}"`, location);
+                    break;
+                }
+            }
+        }
+
+        if (!geocodeData || geocodeData.length === 0) {
+            logger.info('No geocode results for query:', query);
             return [];
         }
 
         // Use the first geocode result
         const { lat, lon } = geocodeData[0];
 
-        // Now search RapidAPI with these coordinates (50 mile radius)
+        // Now search RapidAPI with these coordinates (dynamic radius based on source)
         const response = await fetch(
-            `https://golf-course-finder.p.rapidapi.com/api/golf-clubs/?miles=50&latitude=${lat}&longitude=${lon}`,
+            `https://golf-course-finder.p.rapidapi.com/api/golf-clubs/?miles=${searchRadius}&latitude=${lat}&longitude=${lon}`,
             {
                 headers: {
                     'X-RapidAPI-Key': apiKey,

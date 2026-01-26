@@ -69,7 +69,8 @@ export async function GET(request: NextRequest) {
         let endpoint = '';
 
         if (action === 'search' && query) {
-            endpoint = `/courses?search=${encodeURIComponent(query)}`;
+            // Golf Course API uses /search endpoint with search_query parameter
+            endpoint = `/search?search_query=${encodeURIComponent(query)}`;
         } else if (action === 'get' && courseId) {
             endpoint = `/courses/${courseId}`;
         } else if (action === 'check') {

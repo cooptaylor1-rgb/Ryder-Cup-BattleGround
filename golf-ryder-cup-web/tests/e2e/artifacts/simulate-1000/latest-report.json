@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-01-26T18:53:24.192Z",
+  "config": {
+    "workers": 4,
+    "journeyIterations": 10,
+    "chaosIterations": 5,
+    "fuzzRounds": 5,
+    "fuzzActionsPerRound": 50,
+    "seeds": [
+      "sim-alpha-2024",
+      "sim-beta-2024",
+      "sim-gamma-2024",
+      "sim-delta-2024",
+      "sim-epsilon-2024"
+    ],
+    "reportDir": "tests/e2e/artifacts/simulate-1000"
+  },
+  "totalDuration": 8704894,
+  "phases": [
+    {
+      "name": "Journey Tests",
+      "iterations": 10,
+      "passed": 0,
+      "failed": 10,
+      "totalDuration": 4883323
+    },
+    {
+      "name": "Chaos Tests",
+      "iterations": 5,
+      "passed": 0,
+      "failed": 5,
+      "totalDuration": 1895393
+    },
+    {
+      "name": "Fuzz Tests",
+      "iterations": 5,
+      "passed": 0,
+      "failed": 5,
+      "totalDuration": 1926173
+    }
+  ],
+  "summary": {
+    "totalIterations": 20,
+    "totalPassed": 0,
+    "totalFailed": 20,
+    "successRate": 0,
+    "equivalentUserSessions": 245
+  }
+}

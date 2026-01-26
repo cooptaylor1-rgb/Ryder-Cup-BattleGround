@@ -1,108 +1,38 @@
 {
-  "seed": "fuzz-sim-beta-2024-round1",
-  "timestamp": "2026-01-26T18:26:29.317Z",
+  "seed": "fuzz-sim-alpha-2024-round5",
+  "timestamp": "2026-01-26T18:52:18.543Z",
   "actionCount": 50,
   "failedActions": 0,
   "actions": [
     {
-      "type": "scroll",
-      "timestamp": 1769451957568,
-      "details": {
-        "direction": "up",
-        "amount": 99
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769451958097,
-      "details": {
-        "inputIndex": 0,
-        "value": "",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
-      "type": "scroll",
-      "timestamp": 1769451958420,
-      "details": {
-        "direction": "down",
-        "amount": 325
-      },
-      "success": true
-    },
-    {
-      "type": "scroll",
-      "timestamp": 1769451958940,
-      "details": {
-        "direction": "up",
-        "amount": 157
-      },
-      "success": true
-    },
-    {
-      "type": "scroll",
-      "timestamp": 1769451959458,
-      "details": {
-        "direction": "up",
-        "amount": 221
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769451959996,
-      "details": {
-        "inputIndex": 1,
-        "value": "10.5",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
-      "type": "fill_input",
-      "timestamp": 1769451960352,
-      "details": {
-        "inputIndex": 0,
-        "value": "Pebble Beach",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
       "type": "navigate",
-      "timestamp": 1769451960691,
+      "timestamp": 1769453509101,
       "details": {
-        "target": "/more"
+        "target": "/matchups"
       },
-      "success": true
-    },
-    {
-      "type": "tab",
-      "timestamp": 1769451961752,
-      "details": {
-        "tabCount": 1
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451962188,
-      "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "back",
-      "timestamp": 1769451962503,
-      "details": {},
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769451963455,
+      "timestamp": 1769453510069,
+      "details": {
+        "buttonIndex": 0,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453510717,
+      "details": {
+        "buttonIndex": 4,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453511382,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -111,24 +41,44 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451964096,
+      "timestamp": 1769453512035,
       "details": {
-        "buttonIndex": 1,
-        "buttonText": "Continue"
+        "buttonIndex": 0,
+        "buttonText": "Sign In"
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769453512697,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769453513352,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769453514280,
+      "details": {
+        "target": "/profile"
       },
       "success": true
     },
     {
       "type": "navigate",
-      "timestamp": 1769451964765,
+      "timestamp": 1769453515191,
       "details": {
-        "target": "/schedule"
+        "target": "/"
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769451966669,
+      "timestamp": 1769453516042,
       "details": {
         "buttonIndex": 1,
         "buttonText": "Continue"
@@ -137,7 +87,81 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451967320,
+      "timestamp": 1769453516692,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453517003,
+      "details": {
+        "tabCount": 2
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453517524,
+      "details": {
+        "tabCount": 5
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769453518360,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769453518670,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "navigate",
+      "timestamp": 1769453518981,
+      "details": {
+        "target": "/standings"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453519907,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453520546,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453521191,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769453521918,
       "details": {
         "reason": "No visible links"
       },
@@ -145,7 +169,73 @@
     },
     {
       "type": "click_button",
-      "timestamp": 1769451967631,
+      "timestamp": 1769453522229,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453522873,
+      "details": {
+        "buttonIndex": 1,
+        "buttonText": "Continue"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769453523517,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453523828,
+      "details": {
+        "tabCount": 4
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453524557,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453525196,
+      "details": {
+        "tabCount": 1
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453525608,
+      "details": {
+        "buttonIndex": 2,
+        "buttonText": ""
+      },
+      "success": true
+    },
+    {
+      "type": "back",
+      "timestamp": 1769453526246,
+      "details": {},
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453527130,
       "details": {
         "buttonIndex": 0,
         "buttonText": ""
@@ -154,31 +244,49 @@
     },
     {
       "type": "click_link",
-      "timestamp": 1769451968275,
+      "timestamp": 1769453527766,
       "details": {
         "reason": "No visible links"
       },
       "success": true
     },
     {
-      "type": "navigate",
-      "timestamp": 1769451968584,
+      "type": "tab",
+      "timestamp": 1769453528077,
       "details": {
-        "target": "/schedule"
+        "tabCount": 5
       },
       "success": true
     },
     {
-      "type": "navigate",
-      "timestamp": 1769451969435,
+      "type": "scroll",
+      "timestamp": 1769453528908,
       "details": {
-        "target": "/more"
+        "direction": "down",
+        "amount": 344
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453529422,
+      "details": {
+        "tabCount": 2
       },
       "success": true
     },
     {
       "type": "click_button",
-      "timestamp": 1769451970305,
+      "timestamp": 1769453529939,
+      "details": {
+        "buttonIndex": 3,
+        "buttonText": "Create Your Profile"
+      },
+      "success": true
+    },
+    {
+      "type": "click_button",
+      "timestamp": 1769453530599,
       "details": {
         "buttonIndex": 2,
         "buttonText": ""
@@ -186,25 +294,44 @@
       "success": true
     },
     {
-      "type": "scroll",
-      "timestamp": 1769451970957,
+      "type": "navigate",
+      "timestamp": 1769453531229,
       "details": {
-        "direction": "up",
-        "amount": 210
+        "target": "/matchups"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769453532092,
+      "details": {
+        "inputIndex": 2,
+        "value": "12345",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769453532434,
+      "details": {
+        "inputIndex": 6,
+        "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "tab",
+      "timestamp": 1769453532767,
+      "details": {
+        "tabCount": 4
       },
       "success": true
     },
     {
       "type": "click_link",
-      "timestamp": 1769451971469,
-      "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451971781,
+      "timestamp": 1769453533493,
       "details": {
         "reason": "No visible links"
       },
@@ -212,17 +339,35 @@
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451972095,
+      "timestamp": 1769453533804,
+      "details": {
+        "inputIndex": 5,
+        "value": "Pebble Beach",
+        "inputType": "text"
+      },
+      "success": true
+    },
+    {
+      "type": "click_link",
+      "timestamp": 1769453534137,
+      "details": {
+        "reason": "No visible links"
+      },
+      "success": true
+    },
+    {
+      "type": "fill_input",
+      "timestamp": 1769453534449,
       "details": {
         "inputIndex": 3,
-        "value": "10.5",
+        "value": "!@#$%^&*()",
         "inputType": "email"
       },
       "success": true
     },
     {
       "type": "scroll",
-      "timestamp": 1769451972426,
+      "timestamp": 1769453534780,
       "details": {
         "direction": "down",
         "amount": 219
@@ -230,190 +375,55 @@
       "success": true
     },
     {
-      "type": "tab",
-      "timestamp": 1769451972939,
-      "details": {
-        "tabCount": 5
-      },
-      "success": true
-    },
-    {
-      "type": "navigate",
-      "timestamp": 1769451973773,
-      "details": {
-        "target": "/more"
-      },
-      "success": true
-    },
-    {
-      "type": "navigate",
-      "timestamp": 1769451974639,
-      "details": {
-        "target": "/profile"
-      },
-      "success": true
-    },
-    {
-      "type": "tab",
-      "timestamp": 1769451976179,
-      "details": {
-        "tabCount": 2
-      },
-      "success": true
-    },
-    {
       "type": "click_link",
-      "timestamp": 1769451976698,
+      "timestamp": 1769453535294,
       "details": {
         "reason": "No visible links"
       },
       "success": true
     },
     {
-      "type": "back",
-      "timestamp": 1769451977012,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "back",
-      "timestamp": 1769451977885,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "navigate",
-      "timestamp": 1769451978768,
+      "type": "click_button",
+      "timestamp": 1769453535604,
       "details": {
-        "target": "/schedule"
+        "buttonIndex": 2,
+        "buttonText": ""
       },
       "success": true
     },
     {
-      "type": "back",
-      "timestamp": 1769451979612,
-      "details": {},
+      "type": "scroll",
+      "timestamp": 1769453536245,
+      "details": {
+        "direction": "up",
+        "amount": 263
+      },
       "success": true
     },
     {
       "type": "fill_input",
-      "timestamp": 1769451980518,
+      "timestamp": 1769453536758,
       "details": {
-        "inputIndex": 6,
+        "inputIndex": 4,
         "value": "test@example.com",
-        "inputType": "text"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451980848,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451981506,
-      "details": {
-        "buttonIndex": 2,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "tab",
-      "timestamp": 1769451982141,
-      "details": {
-        "tabCount": 5
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451983010,
-      "details": {
-        "buttonIndex": 0,
-        "buttonText": ""
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451983641,
-      "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "tab",
-      "timestamp": 1769451983974,
-      "details": {
-        "tabCount": 3
+        "inputType": "tel"
       },
       "success": true
     },
     {
       "type": "navigate",
-      "timestamp": 1769451984596,
+      "timestamp": 1769453537090,
       "details": {
-        "target": "/standings"
+        "target": "/captain"
       },
       "success": true
     },
     {
-      "type": "back",
-      "timestamp": 1769451985555,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "back",
-      "timestamp": 1769451986464,
-      "details": {},
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451987099,
+      "type": "scroll",
+      "timestamp": 1769453538028,
       "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "tab",
-      "timestamp": 1769451987410,
-      "details": {
-        "tabCount": 3
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451988033,
-      "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "click_link",
-      "timestamp": 1769451988344,
-      "details": {
-        "reason": "No visible links"
-      },
-      "success": true
-    },
-    {
-      "type": "click_button",
-      "timestamp": 1769451988654,
-      "details": {
-        "buttonIndex": 1,
-        "buttonText": "Continue"
+        "direction": "down",
+        "amount": 296
       },
       "success": true
     }
