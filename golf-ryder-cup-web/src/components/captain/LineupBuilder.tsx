@@ -32,6 +32,7 @@ import {
   GripVertical,
   User,
   Scale,
+  Trash2,
 } from 'lucide-react';
 
 // ============================================
@@ -79,6 +80,7 @@ interface LineupBuilderProps {
   initialMatches?: MatchSlot[];
   onSave?: (matches: MatchSlot[]) => void;
   onPublish?: (matches: MatchSlot[]) => void;
+  onDeleteMatch?: (matchId: string) => Promise<void>;
   onAutoFill?: () => MatchSlot[];
   calculateFairness?: (matches: MatchSlot[]) => FairnessScore;
   isLocked?: boolean;
@@ -96,6 +98,7 @@ export function LineupBuilder({
   initialMatches = [],
   onSave,
   onPublish,
+  onDeleteMatch,
   onAutoFill,
   calculateFairness,
   isLocked = false,
@@ -105,10 +108,10 @@ export function LineupBuilder({
     initialMatches.length > 0
       ? initialMatches
       : Array.from({ length: session.matchCount }, (_, i) => ({
-        id: `match-${i + 1}`,
-        teamAPlayers: [],
-        teamBPlayers: [],
-      }))
+          id: `match-${i + 1}`,
+          teamAPlayers: [],
+          teamBPlayers: [],
+        }))
   );
   const [draggedPlayer, setDraggedPlayer] = useState<Player | null>(null);
   const [showRoster, setShowRoster] = useState<'A' | 'B' | null>('A');
@@ -156,62 +159,88 @@ export function LineupBuilder({
   }, [matches, session.playersPerTeam, fairness]);
 
   // Handlers
-  const handleDragStart = useCallback((player: Player) => {
-    if (isLocked) return;
-    setDraggedPlayer(player);
-  }, [isLocked]);
+  const handleDragStart = useCallback(
+    (player: Player) => {
+      if (isLocked) return;
+      setDraggedPlayer(player);
+    },
+    [isLocked]
+  );
 
   const handleDragEnd = useCallback(() => {
     setDraggedPlayer(null);
   }, []);
 
-  const handleDropOnMatch = useCallback((matchId: string, team: 'A' | 'B') => {
-    if (!draggedPlayer || isLocked) return;
+  const handleDropOnMatch = useCallback(
+    (matchId: string, team: 'A' | 'B') => {
+      if (!draggedPlayer || isLocked) return;
 
-    setMatches((prev) =>
-      prev.map((match) => {
-        if (match.id !== matchId) return match;
+      setMatches((prev) =>
+        prev.map((match) => {
+          if (match.id !== matchId) return match;
 
-        // First remove player from any existing position
-        const updatedMatch = {
-          ...match,
-          teamAPlayers: match.teamAPlayers.filter((p) => p.id !== draggedPlayer.id),
-          teamBPlayers: match.teamBPlayers.filter((p) => p.id !== draggedPlayer.id),
-        };
+          // First remove player from any existing position
+          const updatedMatch = {
+            ...match,
+            teamAPlayers: match.teamAPlayers.filter((p) => p.id !== draggedPlayer.id),
+            teamBPlayers: match.teamBPlayers.filter((p) => p.id !== draggedPlayer.id),
+          };
 
-        // Add to correct team if room
-        const targetPlayers = team === 'A' ? updatedMatch.teamAPlayers : updatedMatch.teamBPlayers;
-        if (targetPlayers.length < session.playersPerTeam && draggedPlayer.team === team) {
-          if (team === 'A') {
-            updatedMatch.teamAPlayers = [...updatedMatch.teamAPlayers, draggedPlayer];
-          } else {
-            updatedMatch.teamBPlayers = [...updatedMatch.teamBPlayers, draggedPlayer];
+          // Add to correct team if room
+          const targetPlayers =
+            team === 'A' ? updatedMatch.teamAPlayers : updatedMatch.teamBPlayers;
+          if (targetPlayers.length < session.playersPerTeam && draggedPlayer.team === team) {
+            if (team === 'A') {
+              updatedMatch.teamAPlayers = [...updatedMatch.teamAPlayers, draggedPlayer];
+            } else {
+              updatedMatch.teamBPlayers = [...updatedMatch.teamBPlayers, draggedPlayer];
+            }
           }
-        }
 
-        return updatedMatch;
-      })
-    );
+          return updatedMatch;
+        })
+      );
 
-    setDraggedPlayer(null);
-    setHasChanges(true);
-  }, [draggedPlayer, isLocked, session.playersPerTeam]);
+      setDraggedPlayer(null);
+      setHasChanges(true);
+    },
+    [draggedPlayer, isLocked, session.playersPerTeam]
+  );
 
-  const handleRemovePlayer = useCallback((matchId: string, playerId: string) => {
-    if (isLocked) return;
+  const handleRemovePlayer = useCallback(
+    (matchId: string, playerId: string) => {
+      if (isLocked) return;
 
-    setMatches((prev) =>
-      prev.map((match) => {
-        if (match.id !== matchId) return match;
-        return {
-          ...match,
-          teamAPlayers: match.teamAPlayers.filter((p) => p.id !== playerId),
-          teamBPlayers: match.teamBPlayers.filter((p) => p.id !== playerId),
-        };
-      })
-    );
-    setHasChanges(true);
-  }, [isLocked]);
+      setMatches((prev) =>
+        prev.map((match) => {
+          if (match.id !== matchId) return match;
+          return {
+            ...match,
+            teamAPlayers: match.teamAPlayers.filter((p) => p.id !== playerId),
+            teamBPlayers: match.teamBPlayers.filter((p) => p.id !== playerId),
+          };
+        })
+      );
+      setHasChanges(true);
+    },
+    [isLocked]
+  );
+
+  const handleDeleteMatch = useCallback(
+    async (matchId: string) => {
+      if (isLocked) return;
+
+      // Remove from local state
+      setMatches((prev) => prev.filter((match) => match.id !== matchId));
+      setHasChanges(true);
+
+      // Call the external delete handler to remove from database
+      if (onDeleteMatch) {
+        await onDeleteMatch(matchId);
+      }
+    },
+    [isLocked, onDeleteMatch]
+  );
 
   const handleAutoFill = useCallback(() => {
     if (isLocked || !onAutoFill) return;
@@ -235,16 +264,10 @@ export function LineupBuilder({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2
-            className="text-xl font-bold"
-            style={{ color: 'var(--ink)' }}
-          >
+          <h2 className="text-xl font-bold" style={{ color: 'var(--ink)' }}>
             {session.name}
           </h2>
-          <p
-            className="text-sm"
-            style={{ color: 'var(--ink-secondary)' }}
-          >
+          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
             {session.type} • {session.matchCount} matches • {session.pointsPerMatch} pts each
           </p>
         </div>
@@ -273,16 +296,11 @@ export function LineupBuilder({
       </div>
 
       {/* Fairness Score */}
-      {fairness && (
-        <FairnessIndicator score={fairness} />
-      )}
+      {fairness && <FairnessIndicator score={fairness} />}
 
       {/* Validation */}
       {(validation.errors.length > 0 || validation.warnings.length > 0) && (
-        <ValidationPanel
-          errors={validation.errors}
-          warnings={validation.warnings}
-        />
+        <ValidationPanel errors={validation.errors} warnings={validation.warnings} />
       )}
 
       {/* Roster Panels */}
@@ -322,6 +340,7 @@ export function LineupBuilder({
             playersPerTeam={session.playersPerTeam}
             onDrop={(team) => handleDropOnMatch(match.id, team)}
             onRemovePlayer={(playerId) => handleRemovePlayer(match.id, playerId)}
+            onDeleteMatch={() => handleDeleteMatch(match.id)}
             isDragging={!!draggedPlayer}
             draggedPlayerTeam={draggedPlayer?.team}
             isLocked={isLocked}
@@ -383,7 +402,7 @@ function RosterToggle({ team, label, isActive, onClick }: RosterToggleProps) {
     <button
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
+        'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all'
       )}
       style={{
         background: isActive ? color : 'var(--surface)',
@@ -425,9 +444,7 @@ function AvailablePlayersPanel({
         className="p-4 rounded-xl text-center"
         style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
       >
-        <p style={{ color: 'var(--ink-secondary)' }}>
-          All players assigned
-        </p>
+        <p style={{ color: 'var(--ink-secondary)' }}>All players assigned</p>
       </div>
     );
   }
@@ -489,16 +506,14 @@ function PlayerChip({
       className={cn(
         'flex items-center gap-2 rounded-lg transition-all',
         isDraggable && 'cursor-grab active:cursor-grabbing active:scale-95',
-        size === 'sm' ? 'px-2 py-1' : 'px-3 py-2',
+        size === 'sm' ? 'px-2 py-1' : 'px-3 py-2'
       )}
       style={{
         background: 'var(--surface)',
         border: `1px solid ${color}50`,
       }}
     >
-      {isDraggable && (
-        <GripVertical className="w-3 h-3" style={{ color: 'var(--ink-tertiary)' }} />
-      )}
+      {isDraggable && <GripVertical className="w-3 h-3" style={{ color: 'var(--ink-tertiary)' }} />}
 
       {player.avatarUrl ? (
         <Image
@@ -531,10 +546,7 @@ function PlayerChip({
         >
           {player.firstName} {player.lastName[0]}.
         </p>
-        <p
-          className="text-xs"
-          style={{ color: 'var(--ink-tertiary)' }}
-        >
+        <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
           {player.handicapIndex.toFixed(1)} HCP
         </p>
       </div>
@@ -565,6 +577,7 @@ interface MatchSlotCardProps {
   playersPerTeam: number;
   onDrop: (team: 'A' | 'B') => void;
   onRemovePlayer: (playerId: string) => void;
+  onDeleteMatch: () => void;
   isDragging: boolean;
   draggedPlayerTeam?: 'A' | 'B';
   isLocked: boolean;
@@ -576,6 +589,7 @@ function MatchSlotCard({
   playersPerTeam,
   onDrop,
   onRemovePlayer,
+  onDeleteMatch,
   isDragging,
   draggedPlayerTeam,
   isLocked,
@@ -592,7 +606,7 @@ function MatchSlotCard({
     <div
       className={cn(
         'p-4 rounded-2xl transition-all',
-        isComplete && 'ring-2 ring-success ring-offset-2 ring-offset-canvas',
+        isComplete && 'ring-2 ring-success ring-offset-2 ring-offset-canvas'
       )}
       style={{
         background: 'var(--surface)',
@@ -611,23 +625,35 @@ function MatchSlotCard({
           >
             {matchNumber}
           </span>
-          <span
-            className="text-sm font-medium"
-            style={{ color: 'var(--ink)' }}
-          >
+          <span className="text-sm font-medium" style={{ color: 'var(--ink)' }}>
             Match {matchNumber}
           </span>
         </div>
 
-        {match.teamAPlayers.length > 0 && match.teamBPlayers.length > 0 && (
-          <div
-            className="flex items-center gap-1 text-xs"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
-            <Scale className="w-3 h-3" />
-            {teamAHandicap.toFixed(1)} vs {teamBHandicap.toFixed(1)}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {match.teamAPlayers.length > 0 && match.teamBPlayers.length > 0 && (
+            <div
+              className="flex items-center gap-1 text-xs"
+              style={{ color: 'var(--ink-tertiary)' }}
+            >
+              <Scale className="w-3 h-3" />
+              {teamAHandicap.toFixed(1)} vs {teamBHandicap.toFixed(1)}
+            </div>
+          )}
+
+          {/* Delete Match Button */}
+          {!isLocked && (
+            <button
+              onClick={onDeleteMatch}
+              className="p-1.5 rounded-lg transition-colors hover:bg-red-100 dark:hover:bg-red-900/30"
+              style={{ color: 'var(--error, #ef4444)' }}
+              title="Delete match"
+              aria-label={`Delete Match ${matchNumber}`}
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Teams */}
@@ -694,10 +720,7 @@ function DropZone({
         e.preventDefault();
         if (!isLocked) onDrop();
       }}
-      className={cn(
-        'p-3 rounded-xl min-h-20 transition-all',
-        isDragging && 'ring-2 ring-dashed',
-      )}
+      className={cn('p-3 rounded-xl min-h-20 transition-all', isDragging && 'ring-2 ring-dashed')}
       style={{
         background: `${color}10`,
         border: `1px solid ${color}30`,
@@ -764,17 +787,16 @@ function FairnessIndicator({ score }: FairnessIndicatorProps) {
             Fairness Score
           </span>
         </div>
-        <span
-          className="text-xl font-bold"
-          style={{ color: getColor(score.overall) }}
-        >
+        <span className="text-xl font-bold" style={{ color: getColor(score.overall) }}>
           {score.overall}%
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Handicap Balance</p>
+          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+            Handicap Balance
+          </p>
           <div className="flex items-center gap-2 mt-1">
             <div
               className="flex-1 h-2 rounded-full overflow-hidden"
@@ -788,13 +810,18 @@ function FairnessIndicator({ score }: FairnessIndicatorProps) {
                 }}
               />
             </div>
-            <span className="text-xs font-medium" style={{ color: getColor(score.handicapBalance) }}>
+            <span
+              className="text-xs font-medium"
+              style={{ color: getColor(score.handicapBalance) }}
+            >
               {score.handicapBalance}%
             </span>
           </div>
         </div>
         <div>
-          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Experience Balance</p>
+          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+            Experience Balance
+          </p>
           <div className="flex items-center gap-2 mt-1">
             <div
               className="flex-1 h-2 rounded-full overflow-hidden"
@@ -808,7 +835,10 @@ function FairnessIndicator({ score }: FairnessIndicatorProps) {
                 }}
               />
             </div>
-            <span className="text-xs font-medium" style={{ color: getColor(score.experienceBalance) }}>
+            <span
+              className="text-xs font-medium"
+              style={{ color: getColor(score.experienceBalance) }}
+            >
               {score.experienceBalance}%
             </span>
           </div>

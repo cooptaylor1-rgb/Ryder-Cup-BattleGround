@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import { createLogger } from '@/lib/utils/logger';
+import { db } from '@/lib/db';
 import {
   LineupBuilder,
   calculateFairnessScore,
@@ -14,6 +15,7 @@ import {
   type Player as LineupPlayer,
   type FairnessScore,
 } from '@/components/captain';
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import {
   ChevronLeft,
   Users,
@@ -47,22 +49,16 @@ export default function SessionPage() {
   const params = useParams();
   const sessionId = params.sessionId as string;
 
-  const {
-    currentTrip,
-    sessions,
-    teams,
-    players,
-    teamMembers,
-    getSessionMatches,
-    updateSession,
-  } = useTripStore();
+  const { currentTrip, sessions, teams, players, teamMembers, getSessionMatches, updateSession } =
+    useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
+  const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
   const [viewMode, setViewMode] = useState<ViewMode>('matches');
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const session = sessions.find(s => s.id === sessionId);
+  const session = sessions.find((s) => s.id === sessionId);
 
   // Load matches
   useEffect(() => {
@@ -83,20 +79,21 @@ export default function SessionPage() {
   }, [sessionId, getSessionMatches, showToast]);
 
   // Get team players
-  const getTeamPlayers = useCallback((teamId: string) => {
-    const memberIds = teamMembers
-      .filter(tm => tm.teamId === teamId)
-      .map(tm => tm.playerId);
-    return players.filter(p => memberIds.includes(p.id));
-  }, [teamMembers, players]);
+  const getTeamPlayers = useCallback(
+    (teamId: string) => {
+      const memberIds = teamMembers.filter((tm) => tm.teamId === teamId).map((tm) => tm.playerId);
+      return players.filter((p) => memberIds.includes(p.id));
+    },
+    [teamMembers, players]
+  );
 
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
+  const teamA = teams.find((t) => t.color === 'usa');
+  const teamB = teams.find((t) => t.color === 'europe');
   const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
   const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
 
   // Convert to LineupBuilder format
-  const lineupTeamA: LineupPlayer[] = teamAPlayers.map(p => ({
+  const lineupTeamA: LineupPlayer[] = teamAPlayers.map((p) => ({
     id: p.id,
     firstName: p.firstName,
     lastName: p.lastName,
@@ -105,7 +102,7 @@ export default function SessionPage() {
     avatarUrl: p.avatarUrl,
   }));
 
-  const lineupTeamB: LineupPlayer[] = teamBPlayers.map(p => ({
+  const lineupTeamB: LineupPlayer[] = teamBPlayers.map((p) => ({
     id: p.id,
     firstName: p.firstName,
     lastName: p.lastName,
@@ -115,41 +112,51 @@ export default function SessionPage() {
   }));
 
   // Session config
-  const sessionConfig: SessionConfig | null = session ? {
-    id: session.id,
-    name: session.name,
-    type: session.sessionType,
-    playersPerTeam: session.sessionType === 'singles' ? 1 : 2,
-    matchCount: matches.length || 4,
-    pointsPerMatch: session.pointsPerMatch ?? 1,
-  } : null;
+  const sessionConfig: SessionConfig | null = session
+    ? {
+        id: session.id,
+        name: session.name,
+        type: session.sessionType,
+        playersPerTeam: session.sessionType === 'singles' ? 1 : 2,
+        matchCount: matches.length || 4,
+        pointsPerMatch: session.pointsPerMatch ?? 1,
+      }
+    : null;
 
   // Convert existing matches to lineup format
   const initialMatches: MatchSlot[] = useMemo(() => {
     return matches.map((match) => ({
       id: match.id,
-      teamAPlayers: match.teamAPlayerIds.map(id => {
-        const player = players.find(p => p.id === id);
-        return player ? {
-          id: player.id,
-          firstName: player.firstName,
-          lastName: player.lastName,
-          handicapIndex: player.handicapIndex ?? 0,
-          team: 'A' as const,
-          avatarUrl: player.avatarUrl,
-        } : null;
-      }).filter(Boolean) as LineupPlayer[],
-      teamBPlayers: match.teamBPlayerIds.map(id => {
-        const player = players.find(p => p.id === id);
-        return player ? {
-          id: player.id,
-          firstName: player.firstName,
-          lastName: player.lastName,
-          handicapIndex: player.handicapIndex ?? 0,
-          team: 'B' as const,
-          avatarUrl: player.avatarUrl,
-        } : null;
-      }).filter(Boolean) as LineupPlayer[],
+      teamAPlayers: match.teamAPlayerIds
+        .map((id) => {
+          const player = players.find((p) => p.id === id);
+          return player
+            ? {
+                id: player.id,
+                firstName: player.firstName,
+                lastName: player.lastName,
+                handicapIndex: player.handicapIndex ?? 0,
+                team: 'A' as const,
+                avatarUrl: player.avatarUrl,
+              }
+            : null;
+        })
+        .filter(Boolean) as LineupPlayer[],
+      teamBPlayers: match.teamBPlayerIds
+        .map((id) => {
+          const player = players.find((p) => p.id === id);
+          return player
+            ? {
+                id: player.id,
+                firstName: player.firstName,
+                lastName: player.lastName,
+                handicapIndex: player.handicapIndex ?? 0,
+                team: 'B' as const,
+                avatarUrl: player.avatarUrl,
+              }
+            : null;
+        })
+        .filter(Boolean) as LineupPlayer[],
     }));
   }, [matches, players]);
 
@@ -175,32 +182,73 @@ export default function SessionPage() {
     }
   };
 
+  // Handle delete match
+  const handleDeleteMatch = useCallback(
+    async (matchId: string): Promise<void> => {
+      return new Promise((resolve) => {
+        showConfirm({
+          title: 'Delete Match',
+          message: 'Are you sure you want to delete this match? This action cannot be undone.',
+          confirmLabel: 'Delete Match',
+          cancelLabel: 'Cancel',
+          variant: 'danger',
+          onConfirm: async () => {
+            try {
+              // Delete hole results first, then the match
+              await db.holeResults.where('matchId').equals(matchId).delete();
+              await db.matches.delete(matchId);
+
+              // Update local state
+              setMatches((prev) => prev.filter((m) => m.id !== matchId));
+              showToast('success', 'Match deleted');
+              resolve();
+            } catch (error) {
+              createLogger('lineup').error('Failed to delete match', { matchId, error });
+              showToast('error', 'Failed to delete match');
+              resolve();
+            }
+          },
+        });
+      });
+    },
+    [showConfirm, showToast]
+  );
+
   // All lineup players for fairness calculation
-  const allLineupPlayers = useMemo(() => [...lineupTeamA, ...lineupTeamB], [lineupTeamA, lineupTeamB]);
+  const allLineupPlayers = useMemo(
+    () => [...lineupTeamA, ...lineupTeamB],
+    [lineupTeamA, lineupTeamB]
+  );
 
   // Calculate fairness
-  const calculateFairness = useCallback((matchSlots: MatchSlot[]): FairnessScore => {
-    const pairings = matchSlots.map(match => ({
-      id: match.id,
-      teamAPlayers: match.teamAPlayers,
-      teamBPlayers: match.teamBPlayers,
-    }));
-    return calculateFairnessScore(pairings, allLineupPlayers);
-  }, [allLineupPlayers]);
+  const calculateFairness = useCallback(
+    (matchSlots: MatchSlot[]): FairnessScore => {
+      const pairings = matchSlots.map((match) => ({
+        id: match.id,
+        teamAPlayers: match.teamAPlayers,
+        teamBPlayers: match.teamBPlayers,
+      }));
+      return calculateFairnessScore(pairings, allLineupPlayers);
+    },
+    [allLineupPlayers]
+  );
 
   // Get player names for match display
   const getMatchPlayerNames = (playerIds: string[]) => {
-    return playerIds.map(id => {
-      const player = players.find(p => p.id === id);
-      return player ? formatPlayerName(player.firstName, player.lastName, 'short') : 'Unknown';
-    }).join(' & ');
+    return playerIds
+      .map((id) => {
+        const player = players.find((p) => p.id === id);
+        return player ? formatPlayerName(player.firstName, player.lastName, 'short') : 'Unknown';
+      })
+      .join(' & ');
   };
 
   // Get match score display
   const getMatchScoreDisplay = (match: Match) => {
     if (match.status === 'completed') {
       if (match.result === 'halved') return 'Halved';
-      const winner = match.result === 'teamAWin' ? teamA?.name || 'Team A' : teamB?.name || 'Team B';
+      const winner =
+        match.result === 'teamAWin' ? teamA?.name || 'Team A' : teamB?.name || 'Team B';
       return `${winner} ${match.margin}&${match.holesRemaining}`;
     }
     if (match.status === 'inProgress') {
@@ -211,7 +259,10 @@ export default function SessionPage() {
 
   if (!currentTrip || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'var(--canvas)' }}
+      >
         <p className="type-meta">Session not found</p>
       </div>
     );
@@ -238,7 +289,8 @@ export default function SessionPage() {
             <div>
               <span className="type-overline">{session.name}</span>
               <p className="type-caption truncate capitalize" style={{ marginTop: '2px' }}>
-                {session.sessionType} • {session.pointsPerMatch} pt{session.pointsPerMatch !== 1 ? 's' : ''} each
+                {session.sessionType} • {session.pointsPerMatch} pt
+                {session.pointsPerMatch !== 1 ? 's' : ''} each
               </p>
             </div>
           </div>
@@ -352,8 +404,13 @@ export default function SessionPage() {
               </div>
             ) : matches.length === 0 ? (
               <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-                <Users size={32} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }} />
-                <p className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>No Matches Yet</p>
+                <Users
+                  size={32}
+                  style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }}
+                />
+                <p className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
+                  No Matches Yet
+                </p>
                 <p className="type-caption">
                   {canEdit ? 'Switch to Edit mode to build the lineup' : 'Lineup not yet created'}
                 </p>
@@ -376,8 +433,12 @@ export default function SessionPage() {
                         <span
                           className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
                           style={{
-                            background: match.status === 'completed' ? 'var(--success)' :
-                              match.status === 'inProgress' ? 'var(--masters)' : 'var(--canvas-sunken)',
+                            background:
+                              match.status === 'completed'
+                                ? 'var(--success)'
+                                : match.status === 'inProgress'
+                                  ? 'var(--masters)'
+                                  : 'var(--canvas-sunken)',
                             color: match.status !== 'scheduled' ? 'white' : 'var(--ink-secondary)',
                           }}
                         >
@@ -386,8 +447,12 @@ export default function SessionPage() {
                         <span
                           className="type-caption font-medium"
                           style={{
-                            color: match.status === 'completed' ? 'var(--success)' :
-                              match.status === 'inProgress' ? 'var(--masters)' : 'var(--ink-tertiary)',
+                            color:
+                              match.status === 'completed'
+                                ? 'var(--success)'
+                                : match.status === 'inProgress'
+                                  ? 'var(--masters)'
+                                  : 'var(--ink-tertiary)',
                           }}
                         >
                           {getMatchScoreDisplay(match)}
@@ -413,7 +478,10 @@ export default function SessionPage() {
                       </div>
 
                       {canScore && (
-                        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t" style={{ borderColor: 'var(--rule)' }}>
+                        <div
+                          className="flex items-center justify-center gap-2 mt-3 pt-3 border-t"
+                          style={{ borderColor: 'var(--rule)' }}
+                        >
                           <span className="type-meta" style={{ color: 'var(--masters)' }}>
                             {match.status === 'inProgress' ? 'Continue Scoring' : 'Start Scoring'}
                           </span>
@@ -442,6 +510,7 @@ export default function SessionPage() {
                   showToast('success', 'Lineup published!');
                   setViewMode('matches');
                 }}
+                onDeleteMatch={handleDeleteMatch}
                 calculateFairness={calculateFairness}
                 isLocked={false}
               />
@@ -477,6 +546,9 @@ export default function SessionPage() {
           <span>More</span>
         </Link>
       </nav>
+
+      {/* Confirm Dialog */}
+      {ConfirmDialogComponent}
     </div>
   );
 }
