@@ -24,6 +24,9 @@ import {
   MoreHorizontal,
   CalendarDays,
   Info,
+  Zap,
+  ChevronDown,
+  HelpCircle,
 } from 'lucide-react';
 import type { SessionType } from '@/lib/types';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
@@ -297,15 +300,15 @@ const ALL_FORMATS: FormatOption[] = [
 ];
 
 // Legacy type array for backward compatibility with existing SessionType
-const SESSION_TYPES = ALL_FORMATS
-  .filter(t => ['foursomes', 'fourball', 'singles'].includes(t.value))
-  .map(t => ({
-    value: t.value as SessionType,
-    label: t.label,
-    description: t.description,
-    playersPerTeam: t.playersPerTeam,
-    defaultMatches: t.defaultMatches,
-  }));
+const SESSION_TYPES = ALL_FORMATS.filter((t) =>
+  ['foursomes', 'fourball', 'singles'].includes(t.value)
+).map((t) => ({
+  value: t.value as SessionType,
+  label: t.label,
+  description: t.description,
+  playersPerTeam: t.playersPerTeam,
+  defaultMatches: t.defaultMatches,
+}));
 
 const FORMAT_CATEGORIES: { value: FormatCategory; label: string; description: string }[] = [
   { value: 'match_play', label: 'Match Play', description: 'Traditional Ryder Cup formats' },
@@ -328,14 +331,30 @@ function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }
 
+// Format explanations for tooltips
+const FORMAT_EXPLANATIONS: Record<string, string> = {
+  foursomes:
+    'Partners share one ball, taking turns hitting. Strategic and builds teamwork. Classic Ryder Cup format.',
+  fourball:
+    'Each player plays their own ball. Best score on each team wins the hole. Most popular for groups.',
+  singles:
+    'One-on-one matches. Individual skill determines outcome. Great for the final day drama.',
+  pinehurst: 'Both tee off, then switch balls for second shot. Pick one ball to finish. Fun twist!',
+  greensomes: 'Both tee off, choose best drive, then alternate from there. Best of both worlds.',
+  scramble: 'All hit, pick the best, all play from there. Great for mixed skill levels.',
+  skins: 'Win hole outright = win a skin. Ties carry over. High-stakes fun!',
+  stableford:
+    'Points for each hole based on score vs par. Rewards birdies, limits damage from blowup holes.',
+};
+
 export default function NewLineupPage() {
   const router = useRouter();
   const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
   // Smart defaults based on existing trip data
-  const defaultSessionName = useMemo(() =>
-    generateSessionName(currentTrip?.startDate, sessions.length),
+  const defaultSessionName = useMemo(
+    () => generateSessionName(currentTrip?.startDate, sessions.length),
     [currentTrip?.startDate, sessions.length]
   );
 
@@ -358,6 +377,8 @@ export default function NewLineupPage() {
   const [matchCount, setMatchCount] = useState(4);
   const [pointsPerMatch, setPointsPerMatch] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [tooltipFormat, setTooltipFormat] = useState<string | null>(null);
 
   // Generate tee times based on first tee time and interval
   const teeTimes = useMemo(() => {
@@ -376,20 +397,21 @@ export default function NewLineupPage() {
   }, [firstTeeTime, teeTimeInterval, matchCount]);
 
   // Get team players
-  const getTeamPlayers = useCallback((teamId: string) => {
-    const memberIds = teamMembers
-      .filter(tm => tm.teamId === teamId)
-      .map(tm => tm.playerId);
-    return players.filter(p => memberIds.includes(p.id));
-  }, [teamMembers, players]);
+  const getTeamPlayers = useCallback(
+    (teamId: string) => {
+      const memberIds = teamMembers.filter((tm) => tm.teamId === teamId).map((tm) => tm.playerId);
+      return players.filter((p) => memberIds.includes(p.id));
+    },
+    [teamMembers, players]
+  );
 
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
+  const teamA = teams.find((t) => t.color === 'usa');
+  const teamB = teams.find((t) => t.color === 'europe');
   const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
   const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
 
   // Convert to LineupBuilder format
-  const lineupTeamA: LineupPlayer[] = teamAPlayers.map(p => ({
+  const lineupTeamA: LineupPlayer[] = teamAPlayers.map((p) => ({
     id: p.id,
     firstName: p.firstName,
     lastName: p.lastName,
@@ -398,7 +420,7 @@ export default function NewLineupPage() {
     avatarUrl: p.avatarUrl,
   }));
 
-  const lineupTeamB: LineupPlayer[] = teamBPlayers.map(p => ({
+  const lineupTeamB: LineupPlayer[] = teamBPlayers.map((p) => ({
     id: p.id,
     firstName: p.firstName,
     lastName: p.lastName,
@@ -407,43 +429,53 @@ export default function NewLineupPage() {
     avatarUrl: p.avatarUrl,
   }));
 
-  const selectedType = ALL_FORMATS.find(t => t.value === sessionType) || ALL_FORMATS[0];
+  const selectedType = ALL_FORMATS.find((t) => t.value === sessionType) || ALL_FORMATS[0];
 
   // Session config for lineup builder
-  const sessionConfig: SessionConfig = useMemo(() => ({
-    id: 'new',
-    name: sessionName || `New ${selectedType.label} Session`,
-    type: sessionType,
-    playersPerTeam: selectedType.playersPerTeam,
-    matchCount,
-    pointsPerMatch,
-  }), [sessionName, sessionType, selectedType, matchCount, pointsPerMatch]);
+  const sessionConfig: SessionConfig = useMemo(
+    () => ({
+      id: 'new',
+      name: sessionName || `New ${selectedType.label} Session`,
+      type: sessionType,
+      playersPerTeam: selectedType.playersPerTeam,
+      matchCount,
+      pointsPerMatch,
+    }),
+    [sessionName, sessionType, selectedType, matchCount, pointsPerMatch]
+  );
 
   // Validation - session name is pre-filled with smart default, so it's always valid
   const canProceedToLineup = sessionName.trim().length > 0;
-  const hasEnoughPlayers = teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
+  const hasEnoughPlayers =
+    teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
     teamBPlayers.length >= selectedType.playersPerTeam * matchCount;
 
   // Handle session type change
   const handleTypeChange = (type: SessionType) => {
     setSessionType(type);
-    const typeInfo = SESSION_TYPES.find(t => t.value === type)!;
+    const typeInfo = SESSION_TYPES.find((t) => t.value === type)!;
     setMatchCount(typeInfo.defaultMatches);
   };
 
   // All lineup players for fairness calculation
-  const allLineupPlayers = useMemo(() => [...lineupTeamA, ...lineupTeamB], [lineupTeamA, lineupTeamB]);
+  const allLineupPlayers = useMemo(
+    () => [...lineupTeamA, ...lineupTeamB],
+    [lineupTeamA, lineupTeamB]
+  );
 
   // Calculate fairness
-  const calculateFairness = useCallback((matches: MatchSlot[]): FairnessScore => {
-    // Convert to format expected by fairness calculator
-    const pairings = matches.map(match => ({
-      id: match.id,
-      teamAPlayers: match.teamAPlayers,
-      teamBPlayers: match.teamBPlayers,
-    }));
-    return calculateFairnessScore(pairings, allLineupPlayers);
-  }, [allLineupPlayers]);
+  const calculateFairness = useCallback(
+    (matches: MatchSlot[]): FairnessScore => {
+      // Convert to format expected by fairness calculator
+      const pairings = matches.map((match) => ({
+        id: match.id,
+        teamAPlayers: match.teamAPlayers,
+        teamBPlayers: match.teamBPlayers,
+      }));
+      return calculateFairnessScore(pairings, allLineupPlayers);
+    },
+    [allLineupPlayers]
+  );
 
   // Auto-fill lineup
   const handleAutoFill = useCallback((): MatchSlot[] => {
@@ -479,48 +511,64 @@ export default function NewLineupPage() {
   }, [showToast]);
 
   // Publish lineup
-  const handlePublish = useCallback(async (_matches: MatchSlot[]) => {
-    if (!currentTrip) return;
+  const handlePublish = useCallback(
+    async (_matches: MatchSlot[]) => {
+      if (!currentTrip) return;
 
-    setIsCreating(true);
-    try {
-      // Derive AM/PM from first tee time for session record
-      const [hours] = firstTeeTime.split(':').map(Number);
-      const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
+      setIsCreating(true);
+      try {
+        // Derive AM/PM from first tee time for session record
+        const [hours] = firstTeeTime.split(':').map(Number);
+        const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
 
-      // Create the session
-      const session = await addSession({
-        tripId: currentTrip.id,
-        name: sessionName,
-        sessionNumber: 1, // Will be calculated by store
-        sessionType,
-        scheduledDate: scheduledDate || undefined,
-        timeSlot: derivedTimeSlot,
-        pointsPerMatch,
-        status: 'scheduled',
-        isLocked: true,
-      });
+        // Create the session
+        const session = await addSession({
+          tripId: currentTrip.id,
+          name: sessionName,
+          sessionNumber: 1, // Will be calculated by store
+          sessionType,
+          scheduledDate: scheduledDate || undefined,
+          timeSlot: derivedTimeSlot,
+          pointsPerMatch,
+          status: 'scheduled',
+          isLocked: true,
+        });
 
-      // Note: Match tee times (teeTimes array) can be stored on individual matches
-      // when the matches are created during lineup building
+        // Note: Match tee times (teeTimes array) can be stored on individual matches
+        // when the matches are created during lineup building
 
-      showToast('success', 'Session created and lineup published!');
+        showToast('success', 'Session created and lineup published!');
 
-      // Navigate to the session view
-      setTimeout(() => {
-        router.push(`/lineup/${session.id}`);
-      }, 1500);
-    } catch (error) {
-      logger.error('Failed to create session', { error });
-      showToast('error', 'Failed to create session');
-    } finally {
-      setIsCreating(false);
-    }
-  }, [currentTrip, sessionName, sessionType, scheduledDate, firstTeeTime, pointsPerMatch, addSession, showToast, router]);
+        // Navigate to the session view
+        setTimeout(() => {
+          router.push(`/lineup/${session.id}`);
+        }, 1500);
+      } catch (error) {
+        logger.error('Failed to create session', { error });
+        showToast('error', 'Failed to create session');
+      } finally {
+        setIsCreating(false);
+      }
+    },
+    [
+      currentTrip,
+      sessionName,
+      sessionType,
+      scheduledDate,
+      firstTeeTime,
+      pointsPerMatch,
+      addSession,
+      showToast,
+      router,
+    ]
+  );
 
   if (!currentTrip || !isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
         <header className="header-premium">
           <div className="container-editorial flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg skeleton-pulse" />
@@ -543,15 +591,23 @@ export default function NewLineupPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
       {/* Premium Header */}
       <header className="header-premium">
         <div className="container-editorial flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => step === 'lineup' ? setStep('setup') : router.back()}
+              onClick={() => (step === 'lineup' ? setStep('setup') : router.back())}
               className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              style={{
+                color: 'var(--ink-secondary)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+              }}
               aria-label="Back"
             >
               <ChevronLeft size={22} strokeWidth={1.75} />
@@ -562,7 +618,8 @@ export default function NewLineupPage() {
                   width: '32px',
                   height: '32px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  background:
+                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -598,280 +655,384 @@ export default function NewLineupPage() {
         {step === 'setup' ? (
           /* STEP 1: Session Setup */
           <>
-            {/* Session Name */}
+            {/* Quick Setup Card */}
             <section className="section">
-              <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-3)' }}>
-                Session Name
-              </label>
-              <input
-                type="text"
-                value={sessionName}
-                onChange={(e) => setSessionName(e.target.value)}
-                placeholder="e.g., Friday AM Fourball"
-                className="input-field w-full"
+              <div
+                className="card"
                 style={{
                   padding: 'var(--space-4)',
-                  fontSize: 'var(--text-lg)',
-                  fontWeight: 500,
-                }}
-              />
-            </section>
-
-            {/* Session Type */}
-            <section className="section">
-              <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-4)' }}>
-                Format
-              </label>
-
-              {/* Format Categories */}
-              {FORMAT_CATEGORIES.map(category => {
-                const categoryFormats = ALL_FORMATS.filter(f => f.category === category.value);
-                return (
-                  <div key={category.value} className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ink-tertiary)' }}>
-                        {category.label}
-                      </p>
-                      <span className="text-xs" style={{ color: 'var(--ink-tertiary)', opacity: 0.7 }}>
-                        {category.description}
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {categoryFormats.map(format => {
-                        const isSelected = sessionType === format.value;
-                        const isMatchPlay = ['foursomes', 'fourball', 'singles'].includes(format.value);
-
-                        return (
-                          <button
-                            key={format.value}
-                            onClick={() => {
-                              if (isMatchPlay) {
-                                handleTypeChange(format.value as SessionType);
-                              } else {
-                                // For non-match-play formats, still update state but show coming soon
-                                setSessionType(format.value as SessionType);
-                                const formatInfo = ALL_FORMATS.find(f => f.value === format.value);
-                                if (formatInfo) setMatchCount(formatInfo.defaultMatches);
-                              }
-                            }}
-                            className={`w-full text-left card transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isMatchPlay ? 'opacity-70' : ''}`}
-                            style={{ padding: 'var(--space-4)' }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <span className="text-xl">{format.icon}</span>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <p className="type-title-sm">{format.label}</p>
-                                    {!isMatchPlay && (
-                                      <span
-                                        className="px-2 py-0.5 rounded text-[10px] font-medium"
-                                        style={{
-                                          background: 'var(--canvas-sunken)',
-                                          color: 'var(--ink-tertiary)',
-                                        }}
-                                      >
-                                        Coming Soon
-                                      </span>
-                                    )}
-                                    {format.scoringMode && (
-                                      <span
-                                        className="px-2 py-0.5 rounded text-[10px] font-medium"
-                                        style={{
-                                          background: format.scoringMode === 'net' ? 'rgba(0, 103, 71, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                                          color: format.scoringMode === 'net' ? 'var(--masters)' : '#3b82f6',
-                                        }}
-                                      >
-                                        {format.scoringMode === 'net' ? 'Net' : format.scoringMode === 'both' ? 'Gross/Net' : 'Gross'}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="type-caption" style={{ marginTop: '4px' }}>
-                                    {format.description}
-                                  </p>
-                                </div>
-                              </div>
-                              {isSelected && (
-                                <CheckCircle2 size={20} style={{ color: 'var(--masters)' }} />
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </section>
-
-            {/* Match Count */}
-            <section className="section">
-              <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-3)' }}>
-                Number of Matches
-              </label>
-              <div className="flex items-center gap-4">
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={matchCount}
-                  onChange={(e) => setMatchCount(parseInt(e.target.value) || 1)}
-                  className="input-field w-24 text-center"
-                  style={{ padding: 'var(--space-3)', fontSize: 'var(--text-lg)', fontWeight: 600 }}
-                />
-                <p className="type-caption">
-                  matches ({matchCount * selectedType.playersPerTeam} players per team needed)
-                </p>
-              </div>
-            </section>
-
-            {/* Schedule */}
-            <section className="section">
-              <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-4)' }}>
-                Schedule (Optional)
-              </label>
-
-              {/* Date picker */}
-              <div className="mb-4">
-                <label className="type-micro block mb-2">Date</label>
-                <input
-                  type="date"
-                  value={scheduledDate}
-                  onChange={(e) => setScheduledDate(e.target.value)}
-                  className="input-field w-full"
-                  style={{ padding: 'var(--space-3)' }}
-                />
-              </div>
-
-              {/* First Tee Time and Interval */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div>
-                  <label className="type-micro block mb-2">First Tee Time</label>
-                  <input
-                    type="time"
-                    value={firstTeeTime}
-                    onChange={(e) => setFirstTeeTime(e.target.value)}
-                    className="input-field w-full"
-                    style={{ padding: 'var(--space-3)' }}
-                  />
-                </div>
-                <div>
-                  <label className="type-micro block mb-2">Interval (min)</label>
-                  <input
-                    type="number"
-                    min={5}
-                    max={30}
-                    value={teeTimeInterval}
-                    onChange={(e) => setTeeTimeInterval(parseInt(e.target.value) || 10)}
-                    className="input-field w-full text-center"
-                    style={{ padding: 'var(--space-3)' }}
-                  />
-                </div>
-              </div>
-
-              {/* Tee Time Preview */}
-              {firstTeeTime && matchCount > 0 && (
-                <div
-                  className="card"
-                  style={{
-                    padding: 'var(--space-3)',
-                    background: 'var(--canvas-sunken)',
-                  }}
-                >
-                  <label className="type-micro block mb-2" style={{ color: 'var(--ink-tertiary)' }}>
-                    Tee Times Preview
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {teeTimes.map((time, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-                        style={{
-                          background: 'var(--surface)',
-                          border: '1px solid var(--rule)',
-                        }}
-                      >
-                        <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
-                          M{index + 1}
-                        </span>
-                        <span className="type-caption font-medium">{time}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </section>
-
-            {/* Points */}
-            <section className="section">
-              <label className="type-overline" style={{ display: 'block', marginBottom: 'var(--space-3)' }}>
-                Points per Match
-              </label>
-              <div className="flex items-center gap-4">
-                <input
-                  type="number"
-                  min={0.5}
-                  max={5}
-                  step={0.5}
-                  value={pointsPerMatch}
-                  onChange={(e) => setPointsPerMatch(parseFloat(e.target.value) || 1)}
-                  className="input-field w-24 text-center"
-                  style={{ padding: 'var(--space-3)', fontSize: 'var(--text-lg)', fontWeight: 600 }}
-                />
-                <p className="type-caption">
-                  points ({matchCount * pointsPerMatch} total available)
-                </p>
-              </div>
-            </section>
-
-            {/* Player Requirements Warning */}
-            {!hasEnoughPlayers && (
-              <section className="section">
-                <div
-                  className="card"
-                  style={{
-                    padding: 'var(--space-4)',
-                    background: 'rgba(234, 179, 8, 0.1)',
-                    border: '1px solid rgba(234, 179, 8, 0.3)',
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle size={20} style={{ color: 'var(--warning)', flexShrink: 0 }} />
-                    <div>
-                      <p className="type-title-sm" style={{ color: 'var(--warning)' }}>
-                        Not Enough Players
-                      </p>
-                      <p className="type-caption" style={{ marginTop: '4px' }}>
-                        Need {selectedType.playersPerTeam * matchCount} players per team.
-                        Currently: Team A ({teamAPlayers.length}), Team B ({teamBPlayers.length})
-                      </p>
-                      <Link
-                        href="/players"
-                        className="type-meta inline-block mt-2"
-                        style={{ color: 'var(--masters)' }}
-                      >
-                        Add players →
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* Continue Button */}
-            <section className="section">
-              <button
-                onClick={() => setStep('lineup')}
-                disabled={!canProceedToLineup}
-                className="btn btn-primary w-full"
-                style={{
-                  padding: 'var(--space-4)',
-                  opacity: canProceedToLineup ? 1 : 0.5,
+                  background:
+                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  color: 'white',
+                  marginBottom: 'var(--space-4)',
                 }}
               >
-                Continue to Lineup Builder
-              </button>
+                <div className="flex items-center gap-3 mb-3">
+                  <Zap size={20} />
+                  <span className="text-sm font-semibold uppercase tracking-wide">Quick Setup</span>
+                </div>
+                <p className="text-sm opacity-90 mb-4">
+                  Start with our recommended defaults. Most groups play Four-Ball with 4 matches.
+                </p>
+                <button
+                  onClick={() => {
+                    setSessionType('fourball');
+                    setMatchCount(4);
+                    setPointsPerMatch(1);
+                    setStep('lineup');
+                  }}
+                  className="w-full py-3 rounded-lg font-semibold transition-all hover:bg-white/30"
+                  style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}
+                >
+                  Use Defaults & Continue →
+                </button>
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors hover:bg-surface-100"
+                  style={{ color: 'var(--ink-secondary)' }}
+                >
+                  {showAdvanced ? 'Hide' : 'Customize'} session options
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              </div>
             </section>
+
+            {showAdvanced && (
+              <>
+                {/* Session Name */}
+                <section className="section">
+                  <label
+                    className="type-overline"
+                    style={{ display: 'block', marginBottom: 'var(--space-3)' }}
+                  >
+                    Session Name
+                  </label>
+                  <input
+                    type="text"
+                    value={sessionName}
+                    onChange={(e) => setSessionName(e.target.value)}
+                    placeholder="e.g., Friday AM Fourball"
+                    className="input-field w-full"
+                    style={{
+                      padding: 'var(--space-4)',
+                      fontSize: 'var(--text-lg)',
+                      fontWeight: 500,
+                    }}
+                  />
+                </section>
+
+                {/* Session Type */}
+                <section className="section">
+                  <label
+                    className="type-overline"
+                    style={{ display: 'block', marginBottom: 'var(--space-4)' }}
+                  >
+                    Format
+                  </label>
+
+                  {/* Format Categories */}
+                  {FORMAT_CATEGORIES.map((category) => {
+                    const categoryFormats = ALL_FORMATS.filter(
+                      (f) => f.category === category.value
+                    );
+                    return (
+                      <div key={category.value} className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <p
+                            className="text-xs font-medium uppercase tracking-wider"
+                            style={{ color: 'var(--ink-tertiary)' }}
+                          >
+                            {category.label}
+                          </p>
+                          <span
+                            className="text-xs"
+                            style={{ color: 'var(--ink-tertiary)', opacity: 0.7 }}
+                          >
+                            {category.description}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {categoryFormats.map((format) => {
+                            const isSelected = sessionType === format.value;
+                            const isMatchPlay = ['foursomes', 'fourball', 'singles'].includes(
+                              format.value
+                            );
+
+                            return (
+                              <button
+                                key={format.value}
+                                onClick={() => {
+                                  if (isMatchPlay) {
+                                    handleTypeChange(format.value as SessionType);
+                                  } else {
+                                    // For non-match-play formats, still update state but show coming soon
+                                    setSessionType(format.value as SessionType);
+                                    const formatInfo = ALL_FORMATS.find(
+                                      (f) => f.value === format.value
+                                    );
+                                    if (formatInfo) setMatchCount(formatInfo.defaultMatches);
+                                  }
+                                }}
+                                className={`w-full text-left card transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isMatchPlay ? 'opacity-70' : ''}`}
+                                style={{ padding: 'var(--space-4)' }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xl">{format.icon}</span>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <p className="type-title-sm">{format.label}</p>
+                                        {!isMatchPlay && (
+                                          <span
+                                            className="px-2 py-0.5 rounded text-[10px] font-medium"
+                                            style={{
+                                              background: 'var(--canvas-sunken)',
+                                              color: 'var(--ink-tertiary)',
+                                            }}
+                                          >
+                                            Coming Soon
+                                          </span>
+                                        )}
+                                        {format.scoringMode && (
+                                          <span
+                                            className="px-2 py-0.5 rounded text-[10px] font-medium"
+                                            style={{
+                                              background:
+                                                format.scoringMode === 'net'
+                                                  ? 'rgba(0, 103, 71, 0.1)'
+                                                  : 'rgba(59, 130, 246, 0.1)',
+                                              color:
+                                                format.scoringMode === 'net'
+                                                  ? 'var(--masters)'
+                                                  : '#3b82f6',
+                                            }}
+                                          >
+                                            {format.scoringMode === 'net'
+                                              ? 'Net'
+                                              : format.scoringMode === 'both'
+                                                ? 'Gross/Net'
+                                                : 'Gross'}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="type-caption" style={{ marginTop: '4px' }}>
+                                        {format.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {isSelected && (
+                                    <CheckCircle2 size={20} style={{ color: 'var(--masters)' }} />
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </section>
+
+                {/* Match Count */}
+                <section className="section">
+                  <label
+                    className="type-overline"
+                    style={{ display: 'block', marginBottom: 'var(--space-3)' }}
+                  >
+                    Number of Matches
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="number"
+                      min={1}
+                      max={12}
+                      value={matchCount}
+                      onChange={(e) => setMatchCount(parseInt(e.target.value) || 1)}
+                      className="input-field w-24 text-center"
+                      style={{
+                        padding: 'var(--space-3)',
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: 600,
+                      }}
+                    />
+                    <p className="type-caption">
+                      matches ({matchCount * selectedType.playersPerTeam} players per team needed)
+                    </p>
+                  </div>
+                </section>
+
+                {/* Schedule */}
+                <section className="section">
+                  <label
+                    className="type-overline"
+                    style={{ display: 'block', marginBottom: 'var(--space-4)' }}
+                  >
+                    Schedule (Optional)
+                  </label>
+
+                  {/* Date picker */}
+                  <div className="mb-4">
+                    <label className="type-micro block mb-2">Date</label>
+                    <input
+                      type="date"
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                      className="input-field w-full"
+                      style={{ padding: 'var(--space-3)' }}
+                    />
+                  </div>
+
+                  {/* First Tee Time and Interval */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <label className="type-micro block mb-2">First Tee Time</label>
+                      <input
+                        type="time"
+                        value={firstTeeTime}
+                        onChange={(e) => setFirstTeeTime(e.target.value)}
+                        className="input-field w-full"
+                        style={{ padding: 'var(--space-3)' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="type-micro block mb-2">Interval (min)</label>
+                      <input
+                        type="number"
+                        min={5}
+                        max={30}
+                        value={teeTimeInterval}
+                        onChange={(e) => setTeeTimeInterval(parseInt(e.target.value) || 10)}
+                        className="input-field w-full text-center"
+                        style={{ padding: 'var(--space-3)' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tee Time Preview */}
+                  {firstTeeTime && matchCount > 0 && (
+                    <div
+                      className="card"
+                      style={{
+                        padding: 'var(--space-3)',
+                        background: 'var(--canvas-sunken)',
+                      }}
+                    >
+                      <label
+                        className="type-micro block mb-2"
+                        style={{ color: 'var(--ink-tertiary)' }}
+                      >
+                        Tee Times Preview
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {teeTimes.map((time, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                            style={{
+                              background: 'var(--surface)',
+                              border: '1px solid var(--rule)',
+                            }}
+                          >
+                            <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                              M{index + 1}
+                            </span>
+                            <span className="type-caption font-medium">{time}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                {/* Points */}
+                <section className="section">
+                  <label
+                    className="type-overline"
+                    style={{ display: 'block', marginBottom: 'var(--space-3)' }}
+                  >
+                    Points per Match
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="number"
+                      min={0.5}
+                      max={5}
+                      step={0.5}
+                      value={pointsPerMatch}
+                      onChange={(e) => setPointsPerMatch(parseFloat(e.target.value) || 1)}
+                      className="input-field w-24 text-center"
+                      style={{
+                        padding: 'var(--space-3)',
+                        fontSize: 'var(--text-lg)',
+                        fontWeight: 600,
+                      }}
+                    />
+                    <p className="type-caption">
+                      points ({matchCount * pointsPerMatch} total available)
+                    </p>
+                  </div>
+                </section>
+
+                {/* Player Requirements Warning */}
+                {!hasEnoughPlayers && (
+                  <section className="section">
+                    <div
+                      className="card"
+                      style={{
+                        padding: 'var(--space-4)',
+                        background: 'rgba(234, 179, 8, 0.1)',
+                        border: '1px solid rgba(234, 179, 8, 0.3)',
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle
+                          size={20}
+                          style={{ color: 'var(--warning)', flexShrink: 0 }}
+                        />
+                        <div>
+                          <p className="type-title-sm" style={{ color: 'var(--warning)' }}>
+                            Not Enough Players
+                          </p>
+                          <p className="type-caption" style={{ marginTop: '4px' }}>
+                            Need {selectedType.playersPerTeam * matchCount} players per team.
+                            Currently: Team A ({teamAPlayers.length}), Team B ({teamBPlayers.length}
+                            )
+                          </p>
+                          <Link
+                            href="/players"
+                            className="type-meta inline-block mt-2"
+                            style={{ color: 'var(--masters)' }}
+                          >
+                            Add players →
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* Continue Button */}
+                <section className="section">
+                  <button
+                    onClick={() => setStep('lineup')}
+                    disabled={!canProceedToLineup}
+                    className="btn btn-primary w-full"
+                    style={{
+                      padding: 'var(--space-4)',
+                      opacity: canProceedToLineup ? 1 : 0.5,
+                    }}
+                  >
+                    Continue to Lineup Builder
+                  </button>
+                </section>
+              </>
+            )}
           </>
         ) : (
           /* STEP 2: Lineup Builder */

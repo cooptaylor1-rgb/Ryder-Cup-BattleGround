@@ -11,6 +11,7 @@ import {
   // Navigation & UI
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   // Account & Auth
   User,
   LogIn,
@@ -88,6 +89,16 @@ export default function MorePage() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showExitTripConfirm, setShowExitTripConfirm] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    features: true,
+    manage: true,
+    settings: false,
+    data: false,
+  });
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
+  };
 
   // Handlers
   const handleEnableCaptainMode = () => {
@@ -527,51 +538,90 @@ export default function MorePage() {
         </motion.button>
 
         {/* Menu Sections */}
-        {menuSections.map((section, sectionIndex) => (
-          <motion.section
-            key={section.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-            style={{ marginBottom: '24px' }}
-          >
-            <h2
-              style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: 'var(--ink-tertiary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                marginBottom: '8px',
-                paddingLeft: '4px',
-              }}
+        {menuSections.map((section, sectionIndex) => {
+          const isExpanded = expandedSections[section.id] ?? true;
+          const filteredItems = section.items.filter(
+            (item) =>
+              (!item.requiresTrip || currentTrip) && (!item.requiresCaptain || isCaptainMode)
+          );
+
+          if (filteredItems.length === 0) return null;
+
+          return (
+            <motion.section
+              key={section.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + sectionIndex * 0.05 }}
+              style={{ marginBottom: '24px' }}
             >
-              {section.title}
-            </h2>
-            <div
-              style={{
-                background: 'var(--surface-card)',
-                borderRadius: '16px',
-                border: '1px solid var(--rule)',
-                overflow: 'hidden',
-              }}
-            >
-              {section.items
-                .filter(
-                  (item) =>
-                    (!item.requiresTrip || currentTrip) && (!item.requiresCaptain || isCaptainMode)
-                )
-                .map((item, index, filteredItems) => (
-                  <MenuItemRow
-                    key={item.id}
-                    item={item}
-                    isLast={index === filteredItems.length - 1}
-                    isLoading={item.id === 'demo' && isSeeding}
-                  />
-                ))}
-            </div>
-          </motion.section>
-        ))}
+              <button
+                onClick={() => toggleSection(section.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  padding: '8px 4px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginBottom: '8px',
+                }}
+              >
+                <h2
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: 'var(--ink-tertiary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {section.title}
+                </h2>
+                <ChevronDown
+                  size={16}
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                  }}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div
+                      style={{
+                        background: 'var(--surface-card)',
+                        borderRadius: '16px',
+                        border: '1px solid var(--rule)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {filteredItems.map((item, index) => (
+                        <MenuItemRow
+                          key={item.id}
+                          item={item}
+                          isLast={index === filteredItems.length - 1}
+                          isLoading={item.id === 'demo' && isSeeding}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.section>
+          );
+        })}
 
         {/* About Section */}
         <motion.section

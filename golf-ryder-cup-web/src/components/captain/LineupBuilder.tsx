@@ -643,15 +643,27 @@ function MatchSlotCard({
 
           {/* Delete Match Button */}
           {!isLocked && (
-            <button
-              onClick={onDeleteMatch}
-              className="p-1.5 rounded-lg transition-colors hover:bg-red-100 dark:hover:bg-red-900/30"
-              style={{ color: 'var(--error, #ef4444)' }}
-              title="Delete match"
-              aria-label={`Delete Match ${matchNumber}`}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={onDeleteMatch}
+                className="p-1.5 rounded-lg transition-colors hover:bg-red-100 dark:hover:bg-red-900/30"
+                style={{ color: 'var(--error, #ef4444)' }}
+                aria-label={`Delete Match ${matchNumber}`}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              {/* Tooltip */}
+              <div
+                className="absolute right-0 top-full mt-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+                style={{
+                  background: 'var(--ink)',
+                  color: 'var(--canvas)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                }}
+              >
+                Remove this match
+              </div>
+            </div>
           )}
         </div>
       </div>
