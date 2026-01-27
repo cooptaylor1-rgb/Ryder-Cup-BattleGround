@@ -1,0 +1,4 @@
+#!/bin/sh
+# Pre-commit hook - runs lint-staged and full check
+
+pnpm lint-staged

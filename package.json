@@ -3,15 +3,23 @@
     "version": "1.0.0",
     "description": "Golf Ryder Cup Tournament Tracker - Web App",
     "private": true,
+    "packageManager": "pnpm@9.15.9",
     "scripts": {
-        "dev": "cd golf-ryder-cup-web && npm run dev",
-        "build": "cd golf-ryder-cup-web && npm run build",
-        "start": "cd golf-ryder-cup-web && npm start",
-        "lint": "cd golf-ryder-cup-web && npm run lint",
-        "postinstall": "cd golf-ryder-cup-web && npm install"
+        "dev": "pnpm -C golf-ryder-cup-web dev",
+        "build": "pnpm -C golf-ryder-cup-web build",
+        "start": "pnpm -C golf-ryder-cup-web start",
+        "lint": "pnpm -C golf-ryder-cup-web lint",
+        "format": "pnpm -C golf-ryder-cup-web format",
+        "format:check": "pnpm -C golf-ryder-cup-web format:check",
+        "typecheck": "pnpm -C golf-ryder-cup-web typecheck",
+        "test": "pnpm -C golf-ryder-cup-web test",
+        "e2e": "pnpm -C golf-ryder-cup-web e2e",
+        "e2e:smoke": "pnpm -C golf-ryder-cup-web e2e:smoke",
+        "check": "pnpm -C golf-ryder-cup-web check",
+        "prepare": "husky"
     },
     "engines": {
-        "node": ">=18.0.0"
+        "node": ">=20.0.0"
     },
     "keywords": [
         "golf",
@@ -21,5 +29,17 @@
         "pwa"
     ],
     "author": "",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lint-staged": "^16.2.7"
+    },
+    "lint-staged": {
+        "golf-ryder-cup-web/**/*.{ts,tsx}": [
+            "pnpm -C golf-ryder-cup-web eslint --fix --max-warnings=0"
+        ],
+        "golf-ryder-cup-web/**/*.{json,md,css,scss}": [
+            "pnpm -C golf-ryder-cup-web prettier --write --ignore-unknown"
+        ]
+    }
 }

@@ -1,46 +1,30 @@
 {
-  "name": "Golf Ryder Cup App - Swift Dev Container",
-  "image": "swift:6.0-jammy",
-
+  "name": "Golf Ryder Cup App",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    }
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-
+  "postCreateCommand": "corepack enable && pnpm install",
+  "forwardPorts": [3000],
   "customizations": {
     "vscode": {
       "extensions": [
-        "sswg.swift-lang",
-        "streetsidesoftware.code-spell-checker",
-        "github.copilot",
-        "github.copilot-chat",
-        "eamodio.gitlens",
-        "gruntfuggly.todo-tree",
-        "redhat.vscode-yaml",
-        "davidanson.vscode-markdownlint"
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "vitest.explorer",
+        "ms-playwright.playwright",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
       ],
       "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
-        "editor.tabSize": 4,
-        "files.insertFinalNewline": true,
-        "files.trimTrailingWhitespace": true,
-        "files.associations": {
-          "*.swift": "swift"
-        }
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsdk": "golf-ryder-cup-web/node_modules/typescript/lib"
       }
     }
-  },
-
-  "postCreateCommand": "swift --version && echo '✅ Swift dev container ready! SPM builds work here. Full iOS builds require GitHub Actions CI (macOS).'",
-
-  "containerUser": "root",
-  "remoteUser": "root",
-
-  "hostRequirements": {
-    "cpus": 4,
-    "memory": "8gb",
-    "storage": "32gb"
   }
 }

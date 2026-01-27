@@ -2,301 +2,100 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: "20"
+
 jobs:
-  # ===========================================
-  # Web App CI (Primary)
-  # ===========================================
-  web-build-and-test:
-    name: Web - Build & Test
+  lint-format-typecheck:
+    name: Lint, Format & Typecheck
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: golf-ryder-cup-web
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: golf-ryder-cup-web/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: TypeScript check
-        run: npm run typecheck
+      - name: Check formatting
+        run: pnpm format:check
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
 
-      - name: Run tests
-        run: npm run test
+      - name: Typecheck
+        run: pnpm typecheck
 
-      - name: Build
-        run: npm run build
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: web-build
-          path: golf-ryder-cup-web/.next
-          retention-days: 7
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-  # ===========================================
-  # E2E Tests (Playwright)
-  # ===========================================
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests
+        run: pnpm test
+
   e2e-smoke:
-    name: E2E - Smoke Tests
+    name: E2E Smoke Tests
     runs-on: ubuntu-latest
-    needs: web-build-and-test
-
-    defaults:
-      run:
-        working-directory: golf-ryder-cup-web
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: golf-ryder-cup-web/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm -C golf-ryder-cup-web exec playwright install --with-deps chromium
 
-      - name: Run smoke tests
-        run: npm run test:smoke
-        env:
-          CI: true
+      - name: Build app
+        run: pnpm build
 
-      - name: Upload Playwright report
+      - name: Run E2E smoke tests
+        run: pnpm e2e:smoke
+
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
-          name: e2e-smoke-report
+          name: playwright-report
           path: golf-ryder-cup-web/tests/e2e/artifacts/
           retention-days: 7
-
-  e2e-regression:
-    name: E2E - Regression Tests
-    runs-on: ubuntu-latest
-    needs: web-build-and-test
-
-    defaults:
-      run:
-        working-directory: golf-ryder-cup-web
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: golf-ryder-cup-web/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run regression tests
-        run: npm run test:regression
-        env:
-          CI: true
-
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: e2e-regression-report
-          path: golf-ryder-cup-web/tests/e2e/artifacts/
-          retention-days: 7
-
-  # ===========================================
-  # Lighthouse CI (Performance Audits)
-  # ===========================================
-  lighthouse:
-    name: Lighthouse CI
-    runs-on: ubuntu-latest
-    needs: web-build-and-test
-
-    defaults:
-      run:
-        working-directory: golf-ryder-cup-web
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: golf-ryder-cup-web/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli@0.13.x
-
-      - name: Run Lighthouse CI
-        run: lhci autorun
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-      - name: Upload Lighthouse report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lighthouse-report
-          path: .lighthouseci/
-          retention-days: 30
-
-  # ===========================================
-  # iOS App CI (Legacy - Optional)
-  # ===========================================
-  ios-build-and-test:
-    name: iOS - Build & Test (Legacy)
-    runs-on: macos-14
-    # iOS CI is optional - only runs when explicitly requested
-    if: github.event_name == 'workflow_dispatch'
-
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app
-
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: Show available SDKs
-        run: xcodebuild -showsdks
-
-      - name: Show available simulators
-        run: xcrun simctl list devices available
-
-      - name: Cache Swift Package Manager
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/Library/Caches/org.swift.swiftpm
-            ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved', '**/Package.swift') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
-      - name: Resolve Package Dependencies
-        run: |
-          cd GolfTripApp
-          xcodebuild -resolvePackageDependencies \
-            -project GolfTripApp.xcodeproj \
-            -scheme GolfTripApp
-
-      - name: Build for Testing
-        run: |
-          cd GolfTripApp
-          xcodebuild build-for-testing \
-            -project GolfTripApp.xcodeproj \
-            -scheme GolfTripApp \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.2' \
-            -configuration Debug \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Run Unit Tests
-        run: |
-          cd GolfTripApp
-          xcodebuild test-without-building \
-            -project GolfTripApp.xcodeproj \
-            -scheme GolfTripApp \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.2' \
-            -resultBundlePath TestResults.xcresult
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: GolfTripApp/TestResults.xcresult
-          retention-days: 7
-
-  lint:
-    name: Swift Lint
-    runs-on: macos-14
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install SwiftLint
-        run: brew install swiftlint
-
-      - name: Run SwiftLint
-        run: |
-          cd GolfTripApp
-          swiftlint lint --reporter github-actions-logging || true
-        continue-on-error: true
-
-  build-release:
-    name: Build Release
-    runs-on: macos-14
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app
-
-      - name: Build Release
-        run: |
-          cd GolfTripApp
-          xcodebuild build \
-            -project GolfTripApp.xcodeproj \
-            -scheme GolfTripApp \
-            -destination 'generic/platform=iOS' \
-            -configuration Release \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            ONLY_ACTIVE_ARCH=NO

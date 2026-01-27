@@ -20,10 +20,17 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,md,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md,css}\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:smoke": "playwright test --grep '@smoke' --project='smoke'",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
@@ -45,7 +52,7 @@
     "db:diff": "supabase db diff",
     "db:push": "supabase db push",
     "analyze": "ANALYZE=true next build",
-    "prepare": "husky"
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
@@ -102,9 +109,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "fake-indexeddb": "^6.2.5",
-    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
-    "lint-staged": "^16.2.7",
+    "prettier": "^3.5.3",
     "sharp": "^0.34.5",
     "storybook": "^8.6.14",
     "tailwindcss": "^4",
@@ -112,14 +118,5 @@
     "typescript": "^5",
     "vitest": "^4.0.17",
     "web-push": "^3.6.7"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "bash -c 'tsc --noEmit'"
-    ],
-    "*.{json,md}": [
-      "prettier --write --ignore-unknown"
-    ]
   }
 }
