@@ -79,7 +79,8 @@ const initialFormData: FormData = {
 
 export default function CreateProfilePage() {
   const router = useRouter();
-  const { createProfile, isAuthenticated, isLoading, error, clearError } = useAuthStore();
+  const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError } =
+    useAuthStore();
   const { showToast } = useUIStore();
 
   const [step, setStep] = useState<Step>('essential');
@@ -90,12 +91,12 @@ export default function CreateProfilePage() {
   );
   const [showOptionalExpanded, setShowOptionalExpanded] = useState(false);
 
-  // Redirect if already logged in
+  // Redirect if already logged in and completed onboarding
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUser?.hasCompletedOnboarding) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, currentUser, router]);
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -160,32 +161,35 @@ export default function CreateProfilePage() {
         ? parseFloat(formData.handicapIndex)
         : undefined;
 
-      const profileData: Omit<UserProfile, 'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete'> =
-        {
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          nickname: formData.nickname.trim() || undefined,
-          email: formData.email.trim(),
-          phoneNumber: formData.phoneNumber.trim() || undefined,
-          handicapIndex:
-            handicapValue !== undefined && !isNaN(handicapValue) ? handicapValue : undefined,
-          ghin: formData.ghin.trim() || undefined,
-          homeCourse: formData.homeCourse.trim() || undefined,
-          preferredTees: formData.preferredTees || undefined,
-          shirtSize: formData.shirtSize || undefined,
-          dietaryRestrictions: formData.dietaryRestrictions.trim() || undefined,
-          emergencyContact: formData.emergencyContactName
-            ? {
-                name: formData.emergencyContactName.trim(),
-                phone: formData.emergencyContactPhone.trim(),
-                relationship: formData.emergencyContactRelationship.trim(),
-              }
-            : undefined,
-        };
+      const profileData: Omit<
+        UserProfile,
+        'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete' | 'hasCompletedOnboarding'
+      > = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        nickname: formData.nickname.trim() || undefined,
+        email: formData.email.trim(),
+        phoneNumber: formData.phoneNumber.trim() || undefined,
+        handicapIndex:
+          handicapValue !== undefined && !isNaN(handicapValue) ? handicapValue : undefined,
+        ghin: formData.ghin.trim() || undefined,
+        homeCourse: formData.homeCourse.trim() || undefined,
+        preferredTees: formData.preferredTees || undefined,
+        shirtSize: formData.shirtSize || undefined,
+        dietaryRestrictions: formData.dietaryRestrictions.trim() || undefined,
+        emergencyContact: formData.emergencyContactName
+          ? {
+              name: formData.emergencyContactName.trim(),
+              phone: formData.emergencyContactPhone.trim(),
+              relationship: formData.emergencyContactRelationship.trim(),
+            }
+          : undefined,
+      };
 
       await createProfile(profileData, formData.pin);
-      showToast('success', 'Welcome! Your profile is ready.');
-      router.push('/');
+      showToast('success', "Welcome! Let's complete your profile.");
+      // Redirect to complete profile page to add optional details
+      router.push('/profile/complete');
     } catch (err) {
       logger.error('Failed to create profile', { error: err });
       showToast('error', 'Failed to create profile');
@@ -202,7 +206,10 @@ export default function CreateProfilePage() {
   return (
     <div className="min-h-screen bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col">
       {/* Header */}
-      <header className="pt-safe-area-inset-top sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200">
+      <header
+        className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div className="px-4 py-3 flex items-center gap-3">
           <button
             onClick={handleBack}

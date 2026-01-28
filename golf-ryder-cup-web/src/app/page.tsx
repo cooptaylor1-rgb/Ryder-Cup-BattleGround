@@ -939,6 +939,10 @@ export default function HomePage() {
             {hasTrips && (
               <button
                 onClick={() => setShowQuickStart(true)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  setShowQuickStart(true);
+                }}
                 className="btn-premium press-scale"
                 style={{
                   display: 'flex',
@@ -947,6 +951,7 @@ export default function HomePage() {
                   padding: 'var(--space-2) var(--space-4)',
                   borderRadius: 'var(--radius-full)',
                   fontSize: 'var(--text-sm)',
+                  minHeight: '44px', // iOS minimum touch target
                 }}
               >
                 <Plus size={14} strokeWidth={2.5} />
