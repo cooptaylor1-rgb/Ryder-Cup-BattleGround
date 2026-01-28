@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build": "next build && node scripts/inject-sw-hash.js",
+    "build:analyze": "ANALYZE=true next build && node scripts/inject-sw-hash.js",
     "build:static": "next build && next export",
     "start": "next start",
     "cap:init": "npx cap init",

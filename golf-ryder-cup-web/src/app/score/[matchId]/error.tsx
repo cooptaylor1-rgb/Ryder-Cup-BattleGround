@@ -1,16 +1,17 @@
 'use client';
 
 /**
- * Scoring Error Page
+ * Match Scoring Error Boundary
  *
- * Specialized error boundary for scoring routes.
- * Ensures users don't lose their scoring progress.
- * Reports to Sentry with scoring context.
+ * Specialized error boundary for the match scoring page.
+ * Provides recovery options and preserves offline scores.
+ * Reports to Sentry with match context.
  */
 
 import * as Sentry from '@sentry/nextjs';
-import { useEffect } from 'react';
-import { RefreshCw, ArrowLeft, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { RefreshCw, ArrowLeft, Target, Save, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 interface ErrorPageProps {
@@ -18,13 +19,38 @@ interface ErrorPageProps {
   reset: () => void;
 }
 
-export default function ScoringError({ error, reset }: ErrorPageProps) {
+export default function MatchScoringError({ error, reset }: ErrorPageProps) {
+  const params = useParams();
+  const matchId = params?.matchId as string | undefined;
+  const [hasOfflineData, setHasOfflineData] = useState(false);
+
   useEffect(() => {
-    // Report scoring errors with context
+    // Report scoring errors with match context
     Sentry.captureException(error, {
-      tags: { feature: 'scoring' },
+      tags: {
+        feature: 'scoring',
+        matchId: matchId || 'unknown',
+      },
+      extra: {
+        errorDigest: error.digest,
+      },
     });
-  }, [error]);
+
+    // Check for offline score data
+    const checkOfflineData = async () => {
+      try {
+        if (matchId && typeof window !== 'undefined') {
+          const { db } = await import('@/lib/db');
+          const offlineScores = await db.holeResults.where('matchId').equals(matchId).count();
+          setHasOfflineData(offlineScores > 0);
+        }
+      } catch {
+        // Silently fail - just showing status
+      }
+    };
+
+    checkOfflineData();
+  }, [error, matchId]);
 
   return (
     <div
@@ -48,8 +74,23 @@ export default function ScoringError({ error, reset }: ErrorPageProps) {
       <p className="text-center max-w-md mb-2" style={{ color: 'var(--ink-secondary)' }}>
         There was a problem with the scoring system.
       </p>
+
+      {/* Offline data status */}
+      {hasOfflineData && (
+        <div
+          className="flex items-center gap-2 px-4 py-2 rounded-lg mb-4"
+          style={{
+            background: 'rgba(34, 197, 94, 0.1)',
+            color: '#16a34a',
+          }}
+        >
+          <Save size={16} />
+          <span className="text-sm font-medium">Your scores are saved locally</span>
+        </div>
+      )}
+
       <p className="text-center max-w-md mb-8 text-sm" style={{ color: 'var(--ink-tertiary)' }}>
-        Don&apos;t worry - your scores are saved locally. Try again to continue scoring.
+        Try again to continue scoring. Your progress won&apos;t be lost.
       </p>
 
       {/* Error Details (Development only) */}
@@ -62,10 +103,11 @@ export default function ScoringError({ error, reset }: ErrorPageProps) {
           }}
         >
           <summary
-            className="px-4 py-3 cursor-pointer text-sm font-medium"
+            className="px-4 py-3 cursor-pointer text-sm font-medium flex items-center gap-2"
             style={{ color: 'var(--ink-secondary)' }}
           >
-            Error Details
+            <AlertTriangle size={14} />
+            Error Details {matchId && `(Match: ${matchId.slice(0, 8)}...)`}
           </summary>
           <div className="px-4 pb-4">
             <pre

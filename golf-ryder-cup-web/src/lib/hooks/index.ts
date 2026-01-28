@@ -57,6 +57,13 @@ export {
   type LiveUpdateType,
 } from './useLiveUpdates';
 
+// Real-time Supabase scoring sync
+export {
+  useRealtimeScoring,
+  type UseRealtimeScoringOptions,
+  type UseRealtimeScoringReturn,
+} from './useRealtimeScoring';
+
 // Offline queue management
 export { useOfflineQueue, type QueuedAction } from './useOfflineQueue';
 

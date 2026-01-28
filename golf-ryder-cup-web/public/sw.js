@@ -8,11 +8,17 @@
  * - iOS Safari can evict caches after 7 days of inactivity
  * - This SW implements cache refresh on every visit to keep caches alive
  * - Periodic ping messages help keep the SW active
+ *
+ * Cache Versioning:
+ * - BUILD_HASH is injected during build process
+ * - Falls back to timestamp-based versioning for dev
  */
 
-const CACHE_NAME = 'golf-ryder-cup-v2';
-const STATIC_CACHE = 'golf-ryder-cup-static-v2';
+// Build hash is injected by build process, fallback to timestamp for dev
+const BUILD_HASH = self.__BUILD_HASH__ || Date.now().toString(36);
 const CACHE_VERSION = 2;
+const CACHE_NAME = `golf-ryder-cup-v${CACHE_VERSION}-${BUILD_HASH}`;
+const STATIC_CACHE = `golf-ryder-cup-static-v${CACHE_VERSION}-${BUILD_HASH}`;
 
 // Track last cache refresh time
 let lastCacheRefresh = Date.now();

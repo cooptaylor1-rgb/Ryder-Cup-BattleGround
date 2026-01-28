@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/utils/apiMiddleware';
+import { apiLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
 // Zod schema for push subscription validation
@@ -81,7 +82,7 @@ async function storeSubscription(
     );
 
     if (error) {
-      console.error('Supabase push subscription error:', error);
+      apiLogger.error('Supabase push subscription error:', error);
       return { success: false, error: error.message };
     }
     return { success: true };
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
       storage: supabaseUrl ? 'cloud' : 'local',
     });
   } catch (error) {
-    console.error('Push subscription error:', error);
+    apiLogger.error('Push subscription error:', error);
     return NextResponse.json({ error: 'Failed to register subscription' }, { status: 500 });
   }
 }
@@ -183,7 +184,7 @@ export async function DELETE(request: NextRequest) {
       message: deleted ? 'Subscription removed' : 'Subscription not found',
     });
   } catch (error) {
-    console.error('Push unsubscribe error:', error);
+    apiLogger.error('Push unsubscribe error:', error);
     return NextResponse.json({ error: 'Failed to unregister subscription' }, { status: 500 });
   }
 }
