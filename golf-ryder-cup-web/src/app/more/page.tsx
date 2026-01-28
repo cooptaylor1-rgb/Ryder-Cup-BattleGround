@@ -82,10 +82,20 @@ export default function MorePage() {
   const router = useRouter();
   const { currentTrip, loadTrip, clearTrip } = useTripStore();
   const { currentUser, isAuthenticated } = useAuthStore();
-  const { isCaptainMode, enableCaptainMode, disableCaptainMode, showToast } = useUIStore();
+  const {
+    isCaptainMode,
+    enableCaptainMode,
+    disableCaptainMode,
+    isAdminMode,
+    enableAdminMode,
+    disableAdminMode,
+    showToast,
+  } = useUIStore();
 
   const [showCaptainModal, setShowCaptainModal] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [captainPin, setCaptainPin] = useState('');
+  const [adminPin, setAdminPin] = useState('');
   const [isSeeding, setIsSeeding] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showExitTripConfirm, setShowExitTripConfirm] = useState(false);
@@ -94,6 +104,7 @@ export default function MorePage() {
     manage: true,
     settings: false,
     data: false,
+    admin: true,
   });
 
   const toggleSection = (sectionId: string) => {
@@ -107,6 +118,15 @@ export default function MorePage() {
       setShowCaptainModal(false);
       setCaptainPin('');
       showToast('success', 'Captain mode enabled');
+    }
+  };
+
+  const handleEnableAdminMode = () => {
+    if (adminPin.length >= 4) {
+      enableAdminMode(adminPin);
+      setShowAdminModal(false);
+      setAdminPin('');
+      showToast('success', 'Admin mode enabled');
     }
   };
 
@@ -289,6 +309,34 @@ export default function MorePage() {
               },
               {
                 id: 'clear',
+                label: 'Clear All Data',
+                description: 'Start fresh',
+                icon: <Trash2 size={20} />,
+                action: () => setShowClearConfirm(true),
+                destructive: true,
+              },
+            ],
+          },
+        ]
+      : []),
+    // Admin (only show when admin mode is enabled)
+    ...(isAdminMode
+      ? [
+          {
+            id: 'admin',
+            title: 'Admin Tools',
+            items: [
+              {
+                id: 'admin-panel',
+                label: 'Admin Panel',
+                description: 'Delete trips & manage data',
+                icon: <Shield size={20} />,
+                href: '/admin',
+                badge: 'Admin',
+                badgeColor: '#dc2626',
+              },
+              {
+                id: 'clear-admin',
                 label: 'Clear All Data',
                 description: 'Start fresh',
                 icon: <Trash2 size={20} />,
@@ -513,7 +561,7 @@ export default function MorePage() {
             background: isCaptainMode ? 'var(--masters-subtle)' : 'var(--surface-card)',
             border: isCaptainMode ? '2px solid var(--masters)' : '1px solid var(--rule)',
             borderRadius: '16px',
-            marginBottom: '24px',
+            marginBottom: '12px',
             cursor: 'pointer',
             textAlign: 'left',
           }}
@@ -539,6 +587,51 @@ export default function MorePage() {
             </p>
           </div>
           <Toggle enabled={isCaptainMode} />
+        </motion.button>
+
+        {/* Admin Mode Quick Toggle */}
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+          onClick={() => (isAdminMode ? disableAdminMode() : setShowAdminModal(true))}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '16px',
+            background: isAdminMode ? 'rgba(220, 38, 38, 0.1)' : 'var(--surface-card)',
+            border: isAdminMode ? '2px solid #dc2626' : '1px solid var(--rule)',
+            borderRadius: '16px',
+            marginBottom: '24px',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <div
+            style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '12px',
+              background: isAdminMode ? '#dc2626' : 'var(--surface-raised)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: isAdminMode ? 'white' : 'var(--ink-secondary)',
+            }}
+          >
+            <Shield size={22} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 600, color: isAdminMode ? '#dc2626' : 'var(--ink-primary)' }}>
+              Admin Mode
+            </p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)' }}>
+              {isAdminMode ? 'Enabled — Data management access' : 'Delete trips & manage data'}
+            </p>
+          </div>
+          <Toggle enabled={isAdminMode} color={isAdminMode ? '#dc2626' : undefined} />
         </motion.button>
 
         {/* Menu Sections */}
@@ -870,6 +963,99 @@ export default function MorePage() {
             </div>
           </Modal>
         )}
+
+        {showAdminModal && (
+          <Modal onClose={() => setShowAdminModal(false)}>
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'rgba(220, 38, 38, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+              }}
+            >
+              <Shield size={28} style={{ color: '#dc2626' }} />
+            </div>
+            <h2
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                marginBottom: '8px',
+                textAlign: 'center',
+              }}
+            >
+              Enable Admin Mode
+            </h2>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--ink-secondary)',
+                marginBottom: '20px',
+                textAlign: 'center',
+              }}
+            >
+              Admin mode allows you to delete trips, clean up data, and access advanced management
+              features.
+            </p>
+            <input
+              type="password"
+              value={adminPin}
+              onChange={(e) => setAdminPin(e.target.value)}
+              placeholder="Enter 4+ digit PIN"
+              autoFocus
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                fontSize: '1rem',
+                borderRadius: '12px',
+                border: '1px solid var(--rule)',
+                background: 'var(--surface-raised)',
+                color: 'var(--ink-primary)',
+                marginBottom: '16px',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  setShowAdminModal(false);
+                  setAdminPin('');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--rule)',
+                  background: 'var(--surface-raised)',
+                  color: 'var(--ink-primary)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEnableAdminMode}
+                disabled={adminPin.length < 4}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: adminPin.length >= 4 ? '#dc2626' : 'var(--rule)',
+                  color: adminPin.length >= 4 ? 'white' : 'var(--ink-tertiary)',
+                  fontWeight: 600,
+                  cursor: adminPin.length >= 4 ? 'pointer' : 'not-allowed',
+                }}
+              >
+                Enable
+              </button>
+            </div>
+          </Modal>
+        )}
       </AnimatePresence>
     </div>
   );
@@ -981,14 +1167,14 @@ function MenuItemRow({
   );
 }
 
-function Toggle({ enabled }: { enabled: boolean }) {
+function Toggle({ enabled, color }: { enabled: boolean; color?: string }) {
   return (
     <div
       style={{
         width: '48px',
         height: '28px',
         borderRadius: '14px',
-        background: enabled ? 'var(--masters)' : 'var(--rule)',
+        background: enabled ? color || 'var(--masters)' : 'var(--rule)',
         position: 'relative',
         transition: 'background 0.2s ease',
         flexShrink: 0,

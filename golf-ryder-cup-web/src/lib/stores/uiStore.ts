@@ -49,6 +49,13 @@ interface UIState {
   verifyCaptainPin: (pin: string) => boolean;
   resetCaptainPin: () => void;
 
+  // Admin Mode (power user features)
+  isAdminMode: boolean;
+  adminPin: string | null;
+  enableAdminMode: (pin: string) => void;
+  disableAdminMode: () => void;
+  verifyAdminPin: (pin: string) => boolean;
+
   // Toasts
   toasts: Toast[];
   showToast: (type: Toast['type'], message: string, duration?: number) => void;
@@ -154,6 +161,30 @@ export const useUIStore = create<UIState>()(
           'info',
           'Captain PIN has been reset. Set a new PIN to re-enable Captain Mode.'
         );
+      },
+
+      // Admin Mode (power user features like bulk delete, data management)
+      isAdminMode: false,
+      adminPin: null,
+
+      enableAdminMode: (pin) => {
+        set({
+          isAdminMode: true,
+          adminPin: pin,
+        });
+        get().showToast('success', 'Admin Mode enabled');
+      },
+
+      disableAdminMode: () => {
+        set({
+          isAdminMode: false,
+        });
+        get().showToast('info', 'Admin Mode disabled');
+      },
+
+      verifyAdminPin: (pin) => {
+        const { adminPin } = get();
+        return adminPin !== null && adminPin === pin;
       },
 
       // Toasts
@@ -277,6 +308,8 @@ export const useUIStore = create<UIState>()(
         isDarkMode: state.isDarkMode,
         isCaptainMode: state.isCaptainMode,
         captainPin: state.captainPin,
+        isAdminMode: state.isAdminMode,
+        adminPin: state.adminPin,
         scoringPreferences: state.scoringPreferences,
         scoringModeByFormat: state.scoringModeByFormat,
       }),
