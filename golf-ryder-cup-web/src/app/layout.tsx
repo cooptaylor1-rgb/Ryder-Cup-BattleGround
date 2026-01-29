@@ -48,7 +48,6 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   ...baseViewport,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -166,7 +165,12 @@ export default function RootLayout({
                   <TripRehydrationProvider>
                     <NotificationProvider>
                       <AppOnboardingProvider>
-                        <main id="main-content">{children}</main>
+                        <main
+                          id="main-content"
+                          className="pb-[calc(80px+env(safe-area-inset-bottom,0px))]"
+                        >
+                          {children}
+                        </main>
                       </AppOnboardingProvider>
                     </NotificationProvider>
                   </TripRehydrationProvider>

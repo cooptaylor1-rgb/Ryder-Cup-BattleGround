@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 
 /**
@@ -16,11 +16,7 @@ import { useAuthStore } from '@/lib/stores';
  * - /join/* (trip invitations)
  */
 
-const PUBLIC_ROUTES = [
-  '/profile/create',
-  '/login',
-  '/join',
-];
+const PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator'];
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -29,6 +25,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, currentUser } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -47,8 +44,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
     if (!isHydrated) return;
 
     // Allow public routes without authentication
-    const isPublicRoute = PUBLIC_ROUTES.some(route =>
-      pathname === route || pathname?.startsWith(route + '/')
+    const isPublicRoute = PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname?.startsWith(route + '/')
     );
 
     if (isPublicRoute) {
@@ -59,7 +56,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     // If not authenticated, redirect to profile creation
     if (!isAuthenticated || !currentUser) {
-      router.replace('/profile/create');
+      const query = searchParams?.toString();
+      const nextPath = query ? `${pathname}?${query}` : pathname;
+      router.replace(`/profile/create?next=${encodeURIComponent(nextPath)}`);
       return;
     }
 
@@ -71,8 +70,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // Show nothing while checking authentication (prevents flash)
   if (!isHydrated || isChecking) {
     // Check if this is a public route - if so, don't block
-    const isPublicRoute = PUBLIC_ROUTES.some(route =>
-      pathname === route || pathname?.startsWith(route + '/')
+    const isPublicRoute = PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname?.startsWith(route + '/')
     );
 
     if (!isPublicRoute) {
@@ -83,7 +82,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'var(--canvas, #f8fafc)'
+            background: 'var(--canvas, #f8fafc)',
           }}
         >
           <div style={{ textAlign: 'center' }}>
@@ -99,9 +98,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
               }}
             />
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            <p style={{ color: 'var(--ink-secondary, #64748b)', fontSize: '14px' }}>
-              Loading...
-            </p>
+            <p style={{ color: 'var(--ink-secondary, #64748b)', fontSize: '14px' }}>Loading...</p>
           </div>
         </div>
       );

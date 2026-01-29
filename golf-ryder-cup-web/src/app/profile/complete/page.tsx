@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { Button, PageLoadingSkeleton } from '@/components/ui';
@@ -44,6 +44,7 @@ interface FormData {
 
 export default function CompleteProfilePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentUser, isAuthenticated, updateProfile, completeOnboarding, isLoading } =
     useAuthStore();
   const { showToast } = useUIStore();
@@ -69,9 +70,10 @@ export default function CompleteProfilePage() {
     if (!isAuthenticated) {
       router.push('/login');
     } else if (currentUser?.hasCompletedOnboarding) {
-      router.push('/');
+      const nextPath = searchParams?.get('next');
+      router.push(nextPath || '/');
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser, router, searchParams]);
 
   // Pre-fill with existing data
   useEffect(() => {
@@ -130,7 +132,8 @@ export default function CompleteProfilePage() {
       await updateProfile(updates);
       await completeOnboarding();
       showToast('success', 'Profile complete! Welcome aboard.');
-      router.push('/');
+      const nextPath = searchParams?.get('next');
+      router.push(nextPath || '/');
     } catch (err) {
       logger.error('Failed to update profile', { error: err });
       showToast('error', 'Failed to save profile');
@@ -143,7 +146,8 @@ export default function CompleteProfilePage() {
     try {
       await completeOnboarding();
       showToast('info', 'You can complete your profile anytime in Settings.');
-      router.push('/');
+      const nextPath = searchParams?.get('next');
+      router.push(nextPath || '/');
     } catch (err) {
       logger.error('Failed to skip onboarding', { error: err });
       router.push('/');

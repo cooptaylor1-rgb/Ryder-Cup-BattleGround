@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { Button } from '@/components/ui';
@@ -79,6 +79,7 @@ const initialFormData: FormData = {
 
 export default function CreateProfilePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError } =
     useAuthStore();
   const { showToast } = useUIStore();
@@ -94,9 +95,10 @@ export default function CreateProfilePage() {
   // Redirect if already logged in and completed onboarding
   useEffect(() => {
     if (isAuthenticated && currentUser?.hasCompletedOnboarding) {
-      router.push('/');
+      const nextPath = searchParams?.get('next');
+      router.push(nextPath || '/');
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser, router, searchParams]);
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -140,7 +142,9 @@ export default function CreateProfilePage() {
     if (step === 'optional') {
       setStep('essential');
     } else {
-      router.push('/login');
+      const nextPath = searchParams?.get('next');
+      const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+      router.push(`/login${nextParam}`);
     }
   };
 
@@ -189,7 +193,9 @@ export default function CreateProfilePage() {
       await createProfile(profileData, formData.pin);
       showToast('success', "Welcome! Let's complete your profile.");
       // Redirect to complete profile page to add optional details
-      router.push('/profile/complete');
+      const nextPath = searchParams?.get('next');
+      const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+      router.push(`/profile/complete${nextParam}`);
     } catch (err) {
       logger.error('Failed to create profile', { error: err });
       showToast('error', 'Failed to create profile');

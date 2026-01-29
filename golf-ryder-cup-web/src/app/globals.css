@@ -343,11 +343,6 @@ textarea:focus-visible {
     padding-right: 40px;
   }
 
-  /* Prevent iOS from zooming on double-tap */
-  * {
-    touch-action: manipulation;
-  }
-
   /* Safe area padding utility classes */
   .safe-top {
     padding-top: env(safe-area-inset-top, 0px);

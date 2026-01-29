@@ -104,6 +104,16 @@ export default defineConfig({
       dependencies: ['setup'],
     },
     {
+      name: 'ios-safari-iphone-14',
+      use: { ...devices['iPhone 14'] },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'ios-safari-iphone-15',
+      use: { ...devices['iPhone 15'] },
+      dependencies: ['setup'],
+    },
+    {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
       dependencies: ['setup'],

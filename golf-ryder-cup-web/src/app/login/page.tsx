@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Button, Card, CardContent } from '@/components/ui';
 import { GolfBallTee } from '@/components/ui/illustrations';
@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isAuthenticated, currentUser, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -27,14 +28,16 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated && currentUser) {
+      const nextPath = searchParams?.get('next');
       // If onboarding not complete, redirect to complete profile
       if (!currentUser.hasCompletedOnboarding) {
-        router.push('/profile/complete');
+        const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+        router.push(`/profile/complete${nextParam}`);
       } else {
-        router.push('/');
+        router.push(nextPath || '/');
       }
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser, router, searchParams]);
 
   // Clear errors when inputs change
   useEffect(() => {
@@ -58,7 +61,9 @@ export default function LoginPage() {
   };
 
   const handleCreateAccount = () => {
-    router.push('/profile/create');
+    const nextPath = searchParams?.get('next');
+    const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+    router.push(`/profile/create${nextParam}`);
   };
 
   return (
@@ -70,9 +75,11 @@ export default function LoginPage() {
             <GolfBallTee size="lg" animated />
           </div>
           <h1 className="text-display-sm text-surface-900 font-semibold tracking-tight">
-            Golf Buddies
+            Golf Ryder Cup
           </h1>
-          <p className="text-body-md text-surface-600 mt-1">Your ultimate trip companion</p>
+          <p className="text-body-md text-surface-600 mt-1">
+            Your ultimate Ryder Cup trip companion
+          </p>
         </div>
       </header>
 

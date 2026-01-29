@@ -983,6 +983,8 @@ export default function EnhancedMatchScoringPage() {
                             ? `0 0 0 3px var(--canvas), 0 0 0 5px ${teamAColor}`
                             : undefined,
                       }}
+                      aria-pressed={currentHoleResult?.winner === 'teamA'}
+                      aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
                     >
                       <span className="block text-lg">{teamAName}</span>
                       <span className="block text-xs opacity-80 mt-0.5">wins hole</span>
@@ -1001,6 +1003,8 @@ export default function EnhancedMatchScoringPage() {
                             ? '0 0 0 3px var(--canvas), 0 0 0 5px var(--ink-tertiary)'
                             : undefined,
                       }}
+                      aria-pressed={currentHoleResult?.winner === 'halved'}
+                      aria-label={`Score hole: Halved${currentHoleResult?.winner === 'halved' ? ' (selected)' : ''}`}
                     >
                       <span className="block text-lg">Halve</span>
                       <span className="block text-xs opacity-60 mt-0.5">tie hole</span>
@@ -1018,6 +1022,8 @@ export default function EnhancedMatchScoringPage() {
                             ? `0 0 0 3px var(--canvas), 0 0 0 5px ${teamBColor}`
                             : undefined,
                       }}
+                      aria-pressed={currentHoleResult?.winner === 'teamB'}
+                      aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
                     >
                       <span className="block text-lg">{teamBName}</span>
                       <span className="block text-xs opacity-80 mt-0.5">wins hole</span>

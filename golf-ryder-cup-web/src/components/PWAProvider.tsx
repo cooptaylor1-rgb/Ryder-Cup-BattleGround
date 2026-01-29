@@ -68,8 +68,6 @@ export function PWAProvider({ children }: PWAProviderProps) {
       },
     });
 
-    return () => clearTimeout(timeoutId);
-
     // Listen for online/offline events
     const handleOnline = () => setOnline(true);
     const handleOffline = () => setOnline(false);
@@ -85,6 +83,7 @@ export function PWAProvider({ children }: PWAProviderProps) {
     mediaQuery.addEventListener('change', handleDisplayModeChange);
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       mediaQuery.removeEventListener('change', handleDisplayModeChange);

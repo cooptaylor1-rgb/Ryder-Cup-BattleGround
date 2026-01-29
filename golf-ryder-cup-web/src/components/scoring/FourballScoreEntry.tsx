@@ -332,6 +332,11 @@ export function FourballScoreEntry({
     return 'halved';
   }, [teamANetScores, teamBNetScores, teamABestIndex, teamBBestIndex]);
 
+  const hasValidScores = useMemo(() => {
+    const isValidScore = (score: number) => Number.isFinite(score) && score >= 1 && score <= 15;
+    return [...teamAScores, ...teamBScores].every(isValidScore);
+  }, [teamAScores, teamBScores]);
+
   // Handle submit
   const handleSubmit = useCallback(() => {
     haptic.scorePoint();
@@ -483,9 +488,9 @@ export function FourballScoreEntry({
       {/* Submit Button */}
       <motion.button
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={isSubmitting || !hasValidScores}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all"
+        className="w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed"
         style={{
           background:
             winner === 'teamA'
@@ -493,12 +498,18 @@ export function FourballScoreEntry({
               : winner === 'teamB'
                 ? teamBColor
                 : 'var(--ink-secondary)',
-          opacity: isSubmitting ? 0.5 : 1,
+          opacity: isSubmitting || !hasValidScores ? 0.5 : 1,
         }}
+        aria-disabled={isSubmitting || !hasValidScores}
       >
         <Check size={20} />
         Record Score
       </motion.button>
+      {!hasValidScores && (
+        <p className="text-xs text-center" style={{ color: 'var(--ink-tertiary)' }}>
+          Enter a valid score (1–15) for every player to record this hole.
+        </p>
+      )}
     </div>
   );
 }
