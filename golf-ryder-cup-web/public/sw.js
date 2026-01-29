@@ -241,7 +241,7 @@ async function serveOfflinePage() {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="theme-color" content="#006644">
-            <title>Offline - Golf Buddies</title>
+            <title>Offline - Golf Ryder Cup</title>
             <style>
                 body {
                     font-family: -apple-system, system-ui, sans-serif;

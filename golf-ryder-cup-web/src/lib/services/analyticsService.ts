@@ -202,11 +202,7 @@ export function trackPageView(path: string, title?: string): void {
 /**
  * Track a timing metric
  */
-export function trackTiming(
-  name: string,
-  duration: number,
-  category?: string
-): void {
+export function trackTiming(name: string, duration: number, category?: string): void {
   track('timing', 'performance', {
     metric_name: name,
     duration_ms: Math.round(duration),
@@ -229,25 +225,18 @@ export function trackMetric(metric: PerformanceMetric): void {
 /**
  * Track an error
  */
-export function trackError(
-  errorName: string,
-  errorMessage?: string,
-  errorStack?: string
-): void {
+export function trackError(errorName: string, errorMessage?: string, errorStack?: string): void {
   track('error', 'error', {
     error_name: errorName,
     error_message: errorMessage || null,
-    error_stack: config.debug ? (errorStack || null) : null,
+    error_stack: config.debug ? errorStack || null : null,
   });
 }
 
 /**
  * Track feature usage
  */
-export function trackFeature(
-  featureName: string,
-  action: 'enabled' | 'disabled' | 'used'
-): void {
+export function trackFeature(featureName: string, action: 'enabled' | 'disabled' | 'used'): void {
   track('feature', 'feature', {
     feature_name: featureName,
     action,
@@ -265,7 +254,7 @@ export function trackScoreEntry(options: {
   matchId: string;
   hole: number;
   score: number;
-  method: 'manual' | 'quick' | 'ocr';
+  method: 'manual' | 'quick' | 'ocr' | 'voice';
 }): void {
   track('score_entry', 'scoring', {
     match_id: options.matchId,
@@ -444,11 +433,7 @@ export async function measureAsync<T>(
 /**
  * Measure a synchronous function's execution time
  */
-export function measure<T>(
-  name: string,
-  fn: () => T,
-  category?: string
-): T {
+export function measure<T>(name: string, fn: () => T, category?: string): T {
   const start = performance.now();
   try {
     return fn();

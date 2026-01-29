@@ -20,9 +20,13 @@
 import { useEffect, useMemo, useState, useCallback, lazy, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
+import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { formatPlayerName } from '@/lib/utils';
+import { addAuditLogEntry } from '@/lib/db';
+import { createAuditEntry } from '@/lib/services/sessionLockService';
+import { track, trackFeature, trackScoreEntry } from '@/lib/services/analyticsService';
+import { playScoreSound } from '@/lib/services/soundEffects';
 import {
   Undo2,
   ChevronLeft,
@@ -99,7 +103,8 @@ export default function EnhancedMatchScoringPage() {
   const params = useParams();
   const matchId = params.matchId as string;
 
-  const { players, teams, teeSets, sessions } = useTripStore();
+  const { currentTrip, players, teams, teeSets, sessions } = useTripStore();
+  const { currentUser } = useAuthStore();
   const { showToast, scoringPreferences, getScoringModeForFormat, setScoringModeForFormat } =
     useUIStore();
   const haptic = useHaptic();
@@ -117,6 +122,7 @@ export default function EnhancedMatchScoringPage() {
     goToHole,
     nextHole,
     prevHole,
+    isSessionLocked,
   } = useScoringStore();
 
   // UI State
@@ -127,6 +133,7 @@ export default function EnhancedMatchScoringPage() {
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
   const [showScoringModeTip, setShowScoringModeTip] = useState(false);
   const [savingIndicator, setSavingIndicator] = useState<string | null>(null);
+  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
 
   // Celebration state
   const [celebration, setCelebration] = useState<{
@@ -173,6 +180,13 @@ export default function EnhancedMatchScoringPage() {
     }
   }, [activeMatch]);
 
+  // Default advanced tools visibility based on screen size
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isLarge = window.matchMedia('(min-width: 1024px)').matches;
+    setShowAdvancedTools(isLarge);
+  }, []);
+
   const dismissScoringModeTip = () => {
     setShowScoringModeTip(false);
     localStorage.setItem('scoring-mode-tip-seen', 'true');
@@ -186,6 +200,12 @@ export default function EnhancedMatchScoringPage() {
   // BUG-021 FIX: Use centralized team color constants
   const teamAColor = TEAM_COLORS.teamA;
   const teamBColor = TEAM_COLORS.teamB;
+
+  const actorName = useMemo(() => {
+    if (!currentUser) return 'Unknown';
+    const fullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+    return currentUser.nickname?.trim() || fullName || currentUser.email || 'User';
+  }, [currentUser]);
 
   // Get session type to determine scoring mode
   const currentSession = useMemo(() => {
@@ -228,6 +248,45 @@ export default function EnhancedMatchScoringPage() {
     return matchState.holeResults.find((r) => r.holeNumber === currentHole);
   }, [matchState, currentHole]);
 
+  const recordScoreAudit = useCallback(
+    async (options: {
+      action: 'scoreEntered' | 'scoreUndone' | 'scoreEdited';
+      holeNumber: number;
+      winner?: HoleWinner;
+      teamAStrokeScore?: number;
+      teamBStrokeScore?: number;
+      method?: 'manual' | 'quick' | 'voice' | 'ocr';
+    }) => {
+      if (!currentTrip || !activeMatch) return;
+
+      const summary =
+        options.action === 'scoreUndone'
+          ? `Undid hole ${options.holeNumber}`
+          : options.action === 'scoreEdited'
+            ? `Updated hole ${options.holeNumber} score`
+            : `Scored hole ${options.holeNumber}`;
+
+      const entry = createAuditEntry(currentTrip.id, options.action, actorName, summary, {
+        details: {
+          holeNumber: options.holeNumber,
+          winner: options.winner ?? null,
+          teamAStrokeScore: options.teamAStrokeScore ?? null,
+          teamBStrokeScore: options.teamBStrokeScore ?? null,
+          method: options.method ?? null,
+        },
+        relatedEntityId: activeMatch.id,
+        relatedEntityType: 'match',
+      });
+
+      try {
+        await addAuditLogEntry(entry);
+      } catch (error) {
+        console.warn('[Score Audit] Failed to record audit entry', error);
+      }
+    },
+    [currentTrip, activeMatch, actorName]
+  );
+
   // Find next incomplete match in session for "Score Next Match" navigation
   const nextIncompleteMatch = useMemo(() => {
     if (!activeMatch || !sessionMatches.length) return null;
@@ -250,16 +309,61 @@ export default function EnhancedMatchScoringPage() {
   // Undo handler - must be defined before executeScore to avoid "accessed before declaration" error
   const handleUndo = useCallback(async () => {
     if (undoStack.length === 0) return;
+    if (isSessionLocked()) {
+      setToast({ message: 'Session is finalized. Unlock to undo scores.', type: 'info' });
+      return;
+    }
+
+    const lastUndo = undoStack[undoStack.length - 1];
+    const holeNumber = lastUndo?.holeNumber ?? currentHole;
+
     haptic.warning();
     await undoLastHole();
     setUndoAction(null);
     setToast({ message: 'Score undone', type: 'info' });
-  }, [undoStack.length, haptic, undoLastHole]);
+
+    track('score_undo', 'scoring', {
+      match_id: activeMatch?.id ?? null,
+      hole: holeNumber,
+    });
+
+    await recordScoreAudit({
+      action: 'scoreUndone',
+      holeNumber,
+      winner: lastUndo?.previousResult?.winner,
+      teamAStrokeScore:
+        lastUndo?.previousResult?.teamAScore ?? lastUndo?.previousResult?.teamAStrokes,
+      teamBStrokeScore:
+        lastUndo?.previousResult?.teamBScore ?? lastUndo?.previousResult?.teamBStrokes,
+    });
+  }, [
+    undoStack,
+    isSessionLocked,
+    currentHole,
+    haptic,
+    undoLastHole,
+    setToast,
+    activeMatch,
+    recordScoreAudit,
+  ]);
 
   // Execute score after confirmation
   const executeScore = useCallback(
-    async (winner: HoleWinner, teamAStrokeScore?: number, teamBStrokeScore?: number) => {
+    async (
+      winner: HoleWinner,
+      teamAStrokeScore?: number,
+      teamBStrokeScore?: number,
+      source?: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice'
+    ) => {
       if (!matchState) return;
+      const wasUnscored = !currentHoleResult || currentHoleResult.winner === 'none';
+      const scoringSource = source ?? scoringMode;
+      const analyticsMethod: 'manual' | 'quick' | 'voice' | 'ocr' =
+        scoringSource === 'voice'
+          ? 'voice'
+          : scoringSource === 'swipe' || scoringSource === 'oneHanded'
+            ? 'quick'
+            : 'manual';
 
       // Show saving indicator
       setSavingIndicator('Saving score...');
@@ -272,6 +376,24 @@ export default function EnhancedMatchScoringPage() {
         await scoreHole(winner);
       }
 
+      if (activeMatch) {
+        trackScoreEntry({
+          matchId: activeMatch.id,
+          hole: currentHole,
+          score: winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0,
+          method: analyticsMethod,
+        });
+      }
+
+      await recordScoreAudit({
+        action: 'scoreEntered',
+        holeNumber: currentHole,
+        winner,
+        teamAStrokeScore,
+        teamBStrokeScore,
+        method: analyticsMethod,
+      });
+
       // Clear saving indicator
       setSavingIndicator(null);
 
@@ -279,6 +401,13 @@ export default function EnhancedMatchScoringPage() {
       const wouldCloseOut =
         Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)) >
         matchState.holesRemaining - 1;
+
+      if (scoringPreferences.soundEffects) {
+        playScoreSound({
+          outcome: winner === 'teamA' ? 'teamA' : winner === 'teamB' ? 'teamB' : 'halved',
+          isMatchWin: wouldCloseOut && winner !== 'halved',
+        });
+      }
 
       // Show celebration
       if (wouldCloseOut && winner !== 'halved') {
@@ -330,24 +459,41 @@ export default function EnhancedMatchScoringPage() {
         timestamp: Date.now(),
         onUndo: handleUndo,
       });
+
+      if (scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut && currentHole < 18) {
+        setTimeout(() => {
+          nextHole();
+        }, 300);
+      }
     },
     [
       matchState,
+      currentHoleResult,
       haptic,
       scoreHole,
+      activeMatch,
       teamAName,
       teamBName,
       teamAColor,
       teamBColor,
       currentHole,
       handleUndo,
+      scoringMode,
+      scoringPreferences.autoAdvance,
+      scoringPreferences.soundEffects,
+      nextHole,
+      recordScoreAudit,
     ]
   );
 
   // Score handler with celebrations
   const handleScore = useCallback(
-    async (winner: HoleWinner) => {
+    async (
+      winner: HoleWinner,
+      source?: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice'
+    ) => {
       if (isSaving || !matchState) return;
+      const scoringSource = source ?? scoringMode;
 
       // Check for match closeout
       const wouldCloseOut =
@@ -362,12 +508,12 @@ export default function EnhancedMatchScoringPage() {
           confirmLabel: 'End Match',
           cancelLabel: 'Cancel',
           variant: 'warning',
-          onConfirm: () => executeScore(winner),
+          onConfirm: () => executeScore(winner, undefined, undefined, scoringSource),
         });
         return;
       }
 
-      await executeScore(winner);
+      await executeScore(winner, undefined, undefined, scoringSource);
     },
     [
       isSaving,
@@ -376,6 +522,7 @@ export default function EnhancedMatchScoringPage() {
       teamAName,
       teamBName,
       showConfirm,
+      scoringMode,
       executeScore,
     ]
   );
@@ -398,12 +545,12 @@ export default function EnhancedMatchScoringPage() {
           confirmLabel: 'End Match',
           cancelLabel: 'Cancel',
           variant: 'warning',
-          onConfirm: () => executeScore(winner, teamAStrokeScore, teamBStrokeScore),
+          onConfirm: () => executeScore(winner, teamAStrokeScore, teamBStrokeScore, 'strokes'),
         });
         return;
       }
 
-      await executeScore(winner, teamAStrokeScore, teamBStrokeScore);
+      await executeScore(winner, teamAStrokeScore, teamBStrokeScore, 'strokes');
     },
     [
       isSaving,
@@ -429,7 +576,7 @@ export default function EnhancedMatchScoringPage() {
 
       // TODO: Store individual player scores in HoleResult
       // For now, just record the best ball scores
-      await executeScore(winner, teamABestScore, teamBBestScore);
+      await executeScore(winner, teamABestScore, teamBBestScore, 'fourball');
     },
     [isSaving, matchState, executeScore]
   );
@@ -438,7 +585,8 @@ export default function EnhancedMatchScoringPage() {
   const handleVoiceScore = useCallback(
     (winner: HoleWinner) => {
       setShowVoiceModal(false);
-      handleScore(winner);
+      trackFeature('voice_scoring', 'used');
+      handleScore(winner, 'voice');
     },
     [handleScore]
   );
@@ -1033,25 +1181,51 @@ export default function EnhancedMatchScoringPage() {
               )}
             </AnimatePresence>
 
-            {/* Press Tracker */}
-            <PressTracker
-              currentHole={currentHole}
-              mainMatchScore={matchState.currentScore}
-              holesRemaining={matchState.holesRemaining}
-              presses={presses}
-              onPress={handlePress}
-              teamAName={teamAName}
-              teamBName={teamBName}
-              betAmount={10}
-              autoPress={false}
-            />
+            {/* Advanced Tools (Presses, Side Bets) */}
+            <div className="rounded-2xl border" style={{ borderColor: 'var(--rule)' }}>
+              <button
+                onClick={() => setShowAdvancedTools((prev) => !prev)}
+                className="w-full flex items-center justify-between px-4 py-3"
+                aria-expanded={showAdvancedTools}
+                aria-controls="advanced-scoring-tools"
+              >
+                <div className="text-left">
+                  <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+                    Advanced tools
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                    Press tracker and side bets
+                  </p>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className={`transition-transform ${showAdvancedTools ? 'rotate-90' : ''}`}
+                  style={{ color: 'var(--ink-tertiary)' }}
+                />
+              </button>
 
-            {/* Side Bet Reminders */}
-            <SideBetReminder
-              currentHole={currentHole}
-              bets={DEMO_SIDE_BETS}
-              currentPlayerId={teamAPlayers[0]?.id}
-            />
+              {showAdvancedTools && (
+                <div id="advanced-scoring-tools" className="px-4 pb-4 space-y-4">
+                  <PressTracker
+                    currentHole={currentHole}
+                    mainMatchScore={matchState.currentScore}
+                    holesRemaining={matchState.holesRemaining}
+                    presses={presses}
+                    onPress={handlePress}
+                    teamAName={teamAName}
+                    teamBName={teamBName}
+                    betAmount={10}
+                    autoPress={false}
+                  />
+
+                  <SideBetReminder
+                    currentHole={currentHole}
+                    bets={DEMO_SIDE_BETS}
+                    currentPlayerId={teamAPlayers[0]?.id}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Scoring Mode Toggle */}
             <div className="flex justify-center pt-2 relative">

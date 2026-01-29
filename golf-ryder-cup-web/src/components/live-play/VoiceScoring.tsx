@@ -18,7 +18,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Mic, Check, X, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { scoringLogger } from '@/lib/utils/logger';
@@ -155,6 +155,7 @@ export function VoiceScoring({
   const [transcript, setTranscript] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
 
   // Keep stateRef in sync with state
   useEffect(() => {
@@ -342,10 +343,6 @@ export function VoiceScoring({
     }
   };
 
-  if (!isSupported) {
-    return null; // Don't render if not supported
-  }
-
   const containerStyles = floating
     ? {
         position: 'fixed' as const,
@@ -355,6 +352,30 @@ export function VoiceScoring({
         zIndex: 50,
       }
     : {};
+
+  if (!isSupported) {
+    return (
+      <div className={className} style={containerStyles}>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="button"
+            className={cn(
+              'flex items-center justify-center',
+              'w-14 h-14 rounded-full shadow-lg',
+              'bg-surface/60 text-white/70 border border-white/10'
+            )}
+            aria-disabled="true"
+            disabled
+          >
+            <Mic className="w-6 h-6" />
+          </button>
+          <p className="text-xs text-center" style={{ color: 'var(--ink-tertiary)' }}>
+            Voice scoring not supported
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={className} style={containerStyles}>
@@ -366,7 +387,7 @@ export function VoiceScoring({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
             onClick={startListening}
             className={cn(
               'flex items-center justify-center',
@@ -406,11 +427,16 @@ export function VoiceScoring({
           >
             {/* Animated mic */}
             <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
+              animate={prefersReducedMotion ? undefined : { scale: [1, 1.1, 1] }}
+              transition={prefersReducedMotion ? undefined : { duration: 1, repeat: Infinity }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-white/20 rounded-full animate-ping" />
+              <div
+                className={cn(
+                  'absolute inset-0 bg-white/20 rounded-full',
+                  !prefersReducedMotion && 'animate-ping'
+                )}
+              />
               <div className="relative p-4 rounded-full bg-white/10">
                 <Mic className="w-8 h-8 text-white" />
               </div>
@@ -505,7 +531,7 @@ export function VoiceScoring({
               </button>
               <motion.button
                 onClick={confirmScore}
-                whileTap={{ scale: 0.95 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-full',
                   'text-white font-medium text-sm',

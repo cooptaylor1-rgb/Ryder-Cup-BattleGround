@@ -61,6 +61,8 @@ let cachedMatchIds: Set<string> | null = null;
 // Page visibility state for pausing updates when tab is hidden
 let isPageVisible = true;
 let visibilityHandler: (() => void) | null = null;
+let visibilityDisconnectTimer: ReturnType<typeof setTimeout> | null = null;
+const VISIBILITY_DISCONNECT_DELAY = 30000;
 
 // ============================================
 // HELPERS
@@ -128,14 +130,26 @@ function setupVisibilityHandler(tripId: string, callbacks: LiveUpdateCallbacks):
       if (isPageVisible) {
         // Tab became visible - reconnect if needed
         logger.log('Tab visible - resuming live updates');
+        if (visibilityDisconnectTimer) {
+          clearTimeout(visibilityDisconnectTimer);
+          visibilityDisconnectTimer = null;
+        }
         if (!activeSubscription && canSubscribe()) {
           subscribeLiveUpdates(tripId, callbacks);
         }
       } else {
         // Tab hidden - pause updates to save resources
         logger.log('Tab hidden - pausing live updates');
-        // Note: We don't disconnect, just stop processing
-        // The connection will be cleaned up on timeout
+        if (!visibilityDisconnectTimer) {
+          visibilityDisconnectTimer = setTimeout(async () => {
+            visibilityDisconnectTimer = null;
+            if (!isPageVisible && activeSubscription) {
+              logger.log('Tab hidden - disconnecting live updates');
+              await unsubscribeLiveUpdates();
+              callbacks.onConnectionChange?.(false);
+            }
+          }, VISIBILITY_DISCONNECT_DELAY);
+        }
       }
     }
   };
@@ -151,6 +165,11 @@ function cleanupVisibilityHandler(): void {
   if (visibilityHandler && typeof document !== 'undefined') {
     document.removeEventListener('visibilitychange', visibilityHandler);
     visibilityHandler = null;
+  }
+
+  if (visibilityDisconnectTimer) {
+    clearTimeout(visibilityDisconnectTimer);
+    visibilityDisconnectTimer = null;
   }
 }
 
@@ -385,6 +404,7 @@ async function handleMatchChange(
   tripId: string,
   callbacks: LiveUpdateCallbacks
 ): Promise<void> {
+  if (!isPageVisible) return;
   const eventType = payload.eventType as ChangeEvent;
   const record = (payload.new || payload.old) as MatchDbRecord | null;
 
@@ -425,6 +445,7 @@ async function handleHoleResultChange(
   tripId: string,
   callbacks: LiveUpdateCallbacks
 ): Promise<void> {
+  if (!isPageVisible) return;
   const eventType = payload.eventType as ChangeEvent;
   const record = (payload.new || payload.old) as HoleResultDbRecord | null;
 
@@ -462,6 +483,7 @@ async function handleSessionChange(
   payload: RealtimePostgresChangesPayload<SessionDbRecord>,
   callbacks: LiveUpdateCallbacks
 ): Promise<void> {
+  if (!isPageVisible) return;
   const eventType = payload.eventType as ChangeEvent;
   const record = (payload.new || payload.old) as SessionDbRecord | null;
 
