@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { Suspense } from 'react';
 import { PWAProvider } from '@/components/PWAProvider';
 import { PWABanners } from '@/components/PWABanners';
 import { PWAUpdateToast } from '@/components/PWAUpdateToast';
@@ -161,20 +162,52 @@ export default function RootLayout({
                 variant="fullscreen"
                 showDetails={process.env.NODE_ENV === 'development'}
               >
-                <AuthGuard>
-                  <TripRehydrationProvider>
-                    <NotificationProvider>
-                      <AppOnboardingProvider>
-                        <main
-                          id="main-content"
-                          className="pb-[calc(80px+env(safe-area-inset-bottom,0px))]"
-                        >
-                          {children}
-                        </main>
-                      </AppOnboardingProvider>
-                    </NotificationProvider>
-                  </TripRehydrationProvider>
-                </AuthGuard>
+                <Suspense
+                  fallback={
+                    <div
+                      style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--canvas, #f8fafc)',
+                      }}
+                    >
+                      <div style={{ textAlign: 'center' }}>
+                        <div
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            margin: '0 auto 16px',
+                            border: '3px solid var(--rule, #e2e8f0)',
+                            borderTopColor: 'var(--masters, #1a472a)',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite',
+                          }}
+                        />
+                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                        <p style={{ color: 'var(--ink-secondary, #64748b)', fontSize: '14px' }}>
+                          Loading...
+                        </p>
+                      </div>
+                    </div>
+                  }
+                >
+                  <AuthGuard>
+                    <TripRehydrationProvider>
+                      <NotificationProvider>
+                        <AppOnboardingProvider>
+                          <main
+                            id="main-content"
+                            className="pb-[calc(80px+env(safe-area-inset-bottom,0px))]"
+                          >
+                            {children}
+                          </main>
+                        </AppOnboardingProvider>
+                      </NotificationProvider>
+                    </TripRehydrationProvider>
+                  </AuthGuard>
+                </Suspense>
               </ErrorBoundary>
               <QuickScoreFAB />
               <OfflineIndicator />
