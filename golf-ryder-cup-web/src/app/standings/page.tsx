@@ -146,13 +146,7 @@ export default function StandingsPage() {
   const teamAName = teamA?.name || 'USA';
   const teamBName = teamB?.name || 'Europe';
 
-  const tripSummaryText = useMemo(() => {
-    if (!standings) return '';
-    const leaderText = standings.leader
-      ? `${standings.leader === 'teamA' ? teamAName : teamBName} leads by ${Math.abs(standings.margin)}`
-      : 'All square';
-    return `🏆 Trip Summary\n${teamAName}: ${standings.teamAPoints} pts\n${teamBName}: ${standings.teamBPoints} pts\n${leaderText}\nMatches completed: ${standings.matchesCompleted}/${standings.totalMatches}`;
-  }, [standings, teamAName, teamBName]);
+  // Trip summary text removed (unused) — avoids conditional hook calls after early returns.
 
   // Aggregate fun stats by type
   const statTotals = new Map<

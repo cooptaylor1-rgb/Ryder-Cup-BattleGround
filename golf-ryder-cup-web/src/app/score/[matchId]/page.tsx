@@ -43,6 +43,26 @@ import {
 } from 'lucide-react';
 import type { HoleWinner, PlayerHoleScore } from '@/lib/types/models';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
+
+function hashStringToSeed(input: string): number {
+  // Simple non-crypto hash → 32-bit seed (deterministic)
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function mulberry32(seed: number) {
+  return function rand() {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 // Core scoring components - loaded immediately
 import {
   SwipeScorePanel,
@@ -110,6 +130,17 @@ export default function EnhancedMatchScoringPage() {
     useUIStore();
   const haptic = useHaptic();
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  const confettiPieces = useMemo(() => {
+    const rand = mulberry32(hashStringToSeed(matchId));
+    return Array.from({ length: 20 }, (_, i) => ({
+      i,
+      x: `${50 + (rand() - 0.5) * 100}%`,
+      y: `${30 + rand() * 60}%`,
+      rotate: rand() * 360,
+      duration: 2 + rand(),
+    }));
+  }, [matchId]);
 
   const {
     activeMatch,
@@ -1496,9 +1527,9 @@ export default function EnhancedMatchScoringPage() {
                 animate={{ opacity: 1 }}
                 className="absolute inset-0 pointer-events-none overflow-hidden"
               >
-                {[...Array(20)].map((_, i) => (
+                {confettiPieces.map((piece) => (
                   <motion.div
-                    key={i}
+                    key={piece.i}
                     className="absolute w-3 h-3 rounded-full"
                     initial={{
                       opacity: 1,
@@ -1508,19 +1539,23 @@ export default function EnhancedMatchScoringPage() {
                     }}
                     animate={{
                       opacity: [1, 1, 0],
-                      x: `${50 + (Math.random() - 0.5) * 100}%`,
-                      y: `${30 + Math.random() * 60}%`,
+                      x: piece.x,
+                      y: piece.y,
                       scale: [0, 1.5, 0.5],
-                      rotate: Math.random() * 360,
+                      rotate: piece.rotate,
                     }}
                     transition={{
-                      duration: 2 + Math.random(),
-                      delay: i * 0.05,
+                      duration: piece.duration,
+                      delay: piece.i * 0.05,
                       ease: 'easeOut',
                     }}
                     style={{
                       background:
-                        i % 3 === 0 ? 'var(--masters)' : i % 3 === 1 ? teamAColor : teamBColor,
+                        piece.i % 3 === 0
+                          ? 'var(--masters)'
+                          : piece.i % 3 === 1
+                            ? teamAColor
+                            : teamBColor,
                     }}
                   />
                 ))}
