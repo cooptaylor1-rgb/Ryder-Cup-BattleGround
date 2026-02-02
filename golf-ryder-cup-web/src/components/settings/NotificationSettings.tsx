@@ -188,7 +188,7 @@ export function NotificationSettings({
               Notifications Not Supported
             </h3>
             <p className="type-body text-[var(--ink-tertiary)] mt-1">
-              Your browser doesn't support push notifications.
+              Your browser doesn&apos;t support push notifications.
               Try using Chrome, Firefox, or Edge on desktop, or install the app on mobile.
             </p>
           </div>
@@ -209,12 +209,12 @@ export function NotificationSettings({
               Notifications Blocked
             </h3>
             <p className="type-body text-[var(--ink-tertiary)] mt-1">
-              You've blocked notifications for this site. To enable them:
+              You&apos;ve blocked notifications for this site. To enable them:
             </p>
             <ol className="type-caption text-[var(--ink-tertiary)] mt-2 space-y-1 list-decimal list-inside">
-              <li>Click the lock/info icon in your browser's address bar</li>
-              <li>Find "Notifications" in the site settings</li>
-              <li>Change from "Block" to "Allow"</li>
+              <li>Click the lock/info icon in your browser&apos;s address bar</li>
+              <li>Find &quot;Notifications&quot; in the site settings</li>
+              <li>Change from &quot;Block&quot; to &quot;Allow&quot;</li>
               <li>Refresh this page</li>
             </ol>
           </div>
