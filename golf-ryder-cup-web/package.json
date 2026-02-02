@@ -52,7 +52,12 @@
     "db:diff": "supabase db diff",
     "db:push": "supabase db push",
     "analyze": "ANALYZE=true next build",
-    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test"
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test",
+    "dev:fixed": "PORT=3002 next dev",
+    "test:one": "vitest run",
+    "typecheck:fast": "tsc --noEmit",
+    "check:fast": "pnpm -s typecheck:fast && pnpm -s test:one src/__tests__/schemaVerification.test.ts",
+    "check:prepush": "pnpm -s typecheck && pnpm -s test && pnpm -s build"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",

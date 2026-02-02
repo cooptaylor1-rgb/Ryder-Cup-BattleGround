@@ -112,21 +112,29 @@ export default function MorePage() {
   };
 
   // Handlers
-  const handleEnableCaptainMode = () => {
-    if (captainPin.length >= 4) {
-      enableCaptainMode(captainPin);
+  const handleEnableCaptainMode = async () => {
+    if (captainPin.length < 4) return;
+
+    try {
+      await enableCaptainMode(captainPin);
       setShowCaptainModal(false);
       setCaptainPin('');
       showToast('success', 'Captain mode enabled');
+    } catch {
+      showToast('error', 'Incorrect captain PIN');
     }
   };
 
-  const handleEnableAdminMode = () => {
-    if (adminPin.length >= 4) {
-      enableAdminMode(adminPin);
+  const handleEnableAdminMode = async () => {
+    if (adminPin.length < 4) return;
+
+    try {
+      await enableAdminMode(adminPin);
       setShowAdminModal(false);
       setAdminPin('');
       showToast('success', 'Admin mode enabled');
+    } catch {
+      showToast('error', 'Incorrect admin PIN');
     }
   };
 

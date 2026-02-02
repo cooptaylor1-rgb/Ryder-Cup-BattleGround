@@ -239,8 +239,9 @@ export function FeatureFlagProvider({
     const flag = flags[key];
     if (!flag) {
       // Check defaults
-      if (config?.defaults && key in config.defaults) {
-        return Boolean(config.defaults[key]);
+      const defaults = config?.defaults;
+      if (defaults && key in defaults) {
+        return Boolean(defaults[key]);
       }
       return false;
     }
@@ -268,6 +269,7 @@ export function FeatureFlagProvider({
 
     return Boolean(flag.value);
   }, [flags, overrides, config?.defaults, environment, userId]);
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
 
   /**
    * Get the value of a feature flag
@@ -279,8 +281,9 @@ export function FeatureFlagProvider({
 
     const flag = flags[key];
     if (!flag) {
-      if (config?.defaults && key in config.defaults) {
-        return config.defaults[key] as T;
+      const defaults = config?.defaults;
+      if (defaults && key in defaults) {
+        return defaults[key] as T;
       }
       return defaultValue;
     }

@@ -17,10 +17,24 @@ export interface CountdownResult {
 }
 
 /**
+ * Parse date inputs.
+ *
+ * IMPORTANT: A bare YYYY-MM-DD string is interpreted as a *local* date to avoid timezone surprises.
+ */
+function parseDate(input: Date | string): Date {
+    if (input instanceof Date) return input;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+        const [y, m, d] = input.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+    return new Date(input);
+}
+
+/**
  * Calculate countdown to a future datetime
  */
 export function getCountdown(targetDate: Date | string): CountdownResult {
-    const target = typeof targetDate === 'string' ? new Date(targetDate) : targetDate;
+    const target = parseDate(targetDate);
     const now = new Date();
     const diffMs = target.getTime() - now.getTime();
     const totalMinutes = Math.floor(diffMs / (1000 * 60));
@@ -163,7 +177,7 @@ export function getCountdownColor(urgency: CountdownResult['urgency']): string {
  * Check if a tee time is today
  */
 export function isToday(date: Date | string): boolean {
-    const target = typeof date === 'string' ? new Date(date) : date;
+    const target = parseDate(date);
     const today = new Date();
     return (
         target.getDate() === today.getDate() &&
@@ -179,7 +193,7 @@ export function formatTeeTime(
     date: Date | string,
     options?: { showCountdown?: boolean }
 ): { time: string; countdown?: string; urgency?: CountdownResult['urgency'] } {
-    const target = typeof date === 'string' ? new Date(date) : date;
+    const target = parseDate(date);
     const time = target.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',

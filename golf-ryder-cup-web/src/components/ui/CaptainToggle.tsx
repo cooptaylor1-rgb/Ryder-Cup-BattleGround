@@ -21,7 +21,7 @@ interface CaptainToggleProps {
 }
 
 export function CaptainToggle({ className }: CaptainToggleProps) {
-  const { isCaptainMode, enableCaptainMode, disableCaptainMode, captainPin, resetCaptainPin } =
+  const { isCaptainMode, enableCaptainMode, disableCaptainMode, captainPinHash, resetCaptainPin } =
     useUIStore();
   const [showPinModal, setShowPinModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -40,14 +40,18 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
     }
   };
 
-  const handleEnableCaptain = () => {
+  const handleEnableCaptain = async () => {
     if (pin.length < 4) {
       setError('PIN must be at least 4 digits');
       return;
     }
 
-    // If there's an existing PIN, verify it; otherwise set new PIN
-    if (captainPin && pin !== captainPin) {
+    try {
+      await enableCaptainMode(pin);
+      setShowPinModal(false);
+      setPin('');
+      setAttempts(0);
+    } catch (_err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 3) {
@@ -55,13 +59,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       } else {
         setError(`Incorrect PIN (${3 - newAttempts} attempts left)`);
       }
-      return;
     }
-
-    enableCaptainMode(pin);
-    setShowPinModal(false);
-    setPin('');
-    setAttempts(0);
   };
 
   const handleResetPin = () => {
@@ -164,7 +162,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
               className="type-caption"
               style={{ marginBottom: 'var(--space-4)', color: 'var(--ink-secondary)' }}
             >
-              {captainPin
+              {captainPinHash
                 ? 'Enter your captain PIN to unlock advanced controls.'
                 : "Set a 4-digit PIN to enable captain mode. You'll need this PIN to re-enable captain mode later."}
             </p>
@@ -215,7 +213,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
             </div>
 
             {/* Forgot PIN link */}
-            {captainPin && (
+            {captainPinHash && (
               <button
                 onClick={() => setShowResetConfirm(true)}
                 style={{
@@ -265,7 +263,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
                   cursor: pin.length < 4 || attempts >= 3 ? 'not-allowed' : 'pointer',
                 }}
               >
-                {captainPin ? 'Unlock' : 'Enable'}
+                {captainPinHash ? 'Unlock' : 'Enable'}
               </button>
             </div>
           </div>
