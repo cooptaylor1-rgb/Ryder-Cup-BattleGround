@@ -14,7 +14,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { expectPageReady, navigateAndSetup, waitForStableDOM } from './utils/test-helpers';
+import { expectPageReady, navigateAndSetup, waitForStableDOM as _waitForStableDOM } from './utils/test-helpers';
 
 // Use iPhone viewport with Chromium (mobile emulation)
 test.use({
@@ -175,7 +175,7 @@ test.describe('Scroll Behaviors', () => {
     await navigateAndSetup(page, '/');
 
     // Get initial scroll position
-    const initialScroll = await page.evaluate(() => window.scrollY);
+    const _initialScroll = await page.evaluate(() => window.scrollY);
 
     // Perform quick swipe up to trigger momentum
     await page.mouse.move(200, 600);
@@ -361,7 +361,7 @@ test.describe('iOS Keyboard Handling', () => {
     const input = page.locator('input, textarea').first();
 
     if (await input.isVisible({ timeout: 2000 }).catch(() => false)) {
-      const initialPosition = await input.boundingBox();
+      const _initialPosition = await input.boundingBox();
 
       // Focus the input
       await input.tap();
@@ -578,7 +578,7 @@ test.describe('Resource Management', () => {
     await navigateAndSetup(page, '/');
 
     // Get initial heap size
-    const initialMetrics = await page.evaluate(() => {
+    const _initialMetrics = await page.evaluate(() => {
       if ('memory' in performance) {
         return (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
       }
@@ -613,7 +613,7 @@ test.describe('Resource Management', () => {
     await navigateAndSetup(page, '/');
 
     // Get initial listener count
-    const initialListeners = await page.evaluate(() => {
+    const _initialListeners = await page.evaluate(() => {
       // This is a proxy measure - not all browsers expose listener count
       return 0; // Placeholder
     });

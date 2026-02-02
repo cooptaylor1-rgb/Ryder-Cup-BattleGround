@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Pre-push hook: run the full quality gate before pushing to remote.
+# This avoids slow feedback loops while keeping main branch safe.
+
+pnpm -C golf-ryder-cup-web check:prepush

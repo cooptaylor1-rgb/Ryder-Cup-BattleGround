@@ -9,7 +9,6 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import {
   calculateTeamStandings,
   calculateMagicNumber,
-  tripSummaryText: string;
   calculatePlayerLeaderboard,
 } from '@/lib/services/tournamentEngine';
 import { computeAwards, calculatePlayerStats } from '@/lib/services/awardsService';
@@ -46,38 +45,6 @@ import { NoStandingsPremiumEmpty } from '@/components/ui';
  * - Fun stats add personality and memorable moments
  * - Awards celebrate achievements beyond just wins
  */
-
-        <div
-          className="card"
-          style={{
-            padding: 'var(--space-4)',
-            marginBottom: 'var(--space-5)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <Trophy size={22} style={{ color: 'var(--masters)' }} />
-            <div>
-              <p className="type-title-sm">Share Trip Summary</p>
-              <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
-                Send final standings to the group.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              if (!tripSummaryText) return;
-              if (navigator.share) {
-                navigator.share({ text: tripSummaryText });
-              } else {
-                navigator.clipboard.writeText(tripSummaryText);
-              }
-            }}
-            className="btn-premium"
-            style={{ marginTop: 'var(--space-3)', padding: 'var(--space-3) var(--space-4)' }}
-          >
-            Share Trip Summary
-          </button>
-        </div>
 
 type TabType = 'competition' | 'stats' | 'awards';
 
@@ -345,7 +312,7 @@ export default function StandingsPage() {
         ) : activeTab === 'stats' ? (
           <FunStatsTab statTotals={statTotals} highlightStats={highlightStats} />
         ) : (
-          <AwardsTab awards={awards} playerStats={playerStats} tripSummaryText={tripSummaryText} />
+          <AwardsTab awards={awards} playerStats={playerStats} />
         )}
       </main>
 

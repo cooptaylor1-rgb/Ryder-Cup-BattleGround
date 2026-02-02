@@ -38,7 +38,7 @@ interface SyncQueueItemDisplay {
   description: string;
   timestamp: number;
   retryCount: number;
-  status: 'pending' | 'syncing' | 'failed';
+  status: 'pending' | 'syncing' | 'failed' | 'completed';
   error?: string;
 }
 

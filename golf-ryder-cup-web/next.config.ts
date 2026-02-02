@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   // Output standalone for optimized container deployments
   output: 'standalone',
 
+  // Turbopack: explicitly set workspace root to avoid slow mis-detection
+  turbopack: {
+    // Point to the monorepo root where node_modules lives.
+    root: '../',
+  },
+
   // Optimize imports for better tree-shaking
   modularizeImports: {
     'lucide-react': {

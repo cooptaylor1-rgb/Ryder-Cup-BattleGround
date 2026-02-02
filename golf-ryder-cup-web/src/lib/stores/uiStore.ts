@@ -9,6 +9,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { DEFAULT_SCORING_PREFERENCES } from '@/lib/types/scoringPreferences';
 import type { SessionType } from '@/lib/types';
+import { hashPin, verifyPin, isHashedPin } from '@/lib/utils/crypto';
 
 // ============================================
 // TYPES
@@ -48,18 +49,16 @@ interface UIState {
 
   // Captain Mode
   isCaptainMode: boolean;
-  captainPin: string | null;
-  enableCaptainMode: (pin: string) => void;
+  captainPinHash: string | null;
+  enableCaptainMode: (pin: string) => Promise<void>;
   disableCaptainMode: () => void;
-  verifyCaptainPin: (pin: string) => boolean;
   resetCaptainPin: () => void;
 
   // Admin Mode (power user features)
   isAdminMode: boolean;
-  adminPin: string | null;
-  enableAdminMode: (pin: string) => void;
+  adminPinHash: string | null;
+  enableAdminMode: (pin: string) => Promise<void>;
   disableAdminMode: () => void;
-  verifyAdminPin: (pin: string) => boolean;
 
   // Toasts
   toasts: Toast[];
@@ -143,12 +142,25 @@ export const useUIStore = create<UIState>()(
 
       // Captain Mode
       isCaptainMode: false,
-      captainPin: null,
+      captainPinHash: null,
 
-      enableCaptainMode: (pin) => {
+      enableCaptainMode: async (pin) => {
+        const current = get().captainPinHash;
+
+        // If a PIN is already set, require verification before enabling.
+        if (current) {
+          const ok = await verifyPin(pin, current);
+          if (!ok) {
+            throw new Error('Incorrect PIN');
+          }
+        }
+
+        // If the stored PIN is legacy (plain/sha), upgrade it.
+        const nextHash = current && isHashedPin(current) && current.startsWith('pbkdf2$') ? current : await hashPin(pin);
+
         set({
           isCaptainMode: true,
-          captainPin: pin,
+          captainPinHash: nextHash,
         });
 
         get().showToast('success', 'Captain Mode enabled');
@@ -162,14 +174,9 @@ export const useUIStore = create<UIState>()(
         get().showToast('info', 'Captain Mode disabled');
       },
 
-      verifyCaptainPin: (pin) => {
-        const { captainPin } = get();
-        return captainPin !== null && captainPin === pin;
-      },
-
       resetCaptainPin: () => {
         set({
-          captainPin: null,
+          captainPinHash: null,
           isCaptainMode: false,
         });
         get().showToast(
@@ -180,12 +187,21 @@ export const useUIStore = create<UIState>()(
 
       // Admin Mode (power user features like bulk delete, data management)
       isAdminMode: false,
-      adminPin: null,
+      adminPinHash: null,
 
-      enableAdminMode: (pin) => {
+      enableAdminMode: async (pin) => {
+        const current = get().adminPinHash;
+
+        if (current) {
+          const ok = await verifyPin(pin, current);
+          if (!ok) throw new Error('Incorrect PIN');
+        }
+
+        const nextHash = current && isHashedPin(current) && current.startsWith('pbkdf2$') ? current : await hashPin(pin);
+
         set({
           isAdminMode: true,
-          adminPin: pin,
+          adminPinHash: nextHash,
         });
         get().showToast('success', 'Admin Mode enabled');
       },
@@ -195,11 +211,6 @@ export const useUIStore = create<UIState>()(
           isAdminMode: false,
         });
         get().showToast('info', 'Admin Mode disabled');
-      },
-
-      verifyAdminPin: (pin) => {
-        const { adminPin } = get();
-        return adminPin !== null && adminPin === pin;
       },
 
       // Toasts
@@ -322,9 +333,9 @@ export const useUIStore = create<UIState>()(
         theme: state.theme,
         isDarkMode: state.isDarkMode,
         isCaptainMode: state.isCaptainMode,
-        captainPin: state.captainPin,
+        captainPinHash: state.captainPinHash,
         isAdminMode: state.isAdminMode,
-        adminPin: state.adminPin,
+        adminPinHash: state.adminPinHash,
         scoringPreferences: state.scoringPreferences,
         scoringModeByFormat: state.scoringModeByFormat,
       }),
