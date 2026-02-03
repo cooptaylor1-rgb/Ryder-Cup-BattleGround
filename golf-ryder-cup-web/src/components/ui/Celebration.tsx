@@ -356,17 +356,22 @@ export function AchievementBadge({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (show) {
+        if (!show) return;
+
+        const kickoff = setTimeout(() => {
             setIsVisible(true);
             haptic.success();
+        }, 0);
 
-            const timeout = setTimeout(() => {
-                setIsVisible(false);
-                onDismiss?.();
-            }, 4000);
+        const timeout = setTimeout(() => {
+            setIsVisible(false);
+            onDismiss?.();
+        }, 4000);
 
-            return () => clearTimeout(timeout);
-        }
+        return () => {
+            clearTimeout(kickoff);
+            clearTimeout(timeout);
+        };
     }, [show, haptic, onDismiss]);
 
     if (!isVisible) return null;

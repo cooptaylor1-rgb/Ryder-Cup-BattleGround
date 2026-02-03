@@ -50,7 +50,24 @@
 ### Blocker
 - Unable to push to remote: `Permission to ... denied to cooperworkertaylor` (git push failed). Need Cooper to confirm correct remote credentials/access or adjust git remote.
 
-### Next (Phase 0 remaining)
-1) Replace remaining user-facing `return null` routes with consistent Loading/Empty/Error UI (target: schedule/trip-stats/spectator/etc.).
-2) Continue reducing correctness-level lint warnings, focusing on remaining `react-hooks/exhaustive-deps` / unused disables that impact correctness.
-3) Run manual QA checklist once browser relay is available.
+### Additional work (08:45 ET)
+- Correctness lint follow-ups:
+  - `golf-ryder-cup-web/src/components/SyncStatusIndicator.tsx`
+    - Fixed pulse timer cleanup to avoid leaked timeouts.
+  - `golf-ryder-cup-web/src/components/ui/Celebration.tsx`
+    - Deferred `AchievementBadge` state transitions via timers (avoids synchronous setState in effect body).
+
+- Audit P1 maintainability refactor (route file slimming):
+  - Extracted `/app/page.tsx` into `golf-ryder-cup-web/src/components/home/HomePage.tsx` and re-exported from `/app/page.tsx`.
+  - Keeps the route file tiny while preserving behavior.
+
+### Checks (post-refactor)
+- `pnpm -C golf-ryder-cup-web typecheck` ✅
+- `pnpm -C golf-ryder-cup-web test` ✅
+
+### Next (continue audit plan beyond Phase 2)
+1) P1 UX reliability: replace remaining user-facing `return null` routes with consistent Loading/Empty/Error UI (lineup/new, profile, captain/manage, etc.).
+2) P1/P3 cleanup: reduce correctness-level lint warnings where they represent real performance risk:
+   - `react-hooks/set-state-in-effect` (AchievementUnlock, ScoreCelebration, StrokeAlertBanner, OfflineIndicator, etc.).
+3) P2 reliability: ensure all polling loops are visibility-aware (live + any other pages/services).
+4) Run manual QA checklist once browser relay is available.

@@ -134,15 +134,18 @@ export function SyncStatusIndicator({
   // Pulse animation when status changes to synced.
   // Defer state updates to avoid setState-in-effect warnings.
   useEffect(() => {
-    if (status === 'synced' && lastSyncTime) {
-      const startTimer = setTimeout(() => {
-        setPulseAnimation(true);
-        const endTimer = setTimeout(() => setPulseAnimation(false), 1000);
-        return () => clearTimeout(endTimer);
-      }, 0);
+    if (status !== 'synced' || !lastSyncTime) return;
 
-      return () => clearTimeout(startTimer);
-    }
+    let endTimer: ReturnType<typeof setTimeout> | null = null;
+    const startTimer = setTimeout(() => {
+      setPulseAnimation(true);
+      endTimer = setTimeout(() => setPulseAnimation(false), 1000);
+    }, 0);
+
+    return () => {
+      clearTimeout(startTimer);
+      if (endTimer) clearTimeout(endTimer);
+    };
   }, [status, lastSyncTime]);
 
   // Auto-trigger sync when coming online with pending changes
