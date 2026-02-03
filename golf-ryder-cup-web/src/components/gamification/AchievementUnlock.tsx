@@ -113,6 +113,7 @@ interface ConfettiParticle {
     y: number;
     rotation: number;
     scale: number;
+    duration: number;
     color: string;
     shape: 'circle' | 'square' | 'star';
 }
@@ -127,6 +128,7 @@ function generateConfetti(count: number, color: string): ConfettiParticle[] {
         y: -20 - Math.random() * 50,
         rotation: Math.random() * 360,
         scale: 0.5 + Math.random() * 0.5,
+        duration: 3 + Math.random() * 2,
         color: colors[Math.floor(Math.random() * colors.length)],
         shape: shapes[Math.floor(Math.random() * shapes.length)],
     }));
@@ -161,7 +163,7 @@ function ConfettiSystem({ color, isActive }: { color: string; isActive: boolean 
                         opacity: 0,
                     }}
                     transition={{
-                        duration: 3 + Math.random() * 2,
+                        duration: particle.duration,
                         ease: 'easeIn',
                     }}
                     className="absolute"

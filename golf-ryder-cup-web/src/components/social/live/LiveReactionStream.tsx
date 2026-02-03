@@ -15,6 +15,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useHaptic } from '@/lib/hooks';
+import { makeSeededRng } from '@/lib/utils/seededRandom';
 
 // ============================================
 // TYPES
@@ -87,12 +88,17 @@ interface FloatingReactionProps {
 function FloatingReaction({ reaction, onComplete, position }: FloatingReactionProps) {
     const config = REACTION_CONFIG[reaction.type];
 
-    // Random horizontal offset
+    const rng = makeSeededRng(`${reaction.id}:${position}`);
+
+    // Deterministic “random” offsets (pure)
     const xOffset = position === 'center'
-        ? (Math.random() - 0.5) * 100
+        ? (rng() - 0.5) * 100
         : position === 'left'
-            ? Math.random() * 50
-            : -Math.random() * 50;
+            ? rng() * 50
+            : -rng() * 50;
+
+    const yDrift = rng() * 100;
+    const xDrift = (rng() - 0.5) * 40;
 
     // Size based on config
     const size = config.size === 'lg' ? 48 : config.size === 'md' ? 36 : 28;
@@ -102,9 +108,9 @@ function FloatingReaction({ reaction, onComplete, position }: FloatingReactionPr
             initial={{ opacity: 0, y: 0, scale: 0, x: xOffset }}
             animate={{
                 opacity: [0, 1, 1, 0],
-                y: -200 - Math.random() * 100,
+                y: -200 - yDrift,
                 scale: [0, 1.2, 1, 0.8],
-                x: xOffset + (Math.random() - 0.5) * 40,
+                x: xOffset + xDrift,
             }}
             transition={{ duration: 2.5, ease: 'easeOut' }}
             onAnimationComplete={onComplete}
@@ -150,31 +156,37 @@ function ReactionBurst({ type, count }: ReactionBurstProps) {
 
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {bursts.map((i) => (
-                <motion.span
-                    key={i}
-                    initial={{
-                        opacity: 1,
-                        scale: 0,
-                        x: '50%',
-                        y: '50%',
-                    }}
-                    animate={{
-                        opacity: 0,
-                        scale: 2,
-                        x: `${50 + (Math.random() - 0.5) * 100}%`,
-                        y: `${50 + (Math.random() - 0.5) * 100}%`,
-                    }}
-                    transition={{
-                        duration: 1,
-                        delay: i * 0.05,
-                        ease: 'easeOut',
-                    }}
-                    className="absolute text-4xl"
-                >
-                    {config.emoji}
-                </motion.span>
-            ))}
+            {bursts.map((i) => {
+                const rng = makeSeededRng(`${type}:${count}:${i}`);
+                const x = 50 + (rng() - 0.5) * 100;
+                const y = 50 + (rng() - 0.5) * 100;
+
+                return (
+                    <motion.span
+                        key={i}
+                        initial={{
+                            opacity: 1,
+                            scale: 0,
+                            x: '50%',
+                            y: '50%',
+                        }}
+                        animate={{
+                            opacity: 0,
+                            scale: 2,
+                            x: `${x}%`,
+                            y: `${y}%`,
+                        }}
+                        transition={{
+                            duration: 1,
+                            delay: i * 0.05,
+                            ease: 'easeOut',
+                        }}
+                        className="absolute text-4xl"
+                    >
+                        {config.emoji}
+                    </motion.span>
+                );
+            })}
         </div>
     );
 }

@@ -7,7 +7,7 @@
  * Creates memorable moments and helps players learn about each other.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trophy,
@@ -18,6 +18,7 @@ import {
     MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { makeSeededRng, seededShuffle } from '@/lib/utils/seededRandom';
 
 // ============================================
 // TYPES
@@ -86,11 +87,13 @@ export function GolfSuperlatives({
     maxQuestions = 5,
     className,
 }: GolfSuperlativesProps) {
-    // Randomly select questions
+    const seed = useId();
+
+    // Select questions deterministically (pure) while still “random-looking”.
     const questions = useMemo(() => {
-        const shuffled = [...ALL_SUPERLATIVES].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, maxQuestions);
-    }, [maxQuestions]);
+        const rng = makeSeededRng(seed);
+        return seededShuffle(ALL_SUPERLATIVES, rng).slice(0, maxQuestions);
+    }, [maxQuestions, seed]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState<SuperlativeAnswer[]>([]);
