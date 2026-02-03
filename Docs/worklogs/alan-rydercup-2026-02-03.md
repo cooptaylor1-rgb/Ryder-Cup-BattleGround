@@ -71,3 +71,14 @@
    - `react-hooks/set-state-in-effect` (AchievementUnlock, ScoreCelebration, StrokeAlertBanner, OfflineIndicator, etc.).
 3) P2 reliability: ensure all polling loops are visibility-aware (live + any other pages/services).
 4) Run manual QA checklist once browser relay is available.
+
+### Additional work (10:45 ET)
+- Phase 1 navigation spine implementation (IA):
+  - Updated `BottomNav` to the canonical tabs: **Today / Score / Standings / Journal / More**.
+  - Updated `SidebarNav` (desktop rail) to match the same spine.
+  - Updated `BottomNav` unit tests to match the new nav + badge keys.
+
+### Next
+1) Move Schedule + Stats entry points into `More` (or contextual CTAs on Today) so functionality remains discoverable after nav spine change.
+2) Continue Phase 0 exit criteria: remove remaining user-facing `return null` routes; add consistent Loading/Empty/Error states.
+3) Run manual QA deletion/offline checklist.

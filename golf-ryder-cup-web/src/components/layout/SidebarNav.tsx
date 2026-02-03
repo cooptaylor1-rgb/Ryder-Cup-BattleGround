@@ -13,27 +13,28 @@ import { useUIStore, useTripStore } from '@/lib/stores';
 import { Tooltip } from '@/components/ui/Tooltip';
 import {
     Target,
-    Users,
     Trophy,
     Shield,
     Settings,
     Home,
     ChevronLeft,
     ChevronRight,
+    BookOpen,
 } from 'lucide-react';
 
 interface NavItem {
     href: string;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
-    tab: 'home' | 'score' | 'matchups' | 'standings' | 'more';
+    tab: 'today' | 'score' | 'standings' | 'journal' | 'more';
 }
 
+// Phase 1 navigation spine: Today / Score / Standings / Journal / More
 const navItems: NavItem[] = [
-    { href: '/', label: 'Home', icon: Home, tab: 'home' },
+    { href: '/', label: 'Today', icon: Home, tab: 'today' },
     { href: '/score', label: 'Score', icon: Target, tab: 'score' },
-    { href: '/matchups', label: 'Matchups', icon: Users, tab: 'matchups' },
     { href: '/standings', label: 'Standings', icon: Trophy, tab: 'standings' },
+    { href: '/social', label: 'Journal', icon: BookOpen, tab: 'journal' },
     { href: '/more', label: 'More', icon: Settings, tab: 'more' },
 ];
 

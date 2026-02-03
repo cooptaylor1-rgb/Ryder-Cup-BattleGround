@@ -16,39 +16,29 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
-import {
-  Target,
-  Trophy,
-  Home,
-  Settings,
-  Shield,
-  CalendarDays,
-  BarChart3,
-  HelpCircle,
-} from 'lucide-react';
+import { Target, Trophy, Home, Settings, Shield, HelpCircle, BookOpen } from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  badgeKey?: 'home' | 'schedule' | 'score' | 'stats' | 'standings' | 'more';
+  badgeKey?: 'today' | 'score' | 'standings' | 'journal' | 'more';
 }
 
+// Phase 1 navigation spine: Today / Score / Standings / Journal / More
 const navItems: NavItem[] = [
-  { href: '/', label: 'Home', icon: Home, badgeKey: 'home' },
-  { href: '/schedule', label: 'Schedule', icon: CalendarDays, badgeKey: 'schedule' },
+  { href: '/', label: 'Today', icon: Home, badgeKey: 'today' },
   { href: '/score', label: 'Score', icon: Target, badgeKey: 'score' },
-  { href: '/trip-stats', label: 'Stats', icon: BarChart3, badgeKey: 'stats' },
   { href: '/standings', label: 'Standings', icon: Trophy, badgeKey: 'standings' },
+  { href: '/social', label: 'Journal', icon: BookOpen, badgeKey: 'journal' },
   { href: '/more', label: 'More', icon: Settings, badgeKey: 'more' },
 ];
 
 export interface NavBadges {
-  home?: number;
-  schedule?: number;
+  today?: number;
   score?: number;
-  stats?: number;
   standings?: number;
+  journal?: number;
   more?: number;
 }
 

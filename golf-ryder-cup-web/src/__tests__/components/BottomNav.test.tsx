@@ -41,11 +41,10 @@ describe('BottomNav Component', () => {
     it('renders all navigation items', () => {
       render(<BottomNav />);
 
-      expect(screen.getByText('Home')).toBeInTheDocument();
-      expect(screen.getByText('Schedule')).toBeInTheDocument();
+      expect(screen.getByText('Today')).toBeInTheDocument();
       expect(screen.getByText('Score')).toBeInTheDocument();
-      expect(screen.getByText('Stats')).toBeInTheDocument();
       expect(screen.getByText('Standings')).toBeInTheDocument();
+      expect(screen.getByText('Journal')).toBeInTheDocument();
       expect(screen.getByText('More')).toBeInTheDocument();
     });
 
@@ -56,16 +55,10 @@ describe('BottomNav Component', () => {
   });
 
   describe('Navigation', () => {
-    it('navigates to home when Home is clicked', () => {
+    it('navigates to today when Today is clicked', () => {
       render(<BottomNav />);
-      fireEvent.click(screen.getByText('Home'));
+      fireEvent.click(screen.getByText('Today'));
       expect(mockPush).toHaveBeenCalledWith('/');
-    });
-
-    it('navigates to schedule when Schedule is clicked', () => {
-      render(<BottomNav />);
-      fireEvent.click(screen.getByText('Schedule'));
-      expect(mockPush).toHaveBeenCalledWith('/schedule');
     });
 
     it('navigates to score when Score is clicked', () => {
@@ -74,10 +67,10 @@ describe('BottomNav Component', () => {
       expect(mockPush).toHaveBeenCalledWith('/score');
     });
 
-    it('navigates to trip-stats when Stats is clicked', () => {
+    it('navigates to journal when Journal is clicked', () => {
       render(<BottomNav />);
-      fireEvent.click(screen.getByText('Stats'));
-      expect(mockPush).toHaveBeenCalledWith('/trip-stats');
+      fireEvent.click(screen.getByText('Journal'));
+      expect(mockPush).toHaveBeenCalledWith('/social');
     });
 
     it('navigates to standings when Standings is clicked', () => {
@@ -94,20 +87,20 @@ describe('BottomNav Component', () => {
   });
 
   describe('Active State', () => {
-    it('marks Home as active when on root path', () => {
+    it('marks Today as active when on root path', () => {
       mockPathname.mockReturnValue('/');
       render(<BottomNav />);
 
-      const homeButton = screen.getByText('Home').closest('button');
-      expect(homeButton).toHaveAttribute('aria-current', 'page');
+      const todayButton = screen.getByText('Today').closest('button');
+      expect(todayButton).toHaveAttribute('aria-current', 'page');
     });
 
-    it('marks Schedule as active on schedule paths', () => {
-      mockPathname.mockReturnValue('/schedule');
+    it('marks Journal as active on social paths', () => {
+      mockPathname.mockReturnValue('/social');
       render(<BottomNav />);
 
-      const scheduleButton = screen.getByText('Schedule').closest('button');
-      expect(scheduleButton).toHaveAttribute('aria-current', 'page');
+      const journalButton = screen.getByText('Journal').closest('button');
+      expect(journalButton).toHaveAttribute('aria-current', 'page');
     });
 
     it('marks Score as active on score sub-paths', () => {
@@ -130,22 +123,22 @@ describe('BottomNav Component', () => {
   });
 
   describe('Badge Display', () => {
-    it('displays badge count for home', () => {
-      const badges: NavBadges = { home: 3 };
+    it('displays badge count for today', () => {
+      const badges: NavBadges = { today: 3 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByText('3')).toBeInTheDocument();
     });
 
-    it('displays badge count for schedule', () => {
-      const badges: NavBadges = { schedule: 5 };
+    it('displays badge count for journal', () => {
+      const badges: NavBadges = { journal: 5 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByText('5')).toBeInTheDocument();
     });
 
     it('displays multiple badges', () => {
-      const badges: NavBadges = { home: 2, score: 1, standings: 4 };
+      const badges: NavBadges = { today: 2, score: 1, standings: 4 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByText('2')).toBeInTheDocument();
@@ -154,21 +147,21 @@ describe('BottomNav Component', () => {
     });
 
     it('does not display badge when count is 0', () => {
-      const badges: NavBadges = { home: 0 };
+      const badges: NavBadges = { today: 0 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.queryByText('0')).not.toBeInTheDocument();
     });
 
     it('caps badge display at 99+', () => {
-      const badges: NavBadges = { home: 150 };
+      const badges: NavBadges = { today: 150 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByText('99+')).toBeInTheDocument();
     });
 
     it('badge has accessible label', () => {
-      const badges: NavBadges = { home: 5 };
+      const badges: NavBadges = { today: 5 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByLabelText('5 notifications')).toBeInTheDocument();
@@ -208,16 +201,16 @@ describe('BottomNav Component', () => {
     it('all nav items are buttons', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
-      // 6 nav items + 1 keyboard shortcuts button (hidden on mobile, visible on md+)
-      expect(buttons).toHaveLength(7);
+      // 5 nav items + 1 keyboard shortcuts button (hidden on mobile, visible on md+)
+      expect(buttons).toHaveLength(6);
     });
 
     it('nav buttons have minimum touch target size', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
 
-      // Only check the 6 main nav buttons (exclude the keyboard hint button)
-      const navButtons = buttons.slice(0, 6);
+      // Only check the 5 main nav buttons (exclude the keyboard hint button)
+      const navButtons = buttons.slice(0, 5);
       navButtons.forEach((button) => {
         expect(button).toHaveClass('min-w-[56px]');
         expect(button).toHaveClass('min-h-[56px]');
