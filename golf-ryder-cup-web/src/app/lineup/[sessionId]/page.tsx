@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import { createLogger } from '@/lib/utils/logger';
-import { db } from '@/lib/db';
+import { deleteMatchCascade } from '@/lib/services/cascadeDelete';
 import {
   LineupBuilder,
   calculateFairnessScore,
@@ -194,9 +194,7 @@ export default function SessionPage() {
           variant: 'danger',
           onConfirm: async () => {
             try {
-              // Delete hole results first, then the match
-              await db.holeResults.where('matchId').equals(matchId).delete();
-              await db.matches.delete(matchId);
+              await deleteMatchCascade(matchId);
 
               // Update local state
               setMatches((prev) => prev.filter((m) => m.id !== matchId));

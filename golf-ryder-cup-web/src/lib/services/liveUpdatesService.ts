@@ -13,6 +13,7 @@ import { supabase, isSupabaseConfigured } from '../supabase/client';
 
 const logger = createLogger('LiveUpdates');
 import { db } from '../db';
+import { deleteMatchCascade } from './cascadeDelete';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Match, HoleResult, RyderCupSession } from '../types/models';
 import type { MatchDbRecord, HoleResultDbRecord, SessionDbRecord } from '../types/dbRecords';
@@ -420,7 +421,8 @@ async function handleMatchChange(
   // Update local database
   try {
     if (eventType === 'DELETE') {
-      await db.matches.delete(match.id);
+      // Mirror server-side deletes locally, including dependent scoring data.
+      await deleteMatchCascade(match.id, { sync: false });
     } else {
       // Check if we have a newer version locally
       const local = await db.matches.get(match.id);
