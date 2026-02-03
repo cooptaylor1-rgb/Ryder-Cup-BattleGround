@@ -10,12 +10,7 @@ import { tripLogger } from '@/lib/utils/logger';
 import { getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import {
   CalendarDays,
-  Users,
   ChevronRight,
-  Home,
-  Target,
-  Trophy,
-  MoreHorizontal,
   Calendar,
   Sunrise,
   Sunset,
@@ -26,6 +21,7 @@ import {
 } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
+import { BottomNav } from '@/components/layout';
 
 /**
  * SCHEDULE PAGE — Personal & Trip Schedule
@@ -489,33 +485,7 @@ export default function SchedulePage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={20} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item nav-item-active">
-          <CalendarDays size={20} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={20} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={20} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={20} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={20} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

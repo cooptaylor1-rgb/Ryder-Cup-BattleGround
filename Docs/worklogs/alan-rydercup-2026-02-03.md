@@ -82,3 +82,13 @@
 1) Move Schedule + Stats entry points into `More` (or contextual CTAs on Today) so functionality remains discoverable after nav spine change.
 2) Continue Phase 0 exit criteria: remove remaining user-facing `return null` routes; add consistent Loading/Empty/Error states.
 3) Run manual QA deletion/offline checklist.
+
+### Additional work (12:55 ET)
+- Discoverability preservation (post-nav-spine):
+  - Added `/stats` as a dedicated Stats hub (Trip Stats + Achievements + Schedule).
+  - Updated Today quick actions to include **Schedule** and point **Stats** to `/stats`.
+  - Updated More → Features to include **Schedule** and **Stats** entries.
+  - Updated `/schedule` to use the canonical `BottomNav` (removes legacy hardcoded nav row).
+
+### Checks
+- `pnpm -C golf-ryder-cup-web typecheck` ✅

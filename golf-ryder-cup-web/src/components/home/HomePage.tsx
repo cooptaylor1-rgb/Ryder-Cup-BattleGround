@@ -10,10 +10,10 @@ import {
   ChevronRight,
   MapPin,
   Calendar,
+  CalendarDays,
   Plus,
   Target,
   Trophy,
-  MessageCircle,
   Award,
   Flame,
   Tv,
@@ -70,7 +70,6 @@ export default function HomePage() {
     userMatchData,
     currentUserPlayer,
     liveMatches,
-    banterPosts,
     sideBets,
     isLoading,
     teamAName,
@@ -205,7 +204,7 @@ export default function HomePage() {
   // Calculate real counts
   const liveMatchesCount = liveMatches?.length || 0;
   const _recentPhotosCount = 0; // Photos not implemented yet
-  const unreadMessages = banterPosts?.length || 0;
+  // banterPosts are discoverable via the Journal tab
   const activeSideBetsCount = sideBets?.filter((b) => b.status === 'active').length || 0;
 
   // Power user: Smart routing - if exactly 1 live match, navigate directly to it
@@ -600,16 +599,15 @@ export default function HomePage() {
                   color="var(--error)"
                 />
                 <QuickActionButton
-                  icon={<MessageCircle size={20} />}
-                  label="Chat"
-                  href="/social"
-                  badge={unreadMessages > 0 ? String(unreadMessages) : undefined}
-                  color="var(--team-usa)"
+                  icon={<CalendarDays size={20} />}
+                  label="Schedule"
+                  href="/schedule"
+                  color="#3b82f6"
                 />
                 <QuickActionButton
                   icon={<BarChart3 size={20} />}
                   label="Stats"
-                  href="/trip-stats"
+                  href="/stats"
                   color="var(--masters)"
                 />
                 <QuickActionButton
