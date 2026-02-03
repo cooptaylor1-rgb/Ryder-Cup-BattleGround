@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { PageLoadingSkeleton } from '@/components/ui';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
 import { ChevronLeft, ShieldCheck, Filter, Search } from 'lucide-react';
 
@@ -72,7 +73,8 @@ export default function CaptainAuditLogPage() {
   }, [entries, actionFilter, actorFilter, searchTerm]);
 
   if (!currentTrip || !isCaptainMode) {
-    return null;
+    // Avoid blank-screen while redirects run.
+    return <PageLoadingSkeleton title="Captain Audit Log" variant="list" />;
   }
 
   return (

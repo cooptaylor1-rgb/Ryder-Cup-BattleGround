@@ -26,3 +26,26 @@
   - `pnpm -C golf-ryder-cup-web lint` (112 warnings, 0 errors)
   - `pnpm -C golf-ryder-cup-web check:fast` ✅
   - `pnpm -C golf-ryder-cup-web test src/__tests__/cascadeDelete.test.ts` ✅
+
+## 2026-02-03
+
+- 08:00 ET — Blank-screen cleanup + correctness lint reduction:
+  - `src/app/score/[matchId]/page.tsx`
+    - Added explicit loading/error/missing-match UI (no more infinite “Loading…” when matchId is invalid or match was deleted).
+    - Surface scoringStore `error` + `isLoading` in the UI and provide Retry/Back actions.
+    - Removed `react-hooks/set-state-in-effect` warning by initializing `showAdvancedTools` via `useState` initializer instead of calling `setShowAdvancedTools()` inside an effect.
+  - `src/app/captain/audit/page.tsx`
+    - Replaced `return null` gate with `PageLoadingSkeleton` so redirecting off the page doesn’t flash a blank screen.
+
+- 08:05 ET — Offline-first integrity test coverage:
+  - Added `src/__tests__/purgeQueueForTrip.test.ts` to ensure `purgeQueueForTrip(tripId)` removes persisted queue items (prevents sync-queue resurrection of deleted trips/entities).
+
+- 08:10 ET — Checks run:
+  - `pnpm -C golf-ryder-cup-web lint` (107 warnings, 0 errors)
+  - `pnpm -C golf-ryder-cup-web test src/__tests__/purgeQueueForTrip.test.ts` ✅
+
+- 08:15 ET — Manual QA checklist drafted (not executed here due to browser relay not attached):
+  - Delete Match → verify: holeResults/scoringEvents removed; score page doesn’t show deleted match; opening `/score/[matchId]` shows “Match unavailable” (no blank screen).
+  - Delete Session → verify: all child matches + scoring removed; no orphan matches on Score/Schedule.
+  - Delete Trip → verify: trip disappears; sync queue contains only (optional) trip delete; no later reappearance.
+  - After each delete → refresh page / reopen app → confirm no “ghost scoring” rehydrates via queued updates.

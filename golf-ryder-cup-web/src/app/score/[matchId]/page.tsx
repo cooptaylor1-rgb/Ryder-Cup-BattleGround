@@ -146,6 +146,8 @@ export default function EnhancedMatchScoringPage() {
     activeMatch,
     activeMatchState,
     currentHole,
+    isLoading,
+    error,
     isSaving,
     undoStack,
     sessionMatches,
@@ -166,7 +168,11 @@ export default function EnhancedMatchScoringPage() {
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
   const [showScoringModeTip, setShowScoringModeTip] = useState(false);
   const [savingIndicator, setSavingIndicator] = useState<string | null>(null);
-  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
+  // Default advanced tools visibility based on screen size (no setState-in-effect)
+  const [showAdvancedTools, setShowAdvancedTools] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(min-width: 1024px)').matches;
+  });
   const [quickScorePending, setQuickScorePending] = useState<{
     team: 'teamA' | 'teamB';
     expiresAt: number;
@@ -217,12 +223,7 @@ export default function EnhancedMatchScoringPage() {
     }
   }, [activeMatch]);
 
-  // Default advanced tools visibility based on screen size
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const isLarge = window.matchMedia('(min-width: 1024px)').matches;
-    setShowAdvancedTools(isLarge);
-  }, []);
+  // Default advanced tools visibility is set via useState initializer.
 
   useEffect(() => {
     if (!quickScorePending) return;
@@ -793,12 +794,15 @@ export default function EnhancedMatchScoringPage() {
     return () => clearTimeout(timeoutId);
   }, [matchState]);
 
-  // Loading state
-  if (!activeMatch || !matchState) {
+  // Loading / error / missing states
+  if (isLoading) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
         style={{ background: 'var(--canvas)' }}
+        role="progressbar"
+        aria-busy="true"
+        aria-label="Loading match"
       >
         <div className="text-center">
           <div
@@ -806,6 +810,69 @@ export default function EnhancedMatchScoringPage() {
             style={{ borderColor: 'var(--masters)', borderTopColor: 'transparent' }}
           />
           <p className="type-meta">Loading match...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: 'var(--canvas)' }}
+        role="alert"
+      >
+        <div className="text-center max-w-sm">
+          <div className="mx-auto mb-3" style={{ color: 'var(--warning)' }}>
+            <AlertCircle size={28} />
+          </div>
+          <p className="type-title-sm">Couldn’t load this match</p>
+          <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+            {error}
+          </p>
+          <div className="mt-5 flex items-center justify-center gap-3">
+            <button
+              onClick={() => selectMatch(matchId)}
+              className="px-4 py-2 rounded-xl font-medium"
+              style={{ background: 'var(--masters)', color: 'white' }}
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => router.push('/score')}
+              className="px-4 py-2 rounded-xl font-medium"
+              style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+            >
+              Back to Score
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeMatch || !matchState) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: 'var(--canvas)' }}
+        role="alert"
+      >
+        <div className="text-center max-w-sm">
+          <div className="mx-auto mb-3" style={{ color: 'var(--ink-tertiary)' }}>
+            <AlertCircle size={28} />
+          </div>
+          <p className="type-title-sm">Match unavailable</p>
+          <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+            This match may have been deleted or hasn’t synced yet.
+          </p>
+          <button
+            onClick={() => router.push('/score')}
+            className="mt-5 px-4 py-2 rounded-xl font-medium"
+            style={{ background: 'var(--masters)', color: 'white' }}
+          >
+            Back to Score
+          </button>
         </div>
       </div>
     );
