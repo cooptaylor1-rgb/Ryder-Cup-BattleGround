@@ -372,6 +372,28 @@ export async function clearFailedQueue(): Promise<number> {
   return cleared;
 }
 
+/**
+ * Purge all queued operations for a given trip.
+ *
+ * Useful when deleting a trip locally: we only want to sync the trip delete,
+ * not stale pending creates/updates for entities that are now gone.
+ */
+export async function purgeQueueForTrip(tripId: string): Promise<number> {
+  await ensureQueueHydrated();
+
+  let removed = 0;
+  for (let i = syncQueue.length - 1; i >= 0; i--) {
+    const item = syncQueue[i];
+    if (item.tripId === tripId) {
+      syncQueue.splice(i, 1);
+      await removeQueueItem(item.id);
+      removed++;
+    }
+  }
+
+  return removed;
+}
+
 // ============================================
 // ENTITY SYNC TO CLOUD
 // ============================================

@@ -22,6 +22,7 @@ import type {
 import { db } from '../db';
 import {
   queueSyncOperation,
+  purgeQueueForTrip,
   syncTripToCloudFull,
   getTripSyncStatus,
   type SyncStatus,
@@ -312,6 +313,9 @@ export const useTripStore = create<TripState>()(
         await db.sessions.where('tripId').equals(tripId).delete();
         await db.teams.where('tripId').equals(tripId).delete();
         await db.trips.delete(tripId);
+
+        // Purge stale pending operations for this trip; we only want to sync the trip delete.
+        await purgeQueueForTrip(tripId);
 
         // Queue cloud delete
         queueSyncOperation('trip', tripId, 'delete', tripId);
