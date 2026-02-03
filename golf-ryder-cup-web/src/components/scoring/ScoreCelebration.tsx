@@ -44,10 +44,12 @@ interface ScoreCelebrationProps {
 interface Particle {
     id: number;
     x: number;
+    xDrift: number;
     color: string;
     size: number;
     rotation: number;
     delay: number;
+    borderRadius: string;
 }
 
 export function ScoreCelebration({
@@ -74,10 +76,12 @@ export function ScoreCelebration({
         return Array.from({ length: count }, (_, i) => ({
             id: i,
             x: Math.random() * 100,
+            xDrift: (Math.random() - 0.5) * 20,
             color: colors[Math.floor(Math.random() * colors.length)],
             size: Math.random() * 8 + 4,
             rotation: Math.random() * 360,
             delay: Math.random() * 0.3,
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
         }));
     }, []);
 
@@ -127,7 +131,7 @@ export function ScoreCelebration({
                                 }}
                                 animate={{
                                     y: '-20vh',
-                                    x: `${particle.x + (Math.random() - 0.5) * 20}vw`,
+                                    x: `${particle.x + particle.xDrift}vw`,
                                     opacity: 0,
                                     rotate: particle.rotation,
                                 }}
@@ -141,7 +145,7 @@ export function ScoreCelebration({
                                     width: particle.size,
                                     height: particle.size,
                                     background: particle.color,
-                                    borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                                    borderRadius: particle.borderRadius,
                                 }}
                             />
                         ))}
@@ -247,7 +251,7 @@ export function ScoreCelebration({
                                 }}
                                 animate={{
                                     y: '-30vh',
-                                    x: `${particle.x + (Math.random() - 0.5) * 40}vw`,
+                                    x: `${particle.x + particle.xDrift * 2}vw`,
                                     opacity: [0, 1, 1, 0],
                                     scale: [0, 1, 1, 0.5],
                                     rotate: particle.rotation * 2,
@@ -262,7 +266,7 @@ export function ScoreCelebration({
                                     width: particle.size * 1.5,
                                     height: particle.size * 1.5,
                                     background: particle.color,
-                                    borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                                    borderRadius: particle.borderRadius,
                                 }}
                             />
                         ))}

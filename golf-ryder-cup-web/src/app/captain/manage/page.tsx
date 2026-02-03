@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { captainLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -74,9 +75,7 @@ export default function CaptainManagePage() {
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            // Delete hole results first, then the match
-            await db.holeResults.where('matchId').equals(matchId).delete();
-            await db.matches.delete(matchId);
+            await deleteMatchCascade(matchId);
             showToast('success', 'Match deleted');
         } catch (error) {
             captainLogger.error('Failed to delete match:', error);
@@ -104,16 +103,7 @@ export default function CaptainManagePage() {
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            // Get all matches in session
-            const sessionMatches = matches.filter(m => m.sessionId === sessionId);
-            // Delete hole results for all matches first
-            for (const match of sessionMatches) {
-                await db.holeResults.where('matchId').equals(match.id).delete();
-            }
-            // Delete matches
-            await db.matches.where('sessionId').equals(sessionId).delete();
-            // Delete session
-            await db.sessions.delete(sessionId);
+            await deleteSessionCascade(sessionId);
             showToast('success', 'Session deleted');
         } catch (error) {
             captainLogger.error('Failed to delete session:', error);
@@ -121,7 +111,7 @@ export default function CaptainManagePage() {
         } finally {
             setIsSubmitting(false);
         }
-    }, [isSubmitting, showToast, matches]);
+    }, [isSubmitting, showToast]);
 
     const handleDeleteSession = useCallback((sessionId: string) => {
         if (isSubmitting) return;

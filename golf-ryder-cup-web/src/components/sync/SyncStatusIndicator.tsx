@@ -104,9 +104,16 @@ export function SyncStatusIndicator({
 
   // Poll for pending events
   useEffect(() => {
-    checkPending();
-    const interval = setInterval(checkPending, 5000);
-    return () => clearInterval(interval);
+    const kickoff = setTimeout(() => {
+      void checkPending();
+    }, 0);
+    const interval = setInterval(() => {
+      void checkPending();
+    }, 5000);
+    return () => {
+      clearTimeout(kickoff);
+      clearInterval(interval);
+    };
   }, [checkPending]);
 
   // Get status icon

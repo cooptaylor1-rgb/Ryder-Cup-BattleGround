@@ -7,7 +7,7 @@
  * Shows team assignment preview and next steps.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trophy,
@@ -22,6 +22,7 @@ import {
     Heart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { makeSeededRng } from '@/lib/utils/seededRandom';
 
 // ============================================
 // TYPES
@@ -58,19 +59,22 @@ interface ProfileCompletionRewardProps {
 // ============================================
 
 function Confetti() {
-    // Memoize confetti pieces to avoid regenerating on each render (impure Math.random)
+    const seed = useId();
+
+    // Deterministic “random” values (pure) to keep render idempotent.
     const confettiPieces = useMemo(() => {
+        const rng = makeSeededRng(seed);
         const colors = ['#FFD700', '#32CD32', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB'];
         return Array.from({ length: 50 }, (_, i) => ({
             id: i,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            left: Math.random() * 100,
-            delay: Math.random() * 0.5,
-            duration: 2 + Math.random() * 2,
-            rotation: Math.random() * 360,
-            size: 8 + Math.random() * 8,
+            color: colors[Math.floor(rng() * colors.length)],
+            left: rng() * 100,
+            delay: rng() * 0.5,
+            duration: 2 + rng() * 2,
+            rotation: rng() * 360,
+            size: 8 + rng() * 8,
         }));
-    }, []);
+    }, [seed]);
 
     return (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
@@ -88,7 +92,7 @@ function Confetti() {
                     }}
                     initial={{ y: -20, opacity: 1, rotate: piece.rotation }}
                     animate={{
-                        y: window.innerHeight + 50,
+                        y: '110vh',
                         opacity: [1, 1, 0],
                         rotate: piece.rotation + 720,
                     }}

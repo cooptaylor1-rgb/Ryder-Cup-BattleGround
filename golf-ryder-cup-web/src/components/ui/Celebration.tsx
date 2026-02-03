@@ -35,6 +35,7 @@ const CONFETTI_COLORS = [
 ];
 
 function generateConfetti(count: number): ConfettiParticle[] {
+    // Randomness is OK here (runs on activation), but must not occur during render.
     return Array.from({ length: count }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
@@ -64,17 +65,23 @@ export function ConfettiBurst({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (active) {
+        if (!active) return;
+
+        // Defer local state updates so we don't synchronously setState in an effect body.
+        const kickoff = setTimeout(() => {
             setParticles(generateConfetti(particleCount));
             setIsVisible(true);
+        }, 0);
 
-            const timeout = setTimeout(() => {
-                setIsVisible(false);
-                onComplete?.();
-            }, 3500);
+        const timeout = setTimeout(() => {
+            setIsVisible(false);
+            onComplete?.();
+        }, 3500);
 
-            return () => clearTimeout(timeout);
-        }
+        return () => {
+            clearTimeout(kickoff);
+            clearTimeout(timeout);
+        };
     }, [active, particleCount, onComplete]);
 
     if (!isVisible) return null;
@@ -124,25 +131,28 @@ export function SuccessOverlay({
     const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
-        if (show) {
+        if (!show) return;
+
+        const kickoff = setTimeout(() => {
             setIsVisible(true);
             setIsExiting(false);
             haptic.success();
+        }, 0);
 
-            const exitTimeout = setTimeout(() => {
-                setIsExiting(true);
-            }, duration - 300);
+        const exitTimeout = setTimeout(() => {
+            setIsExiting(true);
+        }, duration - 300);
 
-            const hideTimeout = setTimeout(() => {
-                setIsVisible(false);
-                onDismiss?.();
-            }, duration);
+        const hideTimeout = setTimeout(() => {
+            setIsVisible(false);
+            onDismiss?.();
+        }, duration);
 
-            return () => {
-                clearTimeout(exitTimeout);
-                clearTimeout(hideTimeout);
-            };
-        }
+        return () => {
+            clearTimeout(kickoff);
+            clearTimeout(exitTimeout);
+            clearTimeout(hideTimeout);
+        };
     }, [show, duration, onDismiss, haptic]);
 
     if (!isVisible) return null;
@@ -208,10 +218,12 @@ export function VictoryCelebration({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (show) {
+        if (!show) return;
+        const kickoff = setTimeout(() => {
             setIsVisible(true);
             haptic.scoreWin();
-        }
+        }, 0);
+        return () => clearTimeout(kickoff);
     }, [show, haptic]);
 
     const handleDismiss = useCallback(() => {
@@ -287,11 +299,17 @@ export function PointScored({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (show) {
+        if (!show) return;
+
+        const kickoff = setTimeout(() => {
             setIsVisible(true);
-            const timeout = setTimeout(() => setIsVisible(false), 1000);
-            return () => clearTimeout(timeout);
-        }
+        }, 0);
+        const timeout = setTimeout(() => setIsVisible(false), 1000);
+
+        return () => {
+            clearTimeout(kickoff);
+            clearTimeout(timeout);
+        };
     }, [show]);
 
     if (!isVisible) return null;
@@ -338,17 +356,22 @@ export function AchievementBadge({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (show) {
+        if (!show) return;
+
+        const kickoff = setTimeout(() => {
             setIsVisible(true);
             haptic.success();
+        }, 0);
 
-            const timeout = setTimeout(() => {
-                setIsVisible(false);
-                onDismiss?.();
-            }, 4000);
+        const timeout = setTimeout(() => {
+            setIsVisible(false);
+            onDismiss?.();
+        }, 4000);
 
-            return () => clearTimeout(timeout);
-        }
+        return () => {
+            clearTimeout(kickoff);
+            clearTimeout(timeout);
+        };
     }, [show, haptic, onDismiss]);
 
     if (!isVisible) return null;

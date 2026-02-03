@@ -277,11 +277,6 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
 
-    // Generate image when summary changes
-    useEffect(() => {
-        generateImage();
-    }, [summary]);
-
     const generateImage = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -415,6 +410,11 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
         const url = canvas.toDataURL('image/png');
         setImageUrl(url);
     }, [summary, tripName]);
+
+    // Generate image when summary changes
+    useEffect(() => {
+        generateImage();
+    }, [generateImage]);
 
     // Share functionality
     const handleShare = async () => {
