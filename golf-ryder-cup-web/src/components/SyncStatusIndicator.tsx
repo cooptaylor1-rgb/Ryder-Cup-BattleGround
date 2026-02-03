@@ -57,17 +57,13 @@ function formatRelativeTime(date: Date | null): string {
 
 // Hook to track last sync time
 export function useLastSyncTime() {
-  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const stored = localStorage.getItem('golf-app-last-sync');
+    return stored ? new Date(stored) : null;
+  });
   const [isSyncing, setIsSyncing] = useState(false);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Load last sync time from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('golf-app-last-sync');
-    if (stored) {
-      setLastSyncTime(new Date(stored));
-    }
-  }, []);
 
   // Update last sync time
   const recordSync = useCallback(() => {
@@ -135,12 +131,17 @@ export function SyncStatusIndicator({
         ? 'pending'
         : 'synced';
 
-  // Pulse animation when status changes to synced
+  // Pulse animation when status changes to synced.
+  // Defer state updates to avoid setState-in-effect warnings.
   useEffect(() => {
     if (status === 'synced' && lastSyncTime) {
-      setPulseAnimation(true);
-      const timer = setTimeout(() => setPulseAnimation(false), 1000);
-      return () => clearTimeout(timer);
+      const startTimer = setTimeout(() => {
+        setPulseAnimation(true);
+        const endTimer = setTimeout(() => setPulseAnimation(false), 1000);
+        return () => clearTimeout(endTimer);
+      }, 0);
+
+      return () => clearTimeout(startTimer);
     }
   }, [status, lastSyncTime]);
 

@@ -75,7 +75,9 @@ export function AnimatedCounter({
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      setDisplayValue(value);
+      // No animation: render value directly (avoid setState-in-effect).
+      startValueRef.current = value;
+      startTimeRef.current = null;
       return;
     }
 
@@ -84,12 +86,12 @@ export function AnimatedCounter({
 
     if (diff === 0) return;
 
-    setIsAnimating(true);
-    setChangeDirection(diff > 0 ? 'up' : 'down');
-    setAnimationStartValue(startValue);
-
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
+        // Initialize animation state on the first RAF tick
+        setIsAnimating(true);
+        setChangeDirection(diff > 0 ? 'up' : 'down');
+        setAnimationStartValue(startValue);
         startTimeRef.current = timestamp + delay;
       }
 
@@ -132,7 +134,7 @@ export function AnimatedCounter({
     };
   }, [value, duration, delay, celebrateOn, onCelebrate, prefersReducedMotion]);
 
-  const formattedValue = formatValue(displayValue, format, prefix, suffix);
+  const formattedValue = formatValue(prefersReducedMotion ? value : displayValue, format, prefix, suffix);
 
   return (
     <div className={cn('relative inline-flex items-baseline gap-1', className)}>
@@ -206,46 +208,21 @@ interface RollingDigitProps {
 }
 
 function RollingDigit({ digit, duration, delay, className }: RollingDigitProps) {
-  const [currentDigit, setCurrentDigit] = useState(digit);
-  const [isRolling, setIsRolling] = useState(false);
-  const prevDigitRef = useRef(digit);
-
-  useEffect(() => {
-    if (digit !== prevDigitRef.current) {
-      setIsRolling(true);
-      const timer = setTimeout(() => {
-        setCurrentDigit(digit);
-        setIsRolling(false);
-        prevDigitRef.current = digit;
-      }, duration + delay);
-      return () => clearTimeout(timer);
-    }
-  }, [digit, duration, delay]);
-
+  // Pure CSS transition driven by the `digit` prop.
+  // Avoids setState-in-effect (and still provides smooth rolling via transitionDelay).
   return (
-    <div
-      className={cn(
-        'relative h-[1em] w-[0.6em] overflow-hidden',
-        className
-      )}
-    >
+    <div className={cn('relative h-[1em] w-[0.6em] overflow-hidden', className)}>
       <div
-        className={cn(
-          'absolute inset-0 flex flex-col transition-transform',
-          isRolling && 'animate-roll-down'
-        )}
+        className={cn('absolute inset-0 flex flex-col transition-transform')}
         style={{
-          transform: `translateY(-${currentDigit * 10}%)`,
+          transform: `translateY(-${digit * 10}%)`,
           transitionDuration: `${duration}ms`,
           transitionDelay: `${delay}ms`,
           transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-          <span
-            key={n}
-            className="h-[1em] flex items-center justify-center tabular-nums"
-          >
+          <span key={n} className="h-[1em] flex items-center justify-center tabular-nums">
             {n}
           </span>
         ))}

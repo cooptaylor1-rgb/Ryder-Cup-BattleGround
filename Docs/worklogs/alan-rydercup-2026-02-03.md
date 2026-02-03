@@ -31,9 +31,26 @@
 - Delete Trip → verify: trip disappears; sync queue contains only (optional) trip delete; no later reappearance.
 - After each delete → refresh page / reopen app → confirm no “ghost scoring” rehydrates via queued updates.
 
+### Additional work (08:20 ET)
+- Correctness lint reduction (set-state-in-effect):
+  - `src/components/SyncStatusIndicator.tsx`
+    - Load lastSyncTime via `useState` initializer (no setState-in-effect).
+    - Defer pulseAnimation toggles to avoid setState-in-effect.
+  - `src/components/sync/SyncStatusIndicator.tsx`
+    - Defer initial `checkPending()` kickoff and interval callback invocation.
+  - `src/components/ui/Celebration.tsx`
+    - Defer state updates on `show/active` effects via kickoff timers.
+  - `src/components/ui/AnimatedCounter.tsx`
+    - Move animation state initialization into first RAF tick.
+    - Make `RollingDigit` pure (CSS transition driven by prop; no effect).
+
+- Lint status:
+  - `pnpm -C golf-ryder-cup-web lint`: **98 warnings** (down from 107), 0 errors.
+
+### Blocker
+- Unable to push to remote: `Permission to ... denied to cooperworkertaylor` (git push failed). Need Cooper to confirm correct remote credentials/access or adjust git remote.
+
 ### Next (Phase 0 remaining)
 1) Replace remaining user-facing `return null` routes with consistent Loading/Empty/Error UI (target: schedule/trip-stats/spectator/etc.).
-2) Reduce correctness-level lint warnings, focusing on:
-   - `react-hooks/set-state-in-effect` (SyncStatusIndicator(s), Celebration, AnimatedCounter, scoring components)
-   - `react-hooks/exhaustive-deps` where it reflects real bugs.
+2) Continue reducing correctness-level lint warnings, focusing on remaining `react-hooks/exhaustive-deps` / unused disables that impact correctness.
 3) Run manual QA checklist once browser relay is available.
