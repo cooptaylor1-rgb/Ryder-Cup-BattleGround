@@ -107,14 +107,19 @@ export default function SchedulePage() {
     if (!isAuthenticated || !currentUser) return null;
 
     // Try to match by email first, then by name
-    return players.find(
-      (p) =>
-        (p.email &&
-          currentUser.email &&
-          p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
-        (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
-          p.lastName.toLowerCase() === currentUser.lastName.toLowerCase())
-    );
+    return players.find((p) => {
+      const playerEmail = p.email?.toLowerCase();
+      const userEmail = currentUser.email?.toLowerCase();
+      if (playerEmail && userEmail && playerEmail === userEmail) return true;
+
+      const playerFirst = (p.firstName ?? '').toLowerCase();
+      const playerLast = (p.lastName ?? '').toLowerCase();
+      const userFirst = (currentUser.firstName ?? '').toLowerCase();
+      const userLast = (currentUser.lastName ?? '').toLowerCase();
+
+      if (!playerFirst || !userFirst || !playerLast || !userLast) return false;
+      return playerFirst === userFirst && playerLast === userLast;
+    });
   }, [currentUser, isAuthenticated, players]);
 
   // Get player name helper - memoized for stable reference

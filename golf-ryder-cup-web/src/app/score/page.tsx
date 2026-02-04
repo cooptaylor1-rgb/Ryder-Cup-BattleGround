@@ -40,12 +40,20 @@ export default function ScorePage() {
     // Find the current user's player record (P0-3)
     const currentUserPlayer = useMemo(() => {
         if (!isAuthenticated || !currentUser) return null;
-        return players.find(
-            p =>
-                (p.email && currentUser.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
-                (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
-                    p.lastName.toLowerCase() === currentUser.lastName.toLowerCase())
-        );
+
+        return players.find(p => {
+            const playerEmail = p.email?.toLowerCase();
+            const userEmail = currentUser.email?.toLowerCase();
+            if (playerEmail && userEmail && playerEmail === userEmail) return true;
+
+            const playerFirst = (p.firstName ?? '').toLowerCase();
+            const playerLast = (p.lastName ?? '').toLowerCase();
+            const userFirst = (currentUser.firstName ?? '').toLowerCase();
+            const userLast = (currentUser.lastName ?? '').toLowerCase();
+
+            if (!playerFirst || !userFirst || !playerLast || !userLast) return false;
+            return playerFirst === userFirst && playerLast === userLast;
+        });
     }, [currentUser, isAuthenticated, players]);
 
     // Track selected session - default to active or first available
