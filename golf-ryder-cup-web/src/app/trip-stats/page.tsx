@@ -296,7 +296,14 @@ function CategoryLeaderboard({
   const sorted = [...playerTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   if (sorted.length === 0 || sorted.every(([, v]) => v === 0)) {
-    return null;
+    return (
+      <div className="card-surface rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-text-secondary mb-2">
+          {categoryDef.emoji} {categoryDef.label} Leaders
+        </h3>
+        <p className="text-sm text-text-tertiary">No leaders yet — start tracking to spark a rivalry.</p>
+      </div>
+    );
   }
 
   return (
@@ -305,20 +312,24 @@ function CategoryLeaderboard({
         {categoryDef.emoji} {categoryDef.label} Leaders
       </h3>
       <div className="space-y-2">
-        {sorted.map(([playerId, total], index) => {
-          const player = players.find((p) => p.id === playerId);
-          if (!player || total === 0) return null;
-
-          return (
-            <div key={playerId} className="flex items-center gap-3">
+        {sorted
+          .map(([playerId, total]) => ({
+            playerId,
+            total,
+            player: players.find((p) => p.id === playerId) ?? null,
+          }))
+          .filter((row) => row.player && row.total > 0)
+          .map((row, index) => (
+            <div key={row.playerId} className="flex items-center gap-3">
               <div className="w-6 text-center font-bold text-text-tertiary">
                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
               </div>
-              <div className="flex-1 font-medium text-text-primary">{getPlayerName(player)}</div>
-              <div className="font-bold text-text-secondary">{total}</div>
+              <div className="flex-1 font-medium text-text-primary">
+                {getPlayerName(row.player!)}
+              </div>
+              <div className="font-bold text-text-secondary">{row.total}</div>
             </div>
-          );
-        })}
+          ))}
       </div>
     </div>
   );

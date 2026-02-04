@@ -16,6 +16,7 @@ import type { UUID, Player } from '@/lib/types/models';
 import type { AwardType, TripAward } from '@/lib/types/tripStats';
 import { AWARD_DEFINITIONS } from '@/lib/types/tripStats';
 import { ChevronLeft, Trophy, Sparkles } from 'lucide-react';
+import { EmptyStatePremium } from '@/components/ui';
 
 function getPlayerName(player: Player): string {
     return `${player.firstName} ${player.lastName}`;
@@ -119,41 +120,51 @@ function AwardCard({
 // ============================================
 
 function WinnerShowcase({
-    awards,
-    players,
+  awards,
+  players,
 }: {
-    awards: TripAward[];
-    players: Player[];
+  awards: TripAward[];
+  players: Player[];
 }) {
-    if (awards.length === 0) return null;
+  const rows = awards
+    .map((award) => {
+      const def = AWARD_DEFINITIONS[award.awardType];
+      const winner = players.find((p) => p.id === award.winnerId) ?? null;
+      return { award, def, winner };
+    })
+    .filter((row) => row.winner);
 
+  if (rows.length === 0) {
     return (
-        <div className="card-elevated rounded-xl p-6 mb-6">
-            <div className="flex items-center gap-2 mb-4">
-                <Trophy size={20} className="text-masters" />
-                <h2 className="type-h3">Award Winners</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                {awards.map(award => {
-                    const def = AWARD_DEFINITIONS[award.awardType];
-                    const winner = players.find(p => p.id === award.winnerId);
-                    if (!winner) return null;
-
-                    return (
-                        <div key={award.id} className="flex items-center gap-3">
-                            <span className="text-2xl">{def.emoji}</span>
-                            <div>
-                                <div className="text-xs text-text-tertiary">{def.label}</div>
-                                <div className="font-semibold text-text-primary">
-                                    {winner.firstName}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
+      <div className="card-elevated rounded-xl p-6 mb-6 text-center">
+        <div className="text-4xl mb-3">🏆</div>
+        <h2 className="type-h3 mb-1">No award winners yet</h2>
+        <p className="text-sm text-text-secondary">
+          Tap an award below to vote and we’ll showcase winners here.
+        </p>
+      </div>
     );
+  }
+
+  return (
+    <div className="card-elevated rounded-xl p-6 mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Trophy size={20} className="text-masters" />
+        <h2 className="type-h3">Award Winners</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        {rows.map(({ award, def, winner }) => (
+          <div key={award.id} className="flex items-center gap-3">
+            <span className="text-2xl">{def.emoji}</span>
+            <div>
+              <div className="text-xs text-text-tertiary">{def.label}</div>
+              <div className="font-semibold text-text-primary">{winner!.firstName}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 // ============================================
@@ -206,19 +217,27 @@ export default function TripAwardsPage() {
         return (
             <main className="page-container">
                 <header className="header-premium">
-                    <button onClick={() => router.back()} className="p-1 text-text-secondary">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+                        aria-label="Go back"
+                    >
                         <ChevronLeft size={20} />
+                        <span className="text-sm">Back</span>
                     </button>
                     <h1 className="type-h2">Trip Awards</h1>
                 </header>
                 <div className="content-area">
-                    <div className="card-surface rounded-xl p-8 text-center">
-                        <div className="text-4xl mb-4">🏆</div>
-                        <h2 className="type-h3 mb-2">No Active Trip</h2>
-                        <p className="text-text-secondary">
-                            Start or join a trip to give awards!
-                        </p>
-                    </div>
+                    <EmptyStatePremium
+                        illustration="podium"
+                        title="No active trip"
+                        description="Start or join a trip to give awards."
+                        action={{
+                            label: 'Go Home',
+                            onClick: () => router.push('/'),
+                        }}
+                        variant="large"
+                    />
                 </div>
             </main>
         );
