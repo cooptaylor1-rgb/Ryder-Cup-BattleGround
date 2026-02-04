@@ -550,7 +550,19 @@ export default function BetDetailPage() {
                                         </>
                                     );
                                 }
-                                return null;
+                                return (
+                                  <>
+                                    <hr
+                                      className="divider-lg"
+                                      style={{ margin: 'var(--space-3) 0' }}
+                                    />
+                                    <div className="text-center" style={{ padding: 'var(--space-2) 0' }}>
+                                      <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+                                        All segments were halved — no payouts.
+                                      </p>
+                                    </div>
+                                  </>
+                                );
                             })()
                         )}
                     </div>

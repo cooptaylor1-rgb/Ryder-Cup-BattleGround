@@ -89,6 +89,7 @@ import {
   type UndoAction,
 } from '@/components/live-play';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
 // Demo side bets for testing - in production these come from the bets store
 const DEMO_SIDE_BETS = [
@@ -796,48 +797,19 @@ export default function EnhancedMatchScoringPage() {
 
   // Loading / error / missing states
   if (isLoading) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--canvas)' }}
-        role="progressbar"
-        aria-busy="true"
-        aria-label="Loading match"
-      >
-        <div className="text-center">
-          <div
-            className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-3"
-            style={{ borderColor: 'var(--masters)', borderTopColor: 'transparent' }}
-          />
-          <p className="type-meta">Loading match...</p>
-        </div>
-      </div>
-    );
+    return <PageLoadingSkeleton title="Scoring" variant="detail" />;
   }
 
   if (error) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center px-6"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
         role="alert"
       >
-        <div className="text-center max-w-sm">
-          <div className="mx-auto mb-3" style={{ color: 'var(--warning)' }}>
-            <AlertCircle size={28} />
-          </div>
-          <p className="type-title-sm">Couldn’t load this match</p>
-          <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
-            {error}
-          </p>
-          <div className="mt-5 flex items-center justify-center gap-3">
-            <button
-              onClick={() => selectMatch(matchId)}
-              className="px-4 py-2 rounded-xl font-medium"
-              style={{ background: 'var(--masters)', color: 'white' }}
-            >
-              Retry
-            </button>
+        <main className="container-editorial py-12">
+          <ErrorEmpty message={error} onRetry={() => selectMatch(matchId)} />
+          <div className="mt-4 flex justify-center">
             <button
               onClick={() => router.push('/score')}
               className="px-4 py-2 rounded-xl font-medium"
@@ -846,7 +818,7 @@ export default function EnhancedMatchScoringPage() {
               Back to Score
             </button>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -854,26 +826,19 @@ export default function EnhancedMatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center px-6"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
         role="alert"
       >
-        <div className="text-center max-w-sm">
-          <div className="mx-auto mb-3" style={{ color: 'var(--ink-tertiary)' }}>
-            <AlertCircle size={28} />
-          </div>
-          <p className="type-title-sm">Match unavailable</p>
-          <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
-            This match may have been deleted or hasn’t synced yet.
-          </p>
-          <button
-            onClick={() => router.push('/score')}
-            className="mt-5 px-4 py-2 rounded-xl font-medium"
-            style={{ background: 'var(--masters)', color: 'white' }}
-          >
-            Back to Score
-          </button>
-        </div>
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="flag"
+            title="Match unavailable"
+            description="This match may have been deleted or hasn’t synced yet."
+            action={{ label: 'Back to Score', onClick: () => router.push('/score') }}
+            variant="large"
+          />
+        </main>
       </div>
     );
   }

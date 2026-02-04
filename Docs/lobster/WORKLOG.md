@@ -26,3 +26,12 @@
 
 ## 2026-02-04 14:32 EST — Phase 1 (batch 8)
 - Lobster plan: removed hard-coded absolute workdir paths and switched to `git rev-parse --show-toplevel` + `pnpm -C` so the checkpoint workflow runs reliably from any checkout location.
+
+## 2026-02-04 17:50 EST — Phase 1 (batch 9)
+- Bet Detail (Nassau results): replaced a silent `return null` when all segments are halved with an explicit “All segments were halved — no payouts.” message.
+
+## 2026-02-04 17:55 EST — Phase 1 (batch 10)
+- Schedule page: standardized loading state to `PageLoadingSkeleton` and upgraded “no matches / no sessions / no events” sections to `EmptyStatePremium` (no more dead `isLoading` rendering).
+- Match scoring page: replaced spinner + bespoke error/missing screens with `PageLoadingSkeleton`, `ErrorEmpty`, and `EmptyStatePremium` for consistent non-blank states.
+- Standings + Home: tightened loading/empty state handling (no redirects/blank renders) and cleaned up lint (unused imports).
+- Commit created locally; push pending due to missing GitHub HTTPS credentials on this host.

@@ -290,6 +290,11 @@ export default function SchedulePage() {
     );
   }
 
+  // Standard loading skeleton when trip exists but match data is still loading.
+  if (isLoading) {
+    return <PageLoadingSkeleton title="Schedule" variant="list" />;
+  }
+
   const displaySchedule = selectedTab === 'my' ? mySchedule : scheduleByDay;
   const hasUserSchedule = mySchedule.length > 0;
 
@@ -379,31 +384,15 @@ export default function SchedulePage() {
 
       {/* Main Content */}
       <main className="container-editorial pb-8" id="schedule-content" role="tabpanel">
-        {/* Loading State */}
-        {isLoading && (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="animate-pulse rounded-xl p-4"
-                style={{ background: 'var(--surface-card)' }}
-              >
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-3"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Error State */}
-        {!isLoading && loadError && (
+        {loadError && (
           <div className="py-12">
             <ErrorEmpty message={loadError} onRetry={loadMatches} />
           </div>
         )}
 
         {/* No Profile Warning */}
-        {!isLoading && !loadError && selectedTab === 'my' && !currentUserPlayer && (
+        {!loadError && selectedTab === 'my' && !currentUserPlayer && (
           <div
             className="p-4 rounded-xl mb-6 flex items-start gap-3"
             style={{
@@ -435,29 +424,23 @@ export default function SchedulePage() {
         )}
 
         {/* No Matches for User */}
-        {!isLoading && !loadError && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
-          <div className="text-center py-12">
-            <Calendar size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">No tee times yet</p>
-            <p className="type-caption mt-2 max-w-xs mx-auto">
-              You haven&apos;t been assigned to any matches. Check the &quot;Full Schedule&quot; tab
-              or ask your captain.
-            </p>
-            <button
-              onClick={() => setSelectedTab('all')}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
-              style={{ background: 'var(--masters)', color: 'white' }}
-            >
-              <Calendar size={16} />
-              View Full Schedule
-            </button>
+        {!loadError && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
+          <div className="py-12">
+            <EmptyStatePremium
+              illustration="calendar"
+              title="No tee times yet"
+              description="You haven't been assigned to any matches. Check the Full Schedule tab or ask your captain."
+              action={{
+                label: 'View Full Schedule',
+                onClick: () => setSelectedTab('all'),
+              }}
+              variant="default"
+            />
           </div>
         )}
 
         {/* Schedule Days */}
-        {!isLoading &&
-          !loadError &&
-          displaySchedule.map((day) => (
+        {!loadError && displaySchedule.map((day) => (
             <div key={day.date} className="mb-8">
               {/* Day Header */}
               <div className="flex items-center gap-3 mb-4">
@@ -481,11 +464,13 @@ export default function SchedulePage() {
 
               {/* Entries */}
               {day.entries.length === 0 ? (
-                <div
-                  className="p-4 rounded-xl text-center"
-                  style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
-                >
-                  <p className="type-caption">No scheduled events</p>
+                <div style={{ padding: 'var(--space-4) 0' }}>
+                  <EmptyStatePremium
+                    illustration="calendar"
+                    title="No scheduled events"
+                    description="Nothing is on the books for this day yet."
+                    variant="compact"
+                  />
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -504,16 +489,16 @@ export default function SchedulePage() {
           ))}
 
         {/* Empty State for All Schedule */}
-        {!isLoading &&
-          !loadError &&
+        {!loadError &&
           selectedTab === 'all' &&
           scheduleByDay.every((day) => day.entries.length === 0) && (
-          <div className="text-center py-16">
-            <Calendar size={48} className="mx-auto mb-4 opacity-30" />
-            <p className="type-title-sm">No sessions scheduled</p>
-            <p className="type-caption mt-2">
-              Sessions will appear here once the captain sets up the schedule.
-            </p>
+          <div className="py-16">
+            <EmptyStatePremium
+              illustration="calendar"
+              title="No sessions scheduled"
+              description="Sessions will appear here once the captain sets up the schedule."
+              variant="default"
+            />
           </div>
         )}
       </main>

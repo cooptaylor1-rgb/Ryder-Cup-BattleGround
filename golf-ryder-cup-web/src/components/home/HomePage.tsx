@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { useTripStore, useAuthStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useUIStore } from '@/lib/stores';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { tripLogger } from '@/lib/utils/logger';
 import {
@@ -55,7 +55,6 @@ import { WeatherWidget } from '@/components/course';
 export default function HomePage() {
   const router = useRouter();
   const { loadTrip, currentTrip: _currentTrip, players, teams, sessions } = useTripStore();
-  const { currentUser: _currentUser, isAuthenticated: _isAuthenticated } = useAuthStore();
   const { isCaptainMode } = useUIStore();
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [showJoinTrip, setShowJoinTrip] = useState(false);
@@ -361,7 +360,24 @@ export default function HomePage() {
       )}
 
       <main className="container-editorial">
-        {/* YOUR MATCH HERO CARD (P0-1) — Top priority for participants */}
+        {/* Editorial spine: make this feel like a curated daily edition (Fried Egg vibe). */}
+        {activeTrip && (
+          <section className="section-xs" style={{ paddingTop: 'var(--space-4)' }}>
+            <p className="type-overline" style={{ letterSpacing: '0.18em', color: 'var(--ink-tertiary)' }}>
+              TODAY
+            </p>
+            <div className="flex items-baseline justify-between gap-3" style={{ marginTop: 'var(--space-2)' }}>
+              <h1 className="type-title" style={{ color: 'var(--ink)' }}>
+                {activeTrip.name}
+              </h1>
+              <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                {formatDate(new Date())}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* YOUR MATCH HERO CARD (What matters now) */}
         {activeTrip && userMatchData && currentUserPlayer && (
           <section className="section-sm">
             <YourMatchCard
@@ -456,10 +472,13 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* LEAD — Active Tournament with Live Score */}
+        {/* LEAD STORY — Active tournament score (editorial headline) */}
         {activeTrip && standings ? (
           <>
             <section className="section">
+              <p className="type-overline" style={{ letterSpacing: '0.18em', color: 'var(--ink-tertiary)', marginBottom: 'var(--space-2)' }}>
+                LEAD STORY
+              </p>
               <button
                 onClick={() => handleSelectTrip(activeTrip.id)}
                 className="w-full text-left press-scale card-interactive"
