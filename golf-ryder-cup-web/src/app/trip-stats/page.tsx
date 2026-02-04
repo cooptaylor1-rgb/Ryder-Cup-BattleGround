@@ -27,6 +27,7 @@ import {
 } from '@/lib/types/tripStats';
 import { Trophy, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 
 // ============================================
 // CATEGORY TABS COMPONENT
@@ -336,9 +337,10 @@ export default function TripStatsPage() {
   const tripStats = useLiveQuery(
     (): Promise<PlayerTripStat[]> =>
       currentTrip?.id ? tripStatsService.getTripStats(currentTrip.id) : Promise.resolve([]),
-    [currentTrip?.id, refreshKey],
-    [] as PlayerTripStat[]
+    [currentTrip?.id, refreshKey]
   );
+
+  const tripStatsData: PlayerTripStat[] = tripStats ?? [];
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
@@ -357,7 +359,7 @@ export default function TripStatsPage() {
   const handleDecrement = async (playerId: UUID, statType: TripStatType) => {
     if (!currentTrip?.id) return;
 
-    const existing = tripStats.find(
+    const existing = tripStatsData.find(
       (s: PlayerTripStat) => s.playerId === playerId && s.statType === statType && !s.sessionId
     );
 
@@ -374,13 +376,17 @@ export default function TripStatsPage() {
 
   for (const def of categoryStats) {
     const playerMap = new Map<UUID, number>();
-    for (const stat of tripStats) {
+    for (const stat of tripStatsData) {
       if (stat.statType === def.type) {
         const current = playerMap.get(stat.playerId) ?? 0;
         playerMap.set(stat.playerId, current + stat.value);
       }
     }
     statMaps.set(def.type, playerMap);
+  }
+
+  if (currentTrip && tripStats === undefined) {
+    return <PageLoadingSkeleton title="Trip Stats" variant="list" />;
   }
 
   if (!currentTrip) {
@@ -398,23 +404,54 @@ export default function TripStatsPage() {
           <h1 className="type-h2">Trip Stats</h1>
         </header>
         <div className="content-area">
-          <div className="card-surface rounded-xl p-8 text-center">
-            <div className="text-4xl mb-4">📊</div>
-            <h2 className="type-h3 mb-2">No Active Trip</h2>
-            <p className="text-text-secondary">Start or join a trip to track fun stats!</p>
-          </div>
+          <EmptyStatePremium
+            illustration="podium"
+            title="No active trip"
+            description="Start or join a trip to track fun stats."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
         </div>
       </main>
     );
   }
 
-  const totalBeers = tripStats
+  if (tripStatsData.length === 0) {
+    return (
+      <main className="page-container">
+        <header className="header-premium">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+            aria-label="Go back"
+          >
+            <ChevronLeft size={20} />
+            <span className="text-sm">Back</span>
+          </button>
+          <h1 className="type-h2">Trip Stats</h1>
+        </header>
+        <div className="content-area">
+          <EmptyStatePremium
+            illustration="podium"
+            title="No stats yet"
+            description="Start tracking the fun — add a few stats and the leaderboards will appear here."
+            variant="large"
+          />
+        </div>
+      </main>
+    );
+  }
+
+  const totalBeers = tripStatsData
     .filter((s: PlayerTripStat) => s.statType === 'beers')
     .reduce((a: number, b: PlayerTripStat) => a + b.value, 0);
-  const totalBallsLost = tripStats
+  const totalBallsLost = tripStatsData
     .filter((s: PlayerTripStat) => s.statType === 'balls_lost')
     .reduce((a: number, b: PlayerTripStat) => a + b.value, 0);
-  const totalMulligans = tripStats
+  const totalMulligans = tripStatsData
     .filter((s: PlayerTripStat) => s.statType === 'mulligans')
     .reduce((a: number, b: PlayerTripStat) => a + b.value, 0);
 

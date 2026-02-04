@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useAuthStore } from '@/lib/stores';
-import { PageLoadingSkeleton } from '@/components/ui';
+import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { db } from '@/lib/db';
 import { tripLogger } from '@/lib/utils/logger';
 import { getCountdown, getCountdownColor, isToday } from '@/lib/utils';
@@ -68,35 +68,39 @@ export default function SchedulePage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [selectedTab, setSelectedTab] = useState<'my' | 'all'>('my');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Load matches from database
-  useEffect(() => {
-    async function loadMatches() {
-      if (!currentTrip) {
-        setIsLoading(false);
+  const loadMatches = useCallback(async () => {
+    if (!currentTrip) {
+      setIsLoading(false);
+      setLoadError(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const sessionIds = sessions.map((s) => s.id);
+      if (sessionIds.length === 0) {
+        setMatches([]);
         return;
       }
 
-      try {
-        const sessionIds = sessions.map((s) => s.id);
-        if (sessionIds.length === 0) {
-          setMatches([]);
-          setIsLoading(false);
-          return;
-        }
-
-        const allMatches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
-
-        setMatches(allMatches);
-      } catch (error) {
-        tripLogger.error('Error loading matches:', error);
-      } finally {
-        setIsLoading(false);
-      }
+      const allMatches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
+      setMatches(allMatches);
+    } catch (error) {
+      tripLogger.error('Error loading matches:', error);
+      setLoadError('We couldn\'t load matches right now.');
+    } finally {
+      setIsLoading(false);
     }
-
-    loadMatches();
   }, [currentTrip, sessions]);
+
+  // Load matches from database
+  useEffect(() => {
+    loadMatches();
+  }, [loadMatches]);
 
   // Find the player record that matches current user
   const currentUserPlayer = useMemo(() => {
@@ -265,7 +269,30 @@ export default function SchedulePage() {
   }, [currentTrip, isLoading, router]);
 
   if (!currentTrip) {
-    return <PageLoadingSkeleton title="Schedule" variant="list" />;
+    if (isLoading) {
+      return <PageLoadingSkeleton title="Schedule" variant="list" />;
+    }
+
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="calendar"
+            title="No trip selected"
+            description="Pick a trip to see the schedule."
+            action={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
   }
 
   const displaySchedule = selectedTab === 'my' ? mySchedule : scheduleByDay;
@@ -373,8 +400,15 @@ export default function SchedulePage() {
           </div>
         )}
 
+        {/* Error State */}
+        {!isLoading && loadError && (
+          <div className="py-12">
+            <ErrorEmpty message={loadError} onRetry={loadMatches} />
+          </div>
+        )}
+
         {/* No Profile Warning */}
-        {!isLoading && selectedTab === 'my' && !currentUserPlayer && (
+        {!isLoading && !loadError && selectedTab === 'my' && !currentUserPlayer && (
           <div
             className="p-4 rounded-xl mb-6 flex items-start gap-3"
             style={{
@@ -406,7 +440,7 @@ export default function SchedulePage() {
         )}
 
         {/* No Matches for User */}
-        {!isLoading && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
+        {!isLoading && !loadError && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule && (
           <div className="text-center py-12">
             <Calendar size={48} className="mx-auto mb-4 opacity-30" />
             <p className="type-title-sm">No tee times yet</p>
@@ -427,6 +461,7 @@ export default function SchedulePage() {
 
         {/* Schedule Days */}
         {!isLoading &&
+          !loadError &&
           displaySchedule.map((day) => (
             <div key={day.date} className="mb-8">
               {/* Day Header */}
@@ -474,7 +509,10 @@ export default function SchedulePage() {
           ))}
 
         {/* Empty State for All Schedule */}
-        {selectedTab === 'all' && scheduleByDay.every((day) => day.entries.length === 0) && (
+        {!isLoading &&
+          !loadError &&
+          selectedTab === 'all' &&
+          scheduleByDay.every((day) => day.entries.length === 0) && (
           <div className="text-center py-16">
             <Calendar size={48} className="mx-auto mb-4 opacity-30" />
             <p className="type-title-sm">No sessions scheduled</p>
