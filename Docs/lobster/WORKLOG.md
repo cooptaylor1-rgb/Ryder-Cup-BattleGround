@@ -17,3 +17,6 @@
 ## 2026-02-04 13:05 EST — Phase 1 (batch 5)
 - Players page: removed auto-redirect when no trip is selected; now shows a premium empty state with a clear CTA back home.
 - Standings page: removed auto-redirect when no trip is selected; now shows a premium empty state with a clear CTA back home (loading skeleton remains for real data loads).
+
+## 2026-02-04 13:20 EST — Phase 1 (batch 6)
+- Schedule page: removed auto-redirect when no trip is selected; now consistently renders the premium empty state instead of bouncing back home.

@@ -261,12 +261,7 @@ export default function SchedulePage() {
       .filter((day) => day.entries.some((e) => e.isUserMatch));
   }, [scheduleByDay, currentUserPlayer]);
 
-  // Redirect if no trip
-  useEffect(() => {
-    if (!currentTrip && !isLoading) {
-      router.push('/');
-    }
-  }, [currentTrip, isLoading, router]);
+  // If no trip, render an explicit empty state (no auto-redirect).
 
   if (!currentTrip) {
     if (isLoading) {
