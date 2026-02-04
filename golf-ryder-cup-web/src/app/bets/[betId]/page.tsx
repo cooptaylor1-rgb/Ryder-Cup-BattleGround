@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium, ErrorEmpty } from '@/components/ui';
 import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
     ChevronLeft,
@@ -43,9 +44,15 @@ export default function BetDetailPage() {
     const [selectedHole, setSelectedHole] = useState<number | null>(null);
 
     // Get the bet
+    // useLiveQuery returns the provided default while loading.
+    // We set default=null so we can distinguish:
+    // - null (loading)
+    // - undefined (not found)
+    // - SideBet (loaded)
     const bet = useLiveQuery(
         () => db.sideBets.get(betId),
-        [betId]
+        [betId],
+        null
     );
 
     // Get linked match if any
@@ -58,11 +65,7 @@ export default function BetDetailPage() {
         [bet?.matchId]
     );
 
-    useEffect(() => {
-        if (!currentTrip) {
-            router.push('/');
-        }
-    }, [currentTrip, router]);
+    // If no active trip, we render an explicit empty state instead of redirecting.
 
     const getPlayer = (id: string): Player | undefined => {
         return players.find(p => p.id === id);
@@ -141,13 +144,56 @@ export default function BetDetailPage() {
         showToast('success', 'Bet reopened');
     };
 
-    if (!bet || !currentTrip) {
+    if (!currentTrip) {
+        return (
+            <div
+                className="min-h-screen pb-24 page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <EmptyStatePremium
+                        illustration="trophy"
+                        title="No trip selected"
+                        description="Pick a trip to view side bets."
+                        action={{
+                            label: 'Back to Home',
+                            onClick: () => router.push('/'),
+                        }}
+                        variant="large"
+                    />
+                </main>
+            </div>
+        );
+    }
+
+    if (bet === null) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
                 <div className="animate-pulse text-center">
                     <DollarSign size={48} className="mx-auto mb-4 opacity-50" />
                     <p>Loading bet...</p>
                 </div>
+            </div>
+        );
+    }
+
+    if (bet === undefined) {
+        return (
+            <div
+                className="min-h-screen pb-24 page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <ErrorEmpty message="We couldn't find that bet." />
+                    <div className="mt-6 flex justify-center">
+                        <button
+                            onClick={() => router.push('/bets')}
+                            className="btn btn-primary"
+                        >
+                            Back to Bets
+                        </button>
+                    </div>
+                </main>
             </div>
         );
     }

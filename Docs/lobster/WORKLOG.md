@@ -20,3 +20,6 @@
 
 ## 2026-02-04 13:20 EST — Phase 1 (batch 6)
 - Schedule page: removed auto-redirect when no trip is selected; now consistently renders the premium empty state instead of bouncing back home.
+
+## 2026-02-04 14:20 EST — Phase 1 (batch 7)
+- Bet Detail page: replaced the ambiguous “Loading bet…” screen with explicit states for: no trip selected (premium empty), loading (pulse), and bet not found (error + back to Bets). No more infinite loading when a bet ID is missing.
