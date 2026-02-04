@@ -20,6 +20,7 @@ import {
     Edit2,
     Trash2,
     Flag,
+    AlertCircle,
     X,
 } from 'lucide-react';
 
@@ -51,7 +52,8 @@ export default function BetDetailPage() {
     const linkedMatch = useLiveQuery(
         async () => {
             if (!bet?.matchId) return null;
-            return db.matches.get(bet.matchId);
+            const match = await db.matches.get(bet.matchId);
+            return match ?? null;
         },
         [bet?.matchId]
     );
@@ -292,6 +294,41 @@ export default function BetDetailPage() {
                 </div>
 
                 {/* Linked Match */}
+                {bet.matchId && linkedMatch === undefined && (
+                    <div
+                        className="card"
+                        style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}
+                    >
+                        <div className="flex items-center gap-3 animate-pulse">
+                            <Flag size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                            <div className="flex-1">
+                                <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+                                    Loading linked match…
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {bet.matchId && linkedMatch === null && (
+                    <div
+                        className="card"
+                        style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}
+                    >
+                        <div className="flex items-start gap-3">
+                            <AlertCircle size={20} style={{ color: 'var(--warning)', marginTop: 2 }} />
+                            <div className="flex-1">
+                                <p className="type-body-sm" style={{ fontWeight: 600 }}>
+                                    Linked match not found
+                                </p>
+                                <p className="type-caption mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                                    This bet is linked to a match that isn’t available on this device yet.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {linkedMatch && (
                     <div
                         className="card"
