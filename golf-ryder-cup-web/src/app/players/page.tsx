@@ -17,7 +17,12 @@ import {
   Plus,
   Check,
 } from 'lucide-react';
-import { NoPlayersPremiumEmpty, PageSkeleton, PlayerListSkeleton } from '@/components/ui';
+import {
+  EmptyStatePremium,
+  NoPlayersPremiumEmpty,
+  PageSkeleton,
+  PlayerListSkeleton,
+} from '@/components/ui';
 
 // Bulk player entry row type
 interface BulkPlayerRow {
@@ -77,11 +82,7 @@ export default function PlayersPage() {
     Array(4).fill(null).map(createEmptyRow)
   );
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // If no active trip, we show a premium empty state instead of redirecting.
 
   const getPlayerTeam = (playerId: string) => {
     const membership = teamMembers.find((tm) => tm.playerId === playerId);
@@ -258,12 +259,15 @@ export default function PlayersPage() {
 
   if (!currentTrip) {
     return (
-      <PageSkeleton>
-        <div className="space-y-4 mt-4">
-          <PlayerListSkeleton count={4} />
-          <PlayerListSkeleton count={4} />
-        </div>
-      </PageSkeleton>
+      <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
+        <EmptyStatePremium
+          illustration="trophy"
+          title="No active trip"
+          description="Start or select a trip to manage players."
+          action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+          variant="large"
+        />
+      </div>
     );
   }
 

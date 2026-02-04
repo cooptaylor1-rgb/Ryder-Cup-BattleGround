@@ -13,3 +13,7 @@
 ## 2026-02-04 12:05 EST — Phase 1 (batch 4)
 - Trip Stats: replaced the Category Leaders widget’s silent `return null` with an explicit “No leaders yet” card.
 - Trip Awards: replaced silent `return null` winner showcase with an explicit “No award winners yet” state, and upgraded the “No active trip” screen to `EmptyStatePremium`.
+
+## 2026-02-04 13:05 EST — Phase 1 (batch 5)
+- Players page: removed auto-redirect when no trip is selected; now shows a premium empty state with a clear CTA back home.
+- Standings page: removed auto-redirect when no trip is selected; now shows a premium empty state with a clear CTA back home (loading skeleton remains for real data loads).

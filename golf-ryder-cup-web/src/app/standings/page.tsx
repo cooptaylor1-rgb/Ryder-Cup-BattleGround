@@ -34,7 +34,7 @@ import {
   Star,
   Medal,
 } from 'lucide-react';
-import { NoStandingsPremiumEmpty } from '@/components/ui';
+import { EmptyStatePremium, NoStandingsPremiumEmpty } from '@/components/ui';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -73,11 +73,7 @@ export default function StandingsPage() {
     []
   );
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // If there is no active trip selected, we show a premium empty state instead of redirecting.
 
   useEffect(() => {
     const loadStandings = async () => {
@@ -106,8 +102,25 @@ export default function StandingsPage() {
     loadStandings();
   }, [currentTrip, showToast]);
 
-  // Show loading skeleton while data loads or redirecting
-  if (!currentTrip || isLoading) {
+  if (!currentTrip) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <EmptyStatePremium
+          illustration="trophy"
+          title="No active trip"
+          description="Start or select a trip to view standings."
+          action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+          variant="large"
+        />
+      </div>
+    );
+  }
+
+  // Show loading skeleton while data loads
+  if (isLoading) {
     return (
       <div
         className="min-h-screen pb-nav page-premium-enter texture-grain"
