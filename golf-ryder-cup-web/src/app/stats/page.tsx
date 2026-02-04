@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTripStore } from '@/lib/stores';
-import { BarChart3, ChevronLeft, Award, Trophy, CalendarDays } from 'lucide-react';
+import { BarChart3, Award, Trophy, CalendarDays } from 'lucide-react';
+import { PageHeader } from '@/components/layout';
 
 /**
  * STATS HUB
@@ -19,42 +20,12 @@ export default function StatsPage() {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-      <header className="header-premium">
-        <div className="container-editorial flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 press-scale"
-            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            aria-label="Back"
-          >
-            <ChevronLeft size={22} strokeWidth={1.75} />
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: 'var(--shadow-glow-green)',
-              }}
-            >
-              <BarChart3 size={16} style={{ color: 'var(--color-accent)' }} />
-            </div>
-            <div>
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                Stats
-              </span>
-              <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                {currentTrip?.name ? currentTrip.name : 'No active trip'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Stats"
+        subtitle={currentTrip?.name ? currentTrip.name : 'No active trip'}
+        icon={<BarChart3 size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
 
       <main className="container-editorial">
         <section className="section">

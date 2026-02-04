@@ -34,6 +34,7 @@
      Warm, paper-like surfaces.
      Not stark white, not cold gray. */
   --canvas: #fdfcfa;
+  --canvas-rgb: 253, 252, 250;
   --canvas-raised: #ffffff;
   --canvas-sunken: #f7f6f3;
   --canvas-warm: #faf9f6;
@@ -55,7 +56,9 @@
   /* ---- BRAND ----
      Masters green — timeless, dignified */
   --masters: #006644;
+  --masters-rgb: 0, 102, 68;
   --masters-hover: #007a52;
+  --masters-deep: #004d33;
   --masters-subtle: #e8f5f0;
   --masters-glow: rgba(0, 102, 68, 0.08);
 
@@ -2278,6 +2281,7 @@ html.outdoor:root {
   /* ---- CANVAS (Outdoor) ----
      Pure white backgrounds for maximum brightness */
   --canvas: #ffffff !important;
+  --canvas-rgb: 255, 255, 255 !important;
   --canvas-raised: #ffffff !important;
   --canvas-sunken: #f5f5f5 !important;
   --canvas-warm: #ffffff !important;
@@ -2298,6 +2302,7 @@ html.outdoor:root {
   /* ---- BRAND (Outdoor) ----
      Deeper green for sunlight visibility */
   --masters: #004d33 !important;
+  --masters-rgb: 0, 77, 51 !important;
   --masters-hover: #006644 !important;
   --masters-deep: #003d29 !important;
   --masters-subtle: #e8f5f0 !important;
@@ -2423,6 +2428,7 @@ html.outdoor body {
   :root {
     /* ---- CANVAS (Dark) ---- */
     --canvas: #0d0b08;
+    --canvas-rgb: 13, 11, 8;
     --canvas-raised: #181512;
     --canvas-sunken: #080706;
     --canvas-warm: #121010;
@@ -2479,6 +2485,7 @@ html.outdoor body {
 
     /* ---- MASTERS GREEN (Dark Mode) ---- */
     --masters: #00b87a;
+    --masters-rgb: 0, 184, 122;
     --masters-hover: #00d88e;
     --masters-subtle: rgba(0, 184, 122, 0.12);
     --masters-glow: rgba(0, 184, 122, 0.25);

@@ -8,7 +8,8 @@ import { useTripStore, useScoringStore, useAuthStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Target } from 'lucide-react';
+import { ChevronRight, Target } from 'lucide-react';
+import { PageHeader } from '@/components/layout';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 import {
@@ -96,8 +97,20 @@ export default function ScorePage() {
         []
     );
 
-    const matchStates: MatchState[] = matches.map(match => {
-        const results = holeResults.filter(r => r.matchId === match.id);
+    // PERF: Pre-index hole results by matchId to avoid O(n*m) filtering each render.
+    const holeResultsByMatchId = useMemo(() => {
+        const list = holeResults ?? [];
+        const map = new Map<string, typeof list>();
+        for (const r of list) {
+            const arr = map.get(r.matchId) ?? [];
+            arr.push(r);
+            map.set(r.matchId, arr);
+        }
+        return map;
+    }, [holeResults]);
+
+    const matchStates: MatchState[] = (matches ?? []).map(match => {
+        const results = holeResultsByMatchId.get(match.id) ?? [];
         return calculateMatchState(match, results);
     });
 
@@ -146,41 +159,12 @@ export default function ScorePage() {
 
     return (
         <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-            {/* Premium Header */}
-            <header className="header-premium">
-                <div className="container-editorial flex items-center gap-3">
-                    <button
-                        onClick={() => router.back()}
-                        className="p-2 -ml-2 press-scale"
-                        style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                        aria-label="Back"
-                    >
-                        <ChevronLeft size={22} strokeWidth={1.75} />
-                    </button>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                        <div
-                            style={{
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: 'var(--radius-md)',
-                                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: 'var(--shadow-glow-green)',
-                            }}
-                        >
-                            <Target size={16} style={{ color: 'var(--color-accent)' }} />
-                        </div>
-                        <div>
-                            <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Score</span>
-                            <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                                {currentTrip.name}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <PageHeader
+                title="Score"
+                subtitle={currentTrip.name}
+                icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                onBack={() => router.back()}
+            />
 
             <main className="container-editorial">
                 {/* Session Header */}

@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft, CalendarDays } from 'lucide-react';
-import { NoSessionsPremiumEmpty, PageSkeleton, PlayerListSkeleton } from '@/components/ui';
+import { EmptyStatePremium, NoSessionsPremiumEmpty } from '@/components/ui';
 
 /**
  * MATCHUPS PAGE — Team Rosters & Sessions
@@ -23,11 +22,7 @@ export default function MatchupsPage() {
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore();
   const { isCaptainMode } = useUIStore();
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // If no active trip selected, show an explicit empty state (no redirect).
 
   const getTeamPlayers = (teamId: string) => {
     const memberIds = teamMembers
@@ -43,12 +38,20 @@ export default function MatchupsPage() {
 
   if (!currentTrip) {
     return (
-      <PageSkeleton>
-        <div className="space-y-4 mt-4">
-          <PlayerListSkeleton count={4} />
-          <PlayerListSkeleton count={4} />
-        </div>
-      </PageSkeleton>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No active trip"
+            description="Start or select a trip to view matchups."
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            variant="large"
+          />
+        </main>
+      </div>
     );
   }
 

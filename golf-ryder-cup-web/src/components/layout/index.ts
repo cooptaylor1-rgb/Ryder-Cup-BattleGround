@@ -9,6 +9,7 @@ export { AppShell } from './AppShell';
 export { Header } from './Header';
 export { BottomNav, type NavBadges } from './BottomNav';
 export { SidebarNav } from './SidebarNav';
+export { PageHeader } from './PageHeader';
 
 // Legacy aliases for backwards compatibility
 export { AppShell as AppShellNew } from './AppShell';

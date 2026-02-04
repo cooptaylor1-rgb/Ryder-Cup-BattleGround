@@ -19,7 +19,6 @@ import type { Award, PlayerStats } from '@/lib/types/awards';
 import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
 import {
   Trophy,
-  ChevronLeft,
   Crown,
   Flame,
   Zap,
@@ -30,6 +29,7 @@ import {
   Medal,
 } from 'lucide-react';
 import { EmptyStatePremium, NoStandingsPremiumEmpty } from '@/components/ui';
+import { PageHeader } from '@/components/layout';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -222,49 +222,12 @@ export default function StandingsPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 press-scale"
-            style={{
-              color: 'var(--ink-secondary)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: 'var(--radius-md)',
-            }}
-            aria-label="Back"
-          >
-            <ChevronLeft size={22} strokeWidth={1.75} />
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: 'var(--shadow-glow-green)',
-              }}
-            >
-              <Trophy size={16} style={{ color: 'var(--color-accent)' }} />
-            </div>
-            <div>
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                Standings
-              </span>
-              <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                {currentTrip.name}
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Standings"
+        subtitle={currentTrip.name}
+        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
 
       {/* Tab Navigation */}
       <div
