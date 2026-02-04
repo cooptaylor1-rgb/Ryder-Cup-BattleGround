@@ -885,7 +885,30 @@ export default function EnhancedMatchScoringPage() {
       {/* Celebration Overlay - Lazy loaded for performance */}
       <AnimatePresence>
         {celebration && (
-          <Suspense fallback={null}>
+          <Suspense
+            fallback={
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center"
+                style={{ background: 'rgba(0,0,0,0.35)' }}
+                role="status"
+                aria-live="polite"
+                aria-label="Loading celebration"
+              >
+                <div
+                  className="flex items-center gap-2 px-4 py-2 rounded-full"
+                  style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}
+                >
+                  <span
+                    className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                    style={{ borderColor: 'var(--masters)', borderTopColor: 'transparent' }}
+                  />
+                  <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                    Loading…
+                  </span>
+                </div>
+              </div>
+            }
+          >
             <ScoreCelebration
               type={celebration.type}
               winner={celebration.winner}

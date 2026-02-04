@@ -6,3 +6,6 @@
 
 ## 2026-02-04 10:05 EST — Phase 1 (batch 2)
 - Bet Detail page: eliminated a silent “missing linked match” section by distinguishing loading vs missing vs present match states and showing a clear inline warning instead of rendering nothing.
+
+## 2026-02-04 11:55 EST — Phase 1 (batch 3)
+- Match scoring page: removed a user-facing blank state by replacing `Suspense` `fallback={null}` (ScoreCelebration lazy load) with an explicit loading overlay.
