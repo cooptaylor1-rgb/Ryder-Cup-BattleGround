@@ -24,6 +24,19 @@
   - `pnpm -C golf-ryder-cup-web typecheck` ✅
   - `git diff --stat` reviewed
 
+### Phase 1 (batch 11): crash-proof user→player matching
+- `golf-ryder-cup-web/src/app/schedule/page.tsx`
+- `golf-ryder-cup-web/src/app/score/page.tsx`
+  - Hardened the current-user-to-player lookup so it won’t throw when `firstName`/`lastName` are missing on either side.
+  - Keeps the route from blanking due to an unhandled `toLowerCase()` on `undefined` in name-only matching.
+
+### Checks / gates
+- Lobster checkpoint:
+  - `pnpm -C golf-ryder-cup-web lint` ✅
+  - `pnpm -C golf-ryder-cup-web typecheck` ✅
+  - Approval gate run ✅
+- Pre-push gate (repo hook): `typecheck` + `test` + `build` ✅
+
 ### Next
 - Sweep remaining user-facing routes that still gate on `return null` / redirect-to-home patterns.
 - Continue Phase 1 checklist from `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`.

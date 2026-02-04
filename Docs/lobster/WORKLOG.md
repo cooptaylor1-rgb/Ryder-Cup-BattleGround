@@ -34,4 +34,9 @@
 - Schedule page: standardized loading state to `PageLoadingSkeleton` and upgraded “no matches / no sessions / no events” sections to `EmptyStatePremium` (no more dead `isLoading` rendering).
 - Match scoring page: replaced spinner + bespoke error/missing screens with `PageLoadingSkeleton`, `ErrorEmpty`, and `EmptyStatePremium` for consistent non-blank states.
 - Standings + Home: tightened loading/empty state handling (no redirects/blank renders) and cleaned up lint (unused imports).
-- Commit created locally; push pending due to missing GitHub HTTPS credentials on this host.
+- Commit created locally; push completed.
+
+## 2026-02-04 18:30 EST — Phase 1 (batch 11)
+- Schedule + Score list pages: hardened current-user-to-player matching to avoid crashes when either side has missing `firstName`/`lastName` fields (prevents rare blank screens on name-only matching).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
