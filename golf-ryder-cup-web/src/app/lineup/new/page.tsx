@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import type { SessionType } from '@/lib/types';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
+import { EmptyStatePremium } from '@/components/ui';
 
 /**
  * NEW SESSION / LINEUP PAGE
@@ -756,13 +757,23 @@ export default function NewLineupPage() {
                   </label>
 
                   {/* Format Categories */}
-                  {FORMAT_CATEGORIES.map((category) => {
-                    const categoryFormats = displayedFormats.filter(
-                      (f) => f.category === category.value
-                    );
-                    // Don't render empty categories when filtering
-                    if (categoryFormats.length === 0) return null;
-                    return (
+                  {displayedFormats.length === 0 ? (
+                    <div style={{ padding: 'var(--space-4) 0' }}>
+                      <EmptyStatePremium
+                        illustration="trophy"
+                        title="No formats found"
+                        description="Try adjusting your filters or toggling Advanced options."
+                        variant="compact"
+                      />
+                    </div>
+                  ) : (
+                    FORMAT_CATEGORIES.map((category) => {
+                      const categoryFormats = displayedFormats.filter(
+                        (f) => f.category === category.value
+                      );
+                      // Don't render empty categories when filtering
+                      if (categoryFormats.length === 0) return null;
+                      return (
                       <div key={category.value} className="mb-6">
                         <div className="flex items-center gap-2 mb-3">
                           <p
@@ -857,7 +868,8 @@ export default function NewLineupPage() {
                         </div>
                       </div>
                     );
-                  })}
+                  })
+                  )}
 
                   {/* Show All / Show Less Formats toggle */}
                   <div className="text-center mt-4">

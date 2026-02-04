@@ -40,3 +40,6 @@
 - Schedule + Score list pages: hardened current-user-to-player matching to avoid crashes when either side has missing `firstName`/`lastName` fields (prevents rare blank screens on name-only matching).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅
+
+## 2026-02-04 18:55 EST — Phase 1 (batch 12)
+- New Lineup / Session page: added an explicit `EmptyStatePremium` when format filters produce zero options (prevents a confusing “blank section” under Format when nothing matches).
