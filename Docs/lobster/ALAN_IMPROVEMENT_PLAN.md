@@ -7,17 +7,18 @@ Goal: run the Ryder Cup “Production Improvement Plan” as resumable Lobster w
 
 ## Prereqs
 - Lobster CLI installed: `lobster version`
-- Workdir: `/Users/agent/clawd/Ryder-Cup-BattleGround`
+- Workdir: the repo root (avoid absolute paths). From anywhere inside the repo:
+  - `cd "$(git rev-parse --show-toplevel)"`
 
 ## Core pipeline: verify + checkpoint + commit gate
 
 Run this after each batch of route fixes.
 
 ```bash
-cd /Users/agent/clawd/Ryder-Cup-BattleGround
+cd "$(git rev-parse --show-toplevel)"
 lobster run --mode tool \
-  "exec --shell 'cd golf-ryder-cup-web && pnpm -s lint' \
-   | exec --shell 'cd golf-ryder-cup-web && pnpm -s typecheck' \
+  "exec --shell 'pnpm -C golf-ryder-cup-web -s lint' \
+   | exec --shell 'pnpm -C golf-ryder-cup-web -s typecheck' \
    | exec --shell 'git status --porcelain' \
    | exec --shell 'git --no-pager diff --stat' \
    | approve --prompt 'Create commit for current batch? (approve=yes to proceed)' --emit"

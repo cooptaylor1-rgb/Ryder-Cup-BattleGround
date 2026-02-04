@@ -23,3 +23,6 @@
 
 ## 2026-02-04 14:20 EST — Phase 1 (batch 7)
 - Bet Detail page: replaced the ambiguous “Loading bet…” screen with explicit states for: no trip selected (premium empty), loading (pulse), and bet not found (error + back to Bets). No more infinite loading when a bet ID is missing.
+
+## 2026-02-04 14:32 EST — Phase 1 (batch 8)
+- Lobster plan: removed hard-coded absolute workdir paths and switched to `git rev-parse --show-toplevel` + `pnpm -C` so the checkpoint workflow runs reliably from any checkout location.
