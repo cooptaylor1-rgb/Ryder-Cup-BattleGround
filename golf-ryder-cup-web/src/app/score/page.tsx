@@ -2,17 +2,21 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useScoringStore, useAuthStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
-import { ChevronRight, ChevronLeft, Home, Target, Users, Trophy, MoreHorizontal, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Target } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
-import { NoScoresPremiumEmpty, PageSkeleton, MatchCardSkeleton, ErrorBoundary } from '@/components/ui';
+import {
+  EmptyStatePremium,
+  ErrorBoundary,
+  NoScoresPremiumEmpty,
+} from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 /**
  * SCORE PAGE — Match List
@@ -46,11 +50,6 @@ export default function ScorePage() {
     // Track selected session - default to active or first available
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!currentTrip) {
-            router.push('/');
-        }
-    }, [currentTrip, router]);
 
     // Determine the default active session (in progress or scheduled)
     const defaultActiveSession = sessions.find(s => s.status === 'inProgress') ||
@@ -124,13 +123,24 @@ export default function ScorePage() {
 
     if (!currentTrip) {
         return (
-            <PageSkeleton>
-                <div className="space-y-4 mt-4">
-                    <MatchCardSkeleton />
-                    <MatchCardSkeleton />
-                    <MatchCardSkeleton />
-                </div>
-            </PageSkeleton>
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <EmptyStatePremium
+                        illustration="scorecard"
+                        title="No trip selected"
+                        description="Pick a trip to view matches and scoring."
+                        action={{
+                            label: 'Back to Home',
+                            onClick: () => router.push('/'),
+                        }}
+                        variant="large"
+                    />
+                </main>
+                <BottomNav />
+            </div>
         );
     }
 
@@ -269,32 +279,7 @@ export default function ScorePage() {
             </main>
 
             {/* Bottom Navigation */}
-            <nav className="nav-premium bottom-nav">
-                <Link href="/" className="nav-item">
-                    <Home size={22} strokeWidth={1.75} />
-                    <span>Home</span>
-                </Link>
-                <Link href="/schedule" className="nav-item">
-                    <CalendarDays size={22} strokeWidth={1.75} />
-                    <span>Schedule</span>
-                </Link>
-                <Link href="/score" className="nav-item nav-item-active">
-                    <Target size={22} strokeWidth={1.75} />
-                    <span>Score</span>
-                </Link>
-                <Link href="/matchups" className="nav-item">
-                    <Users size={22} strokeWidth={1.75} />
-                    <span>Matches</span>
-                </Link>
-                <Link href="/standings" className="nav-item">
-                    <Trophy size={22} strokeWidth={1.75} />
-                    <span>Standings</span>
-                </Link>
-                <Link href="/more" className="nav-item">
-                    <MoreHorizontal size={22} strokeWidth={1.75} />
-                    <span>More</span>
-                </Link>
-            </nav>
+            <BottomNav />
         </div>
     );
 }
