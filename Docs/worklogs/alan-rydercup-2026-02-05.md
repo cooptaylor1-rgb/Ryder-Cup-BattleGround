@@ -93,6 +93,13 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`774b4e9`)
 
+### Phase 1 (batch 24): Trip Stats + Awards — bottom nav + premium wrapper
+- `golf-ryder-cup-web/src/app/trip-stats/page.tsx`
+- `golf-ryder-cup-web/src/app/trip-stats/awards/page.tsx`
+  - Wrapped the Trip Stats and Trip Awards pages in the standard premium page container (`min-h-screen pb-nav page-premium-enter texture-grain` with canvas background).
+  - Added `BottomNav` so both pages keep a clear navigation path, including in empty-state scenarios (no active trip / no stats).
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
