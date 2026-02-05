@@ -531,6 +531,7 @@ function FunStatsTab({
     leader: string;
   }[];
 }) {
+  const router = useRouter();
   const categories = [
     {
       key: 'golf_highlights',
@@ -616,7 +617,7 @@ function FunStatsTab({
             action={{
               label: 'Go score a match',
               onClick: () => {
-                window.location.href = '/matchups';
+                router.push('/matchups');
               },
               icon: <TrendingUp size={18} strokeWidth={2} />,
             }}
@@ -734,7 +735,7 @@ function FunStatsTab({
             action={{
               label: 'Start Tracking',
               onClick: () => {
-                window.location.href = '/trip-stats';
+                router.push('/trip-stats');
               },
               icon: <Star size={18} strokeWidth={2} />,
             }}
