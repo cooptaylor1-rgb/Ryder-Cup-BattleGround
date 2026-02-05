@@ -26,7 +26,7 @@ All times America/New_York.
 
 ## 2026-02-06
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
-- 10:05 — Shipped batch: Profile Create (`/profile/create`) now includes the standard premium wrapper + `BottomNav`, and the fixed bottom actions are lifted above the nav height so onboarding screens aren’t dead ends. (commit TBD)
+- 10:05 — Shipped batch: Profile Create (`/profile/create`) now includes the standard premium wrapper + `BottomNav`, and the fixed bottom actions are lifted above the nav height so onboarding screens aren’t dead ends. (commit 016fe81)
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
 - 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)
 - 03:45 — Shipped batch: Worklog sync — ensured the web worklog reflects the shipped Phase 1 improvements so in-repo history matches Lobster worklog. (commit b039ec6)
