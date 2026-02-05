@@ -17,6 +17,7 @@ import {
   Navigation,
 } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
+import { BottomNav } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 // Toggle component - defined outside of render
@@ -79,7 +80,7 @@ export default function ScoringSettingsPage() {
   const { scoringPreferences, updateScoringPreference, resetScoringPreferences } = useUIStore();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-nav bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center gap-3 px-4 py-3">
@@ -326,6 +327,7 @@ export default function ScoringSettingsPage() {
           Reset to Defaults
         </button>
       </main>
+      <BottomNav />
     </div>
   );
 }

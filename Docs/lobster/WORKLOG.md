@@ -199,3 +199,11 @@
 - Course Database Search modal: added `BottomNav` + `pb-nav` so users can always navigate out.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`0b57d6f`)
+
+## 2026-02-05 04:20 EST — Phase 1 (batch 39)
+- Achievements (`/achievements`): replaced the bespoke bottom navigation with the shared `BottomNav` component so nav is consistent across the app.
+- Achievements: added `BottomNav` to the no-trip and loading states (no dead ends).
+- Settings — Appearance/Scoring/Notifications: added `pb-nav` and `BottomNav` so users can always navigate back to the main spine.
+- Notifications settings: removed the page-local fixed nav + `NavItem` in favor of shared `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (TBD)

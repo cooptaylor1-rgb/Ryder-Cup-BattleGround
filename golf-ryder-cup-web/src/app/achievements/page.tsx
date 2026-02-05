@@ -2,19 +2,17 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+// (Link removed; BottomNav provides navigation)
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
 import { EmptyStatePremium } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
+import { BottomNav } from '@/components/layout';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
   ChevronLeft,
-  Home,
-  Target,
   Users,
   Trophy,
-  MoreHorizontal,
   Award,
   Star,
   Flame,
@@ -24,7 +22,6 @@ import {
   Lock,
   Check,
   TrendingUp,
-  CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -224,6 +221,7 @@ export default function AchievementsPage() {
             }}
           />
         </main>
+        <BottomNav />
       </div>
     );
   }
@@ -252,6 +250,7 @@ export default function AchievementsPage() {
             ))}
           </div>
         </main>
+        <BottomNav />
       </div>
     );
   }
@@ -368,33 +367,7 @@ export default function AchievementsPage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

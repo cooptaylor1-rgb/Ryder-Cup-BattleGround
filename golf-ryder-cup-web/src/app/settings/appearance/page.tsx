@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Palette, Moon, Sun, Mountain, Shield, ChevronRight } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
+import { BottomNav } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
@@ -29,7 +30,7 @@ export default function AppearanceSettingsPage() {
   const { theme, setTheme, autoTheme, setAutoTheme, accentTheme, setAccentTheme } = useUIStore();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pb-nav bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center gap-3 px-4 py-3">
           <Link href="/settings" className="p-2 -m-2 text-gray-600 hover:text-gray-900">
@@ -136,6 +137,7 @@ export default function AppearanceSettingsPage() {
           </Link>
         </section>
       </main>
+      <BottomNav />
     </div>
   );
 }

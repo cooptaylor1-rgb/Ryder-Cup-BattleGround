@@ -22,10 +22,6 @@ import {
     ClipboardList,
     Check,
     AlertCircle,
-    Home,
-    CalendarDays,
-    Target,
-    MoreHorizontal,
 } from 'lucide-react';
 import {
     requestNotificationPermission,
@@ -36,6 +32,7 @@ import {
     type NotificationPreferences,
 } from '@/lib/services/notificationService';
 import { useTripStore } from '@/lib/stores';
+import { BottomNav } from '@/components/layout';
 
 export default function NotificationSettingsPage() {
     const { currentTrip } = useTripStore();
@@ -100,7 +97,7 @@ export default function NotificationSettingsPage() {
     const isNotificationsSupported = typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-        <div className="min-h-screen flex flex-col bg-(--paper)">
+        <div className="min-h-screen pb-nav flex flex-col bg-(--paper)">
             {/* Header */}
             <header className="sticky top-0 z-40 bg-(--paper) border-b border-(--rule)">
                 <div className="flex items-center justify-between px-4 py-3">
@@ -118,7 +115,7 @@ export default function NotificationSettingsPage() {
             </header>
 
             {/* Content */}
-            <main className="flex-1 px-4 py-6 space-y-6 pb-24">
+            <main className="flex-1 px-4 py-6 space-y-6 pb-8">
                 {/* Saved Message */}
                 {savedMessage && (
                     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-(--masters) text-white text-sm font-medium flex items-center gap-2 shadow-lg animate-fadeIn">
@@ -289,16 +286,7 @@ export default function NotificationSettingsPage() {
                 )}
             </main>
 
-            {/* Bottom Navigation */}
-            <nav className="fixed bottom-0 inset-x-0 bg-(--paper) border-t border-(--rule) px-2 pb-safe z-50">
-                <div className="flex justify-around py-2">
-                    <NavItem href="/" icon={Home} label="Home" />
-                    <NavItem href="/schedule" icon={CalendarDays} label="Schedule" />
-                    <NavItem href="/score" icon={Target} label="Score" />
-                    <NavItem href="/standings" icon={Trophy} label="Standings" />
-                    <NavItem href="/more" icon={MoreHorizontal} label="More" active />
-                </div>
-            </nav>
+            <BottomNav />
         </div>
     );
 }
@@ -373,32 +361,4 @@ function SettingToggle({
     );
 }
 
-function NavItem({
-    href,
-    icon: Icon,
-    label,
-    active,
-}: {
-    href: string;
-    icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-    label: string;
-    active?: boolean;
-}) {
-    return (
-        <Link
-            href={href}
-            className="flex flex-col items-center gap-0.5 px-3 py-1.5"
-        >
-            <Icon
-                className="w-6 h-6"
-                style={{ color: active ? 'var(--masters)' : 'var(--ink-muted)' }}
-            />
-            <span
-                className="text-xs"
-                style={{ color: active ? 'var(--masters)' : 'var(--ink-muted)' }}
-            >
-                {label}
-            </span>
-        </Link>
-    );
-}
+// (BottomNav used instead of a local NavItem)
