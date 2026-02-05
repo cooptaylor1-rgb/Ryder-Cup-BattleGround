@@ -24,6 +24,7 @@ All times America/New_York.
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
 - 23:58 — Shipped batch: added `BottomNav` + standardized premium wrappers to Players + Standings (including no-trip and loading states). (commit 659edbb)
 - 10:20 — Shipped batch: Scoring match detail (`/score/[matchId]`) now shows an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and includes `BottomNav` so deep links aren’t dead ends when unauthenticated. (commit 278add9)
+- 10:45 — Shipped batch: Standings Fun Stats tab now uses the standard `EmptyStatePremium` for the “No stats yet” state, with a clear CTA to start tracking Trip Stats. (commit TBD)
 
 ## 2026-02-06
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)

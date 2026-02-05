@@ -268,3 +268,8 @@
 ## 2026-02-05 10:20 EST — Phase 1 (batch 50)
 - Scoring match detail (`/score/[matchId]`): added an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and included `BottomNav` so deep links aren’t blank/dead ends when unauthenticated.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+## 2026-02-05 10:45 EST — Phase 1 (batch 51)
+- Standings: replaced the ad-hoc “No Stats Yet” block in the Fun Stats tab with the standard `EmptyStatePremium` so empty content is consistent and actionable.
+- Added a clear CTA to start tracking Trip Stats.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

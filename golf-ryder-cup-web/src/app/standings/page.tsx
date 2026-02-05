@@ -715,20 +715,20 @@ function FunStatsTab({
           );
         })
       ) : (
-        <div className="text-center" style={{ padding: 'var(--space-12) var(--space-4)' }}>
-          <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>📊</div>
-          <h3 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>
-            No Stats Yet
-          </h3>
-          <p
-            className="type-body"
-            style={{ color: 'var(--ink-tertiary)', marginBottom: 'var(--space-6)' }}
-          >
-            Track beverages, mishaps, highlights and more during your rounds!
-          </p>
-          <Link href="/trip-stats" className="btn btn-primary">
-            Start Tracking
-          </Link>
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No stats yet"
+            description="Track beverages, mishaps, highlights, and more during your rounds."
+            action={{
+              label: 'Start Tracking',
+              onClick: () => {
+                window.location.href = '/trip-stats';
+              },
+              icon: <Star size={18} strokeWidth={2} />,
+            }}
+            variant="compact"
+          />
         </div>
       )}
 

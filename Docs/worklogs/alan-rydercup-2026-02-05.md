@@ -5,6 +5,13 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 51): Standings — Fun Stats empty state uses EmptyStatePremium
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Replaced the ad-hoc “No Stats Yet” card in the Fun Stats tab with the standard `EmptyStatePremium` for consistent premium empty states.
+  - Included a clear CTA to start tracking `/trip-stats`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅
+
 ### Phase 1 (batch 49): Profile Create — keep BottomNav visible + lift fixed actions
 - `golf-ryder-cup-web/src/app/profile/create/page.tsx`
   - Added `BottomNav` so profile creation is never a navigation dead end.
