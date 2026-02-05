@@ -10,13 +10,11 @@ import {
   User,
   Mail,
   Hash,
-  Phone,
   ArrowLeft,
   Check,
   ChevronRight,
   Shirt,
   Home,
-  AlertCircle,
   Lock,
   Sparkles,
 } from 'lucide-react';

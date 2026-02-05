@@ -330,8 +330,8 @@ function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-// Format explanations for tooltips
-const FORMAT_EXPLANATIONS: Record<string, string> = {
+// Format explanations for tooltips (reserved for future tooltip UI)
+const _FORMAT_EXPLANATIONS: Record<string, string> = {
   foursomes:
     'Partners share one ball, taking turns hitting. Strategic and builds teamwork. Classic Ryder Cup format.',
   fourball:
@@ -386,7 +386,7 @@ export default function NewLineupPage() {
   const [pointsPerMatch, setPointsPerMatch] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [tooltipFormat, setTooltipFormat] = useState<string | null>(null);
+  const [_tooltipFormat, _setTooltipFormat] = useState<string | null>(null);
   const [showAllFormats, setShowAllFormats] = useState(false);
 
   // Filter formats: show popular by default, all when expanded

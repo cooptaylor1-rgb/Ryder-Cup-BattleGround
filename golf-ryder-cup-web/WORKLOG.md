@@ -43,5 +43,13 @@ All times America/New_York.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
 - Commit + push ✅ (`72d4c29`)
 
+## 2026-02-05 06:05 EST — Phase 1 (batch 42)
+- Cleanup: removed / underscored unused variables to reduce lint noise.
+  - New Lineup (`/lineup/new`): reserved format tooltip constants/state now uses underscore naming to avoid unused-var warnings until the tooltip UI lands.
+  - Create Profile (`/profile/create`): removed unused icon imports.
+  - PendingSyncIndicator: use `catch {}` for the pending-count refresh path (no unused catch param).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
+- Commit + push ✅ (`TBD`)
+
 ## 2026-02-06
 - 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)

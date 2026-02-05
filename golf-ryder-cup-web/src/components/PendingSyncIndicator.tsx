@@ -19,7 +19,7 @@ export function usePendingSyncQueue() {
     try {
       const count = await getPendingScoreCount();
       setPendingCount(count);
-    } catch (error) {
+    } catch {
       // Silently fail - DB might not be initialized
     }
   }, []);
