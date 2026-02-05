@@ -262,3 +262,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 15:55 EST — Phase 1 (batch 59)
 - Settings — Notifications (`/settings/notifications`): upgraded to the standard premium wrapper and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
 - Commit + push ✅ (`354e05a`)
+
+### 16:25 EST — Phase 1 (batch 60)
+- Captain Bets: winner selection button list now uses `flatMap()` to prefilter valid participants instead of `return null` inside a `map()`.
+- Commit + push ✅ (`0805cd2`)
