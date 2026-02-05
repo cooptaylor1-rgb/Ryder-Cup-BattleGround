@@ -130,6 +130,14 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`85f9312`)
 
+### Phase 1 (batch 34): Spectator mode — explicit load-error state
+- `golf-ryder-cup-web/src/app/spectator/[tripId]/page.tsx`
+  - Added an explicit load-error state (Retry + Go Home) so transient load failures don’t show a misleading “Tournament Not Found” screen.
+  - Preserved the previously-loaded scoreboard view on refresh failures so the screen doesn’t blank.
+  - Added a compact header error badge when the latest refresh fails.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`a288c13`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.

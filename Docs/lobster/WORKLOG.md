@@ -172,3 +172,10 @@
 - New Session / Lineup: replaced the skeleton-only gate with explicit premium empty states for **No trip selected** and **Captain Mode required**, each with clear CTAs and `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`a8dc84c`)
+
+## 2026-02-05 01:40 EST — Phase 1 (batch 34)
+- Spectator mode (`/spectator/[tripId]`): added an explicit load-error state (Retry + Go Home) so transient DB failures don’t show a misleading “Tournament Not Found” screen.
+- Spectator mode: preserve the previously-loaded view on refresh failures so the screen doesn’t blank.
+- Added a compact header error badge when the latest refresh fails.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`a288c13`)
