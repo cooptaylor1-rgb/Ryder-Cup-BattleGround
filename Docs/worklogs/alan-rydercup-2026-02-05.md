@@ -12,6 +12,15 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`1de47dc`)
 
+### Phase 1 (batch 54): Settings subpages — premium wrapper + PageHeader consistency
+- `golf-ryder-cup-web/src/app/settings/appearance/page.tsx`
+- `golf-ryder-cup-web/src/app/settings/scoring/page.tsx`
+  - Upgraded both subpages to the standard premium wrapper (`page-premium-enter`, `texture-grain`, `pb-nav`, `var(--canvas)` background).
+  - Replaced bespoke sticky headers with the shared `PageHeader` pattern for consistency.
+  - Scoring settings: aligned toggles to the actual `ScoringPreferences` keys (no orphan UI controls).
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`7a45cc3`)
+
 ### Phase 1 (batch 53): Worklogs — sync missing batch 52 entry
 - `Docs/lobster/WORKLOG.md`
 - `golf-ryder-cup-web/WORKLOG.md`

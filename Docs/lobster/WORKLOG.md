@@ -318,3 +318,10 @@
 - Docs: synced worklogs to include Phase 1 batch 57 (Lobster + daily + in-repo web worklog).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`71d8681`)
+
+## 2026-02-05 13:45 EST — Phase 1 (batch 59)
+- Settings subpages (`/settings/appearance`, `/settings/scoring`): upgraded both to the standard premium wrapper (`page-premium-enter`, `texture-grain`, `pb-nav`, `var(--canvas)` background).
+- Replaced bespoke sticky headers with the shared `PageHeader` for consistent navigation + layout.
+- Scoring settings: aligned toggles to the actual `ScoringPreferences` keys (removed orphan controls).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7a45cc3`)

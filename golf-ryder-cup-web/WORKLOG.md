@@ -45,3 +45,4 @@ All times America/New_York.
 - 12:15 — Shipped batch: Standings Fun Stats: removed `return null` usage inside the stat-type map (uses a reduce/push) to avoid silent render gaps and keep Phase 1 “no blank returns” consistent. (commit c185928)
 - 12:45 — Shipped batch: Spectator Mode (`/spectator/[tripId]`) adds bottom padding so the fixed “Last updated” footer doesn’t cover the last section on smaller screens. (commit baee815)
 - 13:15 — Shipped batch: `/lineup/new` precomputes and filters format categories instead of `return null` inside the format category map, preventing silent render gaps when filters hide a category. (commit 6087b1e)
+- 13:45 — Shipped batch: Settings subpages (`/settings/appearance`, `/settings/scoring`) upgraded to the standard premium wrapper + shared `PageHeader` for consistent navigation and layout. Scoring toggles aligned to the actual `ScoringPreferences` keys (no orphan controls). (commit 7a45cc3)
