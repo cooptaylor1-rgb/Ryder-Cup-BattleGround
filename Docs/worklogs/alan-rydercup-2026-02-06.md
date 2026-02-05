@@ -102,3 +102,8 @@
   - Prevents silent render gaps when filters hide a category and keeps Phase 1’s “no hidden empty renders” goal consistent.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`6087b1e`)
+
+### Phase 1 (batch 58): Docs — worklog sync
+- Updated Lobster + daily + in-repo web worklog entries to include the Phase 1 batch 57 commit hash.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`71d8681`)
