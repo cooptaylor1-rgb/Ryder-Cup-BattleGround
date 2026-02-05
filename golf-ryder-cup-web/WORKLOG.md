@@ -35,3 +35,4 @@ All times America/New_York.
 - 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)
 - 06:05 — Shipped batch: lint hygiene — removed / underscored unused variables to reduce lint noise (New Lineup, Create Profile icons, PendingSyncIndicator catch). (commit 8b69976)
 - 06:30 — Shipped batch: lint hygiene — removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` from `featureFlags.tsx` to reduce warning noise. (commit 971f463)
+- 07:55 — Shipped batch: Profile now keeps `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (no dead-end edit mode). (commit TBD)

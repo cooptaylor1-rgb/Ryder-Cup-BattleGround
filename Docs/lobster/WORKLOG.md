@@ -237,3 +237,8 @@
 - Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote the file into a single clean chronological timeline (deduped older mixed-format Phase 1 entries) so the in-repo web worklog matches what actually shipped.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`d143e6f`)
+
+## 2026-02-06 07:55 EST — Phase 1 (batch 45)
+- Profile (`/profile`): keep `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (prevents dead-end edit mode).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅

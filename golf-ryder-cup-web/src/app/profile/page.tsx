@@ -458,11 +458,15 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      {/* Fixed Save Button (when editing) */}
+      {/* Fixed Save Button (when editing)
+          Keep BottomNav visible at all times; lift the save bar above the nav height (80px). */}
       {isEditing && (
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 p-4"
-          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+          className="fixed left-0 right-0 z-40 bg-white border-t border-surface-200 p-4"
+          style={{
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+            paddingBottom: '1rem',
+          }}
         >
           <div className="max-w-md mx-auto flex gap-3">
             <Button variant="secondary" size="lg" onClick={handleCancel} className="shrink-0">
@@ -491,7 +495,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {!isEditing && <BottomNav />}
+      <BottomNav />
     </div>
   );
 }
