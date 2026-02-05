@@ -43,3 +43,6 @@
 
 ## 2026-02-04 18:55 EST — Phase 1 (batch 12)
 - New Lineup / Session page: added an explicit `EmptyStatePremium` when format filters produce zero options (prevents a confusing “blank section” under Format when nothing matches).
+
+## 2026-02-05 00:15 EST — Phase 1 (batch 13)
+- Standings (Trip stats section): if all tracked stat totals are zero, we now render a clear premium empty state (“No trip stats yet”) instead of silently rendering nothing under the category headers.

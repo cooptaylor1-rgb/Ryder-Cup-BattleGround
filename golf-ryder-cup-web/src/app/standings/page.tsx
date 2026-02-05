@@ -570,9 +570,28 @@ function FunStatsTab({
   ];
 
   const hasAnyStats = statTotals.size > 0;
+  const hasDisplayableStats = Array.from(statTotals.values()).some((v) => v.total > 0);
 
   return (
     <section className="section-sm">
+      {!hasAnyStats || (!hasDisplayableStats && highlightStats.length === 0) ? (
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <EmptyStatePremium
+            illustration="podium"
+            title="No trip stats yet"
+            description="As soon as scores and side stats are entered, you’ll see leaders and highlights here."
+            action={{
+              label: 'Go score a match',
+              onClick: () => {
+                window.location.href = '/matchups';
+              },
+              icon: <TrendingUp size={18} strokeWidth={2} />,
+            }}
+            variant="compact"
+          />
+        </div>
+      ) : null}
+
       {/* Quick Highlights */}
       {highlightStats.length > 0 && (
         <>
@@ -619,7 +638,7 @@ function FunStatsTab({
       )}
 
       {/* Stats by Category */}
-      {hasAnyStats ? (
+      {hasDisplayableStats ? (
         categories.map((category) => {
           const categoryStats = category.types
             .map((statType) => {
@@ -710,7 +729,7 @@ function FunStatsTab({
       )}
 
       {/* Link to full stats page */}
-      {hasAnyStats && (
+      {hasDisplayableStats && (
         <Link
           href="/trip-stats"
           className="card press-scale"
