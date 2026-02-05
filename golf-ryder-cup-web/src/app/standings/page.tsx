@@ -578,15 +578,11 @@ function FunStatsTab({
 
   const displayCategories = categories
     .map((category) => {
-      const stats = category.types
-        .map((statType) => {
-          const data = statTotals.get(statType as TripStatType);
-          if (!data || data.total === 0) return null;
-          const def = STAT_DEFINITIONS[statType as TripStatType];
-          return { statType, ...def, ...data };
-        })
-        .filter(Boolean) as Array<
-        {
+      const stats = category.types.reduce(
+        (
+          acc,
+          statType
+        ): Array<{
           statType: string;
           label: string;
           description: string;
@@ -595,8 +591,15 @@ function FunStatsTab({
           total: number;
           leader: string;
           leaderValue: number;
-        }
-      >;
+        }> => {
+          const data = statTotals.get(statType as TripStatType);
+          if (!data || data.total === 0) return acc;
+          const def = STAT_DEFINITIONS[statType as TripStatType];
+          acc.push({ statType, ...def, ...data });
+          return acc;
+        },
+        []
+      );
 
       return { category, stats };
     })
