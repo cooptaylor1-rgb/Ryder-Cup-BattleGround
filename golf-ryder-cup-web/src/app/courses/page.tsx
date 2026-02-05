@@ -13,6 +13,7 @@ import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import { NoCoursesPremiumEmpty, NoSearchResultsEmpty } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 /**
  * COURSE LIBRARY PAGE - Masters-inspired design
@@ -252,7 +253,10 @@ export default function CourseLibraryPage() {
     // Database search modal
     if (showDatabaseSearch) {
         return (
-            <div className="min-h-screen bg-surface-base">
+            <div
+              className="min-h-screen pb-nav page-premium-enter texture-grain"
+              style={{ background: 'var(--canvas)' }}
+            >
                 <header className="bg-masters-green text-magnolia px-4 py-4 shadow-lg">
                     <div className="max-w-4xl mx-auto flex items-center gap-3">
                         <button
@@ -270,12 +274,16 @@ export default function CourseLibraryPage() {
                         onClose={() => setShowDatabaseSearch(false)}
                     />
                 </main>
+                <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-surface-base">
+        <div
+          className="min-h-screen pb-nav page-premium-enter texture-grain"
+          style={{ background: 'var(--canvas)' }}
+        >
             {/* Header */}
             <header className="bg-masters-green text-magnolia px-4 py-4 shadow-lg">
                 <div className="max-w-4xl mx-auto flex items-center gap-3">
@@ -404,6 +412,7 @@ export default function CourseLibraryPage() {
                     <NoCoursesPremiumEmpty onSearchCourses={() => setShowDatabaseSearch(true)} />
                 )}
             </main>
+            <BottomNav />
         </div>
     );
 }

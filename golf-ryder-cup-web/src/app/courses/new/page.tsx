@@ -17,6 +17,7 @@ import {
 import { createCourseProfile } from '@/lib/services/courseLibraryService';
 import { useUIStore } from '@/lib/stores';
 import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
+import { BottomNav } from '@/components/layout';
 
 /**
  * NEW COURSE PAGE
@@ -485,6 +486,8 @@ export default function NewCoursePage() {
           )}
         </section>
       </main>
+
+      <BottomNav />
     </div>
   );
 }
