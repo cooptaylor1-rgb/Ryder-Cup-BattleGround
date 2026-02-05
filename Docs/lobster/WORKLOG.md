@@ -241,4 +241,4 @@
 ## 2026-02-06 07:55 EST — Phase 1 (batch 45)
 - Profile (`/profile`): keep `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (prevents dead-end edit mode).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
-- Commit + push ✅
+- Commit + push ✅ (`b6a3f87`, plus worklog follow-up `ea1df51`)
