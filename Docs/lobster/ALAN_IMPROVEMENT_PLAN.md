@@ -41,12 +41,22 @@ git push origin main
 
 Purpose: eliminate blank-screen / `return null` UI states on user-facing routes.
 
-Target routes to sweep (keep a running checklist in the worklog):
+Primary route checklist (keep a running checklist in the worklog):
 - `golf-ryder-cup-web/src/app/schedule/page.tsx`
 - `golf-ryder-cup-web/src/app/score/[matchId]/page.tsx`
 - `golf-ryder-cup-web/src/app/players/*`
 - `golf-ryder-cup-web/src/app/standings/*`
 - `golf-ryder-cup-web/src/app/trip-stats/page.tsx`
+
+If the checklist above is already complete, generate the next sweep list by searching for other “blank state” patterns in routes:
+
+```bash
+rg "return null" golf-ryder-cup-web/src/app -n
+rg "fallback=\{null\}" golf-ryder-cup-web/src/app -n
+rg "router\.(push|replace)\('/\w+" golf-ryder-cup-web/src/app -n
+```
+
+Then pick a small batch (1–3 routes), apply the standard pattern below, and run the Lobster checkpoint + approval gate.
 
 Pattern:
 - `undefined` (loading) → `PageLoadingSkeleton`
