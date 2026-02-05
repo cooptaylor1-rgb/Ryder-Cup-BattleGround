@@ -141,3 +141,10 @@
 ## 2026-02-04 23:34 EST — Phase 1 (batch 28)
 - Match scoring detail (`/score/[matchId]`): added `BottomNav` to loading-error and “match unavailable” states so users always have a clear navigation path.
 - Match scoring detail: added `BottomNav` to the main scoring screen as well (non-invasive; FABs already sit above the nav).
+
+## 2026-02-05 23:58 EST — Phase 1 (batch 29)
+- Players: upgraded the “No active trip” screen to the standard premium wrapper and added `BottomNav`.
+- Players: added `BottomNav` to the main page wrapper and standardized the wrapper to `min-h-screen pb-nav page-premium-enter texture-grain`.
+- Standings: added `BottomNav` to no-trip and loading states, plus the main page.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
