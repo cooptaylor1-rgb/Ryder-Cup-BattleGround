@@ -119,28 +119,29 @@ export function StablefordScorecard({
                 {/* Score Input */}
                 {!readonly && (
                     <div className="grid grid-cols-6 gap-2 mb-4">
-                        {[par - 2, par - 1, par, par + 1, par + 2, par + 3].map((value) => {
-                            if (value < 1) return null;
-                            const isSelected = currentHoleScore?.grossScore === value;
-                            const _pointsForScore = getPointsDisplay(
-                                currentHoleScore?.stablefordPoints || 0
-                            );
+                        {[par - 2, par - 1, par, par + 1, par + 2, par + 3]
+                            .filter((value) => value >= 1)
+                            .map((value) => {
+                                const isSelected = currentHoleScore?.grossScore === value;
+                                const _pointsForScore = getPointsDisplay(
+                                    currentHoleScore?.stablefordPoints || 0
+                                );
 
-                            return (
-                                <button
-                                    key={value}
-                                    onClick={() => handleScoreChange(value)}
-                                    className="py-3 rounded-xl font-semibold transition-all"
-                                    style={{
-                                        background: isSelected ? 'var(--masters)' : 'var(--surface)',
-                                        color: isSelected ? 'white' : 'var(--ink)',
-                                        border: isSelected ? 'none' : '1px solid var(--rule)',
-                                    }}
-                                >
-                                    {value}
-                                </button>
-                            );
-                        })}
+                                return (
+                                    <button
+                                        key={value}
+                                        onClick={() => handleScoreChange(value)}
+                                        className="py-3 rounded-xl font-semibold transition-all"
+                                        style={{
+                                            background: isSelected ? 'var(--masters)' : 'var(--surface)',
+                                            color: isSelected ? 'white' : 'var(--ink)',
+                                            border: isSelected ? 'none' : '1px solid var(--rule)',
+                                        }}
+                                    >
+                                        {value}
+                                    </button>
+                                );
+                            })}
                     </div>
                 )}
 

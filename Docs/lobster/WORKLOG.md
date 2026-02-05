@@ -266,3 +266,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 16:25 EST — Phase 1 (batch 60)
 - Captain Bets: winner selection button list now uses `flatMap()` to prefilter valid participants instead of `return null` inside a `map()`.
 - Commit + push ✅ (`0805cd2`)
+
+### 16:45 EST — Phase 1 (batch 61)
+- Stableford scorecard: score input buttons now prefilter valid values instead of `return null` inside `map()` (avoids silent render gaps and keeps Phase 1 consistency).
