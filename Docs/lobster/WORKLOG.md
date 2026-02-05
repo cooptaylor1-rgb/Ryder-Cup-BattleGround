@@ -159,6 +159,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster improvement plan: added `rg` search commands for quickly generating the next Phase 1 sweep list after the primary route checklist is complete.
 - Commit + push ✅ (`46c367d`)
 
+### 17:15 EST — Docs: Phase 1 sweep — detect top-level `return null`
+- Lobster improvement plan: added a dedicated `rg` command to catch true blank-screen component returns (`return null;`) in route `page.tsx` files.
+- Commit + push ✅ (`21ec8be`)
+
 ### 20:10 EST — Phase 1 (batch 16)
 - Captain routes: removed auto-redirects + pulse-skeleton gates when missing `currentTrip` or Captain Mode; now consistently renders `EmptyStatePremium` with clear CTAs.
 

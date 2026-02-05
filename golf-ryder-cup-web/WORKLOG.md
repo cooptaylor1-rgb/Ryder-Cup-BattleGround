@@ -16,6 +16,7 @@ All times America/New_York.
 - 10:45 — Shipped batch: Standings Fun Stats tab now uses the standard `EmptyStatePremium` for the “No stats yet” state, with a clear CTA to start tracking Trip Stats. (commit e52f2b0)
 - 10:55 — Shipped batch: Standings Fun Stats category sections now precompute displayable categories instead of `return null` inside `map()`, and fall back to the premium empty state if nothing renders (edge case). (commit 1de47dc)
 - 11:20 — Shipped batch: Captain pages now render explicit premium empty states (no-trip / Captain Mode off) instead of auto-redirecting away, preventing confusing skeleton/blank-ish flashes. (commit 8e794b6)
+- 17:15 — Shipped batch: Docs — added a dedicated `rg` sweep command for detecting top-level `return null;` blank-screen returns in route `page.tsx` files. (commit 21ec8be)
 - 20:10 — Shipped batch: removed missing-trip auto-redirects on Social + Live; now uses consistent `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation. (commit 76198a5)
 - 20:45 — Shipped batch: Achievements removed missing-trip auto-redirect; now shows a premium empty state with clear CTAs. (commit c3fdca6)
 - 21:10 — Shipped batch: Stats hub uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit f798894)
