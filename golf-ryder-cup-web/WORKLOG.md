@@ -35,3 +35,10 @@ All times America/New_York.
 - Global error page: added `BottomNav` + standard bottom padding so recovery screens aren’t dead ends.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`6987064`)
+
+## 2026-02-05 05:25 EST — Phase 1 (batch 41)
+- Lineup Builder (`/lineup/builder`): added standard premium wrapper, explicit loading + missing-session + no-trip empty states, and `BottomNav` so it’s never a dead end.
+- New Trip (`/trip/new`): with `showNav={false}`, the page previously had no bottom nav; now includes `BottomNav` + `pb-nav` content padding for consistent navigation.
+- Profile (`/profile`): added premium empty-state wrapper + `BottomNav` for signed-out view; main profile view now uses `pb-nav` and shows `BottomNav` when not editing.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
+- Commit + push ✅ (`72d4c29`)
