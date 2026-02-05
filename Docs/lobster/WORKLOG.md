@@ -278,3 +278,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 17:40 EST — Phase 1 (batch 63)
 - Phase 1 sweep verification: re-ran the strict route scan (`rg "^\s*return null;\s*$"` over `src/app/**/page.tsx`) and confirmed there are no remaining top-level `return null;` blank-screen returns.
 - Remaining `return null` hits in route pages are internal (helpers/`useMemo`) and do not correspond to user-facing blank screens.
+
+### 18:10 EST — Phase 1 (batch 64)
+- Social Stats dashboard: player leaderboard no longer uses `return null` inside the `map()` when a player record is missing; we now prefilter valid rows so rendering is stable and ranks remain consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`75548bb`)
