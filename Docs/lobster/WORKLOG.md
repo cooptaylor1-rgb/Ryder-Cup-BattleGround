@@ -159,3 +159,10 @@
 - Settings page: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`df99c05`)
+
+## 2026-02-05 01:25 EST — Phase 1 (batch 32)
+- Schedule: added an explicit signed-out empty state (“Sign in to view the schedule”) with a clear CTA to `/login` and `BottomNav` for consistent navigation.
+- Score (match list): added an explicit signed-out empty state (“Sign in to view scores”) with CTA to `/login` and `BottomNav`.
+- Schedule: prevented unnecessary match-loading attempts when signed out.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`85f9312`)

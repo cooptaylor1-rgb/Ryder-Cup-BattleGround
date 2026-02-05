@@ -121,6 +121,15 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`31e5a1b`)
 
+### Phase 1 (batch 32): Schedule + Score — signed-out empty states
+- `golf-ryder-cup-web/src/app/schedule/page.tsx`
+  - Added an explicit signed-out state (`EmptyStatePremium`: “Sign in to view the schedule”) with a clear CTA to `/login` and `BottomNav`.
+  - Prevented match-loading attempts when signed out.
+- `golf-ryder-cup-web/src/app/score/page.tsx`
+  - Added an explicit signed-out state (`EmptyStatePremium`: “Sign in to view scores”) with a clear CTA to `/login` and `BottomNav`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`85f9312`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
