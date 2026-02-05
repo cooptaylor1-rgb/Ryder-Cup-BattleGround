@@ -90,6 +90,7 @@ import {
 } from '@/components/live-play';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 // Demo side bets for testing - in production these come from the bets store
 const DEMO_SIDE_BETS = [
@@ -819,6 +820,7 @@ export default function EnhancedMatchScoringPage() {
             </button>
           </div>
         </main>
+        <BottomNav activeMatchId={matchId} />
       </div>
     );
   }
@@ -839,6 +841,7 @@ export default function EnhancedMatchScoringPage() {
             variant="large"
           />
         </main>
+        <BottomNav />
       </div>
     );
   }
@@ -1875,6 +1878,8 @@ export default function EnhancedMatchScoringPage() {
 
       {/* Confirm Dialog */}
       {ConfirmDialogComponent}
+
+      <BottomNav activeMatchId={activeMatch.id} />
     </div>
   );
 }

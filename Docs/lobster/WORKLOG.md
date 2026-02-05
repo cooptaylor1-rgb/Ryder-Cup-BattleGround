@@ -137,3 +137,7 @@
 - Captain routes (Command Center + all subpages): upgraded the **empty-state** scenarios (no active trip / Captain Mode off) to use the standard premium wrapper and include `BottomNav` so users always have a clear navigation path.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-04 23:34 EST — Phase 1 (batch 28)
+- Match scoring detail (`/score/[matchId]`): added `BottomNav` to loading-error and “match unavailable” states so users always have a clear navigation path.
+- Match scoring detail: added `BottomNav` to the main scoring screen as well (non-invasive; FABs already sit above the nav).
