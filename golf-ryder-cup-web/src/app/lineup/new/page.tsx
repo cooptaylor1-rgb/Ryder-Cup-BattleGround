@@ -781,13 +781,15 @@ export default function NewLineupPage() {
                       />
                     </div>
                   ) : (
-                    FORMAT_CATEGORIES.map((category) => {
-                      const categoryFormats = displayedFormats.filter(
-                        (f) => f.category === category.value
-                      );
-                      // Don't render empty categories when filtering
-                      if (categoryFormats.length === 0) return null;
-                      return (
+                    FORMAT_CATEGORIES
+                      .map((category) => ({
+                        category,
+                        formats: displayedFormats.filter(
+                          (f) => f.category === category.value
+                        ),
+                      }))
+                      .filter(({ formats }) => formats.length > 0)
+                      .map(({ category, formats: categoryFormats }) => (
                       <div key={category.value} className="mb-6">
                         <div className="flex items-center gap-2 mb-3">
                           <p
@@ -881,8 +883,7 @@ export default function NewLineupPage() {
                           })}
                         </div>
                       </div>
-                    );
-                  })
+                    ))
                   )}
 
                   {/* Show All / Show Less Formats toggle */}
