@@ -851,14 +851,10 @@ function BetManagementCard({
                     <p className="type-meta" style={{ marginBottom: 'var(--space-2)' }}>Select Winner:</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                         {bet.participantIds
-                            .map((id) => {
+                            .flatMap((id) => {
                                 const player = getPlayer(id);
-                                if (!player) return null;
-                                return { id, player };
+                                return player ? [{ id, player }] : [];
                             })
-                            .filter(
-                                (value): value is { id: string; player: Player } => Boolean(value)
-                            )
                             .map(({ id, player }) => (
                                 <button
                                     key={id}
