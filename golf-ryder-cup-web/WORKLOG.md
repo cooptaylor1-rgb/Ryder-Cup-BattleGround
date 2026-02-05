@@ -53,3 +53,4 @@ All times America/New_York.
 
 ## 2026-02-06
 - 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)
+- 06:30 — Shipped batch: lint hygiene — removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` from `featureFlags.tsx` to reduce warning noise. (commit 971f463)
