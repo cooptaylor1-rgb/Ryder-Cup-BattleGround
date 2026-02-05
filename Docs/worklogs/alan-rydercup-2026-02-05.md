@@ -18,7 +18,7 @@
   - Replaced the bespoke sticky header + `router.back()` behavior with the shared `PageHeader` (Back → `/settings`) for consistent navigation.
   - Load-error state now uses the same header/wrapper pattern as the main view.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`0cf31a4`)
 
 ### Docs: Phase 1 plan — add follow-on sweep commands
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`

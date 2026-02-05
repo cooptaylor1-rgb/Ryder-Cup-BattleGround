@@ -295,4 +295,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Settings — Backup & Restore: replaced the bespoke sticky header with the shared `PageHeader` (Back → `/settings`) for consistent navigation.
 - Load-error state now uses the same wrapper + header pattern as the main view.
 - Lobster checkpoint: `lint` + `typecheck` ✅
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`0cf31a4`)
