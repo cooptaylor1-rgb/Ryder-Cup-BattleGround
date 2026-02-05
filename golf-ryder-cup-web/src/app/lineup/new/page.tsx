@@ -18,19 +18,14 @@ import {
   Users,
   AlertTriangle,
   CheckCircle2,
-  Home,
-  Target,
-  Trophy,
-  MoreHorizontal,
-  CalendarDays,
   Info,
   Zap,
   ChevronDown,
-  HelpCircle,
 } from 'lucide-react';
 import type { SessionType } from '@/lib/types';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
 import { EmptyStatePremium } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 /**
  * NEW SESSION / LINEUP PAGE
@@ -583,29 +578,48 @@ export default function NewLineupPage() {
     ]
   );
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
       <div
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
-        <header className="header-premium">
-          <div className="container-editorial flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg skeleton-pulse" />
-            <div>
-              <div className="w-32 h-3 rounded skeleton-pulse mb-1" />
-              <div className="w-20 h-2 rounded skeleton-pulse" />
-            </div>
-          </div>
-        </header>
-        <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
-          <div className="card-luxury p-6 mb-4">
-            <div className="w-40 h-5 rounded skeleton-pulse mb-4" />
-            <div className="w-full h-10 rounded skeleton-pulse mb-3" />
-            <div className="w-full h-10 rounded skeleton-pulse" />
-          </div>
-          <div className="card-luxury p-4 h-48 skeleton-pulse" />
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="calendar"
+            title="No trip selected"
+            description="Pick a trip before creating a session lineup."
+            action={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
         </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain Mode required"
+            description="Enable Captain Mode to create and publish session lineups."
+            action={{
+              label: 'Go to More',
+              onClick: () => router.push('/more'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
       </div>
     );
   }
@@ -1123,33 +1137,7 @@ export default function NewLineupPage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

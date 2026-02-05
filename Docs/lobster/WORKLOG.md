@@ -166,3 +166,9 @@
 - Schedule: prevented unnecessary match-loading attempts when signed out.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`85f9312`)
+
+## 2026-02-05 01:55 EST — Phase 1 (batch 33)
+- New Session / Lineup (`/lineup/new`): replaced the hand-rolled bottom nav with the shared `BottomNav` component so navigation is always available.
+- New Session / Lineup: replaced the skeleton-only gate with explicit premium empty states for **No trip selected** and **Captain Mode required**, each with clear CTAs and `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`82ecfef`)
