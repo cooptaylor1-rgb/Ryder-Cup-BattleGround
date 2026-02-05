@@ -13,3 +13,9 @@
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`df99c05`)
+
+### Phase 1 (batch 44): Web worklog hygiene — chronological + deduped
+- `golf-ryder-cup-web/WORKLOG.md`
+  - Rewrote into a single clean chronological timeline and removed mixed-format duplicate Phase 1 entries so the in-repo web worklog matches what actually shipped.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`d143e6f`)

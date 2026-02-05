@@ -232,3 +232,8 @@
 - Lint hygiene: removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` directive from `featureFlags.tsx` to reduce warning noise.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-06 07:10 EST — Phase 1 (batch 44)
+- Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote the file into a single clean chronological timeline (deduped older mixed-format Phase 1 entries) so the in-repo web worklog matches what actually shipped.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`d143e6f`)
