@@ -192,3 +192,10 @@
 - Web worklog (`golf-ryder-cup-web/WORKLOG.md`): synced missing shipped Phase 1 entries (Schedule/Score signed-out states, Captain empty states, Social/Live no-redirect handling, Stats hub + Matchups empty states w/ BottomNav, Trip Settings + Backup & Restore hardening, plus Captain empty-state wrapper/nav standardization).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`b039ec6`)
+
+## 2026-02-05 03:45 EST — Phase 1 (batch 38)
+- Courses (`/courses`): standardized the wrapper to `min-h-screen pb-nav page-premium-enter texture-grain` and added `BottomNav` so navigation is always available.
+- New Course (`/courses/new`): added `BottomNav` so users always have a clear navigation path back to the main spine.
+- Course Database Search modal: added `BottomNav` + `pb-nav` so users can always navigate out.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`0b57d6f`)

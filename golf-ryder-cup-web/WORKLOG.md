@@ -11,6 +11,7 @@ All times America/New_York.
 - 01:40 — Shipped batch: spectator mode (`/spectator/[tripId]`) now distinguishes load failures vs not-found, with a Retry path; refresh errors no longer blank the previously-loaded view. (commit a288c13)
 - 01:55 — Shipped batch: updated `/lineup/new` to use the shared `BottomNav` (replacing the custom nav) and added explicit premium empty states for **No trip selected** + **Captain Mode required** so navigation is always clear. (commit a8dc84c)
 - 02:05 — Shipped batch: Complete Profile (`/profile/complete`) now renders explicit premium empty states (signed out + already onboarded) instead of auto-redirecting; added `BottomNav` to keep navigation clear. (commit 2bc0cf3)
+- 03:45 — Shipped batch: Courses (`/courses`) and New Course (`/courses/new`) now include the standard premium wrapper (`pb-nav`) and `BottomNav`, including in the course database search modal, so navigation is always available. (commit 0b57d6f)
 - 11:20 — Shipped batch: Captain pages now render explicit premium empty states (no-trip / Captain Mode off) instead of auto-redirecting away, preventing confusing skeleton/blank-ish flashes. (commit 8e794b6)
 - 20:10 — Shipped batch: removed missing-trip auto-redirects on Social + Live; now uses consistent `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation. (commit 76198a5)
 - 20:45 — Shipped batch: Achievements removed missing-trip auto-redirect; now shows a premium empty state with clear CTAs. (commit c3fdca6)
