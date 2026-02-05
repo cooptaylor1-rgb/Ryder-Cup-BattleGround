@@ -110,6 +110,17 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`4c70f5e`)
 
+### Phase 1 (batch 26): Trip Awards (per-trip) — premium wrapper + explicit empty/error states
+- `golf-ryder-cup-web/src/app/trip/[tripId]/awards/page.tsx`
+  - Upgraded the route to use the standard premium page wrapper and added `BottomNav` so navigation is always available.
+  - Standardized loading → `PageLoadingSkeleton`.
+  - Added explicit non-blank states:
+    - error → `ErrorEmpty` (with Retry) + a compact “Back to Trip” premium empty state
+    - no records → `EmptyStatePremium` (“No awards yet”) with CTA back to the trip
+  - Replaced the legacy custom header with the standard `PageHeader` (Refresh + Share buttons).
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`31e5a1b`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
