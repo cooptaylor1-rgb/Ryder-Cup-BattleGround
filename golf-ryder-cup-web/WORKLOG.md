@@ -49,7 +49,7 @@ All times America/New_York.
   - Create Profile (`/profile/create`): removed unused icon imports.
   - PendingSyncIndicator: use `catch {}` for the pending-count refresh path (no unused catch param).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`8b69976`)
 
 ## 2026-02-06
 - 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)
