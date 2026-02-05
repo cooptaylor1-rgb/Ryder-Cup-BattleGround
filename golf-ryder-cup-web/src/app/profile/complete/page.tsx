@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button, PageLoadingSkeleton } from '@/components/ui';
+import { Button, EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
   Hash,
@@ -18,6 +18,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BottomNav } from '@/components/layout';
 
 /**
  * COMPLETE PROFILE PAGE
@@ -65,15 +66,7 @@ export default function CompleteProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>('golf');
 
-  // Redirect if not logged in or already completed onboarding
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    } else if (currentUser?.hasCompletedOnboarding) {
-      const nextPath = searchParams?.get('next');
-      router.push(nextPath || '/');
-    }
-  }, [isAuthenticated, currentUser, router, searchParams]);
+  const nextPath = searchParams?.get('next') || '/';
 
   // Pre-fill with existing data
   useEffect(() => {
@@ -154,7 +147,62 @@ export default function CompleteProfilePage() {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="golfers"
+            title="Sign in to complete your profile"
+            description="Finish onboarding after you sign in."
+            action={{
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            }}
+            secondaryAction={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  if (currentUser?.hasCompletedOnboarding) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="golfers"
+            title="You’re all set"
+            description="Your profile onboarding is already complete."
+            action={{
+              label: 'Continue',
+              onClick: () => router.push(nextPath),
+            }}
+            secondaryAction={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
   if (!currentUser) {
+    // Auth store can be authenticated but still loading the current user payload.
     return <PageLoadingSkeleton title="Complete Your Profile" variant="form" />;
   }
 
