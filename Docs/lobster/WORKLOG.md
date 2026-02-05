@@ -247,3 +247,4 @@
 - More (`/more`): when all menu items are filtered out (signed out / no trip selected / Captain-only tools hidden), we now render an explicit `EmptyStatePremium` instead of an empty page section.
 - Keeps the “More” hub from feeling blank when the user’s current context hides every item.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`16f8a0a`)
