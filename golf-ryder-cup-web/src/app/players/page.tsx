@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { BottomNav } from '@/components/layout';
 import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
@@ -259,14 +260,20 @@ export default function PlayersPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)' }}>
-        <EmptyStatePremium
-          illustration="trophy"
-          title="No active trip"
-          description="Start or select a trip to manage players."
-          action={{ label: 'Back to Home', onClick: () => router.push('/') }}
-          variant="large"
-        />
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No active trip"
+            description="Start or select a trip to manage players."
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
       </div>
     );
   }
@@ -279,8 +286,8 @@ export default function PlayersPage() {
 
   return (
     <div
-      className="page-premium-enter texture-grain"
-      style={{ minHeight: '100vh', background: 'var(--canvas)' }}
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
     >
       {/* Premium Header */}
       <header className="header-premium">
@@ -807,6 +814,8 @@ export default function PlayersPage() {
           </div>
         </div>
       )}
+
+      <BottomNav />
     </div>
   );
 }

@@ -29,7 +29,7 @@ import {
   Medal,
 } from 'lucide-react';
 import { EmptyStatePremium, NoStandingsPremiumEmpty } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -103,13 +103,16 @@ export default function StandingsPage() {
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
-        <EmptyStatePremium
-          illustration="trophy"
-          title="No active trip"
-          description="Start or select a trip to view standings."
-          action={{ label: 'Back to Home', onClick: () => router.push('/') }}
-          variant="large"
-        />
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No active trip"
+            description="Start or select a trip to view standings."
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
       </div>
     );
   }
@@ -145,6 +148,7 @@ export default function StandingsPage() {
             ))}
           </div>
         </main>
+        <BottomNav />
       </div>
     );
   }
@@ -281,7 +285,7 @@ export default function StandingsPage() {
         )}
       </main>
 
-      {/* Bottom navigation is provided globally by <BottomNav /> in the app shell. */}
+      <BottomNav />
     </div>
   );
 }
