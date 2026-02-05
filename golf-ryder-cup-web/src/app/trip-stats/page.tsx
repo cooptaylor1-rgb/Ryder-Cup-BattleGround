@@ -25,10 +25,10 @@ import {
   getStatsByCategory,
   formatStatValue,
 } from '@/lib/types/tripStats';
-import { Trophy, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 // ============================================
 // CATEGORY TABS COMPONENT
@@ -407,18 +407,14 @@ export default function TripStatsPage() {
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
+        <PageHeader
+          title="Trip Stats"
+          subtitle="Fun tracking beyond scores"
+          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
         <main className="page-container">
-          <header className="header-premium">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-              aria-label="Go back"
-            >
-              <ChevronLeft size={20} />
-              <span className="text-sm">Back</span>
-            </button>
-            <h1 className="type-h2">Trip Stats</h1>
-          </header>
           <div className="content-area">
             <EmptyStatePremium
               illustration="podium"
@@ -443,18 +439,14 @@ export default function TripStatsPage() {
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
+        <PageHeader
+          title="Trip Stats"
+          subtitle={currentTrip.name}
+          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
         <main className="page-container">
-          <header className="header-premium">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-              aria-label="Go back"
-            >
-              <ChevronLeft size={20} />
-              <span className="text-sm">Back</span>
-            </button>
-            <h1 className="type-h2">Trip Stats</h1>
-          </header>
           <div className="content-area">
             <EmptyStatePremium
               illustration="podium"
@@ -484,20 +476,14 @@ export default function TripStatsPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      <main className="page-container">
-        <header className="header-premium">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-            <span className="text-sm">Back</span>
-          </button>
-          <h1 className="type-h2">Trip Stats</h1>
-          <p className="type-body text-text-secondary">Fun tracking beyond scores</p>
-        </header>
+      <PageHeader
+        title="Trip Stats"
+        subtitle={currentTrip.name}
+        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
 
+      <main className="page-container">
         <div className="content-area space-y-6">
           <QuickTrack players={players} tripId={currentTrip.id} onTrack={handleRefresh} />
 

@@ -5,6 +5,13 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 65): Trip Stats — PageHeader + premium wrapper consistency
+- `golf-ryder-cup-web/src/app/trip-stats/page.tsx`
+  - Replaced bespoke header/back button markup with the shared `PageHeader` component.
+  - Applied the same `PageHeader` pattern consistently for: **no active trip**, **no stats yet**, and the **normal** Trip Stats view.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (pending)
+
 ### Docs: Phase 1 plan — add follow-on sweep commands
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`
   - Added `rg` search commands for quickly generating the next Phase 1 sweep list once the primary route checklist is complete.

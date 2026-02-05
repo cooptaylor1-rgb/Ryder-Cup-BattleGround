@@ -283,3 +283,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Social Stats dashboard: player leaderboard no longer uses `return null` inside the `map()` when a player record is missing; we now prefilter valid rows so rendering is stable and ranks remain consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`75548bb`)
+
+### 18:45 EST — Phase 1 (batch 65)
+- Trip Stats: replaced bespoke header/back button markup with the shared `PageHeader` component to match the standard premium wrapper pattern.
+- Trip Stats: applied the same `PageHeader` pattern for **no active trip**, **no stats yet**, and the main view so the page remains consistent across states.
+- Lobster checkpoint: `lint` + `typecheck` ✅
