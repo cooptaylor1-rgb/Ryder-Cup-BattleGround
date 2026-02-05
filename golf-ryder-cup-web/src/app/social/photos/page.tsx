@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
-import { NoPhotosEmpty, PageLoadingSkeleton } from '@/components/ui';
+import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 import {
   ChevronLeft,
   Home,
@@ -105,11 +106,7 @@ export default function PhotosPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // No redirect when no trip is selected — render a premium empty state instead.
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -131,7 +128,30 @@ export default function PhotosPage() {
   const getPlayer = (id: string) => players.find((p) => p.id === id);
 
   if (!currentTrip) {
-    return <PageLoadingSkeleton title="Photos" variant="grid" />;
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="celebration"
+            title="No trip selected"
+            description="Start or select a trip to view and share photos."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            secondaryAction={{
+              label: 'More',
+              onClick: () => router.push('/more'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
   }
 
   return (

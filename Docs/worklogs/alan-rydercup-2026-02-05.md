@@ -61,6 +61,17 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`ab4b319`)
 
+### Phase 1 (batch 20): Social + Live — remove auto-redirects, render premium empty states
+- `golf-ryder-cup-web/src/app/social/page.tsx`
+  - Removed the `useEffect` auto-redirect when `currentTrip` is missing.
+  - Now renders `EmptyStatePremium` (Home + More CTAs) + `BottomNav` so users don’t get bounced away from Social.
+- `golf-ryder-cup-web/src/app/social/photos/page.tsx`
+  - Removed the `useEffect` auto-redirect when `currentTrip` is missing.
+  - Replaced the misleading `PageLoadingSkeleton` fallback with a premium empty state + clear navigation CTAs.
+- `golf-ryder-cup-web/src/app/live/page.tsx`
+  - Removed the `useEffect` auto-redirect when `currentTrip` is missing.
+  - Replaced the skeleton fallback with `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation.
+
 ### Next
-- Sweep for any remaining user-facing pages that still `router.push('/')` when `currentTrip` is missing (keep replacing with `EmptyStatePremium` + clear CTAs).
-- Continue to run the Lobster checkpoint gate after each batch.
+- Run Lobster checkpoint gate (lint + typecheck) for batch 20, then commit + push.
+- Continue sweeping for any remaining user-facing pages that still auto-redirect when `currentTrip` is missing.

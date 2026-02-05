@@ -7,7 +7,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
-import { NoMessagesEmpty } from '@/components/ui';
+import { EmptyStatePremium, NoMessagesEmpty } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 import {
   ChevronLeft,
   Home,
@@ -39,11 +40,7 @@ export default function SocialPage() {
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // No redirect when no trip is selected — render a premium empty state instead.
 
   // Get real banter posts from database
   const banterPosts = useLiveQuery(
@@ -97,20 +94,28 @@ export default function SocialPage() {
 
   if (!currentTrip) {
     return (
-      <main className="page-container">
-        <header className="header-premium">
-          <h1 className="type-h2">Team Banter</h1>
-        </header>
-        <div className="content-area">
-          <div className="card-surface rounded-xl p-8 text-center">
-            <div className="text-4xl mb-4">💬</div>
-            <h2 className="type-h3 mb-2">No Active Trip</h2>
-            <p className="text-text-secondary">
-              Start or join a trip to chat with your group!
-            </p>
-          </div>
-        </div>
-      </main>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="golfers"
+            title="No trip selected"
+            description="Start or select a trip to jump into team banter."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            secondaryAction={{
+              label: 'More',
+              onClick: () => router.push('/more'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 

@@ -7,6 +7,8 @@ import { useTripStore, useScoringStore } from '@/lib/stores';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { uiLogger } from '@/lib/utils/logger';
+import { EmptyStatePremium } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 import {
   ChevronLeft,
   Home,
@@ -21,7 +23,8 @@ import {
   VolumeX,
   CalendarDays,
 } from 'lucide-react';
-import { PageSkeleton, LiveMatchCardSkeleton } from '@/components/ui';
+// (removed unused skeleton imports)
+
 import type { Match, Player } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 
@@ -54,11 +57,7 @@ export default function LivePage() {
     []
   );
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // No redirect when no trip is selected — render a premium empty state instead.
 
   useEffect(() => {
     if (activeSession) {
@@ -141,13 +140,28 @@ export default function LivePage() {
 
   if (!currentTrip) {
     return (
-      <PageSkeleton>
-        <div className="grid gap-4 mt-4">
-          <LiveMatchCardSkeleton />
-          <LiveMatchCardSkeleton />
-          <LiveMatchCardSkeleton />
-        </div>
-      </PageSkeleton>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="scorecard"
+            title="No trip selected"
+            description="Start or select a trip to view the live jumbotron."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            secondaryAction={{
+              label: 'More',
+              onClick: () => router.push('/more'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 
