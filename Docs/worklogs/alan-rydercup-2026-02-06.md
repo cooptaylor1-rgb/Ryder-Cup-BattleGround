@@ -33,3 +33,47 @@
   - Keeps the “More” hub from feeling blank.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`16f8a0a`)
+
+### Phase 1 (batch 47): Lint hygiene sweep + small correctness hardening
+- Removed unused icon imports/vars to reduce warning noise:
+  - PDF export panel, Wolf game card, handicap stroke indicator, notification settings.
+- Vegas game card:
+  - Stabilized `getPlayerName` with `useCallback`, fixed memo deps, and hardened name formatting when `lastName` is missing.
+- AuthGuard:
+  - Included `searchParams` in effect deps to satisfy hooks lint.
+- Session lock manager:
+  - Underscored an unused prop to satisfy lint.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`0ba1a70`)
+
+### Phase 1 (batch 48): Scoring match detail — keep BottomNav scoring context in unavailable states
+- `golf-ryder-cup-web/src/app/score/[matchId]/page.tsx`
+  - When a match is unavailable, the premium empty state now still passes `activeMatchId` into `BottomNav` so the scoring context stays consistent and navigation remains obvious.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`80847d6`)
+
+### Phase 1 (batch 49): Profile Create — premium wrapper + BottomNav + lifted action bar
+- `golf-ryder-cup-web/src/app/profile/create/page.tsx`
+  - Standardized wrapper (`pb-nav` + texture + premium enter) and added `BottomNav` so onboarding screens aren’t navigation dead ends.
+  - Lifted the fixed bottom action bar above the BottomNav height so primary actions remain accessible without hiding navigation.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`016fe81`)
+
+### Phase 1 (batch 50): Scoring match detail — explicit signed-out empty state
+- `golf-ryder-cup-web/src/app/score/[matchId]/page.tsx`
+  - Added an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and included `BottomNav` so deep links aren’t blank/dead ends when unauthenticated.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`278add9`)
+
+### Phase 1 (batch 51): Standings — Fun Stats uses standard premium empty state
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Replaced the ad-hoc “No Stats Yet” block in the Fun Stats tab with the standard `EmptyStatePremium` for consistent, actionable empty content.
+  - Added a clear CTA to start tracking Trip Stats.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`e52f2b0`)
+
+### Phase 1 (batch 52): Standings — Fun Stats category rendering consistency
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Tightened Fun Stats rendering so category sections don’t silently disappear in confusing ways when data is partially missing.
+- Checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`1de47dc`)
