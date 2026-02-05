@@ -28,6 +28,7 @@ import {
 import { Trophy, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 // ============================================
 // CATEGORY TABS COMPONENT
@@ -402,57 +403,69 @@ export default function TripStatsPage() {
 
   if (!currentTrip) {
     return (
-      <main className="page-container">
-        <header className="header-premium">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-            <span className="text-sm">Back</span>
-          </button>
-          <h1 className="type-h2">Trip Stats</h1>
-        </header>
-        <div className="content-area">
-          <EmptyStatePremium
-            illustration="podium"
-            title="No active trip"
-            description="Start or join a trip to track fun stats."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </div>
-      </main>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="page-container">
+          <header className="header-premium">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+              aria-label="Go back"
+            >
+              <ChevronLeft size={20} />
+              <span className="text-sm">Back</span>
+            </button>
+            <h1 className="type-h2">Trip Stats</h1>
+          </header>
+          <div className="content-area">
+            <EmptyStatePremium
+              illustration="podium"
+              title="No active trip"
+              description="Start or join a trip to track fun stats."
+              action={{
+                label: 'Go Home',
+                onClick: () => router.push('/'),
+              }}
+              variant="large"
+            />
+          </div>
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 
   if (tripStatsData.length === 0) {
     return (
-      <main className="page-container">
-        <header className="header-premium">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-            <span className="text-sm">Back</span>
-          </button>
-          <h1 className="type-h2">Trip Stats</h1>
-        </header>
-        <div className="content-area">
-          <EmptyStatePremium
-            illustration="podium"
-            title="No stats yet"
-            description="Start tracking the fun — add a few stats and the leaderboards will appear here."
-            variant="large"
-          />
-        </div>
-      </main>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="page-container">
+          <header className="header-premium">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+              aria-label="Go back"
+            >
+              <ChevronLeft size={20} />
+              <span className="text-sm">Back</span>
+            </button>
+            <h1 className="type-h2">Trip Stats</h1>
+          </header>
+          <div className="content-area">
+            <EmptyStatePremium
+              illustration="podium"
+              title="No stats yet"
+              description="Start tracking the fun — add a few stats and the leaderboards will appear here."
+              variant="large"
+            />
+          </div>
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 
@@ -467,77 +480,83 @@ export default function TripStatsPage() {
     .reduce((a: number, b: PlayerTripStat) => a + b.value, 0);
 
   return (
-    <main className="page-container">
-      <header className="header-premium">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-          aria-label="Go back"
-        >
-          <ChevronLeft size={20} />
-          <span className="text-sm">Back</span>
-        </button>
-        <h1 className="type-h2">Trip Stats</h1>
-        <p className="type-body text-text-secondary">Fun tracking beyond scores</p>
-      </header>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <main className="page-container">
+        <header className="header-premium">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+            aria-label="Go back"
+          >
+            <ChevronLeft size={20} />
+            <span className="text-sm">Back</span>
+          </button>
+          <h1 className="type-h2">Trip Stats</h1>
+          <p className="type-body text-text-secondary">Fun tracking beyond scores</p>
+        </header>
 
-      <div className="content-area space-y-6">
-        <QuickTrack players={players} tripId={currentTrip.id} onTrack={handleRefresh} />
+        <div className="content-area space-y-6">
+          <QuickTrack players={players} tripId={currentTrip.id} onTrack={handleRefresh} />
 
-        <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
+          <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
 
-        <div className="space-y-3">
-          {categoryStats.map((def) => (
-            <StatCard
-              key={def.type}
-              definition={def}
-              playerStats={statMaps.get(def.type) || new Map()}
-              players={players}
-              onIncrement={(playerId) => handleIncrement(playerId, def.type)}
-              onDecrement={(playerId) => handleDecrement(playerId, def.type)}
-            />
-          ))}
+          <div className="space-y-3">
+            {categoryStats.map((def) => (
+              <StatCard
+                key={def.type}
+                definition={def}
+                playerStats={statMaps.get(def.type) || new Map()}
+                players={players}
+                onIncrement={(playerId) => handleIncrement(playerId, def.type)}
+                onDecrement={(playerId) => handleDecrement(playerId, def.type)}
+              />
+            ))}
+          </div>
+
+          <CategoryLeaderboard category={activeCategory} tripId={currentTrip.id} players={players} />
+
+          <div className="card-surface rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-text-secondary mb-3">📊 Trip Totals</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl">🍺</div>
+                <div className="text-xl font-bold text-text-primary">{totalBeers}</div>
+                <div className="text-xs text-text-tertiary">Beers</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl">⚪</div>
+                <div className="text-xl font-bold text-text-primary">{totalBallsLost}</div>
+                <div className="text-xs text-text-tertiary">Balls Lost</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl">🔄</div>
+                <div className="text-xl font-bold text-text-primary">{totalMulligans}</div>
+                <div className="text-xs text-text-tertiary">Mulligans</div>
+              </div>
+            </div>
+          </div>
+
+          <Link
+            href="/trip-stats/awards"
+            className="card-elevated rounded-xl p-4 flex items-center gap-4 hover:bg-surface-highlight transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-masters/10 flex items-center justify-center">
+              <Trophy size={24} className="text-masters" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-text-primary">Trip Awards</h3>
+              <p className="text-sm text-text-secondary">
+                Vote for superlatives: MVP, best dressed, and more!
+              </p>
+            </div>
+            <ChevronRight size={20} className="text-text-tertiary" />
+          </Link>
         </div>
-
-        <CategoryLeaderboard category={activeCategory} tripId={currentTrip.id} players={players} />
-
-        <div className="card-surface rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-text-secondary mb-3">📊 Trip Totals</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl">🍺</div>
-              <div className="text-xl font-bold text-text-primary">{totalBeers}</div>
-              <div className="text-xs text-text-tertiary">Beers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl">⚪</div>
-              <div className="text-xl font-bold text-text-primary">{totalBallsLost}</div>
-              <div className="text-xs text-text-tertiary">Balls Lost</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl">🔄</div>
-              <div className="text-xl font-bold text-text-primary">{totalMulligans}</div>
-              <div className="text-xs text-text-tertiary">Mulligans</div>
-            </div>
-          </div>
-        </div>
-
-        <Link
-          href="/trip-stats/awards"
-          className="card-elevated rounded-xl p-4 flex items-center gap-4 hover:bg-surface-highlight transition-colors"
-        >
-          <div className="w-12 h-12 rounded-full bg-masters/10 flex items-center justify-center">
-            <Trophy size={24} className="text-masters" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-text-primary">Trip Awards</h3>
-            <p className="text-sm text-text-secondary">
-              Vote for superlatives: MVP, best dressed, and more!
-            </p>
-          </div>
-          <ChevronRight size={20} className="text-text-tertiary" />
-        </Link>
-      </div>
-    </main>
+      </main>
+      <BottomNav />
+    </div>
   );
 }

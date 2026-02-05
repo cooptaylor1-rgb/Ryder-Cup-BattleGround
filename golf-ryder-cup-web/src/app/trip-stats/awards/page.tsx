@@ -17,6 +17,7 @@ import type { AwardType, TripAward } from '@/lib/types/tripStats';
 import { AWARD_DEFINITIONS } from '@/lib/types/tripStats';
 import { ChevronLeft, Trophy, Sparkles } from 'lucide-react';
 import { EmptyStatePremium } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 function getPlayerName(player: Player): string {
     return `${player.firstName} ${player.lastName}`;
@@ -215,94 +216,106 @@ export default function TripAwardsPage() {
 
     if (!currentTrip) {
         return (
-            <main className="page-container">
-                <header className="header-premium">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-                        aria-label="Go back"
-                    >
-                        <ChevronLeft size={20} />
-                        <span className="text-sm">Back</span>
-                    </button>
-                    <h1 className="type-h2">Trip Awards</h1>
-                </header>
-                <div className="content-area">
-                    <EmptyStatePremium
-                        illustration="podium"
-                        title="No active trip"
-                        description="Start or join a trip to give awards."
-                        action={{
-                            label: 'Go Home',
-                            onClick: () => router.push('/'),
-                        }}
-                        variant="large"
-                    />
-                </div>
-            </main>
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="page-container">
+                    <header className="header-premium">
+                        <button
+                            onClick={() => router.back()}
+                            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+                            aria-label="Go back"
+                        >
+                            <ChevronLeft size={20} />
+                            <span className="text-sm">Back</span>
+                        </button>
+                        <h1 className="type-h2">Trip Awards</h1>
+                    </header>
+                    <div className="content-area">
+                        <EmptyStatePremium
+                            illustration="podium"
+                            title="No active trip"
+                            description="Start or join a trip to give awards."
+                            action={{
+                                label: 'Go Home',
+                                onClick: () => router.push('/'),
+                            }}
+                            variant="large"
+                        />
+                    </div>
+                </main>
+                <BottomNav />
+            </div>
         );
     }
 
     return (
-        <main className="page-container">
-            <header className="header-premium flex items-center gap-3">
-                <button onClick={() => router.back()} className="p-1 text-text-secondary">
-                    <ChevronLeft size={20} />
-                </button>
-                <div>
-                    <h1 className="type-h2">Trip Awards</h1>
-                    <p className="type-body text-text-secondary">End-of-trip superlatives</p>
-                </div>
-            </header>
-
-            <div className="content-area space-y-6">
-                <WinnerShowcase awards={awards} players={players} />
-
-                <div className="card-surface rounded-xl p-4 flex items-start gap-3">
-                    <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
+        <div
+            className="min-h-screen pb-nav page-premium-enter texture-grain"
+            style={{ background: 'var(--canvas)' }}
+        >
+            <main className="page-container">
+                <header className="header-premium flex items-center gap-3">
+                    <button onClick={() => router.back()} className="p-1 text-text-secondary">
+                        <ChevronLeft size={20} />
+                    </button>
                     <div>
-                        <p className="text-sm text-text-primary font-medium">
-                            Vote for trip superlatives!
-                        </p>
-                        <p className="text-xs text-text-secondary mt-1">
-                            Some awards have auto-suggestions based on trip stats.
-                            Tap any award to select a winner.
-                        </p>
+                        <h1 className="type-h2">Trip Awards</h1>
+                        <p className="type-body text-text-secondary">End-of-trip superlatives</p>
                     </div>
+                </header>
+
+                <div className="content-area space-y-6">
+                    <WinnerShowcase awards={awards} players={players} />
+
+                    <div className="card-surface rounded-xl p-4 flex items-start gap-3">
+                        <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-sm text-text-primary font-medium">
+                                Vote for trip superlatives!
+                            </p>
+                            <p className="text-xs text-text-secondary mt-1">
+                                Some awards have auto-suggestions based on trip stats.
+                                Tap any award to select a winner.
+                            </p>
+                        </div>
+                    </div>
+
+                    <section>
+                        <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
+                        <div className="space-y-3">
+                            {positiveAwards.map(awardType => (
+                                <AwardCard
+                                    key={awardType}
+                                    awardType={awardType}
+                                    currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
+                                    players={players}
+                                    suggestedWinnerId={suggestions.get(awardType)}
+                                    onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
+                                />
+                            ))}
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
+                        <div className="space-y-3">
+                            {funnyAwards.map(awardType => (
+                                <AwardCard
+                                    key={awardType}
+                                    awardType={awardType}
+                                    currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
+                                    players={players}
+                                    suggestedWinnerId={suggestions.get(awardType)}
+                                    onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
+                                />
+                            ))}
+                        </div>
+                    </section>
                 </div>
-
-                <section>
-                    <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
-                    <div className="space-y-3">
-                        {positiveAwards.map(awardType => (
-                            <AwardCard
-                                key={awardType}
-                                awardType={awardType}
-                                currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
-                                players={players}
-                                suggestedWinnerId={suggestions.get(awardType)}
-                                onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
-                            />
-                        ))}
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
-                    <div className="space-y-3">
-                        {funnyAwards.map(awardType => (
-                            <AwardCard
-                                key={awardType}
-                                awardType={awardType}
-                                currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
-                                players={players}
-                                suggestedWinnerId={suggestions.get(awardType)}
-                                onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
-                            />
-                        ))}
-                    </div>
-                </section>
-            </div>
-        </main>
+            </main>
+            <BottomNav />
+        </div>
     );
 }
