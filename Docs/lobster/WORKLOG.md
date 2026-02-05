@@ -288,3 +288,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats: replaced bespoke header/back button markup with the shared `PageHeader` component to match the standard premium wrapper pattern.
 - Trip Stats: applied the same `PageHeader` pattern for **no active trip**, **no stats yet**, and the main view so the page remains consistent across states.
 - Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`435b667`)

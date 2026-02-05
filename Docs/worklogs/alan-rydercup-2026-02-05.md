@@ -10,7 +10,7 @@
   - Replaced bespoke header/back button markup with the shared `PageHeader` component.
   - Applied the same `PageHeader` pattern consistently for: **no active trip**, **no stats yet**, and the **normal** Trip Stats view.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`435b667`)
 
 ### Docs: Phase 1 plan — add follow-on sweep commands
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`
