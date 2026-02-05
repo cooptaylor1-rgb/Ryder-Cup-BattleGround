@@ -335,3 +335,8 @@
 - Web worklog (`golf-ryder-cup-web/WORKLOG.md`): re-sorted 2026-02-05 and 2026-02-06 entries into a clean chronological order so the in-repo timeline matches what shipped.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0f2c0a9`)
+
+## 2026-02-05 14:35 EST — Phase 1 (batch 61)
+- Standings (Fun Stats tab): replaced `window.location.href` CTAs with `router.push()` so navigation stays app-native (no full reloads) and consistent with the rest of the UI.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3d2bac3`)

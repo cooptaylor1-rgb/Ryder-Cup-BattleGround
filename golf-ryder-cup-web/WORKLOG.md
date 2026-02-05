@@ -47,3 +47,4 @@ All times America/New_York.
 - 13:15 — Shipped batch: `/lineup/new` precomputes and filters format categories instead of `return null` inside the format category map, preventing silent render gaps when filters hide a category. (commit 6087b1e)
 - 13:45 — Shipped batch: Settings subpages (`/settings/appearance`, `/settings/scoring`) upgraded to the standard premium wrapper + shared `PageHeader` for consistent navigation and layout. Scoring toggles aligned to the actual `ScoringPreferences` keys (no orphan controls). (commit 7a45cc3)
 - 14:01 — Shipped batch: Captain Bets winner selection no longer uses `return null` inside `map()` when a participant record is missing; we now prefilter so the UI never silently drops buttons. (commit 1f44b15)
+- 14:35 — Shipped batch: Standings Fun Stats CTAs now use `router.push()` instead of `window.location.href` to avoid full page reloads and keep navigation consistent. (commit 3d2bac3)

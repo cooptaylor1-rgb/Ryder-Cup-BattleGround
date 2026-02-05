@@ -5,6 +5,12 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 55): Standings — Fun Stats CTAs use router navigation (no full reload)
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Replaced `window.location.href` usage in Fun Stats empty-state CTAs with `router.push()` for consistent, app-native navigation.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`3d2bac3`)
+
 ### Phase 1 (batch 52): Standings — Fun Stats category rendering never silently disappears
 - `golf-ryder-cup-web/src/app/standings/page.tsx`
   - Precomputed `displayCategories` so the Fun Stats tab never relies on `return null` inside `map()` for category sections.
