@@ -42,6 +42,7 @@ import {
   // Info
   Heart,
 } from 'lucide-react';
+import { BottomNav } from '@/components/layout';
 
 /**
  * MORE PAGE — Redesigned Hub
@@ -375,8 +376,8 @@ export default function MorePage() {
 
   return (
     <div
-      className="pb-nav page-premium-enter"
-      style={{ minHeight: '100vh', background: 'var(--canvas)' }}
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
     >
       {/* Header */}
       <header
@@ -1081,6 +1082,8 @@ export default function MorePage() {
           </Modal>
         )}
       </AnimatePresence>
+
+      <BottomNav />
     </div>
   );
 }
