@@ -12,6 +12,11 @@
 - Commit + push ✅ (`46c367d`)
 
 ### Phase 1 (batch 62): Docs — Lobster worklog chronological cleanup
+
+### Phase 1 (batch 63): Phase 1 sweep verification (no remaining top-level `return null;` in routes)
+- Verified the strict route scan (`rg "^\s*return null;\s*$"` over `golf-ryder-cup-web/src/app/**/page.tsx`) reports no remaining top-level blank-screen returns.
+- Any remaining `return null` hits in route pages are internal (helpers/`useMemo`) and do not produce a user-facing blank screen.
+
 - `Docs/lobster/WORKLOG.md`
   - Re-sorted the Lobster worklog into a clean chronological timeline and deduped conflicting/duplicate entries.
   - Added commit hashes where known to reduce ambiguity when batch numbers overlap.

@@ -274,3 +274,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 16:45 EST — Phase 1 (batch 61)
 - Stableford scorecard: score input buttons now prefilter valid values instead of `return null` inside `map()` (avoids silent render gaps and keeps Phase 1 consistency).
 - Commit + push ✅ (`22191a2`)
+
+### 17:40 EST — Phase 1 (batch 63)
+- Phase 1 sweep verification: re-ran the strict route scan (`rg "^\s*return null;\s*$"` over `src/app/**/page.tsx`) and confirmed there are no remaining top-level `return null;` blank-screen returns.
+- Remaining `return null` hits in route pages are internal (helpers/`useMemo`) and do not correspond to user-facing blank screens.

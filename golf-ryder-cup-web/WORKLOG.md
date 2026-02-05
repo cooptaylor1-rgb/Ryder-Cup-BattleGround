@@ -27,6 +27,7 @@ All times America/New_York.
 - 23:05 — Shipped batch: Backup & Restore (`/settings/backup`) now renders explicit loading/load-error/no-trips empty states + includes `BottomNav` (no silent failures). (commit 6604d23)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
 - 23:58 — Shipped batch: added `BottomNav` + standardized premium wrappers to Players + Standings (including no-trip and loading states). (commit 659edbb)
+- 17:40 — Phase 1 (batch 63): sweep note: re-ran the strict `rg "^\s*return null;\s*$"` route scan and confirmed there are no remaining top-level `return null;` blank-screen returns in `src/app/**/page.tsx`; remaining `return null` hits in routes are limited to internal helpers/`useMemo` values (not user-facing blank screens).
 
 ## 2026-02-06
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
