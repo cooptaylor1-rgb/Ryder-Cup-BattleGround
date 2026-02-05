@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { BottomNav } from '@/components/layout';
@@ -18,12 +18,7 @@ import {
   Plus,
   Check,
 } from 'lucide-react';
-import {
-  EmptyStatePremium,
-  NoPlayersPremiumEmpty,
-  PageSkeleton,
-  PlayerListSkeleton,
-} from '@/components/ui';
+import { EmptyStatePremium, NoPlayersPremiumEmpty } from '@/components/ui';
 
 // Bulk player entry row type
 interface BulkPlayerRow {

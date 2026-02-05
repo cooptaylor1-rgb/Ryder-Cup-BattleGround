@@ -2,20 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium, NoBetsEmpty, Skeleton } from '@/components/ui';
+import { EmptyStatePremium, NoBetsEmpty } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
 import {
   ChevronLeft,
-  Home,
   Target,
   Users,
   Trophy,
-  MoreHorizontal,
   DollarSign,
   Zap,
   TrendingUp,
@@ -24,7 +21,6 @@ import {
   Check,
   Clock,
   Crown,
-  CalendarDays,
   X,
   Flag,
   Ruler,

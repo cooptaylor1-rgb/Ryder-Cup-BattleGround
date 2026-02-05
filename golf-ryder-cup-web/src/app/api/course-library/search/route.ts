@@ -5,7 +5,7 @@ import {
   incrementCourseUsage,
 } from '@/lib/services/courseLibrarySyncService';
 import { apiLogger } from '@/lib/utils/logger';
-import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { applyRateLimit } from '@/lib/utils/apiMiddleware';
 import {
   courseLibrarySearchSchema,
   courseLibraryGetSchema,
