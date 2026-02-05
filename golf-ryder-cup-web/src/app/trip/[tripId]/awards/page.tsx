@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, Trophy, Medal, TrendingUp, Users, RefreshCw, Share2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { Trophy, Medal, TrendingUp, Users, RefreshCw, Share2 } from 'lucide-react';
 import { computeTripRecords } from '@/lib/services/awardsService';
 import type { TripRecords, Award, PlayerStats } from '@/lib/types/awards';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { PageHeader, BottomNav } from '@/components/layout';
+import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
 function AwardCard({ award }: { award: Award }) {
   if (!award.winner) {
@@ -108,6 +109,7 @@ function PlayerStatsCard({ stats, rank }: { stats: PlayerStats; rank: number }) 
 }
 
 export default function AwardsPage() {
+  const router = useRouter();
   const params = useParams();
   const tripId = params.tripId as string;
   const { showToast } = useUIStore();
@@ -163,47 +165,91 @@ export default function AwardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-augusta-green text-white px-4 py-4 shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href={`/trip/${tripId}`} className="p-2 hover:bg-white/10 rounded-lg">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-lg font-semibold">Awards & Records</h1>
-          </div>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title="Awards"
+        subtitle="Awards & records"
+        icon={<Trophy size={16} style={{ color: 'white' }} />}
+        onBack={() => router.push(`/trip/${tripId}`)}
+        rightSlot={
           <div className="flex items-center gap-2">
             <button
               onClick={loadRecords}
               disabled={isLoading}
-              className="p-2 hover:bg-white/10 rounded-lg"
+              className="press-scale"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--rule)',
+                background: 'var(--surface-card)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--ink-primary)',
+              }}
+              aria-label="Refresh"
             >
               <RefreshCw className={cn('w-5 h-5', isLoading && 'animate-spin')} />
             </button>
             <button
               onClick={handleShare}
               disabled={!records}
-              className="p-2 hover:bg-white/10 rounded-lg"
+              className="press-scale"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--rule)',
+                background: 'var(--surface-card)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: records ? 'var(--ink-primary)' : 'var(--ink-tertiary)',
+                opacity: records ? 1 : 0.5,
+                cursor: records ? 'pointer' : 'not-allowed',
+              }}
+              aria-label="Share"
             >
               <Share2 className="w-5 h-5" />
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
-      <main className="max-w-4xl mx-auto p-4 space-y-6">
-        {isLoading && (
+      <main className="container-editorial py-10 space-y-6">
+        {isLoading ? (
+          <PageLoadingSkeleton />
+        ) : error ? (
           <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl h-32 animate-pulse" />
-            ))}
+            <ErrorEmpty message={error} onRetry={loadRecords} />
+            <EmptyStatePremium
+              illustration="flag"
+              title="Need to get back?"
+              description="You can return to the trip and try again in a moment."
+              action={{
+                label: 'Back to Trip',
+                onClick: () => router.push(`/trip/${tripId}`),
+              }}
+              variant="compact"
+              animated={false}
+            />
           </div>
-        )}
-
-        {error && <div className="bg-red-50 text-red-800 p-4 rounded-xl">{error}</div>}
-
-        {records && !isLoading && (
+        ) : !records ? (
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No awards yet"
+            description="Once matches are scored, we’ll summarize the trip’s winners and records here."
+            action={{
+              label: 'Back to Trip',
+              onClick: () => router.push(`/trip/${tripId}`),
+            }}
+            variant="large"
+          />
+        ) : (
           <>
             {/* Final Score Card */}
             <section className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -340,6 +386,7 @@ export default function AwardsPage() {
           </>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }
