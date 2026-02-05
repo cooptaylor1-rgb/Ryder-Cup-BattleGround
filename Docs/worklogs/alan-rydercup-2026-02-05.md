@@ -10,7 +10,14 @@
   - Precomputed `displayCategories` so the Fun Stats tab never relies on `return null` inside `map()` for category sections.
   - If totals exist but don’t produce any category sections (edge case), we now fall back to the same premium empty state (“No stats yet”) instead of rendering a confusing gap.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`1de47dc`)
+
+### Phase 1 (batch 53): Worklogs — sync missing batch 52 entry
+- `Docs/lobster/WORKLOG.md`
+- `golf-ryder-cup-web/WORKLOG.md`
+  - Added the missing Phase 1 (batch 52) entry to the Lobster worklog and added the commit hash to the web worklog timeline.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`e948f49`)
 
 ### Phase 1 (batch 51): Standings — Fun Stats empty state uses EmptyStatePremium
 - `golf-ryder-cup-web/src/app/standings/page.tsx`
