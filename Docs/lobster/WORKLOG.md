@@ -148,3 +148,8 @@
 - Standings: added `BottomNav` to no-trip and loading states, plus the main page.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-06 00:10 EST — Phase 1 (batch 30)
+- Docs: synced `golf-ryder-cup-web/WORKLOG.md` to include the shipped Phase 1 batches 24–29 so the in-app worklog matches the Lobster worklog.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
