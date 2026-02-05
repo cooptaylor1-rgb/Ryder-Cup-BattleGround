@@ -95,3 +95,10 @@
 - Updated Lobster + daily + in-repo web worklog entries to include the batch 55 commit hash.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`8503fdf`)
+
+### Phase 1 (batch 57): Lineup New — format categories without `return null`
+- `golf-ryder-cup-web/src/app/lineup/new/page.tsx`
+  - Precompute + filter format categories instead of returning `null` from inside the category map.
+  - Prevents silent render gaps when filters hide a category and keeps Phase 1’s “no hidden empty renders” goal consistent.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`6087b1e`)

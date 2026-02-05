@@ -307,3 +307,9 @@
 - Docs: updated worklogs to include the batch 55 commit hash.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8503fdf`)
+
+## 2026-02-06 13:15 EST — Phase 1 (batch 57)
+- New Session / Lineup (`/lineup/new`): precompute and filter format categories instead of `return null` inside the category map.
+- Prevents silent render gaps when filters hide an entire category and keeps Phase 1’s “no hidden empty renders” goal consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6087b1e`)
