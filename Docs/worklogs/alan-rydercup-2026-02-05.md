@@ -147,6 +147,14 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`2bc0cf3`)
 
+### Phase 1 (batch 36): Worklogs — sync Phase 1 batch 35 entries
+- `Docs/lobster/WORKLOG.md`
+  - Appended the Phase 1 (batch 35) entry so the Lobster worklog matches what shipped.
+- `golf-ryder-cup-web/WORKLOG.md`
+  - Added the missing shipped batch 35 entry for `/profile/complete`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`cefa9b8`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
