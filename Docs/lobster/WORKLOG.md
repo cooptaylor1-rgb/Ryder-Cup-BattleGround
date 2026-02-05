@@ -69,3 +69,35 @@
 - Bets detail page: removed an unused `useEffect` import (lint hygiene).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-05 20:55 EST — Phase 1 (batch 19)
+- Lineup session page: replaced the plain “Session not found” centered text gate with `EmptyStatePremium` screens.
+- Split missing-data states for clarity:
+  - No active trip → premium empty state with Home CTA.
+  - Session missing → premium empty state with CTA back to `/lineup`.
+- Included `BottomNav` in these empty states so users always have a clear navigation path.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
+
+## 2026-02-05 21:10 EST — Phase 1 (batch 20)
+- Social + Live: removed auto-redirects when `currentTrip` is missing.
+- Replaced skeleton/redirect fallbacks with `EmptyStatePremium` + `BottomNav` so users always have a clear explanation + navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
+
+## 2026-02-05 21:25 EST — Phase 1 (batch 21)
+- Stats hub: replaced ad-hoc “Start or join a trip” content with consistent `EmptyStatePremium` when there’s no active trip.
+- Added `BottomNav` so the Stats hub always has a clear navigation path.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
+
+## 2026-02-05 21:35 EST — Phase 1 (batch 22)
+- Matchups: when there’s no active trip, now uses `EmptyStatePremium` (Home + More CTAs) and includes `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
+
+## 2026-02-05 21:50 EST — Phase 1 (batch 23)
+- Profile page: removed auto-redirect-to-login behavior when unauthenticated (which could show a confusing skeleton/blank while pushing).
+- Profile page: now renders `EmptyStatePremium` with clear CTAs (Sign In / Back to Home) when not authenticated.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅

@@ -86,6 +86,13 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`a09ca56`)
 
+### Phase 1 (batch 23): Profile — premium empty state when unauthenticated
+- `golf-ryder-cup-web/src/app/profile/page.tsx`
+  - Removed the auto-redirect to `/login` when not authenticated (which could show a confusing skeleton/blank while pushing).
+  - Now renders `EmptyStatePremium` with clear CTAs (Sign In / Back to Home) when unauthenticated.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`774b4e9`)
+
 ### Next
-- Continue sweeping for any remaining user-facing pages that still auto-redirect when `currentTrip` is missing.
-- Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` + `BottomNav` for consistency.
+- Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
+- Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
