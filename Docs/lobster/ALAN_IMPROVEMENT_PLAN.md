@@ -58,6 +58,12 @@ rg "router\.(push|replace)\('/\w+" golf-ryder-cup-web/src/app -n
 
 Then pick a small batch (1–3 routes), apply the standard pattern below, and run the Lobster checkpoint + approval gate.
 
+Extra sweep commands (useful for catching true “blank screen” component returns in route pages):
+
+```bash
+rg "^\\s*return null;\\s*$" golf-ryder-cup-web/src/app -n --glob '**/page.tsx' --glob '!**/api/**'
+```
+
 Pattern:
 - `undefined` (loading) → `PageLoadingSkeleton`
 - `[]` / no rows (empty) → `EmptyStatePremium`
