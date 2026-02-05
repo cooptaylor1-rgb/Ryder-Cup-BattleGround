@@ -6,6 +6,7 @@ import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { Button } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
+import { BottomNav } from '@/components/layout';
 import {
   User,
   Mail,
@@ -208,7 +209,7 @@ export default function CreateProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col">
+    <div className="min-h-screen pb-nav bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col texture-grain page-premium-enter">
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200"
@@ -450,8 +451,12 @@ export default function CreateProfilePage() {
 
       {/* Fixed Bottom Actions */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 p-4"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+        className="fixed left-0 right-0 z-40 bg-white border-t border-surface-200 p-4"
+        // Keep BottomNav visible at all times; lift actions above nav height (80px).
+        style={{
+          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+          paddingBottom: '1rem',
+        }}
       >
         <div className="max-w-md mx-auto">
           {step === 'essential' ? (
@@ -510,6 +515,8 @@ export default function CreateProfilePage() {
           )}
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 }

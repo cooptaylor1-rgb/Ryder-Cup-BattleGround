@@ -258,3 +258,9 @@
 - Scoring match detail (`/score/[matchId]`): when a match is unavailable, the premium empty state now still passes `activeMatchId` into `BottomNav` so the scoring context stays consistent and navigation remains obvious.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅
+
+## 2026-02-05 10:05 EST — Phase 1 (batch 49)
+- Profile Create (`/profile/create`): standardized wrapper (`pb-nav` + texture + premium enter) and added `BottomNav` so onboarding screens aren’t navigation dead ends.
+- Profile Create: lifted the fixed bottom action bar above the BottomNav height (80px) so primary actions remain accessible without hiding navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
