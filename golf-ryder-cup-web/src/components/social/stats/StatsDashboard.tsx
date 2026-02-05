@@ -86,6 +86,17 @@ export function StatsDashboard({
 
   const visibleStats = showAllPlayers ? sortedStats : sortedStats.slice(0, 5);
 
+  // Avoid `return null` inside list rendering; prefilter invalid rows so ranks are consistent.
+  const leaderboardRows = useMemo(() => {
+    const rows: Array<{ stats: PlayerStatistics; player: Player }> = [];
+    for (const stats of visibleStats) {
+      const player = players.find((p) => p.id === stats.playerId);
+      if (!player) continue;
+      rows.push({ stats, player });
+    }
+    return rows;
+  }, [players, visibleStats]);
+
   // Calculate aggregate stats
   const aggregateStats = useMemo(() => {
     const totalMatches = matches.filter(m => m.status === 'completed').length;
@@ -180,21 +191,16 @@ export function StatsDashboard({
         </div>
 
         <div className="space-y-3">
-          {visibleStats.map((stats, index) => {
-            const player = players.find(p => p.id === stats.playerId);
-            if (!player) return null;
-
-            return (
-              <PlayerStatsCard
-                key={stats.playerId}
-                stats={stats}
-                player={player}
-                allPlayers={players}
-                rank={index + 1}
-                showDetails={index < 3}
-              />
-            );
-          })}
+          {leaderboardRows.map(({ stats, player }, index) => (
+            <PlayerStatsCard
+              key={stats.playerId}
+              stats={stats}
+              player={player}
+              allPlayers={players}
+              rank={index + 1}
+              showDetails={index < 3}
+            />
+          ))}
         </div>
 
         {sortedStats.length > 5 && (
