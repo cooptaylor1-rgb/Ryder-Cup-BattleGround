@@ -138,6 +138,15 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`a288c13`)
 
+### Phase 1 (batch 35): Complete Profile — remove auto-redirects, render explicit empty states
+- `golf-ryder-cup-web/src/app/profile/complete/page.tsx`
+  - Removed the `useEffect` auto-redirect to `/login` when unauthenticated (which could briefly show a confusing loading skeleton).
+  - Added an explicit signed-out `EmptyStatePremium` with Sign In + Home CTAs and `BottomNav`.
+  - Added an explicit “already onboarded” `EmptyStatePremium` state with Continue + Home CTAs and `BottomNav`.
+  - Kept a loading skeleton only for the authenticated-but-still-loading `currentUser` case.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`2bc0cf3`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
