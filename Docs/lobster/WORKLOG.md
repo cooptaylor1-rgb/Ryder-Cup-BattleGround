@@ -292,3 +292,11 @@
 - Keeps the Phase 1 “no silent render gaps” rule consistent and avoids hidden empty rows inside otherwise-present categories.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c185928`)
+
+## 2026-02-06 12:20 EST — Phase 1 (batch 54)
+- Docs: synced Phase 1 worklogs (Lobster + daily + in-repo web worklog) to include the latest shipped batches.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`80e378f`)
+
+## 2026-02-06 12:45 EST — Phase 1 (batch 55)
+- Spectator mode (`/spectator/[tripId]`): added bottom padding to the main content so the fixed “Last updated” footer doesn’t cover the last section on smaller screens.

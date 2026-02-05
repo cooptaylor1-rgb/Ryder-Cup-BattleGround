@@ -84,3 +84,7 @@
   - Keeps Phase 1’s “no silent render gaps” goal consistent and avoids hidden missing rows inside otherwise-present categories.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`c185928`)
+
+### Phase 1 (batch 55): Spectator mode — fixed footer no longer covers content
+- `golf-ryder-cup-web/src/app/spectator/[tripId]/page.tsx`
+  - Added bottom padding to the main content container so the fixed “Last updated” footer doesn’t overlap the last content section on smaller screens.
