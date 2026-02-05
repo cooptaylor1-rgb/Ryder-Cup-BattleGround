@@ -330,3 +330,8 @@
 - Scoring settings: aligned toggles to the actual `ScoringPreferences` keys (removed orphan controls).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`7a45cc3`)
+
+## 2026-02-05 14:35 EST — Phase 1 (batch 60)
+- Web worklog (`golf-ryder-cup-web/WORKLOG.md`): re-sorted 2026-02-05 and 2026-02-06 entries into a clean chronological order so the in-repo timeline matches what shipped.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0f2c0a9`)
