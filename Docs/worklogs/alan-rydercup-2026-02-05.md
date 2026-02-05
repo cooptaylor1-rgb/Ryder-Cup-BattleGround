@@ -79,6 +79,13 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`f798894`)
 
+### Phase 1 (batch 22): Matchups — premium empty state includes nav
+- `golf-ryder-cup-web/src/app/matchups/page.tsx`
+  - When there’s no active trip, Matchups now uses the consistent `EmptyStatePremium` pattern with Home + More CTAs.
+  - Added `BottomNav` so users always have a clear navigation path even in empty states.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`a09ca56`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect when `currentTrip` is missing.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` + `BottomNav` for consistency.
