@@ -258,3 +258,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 13:25 EST — Phase 1 (batch 58)
 - Docs: synced worklogs to include Phase 1 batch 57.
 - Commit + push ✅ (`71d8681`)
+
+### 15:55 EST — Phase 1 (batch 59)
+- Settings — Notifications (`/settings/notifications`): upgraded to the standard premium wrapper and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
+- (Pending commit + push)

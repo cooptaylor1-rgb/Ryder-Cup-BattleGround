@@ -11,9 +11,8 @@
  */
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-    ChevronLeft,
     Bell,
     BellOff,
     Clock,
@@ -32,9 +31,10 @@ import {
     type NotificationPreferences,
 } from '@/lib/services/notificationService';
 import { useTripStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 export default function NotificationSettingsPage() {
+    const router = useRouter();
     const { currentTrip } = useTripStore();
     const [preferences, setPreferences] = useState<NotificationPreferences>(getPreferences());
     const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>(() => {
@@ -97,25 +97,15 @@ export default function NotificationSettingsPage() {
     const isNotificationsSupported = typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-        <div className="min-h-screen pb-nav flex flex-col bg-(--paper)">
-            {/* Header */}
-            <header className="sticky top-0 z-40 bg-(--paper) border-b border-(--rule)">
-                <div className="flex items-center justify-between px-4 py-3">
-                    <Link
-                        href="/settings"
-                        className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-(--ink-secondary) transition-colors"
-                    >
-                        <ChevronLeft className="w-6 h-6" style={{ color: 'var(--ink)' }} />
-                    </Link>
-                    <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
-                        Notifications
-                    </h1>
-                    <div className="w-10" />
-                </div>
-            </header>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain">
+            <PageHeader
+                title="Notifications"
+                icon={<Bell className="w-4 h-4 text-white" />}
+                onBack={() => router.push('/settings')}
+            />
 
             {/* Content */}
-            <main className="flex-1 px-4 py-6 space-y-6 pb-8">
+            <main className="container-editorial py-6 space-y-6 pb-8">
                 {/* Saved Message */}
                 {savedMessage && (
                     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-(--masters) text-white text-sm font-medium flex items-center gap-2 shadow-lg animate-fadeIn">
