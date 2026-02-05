@@ -5,6 +5,13 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 62): Docs — Lobster worklog chronological cleanup
+- `Docs/lobster/WORKLOG.md`
+  - Re-sorted the Lobster worklog into a clean chronological timeline and deduped conflicting/duplicate entries.
+  - Added commit hashes where known to reduce ambiguity when batch numbers overlap.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`bdf2b56`)
+
 ### Phase 1 (batch 55): Standings — Fun Stats CTAs use router navigation (no full reload)
 - `golf-ryder-cup-web/src/app/standings/page.tsx`
   - Replaced `window.location.href` usage in Fun Stats empty-state CTAs with `router.push()` for consistent, app-native navigation.
