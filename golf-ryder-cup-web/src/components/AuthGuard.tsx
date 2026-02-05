@@ -65,7 +65,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     // User is authenticated, allow access - defer to avoid setState-in-effect
     const timeoutId = setTimeout(() => setIsChecking(false), 0);
     return () => clearTimeout(timeoutId);
-  }, [isHydrated, isAuthenticated, currentUser, pathname, router]);
+  }, [isHydrated, isAuthenticated, currentUser, pathname, router, searchParams]);
 
   // Show nothing while checking authentication (prevents flash)
   if (!isHydrated || isChecking) {

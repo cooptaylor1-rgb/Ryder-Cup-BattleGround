@@ -7,21 +7,13 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import {
-  Users,
-  Trophy,
-  ChevronDown,
-  ChevronUp,
-  Info,
-  Zap,
-} from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Info, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { WolfGame } from '@/lib/types/sideGames';
 import type { Player } from '@/lib/types/models';
 import {
   getWolfForHole,
   wolfChoosesPartner,
-  recordWolfHoleResult,
   calculateWolfPayouts,
 } from '@/lib/services/extendedSideGamesService';
 

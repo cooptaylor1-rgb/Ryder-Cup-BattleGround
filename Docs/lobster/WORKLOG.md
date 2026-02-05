@@ -160,6 +160,13 @@
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`df99c05`)
 
+## 2026-02-06 11:40 EST — Phase 1 (batch 47)
+- Lint hygiene sweep (warnings-only): removed unused icon imports/vars (PDF export panel, Wolf game card, handicap stroke indicator, notification settings).
+- Vegas game card: stabilized `getPlayerName` with `useCallback`, fixed memo deps, and hardened name formatting when `lastName` is missing.
+- AuthGuard: included `searchParams` in effect deps to satisfy hooks lint.
+- Session lock manager: underscored an unused prop to satisfy lint.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ## 2026-02-05 01:25 EST — Phase 1 (batch 32)
 - Schedule: added an explicit signed-out empty state (“Sign in to view the schedule”) with a clear CTA to `/login` and `BottomNav` for consistent navigation.
 - Score (match list): added an explicit signed-out empty state (“Sign in to view scores”) with CTA to `/login` and `BottomNav`.

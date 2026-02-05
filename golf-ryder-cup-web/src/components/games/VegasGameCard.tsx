@@ -7,14 +7,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  RefreshCw,
-  Info,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { RefreshCw, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { VegasGame } from '@/lib/types/sideGames';
 import type { Player } from '@/lib/types/models';
@@ -42,18 +35,22 @@ export function VegasGameCard({
   const [team1Scores, setTeam1Scores] = useState<[string, string]>(['', '']);
   const [team2Scores, setTeam2Scores] = useState<[string, string]>(['', '']);
 
-  const getPlayerName = (playerId: string) => {
-    const p = players.find(pl => pl.id === playerId);
-    return p ? `${p.firstName} ${p.lastName.charAt(0)}.` : 'Unknown';
-  };
+  const getPlayerName = useCallback(
+    (playerId: string) => {
+      const p = players.find((pl) => pl.id === playerId);
+      const initial = p?.lastName?.trim()?.charAt(0) ?? '';
+      return p ? `${p.firstName} ${initial ? `${initial}.` : ''}`.trim() : 'Unknown';
+    },
+    [players]
+  );
 
   const team1Names = useMemo(() => {
-    return game.team1PlayerIds.map(id => getPlayerName(id));
-  }, [game.team1PlayerIds, players]);
+    return game.team1PlayerIds.map((id) => getPlayerName(id));
+  }, [game.team1PlayerIds, getPlayerName]);
 
   const team2Names = useMemo(() => {
-    return game.team2PlayerIds.map(id => getPlayerName(id));
-  }, [game.team2PlayerIds, players]);
+    return game.team2PlayerIds.map((id) => getPlayerName(id));
+  }, [game.team2PlayerIds, getPlayerName]);
 
   const payouts = useMemo(() => {
     return calculateVegasPayouts(game, players);

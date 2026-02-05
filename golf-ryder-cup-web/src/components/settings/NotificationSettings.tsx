@@ -10,10 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Bell,
   BellOff,
-  Check,
-  X,
   AlertCircle,
-  Smartphone,
   Trophy,
   MessageCircle,
   BarChart3,

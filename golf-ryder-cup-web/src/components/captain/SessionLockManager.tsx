@@ -36,7 +36,7 @@ export function SessionLockManager({
   sessionName,
   currentLock,
   currentUserId,
-  currentUserName,
+  currentUserName: _currentUserName,
   isCaptain = false,
   onLockChange,
   compact = false,

@@ -3,11 +3,7 @@
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { CircleDot, Info } from 'lucide-react';
-import {
-  allocateStrokes,
-  isOneBallFormat,
-  getMatchPlayStrokesOnHole,
-} from '@/lib/services/handicapCalculator';
+import { isOneBallFormat, getMatchPlayStrokesOnHole } from '@/lib/services/handicapCalculator';
 
 /**
  * HANDICAP STROKE INDICATOR

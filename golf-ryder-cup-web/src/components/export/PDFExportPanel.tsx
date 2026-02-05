@@ -11,9 +11,7 @@ import {
   FileText,
   Download,
   Trophy,
-  Users,
   BarChart3,
-  Calendar,
   Loader2,
   Check,
 } from 'lucide-react';
