@@ -6,6 +6,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import { Users, Plus, Shield, Calendar, ChevronRight, Home, Target, Trophy, MoreHorizontal, ChevronLeft, CalendarDays } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsPremiumEmpty } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 
 /**
  * MATCHUPS PAGE — Team Rosters & Sessions
@@ -47,10 +48,12 @@ export default function MatchupsPage() {
             illustration="trophy"
             title="No active trip"
             description="Start or select a trip to view matchups."
-            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            action={{ label: 'Go Home', onClick: () => router.push('/') }}
+            secondaryAction={{ label: 'More', onClick: () => router.push('/more') }}
             variant="large"
           />
         </main>
+        <BottomNav />
       </div>
     );
   }
