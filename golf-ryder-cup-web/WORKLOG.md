@@ -12,6 +12,9 @@ All times America/New_York.
 - 01:55 — Shipped batch: updated `/lineup/new` to use the shared `BottomNav` (replacing the custom nav) and added explicit premium empty states for **No trip selected** + **Captain Mode required** so navigation is always clear. (commit a8dc84c)
 - 02:05 — Shipped batch: Complete Profile (`/profile/complete`) now renders explicit premium empty states (signed out + already onboarded) instead of auto-redirecting; added `BottomNav` to keep navigation clear. (commit 2bc0cf3)
 - 03:45 — Shipped batch: Courses (`/courses`) and New Course (`/courses/new`) now include the standard premium wrapper (`pb-nav`) and `BottomNav`, including in the course database search modal, so navigation is always available. (commit 0b57d6f)
+- 10:20 — Shipped batch: Scoring match detail (`/score/[matchId]`) now shows an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and includes `BottomNav` so deep links aren’t dead ends when unauthenticated. (commit 278add9)
+- 10:45 — Shipped batch: Standings Fun Stats tab now uses the standard `EmptyStatePremium` for the “No stats yet” state, with a clear CTA to start tracking Trip Stats. (commit e52f2b0)
+- 10:55 — Shipped batch: Standings Fun Stats category sections now precompute displayable categories instead of `return null` inside `map()`, and fall back to the premium empty state if nothing renders (edge case). (commit 1de47dc)
 - 11:20 — Shipped batch: Captain pages now render explicit premium empty states (no-trip / Captain Mode off) instead of auto-redirecting away, preventing confusing skeleton/blank-ish flashes. (commit 8e794b6)
 - 20:10 — Shipped batch: removed missing-trip auto-redirects on Social + Live; now uses consistent `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation. (commit 76198a5)
 - 20:45 — Shipped batch: Achievements removed missing-trip auto-redirect; now shows a premium empty state with clear CTAs. (commit c3fdca6)
@@ -23,13 +26,9 @@ All times America/New_York.
 - 23:05 — Shipped batch: Backup & Restore (`/settings/backup`) now renders explicit loading/load-error/no-trips empty states + includes `BottomNav` (no silent failures). (commit 6604d23)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
 - 23:58 — Shipped batch: added `BottomNav` + standardized premium wrappers to Players + Standings (including no-trip and loading states). (commit 659edbb)
-- 10:20 — Shipped batch: Scoring match detail (`/score/[matchId]`) now shows an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and includes `BottomNav` so deep links aren’t dead ends when unauthenticated. (commit 278add9)
-- 10:45 — Shipped batch: Standings Fun Stats tab now uses the standard `EmptyStatePremium` for the “No stats yet” state, with a clear CTA to start tracking Trip Stats. (commit e52f2b0)
-- 10:55 — Shipped batch: Standings Fun Stats category sections now precompute displayable categories instead of `return null` inside `map()`, and fall back to the premium empty state if nothing renders (edge case). (commit 1de47dc)
 
 ## 2026-02-06
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
-- 10:05 — Shipped batch: Profile Create (`/profile/create`) now includes the standard premium wrapper + `BottomNav`, and the fixed bottom actions are lifted above the nav height so onboarding screens aren’t dead ends. (commit 016fe81)
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
 - 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)
 - 03:45 — Shipped batch: Worklog sync — ensured the web worklog reflects the shipped Phase 1 improvements so in-repo history matches Lobster worklog. (commit b039ec6)
@@ -41,6 +40,7 @@ All times America/New_York.
 - 06:30 — Shipped batch: lint hygiene — removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` from `featureFlags.tsx` to reduce warning noise. (commit 971f463)
 - 07:55 — Shipped batch: Profile now keeps `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (no dead-end edit mode). (commit b6a3f87)
 - 08:20 — Shipped batch: More (`/more`) now shows an explicit premium empty state when every menu section is hidden by context (signed out / no trip / Captain-only tools), preventing a confusing “blank” hub. (commit 16f8a0a)
+- 10:05 — Shipped batch: Profile Create (`/profile/create`) now includes the standard premium wrapper + `BottomNav`, and the fixed bottom actions are lifted above the nav height so onboarding screens aren’t dead ends. (commit 016fe81)
 - 11:40 — Shipped batch: lint hygiene sweep — removed unused icon imports/vars, fixed hook deps in AuthGuard, and stabilized memo deps in Vegas side game card (reduces lint warnings without behavior changes).
 - 12:15 — Shipped batch: Standings Fun Stats: removed `return null` usage inside the stat-type map (uses a reduce/push) to avoid silent render gaps and keep Phase 1 “no blank returns” consistent. (commit c185928)
 - 12:45 — Shipped batch: Spectator Mode (`/spectator/[tripId]`) adds bottom padding so the fixed “Last updated” footer doesn’t cover the last section on smaller screens. (commit baee815)
