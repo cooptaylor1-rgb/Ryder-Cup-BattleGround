@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { BottomNav } from '@/components/layout';
 
 export default function GlobalError({
     error,
@@ -27,7 +28,7 @@ export default function GlobalError({
     return (
         <html>
             <body>
-                <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-surface-50 to-surface-100 px-4">
+                <div className="min-h-screen pb-nav page-premium-enter texture-grain flex items-center justify-center bg-linear-to-b from-surface-50 to-surface-100 px-4">
                     <div className="max-w-md w-full text-center">
                         {/* Error Icon */}
                         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
@@ -62,21 +63,21 @@ export default function GlobalError({
                             <Button
                                 variant="secondary"
                                 size="lg"
-                                onClick={() => window.location.href = '/'}
+                                onClick={() => {
+                                    window.location.href = '/';
+                                }}
                             >
                                 <Home className="w-4 h-4 mr-2" />
                                 Go Home
                             </Button>
-                            <Button
-                                variant="primary"
-                                size="lg"
-                                onClick={reset}
-                            >
+                            <Button variant="primary" size="lg" onClick={reset}>
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Try Again
                             </Button>
                         </div>
                     </div>
+
+                    <BottomNav />
                 </div>
             </body>
         </html>

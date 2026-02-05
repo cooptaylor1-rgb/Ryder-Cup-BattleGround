@@ -207,3 +207,9 @@
 - Notifications settings: removed the page-local fixed nav + `NavItem` in favor of shared `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`bb1f9e3`)
+
+## 2026-02-05 04:45 EST — Phase 1 (batch 40)
+- App-level Not Found + route error pages: standardized wrappers to the premium layout (`pb-nav` + texture) and added `BottomNav` so users always have a clear navigation path when they hit a 404 or crash.
+- Global error page: added `BottomNav` + standard bottom padding so recovery screens aren’t dead ends.
+- Lobster checkpoint: pending
+- Commit + push: pending

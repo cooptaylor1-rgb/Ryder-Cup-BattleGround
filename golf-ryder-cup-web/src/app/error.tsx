@@ -12,6 +12,7 @@ import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { BottomNav } from '@/components/layout';
 
 interface ErrorPageProps {
     error: Error & { digest?: string };
@@ -26,7 +27,7 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
 
     return (
         <div
-            className="min-h-screen flex flex-col items-center justify-center p-6"
+            className="min-h-screen pb-nav page-premium-enter texture-grain flex flex-col items-center justify-center p-6"
             style={{ background: 'var(--canvas)' }}
         >
             {/* Icon */}
@@ -120,6 +121,8 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
                     Go Home
                 </Link>
             </div>
+
+            <BottomNav />
         </div>
     );
 }

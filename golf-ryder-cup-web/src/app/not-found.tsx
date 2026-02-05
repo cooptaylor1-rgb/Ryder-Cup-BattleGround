@@ -9,13 +9,14 @@
 import Link from 'next/link';
 import { MapPin, Home, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { BottomNav } from '@/components/layout';
 
 export default function NotFound() {
     const router = useRouter();
 
     return (
         <div
-            className="min-h-screen flex flex-col items-center justify-center p-6"
+            className="min-h-screen pb-nav page-premium-enter texture-grain flex flex-col items-center justify-center p-6"
             style={{ background: 'var(--canvas)' }}
         >
             {/* Golf Flag Icon */}
@@ -110,6 +111,8 @@ export default function NotFound() {
                     ))}
                 </div>
             </div>
+
+            <BottomNav />
         </div>
     );
 }

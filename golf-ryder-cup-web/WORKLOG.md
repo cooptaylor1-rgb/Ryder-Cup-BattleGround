@@ -29,3 +29,9 @@ All times America/New_York.
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
 - 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)
 - 04:20 — Shipped batch: Achievements now uses the shared `BottomNav` (including no-trip and loading states). Settings subpages (Appearance/Scoring/Notifications) now include `BottomNav` + `pb-nav` so navigation is always available. (commit bb1f9e3)
+
+## 2026-02-05 04:45 EST — Phase 1 (batch 40)
+- App-level Not Found + route error pages: standardized wrappers to the premium layout (`pb-nav` + texture) and added `BottomNav` so users always have a clear navigation path when they hit a 404 or crash.
+- Global error page: added `BottomNav` + standard bottom padding so recovery screens aren’t dead ends.
+- Lobster checkpoint: pending
+- Commit + push: pending
