@@ -100,6 +100,16 @@
   - Added `BottomNav` so both pages keep a clear navigation path, including in empty-state scenarios (no active trip / no stats).
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 
+### Phase 1 (batch 25): Trip Settings — premium wrapper + explicit states
+- `golf-ryder-cup-web/src/app/trip/[tripId]/settings/page.tsx`
+  - Upgraded to the standard premium page wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) and added `BottomNav` so users always have a clear navigation path.
+  - Added explicit loading/error/not-found states:
+    - loading → `PageLoadingSkeleton`
+    - lookup error → `EmptyStatePremium` with Retry + Home CTAs
+    - missing trip → `EmptyStatePremium` with Home + More CTAs
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`4c70f5e`)
+
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.

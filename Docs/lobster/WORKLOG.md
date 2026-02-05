@@ -101,3 +101,17 @@
 - Profile page: now renders `EmptyStatePremium` with clear CTAs (Sign In / Back to Home) when not authenticated.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-05 22:05 EST — Phase 1 (batch 24)
+- Trip Stats + Trip Awards: updated both pages to use the standard premium page wrapper and added `BottomNav` so navigation is always clear, including in empty-state scenarios (no active trip / no stats).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
+
+## 2026-02-05 22:30 EST — Phase 1 (batch 25)
+- Trip settings (`/trip/[tripId]/settings`): upgraded to the standard premium page wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) and added `BottomNav` so navigation is always available.
+- Trip settings: added explicit loading/error/not-found states:
+  - loading → `PageLoadingSkeleton`
+  - lookup error → `EmptyStatePremium` with Retry + Home CTAs
+  - missing trip → `EmptyStatePremium` with Home + More CTAs
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
