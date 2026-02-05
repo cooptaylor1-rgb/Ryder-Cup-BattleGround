@@ -142,6 +142,29 @@ export default function ScorePage() {
     const isLoading = matches === undefined || holeResults === undefined;
     const _hasNoMatches = !isLoading && matches.length === 0; // Used for future empty state UI
 
+    if (!isAuthenticated) {
+        return (
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <EmptyStatePremium
+                        illustration="scorecard"
+                        title="Sign in to view scores"
+                        description="Match scoring is available after you sign in."
+                        action={{
+                            label: 'Sign In',
+                            onClick: () => router.push('/login'),
+                        }}
+                        variant="large"
+                    />
+                </main>
+                <BottomNav />
+            </div>
+        );
+    }
+
     if (!currentTrip) {
         return (
             <div

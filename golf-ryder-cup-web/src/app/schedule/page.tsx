@@ -71,6 +71,13 @@ export default function SchedulePage() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadMatches = useCallback(async () => {
+    if (!isAuthenticated) {
+      setMatches([]);
+      setIsLoading(false);
+      setLoadError(null);
+      return;
+    }
+
     if (!currentTrip) {
       setIsLoading(false);
       setLoadError(null);
@@ -95,7 +102,7 @@ export default function SchedulePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentTrip, sessions]);
+  }, [currentTrip, sessions, isAuthenticated]);
 
   // Load matches from database
   useEffect(() => {
@@ -265,6 +272,30 @@ export default function SchedulePage() {
       }))
       .filter((day) => day.entries.some((e) => e.isUserMatch));
   }, [scheduleByDay, currentUserPlayer]);
+
+  // If not signed in, render an explicit empty state (no blank redirects).
+  if (!isAuthenticated) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="calendar"
+            title="Sign in to view the schedule"
+            description="Your trip schedule is available after you sign in."
+            action={{
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
 
   // If no trip, render an explicit empty state (no auto-redirect).
 
