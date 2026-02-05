@@ -253,3 +253,8 @@
 - Docs: updated the daily worklog (`Docs/worklogs/alan-rydercup-2026-02-06.md`) to include the shipped Phase 1 batches 45–46 so the daily log matches Lobster + web worklogs.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5b7d3cb`)
+
+## 2026-02-05 09:55 EST — Phase 1 (batch 48)
+- Scoring match detail (`/score/[matchId]`): when a match is unavailable, the premium empty state now still passes `activeMatchId` into `BottomNav` so the scoring context stays consistent and navigation remains obvious.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅

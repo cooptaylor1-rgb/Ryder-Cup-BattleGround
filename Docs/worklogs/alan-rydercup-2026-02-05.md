@@ -5,6 +5,12 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 48): Scoring (match detail) — keep BottomNav context in missing-match state
+- `golf-ryder-cup-web/src/app/score/[matchId]/page.tsx`
+  - When a match is unavailable (deleted or not synced), the premium empty state now still passes `activeMatchId` into `BottomNav` so the scoring context stays consistent and navigation remains obvious.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅
+
 ### Phase 1 (batch 13): Standings — Trip stats empty state
 - `golf-ryder-cup-web/src/app/standings/page.tsx`
   - When all tracked trip stat totals are zero, the Trip Stats section now renders a clear premium empty state ("No trip stats yet") instead of silently rendering nothing.

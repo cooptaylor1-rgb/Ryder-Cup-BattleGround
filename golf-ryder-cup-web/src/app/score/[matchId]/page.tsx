@@ -841,7 +841,7 @@ export default function EnhancedMatchScoringPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
+        <BottomNav activeMatchId={matchId} />
       </div>
     );
   }
