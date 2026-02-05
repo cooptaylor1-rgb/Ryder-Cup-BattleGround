@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { NoBetsEmpty, PageSkeleton, Skeleton } from '@/components/ui';
+import { EmptyStatePremium, NoBetsEmpty, PageSkeleton, Skeleton } from '@/components/ui';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
 import {
   ChevronLeft,
@@ -52,11 +52,7 @@ export default function BetsPage() {
   const [nassauTeamA, setNassauTeamA] = useState<string[]>([]);
   const [nassauTeamB, setNassauTeamB] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // If no active trip, we render a premium empty state instead of redirecting.
 
   // Get real side bets from database
   const sideBets = useLiveQuery(
@@ -89,6 +85,22 @@ export default function BetsPage() {
     [currentTrip?.id],
     []
   );
+
+  if (!currentTrip) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+        <div style={{ padding: 'var(--space-6) var(--space-4)' }}>
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No trip selected"
+            description="Select or create a trip to view and manage side bets."
+            action={{ label: 'Go Home', onClick: () => router.push('/') }}
+            secondaryAction={{ label: 'More', onClick: () => router.push('/more') }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   const activeBets = sideBets.filter((b) => b.status === 'active' || b.status === 'pending');
   const completedBets = sideBets.filter((b) => b.status === 'completed');
