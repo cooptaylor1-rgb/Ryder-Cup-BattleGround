@@ -7,14 +7,23 @@ All times America/New_York.
 - 18:10 — Shipped batch: added `PageHeader` + migrated Score/Standings/Stats; matchups now shows explicit empty state (no redirect); token audit added `--masters-rgb`/`--canvas-rgb` + `--masters-deep`; Score page perf indexed holeResults by matchId. (commit 7bef19b)
 
 ## 2026-02-05
+- 01:25 — Shipped batch: added explicit signed-out empty states for Schedule + Score (with CTAs to `/login`) and included `BottomNav` for consistent navigation. (commit 85f9312)
 - 01:40 — Shipped batch: spectator mode (`/spectator/[tripId]`) now distinguishes load failures vs not-found, with a Retry path; refresh errors no longer blank the previously-loaded view. (commit a288c13)
 - 01:55 — Shipped batch: updated `/lineup/new` to use the shared `BottomNav` (replacing the custom nav) and added explicit premium empty states for **No trip selected** + **Captain Mode required** so navigation is always clear. (commit a8dc84c)
 - 02:05 — Shipped batch: Complete Profile (`/profile/complete`) now renders explicit premium empty states (signed out + already onboarded) instead of auto-redirecting; added `BottomNav` to keep navigation clear. (commit 2bc0cf3)
+- 11:20 — Shipped batch: Captain pages now render explicit premium empty states (no-trip / Captain Mode off) instead of auto-redirecting away, preventing confusing skeleton/blank-ish flashes. (commit 8e794b6)
+- 20:10 — Shipped batch: removed missing-trip auto-redirects on Social + Live; now uses consistent `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation. (commit 76198a5)
+- 20:45 — Shipped batch: Achievements removed missing-trip auto-redirect; now shows a premium empty state with clear CTAs. (commit c3fdca6)
+- 21:10 — Shipped batch: Stats hub uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit f798894)
+- 21:35 — Shipped batch: Matchups uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit a09ca56)
 - 22:05 — Shipped batch: updated Trip Stats + Trip Awards to use the standard premium page wrapper and added `BottomNav` so navigation is always clear (including no active trip / no stats yet). (commit 6dccf48)
+- 22:30 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) now uses the standard premium wrapper + `BottomNav` and renders explicit loading/error/not-found states. (commit 4c70f5e)
 - 23:05 — Shipped batch: hardened the per-trip Trip Awards route (`/trip/[tripId]/awards`) with the standard premium wrapper, `BottomNav`, and explicit loading/error/empty states. (commit 31e5a1b)
+- 23:05 — Shipped batch: Backup & Restore (`/settings/backup`) now renders explicit loading/load-error/no-trips empty states + includes `BottomNav` (no silent failures). (commit 6604d23)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
 - 23:58 — Shipped batch: added `BottomNav` + standardized premium wrappers to Players + Standings (including no-trip and loading states). (commit 659edbb)
 
 ## 2026-02-06
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
+- 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)

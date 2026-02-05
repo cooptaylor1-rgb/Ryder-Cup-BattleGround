@@ -158,3 +158,8 @@
 ### Next
 - Continue sweeping for any remaining user-facing pages that still auto-redirect in ways that can cause a blank/skeleton flash.
 - Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` for consistency.
+
+### Phase 1 (batch 37): Web worklog — sync missing shipped Phase 1 entries
+- `golf-ryder-cup-web/WORKLOG.md`
+  - Synced the in-app worklog so it includes the shipped Phase 1 batches that were missing (Schedule/Score signed-out states, Captain empty states, Social/Live no-redirect handling, Stats hub + Matchups empty states w/ BottomNav, Trip Settings + Backup & Restore hardening, and Captain empty-state wrapper/nav standardization).
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
