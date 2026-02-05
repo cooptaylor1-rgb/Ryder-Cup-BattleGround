@@ -155,6 +155,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standings (Fun Stats): replaced `window.location.href` CTAs with `router.push()`.
 - Commit + push ✅ (`3d2bac3`)
 
+### 15:35 EST — Docs: Phase 1 plan follow-on sweep commands
+- Lobster improvement plan: added `rg` search commands for quickly generating the next Phase 1 sweep list after the primary route checklist is complete.
+- Commit + push ✅ (`46c367d`)
+
 ### 20:10 EST — Phase 1 (batch 16)
 - Captain routes: removed auto-redirects + pulse-skeleton gates when missing `currentTrip` or Captain Mode; now consistently renders `EmptyStatePremium` with clear CTAs.
 

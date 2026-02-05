@@ -5,6 +5,12 @@
 
 ## 2026-02-05
 
+### Docs: Phase 1 plan — add follow-on sweep commands
+- `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`
+  - Added `rg` search commands for quickly generating the next Phase 1 sweep list once the primary route checklist is complete.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`46c367d`)
+
 ### Phase 1 (batch 62): Docs — Lobster worklog chronological cleanup
 - `Docs/lobster/WORKLOG.md`
   - Re-sorted the Lobster worklog into a clean chronological timeline and deduped conflicting/duplicate entries.
