@@ -16,6 +16,8 @@ import {
   type FairnessScore,
 } from '@/components/captain';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { EmptyStatePremium } from '@/components/ui';
+import { BottomNav } from '@/components/layout';
 import {
   ChevronLeft,
   Users,
@@ -255,13 +257,43 @@ export default function SessionPage() {
     return 'Not Started';
   };
 
-  if (!currentTrip || !session) {
+  if (!currentTrip) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
-        <p className="type-meta">Session not found</p>
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No active trip"
+            description="Start or select a trip to view this session."
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+        role="alert"
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="calendar"
+            title="Session not found"
+            description="This session may have been deleted or hasn’t synced yet."
+            action={{ label: 'Back to Lineups', onClick: () => router.push('/lineup') }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
       </div>
     );
   }
