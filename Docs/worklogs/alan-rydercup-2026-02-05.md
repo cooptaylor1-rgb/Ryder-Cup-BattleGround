@@ -72,6 +72,13 @@
   - Removed the `useEffect` auto-redirect when `currentTrip` is missing.
   - Replaced the skeleton fallback with `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation.
 
+### Phase 1 (batch 21): Stats hub — premium empty state + BottomNav
+- `golf-ryder-cup-web/src/app/stats/page.tsx`
+  - Replaced the ad-hoc “Start or join a trip” card (with emoji) with a consistent `EmptyStatePremium` screen when there’s no active trip.
+  - Added `BottomNav` so the Stats hub always has a clear navigation path.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`f798894`)
+
 ### Next
-- Run Lobster checkpoint gate (lint + typecheck) for batch 20, then commit + push.
 - Continue sweeping for any remaining user-facing pages that still auto-redirect when `currentTrip` is missing.
+- Consider standardizing any remaining ad-hoc empty-state cards (emoji/centered text) to `EmptyStatePremium` + `BottomNav` for consistency.
