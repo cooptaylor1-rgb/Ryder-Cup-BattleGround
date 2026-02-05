@@ -51,6 +51,16 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅
 
+### Phase 1 (batch 19): Lineup session page — explicit premium empty states
+- `golf-ryder-cup-web/src/app/lineup/[sessionId]/page.tsx`
+  - Replaced the plain "Session not found" centered text gate with `EmptyStatePremium` screens.
+  - Split missing-data states for clarity:
+    - No active trip → premium empty state with Home CTA.
+    - Session missing → premium empty state with CTA back to `/lineup`.
+  - Included `BottomNav` in these empty states so users always have a clear navigation path.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`ab4b319`)
+
 ### Next
 - Sweep for any remaining user-facing pages that still `router.push('/')` when `currentTrip` is missing (keep replacing with `EmptyStatePremium` + clear CTAs).
 - Continue to run the Lobster checkpoint gate after each batch.
