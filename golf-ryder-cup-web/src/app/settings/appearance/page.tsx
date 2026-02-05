@@ -1,20 +1,22 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Palette, Moon, Sun, Mountain, Shield, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Palette, Moon, Sun, Mountain, Shield, ChevronRight } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
   return (
     <button
+      type="button"
       onClick={() => onChange(!checked)}
       className={cn(
         'relative w-12 h-7 rounded-full transition-colors',
-        checked ? 'bg-augusta-green' : 'bg-gray-300'
+        checked ? 'bg-masters' : 'bg-surface-200'
       )}
+      aria-pressed={checked}
     >
       <span
         className={cn(
@@ -27,116 +29,199 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boo
 }
 
 export default function AppearanceSettingsPage() {
+  const router = useRouter();
   const { theme, setTheme, autoTheme, setAutoTheme, accentTheme, setAccentTheme } = useUIStore();
 
   return (
-    <div className="min-h-screen pb-nav bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Link href="/settings" className="p-2 -m-2 text-gray-600 hover:text-gray-900">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-lg font-semibold">Appearance</h1>
-        </div>
-      </header>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title="Appearance"
+        subtitle="Theme & display"
+        onBack={() => router.push('/settings')}
+        icon={<Palette size={16} style={{ color: 'var(--color-accent)' }} />}
+      />
 
-      <main className="max-w-4xl mx-auto p-4 space-y-6">
-        <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Palette className="w-5 h-5 text-augusta-green" />
-              Theme
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">Choose the look that fits your round.</p>
-          </div>
-          <div className="p-4 flex gap-2">
-            {(
-              [
-                { value: 'light', label: 'Light', icon: Sun },
-                { value: 'dark', label: 'Dark', icon: Moon },
-                { value: 'outdoor', label: 'Outdoor', icon: Mountain },
-              ] as const
-            ).map((option) => {
-              const Icon = option.icon;
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => setTheme(option.value)}
-                  className={cn(
-                    'flex-1 py-3 px-3 rounded-lg font-medium transition-colors border-2 text-sm flex items-center justify-center gap-2',
-                    theme === option.value
-                      ? 'border-augusta-green bg-augusta-green/5 text-augusta-green'
-                      : 'border-gray-200 bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Auto Theme</h2>
-            <p className="text-sm text-gray-500 mt-1">Switches to dark at night.</p>
-          </div>
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-900">Sunset Mode</p>
-              <p className="text-sm text-gray-500">Automatically use dark after 7pm.</p>
-            </div>
-            <Toggle checked={autoTheme} onChange={setAutoTheme} />
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Accent Theme</h2>
-            <p className="text-sm text-gray-500 mt-1">Choose your highlight color.</p>
-          </div>
-          <div className="p-4 flex gap-2">
-            {(
-              [
-                { value: 'masters', label: 'Masters', color: '#006747' },
-                { value: 'usa', label: 'Team USA', color: '#0047AB' },
-                { value: 'europe', label: 'Team Europe', color: '#8B0000' },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setAccentTheme(option.value)}
-                className={cn(
-                  'flex-1 py-3 px-3 rounded-lg font-medium transition-colors border-2 text-sm flex items-center justify-center gap-2',
-                  accentTheme === option.value
-                    ? 'border-augusta-green bg-augusta-green/5 text-augusta-green'
-                    : 'border-gray-200 bg-gray-50 text-gray-600'
-                )}
+      <main className="container-editorial">
+        <section className="section">
+          <div className="card" style={{ padding: 'var(--space-5)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow-green)',
+                }}
               >
-                <span className="w-3 h-3 rounded-full" style={{ background: option.color }} />
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <Link
-            href="/more"
-            className="flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50"
-          >
-            <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-augusta-green" />
+                <Palette size={18} style={{ color: 'var(--color-accent)' }} />
+              </div>
               <div>
-                <div className="font-medium">Back to More</div>
-                <div className="text-sm text-gray-500">Manage account and devices</div>
+                <p className="type-title-sm">Theme</p>
+                <p className="type-caption">Choose the look that fits your round.</p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-          </Link>
+
+            <div className="mt-5" style={{ display: 'flex', gap: 'var(--space-3)' }}>
+              {(
+                [
+                  { value: 'light', label: 'Light', icon: Sun },
+                  { value: 'dark', label: 'Dark', icon: Moon },
+                  { value: 'outdoor', label: 'Outdoor', icon: Mountain },
+                ] as const
+              ).map((option) => {
+                const Icon = option.icon;
+                const isSelected = theme === option.value;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setTheme(option.value)}
+                    className={cn('press-scale', isSelected ? 'btn-premium' : 'btn-ghost')}
+                    style={{
+                      flex: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 'var(--space-2)',
+                      padding: '10px 12px',
+                    }}
+                  >
+                    <Icon size={16} />
+                    <span className="type-body-sm" style={{ fontWeight: 650 }}>
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-sm">
+          <div className="card" style={{ padding: 'var(--space-5)' }}>
+            <p className="type-title-sm">Auto Theme</p>
+            <p className="type-caption">Switches to dark at night.</p>
+
+            <div
+              className="mt-4"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <div>
+                <p className="type-body-sm" style={{ fontWeight: 650 }}>
+                  Sunset Mode
+                </p>
+                <p className="type-caption">Automatically use dark after 7pm.</p>
+              </div>
+              <Toggle checked={autoTheme} onChange={setAutoTheme} />
+            </div>
+          </div>
+        </section>
+
+        <section className="section-sm">
+          <div className="card" style={{ padding: 'var(--space-5)' }}>
+            <p className="type-title-sm">Accent Theme</p>
+            <p className="type-caption">Choose your highlight color.</p>
+
+            <div className="mt-5" style={{ display: 'flex', gap: 'var(--space-3)' }}>
+              {(
+                [
+                  { value: 'masters', label: 'Masters', color: '#006747' },
+                  { value: 'usa', label: 'Team USA', color: '#0047AB' },
+                  { value: 'europe', label: 'Team Europe', color: '#8B0000' },
+                ] as const
+              ).map((option) => {
+                const isSelected = accentTheme === option.value;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setAccentTheme(option.value)}
+                    className={cn('press-scale', isSelected ? 'btn-premium' : 'btn-ghost')}
+                    style={{
+                      flex: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 'var(--space-2)',
+                      padding: '10px 12px',
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 999,
+                        background: option.color,
+                        display: 'inline-block',
+                      }}
+                    />
+                    <span className="type-body-sm" style={{ fontWeight: 650 }}>
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-sm">
+          <div className="card" style={{ padding: 'var(--space-4)' }}>
+            <button
+              type="button"
+              onClick={() => router.push('/more')}
+              className="press-scale"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 'var(--space-3)',
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                color: 'var(--ink)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(0,103,71,0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Shield size={18} style={{ color: 'var(--masters)' }} />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <p className="type-body-sm" style={{ fontWeight: 650 }}>
+                    Back to More
+                  </p>
+                  <p className="type-caption">Manage account and devices</p>
+                </div>
+              </div>
+              <ChevronRight size={18} style={{ color: 'var(--ink-secondary)' }} />
+            </button>
+          </div>
         </section>
       </main>
+
       <BottomNav />
     </div>
   );
