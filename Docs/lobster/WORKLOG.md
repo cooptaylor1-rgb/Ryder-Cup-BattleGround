@@ -264,3 +264,7 @@
 - Profile Create: lifted the fixed bottom action bar above the BottomNav height (80px) so primary actions remain accessible without hiding navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅
+
+## 2026-02-05 10:20 EST — Phase 1 (batch 50)
+- Scoring match detail (`/score/[matchId]`): added an explicit signed-out premium empty state (Sign In + Back to Score CTAs) and included `BottomNav` so deep links aren’t blank/dead ends when unauthenticated.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

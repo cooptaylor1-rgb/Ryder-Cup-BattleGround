@@ -127,7 +127,7 @@ export default function EnhancedMatchScoringPage() {
   const matchId = params.matchId as string;
 
   const { currentTrip, players, teams, teeSets, sessions } = useTripStore();
-  const { currentUser } = useAuthStore();
+  const { currentUser, isAuthenticated } = useAuthStore();
   const { showToast, scoringPreferences, getScoringModeForFormat, setScoringModeForFormat } =
     useUIStore();
   const haptic = useHaptic();
@@ -797,6 +797,33 @@ export default function EnhancedMatchScoringPage() {
   }, [matchState]);
 
   // Loading / error / missing states
+  if (!isAuthenticated) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="scorecard"
+            title="Sign in to score this match"
+            description="Match scoring is available after you sign in."
+            action={{
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            }}
+            secondaryAction={{
+              label: 'Back to Score',
+              onClick: () => router.push('/score'),
+            }}
+            variant="large"
+          />
+        </main>
+        <BottomNav />
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <PageLoadingSkeleton title="Scoring" variant="detail" />;
   }

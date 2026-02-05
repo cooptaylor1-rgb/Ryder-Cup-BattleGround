@@ -187,3 +187,9 @@
   - Removed unused `addRateLimitHeaders` import.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`3770052`)
+
+### Phase 1 (batch 50): Score match detail — signed-out empty state
+- Scoring match detail (`/score/[matchId]`)
+  - Added an explicit signed-out `EmptyStatePremium` with **Sign In** + **Back to Score** CTAs.
+  - Included `BottomNav` so deep links aren’t navigation dead ends.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
