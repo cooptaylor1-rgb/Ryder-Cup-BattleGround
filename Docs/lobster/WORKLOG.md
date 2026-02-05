@@ -63,3 +63,9 @@
 - Achievements page: removed the auto-redirect to Home when `currentTrip` is missing; now shows an explicit `EmptyStatePremium` (“No trip selected”) with a clear CTA.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-05 20:45 EST — Phase 1 (batch 18)
+- Bets page: removed the auto-redirect when `currentTrip` is missing; now shows a premium empty state (Home + More CTAs) so users don’t get bounced away.
+- Bets detail page: removed an unused `useEffect` import (lint hygiene).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅

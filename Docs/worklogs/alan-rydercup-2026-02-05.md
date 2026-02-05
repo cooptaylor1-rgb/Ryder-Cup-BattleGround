@@ -40,7 +40,17 @@
   - Removed the auto-redirect to Home when `currentTrip` is missing.
   - Now renders `EmptyStatePremium` ("No trip selected") with a clear CTA back to Home.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster prompt emitted)
+- Commit + push ✅
+
+### Phase 1 (batch 18): Bets — explicit empty state (no redirect)
+- `golf-ryder-cup-web/src/app/bets/page.tsx`
+  - Removed the auto-redirect to Home when `currentTrip` is missing.
+  - Now renders `EmptyStatePremium` (Home + More CTAs) so users don’t get bounced away from the Bets section.
+- `golf-ryder-cup-web/src/app/bets/[betId]/page.tsx`
+  - Removed an unused `useEffect` import (lint hygiene).
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅
 
 ### Next
-- Consider extending the same premium empty-state pattern to other non-core routes that currently auto-redirect when `currentTrip` is missing (e.g., Achievements / Social / Live).
+- Sweep for any remaining user-facing pages that still `router.push('/')` when `currentTrip` is missing (keep replacing with `EmptyStatePremium` + clear CTAs).
 - Continue to run the Lobster checkpoint gate after each batch.
