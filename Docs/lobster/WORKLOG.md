@@ -206,4 +206,4 @@
 - Settings — Appearance/Scoring/Notifications: added `pb-nav` and `BottomNav` so users can always navigate back to the main spine.
 - Notifications settings: removed the page-local fixed nav + `NavItem` in favor of shared `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`bb1f9e3`)
