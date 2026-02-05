@@ -163,3 +163,13 @@
 - `golf-ryder-cup-web/WORKLOG.md`
   - Synced the in-app worklog so it includes the shipped Phase 1 batches that were missing (Schedule/Score signed-out states, Captain empty states, Social/Live no-redirect handling, Stats hub + Matchups empty states w/ BottomNav, Trip Settings + Backup & Restore hardening, and Captain empty-state wrapper/nav standardization).
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+
+### Phase 1 (batch 41): Lint hygiene — remove unused imports
+- `golf-ryder-cup-web/src/app/players/page.tsx`
+  - Removed unused `useEffect` and unused skeleton imports (`PageSkeleton`, `PlayerListSkeleton`).
+- `golf-ryder-cup-web/src/app/bets/page.tsx`
+  - Removed unused `Link`, `Skeleton`, and unused icon imports.
+- `golf-ryder-cup-web/src/app/api/course-library/search/route.ts`
+  - Removed unused `addRateLimitHeaders` import.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`3770052`)

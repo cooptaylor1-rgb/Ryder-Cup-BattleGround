@@ -213,3 +213,11 @@
 - Global error page: added `BottomNav` + standard bottom padding so recovery screens aren’t dead ends.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`6987064`)
+
+## 2026-02-05 04:58 EST — Phase 1 (batch 41)
+- Lint hygiene: removed unused imports to reduce warning noise.
+  - Players: removed unused `useEffect` + unused skeleton imports.
+  - Bets: removed unused `Link`, `Skeleton`, and unused icon imports.
+  - Course library search API route: removed unused `addRateLimitHeaders` import.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`3770052`)
