@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import { BottomNav } from '@/components/layout';
 import { draftLogger } from '@/lib/utils/logger';
 import { DraftBoard } from '@/components/captain';
 import {
@@ -73,8 +74,11 @@ export default function DraftPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="container-editorial section">
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
             title="No active trip"
@@ -84,16 +88,21 @@ export default function DraftPage() {
               onClick: () => router.push('/'),
               icon: <Home size={16} />,
             }}
+            variant="large"
           />
-        </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="container-editorial section">
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
             title="Captain mode required"
@@ -107,8 +116,10 @@ export default function DraftPage() {
               label: 'Go Home',
               onClick: () => router.push('/'),
             }}
+            variant="large"
           />
-        </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }
