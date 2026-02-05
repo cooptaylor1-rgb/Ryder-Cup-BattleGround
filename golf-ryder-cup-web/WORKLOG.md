@@ -9,6 +9,7 @@ All times America/New_York.
 ## 2026-02-05
 - 01:40 — Shipped batch: spectator mode (`/spectator/[tripId]`) now distinguishes load failures vs not-found, with a Retry path; refresh errors no longer blank the previously-loaded view. (commit a288c13)
 - 01:55 — Shipped batch: updated `/lineup/new` to use the shared `BottomNav` (replacing the custom nav) and added explicit premium empty states for **No trip selected** + **Captain Mode required** so navigation is always clear. (commit a8dc84c)
+- 02:05 — Shipped batch: Complete Profile (`/profile/complete`) now renders explicit premium empty states (signed out + already onboarded) instead of auto-redirecting; added `BottomNav` to keep navigation clear. (commit 2bc0cf3)
 - 22:05 — Shipped batch: updated Trip Stats + Trip Awards to use the standard premium page wrapper and added `BottomNav` so navigation is always clear (including no active trip / no stats yet). (commit 6dccf48)
 - 23:05 — Shipped batch: hardened the per-trip Trip Awards route (`/trip/[tripId]/awards`) with the standard premium wrapper, `BottomNav`, and explicit loading/error/empty states. (commit 31e5a1b)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)

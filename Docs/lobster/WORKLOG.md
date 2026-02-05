@@ -179,3 +179,11 @@
 - Added a compact header error badge when the latest refresh fails.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`a288c13`)
+
+## 2026-02-05 02:05 EST — Phase 1 (batch 35)
+- Complete Profile (`/profile/complete`): removed the auto-redirect to `/login` when unauthenticated to avoid a confusing skeleton flash.
+- Complete Profile: added an explicit signed-out premium empty state with Sign In + Home CTAs and `BottomNav`.
+- Complete Profile: added an explicit “already onboarded” premium empty state with Continue + Home CTAs and `BottomNav`.
+- Complete Profile: kept a loading skeleton only for the authenticated-but-still-loading `currentUser` case.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`2bc0cf3`)
