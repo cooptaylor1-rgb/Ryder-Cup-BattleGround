@@ -10,7 +10,7 @@
  * - Validate before import
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     ArrowLeft,
@@ -30,6 +30,8 @@ import {
 import { useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
 import { db } from '@/lib/db';
+import { BottomNav } from '@/components/layout';
+import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import {
     exportTripToFile,
     importTripFromFile,
@@ -61,6 +63,7 @@ export default function BackupRestorePage() {
 
     const [trips, setTrips] = useState<TripSummary[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
 
     // Export state
@@ -86,24 +89,29 @@ export default function BackupRestorePage() {
     // LOAD TRIPS
     // ============================================
 
-    useEffect(() => {
-        const loadTrips = async () => {
+    const loadTrips = useCallback(async () => {
+        setLoading(true);
+        setLoadError(null);
+
+        try {
             const allTrips = await db.trips.toArray();
             const summaries: TripSummary[] = [];
 
             for (const trip of allTrips) {
                 const sessions = await db.sessions.where('tripId').equals(trip.id).count();
-                const sessionIds = (
-                    await db.sessions.where('tripId').equals(trip.id).toArray()
-                ).map((s) => s.id);
-                const matches = sessionIds.length > 0
-                    ? await db.matches.where('sessionId').anyOf(sessionIds).count()
-                    : 0;
+                const sessionIds = (await db.sessions.where('tripId').equals(trip.id).toArray()).map(
+                    (s) => s.id
+                );
+                const matches =
+                    sessionIds.length > 0
+                        ? await db.matches.where('sessionId').anyOf(sessionIds).count()
+                        : 0;
                 const teams = await db.teams.where('tripId').equals(trip.id).toArray();
                 const teamIds = teams.map((t) => t.id);
-                const playerCount = teamIds.length > 0
-                    ? await db.teamMembers.where('teamId').anyOf(teamIds).count()
-                    : 0;
+                const playerCount =
+                    teamIds.length > 0
+                        ? await db.teamMembers.where('teamId').anyOf(teamIds).count()
+                        : 0;
 
                 summaries.push({
                     id: trip.id,
@@ -116,20 +124,30 @@ export default function BackupRestorePage() {
             }
 
             // Sort by date descending
-            summaries.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+            summaries.sort(
+                (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+            );
             setTrips(summaries);
-            setLoading(false);
 
             // Auto-select current trip
             if (currentTrip) {
                 setSelectedTripId(currentTrip.id);
             } else if (summaries.length > 0) {
                 setSelectedTripId(summaries[0].id);
+            } else {
+                setSelectedTripId(null);
             }
-        };
-
-        loadTrips();
+        } catch (error) {
+            tripLogger.error('Failed to load trips for backup/restore:', error);
+            setLoadError("We couldn't load trips right now.");
+        } finally {
+            setLoading(false);
+        }
     }, [currentTrip]);
+
+    useEffect(() => {
+        void loadTrips();
+    }, [loadTrips]);
 
     // ============================================
     // EXPORT HANDLERS
@@ -253,15 +271,22 @@ export default function BackupRestorePage() {
     // ============================================
 
     if (loading) {
+        return <PageLoadingSkeleton />;
+    }
+
+    if (loadError) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#004225] border-t-transparent" />
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain">
+                <div className="p-4">
+                    <ErrorEmpty message={loadError} onRetry={loadTrips} />
+                </div>
+                <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A]">
+        <div className="min-h-screen bg-[#0A0A0A] pb-nav">
             {/* Header */}
             <header className="sticky top-0 z-40 bg-[#141414] border-b border-[#2A2A2A] px-4 py-3">
                 <div className="flex items-center gap-3">
@@ -278,7 +303,7 @@ export default function BackupRestorePage() {
                 </div>
             </header>
 
-            <main className="p-4 pb-24 max-w-2xl mx-auto space-y-6">
+            <main className="p-4 pb-nav max-w-2xl mx-auto space-y-6">
                 {/* Export Section */}
                 <section className="bg-[#141414] rounded-2xl border border-[#2A2A2A] overflow-hidden">
                     <div className="p-4 border-b border-[#2A2A2A]">
@@ -304,7 +329,22 @@ export default function BackupRestorePage() {
                     {/* Trip list */}
                     <div className="p-4 space-y-2">
                         {trips.length === 0 ? (
-                            <p className="text-center text-[#707070] py-8">No trips to export</p>
+                            <div className="py-8">
+                                <EmptyStatePremium
+                                    illustration="trophy"
+                                    title="No trips yet"
+                                    description="Create your first tournament to enable backups and sharing."
+                                    action={{
+                                        label: 'Create a Trip',
+                                        onClick: () => router.push('/trip/new'),
+                                    }}
+                                    secondaryAction={{
+                                        label: 'Go Home',
+                                        onClick: () => router.push('/'),
+                                    }}
+                                    variant="compact"
+                                />
+                            </div>
                         ) : (
                             trips.map((trip) => (
                                 <TripCard
@@ -479,6 +519,8 @@ export default function BackupRestorePage() {
                     </div>
                 </div>
             </main>
+
+            <BottomNav />
         </div>
     );
 }
