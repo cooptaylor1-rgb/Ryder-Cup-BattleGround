@@ -171,4 +171,4 @@
 - New Session / Lineup (`/lineup/new`): replaced the hand-rolled bottom nav with the shared `BottomNav` component so navigation is always available.
 - New Session / Lineup: replaced the skeleton-only gate with explicit premium empty states for **No trip selected** and **Captain Mode required**, each with clear CTAs and `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
-- Commit + push ✅ (`82ecfef`)
+- Commit + push ✅ (`a8dc84c`)
