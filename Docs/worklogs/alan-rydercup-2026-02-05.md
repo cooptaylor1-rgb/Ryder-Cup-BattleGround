@@ -5,6 +5,13 @@
 
 ## 2026-02-05
 
+### Phase 1 (batch 52): Standings — Fun Stats category rendering never silently disappears
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Precomputed `displayCategories` so the Fun Stats tab never relies on `return null` inside `map()` for category sections.
+  - If totals exist but don’t produce any category sections (edge case), we now fall back to the same premium empty state (“No stats yet”) instead of rendering a confusing gap.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅
+
 ### Phase 1 (batch 51): Standings — Fun Stats empty state uses EmptyStatePremium
 - `golf-ryder-cup-web/src/app/standings/page.tsx`
   - Replaced the ad-hoc “No Stats Yet” card in the Fun Stats tab with the standard `EmptyStatePremium` for consistent premium empty states.

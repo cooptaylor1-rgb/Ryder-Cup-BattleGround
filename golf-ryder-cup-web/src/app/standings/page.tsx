@@ -576,6 +576,32 @@ function FunStatsTab({
   const hasAnyStats = statTotals.size > 0;
   const hasDisplayableStats = Array.from(statTotals.values()).some((v) => v.total > 0);
 
+  const displayCategories = categories
+    .map((category) => {
+      const stats = category.types
+        .map((statType) => {
+          const data = statTotals.get(statType as TripStatType);
+          if (!data || data.total === 0) return null;
+          const def = STAT_DEFINITIONS[statType as TripStatType];
+          return { statType, ...def, ...data };
+        })
+        .filter(Boolean) as Array<
+        {
+          statType: string;
+          label: string;
+          description: string;
+          emoji: string;
+          isNegative?: boolean;
+          total: number;
+          leader: string;
+          leaderValue: number;
+        }
+      >;
+
+      return { category, stats };
+    })
+    .filter((entry) => entry.stats.length > 0);
+
   return (
     <section className="section-sm">
       {!hasAnyStats || (!hasDisplayableStats && highlightStats.length === 0) ? (
@@ -642,78 +668,60 @@ function FunStatsTab({
       )}
 
       {/* Stats by Category */}
-      {hasDisplayableStats ? (
-        categories.map((category) => {
-          const categoryStats = category.types
-            .map((statType) => {
-              const data = statTotals.get(statType as TripStatType);
-              if (!data || data.total === 0) return null;
-              const def = STAT_DEFINITIONS[statType as TripStatType];
-              return { statType, ...def, ...data };
-            })
-            .filter(Boolean);
-
-          if (categoryStats.length === 0) return null;
-
-          return (
-            <div key={category.key} style={{ marginBottom: 'var(--space-8)' }}>
-              <h3
-                className="type-overline"
-                style={{
-                  marginBottom: 'var(--space-4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                }}
-              >
-                <span>{category.emoji}</span>
-                <span>{category.label}</span>
-              </h3>
-              <div className="space-y-2">
-                {categoryStats.map(
-                  (stat) =>
-                    stat && (
-                      <div
-                        key={stat.statType}
-                        className="card"
-                        style={{
-                          padding: 'var(--space-3) var(--space-4)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <div
-                          style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}
-                        >
-                          <span style={{ fontSize: '20px' }}>{stat.emoji}</span>
-                          <div>
-                            <p className="type-body-sm">{stat.label}</p>
-                            <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
-                              {stat.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <p
-                            className="type-title"
-                            style={{ color: stat.isNegative ? 'var(--error)' : 'var(--masters)' }}
-                          >
-                            {stat.total}
-                          </p>
-                          {stat.leader && (
-                            <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
-                              👑 {stat.leader}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )
-                )}
-              </div>
+      {hasDisplayableStats && displayCategories.length > 0 ? (
+        displayCategories.map(({ category, stats }) => (
+          <div key={category.key} style={{ marginBottom: 'var(--space-8)' }}>
+            <h3
+              className="type-overline"
+              style={{
+                marginBottom: 'var(--space-4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              <span>{category.emoji}</span>
+              <span>{category.label}</span>
+            </h3>
+            <div className="space-y-2">
+              {stats.map((stat) => (
+                <div
+                  key={stat.statType}
+                  className="card"
+                  style={{
+                    padding: 'var(--space-3) var(--space-4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                    <span style={{ fontSize: '20px' }}>{stat.emoji}</span>
+                    <div>
+                      <p className="type-body-sm">{stat.label}</p>
+                      <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                        {stat.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p
+                      className="type-title"
+                      style={{ color: stat.isNegative ? 'var(--error)' : 'var(--masters)' }}
+                    >
+                      {stat.total}
+                    </p>
+                    {stat.leader && (
+                      <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                        👑 {stat.leader}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          );
-        })
+          </div>
+        ))
       ) : (
         <div style={{ marginBottom: 'var(--space-8)' }}>
           <EmptyStatePremium
