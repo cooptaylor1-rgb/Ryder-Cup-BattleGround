@@ -280,3 +280,9 @@
 - Standings: replaced the ad-hoc “No Stats Yet” block in the Fun Stats tab with the standard `EmptyStatePremium` so empty content is consistent and actionable.
 - Added a clear CTA to start tracking Trip Stats.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+## 2026-02-05 11:20 EST — Phase 1 (batch 52)
+- Standings: Fun Stats category sections now precompute displayable categories instead of `return null` inside `map()`.
+- If totals exist but don’t produce any category sections (edge case), we now fall back to the same premium empty state (“No stats yet”) instead of rendering a confusing gap.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1de47dc`)
