@@ -48,4 +48,4 @@ All times America/New_York.
 - 13:45 — Shipped batch: Settings subpages (`/settings/appearance`, `/settings/scoring`) upgraded to the standard premium wrapper + shared `PageHeader` for consistent navigation and layout. Scoring toggles aligned to the actual `ScoringPreferences` keys (no orphan controls). (commit 7a45cc3)
 - 14:01 — Shipped batch: Captain Bets winner selection no longer uses `return null` inside `map()` when a participant record is missing; we now prefilter so the UI never silently drops buttons. (commit 1f44b15)
 - 14:35 — Shipped batch: Standings Fun Stats CTAs now use `router.push()` instead of `window.location.href` to avoid full page reloads and keep navigation consistent. (commit 3d2bac3)
-- 15:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) now uses the standard premium wrapper + shared `PageHeader` (removes bespoke sticky header) for consistent layout/navigation. (commit TBD)
+- 15:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) now uses the standard premium wrapper + shared `PageHeader` (removes bespoke sticky header) for consistent layout/navigation. (commit 354e05a)

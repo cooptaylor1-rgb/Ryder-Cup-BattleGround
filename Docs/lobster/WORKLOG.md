@@ -261,4 +261,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ### 15:55 EST — Phase 1 (batch 59)
 - Settings — Notifications (`/settings/notifications`): upgraded to the standard premium wrapper and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
-- (Pending commit + push)
+- Commit + push ✅ (`354e05a`)
