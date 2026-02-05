@@ -132,3 +132,8 @@
 - Backup & Restore: added `BottomNav` and ensured adequate bottom padding (`pb-nav`) so navigation is always available.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-05 23:40 EST — Phase 1 (batch 27)
+- Captain routes (Command Center + all subpages): upgraded the **empty-state** scenarios (no active trip / Captain Mode off) to use the standard premium wrapper and include `BottomNav` so users always have a clear navigation path.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
