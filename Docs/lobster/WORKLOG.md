@@ -221,3 +221,9 @@
   - Course library search API route: removed unused `addRateLimitHeaders` import.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`3770052`)
+
+## 2026-02-05 05:35 EST — Phase 1 (batch 42)
+- Login (`/login`): added `BottomNav` and `pb-nav` so signed-out users still have a clear navigation path.
+- Admin (`/admin`): added `BottomNav` to both the main admin UI and the “Admin Mode Required” screen so recovery screens aren’t dead ends.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`9da832a`)

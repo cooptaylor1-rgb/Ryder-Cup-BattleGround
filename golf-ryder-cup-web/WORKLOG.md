@@ -42,3 +42,6 @@ All times America/New_York.
 - Profile (`/profile`): added premium empty-state wrapper + `BottomNav` for signed-out view; main profile view now uses `pb-nav` and shows `BottomNav` when not editing.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
 - Commit + push ✅ (`72d4c29`)
+
+## 2026-02-06
+- 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)
