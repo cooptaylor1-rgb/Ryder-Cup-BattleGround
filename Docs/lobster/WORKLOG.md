@@ -286,3 +286,9 @@
 - If totals exist but don’t produce any category sections (edge case), we now fall back to the same premium empty state (“No stats yet”) instead of rendering a confusing gap.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1de47dc`)
+
+## 2026-02-05 12:15 EST — Phase 1 (batch 53)
+- Standings (Fun Stats): removed remaining `return null` usage inside the stat-type mapping by switching to a `reduce`/`push` approach.
+- Keeps the Phase 1 “no silent render gaps” rule consistent and avoids hidden empty rows inside otherwise-present categories.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c185928`)

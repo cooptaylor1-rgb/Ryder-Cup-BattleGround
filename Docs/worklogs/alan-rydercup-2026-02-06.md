@@ -77,3 +77,10 @@
   - Tightened Fun Stats rendering so category sections don’t silently disappear in confusing ways when data is partially missing.
 - Checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`1de47dc`)
+
+### Phase 1 (batch 53): Standings — remove remaining `return null` inside stat mapping
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Removed the remaining `return null` usage inside the stat-type mapping by switching to a `reduce`/`push` approach.
+  - Keeps Phase 1’s “no silent render gaps” goal consistent and avoids hidden missing rows inside otherwise-present categories.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`c185928`)

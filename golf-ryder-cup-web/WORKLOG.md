@@ -42,3 +42,4 @@ All times America/New_York.
 - 07:55 — Shipped batch: Profile now keeps `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (no dead-end edit mode). (commit b6a3f87)
 - 08:20 — Shipped batch: More (`/more`) now shows an explicit premium empty state when every menu section is hidden by context (signed out / no trip / Captain-only tools), preventing a confusing “blank” hub. (commit 16f8a0a)
 - 11:40 — Shipped batch: lint hygiene sweep — removed unused icon imports/vars, fixed hook deps in AuthGuard, and stabilized memo deps in Vegas side game card (reduces lint warnings without behavior changes).
+- 12:15 — Shipped batch: Standings Fun Stats: removed `return null` usage inside the stat-type map (uses a reduce/push) to avoid silent render gaps and keep Phase 1 “no blank returns” consistent. (commit c185928)
