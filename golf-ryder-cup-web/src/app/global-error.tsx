@@ -9,6 +9,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { BottomNav } from '@/components/layout';
@@ -20,6 +21,7 @@ export default function GlobalError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const router = useRouter();
     useEffect(() => {
         // Report error to Sentry
         Sentry.captureException(error);
@@ -63,9 +65,7 @@ export default function GlobalError({
                             <Button
                                 variant="secondary"
                                 size="lg"
-                                onClick={() => {
-                                    window.location.href = '/';
-                                }}
+                                onClick={() => router.push('/')}
                             >
                                 <Home className="w-4 h-4 mr-2" />
                                 Go Home
