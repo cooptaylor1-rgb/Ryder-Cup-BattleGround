@@ -115,3 +115,10 @@
   - missing trip → `EmptyStatePremium` with Home + More CTAs
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-05 23:05 EST — Phase 1 (batch 26)
+- Backup & Restore (`/settings/backup`): added explicit loading and load-error states (`PageLoadingSkeleton` + `ErrorEmpty` with Retry) to prevent silent failures.
+- Backup & Restore: added a clear premium empty state when there are no trips yet (Create a Trip / Go Home CTAs).
+- Backup & Restore: added `BottomNav` and ensured adequate bottom padding (`pb-nav`) so navigation is always available.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
