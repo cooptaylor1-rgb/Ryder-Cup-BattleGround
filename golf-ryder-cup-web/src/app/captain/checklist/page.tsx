@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+// Note: this route is client-only; we intentionally avoid auto-redirects to show explicit empty states.
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { PreFlightChecklist } from '@/components/captain';
 import {
   ChevronLeft,
@@ -37,16 +38,7 @@ export default function ChecklistPage() {
   } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
-  // Redirect if not captain
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: avoid auto-redirects so we can render explicit empty states.
 
   // Get matches for validation (would need to aggregate from sessions)
   const matches: never[] = []; // In production, fetch from store
@@ -56,12 +48,43 @@ export default function ChecklistPage() {
     showToast('success', 'All systems go! Ready to play.');
   };
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="animate-pulse text-center">
-          <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'var(--surface-elevated)' }} />
-          <div className="h-4 w-24 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to run the pre-flight checklist."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access the checklist."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+          />
         </div>
       </div>
     );

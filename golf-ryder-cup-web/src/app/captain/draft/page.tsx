@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { draftLogger } from '@/lib/utils/logger';
 import { DraftBoard } from '@/components/captain';
 import {
@@ -33,15 +34,7 @@ export default function DraftPage() {
   const { currentTrip, players, teams, assignPlayerToTeam, teamMembers } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: avoid auto-redirects so we can render explicit empty states.
 
   const handleDraftComplete = useCallback(async (assignments: Map<string, string>) => {
     // Apply the draft results to the trip store
@@ -78,12 +71,43 @@ export default function DraftPage() {
     }
   }, [assignPlayerToTeam, teamMembers, showToast, router]);
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="animate-pulse text-center">
-          <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'var(--surface-elevated)' }} />
-          <div className="h-4 w-24 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to run the team draft."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access Draft."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+          />
         </div>
       </div>
     );

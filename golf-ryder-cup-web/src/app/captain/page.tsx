@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import {
   Shield,
   Users,
@@ -165,30 +166,44 @@ export default function CaptainPage() {
   // P0-7: State for expandable quick actions grid - default to showing all
   const [showAllActions, setShowAllActions] = useState(true);
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: avoid auto-redirects so we can render explicit empty states.
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--canvas)' }}
-      >
-        <div className="animate-pulse text-center">
-          <div
-            className="w-12 h-12 rounded-full mx-auto mb-4"
-            style={{ background: 'var(--surface-elevated)' }}
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to access Captain tools."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
           />
-          <div
-            className="h-4 w-32 mx-auto rounded"
-            style={{ background: 'var(--surface-elevated)' }}
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access the Captain Command Center."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
           />
         </div>
       </div>

@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { PageLoadingSkeleton } from '@/components/ui';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
-import { ChevronLeft, ShieldCheck, Filter, Search } from 'lucide-react';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import { ChevronLeft, ShieldCheck, Filter, Search, Home, MoreHorizontal } from 'lucide-react';
 
 const ACTION_TYPES: AuditActionType[] = [
   'sessionCreated',
@@ -34,15 +34,7 @@ export default function CaptainAuditLogPage() {
   const [actionFilter, setActionFilter] = useState<'all' | AuditActionType>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: avoid auto-redirects so we can render explicit empty states.
 
   const entries = useLiveQuery(
     async (): Promise<AuditLogEntry[]> => {
@@ -72,9 +64,46 @@ export default function CaptainAuditLogPage() {
     });
   }, [entries, actionFilter, actorFilter, searchTerm]);
 
-  if (!currentTrip || !isCaptainMode) {
-    // Avoid blank-screen while redirects run.
-    return <PageLoadingSkeleton title="Captain Audit Log" variant="list" />;
+  if (!currentTrip) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to view the audit log."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access the audit log."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import {
   AttendanceCheckIn,
   type AttendeePlayer,
@@ -40,16 +41,8 @@ export default function AvailabilityPage() {
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const sessionInitialized = React.useRef(false);
 
-  // Redirect if not captain
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: avoid auto-redirects so we can render explicit empty states.
+  // (We render them after hooks to comply with React Rules of Hooks.)
 
   // Get active/upcoming sessions (memoized for stable reference)
   const activeSessions = useMemo(() =>
@@ -137,12 +130,43 @@ export default function AvailabilityPage() {
 
   const currentSession = sessions.find(s => s.id === selectedSession);
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="animate-pulse text-center">
-          <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'var(--surface-elevated)' }} />
-          <div className="h-4 w-24 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to manage attendance."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access Attendance."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+          />
         </div>
       </div>
     );
