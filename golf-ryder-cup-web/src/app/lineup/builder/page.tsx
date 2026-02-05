@@ -39,9 +39,12 @@ import {
     type FairnessScore,
 } from '@/lib/services/lineupBuilderService';
 
+import { useTripStore } from '@/lib/stores';
+import { BottomNav } from '@/components/layout';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+
 // Extended type for drag operations
 type DraggedPlayer = LineupPlayer & { matchNumber?: number };
-import { useTripStore } from '@/lib/stores';
 
 // ============================================
 // MAIN COMPONENT
@@ -63,6 +66,7 @@ export default function LineupBuilderPage() {
         team: 'teamA' | 'teamB';
     } | null>(null);
     const [showFairnessDetails, setShowFairnessDetails] = useState(false);
+
 
     // ============================================
     // INITIALIZE
@@ -227,30 +231,47 @@ export default function LineupBuilderPage() {
     // RENDER
     // ============================================
 
-    if (loading) {
+    if (!trip) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#004225] border-t-transparent" />
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <EmptyStatePremium
+                        illustration="trophy"
+                        title="No active trip"
+                        description="Start or select a trip to build a lineup."
+                        action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+                        variant="large"
+                    />
+                </main>
+                <BottomNav />
             </div>
         );
     }
 
+    if (loading) {
+        return <PageLoadingSkeleton title="Loading lineup builder…" showBackButton={false} />;
+    }
+
     if (!sessionId || !lineupState) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-                <div className="text-center">
-                    <Users className="w-12 h-12 text-[#707070] mx-auto mb-4" />
-                    <h2 className="text-xl font-semibold text-white mb-2">No Session Selected</h2>
-                    <p className="text-[#A0A0A0] mb-6">
-                        Please select a session to build the lineup
-                    </p>
-                    <button
-                        onClick={() => router.back()}
-                        className="px-4 py-2 bg-[#004225] text-white rounded-lg"
-                    >
-                        Go Back
-                    </button>
-                </div>
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <main className="container-editorial py-12">
+                    <EmptyStatePremium
+                        illustration="calendar"
+                        title="No session selected"
+                        description="Select a session to build the lineup."
+                        action={{ label: 'Go Back', onClick: () => router.back() }}
+                        secondaryAction={{ label: 'Back to Home', onClick: () => router.push('/') }}
+                        variant="large"
+                    />
+                </main>
+                <BottomNav />
             </div>
         );
     }

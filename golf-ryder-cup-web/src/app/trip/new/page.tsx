@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppShell } from '@/components/layout';
+import { AppShell, BottomNav } from '@/components/layout';
 import { TripTemplatePicker } from '@/components/trip-setup';
 import { type TripTemplate } from '@/lib/types/templates';
 import {
@@ -145,7 +145,8 @@ export default function NewTripPage() {
                 )
             }
         >
-            {/* Step: Select Template */}
+            <div className="pb-nav">
+                {/* Step: Select Template */}
             {step === 'select' && (
                 <div className="p-4">
                     <TripTemplatePicker
@@ -352,6 +353,8 @@ export default function NewTripPage() {
                     </button>
                 </div>
             )}
+            </div>
+            <BottomNav />
         </AppShell>
     );
 }

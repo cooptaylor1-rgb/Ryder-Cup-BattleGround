@@ -22,6 +22,7 @@ import {
   Save,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BottomNav } from '@/components/layout';
 
 /**
  * PROFILE PAGE
@@ -80,20 +81,11 @@ export default function ProfilePage() {
 
   if (!isAuthenticated && !isLoading) {
     return (
-      <main className="page-container">
-        <header className="header-premium">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-            <span className="text-sm">Back</span>
-          </button>
-          <h1 className="type-h2">Profile</h1>
-        </header>
-
-        <div className="content-area">
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
             title="Sign in to view your profile"
@@ -108,8 +100,9 @@ export default function ProfilePage() {
             }}
             variant="large"
           />
-        </div>
-      </main>
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 
@@ -176,7 +169,7 @@ export default function ProfilePage() {
       </header>
 
       {/* Main Content */}
-      <main className="px-4 py-6 pb-32">
+      <main className="px-4 py-6 pb-nav">
         <div className="max-w-md mx-auto space-y-6">
           {/* Profile Header Card */}
           <Card variant="elevated" className="overflow-hidden">
@@ -497,6 +490,8 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {!isEditing && <BottomNav />}
     </div>
   );
 }
