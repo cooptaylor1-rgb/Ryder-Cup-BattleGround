@@ -300,3 +300,5 @@
 
 ## 2026-02-06 12:45 EST — Phase 1 (batch 55)
 - Spectator mode (`/spectator/[tripId]`): added bottom padding to the main content so the fixed “Last updated” footer doesn’t cover the last section on smaller screens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`baee815`)
