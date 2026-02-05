@@ -12,6 +12,13 @@
 ### Phase status
 - Phase 1 route sweep is now functionally complete for the current checklist in `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md` (Schedule / Score / Players / Standings / Trip Stats).
 
+### Phase 1 (batch 15): Captain pages — explicit empty states (no redirects)
+- `golf-ryder-cup-web/src/app/captain/messages/page.tsx`
+- `golf-ryder-cup-web/src/app/captain/contacts/page.tsx`
+- `golf-ryder-cup-web/src/app/captain/carts/page.tsx`
+  - Removed the auto-redirect + pulse-skeleton gate when `currentTrip` is missing or Captain Mode is off.
+  - Now renders `EmptyStatePremium` with clear CTAs (Home / More) so users don’t land on confusing blank-ish screens.
+
 ### Next
-- Consider extending Phase 1 patterns to Captain-mode routes and other secondary pages that still hide whole sections via `return null` (where it creates confusing blanks).
+- Consider extending the same Captain-mode pattern to the remaining Captain routes (Audit / Checklist / Invites / etc.).
 - Continue to run the Lobster checkpoint gate after each batch.

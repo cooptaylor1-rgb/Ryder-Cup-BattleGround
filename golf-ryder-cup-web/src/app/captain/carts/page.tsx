@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+// (no React hooks needed here)
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { CartAssignmentManager, type CartPlayer } from '@/components/captain';
 import {
   ChevronLeft,
@@ -27,22 +28,45 @@ export default function CartsPage() {
   const { currentTrip, players, teams, teamMembers } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-      return;
-    }
-    if (!isCaptainMode) {
-      router.push('/more');
-    }
-  }, [currentTrip, isCaptainMode, router]);
+  // Note: we avoid auto-redirects here so we can render a clear empty-state instead.
 
-  if (!currentTrip || !isCaptainMode) {
+  if (!currentTrip) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-        <div className="animate-pulse text-center">
-          <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'var(--surface-elevated)' }} />
-          <div className="h-4 w-24 mx-auto rounded" style={{ background: 'var(--surface-elevated)' }} />
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to manage cart assignments."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+        <div className="container-editorial section">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access Cart Assignments."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+          />
         </div>
       </div>
     );

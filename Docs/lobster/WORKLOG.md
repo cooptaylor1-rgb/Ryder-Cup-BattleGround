@@ -49,3 +49,6 @@
 
 ## 2026-02-05 09:10 EST — Phase 1 (batch 14)
 - Docs: added a dedicated daily worklog entry for 2026-02-05 and noted that the Phase 1 route sweep is functionally complete for the current checklist.
+
+## 2026-02-05 11:20 EST — Phase 1 (batch 15)
+- Captain pages (Messages / Contacts / Cart Assignments): removed auto-redirect + pulse-skeleton gate when missing `currentTrip` or Captain Mode; now renders `EmptyStatePremium` with clear CTAs (Home / More) so users don’t hit confusing blanks.
