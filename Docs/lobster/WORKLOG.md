@@ -242,3 +242,8 @@
 - Profile (`/profile`): keep `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (prevents dead-end edit mode).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`b6a3f87`, plus worklog follow-up `ea1df51`)
+
+## 2026-02-06 08:20 EST — Phase 1 (batch 46)
+- More (`/more`): when all menu items are filtered out (signed out / no trip selected / Captain-only tools hidden), we now render an explicit `EmptyStatePremium` instead of an empty page section.
+- Keeps the “More” hub from feeling blank when the user’s current context hides every item.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)

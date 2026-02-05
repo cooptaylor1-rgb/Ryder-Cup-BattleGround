@@ -43,6 +43,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { BottomNav } from '@/components/layout';
+import { EmptyStatePremium } from '@/components/ui';
 
 /**
  * MORE PAGE — Redesigned Hub
@@ -660,90 +661,128 @@ export default function MorePage() {
         </motion.button>
 
         {/* Menu Sections */}
-        {menuSections.map((section, sectionIndex) => {
-          const isExpanded = expandedSections[section.id] ?? true;
-          const filteredItems = section.items.filter(
-            (item) =>
-              (!item.requiresTrip || currentTrip) && (!item.requiresCaptain || isCaptainMode)
-          );
+        {(() => {
+          const visibleSections = menuSections
+            .map((section) => {
+              const filteredItems = section.items.filter(
+                (item) =>
+                  (!item.requiresTrip || currentTrip) && (!item.requiresCaptain || isCaptainMode)
+              );
+              return { section, filteredItems };
+            })
+            .filter(({ filteredItems }) => filteredItems.length > 0);
 
-          if (filteredItems.length === 0) return null;
+          if (visibleSections.length === 0) {
+            const emptyCopy = !isAuthenticated
+              ? {
+                  title: 'Sign in to continue',
+                  description: 'Log in to access your account, trips, and settings.',
+                  action: { label: 'Sign In', onClick: () => router.push('/login') },
+                }
+              : !currentTrip
+                ? {
+                    title: 'No trip selected',
+                    description: 'Select or create a trip to unlock tournament tools and stats.',
+                    action: { label: 'Go Home', onClick: () => router.push('/') },
+                  }
+                : {
+                    title: 'Nothing to show yet',
+                    description: 'More tools will appear here as your tournament fills in.',
+                    action: { label: 'Go Home', onClick: () => router.push('/') },
+                  };
 
-          return (
-            <motion.section
-              key={section.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-              style={{ marginBottom: '24px' }}
-            >
-              <button
-                onClick={() => toggleSection(section.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '8px 4px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  marginBottom: '8px',
-                }}
+            return (
+              <div style={{ marginTop: '24px' }}>
+                <EmptyStatePremium
+                  illustration="flag"
+                  title={emptyCopy.title}
+                  description={emptyCopy.description}
+                  action={emptyCopy.action}
+                  variant="large"
+                />
+              </div>
+            );
+          }
+
+          return visibleSections.map(({ section, filteredItems }, sectionIndex) => {
+            const isExpanded = expandedSections[section.id] ?? true;
+
+            return (
+              <motion.section
+                key={section.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + sectionIndex * 0.05 }}
+                style={{ marginBottom: '24px' }}
               >
-                <h2
+                <button
+                  onClick={() => toggleSection(section.id)}
                   style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: 'var(--ink-tertiary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    padding: '8px 4px',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginBottom: '8px',
                   }}
                 >
-                  {section.title}
-                </h2>
-                <ChevronDown
-                  size={16}
-                  style={{
-                    color: 'var(--ink-tertiary)',
-                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease',
-                  }}
-                />
-              </button>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    style={{ overflow: 'hidden' }}
+                  <h2
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: 'var(--ink-tertiary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
                   >
-                    <div
-                      style={{
-                        background: 'var(--surface-card)',
-                        borderRadius: '16px',
-                        border: '1px solid var(--rule)',
-                        overflow: 'hidden',
-                      }}
+                    {section.title}
+                  </h2>
+                  <ChevronDown
+                    size={16}
+                    style={{
+                      color: 'var(--ink-tertiary)',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease',
+                    }}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ overflow: 'hidden' }}
                     >
-                      {filteredItems.map((item, index) => (
-                        <MenuItemRow
-                          key={item.id}
-                          item={item}
-                          isLast={index === filteredItems.length - 1}
-                          isLoading={item.id === 'demo' && isSeeding}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.section>
-          );
-        })}
+                      <div
+                        style={{
+                          background: 'var(--surface-card)',
+                          borderRadius: '16px',
+                          border: '1px solid var(--rule)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {filteredItems.map((item, index) => (
+                          <MenuItemRow
+                            key={item.id}
+                            item={item}
+                            isLast={index === filteredItems.length - 1}
+                            isLoading={item.id === 'demo' && isSeeding}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.section>
+            );
+          });
+        })()}
 
         {/* About Section */}
         <motion.section
