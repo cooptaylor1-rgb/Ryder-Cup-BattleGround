@@ -850,10 +850,16 @@ function BetManagementCard({
                 <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--rule-faint)' }}>
                     <p className="type-meta" style={{ marginBottom: 'var(--space-2)' }}>Select Winner:</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                        {bet.participantIds.map(id => {
-                            const player = getPlayer(id);
-                            if (!player) return null;
-                            return (
+                        {bet.participantIds
+                            .map((id) => {
+                                const player = getPlayer(id);
+                                if (!player) return null;
+                                return { id, player };
+                            })
+                            .filter(
+                                (value): value is { id: string; player: Player } => Boolean(value)
+                            )
+                            .map(({ id, player }) => (
                                 <button
                                     key={id}
                                     onClick={() => {
@@ -873,8 +879,7 @@ function BetManagementCard({
                                 >
                                     {player.firstName}
                                 </button>
-                            );
-                        })}
+                            ))}
                         <button
                             onClick={() => {
                                 onComplete();
