@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import NextImage from 'next/image';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button, Card, CardContent, PageSkeleton, Skeleton } from '@/components/ui';
+import { Button, Card, CardContent, EmptyStatePremium, PageSkeleton, Skeleton } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
   User,
@@ -41,14 +41,13 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Redirect if not logged in
+  // Initialize form when user data is available.
+  // We avoid auto-redirects so users never hit a confusing blank/skeleton screen.
   useEffect(() => {
-    if (!isAuthenticated || !currentUser) {
-      router.push('/login');
-    } else {
+    if (isAuthenticated && currentUser) {
       setFormData(currentUser);
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -78,6 +77,41 @@ export default function ProfilePage() {
     setFormData(currentUser || {});
     setIsEditing(false);
   };
+
+  if (!isAuthenticated && !isLoading) {
+    return (
+      <main className="page-container">
+        <header className="header-premium">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
+            aria-label="Go back"
+          >
+            <ChevronLeft size={20} />
+            <span className="text-sm">Back</span>
+          </button>
+          <h1 className="type-h2">Profile</h1>
+        </header>
+
+        <div className="content-area">
+          <EmptyStatePremium
+            illustration="golfers"
+            title="Sign in to view your profile"
+            description="Your profile is tied to your account. Sign in to view and edit your details."
+            action={{
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            }}
+            secondaryAction={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </div>
+      </main>
+    );
+  }
 
   if (!currentUser) {
     return (
