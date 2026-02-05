@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium, NoBetsEmpty, PageSkeleton, Skeleton } from '@/components/ui';
+import { EmptyStatePremium, NoBetsEmpty, Skeleton } from '@/components/ui';
+import { BottomNav, PageHeader } from '@/components/layout';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
 import {
   ChevronLeft,
@@ -249,15 +250,30 @@ export default function BetsPage() {
 
   if (!currentTrip) {
     return (
-      <PageSkeleton>
-        <div className="space-y-4 mt-4">
-          <Skeleton className="h-12 w-full rounded-xl" />
-          <div className="grid gap-3">
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <Skeleton className="h-24 w-full rounded-xl" />
-          </div>
-        </div>
-      </PageSkeleton>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <PageHeader
+          title="Bets"
+          subtitle="No active trip"
+          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No trip selected"
+            description="Select or create a trip to view and manage side bets."
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            secondaryAction={{ label: 'More', onClick: () => router.push('/more') }}
+            variant="large"
+          />
+        </main>
+
+        <BottomNav />
+      </div>
     );
   }
 
@@ -392,33 +408,7 @@ export default function BetsPage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
 
       {/* Create Bet Modal */}
       {showCreateModal && (

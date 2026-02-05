@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium, ErrorEmpty } from '@/components/ui';
+import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
+import { BottomNav, PageHeader } from '@/components/layout';
 import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
     ChevronLeft,
@@ -147,9 +148,15 @@ export default function BetDetailPage() {
     if (!currentTrip) {
         return (
             <div
-                className="min-h-screen pb-24 page-premium-enter texture-grain"
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
                 style={{ background: 'var(--canvas)' }}
             >
+                <PageHeader
+                    title="Bets"
+                    subtitle="No active trip"
+                    icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+                    onBack={() => router.back()}
+                />
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -162,38 +169,36 @@ export default function BetDetailPage() {
                         variant="large"
                     />
                 </main>
+                <BottomNav />
             </div>
         );
     }
 
     if (bet === null) {
-        return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
-                <div className="animate-pulse text-center">
-                    <DollarSign size={48} className="mx-auto mb-4 opacity-50" />
-                    <p>Loading bet...</p>
-                </div>
-            </div>
-        );
+        return <PageLoadingSkeleton title="Bet Details" variant="detail" />;
     }
 
     if (bet === undefined) {
         return (
             <div
-                className="min-h-screen pb-24 page-premium-enter texture-grain"
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
                 style={{ background: 'var(--canvas)' }}
             >
+                <PageHeader
+                    title="Bet Details"
+                    subtitle={currentTrip.name}
+                    icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+                    onBack={() => router.push('/bets')}
+                />
                 <main className="container-editorial py-12">
                     <ErrorEmpty message="We couldn't find that bet." />
                     <div className="mt-6 flex justify-center">
-                        <button
-                            onClick={() => router.push('/bets')}
-                            className="btn btn-primary"
-                        >
+                        <button onClick={() => router.push('/bets')} className="btn btn-primary">
                             Back to Bets
                         </button>
                     </div>
                 </main>
+                <BottomNav />
             </div>
         );
     }
@@ -239,7 +244,7 @@ export default function BetDetailPage() {
     };
 
     return (
-        <div className="min-h-screen pb-24 page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
             {/* Header */}
             <header className="header-premium">
                 <div className="container-editorial flex items-center justify-between">
@@ -834,6 +839,8 @@ export default function BetDetailPage() {
                     </div>
                 </div>
             )}
+
+            <BottomNav />
         </div>
     );
 }
