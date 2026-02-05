@@ -42,6 +42,7 @@ export default function SpectatorPage() {
 
     const [spectatorView, setSpectatorView] = useState<SpectatorView | null>(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isOnline, setIsOnline] = useState(true);
     const [_fullscreen, setFullscreen] = useState(false);
@@ -51,9 +52,12 @@ export default function SpectatorPage() {
     // ============================================
 
     const loadData = useCallback(async () => {
+        setLoadError(null);
+
         try {
             const trip = await db.trips.get(tripId);
             if (!trip) {
+                setSpectatorView(null);
                 setLoading(false);
                 return;
             }
@@ -86,6 +90,8 @@ export default function SpectatorPage() {
             setLastUpdated(new Date());
         } catch (error) {
             tripLogger.error('Spectator view load failed:', error);
+            setLoadError('We couldn\'t load this scoreboard right now.');
+            // Keep any previously-loaded view so refresh failures don’t blank the screen.
         } finally {
             setLoading(false);
         }
@@ -148,14 +154,30 @@ export default function SpectatorPage() {
             <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
                 <div className="text-center">
                     <Trophy className="w-16 h-16 text-[#505050] mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-white mb-2">Tournament Not Found</h2>
-                    <p className="text-[#A0A0A0] mb-6">This tournament doesn&apos;t exist or has been removed.</p>
-                    <button
-                        onClick={() => router.push('/')}
-                        className="px-6 py-3 bg-[#004225] text-white rounded-xl"
-                    >
-                        Go Home
-                    </button>
+                    <h2 className="text-2xl font-bold text-white mb-2">
+                        {loadError ? 'Unable to Load Scoreboard' : 'Tournament Not Found'}
+                    </h2>
+                    <p className="text-[#A0A0A0] mb-6">
+                        {loadError
+                            ? loadError
+                            : "This tournament doesn\'t exist or has been removed."}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        {loadError && (
+                            <button
+                                onClick={loadData}
+                                className="px-6 py-3 bg-[#004225] text-white rounded-xl"
+                            >
+                                Retry
+                            </button>
+                        )}
+                        <button
+                            onClick={() => router.push('/')}
+                            className="px-6 py-3 bg-[#1F1F1F] text-white rounded-xl border border-[#2A2A2A]"
+                        >
+                            Go Home
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -183,6 +205,13 @@ export default function SpectatorPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {loadError && (
+                            <div className="flex items-center gap-1 px-2 py-1 rounded text-xs text-red-300 bg-red-500/10 border border-red-500/20">
+                                <span className="w-2 h-2 rounded-full bg-red-400" />
+                                Error
+                            </div>
+                        )}
+
                         {/* Connection Status */}
                         <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${isOnline ? 'text-green-400' : 'text-red-400'}`}>
                             {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
