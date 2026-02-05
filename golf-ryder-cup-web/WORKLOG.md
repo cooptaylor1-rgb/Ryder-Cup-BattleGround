@@ -11,3 +11,6 @@ All times America/New_York.
 - 23:05 — Shipped batch: hardened the per-trip Trip Awards route (`/trip/[tripId]/awards`) with the standard premium wrapper, `BottomNav`, and explicit loading/error/empty states. (commit 31e5a1b)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
 - 23:58 — Shipped batch: added `BottomNav` + standardized premium wrappers to Players + Standings (including no-trip and loading states). (commit 659edbb)
+
+## 2026-02-06
+- 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)

@@ -153,3 +153,9 @@
 - Docs: synced `golf-ryder-cup-web/WORKLOG.md` to include the shipped Phase 1 batches 24–29 so the in-app worklog matches the Lobster worklog.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅
+
+## 2026-02-06 00:25 EST — Phase 1 (batch 31)
+- More page: standardized the main wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) and added `BottomNav` so navigation is always available.
+- Settings page: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅ (`df99c05`)
