@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTripStore } from '@/lib/stores';
-import { BarChart3, Award, Trophy, CalendarDays } from 'lucide-react';
-import { PageHeader } from '@/components/layout';
+import { Award, BarChart3, CalendarDays } from 'lucide-react';
+import { PageHeader, BottomNav } from '@/components/layout';
+import { EmptyStatePremium } from '@/components/ui';
 
 /**
  * STATS HUB
@@ -39,23 +40,16 @@ export default function StatsPage() {
 
         {!currentTrip ? (
           <section className="section-sm">
-            <div className="card-surface rounded-2xl p-8 text-center">
-              <div className="text-4xl mb-4">📊</div>
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                Start or join a trip
-              </h2>
-              <p className="type-caption">Stats will appear here once you’re in an active trip.</p>
-              <div className="mt-6">
-                <Link
-                  href="/"
-                  className="btn-premium"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-                >
-                  <Trophy size={16} />
-                  Go to Today
-                </Link>
-              </div>
-            </div>
+            <EmptyStatePremium
+              illustration="podium"
+              title="No active trip"
+              description="Start or join a trip to view stats."
+              action={{
+                label: 'Back to Home',
+                onClick: () => router.push('/'),
+              }}
+              variant="large"
+            />
           </section>
         ) : (
           <section className="section-sm">
@@ -126,6 +120,7 @@ export default function StatsPage() {
           </section>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }
