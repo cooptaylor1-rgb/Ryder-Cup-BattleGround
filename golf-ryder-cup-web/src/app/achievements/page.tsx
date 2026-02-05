@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
+import { EmptyStatePremium } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
@@ -62,11 +63,7 @@ export default function AchievementsPage() {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!currentTrip) {
-      router.push('/');
-    }
-  }, [currentTrip, router]);
+  // If no active trip, we render an explicit empty state instead of redirecting.
 
   // Load real player stats from the database
   useEffect(() => {
@@ -210,8 +207,29 @@ export default function AchievementsPage() {
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const totalCount = achievements.length;
 
-  // Show loading state while redirecting or loading data
-  if (!currentTrip || isLoading) {
+  if (!currentTrip) {
+    return (
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No trip selected"
+            description="Pick a trip to view achievements."
+            action={{
+              label: 'Back to Home',
+              onClick: () => router.push('/'),
+            }}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  // Show loading state while fetching stats
+  if (isLoading) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
         <header className="header-premium">

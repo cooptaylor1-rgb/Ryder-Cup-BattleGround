@@ -35,6 +35,12 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster prompt emitted)
 - Commit + push ✅
 
+### Phase 1 (batch 17): Achievements — explicit empty state (no redirect)
+- `golf-ryder-cup-web/src/app/achievements/page.tsx`
+  - Removed the auto-redirect to Home when `currentTrip` is missing.
+  - Now renders `EmptyStatePremium` ("No trip selected") with a clear CTA back to Home.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster prompt emitted)
+
 ### Next
-- Consider extending the same Captain-mode pattern to any remaining nested Captain routes added in the future.
+- Consider extending the same premium empty-state pattern to other non-core routes that currently auto-redirect when `currentTrip` is missing (e.g., Achievements / Social / Live).
 - Continue to run the Lobster checkpoint gate after each batch.
