@@ -227,3 +227,8 @@
 - Admin (`/admin`): added `BottomNav` to both the main admin UI and the “Admin Mode Required” screen so recovery screens aren’t dead ends.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
 - Commit + push ✅ (`9da832a`)
+
+## 2026-02-05 06:30 EST — Phase 1 (batch 43)
+- Lint hygiene: removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` directive from `featureFlags.tsx` to reduce warning noise.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅

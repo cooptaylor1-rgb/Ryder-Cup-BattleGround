@@ -269,7 +269,6 @@ export function FeatureFlagProvider({
 
     return Boolean(flag.value);
   }, [flags, overrides, config?.defaults, environment, userId]);
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
 
   /**
    * Get the value of a feature flag
