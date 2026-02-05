@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { BottomNav } from '@/components/layout/BottomNav';
 import { createLogger } from '@/lib/utils/logger';
 import {
   ChevronLeft,
@@ -257,7 +258,7 @@ export default function AdminPage() {
   if (!isAdminMode) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="min-h-screen pb-nav flex items-center justify-center"
         style={{ background: 'var(--canvas)' }}
       >
         <div className="text-center p-8">
@@ -279,6 +280,8 @@ export default function AdminPage() {
             Go to More
           </Link>
         </div>
+
+        <BottomNav />
       </div>
     );
   }
@@ -711,6 +714,8 @@ export default function AdminPage() {
           </div>
         </section>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

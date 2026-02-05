@@ -7,6 +7,7 @@ import { Button, Card, CardContent } from '@/components/ui';
 import { GolfBallTee } from '@/components/ui/illustrations';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BottomNav } from '@/components/layout/BottomNav';
 
 /**
  * LOGIN PAGE
@@ -67,7 +68,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col">
+    <div className="min-h-screen pb-nav bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col">
       {/* Header */}
       <header className="pt-safe-area-inset-top">
         <div className="p-6 text-center">
@@ -233,6 +234,8 @@ export default function LoginPage() {
           </p>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }
