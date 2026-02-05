@@ -4,7 +4,7 @@ All times America/New_York.
 
 ## 2026-02-04
 - 18:00 — Started NOW batch: Phase 1 sweep (blank-screen `return null`), PageHeader unification, token audit (RGB vars), Score page perf (holeResults index).
-- 18:10 — Shipped batch: added `PageHeader` + migrated Score/Standings/Stats; matchups now shows explicit empty state (no redirect); token audit added `--masters-rgb`/`--canvas-rgb` + `--masters-deep`; Score page perf indexed holeResults by matchId. (commit 7bef19b)
+- 18:10 — Shipped batch: added `PageHeader` + migrated Score/Standings/Stats; Matchups now shows explicit empty state (no redirect); token audit added `--masters-rgb`/`--canvas-rgb` + `--masters-deep`; Score page perf indexed holeResults by matchId. (commit 7bef19b)
 
 ## 2026-02-05
 - 01:25 — Shipped batch: added explicit signed-out empty states for Schedule + Score (with CTAs to `/login`) and included `BottomNav` for consistent navigation. (commit 85f9312)
@@ -28,29 +28,10 @@ All times America/New_York.
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
 - 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)
+- 03:45 — Shipped batch: Worklog sync — ensured the web worklog reflects the shipped Phase 1 improvements so in-repo history matches Lobster worklog. (commit b039ec6)
 - 04:20 — Shipped batch: Achievements now uses the shared `BottomNav` (including no-trip and loading states). Settings subpages (Appearance/Scoring/Notifications) now include `BottomNav` + `pb-nav` so navigation is always available. (commit bb1f9e3)
-
-## 2026-02-05 04:45 EST — Phase 1 (batch 40)
-- App-level Not Found + route error pages: standardized wrappers to the premium layout (`pb-nav` + texture) and added `BottomNav` so users always have a clear navigation path when they hit a 404 or crash.
-- Global error page: added `BottomNav` + standard bottom padding so recovery screens aren’t dead ends.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
-- Commit + push ✅ (`6987064`)
-
-## 2026-02-05 05:25 EST — Phase 1 (batch 41)
-- Lineup Builder (`/lineup/builder`): added standard premium wrapper, explicit loading + missing-session + no-trip empty states, and `BottomNav` so it’s never a dead end.
-- New Trip (`/trip/new`): with `showNav={false}`, the page previously had no bottom nav; now includes `BottomNav` + `pb-nav` content padding for consistent navigation.
-- Profile (`/profile`): added premium empty-state wrapper + `BottomNav` for signed-out view; main profile view now uses `pb-nav` and shows `BottomNav` when not editing.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
-- Commit + push ✅ (`72d4c29`)
-
-## 2026-02-05 06:05 EST — Phase 1 (batch 42)
-- Cleanup: removed / underscored unused variables to reduce lint noise.
-  - New Lineup (`/lineup/new`): reserved format tooltip constants/state now uses underscore naming to avoid unused-var warnings until the tooltip UI lands.
-  - Create Profile (`/profile/create`): removed unused icon imports.
-  - PendingSyncIndicator: use `catch {}` for the pending-count refresh path (no unused catch param).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate passed)
-- Commit + push ✅ (`8b69976`)
-
-## 2026-02-06
+- 04:45 — Shipped batch: app-level Not Found + route error pages standardized to the premium layout (`pb-nav` + texture) and now include `BottomNav` so recovery screens aren’t dead ends. (commit 6987064)
+- 04:58 — Shipped batch: lint hygiene — removed unused imports (Players, Bets, Course library search API route). (commit 3770052)
 - 05:35 — Shipped batch: added `BottomNav` to Login (`/login`) and Admin (`/admin`) so signed-out / access-gated screens still have clear navigation. (commit 9da832a)
+- 06:05 — Shipped batch: lint hygiene — removed / underscored unused variables to reduce lint noise (New Lineup, Create Profile icons, PendingSyncIndicator catch). (commit 8b69976)
 - 06:30 — Shipped batch: lint hygiene — removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` from `featureFlags.tsx` to reduce warning noise. (commit 971f463)
