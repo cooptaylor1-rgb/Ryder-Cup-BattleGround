@@ -191,4 +191,4 @@
 ## 2026-02-05 02:45 EST — Phase 1 (batch 37)
 - Web worklog (`golf-ryder-cup-web/WORKLOG.md`): synced missing shipped Phase 1 entries (Schedule/Score signed-out states, Captain empty states, Social/Live no-redirect handling, Stats hub + Matchups empty states w/ BottomNav, Trip Settings + Backup & Restore hardening, plus Captain empty-state wrapper/nav standardization).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
-- Commit + push ✅
+- Commit + push ✅ (`b039ec6`)
