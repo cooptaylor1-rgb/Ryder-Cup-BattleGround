@@ -19,6 +19,22 @@
   - Removed the auto-redirect + pulse-skeleton gate when `currentTrip` is missing or Captain Mode is off.
   - Now renders `EmptyStatePremium` with clear CTAs (Home / More) so users don’t land on confusing blank-ish screens.
 
+### Phase 1 (batch 16): Captain routes — consistent premium empty states (no redirects)
+- Updated remaining Captain routes to avoid auto-redirects / pulse-skeleton gates when missing `currentTrip` or Captain Mode.
+- Now consistently renders `EmptyStatePremium` with clear CTAs (Home / More) on:
+  - `/captain` (Command Center)
+  - `/captain/audit`
+  - `/captain/availability`
+  - `/captain/bets`
+  - `/captain/checklist`
+  - `/captain/draft`
+  - `/captain/invites`
+  - `/captain/manage`
+  - `/captain/settings`
+- Availability: ensured empty-state checks occur after hooks to comply with React Rules of Hooks.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster prompt emitted)
+- Commit + push ✅
+
 ### Next
-- Consider extending the same Captain-mode pattern to the remaining Captain routes (Audit / Checklist / Invites / etc.).
+- Consider extending the same Captain-mode pattern to any remaining nested Captain routes added in the future.
 - Continue to run the Lobster checkpoint gate after each batch.

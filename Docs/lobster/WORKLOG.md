@@ -52,3 +52,9 @@
 
 ## 2026-02-05 11:20 EST — Phase 1 (batch 15)
 - Captain pages (Messages / Contacts / Cart Assignments): removed auto-redirect + pulse-skeleton gate when missing `currentTrip` or Captain Mode; now renders `EmptyStatePremium` with clear CTAs (Home / More) so users don’t hit confusing blanks.
+
+## 2026-02-05 20:10 EST — Phase 1 (batch 16)
+- Captain pages (Command Center / Audit / Availability / Invites / Checklist / Draft / Manage / Side Bets / Settings): removed auto-redirects + pulse-skeleton gates when missing `currentTrip` or Captain Mode; now consistently renders `EmptyStatePremium` with clear CTAs.
+- Availability page: adjusted empty-state rendering to occur after hooks to comply with React Rules of Hooks (no conditional hook errors).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval prompt emitted)
+- Commit + push ✅
