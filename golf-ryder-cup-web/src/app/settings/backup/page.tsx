@@ -13,7 +13,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    ArrowLeft,
     Download,
     Upload,
     FileJson,
@@ -30,7 +29,7 @@ import {
 import { useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
 import { db } from '@/lib/db';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import {
     exportTripToFile,
@@ -276,34 +275,39 @@ export default function BackupRestorePage() {
 
     if (loadError) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain">
-                <div className="p-4">
+            <div
+                className="min-h-screen pb-nav page-premium-enter texture-grain"
+                style={{ background: 'var(--canvas)' }}
+            >
+                <PageHeader
+                    title="Backup & Restore"
+                    subtitle="Trip data management"
+                    icon={<HardDrive className="w-4 h-4 text-white" />}
+                    onBack={() => router.push('/settings')}
+                />
+
+                <main className="container-editorial py-6">
                     <ErrorEmpty message={loadError} onRetry={loadTrips} />
-                </div>
+                </main>
+
                 <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] pb-nav">
-            {/* Header */}
-            <header className="sticky top-0 z-40 bg-[#141414] border-b border-[#2A2A2A] px-4 py-3">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => router.back()}
-                        className="p-2 -ml-2 hover:bg-[#282828] rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5 text-[#A0A0A0]" />
-                    </button>
-                    <div>
-                        <h1 className="text-lg font-semibold text-white">Backup & Restore</h1>
-                        <p className="text-xs text-[#707070]">Export and import trip data</p>
-                    </div>
-                </div>
-            </header>
+        <div
+            className="min-h-screen pb-nav page-premium-enter texture-grain"
+            style={{ background: 'var(--canvas)' }}
+        >
+            <PageHeader
+                title="Backup & Restore"
+                subtitle="Export and import trip data"
+                icon={<HardDrive className="w-4 h-4 text-white" />}
+                onBack={() => router.push('/settings')}
+            />
 
-            <main className="p-4 pb-nav max-w-2xl mx-auto space-y-6">
+            <main className="container-editorial py-6 space-y-6 pb-8">
                 {/* Export Section */}
                 <section className="bg-[#141414] rounded-2xl border border-[#2A2A2A] overflow-hidden">
                     <div className="p-4 border-b border-[#2A2A2A]">

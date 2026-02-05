@@ -289,3 +289,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats: applied the same `PageHeader` pattern for **no active trip**, **no stats yet**, and the main view so the page remains consistent across states.
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`435b667`)
+
+### 19:25 EST — Phase 1 (batch 66)
+- Settings — Backup & Restore (`/settings/backup`): upgraded to the standard premium wrapper (canvas background + `pb-nav page-premium-enter texture-grain`) to match the rest of Settings.
+- Settings — Backup & Restore: replaced the bespoke sticky header with the shared `PageHeader` (Back → `/settings`) for consistent navigation.
+- Load-error state now uses the same wrapper + header pattern as the main view.
+- Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (pending)

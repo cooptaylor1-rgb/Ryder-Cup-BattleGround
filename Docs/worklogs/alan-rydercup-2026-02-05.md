@@ -12,6 +12,14 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`435b667`)
 
+### Phase 1 (batch 66): Settings — Backup & Restore uses standard wrapper + PageHeader
+- `golf-ryder-cup-web/src/app/settings/backup/page.tsx`
+  - Upgraded the page to the standard premium wrapper (`pb-nav page-premium-enter texture-grain` with canvas background) to match the rest of Settings.
+  - Replaced the bespoke sticky header + `router.back()` behavior with the shared `PageHeader` (Back → `/settings`) for consistent navigation.
+  - Load-error state now uses the same header/wrapper pattern as the main view.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (pending)
+
 ### Docs: Phase 1 plan — add follow-on sweep commands
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`
   - Added `rg` search commands for quickly generating the next Phase 1 sweep list once the primary route checklist is complete.
