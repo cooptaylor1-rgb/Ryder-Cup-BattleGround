@@ -307,3 +307,13 @@
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`842aa60`)
+
+### Phase 1 (batch 89): Bets + Bet Detail — shared `PageHeader`; Standings loading — standard `PageLoadingSkeleton`
+- `golf-ryder-cup-web/src/app/bets/page.tsx`
+  - Replaced bespoke `header-premium` markup with the shared `PageHeader` (Back + Create in `rightSlot`) for consistent premium navigation.
+- `golf-ryder-cup-web/src/app/bets/[betId]/page.tsx`
+  - Replaced bespoke header markup with the shared `PageHeader`, preserving the larger status-colored icon container via `iconContainerStyle` and keeping Edit/Delete actions in `rightSlot`.
+- `golf-ryder-cup-web/src/app/standings/page.tsx`
+  - Loading state now uses `PageLoadingSkeleton title="Standings"` instead of a custom header/content skeleton.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`47e8ac0`)

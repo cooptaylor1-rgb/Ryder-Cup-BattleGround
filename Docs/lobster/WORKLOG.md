@@ -545,3 +545,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - All three pages now use the shared `BottomNav` (replacing the hand-rolled nav markup) so Captain tools remain consistent with the Phase 1 premium navigation pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`842aa60`)
+
+### 16:50 EST — Phase 1 — Standardize Bets + Standings headers/loading
+- Bets (`/bets`) and Bet Detail (`/bets/[betId]`): migrated from bespoke `header-premium` markup onto the shared `PageHeader` (actions in `rightSlot`) for consistent premium navigation.
+- Standings (`/standings`): loading state now uses the standard `PageLoadingSkeleton`.
+- Commit + push ✅ (`47e8ac0`)
