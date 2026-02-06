@@ -343,3 +343,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Recap: prefiltered missing player records in the match rows so names don’t render as empty strings.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8a07584`)
+
+### 23:15 EST — Phase 1 (batch 75)
+- Profile (`/profile`): loading state now uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`, so users can always navigate even while auth/profile data is loading.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`023ed48`)
