@@ -353,5 +353,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
 
+### 01:02 EST — Phase 1 (batch 77)
+- Players (`/players`): replaced bespoke header markup with the shared `PageHeader` component so the route matches the standard premium header pattern used across Phase 1 routes.
+- Kept captain actions available via `rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c315aba`)
+
 ## 2026-02-06
 

@@ -66,3 +66,4 @@ All times America/New_York.
 - 22:10 — Shipped batch: Trip Recap component prefilters matches with computed state (no `return null` inside the match list render) and filters missing player records so names don’t render as empty strings. (commit 8a07584)
 - 23:15 — Shipped batch: Profile (`/profile`) loading state now uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`, so the route is never a navigation dead end while auth is still loading. (commit 023ed48)
 - 23:20 — Shipped batch: Bets (`/bets`) no-trip state is now the standard premium wrapper + `PageHeader` + `BottomNav` (and removed a duplicate early-return block that was preventing the upgraded state from rendering). (commit 0ed199a)
+- 01:02 — Shipped batch: Players (`/players`) now uses the shared `PageHeader` (captain actions stay available via `rightSlot`) for consistent premium navigation. (commit c315aba)

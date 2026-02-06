@@ -114,3 +114,10 @@
   - No-trip state now uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav` so it’s never a navigation dead end.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`0ed199a`)
+
+### Phase 1 (batch 77): Players — use shared `PageHeader`
+- `golf-ryder-cup-web/src/app/players/page.tsx`
+  - Replaced the bespoke “premium header” markup with the shared `PageHeader` for consistency across Phase 1 routes.
+  - Kept captain actions available via `rightSlot`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`c315aba`)
