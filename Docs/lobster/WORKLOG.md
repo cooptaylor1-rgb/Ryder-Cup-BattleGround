@@ -380,3 +380,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ddb8690`)
 
+### 02:55 EST — Phase 1 (batch 80)
+- Settings hub (`/settings`): updated the Notifications and Data/Storage entries to link to the dedicated `/settings/notifications` and `/settings/backup` pages.
+- Settings — Notifications: standardized the page wrapper to include the premium background canvas.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7cea01b`)
+
