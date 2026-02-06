@@ -367,3 +367,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`cd811e2`)
 
+### 01:55 EST — Phase 1 — Route sweep verification (no remaining blank-screen patterns)
+- Verified there are no remaining route-level blank-screen patterns in `src/app/**/page.tsx`:
+  - no `return null;` top-level returns
+  - no `return null` hits in route pages (excluding `api/`)
+  - no `Suspense fallback={null}` usage in routes
+- Next: if we want to keep tightening “silent gaps”, consider a component-level sweep for `return null` inside user-facing widgets (separate from the route blank-screen goal).
+
