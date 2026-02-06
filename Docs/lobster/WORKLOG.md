@@ -312,4 +312,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Player onboarding + gamification components: removed remaining `return null` usages inside `map()` by prefiltering with `filter(Boolean)`/`flatMap()` so UI sections don’t silently skip rows when definitions are missing.
 - Affected components: Profile Completion Reward, Golf Superlatives display, Achievements (compact).
 - Lobster checkpoint: `lint` + `typecheck` ✅
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`3e0ee18`)
