@@ -20,6 +20,19 @@
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`0cf31a4`)
 
+### Phase 1 (batch 67): Global error page — Go Home uses App Router navigation
+- `golf-ryder-cup-web/src/app/global-error.tsx`
+  - Replaced `window.location.href = '/'` with `router.push('/')` for the “Go Home” action so recovery navigation stays consistent with App Router semantics.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`2d4641c`)
+
+### Docs: worklogs — record Phase 1 (batch 67)
+- `Docs/lobster/WORKLOG.md`
+- `golf-ryder-cup-web/WORKLOG.md`
+  - Added Phase 1 (batch 67) entries + commit hash.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`4f562d6`)
+
 ### Docs: Phase 1 plan — add follow-on sweep commands
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`
   - Added `rg` search commands for quickly generating the next Phase 1 sweep list once the primary route checklist is complete.
