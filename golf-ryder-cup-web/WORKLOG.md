@@ -82,3 +82,4 @@ All times America/New_York.
 - 09:20 — Shipped batch: Live Scores (/live) migrated off the bespoke header + hand-rolled bottom nav onto the shared PageHeader + BottomNav, with sound/fullscreen/refresh controls in PageHeader.rightSlot. (commit a6555c9)
 - 09:55 — Shipped batch: Lineup Session (`/lineup/[sessionId]`) migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, and standardized the wrapper to the premium layout for consistent navigation. (commit a36bfe2)
 - 10:25 — Shipped batch: Settings hub (`/settings`) replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation. (commit 6879433)
+- 10:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) removed invalid Tailwind “CSS var” class syntax that could cause missing styles; standardized to CSS variable inline styles while keeping shared `PageHeader` + `BottomNav`. (commit 3371b11)

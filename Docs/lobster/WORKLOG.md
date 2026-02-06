@@ -470,3 +470,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Settings hub (`/settings`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6879433`)
+
+### 10:55 EST — Phase 1 (batch 92)
+- Settings — Notifications (`/settings/notifications`): removed invalid Tailwind “CSS var” class syntax (e.g. `bg-(--masters)`) that could cause the page to render with missing styles.
+- Standardized the page to use CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) and kept the shared `PageHeader` + `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3371b11`)

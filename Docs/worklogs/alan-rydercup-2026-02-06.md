@@ -219,3 +219,10 @@
   - Replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`6879433`)
+
+### Phase 1 (batch 92): Settings — Notifications styling correctness
+- `golf-ryder-cup-web/src/app/settings/notifications/page.tsx`
+  - Removed invalid Tailwind “CSS var” class syntax (e.g. `bg-(--masters)`, `text-(--ink-muted)`) which could lead to missing styles.
+  - Standardized styling via CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) while keeping the shared `PageHeader` + `BottomNav`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`3371b11`)
