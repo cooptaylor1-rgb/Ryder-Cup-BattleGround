@@ -7,8 +7,8 @@ import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
-import { ChevronLeft, ShieldCheck, Filter, Search, Home, MoreHorizontal } from 'lucide-react';
+import { BottomNav, PageHeader } from '@/components/layout';
+import { ShieldCheck, Filter, Search, Home, MoreHorizontal } from 'lucide-react';
 
 const ACTION_TYPES: AuditActionType[] = [
   'sessionCreated',
@@ -122,31 +122,12 @@ export default function CaptainAuditLogPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      <header className="header-premium">
-        <div className="container-editorial flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 press-scale"
-            style={{ color: 'var(--ink-secondary)' }}
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: 'var(--masters)' }}
-            >
-              <ShieldCheck size={18} style={{ color: 'white' }} />
-            </div>
-            <div>
-              <p className="type-overline">Captain Audit Log</p>
-              <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
-                Monitor critical scoring and lineup changes
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Captain Audit Log"
+        subtitle="Monitor scoring and lineup changes"
+        icon={<ShieldCheck size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
 
       <main className="container-editorial section">
         <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>

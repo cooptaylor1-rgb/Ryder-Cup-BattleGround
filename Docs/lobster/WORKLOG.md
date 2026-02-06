@@ -510,3 +510,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
 
+
+### 14:35 EST — Phase 1 (batch 97)
+- Captain Command Center (`/captain`): replaced bespoke `header-premium` markup with the shared `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Captain Audit Log (`/captain/audit`): migrated the header to `PageHeader` for consistent premium navigation.
+- Invitations (`/captain/invites`): migrated the header to `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)

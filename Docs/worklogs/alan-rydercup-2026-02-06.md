@@ -261,3 +261,15 @@
   - Kept the existing `BottomNav`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`cd161c6`)
+
+### Phase 1 (batch 97): Captain hub + Audit Log + Invitations — shared `PageHeader` + shared `BottomNav`
+- `golf-ryder-cup-web/src/app/captain/page.tsx`
+  - Replaced bespoke `header-premium` markup with the shared `PageHeader` (Settings icon in `rightSlot`).
+  - Replaced the hand-rolled bottom nav markup with the shared `BottomNav`.
+- `golf-ryder-cup-web/src/app/captain/audit/page.tsx`
+  - Migrated the header to `PageHeader` for consistent premium navigation.
+- `golf-ryder-cup-web/src/app/captain/invites/page.tsx`
+  - Migrated the header to `PageHeader`.
+  - Replaced the hand-rolled bottom nav markup with the shared `BottomNav`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`TBD`)

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import {
   Shield,
   Users,
@@ -17,17 +17,14 @@ import {
   QrCode,
   Settings,
   ChevronRight,
-  ChevronLeft,
-  ChevronDown,
+    ChevronDown,
   Plus,
   AlertTriangle,
   CheckCircle2,
   Clock,
   Trophy,
   Home,
-  Target,
   MoreHorizontal,
-  CalendarDays,
   Zap,
   Car,
   Phone,
@@ -260,49 +257,12 @@ export default function CaptainPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Shield size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                  Captain Command
-                </span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  {currentTrip.name}
-                </p>
-              </div>
-            </div>
-          </div>
+            <PageHeader
+        title="Captain Command"
+        subtitle={currentTrip.name}
+        icon={<Shield size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
           <Link
             href="/captain/settings"
             className="p-2 press-scale"
@@ -310,8 +270,8 @@ export default function CaptainPage() {
           >
             <Settings size={20} strokeWidth={1.75} />
           </Link>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial">
         {/* Trip Readiness */}
@@ -665,33 +625,7 @@ export default function CaptainPage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+            <BottomNav />
     </div>
   );
 }
