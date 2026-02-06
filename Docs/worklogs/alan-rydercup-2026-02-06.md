@@ -136,3 +136,15 @@
   - Added the shared `PageHeader` (with step-aware title and back behavior) and kept `BottomNav` available so the flow is never a navigation dead end.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`ddb8690`)
+
+### Phase 1 (batch 80): Settings hub — correct links + wrapper consistency
+- `golf-ryder-cup-web/src/app/settings/page.tsx`
+  - Updated the Notifications and Data/Storage entries to link to the dedicated `/settings/notifications` and `/settings/backup` pages.
+  - Standardized the Notifications wrapper to include the premium background canvas.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`7cea01b`)
+
+### Docs: Lobster worklog hygiene — date heading fix
+- `Docs/lobster/WORKLOG.md`
+  - Fixed the date heading so midnight entries (00:10+) are correctly grouped under 2026-02-06.
+- Commit + push ✅ (`a48b648`)
