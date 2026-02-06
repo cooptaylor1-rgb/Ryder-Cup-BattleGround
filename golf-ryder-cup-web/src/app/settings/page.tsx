@@ -49,17 +49,17 @@ const SETTINGS_ITEMS: SettingItem[] = [
   {
     id: 'notifications',
     label: 'Notifications',
-    description: 'System notification settings',
+    description: 'Tee time reminders and score alerts',
     icon: Bell,
-    href: '/more#preferences',
+    href: '/settings/notifications',
     color: '#f59e0b',
   },
   {
-    id: 'data',
-    label: 'Data & Storage',
-    description: 'Demo data, clear cache',
+    id: 'backup',
+    label: 'Backup & Restore',
+    description: 'Export and import trips',
     icon: Database,
-    href: '/more#data',
+    href: '/settings/backup',
     color: '#06b6d4',
   },
   {

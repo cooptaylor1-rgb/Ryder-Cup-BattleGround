@@ -97,7 +97,10 @@ export default function NotificationSettingsPage() {
     const isNotificationsSupported = typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain">
+        <div
+            className="min-h-screen pb-nav page-premium-enter texture-grain"
+            style={{ background: 'var(--canvas)' }}
+        >
             <PageHeader
                 title="Notifications"
                 icon={<Bell className="w-4 h-4 text-white" />}
