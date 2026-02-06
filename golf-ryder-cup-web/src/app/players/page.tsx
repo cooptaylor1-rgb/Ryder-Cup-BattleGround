@@ -82,7 +82,7 @@ export default function PlayersPage() {
 
   const getPlayerTeam = (playerId: string) => {
     const membership = teamMembers.find((tm) => tm.playerId === playerId);
-    if (!membership) return null;
+    if (!membership) return undefined;
     return teams.find((t) => t.id === membership.teamId);
   };
 

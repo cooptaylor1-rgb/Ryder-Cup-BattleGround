@@ -678,7 +678,7 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
 
   // Calculate Nassau summary
   const getNassauSummary = () => {
-    if (!isNassau || !bet.nassauResults) return null;
+    if (!isNassau || !bet.nassauResults) return undefined;
     const r = bet.nassauResults;
     let teamAWins = 0;
     let teamBWins = 0;

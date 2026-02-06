@@ -549,7 +549,7 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
 
   // Calculate countdown for upcoming tee times (P1: Show countdown)
   const countdown = useMemo(() => {
-    if (!entry.datetime || entry.status !== 'upcoming') return null;
+    if (!entry.datetime || entry.status !== 'upcoming') return undefined;
     return getCountdown(entry.datetime);
   }, [entry.datetime, entry.status]);
 
