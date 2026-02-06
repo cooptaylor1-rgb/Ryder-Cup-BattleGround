@@ -313,3 +313,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Affected components: Profile Completion Reward, Golf Superlatives display, Achievements (compact).
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`3e0ee18`)
+
+### 20:35 EST — Phase 1 (batch 70)
+- Trip Settings (`/trip/[tripId]/settings`): replaced bespoke header markup with the shared `PageHeader` component (Back → Trip, Home button in `rightSlot`) so the route matches the standard premium header pattern across all states.
+- Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`a40d29e`)
