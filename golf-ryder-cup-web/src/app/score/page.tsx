@@ -148,6 +148,13 @@ export default function ScorePage() {
                 className="min-h-screen pb-nav page-premium-enter texture-grain"
                 style={{ background: 'var(--canvas)' }}
             >
+                <PageHeader
+                    title="Score"
+                    subtitle="Sign in required"
+                    icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                    onBack={() => router.back()}
+                />
+
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="scorecard"
@@ -171,6 +178,13 @@ export default function ScorePage() {
                 className="min-h-screen pb-nav page-premium-enter texture-grain"
                 style={{ background: 'var(--canvas)' }}
             >
+                <PageHeader
+                    title="Score"
+                    subtitle="No active trip"
+                    icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                    onBack={() => router.back()}
+                />
+
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="scorecard"
