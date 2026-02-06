@@ -39,7 +39,7 @@ export default function ScorePage() {
 
     // Find the current user's player record (P0-3)
     const currentUserPlayer = useMemo(() => {
-        if (!isAuthenticated || !currentUser) return null;
+        if (!isAuthenticated || !currentUser) return undefined;
 
         return players.find(p => {
             const playerEmail = p.email?.toLowerCase();

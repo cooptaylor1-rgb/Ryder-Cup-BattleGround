@@ -111,7 +111,7 @@ export default function SchedulePage() {
 
   // Find the player record that matches current user
   const currentUserPlayer = useMemo(() => {
-    if (!isAuthenticated || !currentUser) return null;
+    if (!isAuthenticated || !currentUser) return undefined;
 
     // Try to match by email first, then by name
     return players.find((p) => {
