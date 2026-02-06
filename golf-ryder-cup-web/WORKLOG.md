@@ -24,7 +24,7 @@ All times America/New_York.
 - 21:35 — Shipped batch: Matchups uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit a09ca56)
 - 22:05 — Shipped batch: updated Trip Stats + Trip Awards to use the standard premium page wrapper and added `BottomNav` so navigation is always clear (including no active trip / no stats yet). (commit 6dccf48)
 - 22:30 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) now uses the standard premium wrapper + `BottomNav` and renders explicit loading/error/not-found states. (commit 4c70f5e)
-- 22:55 — Shipped batch: Live (`/live`) now renders explicit premium empty states for **No active session** and **No live matches**, each with clear CTAs to Schedule/Matchups. (commit TBD)
+- 22:55 — Shipped batch: Live (`/live`) now renders explicit premium empty states for **No active session** and **No live matches**, each with clear CTAs to Schedule/Matchups. (commit ff1070a)
 - 23:05 — Shipped batch: hardened the per-trip Trip Awards route (`/trip/[tripId]/awards`) with the standard premium wrapper, `BottomNav`, and explicit loading/error/empty states. (commit 31e5a1b)
 - 23:05 — Shipped batch: Backup & Restore (`/settings/backup`) now renders explicit loading/load-error/no-trips empty states + includes `BottomNav` (no silent failures). (commit 6604d23)
 - 23:34 — Shipped batch: added `BottomNav` across the match scoring detail page (main + unavailable/error states) so there’s always a clear way to navigate back out. (commit 5455aea)
