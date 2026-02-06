@@ -414,47 +414,17 @@ export default function TripStatsPage() {
           onBack={() => router.back()}
         />
 
-        <main className="page-container">
-          <div className="content-area">
-            <EmptyStatePremium
-              illustration="podium"
-              title="No active trip"
-              description="Start or join a trip to track fun stats."
-              action={{
-                label: 'Go Home',
-                onClick: () => router.push('/'),
-              }}
-              variant="large"
-            />
-          </div>
-        </main>
-        <BottomNav />
-      </div>
-    );
-  }
-
-  if (tripStatsData.length === 0) {
-    return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
-        <PageHeader
-          title="Trip Stats"
-          subtitle={currentTrip.name}
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
-        />
-
-        <main className="page-container">
-          <div className="content-area">
-            <EmptyStatePremium
-              illustration="podium"
-              title="No stats yet"
-              description="Start tracking the fun — add a few stats and the leaderboards will appear here."
-              variant="large"
-            />
-          </div>
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="podium"
+            title="No active trip"
+            description="Start or join a trip to track fun stats."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
         </main>
         <BottomNav />
       </div>
@@ -483,9 +453,31 @@ export default function TripStatsPage() {
         onBack={() => router.back()}
       />
 
-      <main className="page-container">
-        <div className="content-area space-y-6">
-          <QuickTrack players={players} tripId={currentTrip.id} onTrack={handleRefresh} />
+      <main className="container-editorial pb-8">
+        <div className="space-y-6">
+          {tripStatsData.length === 0 ? (
+            <EmptyStatePremium
+              illustration="podium"
+              title="No stats yet"
+              description="Start tracking below — once you add a few stats, leaderboards will appear here."
+              variant="compact"
+            />
+          ) : null}
+
+          {players.length > 0 ? (
+            <QuickTrack players={players} tripId={currentTrip.id} onTrack={handleRefresh} />
+          ) : (
+            <EmptyStatePremium
+              illustration="trophy"
+              title="Add players to start tracking"
+              description="Trip stats are tracked per player. Add players first, then come back here to start the rivalry."
+              action={{
+                label: 'Manage Players',
+                onClick: () => router.push('/players'),
+              }}
+              variant="compact"
+            />
+          )}
 
           <CategoryTabs active={activeCategory} onChange={setActiveCategory} />
 
