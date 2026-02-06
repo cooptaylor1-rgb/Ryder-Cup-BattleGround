@@ -364,38 +364,44 @@ export function TripRecap({
                             <div className="space-y-2">
                                 {matches
                                     .filter((m) => m.sessionId === session.id)
-                                    .map((match) => {
+                                    .flatMap((match) => {
                                         const state = matchStates.get(match.id);
-                                        if (!state) return null;
-
-                                        return (
-                                            <div
-                                                key={match.id}
-                                                className="flex items-center gap-3 p-3 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700"
-                                            >
-                                                <div className="flex-1 text-sm">
-                                                    {match.teamAPlayerIds.map(id => {
-                                                        const p = players.get(id);
-                                                        return p ? formatPlayerName(p.firstName, p.lastName, 'short') : '';
-                                                    }).join(' & ')}
-                                                </div>
-                                                <div className={cn(
-                                                    'font-bold',
-                                                    state.currentScore > 0 ? 'text-team-usa' :
-                                                        state.currentScore < 0 ? 'text-team-europe' :
-                                                            'text-surface-500'
-                                                )}>
-                                                    {state.displayScore}
-                                                </div>
-                                                <div className="flex-1 text-sm text-right">
-                                                    {match.teamBPlayerIds.map(id => {
-                                                        const p = players.get(id);
-                                                        return p ? formatPlayerName(p.firstName, p.lastName, 'short') : '';
-                                                    }).join(' & ')}
-                                                </div>
+                                        if (!state) return [];
+                                        return [{ match, state }];
+                                    })
+                                    .map(({ match, state }) => (
+                                        <div
+                                            key={match.id}
+                                            className="flex items-center gap-3 p-3 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700"
+                                        >
+                                            <div className="flex-1 text-sm">
+                                                {match.teamAPlayerIds
+                                                    .map((id) => players.get(id))
+                                                    .filter((p): p is Player => Boolean(p))
+                                                    .map((p) => formatPlayerName(p.firstName, p.lastName, 'short'))
+                                                    .join(' & ')}
                                             </div>
-                                        );
-                                    })}
+                                            <div
+                                                className={cn(
+                                                    'font-bold',
+                                                    state.currentScore > 0
+                                                        ? 'text-team-usa'
+                                                        : state.currentScore < 0
+                                                          ? 'text-team-europe'
+                                                          : 'text-surface-500'
+                                                )}
+                                            >
+                                                {state.displayScore}
+                                            </div>
+                                            <div className="flex-1 text-sm text-right">
+                                                {match.teamBPlayerIds
+                                                    .map((id) => players.get(id))
+                                                    .filter((p): p is Player => Boolean(p))
+                                                    .map((p) => formatPlayerName(p.firstName, p.lastName, 'short'))
+                                                    .join(' & ')}
+                                            </div>
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                     ))}
