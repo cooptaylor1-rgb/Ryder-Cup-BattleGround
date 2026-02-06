@@ -8,21 +8,14 @@ import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
 import { EmptyStatePremium, NoMessagesEmpty } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import {
-  ChevronLeft,
-  Home,
-  Target,
-  Users,
-  Trophy,
-  MoreHorizontal,
   MessageCircle,
   Camera,
   Send,
   Smile,
   Image as ImageIcon,
   Flame,
-  CalendarDays,
 } from 'lucide-react';
 import type { Player, BanterPost } from '@/lib/types/models';
 
@@ -57,7 +50,7 @@ export default function SocialPage() {
   );
 
   const getPlayer = (id: string): Player | undefined => {
-    return players.find(p => p.id === id);
+    return players.find((p) => p.id === id);
   };
 
   const handleSend = async () => {
@@ -120,49 +113,25 @@ export default function SocialPage() {
   }
 
   return (
-    <div className="pb-nav page-premium-enter texture-grain" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--canvas)' }}>
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <button
-              onClick={() => router.back()}
-              className="press-scale"
-              style={{ padding: 'var(--space-2)', marginLeft: 'calc(-1 * var(--space-2))', color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <MessageCircle size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Trash Talk</span>
-                <p className="type-caption">{currentTrip.name}</p>
-              </div>
-            </div>
-          </div>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)', display: 'flex', flexDirection: 'column' }}
+    >
+      <PageHeader
+        title="Trash Talk"
+        subtitle={currentTrip.name}
+        icon={<MessageCircle size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
           <Link
             href="/social/photos"
             className="btn-premium"
             style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)' }}
           >
-            <Camera size={22} />
+            <Camera size={20} />
           </Link>
-        </div>
-      </header>
+        }
+      />
 
       {/* Quick Tabs */}
       <div className="container-editorial" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }}>
@@ -174,34 +143,31 @@ export default function SocialPage() {
       </div>
 
       {/* Comments Feed */}
-      <main className="container-editorial" style={{ flex: 1, overflowY: 'auto', paddingBottom: 'var(--space-4)' }}>
+      <main
+        className="container-editorial"
+        style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(var(--space-4) + 64px)' }}
+      >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           {banterPosts.map((post) => {
             const player = post.authorId ? getPlayer(post.authorId) : undefined;
-            return (
-              <PostCard
-                key={post.id}
-                post={post}
-                player={player}
-              />
-            );
+            return <PostCard key={post.id} post={post} player={player} />;
           })}
         </div>
 
-        {banterPosts.length === 0 && (
-          <NoMessagesEmpty />
-        )}
+        {banterPosts.length === 0 && <NoMessagesEmpty />}
       </main>
 
       {/* Message Input */}
       <div
         style={{
-          position: 'sticky',
+          position: 'fixed',
           bottom: 'var(--nav-height)',
           left: 0,
           right: 0,
-          background: 'var(--canvas-raised)',
+          background: 'rgba(var(--canvas-rgb), 0.92)',
           borderTop: '1px solid var(--rule)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 20,
         }}
       >
         {/* Quick Reactions */}
@@ -277,33 +243,7 @@ export default function SocialPage() {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }
