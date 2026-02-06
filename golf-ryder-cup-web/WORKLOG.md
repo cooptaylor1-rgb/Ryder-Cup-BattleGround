@@ -68,3 +68,4 @@ All times America/New_York.
 - 23:20 — Shipped batch: Bets (`/bets`) no-trip state is now the standard premium wrapper + `PageHeader` + `BottomNav` (and removed a duplicate early-return block that was preventing the upgraded state from rendering). (commit 0ed199a)
 - 01:02 — Shipped batch: Players (`/players`) now uses the shared `PageHeader` (captain actions stay available via `rightSlot`) for consistent premium navigation. (commit c315aba)
 - 01:30 — Shipped batch: removed the remaining `return null` occurrences from route `page.tsx` files by switching a few internal memos/state sentinels to `undefined` (Score match detail quick-score pending + session/hole memos; Bet detail linked-match query when no matchId). Keeps the Phase 1 `rg "return null"` sweep clean. (commit cd811e2)
+- 01:55 — Docs: logged Phase 1 route sweep verification (no remaining route-level blank-screen patterns found). (commit d4c5c7f)
