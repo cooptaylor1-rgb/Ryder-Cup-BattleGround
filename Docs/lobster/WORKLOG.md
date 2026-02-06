@@ -441,4 +441,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Awards (`/trip-stats/awards`): replaced bespoke `header-premium` markup with the shared `PageHeader`.
 - Trip Awards: standardized the layout to the usual premium route wrapper + `container-editorial` pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`6dacc3c`)

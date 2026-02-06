@@ -190,4 +190,4 @@
   - Standardized the layout to the typical `container-editorial` pattern and removed ad-hoc `page-container/content-area` structure.
   - Keeps `BottomNav` available in both no-trip and active-trip states.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`6dacc3c`)
