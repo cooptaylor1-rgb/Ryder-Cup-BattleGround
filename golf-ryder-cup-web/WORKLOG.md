@@ -84,3 +84,4 @@ All times America/New_York.
 - 10:25 — Shipped batch: Settings hub (`/settings`) replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation. (commit 6879433)
 - 10:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) removed invalid Tailwind “CSS var” class syntax that could cause missing styles; standardized to CSS variable inline styles while keeping shared `PageHeader` + `BottomNav`. (commit 3371b11)
 - 11:25 — Shipped batch: Profile (`/profile`) migrated the authenticated state onto the standard premium wrapper (`pb-nav` + texture + premium enter) and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation. (commit 482d2ac)
+- 11:58 — Shipped batch: Day Summary modal now renders an explicit “No active trip” state instead of returning `null`, so opening the summary overlay can’t silently do nothing. (commit 0ab52cd)

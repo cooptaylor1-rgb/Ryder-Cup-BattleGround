@@ -481,3 +481,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized the page to use CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) and kept the shared `PageHeader` + `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3371b11`)
+
+### 11:58 EST — Phase 1 (batch 93)
+- Day Summary modal: removed the top-level `if (!currentTrip) return null;` so opening the modal can’t silently do nothing.
+- Added explicit modal body states for **No active trip**, **Generating summary…**, and **No matches found**.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0ab52cd`)

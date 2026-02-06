@@ -226,3 +226,10 @@
   - Standardized styling via CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) while keeping the shared `PageHeader` + `BottomNav`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`3371b11`)
+
+### Phase 1 (batch 93): Day Summary modal — explicit no-trip state
+- `golf-ryder-cup-web/src/components/social/DaySummaryCard.tsx`
+  - Removed the top-level `if (!currentTrip) return null;` so opening the Day Summary modal can’t silently do nothing.
+  - Added explicit modal body states for: **No active trip**, **Generating summary…**, and **No matches found**.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`0ab52cd`)

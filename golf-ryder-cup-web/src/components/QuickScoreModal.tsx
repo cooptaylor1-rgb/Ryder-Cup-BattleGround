@@ -46,7 +46,8 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
     // Get match data
     const match = useLiveQuery(
         () => db.matches.get(matchId),
-        [matchId]
+        [matchId],
+        null
     );
 
     // Get hole results
@@ -160,8 +161,6 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
         return playerList.map(p => p.lastName).join(' / ');
     };
 
-    if (!match) return null;
-
     return (
         <AnimatePresence>
             {isOpen && (
@@ -206,8 +205,31 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                             </button>
                         </div>
 
-                        {/* Error Message */}
-                        {error && (
+                        {match === null && (
+                            <div className="px-5 py-10 text-center">
+                                <p className="text-sm text-muted-foreground">Loading match…</p>
+                            </div>
+                        )}
+
+                        {match === undefined && (
+                            <div className="px-5 py-10 text-center">
+                                <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                                    <AlertCircle size={20} className="text-muted-foreground" />
+                                </div>
+                                <p className="text-sm text-muted-foreground">This match isn’t available yet.</p>
+                                <button
+                                    onClick={onClose}
+                                    className="mt-4 inline-flex items-center justify-center rounded-xl bg-muted px-4 py-2 text-sm font-medium hover:bg-muted/80"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        )}
+
+                        {match && (
+                            <>
+                                {/* Error Message */}
+                                {error && (
                             <div className="mx-5 mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3">
                                 <AlertCircle size={20} className="text-red-500 shrink-0" />
                                 <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -378,6 +400,8 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                                 </motion.div>
                             )}
                         </AnimatePresence>
+                            </>
+                        )}
 
                         {/* Bottom safe area */}
                         <div className="h-8" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
