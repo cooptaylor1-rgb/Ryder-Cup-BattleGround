@@ -361,3 +361,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-06
 
+### 01:30 EST — Phase 1 (batch 78)
+- Score match detail (`/score/[matchId]`): replaced internal `null` sentinels with `undefined` (session/hole-result memos + quick-score pending state), removing the remaining `return null` hits from Phase 1’s route sweep.
+- Bet detail (`/bets/[betId]`): linked-match query returns `undefined` when there’s no `matchId` (no behavior change), avoiding an extra `return null` hit in route code.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cd811e2`)
+
