@@ -221,8 +221,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Players: upgraded to the standard premium wrapper and added `BottomNav` in all states.
 - Standings: added `BottomNav` to no-trip/loading states and standardized wrapper.
 
-## 2026-02-06
-
 ### 00:10 EST — Phase 1 (batch 30)
 - Docs: synced `golf-ryder-cup-web/WORKLOG.md` to include shipped Phase 1 batches 24–29.
 
@@ -354,3 +352,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Bets no-trip state now consistently uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
+
+## 2026-02-06
+
