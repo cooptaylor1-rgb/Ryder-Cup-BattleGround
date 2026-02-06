@@ -386,3 +386,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`7cea01b`)
 
+### 03:25 EST — Docs: Lobster worklog hygiene
+- Fixed the date heading so midnight entries (00:10+) are correctly grouped under 2026-02-06.
+
