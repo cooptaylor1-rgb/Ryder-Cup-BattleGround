@@ -317,3 +317,11 @@
   - Loading state now uses `PageLoadingSkeleton title="Standings"` instead of a custom header/content skeleton.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`47e8ac0`)
+
+### Phase 1 (batch 104): Trip Awards + Trip Settings — standard loading skeletons
+- `golf-ryder-cup-web/src/app/trip/[tripId]/awards/page.tsx`
+  - Avoid nested/duplicated nav by using an early-return `PageLoadingSkeleton title="Awards" variant="detail"` instead of rendering the skeleton inside the already-wrapped page.
+- `golf-ryder-cup-web/src/app/trip/[tripId]/settings/page.tsx`
+  - Loading state now uses `PageLoadingSkeleton title="Trip Settings" variant="form"` for a self-labeled, consistent premium loading screen.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`8f55e29`)

@@ -550,3 +550,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Bets (`/bets`) and Bet Detail (`/bets/[betId]`): migrated from bespoke `header-premium` markup onto the shared `PageHeader` (actions in `rightSlot`) for consistent premium navigation.
 - Standings (`/standings`): loading state now uses the standard `PageLoadingSkeleton`.
 - Commit + push ✅ (`47e8ac0`)
+
+### 17:20 EST — Phase 1 (batch 104)
+- Trip Awards (`/trip/[tripId]/awards`): loading now uses an early-return `PageLoadingSkeleton title="Awards" variant="detail"` so we don’t render a full-page skeleton (with its own header/nav) inside an already-rendered page.
+- Trip Settings (`/trip/[tripId]/settings`): loading now uses `PageLoadingSkeleton title="Trip Settings" variant="form"` for a consistent, self-labeled premium skeleton.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8f55e29`)
