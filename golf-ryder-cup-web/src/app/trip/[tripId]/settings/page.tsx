@@ -147,7 +147,7 @@ export default function TripSettingsPage() {
   };
 
   if (isVerifyingTrip) {
-    return <PageLoadingSkeleton />;
+    return <PageLoadingSkeleton title="Trip Settings" variant="form" />;
   }
 
   if (tripLookupError) {

@@ -164,6 +164,10 @@ export default function AwardsPage() {
     }
   };
 
+  if (isLoading) {
+    return <PageLoadingSkeleton title="Awards" variant="detail" />;
+  }
+
   return (
     <div
       className="min-h-screen pb-nav page-premium-enter texture-grain"
@@ -221,9 +225,7 @@ export default function AwardsPage() {
       />
 
       <main className="container-editorial py-10 space-y-6">
-        {isLoading ? (
-          <PageLoadingSkeleton />
-        ) : error ? (
+        {error ? (
           <div className="space-y-4">
             <ErrorEmpty message={error} onRetry={loadRecords} />
             <EmptyStatePremium
