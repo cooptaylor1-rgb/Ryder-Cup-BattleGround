@@ -17,20 +17,14 @@ import {
 } from '@/components/captain';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import {
-  ChevronLeft,
   Users,
   Calendar,
   Clock,
   Play,
   Lock,
   Unlock,
-  Trophy,
-  Home,
-  Target,
-  MoreHorizontal,
-  CalendarDays,
   ChevronRight,
   Edit3,
   Eye,
@@ -303,29 +297,16 @@ export default function SessionPage() {
   const canStart = isCaptainMode && session.status === 'scheduled' && matches.length > 0;
 
   return (
-    <div className="min-h-screen pb-nav page-enter" style={{ background: 'var(--canvas)' }}>
-      {/* Header */}
-      <header className="header">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)' }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div>
-              <span className="type-overline">{session.name}</span>
-              <p className="type-caption truncate capitalize" style={{ marginTop: '2px' }}>
-                {session.sessionType} • {session.pointsPerMatch} pt
-                {session.pointsPerMatch !== 1 ? 's' : ''} each
-              </p>
-            </div>
-          </div>
-
-          {/* Status badge */}
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title={session.name}
+        subtitle={`${session.sessionType} • ${session.pointsPerMatch} pt${session.pointsPerMatch !== 1 ? 's' : ''} each`}
+        icon={<Users size={18} color="white" />}
+        onBack={() => router.back()}
+        rightSlot={
           <div className="flex items-center gap-2">
             {session.status === 'inProgress' && (
               <span className="live-badge">
@@ -346,13 +327,14 @@ export default function SessionPage() {
                 onClick={handleToggleLock}
                 className="p-2 press-scale"
                 style={{ color: isLocked ? 'var(--masters)' : 'var(--ink-tertiary)' }}
+                aria-label={isLocked ? 'Unlock session' : 'Lock session'}
               >
                 {isLocked ? <Lock size={18} /> : <Unlock size={18} />}
               </button>
             )}
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial">
         {/* Session Info */}
@@ -549,33 +531,7 @@ export default function SessionPage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
 
       {/* Confirm Dialog */}
       {ConfirmDialogComponent}
