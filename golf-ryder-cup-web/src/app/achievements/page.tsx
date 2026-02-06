@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type React from 'react';
 import { useRouter } from 'next/navigation';
 // (Link removed; BottomNav provides navigation)
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
-import { EmptyStatePremium } from '@/components/ui';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
-  ChevronLeft,
   Users,
-  Trophy,
   Award,
   Star,
   Flame,
@@ -62,13 +61,13 @@ export default function AchievementsPage() {
 
   // If no active trip, we render an explicit empty state instead of redirecting.
 
-  // Load real player stats from the database
   useEffect(() => {
     async function loadStats() {
       if (!currentTrip) {
         setIsLoading(false);
         return;
       }
+
       try {
         setIsLoading(true);
         const stats = await calculatePlayerStats(currentTrip.id);
@@ -80,18 +79,18 @@ export default function AchievementsPage() {
         setIsLoading(false);
       }
     }
+
     loadStats();
   }, [currentTrip, showToast]);
 
-  // Calculate achievements based on real player stats
   const achievements = useMemo((): Achievement[] => {
     // Aggregate stats across all players
     const totalHolesWon = playerStats.reduce((sum, s) => sum + s.holesWon, 0);
-    const maxMatchesPlayed = Math.max(0, ...playerStats.map(s => s.matchesPlayed));
-    const maxWins = Math.max(0, ...playerStats.map(s => s.wins));
-    const maxPoints = Math.max(0, ...playerStats.map(s => s.points));
-    const maxStreak = Math.max(0, ...playerStats.map(s => s.longestWinStreak));
-    const maxBiggestWin = Math.max(0, ...playerStats.map(s => s.biggestWin));
+    const maxMatchesPlayed = Math.max(0, ...playerStats.map((s) => s.matchesPlayed));
+    const maxWins = Math.max(0, ...playerStats.map((s) => s.wins));
+    const maxPoints = Math.max(0, ...playerStats.map((s) => s.points));
+    const maxStreak = Math.max(0, ...playerStats.map((s) => s.longestWinStreak));
+    const maxBiggestWin = Math.max(0, ...playerStats.map((s) => s.biggestWin));
 
     return [
       {
@@ -126,7 +125,7 @@ export default function AchievementsPage() {
         id: '4',
         name: 'Closer',
         description: 'Win a match',
-        icon: <Trophy size={24} />,
+        icon: <Award size={24} />,
         rarity: 'common',
         unlocked: maxWins > 0,
         progress: maxWins,
@@ -148,7 +147,7 @@ export default function AchievementsPage() {
         description: 'Win 5 matches without a loss',
         icon: <Crown size={24} />,
         rarity: 'legendary',
-        unlocked: maxWins >= 5 && playerStats.some(s => s.wins >= 5 && s.losses === 0),
+        unlocked: maxWins >= 5 && playerStats.some((s) => s.wins >= 5 && s.losses === 0),
         progress: maxWins,
         maxProgress: 5,
       },
@@ -226,145 +225,94 @@ export default function AchievementsPage() {
     );
   }
 
-  // Show loading state while fetching stats
   if (isLoading) {
-    return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-        <header className="header-premium">
-          <div className="container-editorial flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg skeleton-pulse" />
-            <div>
-              <div className="w-24 h-3 rounded skeleton-pulse mb-1" />
-              <div className="w-16 h-2 rounded skeleton-pulse" />
-            </div>
-          </div>
-        </header>
-        <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
-          <div className="card-luxury p-6 mb-4">
-            <div className="w-32 h-5 rounded skeleton-pulse mb-3" />
-            <div className="w-full h-4 rounded-full skeleton-pulse" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="card-luxury p-4 h-32 skeleton-pulse" />
-            ))}
-          </div>
-        </main>
-        <BottomNav />
-      </div>
-    );
+    return <PageLoadingSkeleton title="Achievements" variant="grid" />;
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 press-scale"
-            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            aria-label="Back"
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title="Achievements"
+        subtitle={`${unlockedCount} of ${totalCount} unlocked`}
+        icon={<Award size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
+
+      <main
+        className="container-editorial"
+        style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}
+      >
+        {/* Progress Overview */}
+        <div
+          className="card text-center"
+          style={{
+            background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
+            color: 'white',
+            padding: 'var(--space-6)',
+            marginBottom: 'var(--space-6)',
+          }}
+        >
+          <Award size={48} style={{ margin: '0 auto var(--space-3)', opacity: 0.9 }} />
+          <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>
+            {Math.round((unlockedCount / totalCount) * 100)}%
+          </h2>
+          <p className="type-body" style={{ opacity: 0.8 }}>
+            Trip Progress
+          </p>
+
+          {/* Progress Bar */}
+          <div
+            style={{
+              marginTop: 'var(--space-4)',
+              height: '8px',
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(255,255,255,0.2)',
+              overflow: 'hidden',
+            }}
           >
-            <ChevronLeft size={22} />
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <div
               style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: 'var(--shadow-glow-green)',
+                height: '100%',
+                borderRadius: 'var(--radius-full)',
+                background: 'white',
+                transition: 'width 0.5s ease',
+                width: `${(unlockedCount / totalCount) * 100}%`,
               }}
-            >
-              <Award size={16} style={{ color: 'var(--color-accent)' }} />
-            </div>
-            <div>
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Achievements</span>
-              <p className="type-caption">{unlockedCount} of {totalCount} unlocked</p>
-            </div>
+            />
           </div>
         </div>
-      </header>
 
-      <main className="container-editorial" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
-        {/* Loading State */}
-        {isLoading ? (
-          <div className="space-y-4">
-            <div
-              className="animate-pulse rounded-xl"
-              style={{ background: 'var(--surface-card)', height: '160px' }}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map(i => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-xl"
-                  style={{ background: 'var(--surface-card)', height: '120px' }}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Progress Overview */}
-            <div
-              className="card text-center"
-              style={{
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
-                color: 'white',
-                padding: 'var(--space-6)',
-                marginBottom: 'var(--space-6)',
-              }}
-            >
-              <Award size={48} style={{ margin: '0 auto var(--space-3)', opacity: 0.9 }} />
-              <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>
-                {Math.round((unlockedCount / totalCount) * 100)}%
-              </h2>
-              <p className="type-body" style={{ opacity: 0.8 }}>Trip Progress</p>
+        {/* Category Filter */}
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+          <CategoryButton
+            label="All"
+            count={totalCount}
+            active={selectedCategory === 'all'}
+            onClick={() => setSelectedCategory('all')}
+          />
+          <CategoryButton
+            label="Unlocked"
+            count={unlockedCount}
+            active={selectedCategory === 'unlocked'}
+            onClick={() => setSelectedCategory('unlocked')}
+          />
+          <CategoryButton
+            label="Locked"
+            count={totalCount - unlockedCount}
+            active={selectedCategory === 'locked'}
+            onClick={() => setSelectedCategory('locked')}
+          />
+        </div>
 
-              {/* Progress Bar */}
-              <div style={{ marginTop: 'var(--space-4)', height: '8px', borderRadius: 'var(--radius-full)', background: 'rgba(255,255,255,0.2)', overflow: 'hidden' }}>
-                <div
-                  style={{ height: '100%', borderRadius: 'var(--radius-full)', background: 'white', transition: 'width 0.5s ease', width: `${(unlockedCount / totalCount) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-              <CategoryButton
-                label="All"
-                count={totalCount}
-                active={selectedCategory === 'all'}
-                onClick={() => setSelectedCategory('all')}
-              />
-              <CategoryButton
-                label="Unlocked"
-                count={unlockedCount}
-                active={selectedCategory === 'unlocked'}
-                onClick={() => setSelectedCategory('unlocked')}
-              />
-              <CategoryButton
-                label="Locked"
-                count={totalCount - unlockedCount}
-                active={selectedCategory === 'locked'}
-                onClick={() => setSelectedCategory('locked')}
-              />
-            </div>
-
-            {/* Achievements Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-              {filteredAchievements.map((achievement) => (
-                <AchievementCard key={achievement.id} achievement={achievement} />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Achievements Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
+          {filteredAchievements.map((achievement) => (
+            <AchievementCard key={achievement.id} achievement={achievement} />
+          ))}
+        </div>
       </main>
 
       <BottomNav />
@@ -372,7 +320,6 @@ export default function AchievementsPage() {
   );
 }
 
-/* Category Button */
 interface CategoryButtonProps {
   label: string;
   count: number;
@@ -392,7 +339,6 @@ function CategoryButton({ label, count, active, onClick }: CategoryButtonProps) 
   );
 }
 
-/* Achievement Card */
 interface AchievementCardProps {
   achievement: Achievement;
 }
@@ -413,7 +359,6 @@ function AchievementCard({ achievement }: AchievementCardProps) {
         border: `1px solid ${achievement.unlocked ? colors.bg : 'var(--rule)'}`,
       }}
     >
-      {/* Rarity Badge */}
       <span
         className="type-micro"
         style={{
@@ -430,7 +375,6 @@ function AchievementCard({ achievement }: AchievementCardProps) {
         {achievement.rarity}
       </span>
 
-      {/* Icon */}
       <div
         style={{
           width: '48px',
@@ -447,25 +391,51 @@ function AchievementCard({ achievement }: AchievementCardProps) {
         {achievement.unlocked ? achievement.icon : <Lock size={24} />}
       </div>
 
-      {/* Info */}
-      <h3 className="type-body-sm" style={{ fontWeight: 600, marginBottom: 'var(--space-1)' }}>{achievement.name}</h3>
+      <h3 className="type-body-sm" style={{ fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+        {achievement.name}
+      </h3>
       <p className="type-caption">{achievement.description}</p>
 
-      {/* Progress or Status */}
       {achievement.unlocked ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginTop: 'var(--space-3)', color: 'var(--success)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-1)',
+            marginTop: 'var(--space-3)',
+            color: 'var(--success)',
+          }}
+        >
           <Check size={14} />
-          <span className="type-micro" style={{ fontWeight: 500 }}>Unlocked</span>
+          <span className="type-micro" style={{ fontWeight: 500 }}>
+            Unlocked
+          </span>
         </div>
       ) : achievement.progress !== undefined && achievement.maxProgress ? (
         <div style={{ marginTop: 'var(--space-3)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
-            <span className="type-micro" style={{ opacity: 0.7 }}>Progress</span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--space-1)',
+            }}
+          >
+            <span className="type-micro" style={{ opacity: 0.7 }}>
+              Progress
+            </span>
             <span className="type-micro" style={{ fontWeight: 500 }}>
               {achievement.progress}/{achievement.maxProgress}
             </span>
           </div>
-          <div style={{ height: '6px', borderRadius: 'var(--radius-full)', background: 'var(--rule)', overflow: 'hidden' }}>
+          <div
+            style={{
+              height: '6px',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--rule)',
+              overflow: 'hidden',
+            }}
+          >
             <div
               style={{
                 height: '100%',
