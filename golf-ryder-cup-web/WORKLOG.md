@@ -62,3 +62,4 @@ All times America/New_York.
 - 20:20 — Shipped batch: Profile Completion Reward / Golf Superlatives / Achievements (compact) now prefilter definitions instead of `return null` inside `map()`, avoiding silent render gaps. (commit 3e0ee18)
 - 20:35 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) now uses the shared `PageHeader` component (Back → Trip, Home in `rightSlot`) so the route matches the standard premium header pattern across all states. (commit a40d29e)
 - 20:55 — Shipped batch: minor optional-value hygiene — switched a few internal helpers from `null` to `undefined` (Schedule countdown memo, Players `getPlayerTeam`, Bets Nassau summary) to reduce `null` sentinels in route code. (commit 25adf90)
+- 22:10 — Shipped batch: Trip Recap component prefilters matches with computed state (no `return null` inside the match list render) and filters missing player records so names don’t render as empty strings. (commit 8a07584)

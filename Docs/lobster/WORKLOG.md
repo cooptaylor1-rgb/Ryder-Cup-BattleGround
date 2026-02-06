@@ -334,3 +334,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8e82188`)
 
+
+### 22:10 EST — Phase 1 (batch 74)
+- Trip Recap component: avoided `return null` inside the match list render by prefiltering to matches with computed state (stable rendering, no silent row drops).
+- Trip Recap: prefiltered missing player records in the match rows so names don’t render as empty strings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8a07584`)
