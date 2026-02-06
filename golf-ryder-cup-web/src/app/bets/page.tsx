@@ -85,16 +85,29 @@ export default function BetsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-        <div style={{ padding: 'var(--space-6) var(--space-4)' }}>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <PageHeader
+          title="Bets"
+          subtitle="No active trip"
+          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
+        <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
             title="No trip selected"
             description="Select or create a trip to view and manage side bets."
-            action={{ label: 'Go Home', onClick: () => router.push('/') }}
+            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
             secondaryAction={{ label: 'More', onClick: () => router.push('/more') }}
+            variant="large"
           />
-        </div>
+        </main>
+
+        <BottomNav />
       </div>
     );
   }
@@ -241,37 +254,8 @@ export default function BetsPage() {
 
   const getMatchPlayers = (match: Match) => {
     const allPlayerIds = [...match.teamAPlayerIds, ...match.teamBPlayerIds];
-    return allPlayerIds.map(id => players.find(p => p.id === id)).filter(Boolean) as Player[];
+    return allPlayerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean) as Player[];
   };
-
-  if (!currentTrip) {
-    return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
-        <PageHeader
-          title="Bets"
-          subtitle="No active trip"
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
-        />
-
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="No trip selected"
-            description="Select or create a trip to view and manage side bets."
-            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
-            secondaryAction={{ label: 'More', onClick: () => router.push('/more') }}
-            variant="large"
-          />
-        </main>
-
-        <BottomNav />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
