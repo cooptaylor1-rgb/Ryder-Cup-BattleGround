@@ -212,4 +212,4 @@
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
   - Moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (`b53eae0`)
+- Commit + push ✅ (`a6555c9`)

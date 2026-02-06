@@ -459,4 +459,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Live Scores: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
 - Live Scores: moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`b53eae0`)
+- Commit + push ✅ (`a6555c9`)
