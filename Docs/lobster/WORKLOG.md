@@ -374,3 +374,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
   - no `Suspense fallback={null}` usage in routes
 - Next: if we want to keep tightening “silent gaps”, consider a component-level sweep for `return null` inside user-facing widgets (separate from the route blank-screen goal).
 
+### 02:30 EST — Phase 1 (batch 79)
+- New Trip (`/trip/new`): removed legacy `AppShell` usage and migrated the route to the standard premium wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) with the shared `PageHeader`.
+- Kept `BottomNav` always available during the multi-step flow, so creating a trip never becomes a navigation dead end.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ddb8690`)
+

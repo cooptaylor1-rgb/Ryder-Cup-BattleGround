@@ -129,3 +129,10 @@
   - Linked match query now returns `undefined` when there’s no `matchId` (no behavior change), avoiding an extra `return null` hit in route code.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`cd811e2`)
+
+### Phase 1 (batch 79): New Trip — standard premium wrapper + PageHeader
+- `golf-ryder-cup-web/src/app/trip/new/page.tsx`
+  - Removed legacy `AppShell` usage and moved the route onto the standard premium page wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`).
+  - Added the shared `PageHeader` (with step-aware title and back behavior) and kept `BottomNav` available so the flow is never a navigation dead end.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`ddb8690`)
