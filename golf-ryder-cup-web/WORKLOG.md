@@ -55,3 +55,4 @@ All times America/New_York.
 - 16:45 — Shipped batch: Stableford scorecard score input buttons now prefilter valid values instead of `return null` inside `map()` to avoid silent render gaps and keep the Phase 1 “no null map returns” pattern consistent. (commit 22191a2)
 - 18:10 — Shipped batch: Social Stats dashboard leaderboard prefilters valid player rows instead of `return null` inside `map()`, keeping the UI stable and ranks consistent if a player record is missing. (commit 75548bb)
 - 19:25 — Shipped batch: Settings — Backup & Restore (`/settings/backup`) upgraded to the standard premium wrapper + shared `PageHeader` (Back → `/settings`) for consistent Settings navigation. (commit 0cf31a4)
+- 19:40 — Shipped batch: Global error page uses `router.push('/')` instead of `window.location.href` for the “Go Home” action, keeping recovery navigation consistent with App Router semantics. (commit 2d4641c)

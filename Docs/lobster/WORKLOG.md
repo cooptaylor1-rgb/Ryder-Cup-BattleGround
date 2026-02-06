@@ -290,6 +290,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`435b667`)
 
+### 19:05 EST — Phase 1 (batch 67)
+- Global error page (`/global-error`): replaced `window.location.href = '/'` with `router.push('/')` so recovery navigation uses App Router semantics.
+- Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`2d4641c`)
+
 ### 19:25 EST — Phase 1 (batch 66)
 - Settings — Backup & Restore (`/settings/backup`): upgraded to the standard premium wrapper (canvas background + `pb-nav page-premium-enter texture-grain`) to match the rest of Settings.
 - Settings — Backup & Restore: replaced the bespoke sticky header with the shared `PageHeader` (Back → `/settings`) for consistent navigation.
