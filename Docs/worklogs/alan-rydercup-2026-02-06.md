@@ -282,3 +282,10 @@
   - Prevents these interactions/selected states from silently missing styles.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`b428a85`)
+
+### Phase 1 (batch 102): Score — empty states use shared `PageHeader`
+- `golf-ryder-cup-web/src/app/score/page.tsx`
+  - Signed-out and no-trip states now include the shared `PageHeader` so the Score list stays consistent with premium navigation.
+  - Keeps `BottomNav` available in all states.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`5299a11`)

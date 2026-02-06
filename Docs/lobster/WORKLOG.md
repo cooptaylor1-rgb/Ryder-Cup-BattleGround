@@ -532,3 +532,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - This prevents styles from silently failing to apply.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`b428a85`)
+
+### 15:45 EST — Phase 1 (batch 102)
+- Score (match list) (`/score`): signed-out and no-trip states now use the shared `PageHeader` (with `BottomNav`) for consistent premium navigation instead of dropping straight into a bare empty state.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5299a11`)
