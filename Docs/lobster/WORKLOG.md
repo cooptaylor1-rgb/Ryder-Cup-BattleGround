@@ -453,3 +453,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Settings — Backup & Restore (`/settings/backup`): loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"` so the skeleton is correctly labeled and matches the standard list layout.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a838d0e`)
+
+### 09:20 EST — Phase 1 (batch 90)
+- Live Scores (`/live`): replaced the bespoke premium header markup with the shared `PageHeader` for consistent premium navigation.
+- Live Scores: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+- Live Scores: moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b53eae0`)

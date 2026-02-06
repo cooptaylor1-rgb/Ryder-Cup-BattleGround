@@ -205,3 +205,11 @@
   - Keeps the loading screen consistent and self-labeled while trip backups load.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`a838d0e`)
+
+### Phase 1 (batch 90): Live Scores — shared `PageHeader` + shared `BottomNav`
+- `golf-ryder-cup-web/src/app/live/page.tsx`
+  - Replaced the bespoke premium header markup with the shared `PageHeader` for consistent premium navigation.
+  - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+  - Moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`b53eae0`)

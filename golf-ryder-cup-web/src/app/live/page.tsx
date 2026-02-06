@@ -2,26 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { uiLogger } from '@/lib/utils/logger';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import {
-  ChevronLeft,
-  Home,
-  Target,
-  Users,
-  Trophy,
-  MoreHorizontal,
   Tv,
   RefreshCw,
   Maximize2,
   Volume2,
   VolumeX,
-  CalendarDays,
 } from 'lucide-react';
 // (removed unused skeleton imports)
 
@@ -167,59 +159,55 @@ export default function LivePage() {
 
   return (
     <div
-      className="min-h-screen pb-nav page-premium-enter bg-background text-foreground"
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium bg-transparent border-b border-border">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <div className="flex items-center gap-3">
-              <div
-                className="w-8 h-8 rounded-md bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg"
-              >
-                <Tv size={16} className="text-white" />
-              </div>
-              <div>
-                <span className="type-overline text-muted-foreground tracking-wider">Live Scores</span>
-                <p className="text-sm text-muted-foreground">{currentTrip.name}</p>
-              </div>
-            </div>
-          </div>
+      <PageHeader
+        title="Live Scores"
+        subtitle={currentTrip.name}
+        icon={<Tv size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
+              className="p-2 rounded-lg transition-colors"
+              style={{
+                background: 'var(--surface-card)',
+                border: '1px solid var(--rule)',
+              }}
               aria-label={soundEnabled ? 'Mute' : 'Unmute'}
             >
-              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+              {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
+              className="p-2 rounded-lg transition-colors"
+              style={{
+                background: 'var(--surface-card)',
+                border: '1px solid var(--rule)',
+              }}
               aria-label="Toggle fullscreen"
             >
-              <Maximize2 size={20} />
+              <Maximize2 size={18} />
             </button>
             <button
               onClick={() => {
                 if (activeSession) loadSessionMatches(activeSession.id);
                 setLastUpdate(new Date());
               }}
-              className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
+              className="p-2 rounded-lg transition-colors"
+              style={{
+                background: 'var(--surface-card)',
+                border: '1px solid var(--rule)',
+              }}
               aria-label="Refresh"
             >
-              <RefreshCw size={20} />
+              <RefreshCw size={18} />
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial py-6">
         {/* Session Info */}
@@ -287,33 +275,7 @@ export default function LivePage() {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav bg-background/95 backdrop-blur-sm border-t border-border">
-        <Link href="/" className="nav-item text-muted-foreground hover:text-foreground">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item text-muted-foreground hover:text-foreground">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item text-muted-foreground hover:text-foreground">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item text-muted-foreground hover:text-foreground">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item text-muted-foreground hover:text-foreground">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item text-muted-foreground hover:text-foreground">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }
