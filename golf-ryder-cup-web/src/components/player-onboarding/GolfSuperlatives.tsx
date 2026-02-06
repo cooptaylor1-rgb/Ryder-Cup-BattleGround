@@ -315,11 +315,11 @@ export function SuperlativesDisplay({
                 {playerName ? `${playerName}'s Superlatives` : 'Superlatives'}
             </h4>
             <div className="space-y-2">
-                {answers.map((answer) => {
+                {answers.flatMap((answer) => {
                     const superlative = getSuperlative(answer.superlativeId);
-                    if (!superlative) return null;
+                    if (!superlative) return [];
 
-                    return (
+                    return [
                         <div
                             key={answer.superlativeId}
                             className="flex items-start gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/10"
@@ -333,8 +333,8 @@ export function SuperlativesDisplay({
                                     &ldquo;{answer.answer}&rdquo;
                                 </div>
                             </div>
-                        </div>
-                    );
+                        </div>,
+                    ];
                 })}
             </div>
         </div>

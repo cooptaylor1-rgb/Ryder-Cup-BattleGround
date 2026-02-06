@@ -247,19 +247,23 @@ export function Achievements({
     if (compact) {
         return (
             <div className={cn('flex flex-wrap gap-2', className)}>
-                {achievements.slice(0, 5).map((achievement) => {
-                    const def = ACHIEVEMENT_DEFINITIONS.find((d) => d.type === achievement.achievementType);
-                    if (!def) return null;
+                {achievements
+                    .slice(0, 5)
+                    .flatMap((achievement) => {
+                        const def = ACHIEVEMENT_DEFINITIONS.find(
+                            (d) => d.type === achievement.achievementType
+                        );
+                        if (!def) return [];
 
-                    return (
-                        <AchievementBadge
-                            key={achievement.id}
-                            definition={def}
-                            earned
-                            size="sm"
-                        />
-                    );
-                })}
+                        return [
+                            <AchievementBadge
+                                key={achievement.id}
+                                definition={def}
+                                earned
+                                size="sm"
+                            />,
+                        ];
+                    })}
                 {achievements.length > 5 && (
                     <div className="px-2 py-1 rounded bg-surface-100 dark:bg-surface-800 text-sm text-surface-500">
                         +{achievements.length - 5} more

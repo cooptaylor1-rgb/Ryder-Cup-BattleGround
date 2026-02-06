@@ -20,6 +20,7 @@ import {
     ChevronRight,
     Zap,
     Heart,
+    type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { makeSeededRng } from '@/lib/utils/seededRandom';
@@ -132,12 +133,34 @@ export function ProfileCompletionReward({
         return () => clearTimeout(timer);
     }, []);
 
-    const achievementsEarned = [
-        data.stats?.profileComplete && { icon: Check, label: 'Profile Complete', color: 'text-green-500' },
-        data.stats?.ghinVerified && { icon: Star, label: 'GHIN Verified', color: 'text-amber-500' },
-        data.stats?.photoUploaded && { icon: Heart, label: 'Photo Added', color: 'text-pink-500' },
-        data.stats?.availabilitySet && { icon: Calendar, label: 'Availability Set', color: 'text-blue-500' },
-    ].filter(Boolean);
+    type EarnedAchievement = {
+        icon: LucideIcon;
+        label: string;
+        color: string;
+    };
+
+    const achievementsEarned: EarnedAchievement[] = [
+        data.stats?.profileComplete && {
+            icon: Check,
+            label: 'Profile Complete',
+            color: 'text-green-500',
+        },
+        data.stats?.ghinVerified && {
+            icon: Star,
+            label: 'GHIN Verified',
+            color: 'text-amber-500',
+        },
+        data.stats?.photoUploaded && {
+            icon: Heart,
+            label: 'Photo Added',
+            color: 'text-pink-500',
+        },
+        data.stats?.availabilitySet && {
+            icon: Calendar,
+            label: 'Availability Set',
+            color: 'text-blue-500',
+        },
+    ].filter((achievement): achievement is EarnedAchievement => Boolean(achievement));
 
     return (
         <div className={cn('min-h-screen flex flex-col', className)}>
@@ -250,7 +273,6 @@ export function ProfileCompletionReward({
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
                                     {achievementsEarned.map((achievement, idx) => {
-                                        if (!achievement) return null;
                                         const Icon = achievement.icon;
                                         return (
                                             <motion.div
