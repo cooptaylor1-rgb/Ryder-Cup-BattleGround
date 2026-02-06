@@ -226,39 +226,64 @@ export default function LivePage() {
         {activeSession && (
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="text-muted-foreground">
-              Last updated: {lastUpdate.toLocaleTimeString()}
-            </p>
+            <p className="text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
           </div>
         )}
 
-        {/* Matches Grid */}
-        {isLoadingMatches ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-40 rounded-xl bg-muted/50" />
-            ))}
+        {!activeSession ? (
+          <div className="max-w-xl mx-auto py-12">
+            <EmptyStatePremium
+              illustration="scorecard"
+              title="No active session"
+              description="Once a session is in progress, live matches will appear here automatically."
+              action={{
+                label: 'View Schedule',
+                onClick: () => router.push('/schedule'),
+              }}
+              secondaryAction={{
+                label: 'Go to Matchups',
+                onClick: () => router.push('/matchups'),
+              }}
+              variant="large"
+            />
           </div>
-        ) : matches && matches.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {matches.map((match) => {
-              const state = getMatchState(match.id);
-              return (
-                <LiveMatchCard
-                  key={match.id}
-                  match={match}
-                  state={state}
-                  getPlayer={getPlayer}
+        ) : (
+          /* Matches Grid */
+          <>
+            {isLoadingMatches ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-40 rounded-xl bg-muted/50" />
+                ))}
+              </div>
+            ) : matches && matches.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {matches.map((match) => {
+                  const state = getMatchState(match.id);
+                  return (
+                    <LiveMatchCard key={match.id} match={match} state={state} getPlayer={getPlayer} />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="max-w-xl mx-auto py-12">
+                <EmptyStatePremium
+                  illustration="scorecard"
+                  title="No live matches"
+                  description="Start a session to see live scores here."
+                  action={{
+                    label: 'Go to Matchups',
+                    onClick: () => router.push('/matchups'),
+                  }}
+                  secondaryAction={{
+                    label: 'View Schedule',
+                    onClick: () => router.push('/schedule'),
+                  }}
+                  variant="large"
                 />
-              );
-            })}
-          </div>
-        ) : !isLoadingMatches && (
-          <div className="text-center py-20 text-muted-foreground">
-            <Tv size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-xl">No live matches</p>
-            <p className="text-sm mt-2">Start a session to see live scores here</p>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </main>
 
