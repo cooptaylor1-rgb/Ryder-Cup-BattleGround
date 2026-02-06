@@ -477,6 +477,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`a40d29e`)
 
+### 13:55 EST — Phase 1 (batch 96)
+- New Course (`/courses/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Kept the existing `BottomNav` so the flow remains non-blocking.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cd161c6`)
+
 ### 20:55 EST — Phase 1 (batch 71)
 - Minor optional-value hygiene: switched a few internal helpers from `null` to `undefined` (Schedule countdown memo, Players `getPlayerTeam`, Bets Nassau summary) to keep “absence” values idiomatic/consistent and reduce `null` sentinels in route code.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

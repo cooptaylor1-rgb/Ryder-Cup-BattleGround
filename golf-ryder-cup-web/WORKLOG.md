@@ -87,3 +87,4 @@ All times America/New_York.
 - 11:58 — Shipped batch: Day Summary modal now renders an explicit “No active trip” state instead of returning `null`, so opening the summary overlay can’t silently do nothing. (commit 0ab52cd)
 - 12:15 — Shipped batch: Quick Score modal now renders explicit “Loading match…” and “Match unavailable” states instead of returning `null`, so opening Quick Score can’t silently do nothing. (commit a60c681)
 - 13:00 — Shipped batch: New Course (/courses/new) Scan Scorecard CTA removed invalid Tailwind CSS-var hover classes; now uses standard "press-scale" interaction (no style regressions in production builds). (commit cdd0159)
+- 13:55 — Shipped batch: New Course (`/courses/new`) replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation (keeps existing `BottomNav`). (commit cd161c6)
