@@ -431,3 +431,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Matchups: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3ee6528`)
+
+### 07:15 EST — Phase 1 (batch 86)
+- Trip Settings (`/trip/[tripId]/settings`): removed an unused `next/link` import (lint hygiene; no UI change).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b152413`)

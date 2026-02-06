@@ -76,3 +76,4 @@ All times America/New_York.
 - 05:15 — Shipped batch: Achievements (`/achievements`) now uses the shared `PageHeader` and the standard `PageLoadingSkeleton` (grid) instead of bespoke header/loading markup. (commit 5545df4)
 - 05:45 — Shipped batch: Players + Standings error boundaries upgraded to the standard premium wrapper (`PageHeader` + texture + `pb-nav`) and now include `BottomNav` so recovery screens aren’t dead ends. (commit e14c286)
 - 06:15 — Shipped batch: Social Photos (`/social/photos`) migrated off the bespoke premium header onto the shared `PageHeader`, keeping the view toggle + upload actions in `rightSlot`. (commit d114a9b)
+- 07:15 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) removed an unused `next/link` import (lint hygiene; no UI change). (commit b152413)
