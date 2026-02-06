@@ -248,3 +248,9 @@
   - Keeps Captain Mode pages consistent with the Phase 1 premium navigation pattern.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`1ac63a6`)
+
+### Docs: Lobster worklog chronological sort
+- `Docs/lobster/WORKLOG.md`
+  - Re-sorted the 2026-02-06 section chronologically so Phase 1 batch entries read in the order they shipped.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`9d10f2e`)
