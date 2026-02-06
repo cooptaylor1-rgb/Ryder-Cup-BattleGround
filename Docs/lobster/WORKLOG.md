@@ -525,4 +525,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Contacts: replaced the hand-rolled bottom nav with the shared `BottomNav`.
 - Shared `PageHeader`: added `iconContainerStyle`/`iconContainerClassName` so routes can keep their custom icon gradients while standardizing structure.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`374f7b0`)
