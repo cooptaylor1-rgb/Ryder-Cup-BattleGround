@@ -419,3 +419,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Achievements: simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5545df4`)
+
+### 06:15 EST — Phase 1 (batch 84)
+- Social Photos (`/social/photos`): migrated off the bespoke premium header onto the shared `PageHeader` for consistency with Phase 1 routes.
+- Social Photos: kept the view toggle + upload actions in `PageHeader.rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d114a9b`)
