@@ -240,3 +240,11 @@
   - Replaced the top-level `if (!match) return null;` with explicit in-modal UI for **Loading match…** and **Match unavailable**, so Quick Score can’t silently do nothing.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`a60c681`)
+
+### Phase 1 (batch 95): Captain Checklist — shared `PageHeader` + shared `BottomNav`
+- `golf-ryder-cup-web/src/app/captain/checklist/page.tsx`
+  - Replaced bespoke `header-premium` markup with the shared `PageHeader`.
+  - Replaced the hand-rolled bottom nav with the shared `BottomNav`.
+  - Keeps Captain Mode pages consistent with the Phase 1 premium navigation pattern.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`1ac63a6`)

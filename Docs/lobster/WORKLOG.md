@@ -493,3 +493,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Removed the top-level `if (!match) return null;` and replaced it with explicit in-modal UI for **Loading match…** and **Match unavailable**, so opening Quick Score can’t silently do nothing.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a60c681`)
+
+### 12:35 EST — Phase 1 (batch 95)
+- Captain checklist (`/captain/checklist`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Captain checklist: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1ac63a6`)
