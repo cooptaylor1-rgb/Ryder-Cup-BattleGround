@@ -499,3 +499,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain checklist: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1ac63a6`)
+
+### 13:00 EST — Phase 1 (batch 96)
+- New Course (`/courses/new`): removed invalid Tailwind “CSS var” hover class syntax from the Scan Scorecard CTA and switched to the standard `press-scale` interaction.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cdd0159`)
