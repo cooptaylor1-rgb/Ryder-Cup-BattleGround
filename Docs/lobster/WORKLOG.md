@@ -301,3 +301,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Load-error state now uses the same wrapper + header pattern as the main view.
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`0cf31a4`)
+
+### 19:40 EST — Phase 1 (batch 68)
+- Schedule: removed the unused `_getUserTeam` helper (and its exact `return null;`) to keep the Phase 1 “no blank returns” sweep clean.
+- Score Match Detail: `nextIncompleteMatch` now returns `undefined` instead of `null` (internal value), removing the remaining exact `return null;` in route code.
+- Lobster checkpoint: `lint` + `typecheck` ✅
+- Commit + push ✅ (`dc0ca4d`)
