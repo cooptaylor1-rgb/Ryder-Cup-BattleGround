@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
@@ -13,7 +13,6 @@ import {
   UserPlus,
   Users,
   X,
-  ChevronLeft,
   UsersRound,
   Plus,
   Check,
@@ -284,53 +283,14 @@ export default function PlayersPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div
-          className="container-editorial"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <button
-              onClick={() => router.back()}
-              className="press-scale"
-              style={{
-                padding: 'var(--space-1)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--ink-secondary)',
-              }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Users size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                  Players
-                </span>
-                <p className="type-meta">{players.length} players</p>
-              </div>
-            </div>
-          </div>
-          {isCaptainMode && (
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      <PageHeader
+        title="Players"
+        subtitle={`${players.length} player${players.length === 1 ? '' : 's'}`}
+        icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
+          isCaptainMode ? (
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowBulkAdd(true)}
                 className="btn-secondary press-scale"
@@ -349,7 +309,7 @@ export default function PlayersPage() {
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(0, 103, 71, 0.3)',
                 }}
-                title="Add multiple players at once - fastest way to add your group"
+                title="Add multiple players at once"
               >
                 <UsersRound size={16} />
                 Add Multiple
@@ -374,9 +334,9 @@ export default function PlayersPage() {
                 Add One
               </button>
             </div>
-          )}
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       <main className="container-editorial" style={{ paddingBottom: 'var(--space-8)' }}>
         {/* Team A */}
