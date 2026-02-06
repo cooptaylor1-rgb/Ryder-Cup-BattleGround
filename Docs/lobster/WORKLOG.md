@@ -556,3 +556,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Commit + push ✅ (`0ed199a`)
 
 
+
+### 18:40 EST — Phase 1 (batch 105)
+- Captain Emergency Contacts: removed `return null` inside the player-group `map()` by prefiltering empty groups for stable rendering.
+- Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`44c8299`)
