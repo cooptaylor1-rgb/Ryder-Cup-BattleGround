@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
-  ChevronLeft,
   ChevronRight,
   Settings,
   Target,
@@ -12,7 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * SETTINGS PAGE
@@ -73,6 +73,7 @@ const SETTINGS_ITEMS: SettingItem[] = [
 ];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { theme } = useUIStore();
 
   return (
@@ -80,50 +81,12 @@ export default function SettingsPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/more"
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </Link>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Settings size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                  Settings
-                </span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  App preferences
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Settings"
+        subtitle="App preferences"
+        icon={<Settings size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.push('/more')}
+      />
 
       <main className="container-editorial">
         {/* Current Theme Info */}
