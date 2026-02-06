@@ -169,3 +169,17 @@
   - Simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`5545df4`)
+
+### Phase 1 (batch 84): Social Photos — shared `PageHeader`
+- `golf-ryder-cup-web/src/app/social/photos/page.tsx`
+  - Migrated off the bespoke premium header onto the shared `PageHeader` for consistent premium navigation.
+  - Kept the view toggle + upload actions in `PageHeader.rightSlot`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`d114a9b`)
+
+### Phase 1 (batch 85): Matchups — shared `PageHeader` + shared `BottomNav`
+- `golf-ryder-cup-web/src/app/matchups/page.tsx`
+  - Replaced bespoke header markup with the shared `PageHeader` for consistent premium navigation.
+  - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`3ee6528`)

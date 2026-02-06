@@ -425,3 +425,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Social Photos: kept the view toggle + upload actions in `PageHeader.rightSlot`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d114a9b`)
+
+### 06:50 EST — Phase 1 (batch 85)
+- Matchups (`/matchups`): replaced bespoke header markup with the shared `PageHeader` for consistent premium navigation.
+- Matchups: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3ee6528`)
