@@ -421,9 +421,50 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Docs: synced worklogs to include Phase 1 batch 57.
 - Commit + push ✅ (`71d8681`)
 
+### 13:55 EST — Phase 1 (batch 96)
+- New Course (`/courses/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Kept the existing `BottomNav` so the flow remains non-blocking.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cd161c6`)
+
+### 14:35 EST — Phase 1 (batch 97)
+- Captain Command Center (`/captain`): replaced bespoke `header-premium` markup with the shared `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Captain Audit Log (`/captain/audit`): migrated the header to `PageHeader` for consistent premium navigation.
+- Invitations (`/captain/invites`): migrated the header to `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1941d5b`)
+
+### 15:25 EST — Phase 1 (batch 99)
+- New Session / Lineup (`/lineup/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` and kept the step indicator in `rightSlot`.
+- Captain Attendance (`/captain/availability`): migrated the header to `PageHeader`, keeping the refresh action in `rightSlot`.
+- Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): migrated headers to `PageHeader`.
+- Contacts: replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Shared `PageHeader`: added `iconContainerStyle`/`iconContainerClassName` so routes can keep their custom icon gradients while standardizing structure.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`374f7b0`)
+
+### 15:30 EST — Phase 1 (batch 101)
+- Course Library (`/courses`) + Scan Scorecard upload + Quick Score modal: replaced invalid Tailwind “CSS var” class syntax (e.g. `hover:border-(--masters)`, `ring-(--team-usa)`) with valid arbitrary-value forms like `hover:border-[var(--masters)]` and `ring-[var(--team-usa)]`.
+- This prevents styles from silently failing to apply.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b428a85`)
+
+### 15:45 EST — Phase 1 (batch 102)
+- Score (match list) (`/score`): signed-out and no-trip states now use the shared `PageHeader` (with `BottomNav`) for consistent premium navigation instead of dropping straight into a bare empty state.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5299a11`)
+
 ### 15:55 EST — Phase 1 (batch 59)
 - Settings — Notifications (`/settings/notifications`): upgraded to the standard premium wrapper and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
 - Commit + push ✅ (`354e05a`)
+
+### 16:15 EST — Phase 1 (batch 103)
+- Captain Messages (`/captain/messages`): migrated the bespoke header onto the shared `PageHeader`.
+- Captain Draft (`/captain/draft`): migrated the bespoke header onto the shared `PageHeader`.
+- Captain Settings (`/captain/settings`): migrated the bespoke header onto the shared `PageHeader`.
+- All three pages now use the shared `BottomNav` (replacing the hand-rolled nav markup) so Captain tools remain consistent with the Phase 1 premium navigation pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`842aa60`)
 
 ### 16:25 EST — Phase 1 (batch 60)
 - Captain Bets: winner selection button list now uses `flatMap()` to prefilter valid participants instead of `return null` inside a `map()`.
@@ -433,6 +474,16 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Stableford scorecard: score input buttons now prefilter valid values instead of `return null` inside `map()` (avoids silent render gaps and keeps Phase 1 consistency).
 - Commit + push ✅ (`22191a2`)
 
+### 16:50 EST — Phase 1 — Standardize Bets + Standings headers/loading
+- Bets (`/bets`) and Bet Detail (`/bets/[betId]`): migrated from bespoke `header-premium` markup onto the shared `PageHeader` (actions in `rightSlot`) for consistent premium navigation.
+- Standings (`/standings`): loading state now uses the standard `PageLoadingSkeleton`.
+- Commit + push ✅ (`47e8ac0`)
+
+### 17:20 EST — Phase 1 (batch 104)
+- Trip Awards (`/trip/[tripId]/awards`): loading now uses an early-return `PageLoadingSkeleton title="Awards" variant="detail"` so we don’t render a full-page skeleton (with its own header/nav) inside an already-rendered page.
+- Trip Settings (`/trip/[tripId]/settings`): loading now uses `PageLoadingSkeleton title="Trip Settings" variant="form"` for a consistent, self-labeled premium skeleton.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8f55e29`)
 ### 17:40 EST — Phase 1 (batch 63)
 - Phase 1 sweep verification: re-ran the strict route scan (`rg "^\s*return null;\s*$"` over `src/app/**/page.tsx`) and confirmed there are no remaining top-level `return null;` blank-screen returns.
 - Remaining `return null` hits in route pages are internal (helpers/`useMemo`) and do not correspond to user-facing blank screens.
@@ -477,12 +528,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`a40d29e`)
 
-### 13:55 EST — Phase 1 (batch 96)
-- New Course (`/courses/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
-- Kept the existing `BottomNav` so the flow remains non-blocking.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`cd161c6`)
-
 ### 20:55 EST — Phase 1 (batch 71)
 - Minor optional-value hygiene: switched a few internal helpers from `null` to `undefined` (Schedule countdown memo, Players `getPlayerTeam`, Bets Nassau summary) to keep “absence” values idiomatic/consistent and reduce `null` sentinels in route code.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
@@ -511,48 +556,3 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Commit + push ✅ (`0ed199a`)
 
 
-### 14:35 EST — Phase 1 (batch 97)
-- Captain Command Center (`/captain`): replaced bespoke `header-premium` markup with the shared `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
-- Captain Audit Log (`/captain/audit`): migrated the header to `PageHeader` for consistent premium navigation.
-- Invitations (`/captain/invites`): migrated the header to `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`1941d5b`)
-
-### 15:25 EST — Phase 1 (batch 99)
-- New Session / Lineup (`/lineup/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` and kept the step indicator in `rightSlot`.
-- Captain Attendance (`/captain/availability`): migrated the header to `PageHeader`, keeping the refresh action in `rightSlot`.
-- Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): migrated headers to `PageHeader`.
-- Contacts: replaced the hand-rolled bottom nav with the shared `BottomNav`.
-- Shared `PageHeader`: added `iconContainerStyle`/`iconContainerClassName` so routes can keep their custom icon gradients while standardizing structure.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`374f7b0`)
-
-### 15:30 EST — Phase 1 (batch 101)
-- Course Library (`/courses`) + Scan Scorecard upload + Quick Score modal: replaced invalid Tailwind “CSS var” class syntax (e.g. `hover:border-(--masters)`, `ring-(--team-usa)`) with valid arbitrary-value forms like `hover:border-[var(--masters)]` and `ring-[var(--team-usa)]`.
-- This prevents styles from silently failing to apply.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`b428a85`)
-
-### 15:45 EST — Phase 1 (batch 102)
-- Score (match list) (`/score`): signed-out and no-trip states now use the shared `PageHeader` (with `BottomNav`) for consistent premium navigation instead of dropping straight into a bare empty state.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5299a11`)
-
-### 16:15 EST — Phase 1 (batch 103)
-- Captain Messages (`/captain/messages`): migrated the bespoke header onto the shared `PageHeader`.
-- Captain Draft (`/captain/draft`): migrated the bespoke header onto the shared `PageHeader`.
-- Captain Settings (`/captain/settings`): migrated the bespoke header onto the shared `PageHeader`.
-- All three pages now use the shared `BottomNav` (replacing the hand-rolled nav markup) so Captain tools remain consistent with the Phase 1 premium navigation pattern.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`842aa60`)
-
-### 16:50 EST — Phase 1 — Standardize Bets + Standings headers/loading
-- Bets (`/bets`) and Bet Detail (`/bets/[betId]`): migrated from bespoke `header-premium` markup onto the shared `PageHeader` (actions in `rightSlot`) for consistent premium navigation.
-- Standings (`/standings`): loading state now uses the standard `PageLoadingSkeleton`.
-- Commit + push ✅ (`47e8ac0`)
-
-### 17:20 EST — Phase 1 (batch 104)
-- Trip Awards (`/trip/[tripId]/awards`): loading now uses an early-return `PageLoadingSkeleton title="Awards" variant="detail"` so we don’t render a full-page skeleton (with its own header/nav) inside an already-rendered page.
-- Trip Settings (`/trip/[tripId]/settings`): loading now uses `PageLoadingSkeleton title="Trip Settings" variant="form"` for a consistent, self-labeled premium skeleton.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`8f55e29`)
