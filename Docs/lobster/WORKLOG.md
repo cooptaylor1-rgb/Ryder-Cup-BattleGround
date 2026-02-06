@@ -436,3 +436,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Settings (`/trip/[tripId]/settings`): removed an unused `next/link` import (lint hygiene; no UI change).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`b152413`)
+
+### 07:45 EST — Phase 1 (batch 87)
+- Trip Awards (`/trip-stats/awards`): replaced bespoke `header-premium` markup with the shared `PageHeader`.
+- Trip Awards: standardized the layout to the usual premium route wrapper + `container-editorial` pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)

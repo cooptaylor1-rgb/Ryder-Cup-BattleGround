@@ -15,12 +15,12 @@ import * as tripStatsService from '@/lib/services/tripStatsService';
 import type { UUID, Player } from '@/lib/types/models';
 import type { AwardType, TripAward } from '@/lib/types/tripStats';
 import { AWARD_DEFINITIONS } from '@/lib/types/tripStats';
-import { ChevronLeft, Trophy, Sparkles } from 'lucide-react';
+import { Trophy, Sparkles } from 'lucide-react';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 function getPlayerName(player: Player): string {
-    return `${player.firstName} ${player.lastName}`;
+  return `${player.firstName} ${player.lastName}`;
 }
 
 // ============================================
@@ -28,92 +28,91 @@ function getPlayerName(player: Player): string {
 // ============================================
 
 function AwardCard({
-    awardType,
-    currentWinner,
-    players,
-    suggestedWinnerId,
-    onSelectWinner,
+  awardType,
+  currentWinner,
+  players,
+  suggestedWinnerId,
+  onSelectWinner,
 }: {
-    awardType: AwardType;
-    currentWinner?: TripAward;
-    players: Player[];
-    suggestedWinnerId?: UUID;
-    onSelectWinner: (playerId: UUID) => void;
+  awardType: AwardType;
+  currentWinner?: TripAward;
+  players: Player[];
+  suggestedWinnerId?: UUID;
+  onSelectWinner: (playerId: UUID) => void;
 }) {
-    const [expanded, setExpanded] = useState(false);
-    const def = AWARD_DEFINITIONS[awardType];
+  const [expanded, setExpanded] = useState(false);
+  const def = AWARD_DEFINITIONS[awardType];
 
-    const winnerPlayer = currentWinner
-        ? players.find(p => p.id === currentWinner.winnerId)
-        : null;
+  const winnerPlayer = currentWinner ? players.find((p) => p.id === currentWinner.winnerId) : null;
 
-    const suggestedPlayer = suggestedWinnerId
-        ? players.find(p => p.id === suggestedWinnerId)
-        : null;
+  const suggestedPlayer = suggestedWinnerId ? players.find((p) => p.id === suggestedWinnerId) : null;
 
-    return (
-        <div className={`
-      card-surface rounded-xl overflow-hidden
-      ${def.isPositive ? 'ring-1 ring-masters/20' : 'ring-1 ring-surface-border/30'}
-    `}>
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
-            >
-                <div className="flex items-center gap-3">
-                    <span className="text-3xl">{def.emoji}</span>
-                    <div className="text-left">
-                        <div className="font-semibold text-text-primary">{def.label}</div>
-                        <div className="text-sm text-text-tertiary">{def.description}</div>
-                    </div>
-                </div>
-                {winnerPlayer ? (
-                    <div className="text-right">
-                        <div className="font-bold text-masters">{winnerPlayer.firstName}</div>
-                        <div className="text-xs text-text-tertiary">Winner</div>
-                    </div>
-                ) : suggestedPlayer ? (
-                    <div className="text-right">
-                        <div className="text-sm text-text-secondary">{suggestedPlayer.firstName}</div>
-                        <div className="text-xs text-text-tertiary">Suggested</div>
-                    </div>
-                ) : (
-                    <div className="text-sm text-text-tertiary">Tap to vote</div>
-                )}
-            </button>
-
-            {expanded && (
-                <div className="border-t border-surface-border p-4">
-                    <p className="text-sm text-text-secondary mb-3">Select a winner:</p>
-                    <div className="flex flex-wrap gap-2">
-                        {players.map(player => {
-                            const isWinner = currentWinner?.winnerId === player.id;
-                            const isSuggested = suggestedWinnerId === player.id;
-
-                            return (
-                                <button
-                                    key={player.id}
-                                    onClick={() => onSelectWinner(player.id)}
-                                    className={`
-                    px-4 py-2 rounded-full text-sm font-medium transition-all
-                    ${isWinner
-                                            ? 'bg-masters text-white shadow-md'
-                                            : isSuggested
-                                                ? 'bg-masters/20 text-masters border border-masters/30'
-                                                : 'bg-surface-elevated text-text-primary hover:bg-surface-highlight'
-                                        }
-                  `}
-                                >
-                                    {getPlayerName(player)}
-                                    {isWinner && ' 🏆'}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
+  return (
+    <div
+      className={`
+        card-surface rounded-xl overflow-hidden
+        ${def.isPositive ? 'ring-1 ring-masters/20' : 'ring-1 ring-surface-border/30'}
+      `}
+    >
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{def.emoji}</span>
+          <div className="text-left">
+            <div className="font-semibold text-text-primary">{def.label}</div>
+            <div className="text-sm text-text-tertiary">{def.description}</div>
+          </div>
         </div>
-    );
+        {winnerPlayer ? (
+          <div className="text-right">
+            <div className="font-bold text-masters">{winnerPlayer.firstName}</div>
+            <div className="text-xs text-text-tertiary">Winner</div>
+          </div>
+        ) : suggestedPlayer ? (
+          <div className="text-right">
+            <div className="text-sm text-text-secondary">{suggestedPlayer.firstName}</div>
+            <div className="text-xs text-text-tertiary">Suggested</div>
+          </div>
+        ) : (
+          <div className="text-sm text-text-tertiary">Tap to vote</div>
+        )}
+      </button>
+
+      {expanded && (
+        <div className="border-t border-surface-border p-4">
+          <p className="text-sm text-text-secondary mb-3">Select a winner:</p>
+          <div className="flex flex-wrap gap-2">
+            {players.map((player) => {
+              const isWinner = currentWinner?.winnerId === player.id;
+              const isSuggested = suggestedWinnerId === player.id;
+
+              return (
+                <button
+                  key={player.id}
+                  onClick={() => onSelectWinner(player.id)}
+                  className={`
+                    px-4 py-2 rounded-full text-sm font-medium transition-all
+                    ${
+                      isWinner
+                        ? 'bg-masters text-white shadow-md'
+                        : isSuggested
+                          ? 'bg-masters/20 text-masters border border-masters/30'
+                          : 'bg-surface-elevated text-text-primary hover:bg-surface-highlight'
+                    }
+                  `}
+                >
+                  {getPlayerName(player)}
+                  {isWinner && ' 🏆'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ============================================
@@ -173,149 +172,156 @@ function WinnerShowcase({
 // ============================================
 
 const positiveAwards: AwardType[] = [
-    'mvp', 'best_dressed', 'best_story', 'most_improved',
-    'party_animal', 'early_bird', 'night_owl', 'best_attitude',
-    'clutch_player', 'social_butterfly', 'best_cheerleader', 'beverage_king',
+  'mvp',
+  'best_dressed',
+  'best_story',
+  'most_improved',
+  'party_animal',
+  'early_bird',
+  'night_owl',
+  'best_attitude',
+  'clutch_player',
+  'social_butterfly',
+  'best_cheerleader',
+  'beverage_king',
 ];
 
 const funnyAwards: AwardType[] = [
-    'worst_dressed', 'most_excuses', 'slowest_player',
-    'most_lost_balls', 'cart_path_champion', 'sand_king', 'water_magnet',
+  'worst_dressed',
+  'most_excuses',
+  'slowest_player',
+  'most_lost_balls',
+  'cart_path_champion',
+  'sand_king',
+  'water_magnet',
 ];
 
 export default function TripAwardsPage() {
-    const router = useRouter();
-    const { currentTrip, players } = useTripStore();
-    const [refreshKey, setRefreshKey] = useState(0);
+  const router = useRouter();
+  const { currentTrip, players } = useTripStore();
+  const [refreshKey, setRefreshKey] = useState(0);
 
-    const awards = useLiveQuery(
-        (): Promise<TripAward[]> =>
-            currentTrip?.id ? tripStatsService.getTripAwards(currentTrip.id) : Promise.resolve([]),
-        [currentTrip?.id, refreshKey],
-        [] as TripAward[]
-    );
+  const awards = useLiveQuery(
+    (): Promise<TripAward[]> =>
+      currentTrip?.id ? tripStatsService.getTripAwards(currentTrip.id) : Promise.resolve([]),
+    [currentTrip?.id, refreshKey],
+    [] as TripAward[]
+  );
 
-    const suggestions = useLiveQuery(
-        (): Promise<Map<AwardType, UUID>> =>
-            currentTrip?.id ? tripStatsService.getSuggestedAwards(currentTrip.id) : Promise.resolve(new Map()),
-        [currentTrip?.id, refreshKey],
-        new Map<AwardType, UUID>()
-    );
+  const suggestions = useLiveQuery(
+    (): Promise<Map<AwardType, UUID>> =>
+      currentTrip?.id
+        ? tripStatsService.getSuggestedAwards(currentTrip.id)
+        : Promise.resolve(new Map()),
+    [currentTrip?.id, refreshKey],
+    new Map<AwardType, UUID>()
+  );
 
-    const handleSelectWinner = async (awardType: AwardType, playerId: UUID) => {
-        if (!currentTrip?.id) return;
+  const handleSelectWinner = async (awardType: AwardType, playerId: UUID) => {
+    if (!currentTrip?.id) return;
 
-        await tripStatsService.giveAward({
-            tripId: currentTrip.id,
-            awardType,
-            winnerId: playerId,
-        });
+    await tripStatsService.giveAward({
+      tripId: currentTrip.id,
+      awardType,
+      winnerId: playerId,
+    });
 
-        setRefreshKey(k => k + 1);
-    };
+    setRefreshKey((k) => k + 1);
+  };
 
-    if (!currentTrip) {
-        return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
-                <main className="page-container">
-                    <header className="header-premium">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors -ml-1 mb-2"
-                            aria-label="Go back"
-                        >
-                            <ChevronLeft size={20} />
-                            <span className="text-sm">Back</span>
-                        </button>
-                        <h1 className="type-h2">Trip Awards</h1>
-                    </header>
-                    <div className="content-area">
-                        <EmptyStatePremium
-                            illustration="podium"
-                            title="No active trip"
-                            description="Start or join a trip to give awards."
-                            action={{
-                                label: 'Go Home',
-                                onClick: () => router.push('/'),
-                            }}
-                            variant="large"
-                        />
-                    </div>
-                </main>
-                <BottomNav />
-            </div>
-        );
-    }
-
+  if (!currentTrip) {
     return (
-        <div
-            className="min-h-screen pb-nav page-premium-enter texture-grain"
-            style={{ background: 'var(--canvas)' }}
-        >
-            <main className="page-container">
-                <header className="header-premium flex items-center gap-3">
-                    <button onClick={() => router.back()} className="p-1 text-text-secondary">
-                        <ChevronLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="type-h2">Trip Awards</h1>
-                        <p className="type-body text-text-secondary">End-of-trip superlatives</p>
-                    </div>
-                </header>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <PageHeader
+          title="Trip Awards"
+          subtitle="No active trip"
+          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
 
-                <div className="content-area space-y-6">
-                    <WinnerShowcase awards={awards} players={players} />
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="podium"
+            title="No active trip"
+            description="Start or join a trip to give awards."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </main>
 
-                    <div className="card-surface rounded-xl p-4 flex items-start gap-3">
-                        <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
-                        <div>
-                            <p className="text-sm text-text-primary font-medium">
-                                Vote for trip superlatives!
-                            </p>
-                            <p className="text-xs text-text-secondary mt-1">
-                                Some awards have auto-suggestions based on trip stats.
-                                Tap any award to select a winner.
-                            </p>
-                        </div>
-                    </div>
-
-                    <section>
-                        <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
-                        <div className="space-y-3">
-                            {positiveAwards.map(awardType => (
-                                <AwardCard
-                                    key={awardType}
-                                    awardType={awardType}
-                                    currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
-                                    players={players}
-                                    suggestedWinnerId={suggestions.get(awardType)}
-                                    onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
-                                />
-                            ))}
-                        </div>
-                    </section>
-
-                    <section>
-                        <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
-                        <div className="space-y-3">
-                            {funnyAwards.map(awardType => (
-                                <AwardCard
-                                    key={awardType}
-                                    awardType={awardType}
-                                    currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
-                                    players={players}
-                                    suggestedWinnerId={suggestions.get(awardType)}
-                                    onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                </div>
-            </main>
-            <BottomNav />
-        </div>
+        <BottomNav />
+      </div>
     );
+  }
+
+  return (
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title="Trip Awards"
+        subtitle={currentTrip.name}
+        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+      />
+
+      <main className="container-editorial pb-12">
+        <section className="section-sm space-y-6">
+          <WinnerShowcase awards={awards} players={players} />
+
+          <div className="card-surface rounded-xl p-4 flex items-start gap-3">
+            <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-text-primary font-medium">Vote for trip superlatives!</p>
+              <p className="text-xs text-text-secondary mt-1">
+                Some awards have auto-suggestions based on trip stats. Tap any award to select a
+                winner.
+              </p>
+            </div>
+          </div>
+
+          <section>
+            <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
+            <div className="space-y-3">
+              {positiveAwards.map((awardType) => (
+                <AwardCard
+                  key={awardType}
+                  awardType={awardType}
+                  currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
+                  players={players}
+                  suggestedWinnerId={suggestions.get(awardType)}
+                  onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
+            <div className="space-y-3">
+              {funnyAwards.map((awardType) => (
+                <AwardCard
+                  key={awardType}
+                  awardType={awardType}
+                  currentWinner={awards.find((a: TripAward) => a.awardType === awardType)}
+                  players={players}
+                  suggestedWinnerId={suggestions.get(awardType)}
+                  onSelectWinner={(playerId) => handleSelectWinner(awardType, playerId)}
+                />
+              ))}
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <BottomNav />
+    </div>
+  );
 }
