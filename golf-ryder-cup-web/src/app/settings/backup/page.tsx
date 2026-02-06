@@ -270,7 +270,7 @@ export default function BackupRestorePage() {
     // ============================================
 
     if (loading) {
-        return <PageLoadingSkeleton />;
+        return <PageLoadingSkeleton title="Backup & Restore" variant="list" />;
     }
 
     if (loadError) {
