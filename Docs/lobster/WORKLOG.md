@@ -526,3 +526,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Shared `PageHeader`: added `iconContainerStyle`/`iconContainerClassName` so routes can keep their custom icon gradients while standardizing structure.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`374f7b0`)
+
+### 15:30 EST — Phase 1 (batch 101)
+- Course Library (`/courses`) + Scan Scorecard upload + Quick Score modal: replaced invalid Tailwind “CSS var” class syntax (e.g. `hover:border-(--masters)`, `ring-(--team-usa)`) with valid arbitrary-value forms like `hover:border-[var(--masters)]` and `ring-[var(--team-usa)]`.
+- This prevents styles from silently failing to apply.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b428a85`)

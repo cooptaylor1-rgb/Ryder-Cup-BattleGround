@@ -273,3 +273,12 @@
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`1941d5b`)
+
+### Phase 1 (batch 101): Fix invalid Tailwind CSS var classes (Courses + Quick Score)
+- `golf-ryder-cup-web/src/app/courses/page.tsx`
+- `golf-ryder-cup-web/src/components/course/ScorecardUpload.tsx`
+- `golf-ryder-cup-web/src/components/QuickScoreModal.tsx`
+  - Replaced invalid Tailwind “CSS var” class syntax like `hover:border-(--masters)` / `ring-(--team-usa)` with valid arbitrary values (`hover:border-[var(--masters)]`, `ring-[var(--team-usa)]`).
+  - Prevents these interactions/selected states from silently missing styles.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`b428a85`)
