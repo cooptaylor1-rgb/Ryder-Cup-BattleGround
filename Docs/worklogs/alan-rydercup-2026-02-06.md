@@ -233,3 +233,10 @@
   - Added explicit modal body states for: **No active trip**, **Generating summary…**, and **No matches found**.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`0ab52cd`)
+
+### Phase 1 (batch 94): Quick Score modal — explicit loading/unavailable states
+- `golf-ryder-cup-web/src/components/QuickScoreModal.tsx`
+  - Added an explicit default value (`null`) to the Dexie `useLiveQuery` match query so we can distinguish **loading** (`null`) vs **not found** (`undefined`).
+  - Replaced the top-level `if (!match) return null;` with explicit in-modal UI for **Loading match…** and **Match unavailable**, so Quick Score can’t silently do nothing.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`a60c681`)

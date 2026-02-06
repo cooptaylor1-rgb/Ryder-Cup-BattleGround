@@ -85,3 +85,4 @@ All times America/New_York.
 - 10:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) removed invalid Tailwind “CSS var” class syntax that could cause missing styles; standardized to CSS variable inline styles while keeping shared `PageHeader` + `BottomNav`. (commit 3371b11)
 - 11:25 — Shipped batch: Profile (`/profile`) migrated the authenticated state onto the standard premium wrapper (`pb-nav` + texture + premium enter) and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation. (commit 482d2ac)
 - 11:58 — Shipped batch: Day Summary modal now renders an explicit “No active trip” state instead of returning `null`, so opening the summary overlay can’t silently do nothing. (commit 0ab52cd)
+- 12:15 — Shipped batch: Quick Score modal now renders explicit “Loading match…” and “Match unavailable” states instead of returning `null`, so opening Quick Score can’t silently do nothing. (commit a60c681)

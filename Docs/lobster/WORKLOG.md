@@ -487,3 +487,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Added explicit modal body states for **No active trip**, **Generating summary…**, and **No matches found**.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ab52cd`)
+
+### 12:15 EST — Phase 1 (batch 94)
+- Quick Score modal: added an explicit `useLiveQuery` default value so we can distinguish loading vs not-found.
+- Removed the top-level `if (!match) return null;` and replaced it with explicit in-modal UI for **Loading match…** and **Match unavailable**, so opening Quick Score can’t silently do nothing.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a60c681`)
