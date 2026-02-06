@@ -516,4 +516,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Audit Log (`/captain/audit`): migrated the header to `PageHeader` for consistent premium navigation.
 - Invitations (`/captain/invites`): migrated the header to `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`1941d5b`)

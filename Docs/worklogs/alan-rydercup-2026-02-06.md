@@ -272,4 +272,4 @@
   - Migrated the header to `PageHeader`.
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`1941d5b`)
