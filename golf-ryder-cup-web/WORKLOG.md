@@ -73,3 +73,4 @@ All times America/New_York.
 - 02:55 — Shipped batch: Settings hub (`/settings`) now links Notifications + Backup to the dedicated `/settings/notifications` and `/settings/backup` pages; Notifications page wrapper now includes the premium background canvas for consistency. (commit 7cea01b)
 - 04:15 — Shipped batch: Login (`/login`) now uses the standard premium wrapper enter/texture classes and fixes a stray “Golf Buddies” string for consistent branding/copy. (commit ee6ad19)
 - 04:50 — Shipped batch: Social (`/social`) migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, keeping the message composer pinned above nav for consistent premium navigation. (commit 5354ae6)
+- 05:15 — Shipped batch: Achievements (`/achievements`) now uses the shared `PageHeader` and the standard `PageLoadingSkeleton` (grid) instead of bespoke header/loading markup. (commit 5545df4)

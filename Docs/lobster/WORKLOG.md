@@ -407,3 +407,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Social: pinned the message composer above `BottomNav` (fixed bar at `bottom: var(--nav-height)`) and increased feed padding so content never hides behind the composer.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5354ae6`)
+
+### 05:15 EST — Phase 1 (batch 83)
+- Achievements (`/achievements`): replaced the bespoke premium header with the shared `PageHeader` for consistency with Phase 1 routes.
+- Achievements: simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5545df4`)

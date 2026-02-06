@@ -162,3 +162,10 @@
   - Kept the message composer pinned above `BottomNav` and padded the feed so posts don’t hide behind the composer.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`5354ae6`)
+
+### Phase 1 (batch 83): Achievements — shared `PageHeader` + `PageLoadingSkeleton`
+- `golf-ryder-cup-web/src/app/achievements/page.tsx`
+  - Replaced the bespoke premium header with the shared `PageHeader` for consistent navigation.
+  - Simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`5545df4`)
