@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal } from 'lucide-react';
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
