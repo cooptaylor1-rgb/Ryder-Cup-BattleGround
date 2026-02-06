@@ -45,6 +45,7 @@ All times America/New_York.
 - 06:30 — Shipped batch: lint hygiene — removed an unused `eslint-disable-next-line react-hooks/preserve-manual-memoization` from `featureFlags.tsx` to reduce warning noise. (commit 971f463)
 - 07:55 — Shipped batch: Profile now keeps `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height (no dead-end edit mode). (commit b6a3f87)
 - 08:20 — Shipped batch: More (`/more`) now shows an explicit premium empty state when every menu section is hidden by context (signed out / no trip / Captain-only tools), preventing a confusing “blank” hub. (commit 16f8a0a)
+- 08:55 — Shipped batch: Settings — Backup & Restore (`/settings/backup`) loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"` so the skeleton is correctly labeled and matches the standard list layout. (commit a838d0e)
 - 10:05 — Shipped batch: Profile Create (`/profile/create`) now includes the standard premium wrapper + `BottomNav`, and the fixed bottom actions are lifted above the nav height so onboarding screens aren’t dead ends. (commit 016fe81)
 - 11:40 — Shipped batch: lint hygiene sweep — removed unused icon imports/vars, fixed hook deps in AuthGuard, and stabilized memo deps in Vegas side game card (reduces lint warnings without behavior changes).
 - 12:15 — Shipped batch: Standings Fun Stats: removed `return null` usage inside the stat-type map (uses a reduce/push) to avoid silent render gaps and keep Phase 1 “no blank returns” consistent. (commit c185928)

@@ -448,3 +448,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats: standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0f1ca16`)
+
+### 08:55 EST — Phase 1 (batch 89)
+- Settings — Backup & Restore (`/settings/backup`): loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"` so the skeleton is correctly labeled and matches the standard list layout.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a838d0e`)

@@ -198,3 +198,10 @@
   - Standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`0f1ca16`)
+
+### Phase 1 (batch 89): Settings — Backup & Restore loading skeleton uses standard title
+- `golf-ryder-cup-web/src/app/settings/backup/page.tsx`
+  - Loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"`.
+  - Keeps the loading screen consistent and self-labeled while trip backups load.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`a838d0e`)
