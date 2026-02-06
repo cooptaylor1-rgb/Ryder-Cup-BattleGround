@@ -259,6 +259,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a36bfe2`)
 
+### 11:25 EST — Phase 1 (batch 49)
+- Profile (`/profile`): migrated the authenticated state onto the standard premium wrapper (`pb-nav` + texture + premium enter) and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`482d2ac`)
+
 ### 11:40 EST — Phase 1 (batch 47)
 - Lint hygiene sweep + small correctness hardening (warnings-only).
 - Commit + push ✅ (`0ba1a70`)
