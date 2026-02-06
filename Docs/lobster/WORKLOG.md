@@ -348,3 +348,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Profile (`/profile`): loading state now uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`, so users can always navigate even while auth/profile data is loading.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`023ed48`)
+
+### 23:20 EST — Phase 1 (batch 76)
+- Bets (`/bets`): removed a duplicate early-return no-trip block that prevented the upgraded state from rendering.
+- Bets no-trip state now consistently uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0ed199a`)

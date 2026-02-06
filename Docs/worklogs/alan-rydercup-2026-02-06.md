@@ -107,3 +107,10 @@
 - Updated Lobster + daily + in-repo web worklog entries to include the Phase 1 batch 57 commit hash.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`71d8681`)
+
+### Phase 1 (batch 76): Bets — fix no-trip empty state return + standard wrapper
+- `golf-ryder-cup-web/src/app/bets/page.tsx`
+  - Removed a duplicate early-return `if (!currentTrip)` block that prevented the upgraded no-trip screen from rendering.
+  - No-trip state now uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav` so it’s never a navigation dead end.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`0ed199a`)
