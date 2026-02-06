@@ -506,50 +506,65 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
     const { currentTrip } = useTripStore();
     const { summary, isLoading } = useDaySummary(date);
 
-    if (!currentTrip) return null;
+    // Modal closed → render nothing.
+    if (!isOpen) return null;
 
     return (
         <AnimatePresence>
-            {isOpen && (
-                <>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/60 z-50"
-                        onClick={onClose}
-                    />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] md:max-h-[90vh] z-50 overflow-auto rounded-2xl bg-background"
-                    >
-                        {/* Header */}
-                        <div className="sticky top-0 bg-background/95 backdrop-blur-sm p-4 flex items-center justify-between border-b border-border">
-                            <h2 className="font-semibold">Day Summary</h2>
-                            <button onClick={onClose} className="p-2 rounded-full hover:bg-muted">
-                                <X size={20} />
-                            </button>
-                        </div>
+            <>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/60 z-50"
+                    onClick={onClose}
+                />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] md:max-h-[90vh] z-50 overflow-auto rounded-2xl bg-background"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Day Summary"
+                >
+                    {/* Header */}
+                    <div className="sticky top-0 bg-background/95 backdrop-blur-sm p-4 flex items-center justify-between border-b border-border">
+                        <h2 className="font-semibold">Day Summary</h2>
+                        <button
+                            onClick={onClose}
+                            className="p-2 rounded-full hover:bg-muted"
+                            aria-label="Close"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
 
-                        {/* Content */}
-                        <div className="p-4">
-                            {isLoading ? (
-                                <div className="text-center py-12 text-muted-foreground">
-                                    Generating summary...
-                                </div>
-                            ) : summary ? (
-                                <DaySummaryCard summary={summary} tripName={currentTrip.name} />
-                            ) : (
-                                <div className="text-center py-12 text-muted-foreground">
-                                    No matches found for this day
-                                </div>
-                            )}
-                        </div>
-                    </motion.div>
-                </>
-            )}
+                    {/* Content */}
+                    <div className="p-4">
+                        {!currentTrip ? (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                    No active trip
+                                </p>
+                                <p className="text-sm mt-2">
+                                    Start or select a trip to generate a day summary.
+                                </p>
+                            </div>
+                        ) : isLoading ? (
+                            <div className="text-center py-12 text-muted-foreground">
+                                Generating summary...
+                            </div>
+                        ) : summary ? (
+                            <DaySummaryCard summary={summary} tripName={currentTrip.name} />
+                        ) : (
+                            <div className="text-center py-12 text-muted-foreground">
+                                No matches found for this day
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </>
         </AnimatePresence>
     );
 }
