@@ -442,3 +442,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Awards: standardized the layout to the usual premium route wrapper + `container-editorial` pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6dacc3c`)
+
+### 08:25 EST — Phase 1 (batch 88)
+- Trip Stats (`/trip-stats`): removed the “No stats yet” early-return so users can start tracking immediately from an all-zero state (tracking UI renders even before any stats exist).
+- Trip Stats: standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0f1ca16`)

@@ -191,3 +191,10 @@
   - Keeps `BottomNav` available in both no-trip and active-trip states.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`6dacc3c`)
+
+### Phase 1 (batch 88): Trip Stats — allow tracking from zero-state
+- `golf-ryder-cup-web/src/app/trip-stats/page.tsx`
+  - Removed the “No stats yet” early-return so users can start tracking immediately from an all-zero state.
+  - Standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`0f1ca16`)

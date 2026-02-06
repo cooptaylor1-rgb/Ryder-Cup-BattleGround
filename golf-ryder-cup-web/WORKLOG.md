@@ -77,3 +77,4 @@ All times America/New_York.
 - 05:45 — Shipped batch: Players + Standings error boundaries upgraded to the standard premium wrapper (`PageHeader` + texture + `pb-nav`) and now include `BottomNav` so recovery screens aren’t dead ends. (commit e14c286)
 - 06:15 — Shipped batch: Social Photos (`/social/photos`) migrated off the bespoke premium header onto the shared `PageHeader`, keeping the view toggle + upload actions in `rightSlot`. (commit d114a9b)
 - 07:15 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) removed an unused `next/link` import (lint hygiene; no UI change). (commit b152413)
+- 08:25 — Shipped batch: Trip Stats (/trip-stats) no longer blocks the first stat entry behind a "No stats yet" screen; we now render the tracking UI even at zero so users can start recording immediately. Also standardized the no-trip state to use the shared premium wrapper + container-editorial. (commit 0f1ca16)
