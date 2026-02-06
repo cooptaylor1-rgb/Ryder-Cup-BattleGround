@@ -3,11 +3,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal } from 'lucide-react';
+import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal } from 'lucide-react';
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 
 export default function TripSettingsPage() {
@@ -156,17 +156,21 @@ export default function TripSettingsPage() {
       <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
         <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
-          <header className="header-premium">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back</span>
-            </button>
-            <h1 className="type-h2">Trip Settings</h1>
-          </header>
+          <PageHeader
+            title="Trip Settings"
+            icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+            onBack={() => router.back()}
+            rightSlot={
+              <button
+                onClick={() => router.push('/')}
+                className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                aria-label="Go home"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </button>
+            }
+          />
 
           <div className="content-area">
             <EmptyStatePremium
@@ -198,17 +202,21 @@ export default function TripSettingsPage() {
       <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
         <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
-          <header className="header-premium">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back</span>
-            </button>
-            <h1 className="type-h2">Trip Settings</h1>
-          </header>
+          <PageHeader
+            title="Trip Settings"
+            icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+            onBack={() => router.back()}
+            rightSlot={
+              <button
+                onClick={() => router.push('/')}
+                className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                aria-label="Go home"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </button>
+            }
+          />
 
           <div className="content-area">
             <EmptyStatePremium
@@ -236,21 +244,12 @@ export default function TripSettingsPage() {
     <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
       <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
       <div className="relative page-container">
-        {/* Header */}
-        <header className="header-premium">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <Link
-                href={`/trip/${tripId}`}
-                className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm">Back to Trip</span>
-              </Link>
-              <h1 className="type-h2 mt-2">Trip Settings</h1>
-              <p className="text-sm text-text-secondary mt-1">{tripName}</p>
-            </div>
-
+        <PageHeader
+          title="Trip Settings"
+          subtitle={tripName ?? undefined}
+          icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.push(`/trip/${tripId}`)}
+          rightSlot={
             <button
               onClick={() => router.push('/')}
               className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
@@ -259,8 +258,8 @@ export default function TripSettingsPage() {
               <Home className="w-4 h-4" />
               Home
             </button>
-          </div>
-        </header>
+          }
+        />
 
         <div className="content-area space-y-6">
           {/* Backup & Export Section */}
