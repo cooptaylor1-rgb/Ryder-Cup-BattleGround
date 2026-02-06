@@ -221,6 +221,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Players: upgraded to the standard premium wrapper and added `BottomNav` in all states.
 - Standings: added `BottomNav` to no-trip/loading states and standardized wrapper.
 
+## 2026-02-06
+
 ### 00:10 EST — Phase 1 (batch 30)
 - Docs: synced `golf-ryder-cup-web/WORKLOG.md` to include shipped Phase 1 batches 24–29.
 
@@ -358,8 +360,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Kept captain actions available via `rightSlot`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c315aba`)
-
-## 2026-02-06
 
 ### 01:30 EST — Phase 1 (batch 78)
 - Score match detail (`/score/[matchId]`): replaced internal `null` sentinels with `undefined` (session/hole-result memos + quick-score pending state), removing the remaining `return null` hits from Phase 1’s route sweep.
