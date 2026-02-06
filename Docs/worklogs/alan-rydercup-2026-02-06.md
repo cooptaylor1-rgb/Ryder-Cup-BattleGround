@@ -148,3 +148,10 @@
 - `Docs/lobster/WORKLOG.md`
   - Fixed the date heading so midnight entries (00:10+) are correctly grouped under 2026-02-06.
 - Commit + push ✅ (`a48b648`)
+
+### Phase 1 (batch 81): Login — standard premium wrapper + copy fix
+- `golf-ryder-cup-web/src/app/login/page.tsx`
+  - Added `page-premium-enter` + `texture-grain` to the wrapper so Login matches the standard premium route wrapper pattern.
+  - Fixed a stray “Golf Buddies” string → “Golf Ryder Cup” for consistent branding.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`ee6ad19`)

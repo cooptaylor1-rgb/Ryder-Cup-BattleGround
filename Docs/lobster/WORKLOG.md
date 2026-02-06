@@ -395,3 +395,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6f6ff9a`)
 
+
+### 04:15 EST — Phase 1 (batch 81)
+- Login (`/login`): added the standard premium wrapper enter/texture classes for consistency with Phase 1 routes.
+- Login: fixed a stray “Golf Buddies” copy string so branding matches the app.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ee6ad19`)
