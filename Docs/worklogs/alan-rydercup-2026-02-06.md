@@ -253,7 +253,7 @@
 - `Docs/lobster/WORKLOG.md`
   - Re-sorted the 2026-02-06 section chronologically so Phase 1 batch entries read in the order they shipped.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (`9d10f2e`)
+- Commit + push ✅ (`cd6ca71`)
 
 ### Phase 1 (batch 96): Courses New — shared `PageHeader`
 - `golf-ryder-cup-web/src/app/courses/new/page.tsx`
