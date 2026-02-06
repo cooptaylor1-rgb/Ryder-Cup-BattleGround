@@ -213,3 +213,9 @@
   - Moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`a6555c9`)
+
+### Phase 1 (batch 91): Settings hub — shared `PageHeader`
+- `golf-ryder-cup-web/src/app/settings/page.tsx`
+  - Replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`6879433`)

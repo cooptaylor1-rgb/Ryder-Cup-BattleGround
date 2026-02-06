@@ -465,3 +465,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Live Scores: moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a6555c9`)
+
+### 10:25 EST — Phase 1 (batch 91)
+- Settings hub (`/settings`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6879433`)
