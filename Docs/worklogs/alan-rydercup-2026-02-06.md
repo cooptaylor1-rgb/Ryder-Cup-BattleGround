@@ -306,4 +306,4 @@
   - Migrated the bespoke `header-premium` markup onto the shared `PageHeader` for consistent premium navigation.
   - Replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`842aa60`)

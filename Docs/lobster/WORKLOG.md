@@ -544,4 +544,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Settings (`/captain/settings`): migrated the bespoke header onto the shared `PageHeader`.
 - All three pages now use the shared `BottomNav` (replacing the hand-rolled nav markup) so Captain tools remain consistent with the Phase 1 premium navigation pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`842aa60`)
