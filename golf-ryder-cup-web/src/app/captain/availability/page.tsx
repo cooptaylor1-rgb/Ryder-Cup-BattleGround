@@ -6,13 +6,13 @@ import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   AttendanceCheckIn,
   type AttendeePlayer,
   type AttendanceStatus,
 } from '@/components/captain';
 import {
-  ChevronLeft,
   Users,
   Shield,
   Home,
@@ -185,51 +185,27 @@ export default function AvailabilityPage() {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Shield size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Attendance</span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  Track player arrivals
-                </p>
-              </div>
-            </div>
-          </div>
-
+      <PageHeader
+        title="Attendance"
+        subtitle="Track player arrivals"
+        icon={<Shield size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
           <button
             onClick={handleRefresh}
             className="p-2 press-scale"
-            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            style={{
+              color: 'var(--ink-secondary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            aria-label="Refresh"
           >
             <RefreshCw size={20} strokeWidth={1.75} />
           </button>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial">
         {/* Session Selector */}

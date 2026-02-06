@@ -517,3 +517,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Invitations (`/captain/invites`): migrated the header to `PageHeader` and replaced the hand-rolled bottom nav with the shared `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1941d5b`)
+
+### 15:25 EST — Phase 1 (batch 99)
+- New Session / Lineup (`/lineup/new`): replaced bespoke `header-premium` markup with the shared `PageHeader` and kept the step indicator in `rightSlot`.
+- Captain Attendance (`/captain/availability`): migrated the header to `PageHeader`, keeping the refresh action in `rightSlot`.
+- Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): migrated headers to `PageHeader`.
+- Contacts: replaced the hand-rolled bottom nav with the shared `BottomNav`.
+- Shared `PageHeader`: added `iconContainerStyle`/`iconContainerClassName` so routes can keep their custom icon gradients while standardizing structure.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)

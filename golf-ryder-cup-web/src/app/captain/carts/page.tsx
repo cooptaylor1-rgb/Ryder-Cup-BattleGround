@@ -6,17 +6,9 @@ import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { CartAssignmentManager, type CartPlayer } from '@/components/captain';
-import {
-  ChevronLeft,
-  Car,
-  Users,
-  Home,
-  Target,
-  Trophy,
-  MoreHorizontal,
-  CalendarDays,
-} from 'lucide-react';
+import { Car, Users, Home, Target, Trophy, MoreHorizontal, CalendarDays } from 'lucide-react';
 
 /**
  * CART ASSIGNMENTS PAGE
@@ -106,43 +98,16 @@ export default function CartsPage() {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)',
-                }}
-              >
-                <Car size={16} style={{ color: 'white' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Cart Assignments</span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  Assign golf carts
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Cart Assignments"
+        subtitle="Assign golf carts"
+        icon={<Car size={16} style={{ color: 'white' }} />}
+        iconContainerStyle={{
+          background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+          boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)',
+        }}
+        onBack={() => router.back()}
+      />
 
       <main className="container-editorial">
         <section className="section">

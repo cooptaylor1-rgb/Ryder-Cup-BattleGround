@@ -9,12 +9,16 @@ export function PageHeader({
   icon,
   onBack,
   rightSlot,
+  iconContainerStyle,
+  iconContainerClassName,
 }: {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
   onBack?: () => void;
   rightSlot?: React.ReactNode;
+  iconContainerStyle?: React.CSSProperties;
+  iconContainerClassName?: string;
 }) {
   return (
     <header className="header-premium">
@@ -40,6 +44,7 @@ export function PageHeader({
           <div className="flex items-center gap-3 min-w-0">
             {icon && (
               <div
+                className={iconContainerClassName}
                 style={{
                   width: '32px',
                   height: '32px',
@@ -50,6 +55,7 @@ export function PageHeader({
                   justifyContent: 'center',
                   boxShadow: 'var(--shadow-glow-green)',
                   flexShrink: 0,
+                  ...iconContainerStyle,
                 }}
               >
                 {icon}

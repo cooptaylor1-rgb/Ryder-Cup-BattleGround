@@ -13,19 +13,12 @@ import {
   type Player as LineupPlayer,
   type FairnessScore,
 } from '@/components/captain';
-import {
-  ChevronLeft,
-  Users,
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  Zap,
-  ChevronDown,
-} from 'lucide-react';
+import { Users, AlertTriangle, CheckCircle2, Info, Zap, ChevronDown } from 'lucide-react';
 import type { SessionType } from '@/lib/types';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
 import { EmptyStatePremium } from '@/components/ui';
 import { BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
  * NEW SESSION / LINEUP PAGE
@@ -629,52 +622,13 @@ export default function NewLineupPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => (step === 'lineup' ? setStep('setup') : router.back())}
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Users size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                  {step === 'setup' ? 'New Session' : 'Build Lineup'}
-                </span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  {step === 'setup' ? 'Configure session settings' : sessionName}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Step indicator */}
-          <div className="flex items-center gap-2">
+      <PageHeader
+        title={step === 'setup' ? 'New Session' : 'Build Lineup'}
+        subtitle={step === 'setup' ? 'Configure session settings' : sessionName}
+        icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => (step === 'lineup' ? setStep('setup') : router.back())}
+        rightSlot={
+          <div className="flex items-center gap-2" aria-label="Progress">
             <span
               className={`w-2 h-2 rounded-full ${step === 'setup' ? 'bg-masters' : 'bg-ink-tertiary'}`}
             />
@@ -682,8 +636,8 @@ export default function NewLineupPage() {
               className={`w-2 h-2 rounded-full ${step === 'lineup' ? 'bg-masters' : 'bg-ink-tertiary'}`}
             />
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial">
         {step === 'setup' ? (
