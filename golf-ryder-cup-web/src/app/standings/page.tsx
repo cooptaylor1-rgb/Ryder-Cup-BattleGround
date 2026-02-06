@@ -28,7 +28,7 @@ import {
   Star,
   Medal,
 } from 'lucide-react';
-import { EmptyStatePremium, NoStandingsPremiumEmpty } from '@/components/ui';
+import { EmptyStatePremium, NoStandingsPremiumEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
@@ -119,38 +119,7 @@ export default function StandingsPage() {
 
   // Show loading skeleton while data loads
   if (isLoading) {
-    return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
-        <header className="header-premium">
-          <div className="container-editorial flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg skeleton-pulse" />
-            <div>
-              <div className="w-20 h-3 rounded skeleton-pulse mb-1" />
-              <div className="w-28 h-2 rounded skeleton-pulse" />
-            </div>
-          </div>
-        </header>
-        <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
-          <div className="card-luxury p-6 mb-4">
-            <div className="flex justify-between mb-6">
-              <div className="w-16 h-12 rounded skeleton-pulse" />
-              <div className="w-12 h-8 rounded skeleton-pulse" />
-              <div className="w-16 h-12 rounded skeleton-pulse" />
-            </div>
-            <div className="w-full h-6 rounded-full skeleton-pulse" />
-          </div>
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="card-luxury p-4 h-16 skeleton-pulse" />
-            ))}
-          </div>
-        </main>
-        <BottomNav />
-      </div>
-    );
+    return <PageLoadingSkeleton title="Standings" showBackButton={false} variant="default" />;
   }
 
   const teamA = teams.find((t) => t.color === 'usa');

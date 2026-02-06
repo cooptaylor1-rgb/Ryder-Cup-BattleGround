@@ -10,7 +10,6 @@ import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components
 import { BottomNav, PageHeader } from '@/components/layout';
 import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
-    ChevronLeft,
     DollarSign,
     Zap,
     Target,
@@ -245,39 +244,18 @@ export default function BetDetailPage() {
 
     return (
         <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-            {/* Header */}
-            <header className="header-premium">
-                <div className="container-editorial flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-2 -ml-2 press-scale"
-                            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                            aria-label="Back"
-                        >
-                            <ChevronLeft size={22} />
-                        </button>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                            <div
-                                style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: 'var(--radius-md)',
-                                    background: bet.status === 'completed' ? 'var(--success)' : 'var(--masters)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'white',
-                                }}
-                            >
-                                {bet.status === 'completed' ? <Check size={20} /> : getBetIcon(bet.type)}
-                            </div>
-                            <div>
-                                <h1 className="type-title">{bet.name}</h1>
-                                <p className="type-caption">{bet.description}</p>
-                            </div>
-                        </div>
-                    </div>
+            <PageHeader
+                title={bet.name}
+                subtitle={bet.description}
+                icon={bet.status === 'completed' ? <Check size={18} /> : getBetIcon(bet.type)}
+                iconContainerStyle={{
+                    width: '40px',
+                    height: '40px',
+                    background: bet.status === 'completed' ? 'var(--success)' : 'var(--masters)',
+                    boxShadow: 'none',
+                }}
+                onBack={() => router.back()}
+                rightSlot={
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowEditModal(true)}
@@ -296,8 +274,8 @@ export default function BetDetailPage() {
                             <Trash2 size={20} style={{ color: 'var(--error)' }} />
                         </button>
                     </div>
-                </div>
-            </header>
+                }
+            />
 
             <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
                 {/* Pot Card */}
