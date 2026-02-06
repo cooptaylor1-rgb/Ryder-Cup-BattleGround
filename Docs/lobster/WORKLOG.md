@@ -537,3 +537,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Score (match list) (`/score`): signed-out and no-trip states now use the shared `PageHeader` (with `BottomNav`) for consistent premium navigation instead of dropping straight into a bare empty state.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5299a11`)
+
+### 16:15 EST — Phase 1 (batch 103)
+- Captain Messages (`/captain/messages`): migrated the bespoke header onto the shared `PageHeader`.
+- Captain Draft (`/captain/draft`): migrated the bespoke header onto the shared `PageHeader`.
+- Captain Settings (`/captain/settings`): migrated the bespoke header onto the shared `PageHeader`.
+- All three pages now use the shared `BottomNav` (replacing the hand-rolled nav markup) so Captain tools remain consistent with the Phase 1 premium navigation pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)

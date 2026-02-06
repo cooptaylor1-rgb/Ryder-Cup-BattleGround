@@ -3,22 +3,13 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
-import { draftLogger } from '@/lib/utils/logger';
+
 import { DraftBoard } from '@/components/captain';
-import {
-  ChevronLeft,
-  Shield,
-  Shuffle,
-  Users,
-  Home,
-  Target,
-  Trophy,
-  MoreHorizontal,
-  CalendarDays,
-} from 'lucide-react';
+import { BottomNav, PageHeader } from '@/components/layout';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import { useTripStore, useUIStore } from '@/lib/stores';
+import { draftLogger } from '@/lib/utils/logger';
+import { Home, MoreHorizontal, Shield, Shuffle, Users } from 'lucide-react';
 
 /**
  * TEAM DRAFT PAGE
@@ -131,43 +122,12 @@ export default function DraftPage() {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 0 16px rgba(139, 92, 246, 0.3)',
-                }}
-              >
-                <Shuffle size={16} style={{ color: 'white' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Team Draft</span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  Assign players to teams
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Team Draft"
+        subtitle="Assign players to teams"
+        onBack={() => router.back()}
+        icon={<Shuffle size={16} style={{ color: 'white' }} />}
+      />
 
       <main className="container-editorial">
         <section className="section">
@@ -222,33 +182,7 @@ export default function DraftPage() {
         </section>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }
