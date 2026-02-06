@@ -6,9 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import {
-  ChevronLeft,
   Home,
   Target,
   Users,
@@ -159,72 +158,32 @@ export default function PhotosPage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              aria-label="Back"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Camera size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                  Photos
-                </span>
-                <p className="type-caption">{photos.length} photos</p>
-              </div>
-            </div>
-          </div>
+      <PageHeader
+        title="Photos"
+        subtitle={currentTrip.name}
+        icon={<Camera size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === 'grid' ? 'masonry' : 'grid')}
-              className="p-2 rounded-lg"
-              style={{
-                color: 'var(--ink-tertiary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="btn-secondary press-scale"
+              style={{ padding: 'var(--space-2)' }}
               aria-label={viewMode === 'grid' ? 'Switch to masonry view' : 'Switch to grid view'}
             >
-              {viewMode === 'grid' ? <LayoutGrid size={20} /> : <Grid size={20} />}
+              {viewMode === 'grid' ? <LayoutGrid size={18} /> : <Grid size={18} />}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="btn-premium p-2 rounded-lg"
-              style={{ color: 'var(--color-accent)' }}
+              className="btn-premium press-scale"
+              style={{ padding: 'var(--space-2)' }}
               aria-label="Add photo"
             >
-              <Plus size={22} />
+              <Plus size={18} />
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <input
         ref={fileInputRef}
