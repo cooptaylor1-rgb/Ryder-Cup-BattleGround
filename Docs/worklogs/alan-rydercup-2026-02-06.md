@@ -155,3 +155,10 @@
   - Fixed a stray “Golf Buddies” string → “Golf Ryder Cup” for consistent branding.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`ee6ad19`)
+
+### Phase 1 (batch 82): Social — shared `PageHeader` + `BottomNav`
+- `golf-ryder-cup-web/src/app/social/page.tsx`
+  - Replaced the bespoke Social header + hand-rolled bottom nav with the shared `PageHeader` + `BottomNav` to match Phase 1’s standard premium navigation.
+  - Kept the message composer pinned above `BottomNav` and padded the feed so posts don’t hide behind the composer.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`5354ae6`)

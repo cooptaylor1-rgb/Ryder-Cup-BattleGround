@@ -401,3 +401,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Login: fixed a stray “Golf Buddies” copy string so branding matches the app.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ee6ad19`)
+
+### 04:50 EST — Phase 1 (batch 82)
+- Social (`/social`): migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav` for consistent premium navigation.
+- Social: pinned the message composer above `BottomNav` (fixed bar at `bottom: var(--nav-height)`) and increased feed padding so content never hides behind the composer.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5354ae6`)
