@@ -291,15 +291,6 @@
 - Commit + push ✅ (`5299a11`)
 
 ### Phase 1 (batch 103): Captain tools — shared PageHeader + shared BottomNav
-- 
-- 
-- 
-  - Migrated the bespoke  markup onto the shared  for consistent premium navigation.
-  - Replaced the hand-rolled bottom nav markup with the shared  component.
-- Checkpoint:  +  ✅ (Lobster approval gate run)
-- Commit + push ✅ ()
-
-### Phase 1 (batch 103): Captain tools — shared PageHeader + shared BottomNav
 - `golf-ryder-cup-web/src/app/captain/messages/page.tsx`
 - `golf-ryder-cup-web/src/app/captain/draft/page.tsx`
 - `golf-ryder-cup-web/src/app/captain/settings/page.tsx`
