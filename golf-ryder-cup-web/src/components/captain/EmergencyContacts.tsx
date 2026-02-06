@@ -405,10 +405,9 @@ export function EmergencyContacts({
                 </div>
 
                 {/* Player Groups */}
-                {Object.entries(groupedPlayers).map(([groupId, groupPlayers]) => {
-                    if (groupPlayers.length === 0) return null;
-
-                    return (
+                {Object.entries(groupedPlayers)
+                    .filter(([, groupPlayers]) => groupPlayers.length > 0)
+                    .map(([groupId, groupPlayers]) => (
                         <div key={groupId} className="border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
                             <button
                                 onClick={() => toggleGroup(groupId)}
@@ -469,8 +468,7 @@ export function EmergencyContacts({
                                 )}
                             </AnimatePresence>
                         </div>
-                    );
-                })}
+                    ))}
             </div>
         </div>
     );

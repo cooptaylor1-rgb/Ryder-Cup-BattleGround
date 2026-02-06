@@ -235,9 +235,10 @@ export function SideBetOptIn({
             </div>
 
             {/* Bets by Category */}
-            {(['individual', 'team', 'match'] as SideBet['category'][]).map(category => {
+            {(['individual', 'team', 'match'] as SideBet['category'][])
+                .filter((category) => byCategory[category].length > 0)
+                .map((category) => {
                 const bets = byCategory[category];
-                if (bets.length === 0) return null;
 
                 return (
                     <div key={category}>
