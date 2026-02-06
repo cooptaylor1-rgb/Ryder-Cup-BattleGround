@@ -323,3 +323,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Minor optional-value hygiene: switched a few internal helpers from `null` to `undefined` (Schedule countdown memo, Players `getPlayerTeam`, Bets Nassau summary) to keep “absence” values idiomatic/consistent and reduce `null` sentinels in route code.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`25adf90`)
+
+### 21:18 EST — Phase 1 (batch 72)
+- Schedule + Score: `currentUserPlayer` memos now return `undefined` instead of `null` when unauthenticated, keeping “absence” values idiomatic and reducing `null` sentinels in route code.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8e82188`)

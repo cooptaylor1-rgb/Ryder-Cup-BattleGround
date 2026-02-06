@@ -20,6 +20,7 @@ All times America/New_York.
 - 20:10 — Shipped batch: removed missing-trip auto-redirects on Social + Live; now uses consistent `EmptyStatePremium` + `BottomNav` so users land on a clear explanation + navigation. (commit 76198a5)
 - 20:45 — Shipped batch: Achievements removed missing-trip auto-redirect; now shows a premium empty state with clear CTAs. (commit c3fdca6)
 - 21:10 — Shipped batch: Stats hub uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit f798894)
+- 21:18 — Shipped batch: Schedule + Score now treat unauthenticated “no current user” as `undefined` (not `null`) in the `currentUserPlayer` memo, reducing `null` sentinels in route code. (commit 8e82188)
 - 21:35 — Shipped batch: Matchups uses a consistent premium empty state (no active trip) and includes `BottomNav`. (commit a09ca56)
 - 22:05 — Shipped batch: updated Trip Stats + Trip Awards to use the standard premium page wrapper and added `BottomNav` so navigation is always clear (including no active trip / no stats yet). (commit 6dccf48)
 - 22:30 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) now uses the standard premium wrapper + `BottomNav` and renders explicit loading/error/not-found states. (commit 4c70f5e)
