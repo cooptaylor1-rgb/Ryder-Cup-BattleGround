@@ -160,13 +160,6 @@ export default function SchedulePage() {
     [currentUserPlayer]
   );
 
-  // Get user's team in a match
-  const _getUserTeam = (match: Match): 'A' | 'B' | null => {
-    if (!currentUserPlayer) return null;
-    if (match.teamAPlayerIds.includes(currentUserPlayer.id)) return 'A';
-    if (match.teamBPlayerIds.includes(currentUserPlayer.id)) return 'B';
-    return null;
-  };
 
   // Build schedule entries
   const scheduleByDay = useMemo((): DaySchedule[] => {

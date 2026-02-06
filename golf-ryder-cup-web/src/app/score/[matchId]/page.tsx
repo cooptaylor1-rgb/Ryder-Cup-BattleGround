@@ -405,7 +405,7 @@ export default function EnhancedMatchScoringPage() {
 
   // Find next incomplete match in session for "Score Next Match" navigation
   const nextIncompleteMatch = useMemo(() => {
-    if (!activeMatch || !sessionMatches.length) return null;
+    if (!activeMatch || !sessionMatches.length) return undefined;
     const currentIndex = sessionMatches.findIndex((m) => m.id === activeMatch.id);
     // Look for the next match after current that isn't completed
     for (let i = currentIndex + 1; i < sessionMatches.length; i++) {
@@ -419,7 +419,7 @@ export default function EnhancedMatchScoringPage() {
         return sessionMatches[i];
       }
     }
-    return null;
+    return undefined;
   }, [activeMatch, sessionMatches]);
 
   // Undo handler - must be defined before executeScore to avoid "accessed before declaration" error
