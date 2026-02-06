@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * SCHEDULE PAGE — Personal & Trip Schedule
@@ -273,6 +273,13 @@ export default function SchedulePage() {
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
+        <PageHeader
+          title="Schedule"
+          subtitle="Sign in required"
+          icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="calendar"
@@ -291,7 +298,6 @@ export default function SchedulePage() {
   }
 
   // If no trip, render an explicit empty state (no auto-redirect).
-
   if (!currentTrip) {
     if (isLoading) {
       return <PageLoadingSkeleton title="Schedule" variant="list" />;
@@ -302,6 +308,13 @@ export default function SchedulePage() {
         className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)' }}
       >
+        <PageHeader
+          title="Schedule"
+          subtitle="No active trip"
+          icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="calendar"
@@ -332,32 +345,13 @@ export default function SchedulePage() {
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: 'var(--shadow-glow-green)',
-              }}
-            >
-              <CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />
-            </div>
-            <div>
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                Schedule
-              </span>
-              <p className="type-caption">{currentTrip.name}</p>
-            </div>
-          </div>
-          {currentUserPlayer && (
+      <PageHeader
+        title="Schedule"
+        subtitle={currentTrip.name}
+        icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
+          currentUserPlayer ? (
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-full"
               style={{
@@ -369,9 +363,9 @@ export default function SchedulePage() {
               <User size={14} style={{ color: 'var(--masters)' }} />
               <span className="text-xs font-medium">{currentUserPlayer.firstName}</span>
             </div>
-          )}
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       {/* Tab Selector */}
       <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">

@@ -227,6 +227,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Settings page: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
 - Commit + push ✅ (`df99c05`)
 
+### 02:10 EST — Phase 1 (batch 73)
+- Schedule (`/schedule`): replaced bespoke header markup with the shared `PageHeader` across the signed-out, no-trip, and main states for consistent premium navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 07:10 EST — Phase 1 (batch 44)
 - Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote into a single clean chronological timeline (deduped mixed-format Phase 1 entries).
 - Commit + push ✅ (`d143e6f`)
@@ -328,3 +333,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Schedule + Score: `currentUserPlayer` memos now return `undefined` instead of `null` when unauthenticated, keeping “absence” values idiomatic and reducing `null` sentinels in route code.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8e82188`)
+

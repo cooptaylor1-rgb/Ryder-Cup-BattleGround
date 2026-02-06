@@ -34,6 +34,7 @@ All times America/New_York.
 - 00:25 — Shipped batch: standardized `BottomNav` usage on More + Settings (More now includes `BottomNav`; Settings replaces the custom nav with the shared component). (commit df99c05)
 - 00:55 — Shipped batch: standardized `BottomNav` usage on Bets + Bet Detail, replaced the custom nav with the shared component, and added explicit premium no-trip / loading / not-found states. (commit 256af68)
 - 01:10 — Shipped batch: Captain routes’ empty-state screens upgraded to the standard premium wrapper and include `BottomNav`, so navigation is always available even when Captain Mode is off / no trip is selected. (commit 65f183e)
+- 02:10 — Shipped batch: Schedule (`/schedule`) now uses the shared `PageHeader` across signed-out, no-trip, and main states for consistent premium navigation.
 - 03:45 — Shipped batch: Worklog sync — ensured the web worklog reflects the shipped Phase 1 improvements so in-repo history matches Lobster worklog. (commit b039ec6)
 - 04:20 — Shipped batch: Achievements now uses the shared `BottomNav` (including no-trip and loading states). Settings subpages (Appearance/Scoring/Notifications) now include `BottomNav` + `pb-nav` so navigation is always available. (commit bb1f9e3)
 - 04:45 — Shipped batch: app-level Not Found + route error pages standardized to the premium layout (`pb-nav` + texture) and now include `BottomNav` so recovery screens aren’t dead ends. (commit 6987064)
