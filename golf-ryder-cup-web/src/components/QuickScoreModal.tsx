@@ -288,7 +288,7 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                                 onClick={() => handleScore('teamA')}
                                 disabled={isSubmitting}
                                 className={`w-full py-6 px-5 rounded-2xl flex items-center justify-between transition-all active:scale-[0.97] disabled:opacity-50 ${currentResult?.winner === 'teamA'
-                                    ? 'ring-2 ring-offset-2 ring-(--team-usa)'
+                                    ? 'ring-2 ring-offset-2 ring-[var(--team-usa)]'
                                     : ''
                                     }`}
                                 style={{
@@ -351,7 +351,7 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                                 onClick={() => handleScore('teamB')}
                                 disabled={isSubmitting}
                                 className={`w-full py-6 px-5 rounded-2xl flex items-center justify-between transition-all active:scale-[0.97] disabled:opacity-50 ${currentResult?.winner === 'teamB'
-                                    ? 'ring-2 ring-offset-2 ring-(--team-europe)'
+                                    ? 'ring-2 ring-offset-2 ring-[var(--team-europe)]'
                                     : ''
                                     }`}
                                 style={{

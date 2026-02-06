@@ -327,7 +327,7 @@ export default function CourseLibraryPage() {
                 {/* Featured: Scan Scorecard with AI */}
                 <button
                     onClick={() => setShowScorecardUpload(true)}
-                    className="w-full p-4 rounded-xl border-2 border-dashed transition-all hover:border-(--masters) hover:bg-(--masters-soft)"
+                    className="w-full p-4 rounded-xl border-2 border-dashed transition-all hover:border-[var(--masters)] hover:bg-[var(--masters-soft)]"
                     style={{
                         borderColor: 'var(--masters)',
                         background: 'linear-gradient(135deg, var(--masters-soft) 0%, transparent 100%)',

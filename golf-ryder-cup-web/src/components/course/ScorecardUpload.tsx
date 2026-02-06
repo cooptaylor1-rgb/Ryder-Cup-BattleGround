@@ -211,7 +211,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={() => fileInputRef.current?.click()}
-                className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors hover:border-(--masters)"
+                className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors hover:border-[var(--masters)]"
                 style={{ borderColor: 'var(--rule)', background: 'var(--surface-elevated)' }}
               >
                 <Upload size={48} className="mx-auto mb-4" style={{ color: 'var(--ink-tertiary)' }} />
