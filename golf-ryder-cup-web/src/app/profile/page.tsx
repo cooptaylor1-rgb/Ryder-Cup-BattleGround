@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import NextImage from 'next/image';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button, Card, CardContent, EmptyStatePremium, PageSkeleton, Skeleton } from '@/components/ui';
+import { Button, Card, CardContent, EmptyStatePremium, Skeleton } from '@/components/ui';
 import { GolfersIllustration } from '@/components/ui/illustrations';
 import {
   User,
@@ -22,7 +22,7 @@ import {
   Save,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * PROFILE PAGE
@@ -108,28 +108,40 @@ export default function ProfilePage() {
 
   if (!currentUser) {
     return (
-      <PageSkeleton>
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Profile Header Skeleton */}
-          <Card variant="elevated" className="overflow-hidden">
-            <div className="bg-linear-to-br from-masters/20 to-masters/5 p-6 text-center">
-              <Skeleton className="w-24 h-24 rounded-full mx-auto mb-4" />
-              <Skeleton className="h-6 w-40 mx-auto mb-2" />
-              <Skeleton className="h-4 w-24 mx-auto mb-3" />
-              <Skeleton className="h-10 w-32 mx-auto rounded-full" />
-            </div>
-          </Card>
-          {/* Form Section Skeletons */}
-          <Card variant="default">
-            <CardContent className="p-4 space-y-4">
-              <Skeleton className="h-5 w-24" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      </PageSkeleton>
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
+        <PageHeader
+          title="Profile"
+          subtitle={isAuthenticated ? 'Loading your profile…' : undefined}
+          icon={<User size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.push('/more')}
+        />
+        <main className="container-editorial py-6">
+          <div className="max-w-md mx-auto space-y-6">
+            {/* Profile Header Skeleton */}
+            <Card variant="elevated" className="overflow-hidden">
+              <div className="bg-linear-to-br from-masters/20 to-masters/5 p-6 text-center">
+                <Skeleton className="w-24 h-24 rounded-full mx-auto mb-4" />
+                <Skeleton className="h-6 w-40 mx-auto mb-2" />
+                <Skeleton className="h-4 w-24 mx-auto mb-3" />
+                <Skeleton className="h-10 w-32 mx-auto rounded-full" />
+              </div>
+            </Card>
+            {/* Form Section Skeletons */}
+            <Card variant="default">
+              <CardContent className="p-4 space-y-4">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <BottomNav />
+      </div>
     );
   }
 
