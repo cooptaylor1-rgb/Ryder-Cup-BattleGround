@@ -230,7 +230,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 02:10 EST — Phase 1 (batch 73)
 - Schedule (`/schedule`): replaced bespoke header markup with the shared `PageHeader` across the signed-out, no-trip, and main states for consistent premium navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`2b642bb`)
 
 ### 07:10 EST — Phase 1 (batch 44)
 - Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote into a single clean chronological timeline (deduped mixed-format Phase 1 entries).
@@ -333,7 +333,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Schedule + Score: `currentUserPlayer` memos now return `undefined` instead of `null` when unauthenticated, keeping “absence” values idiomatic and reducing `null` sentinels in route code.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8e82188`)
-
 
 ### 22:10 EST — Phase 1 (batch 74)
 - Trip Recap component: avoided `return null` inside the match list render by prefiltering to matches with computed state (stable rendering, no silent row drops).
