@@ -59,7 +59,7 @@ export default function BetDetailPage() {
     // Get linked match if any
     const linkedMatch = useLiveQuery(
         async () => {
-            if (!bet?.matchId) return null;
+            if (!bet?.matchId) return undefined;
             const match = await db.matches.get(bet.matchId);
             return match ?? null;
         },

@@ -178,7 +178,7 @@ export default function EnhancedMatchScoringPage() {
   const [quickScorePending, setQuickScorePending] = useState<{
     team: 'teamA' | 'teamB';
     expiresAt: number;
-  } | null>(null);
+  } | undefined>(undefined);
 
   // Celebration state
   const [celebration, setCelebration] = useState<{
@@ -230,10 +230,9 @@ export default function EnhancedMatchScoringPage() {
   useEffect(() => {
     if (!quickScorePending) return;
     const timeoutId = setTimeout(() => {
-      setQuickScorePending((current) => {
-        if (!current) return null;
-        return current.expiresAt <= Date.now() ? null : current;
-      });
+      setQuickScorePending((current) =>
+        current && current.expiresAt <= Date.now() ? undefined : current
+      );
     }, 2100);
 
     return () => clearTimeout(timeoutId);
@@ -261,7 +260,7 @@ export default function EnhancedMatchScoringPage() {
 
   // Get session type to determine scoring mode
   const currentSession = useMemo(() => {
-    if (!activeMatch) return null;
+    if (!activeMatch) return undefined;
     return sessions.find((s) => s.id === activeMatch.sessionId);
   }, [activeMatch, sessions]);
 
@@ -296,7 +295,7 @@ export default function EnhancedMatchScoringPage() {
   }, [activeMatch, players]);
 
   const currentHoleResult = useMemo(() => {
-    if (!matchState) return null;
+    if (!matchState) return undefined;
     return matchState.holeResults.find((r) => r.holeNumber === currentHole);
   }, [matchState, currentHole]);
 
@@ -714,7 +713,7 @@ export default function EnhancedMatchScoringPage() {
       const isConfirmed = quickScorePending?.team === team && quickScorePending.expiresAt > now;
 
       if (isConfirmed) {
-        setQuickScorePending(null);
+        setQuickScorePending(undefined);
         handleScore(team === 'teamA' ? 'teamA' : 'teamB', 'buttons');
         return;
       }
