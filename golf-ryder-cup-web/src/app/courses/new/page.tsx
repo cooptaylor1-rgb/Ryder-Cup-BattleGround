@@ -2,9 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
-  ChevronLeft,
   Save,
   Plus,
   Trash2,
@@ -17,7 +15,7 @@ import {
 import { createCourseProfile } from '@/lib/services/courseLibraryService';
 import { useUIStore } from '@/lib/stores';
 import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * NEW COURSE PAGE
@@ -206,7 +204,10 @@ export default function NewCoursePage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
       {/* Scorecard Upload Modal */}
       {showScorecardUpload && (
         <ScorecardUpload
@@ -215,51 +216,28 @@ export default function NewCoursePage() {
         />
       )}
 
-      {/* Premium Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/courses"
-              className="p-2 -ml-2 press-scale"
-              style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </Link>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                }}
-              >
-                <Flag size={16} style={{ color: 'var(--color-accent)' }} />
-              </div>
-              <div>
-                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Add Course</span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  Enter course details
-                </p>
-              </div>
-            </div>
-          </div>
+      <PageHeader
+        title="Add Course"
+        subtitle="Enter course details"
+        icon={<Flag size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.push('/courses')}
+        rightSlot={
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
             className="btn-premium"
-            style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+            style={{
+              padding: 'var(--space-2) var(--space-3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+            }}
           >
             <Save size={16} />
             Save
           </button>
-        </div>
-      </header>
+        }
+      />
 
       <main className="container-editorial">
         {/* Scan Scorecard CTA */}
