@@ -254,6 +254,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - More (`/more`): when all menu items are filtered out, render an explicit `EmptyStatePremium` instead of an empty page section.
 - Commit + push ✅ (`16f8a0a`)
 
+### 09:55 EST — Phase 1 (batch 48)
+- Lineup Session (`/lineup/[sessionId]`): migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, and standardized the wrapper to the premium layout for consistent navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a36bfe2`)
+
 ### 11:40 EST — Phase 1 (batch 47)
 - Lint hygiene sweep + small correctness hardening (warnings-only).
 - Commit + push ✅ (`0ba1a70`)

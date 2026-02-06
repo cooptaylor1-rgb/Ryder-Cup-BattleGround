@@ -80,3 +80,4 @@ All times America/New_York.
 - 07:15 — Shipped batch: Trip Settings (`/trip/[tripId]/settings`) removed an unused `next/link` import (lint hygiene; no UI change). (commit b152413)
 - 08:25 — Shipped batch: Trip Stats (/trip-stats) no longer blocks the first stat entry behind a "No stats yet" screen; we now render the tracking UI even at zero so users can start recording immediately. Also standardized the no-trip state to use the shared premium wrapper + container-editorial. (commit 0f1ca16)
 - 09:20 — Shipped batch: Live Scores (/live) migrated off the bespoke header + hand-rolled bottom nav onto the shared PageHeader + BottomNav, with sound/fullscreen/refresh controls in PageHeader.rightSlot. (commit a6555c9)
+- 09:55 — Shipped batch: Lineup Session (`/lineup/[sessionId]`) migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, and standardized the wrapper to the premium layout for consistent navigation. (commit a36bfe2)
