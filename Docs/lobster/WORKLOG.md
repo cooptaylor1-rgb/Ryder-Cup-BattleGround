@@ -231,10 +231,69 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Settings page: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
 - Commit + push ✅ (`df99c05`)
 
+### 01:02 EST — Phase 1 (batch 77)
+- Players (`/players`): replaced bespoke header markup with the shared `PageHeader` component so the route matches the standard premium header pattern used across Phase 1 routes.
+- Kept captain actions available via `rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c315aba`)
+
+### 01:30 EST — Phase 1 (batch 78)
+- Score match detail (`/score/[matchId]`): replaced internal `null` sentinels with `undefined` (session/hole-result memos + quick-score pending state), removing the remaining `return null` hits from Phase 1’s route sweep.
+- Bet detail (`/bets/[betId]`): linked-match query returns `undefined` when there’s no `matchId` (no behavior change), avoiding an extra `return null` hit in route code.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cd811e2`)
+
+### 01:55 EST — Phase 1 — Route sweep verification (no remaining blank-screen patterns)
+- Verified there are no remaining route-level blank-screen patterns in `src/app/**/page.tsx`:
+  - no `return null;` top-level returns
+  - no `return null` hits in route pages (excluding `api/`)
+  - no `Suspense fallback={null}` usage in routes
+- Next: if we want to keep tightening “silent gaps”, consider a component-level sweep for `return null` inside user-facing widgets (separate from the route blank-screen goal).
+
 ### 02:10 EST — Phase 1 (batch 73)
 - Schedule (`/schedule`): replaced bespoke header markup with the shared `PageHeader` across the signed-out, no-trip, and main states for consistent premium navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`2b642bb`)
+
+### 02:30 EST — Phase 1 (batch 79)
+- New Trip (`/trip/new`): removed legacy `AppShell` usage and migrated the route to the standard premium wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) with the shared `PageHeader`.
+- Kept `BottomNav` always available during the multi-step flow, so creating a trip never becomes a navigation dead end.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ddb8690`)
+
+### 02:55 EST — Phase 1 (batch 80)
+- Settings hub (`/settings`): updated the Notifications and Data/Storage entries to link to the dedicated `/settings/notifications` and `/settings/backup` pages.
+- Settings — Notifications: standardized the page wrapper to include the premium background canvas.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7cea01b`)
+
+### 03:25 EST — Docs: Lobster worklog hygiene
+- Fixed the date heading so midnight entries (00:10+) are correctly grouped under 2026-02-06.
+- Commit + push ✅ (`a48b648`)
+
+### 03:50 EST — Docs: daily worklog sync
+- Daily worklog (`Docs/worklogs/alan-rydercup-2026-02-06.md`): synced to include Phase 1 batch 80 + the Lobster worklog date-heading fix.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6f6ff9a`)
+
+
+### 04:15 EST — Phase 1 (batch 81)
+- Login (`/login`): added the standard premium wrapper enter/texture classes for consistency with Phase 1 routes.
+- Login: fixed a stray “Golf Buddies” copy string so branding matches the app.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ee6ad19`)
+
+### 04:50 EST — Phase 1 (batch 82)
+- Social (`/social`): migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav` for consistent premium navigation.
+- Social: pinned the message composer above `BottomNav` (fixed bar at `bottom: var(--nav-height)`) and increased feed padding so content never hides behind the composer.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5354ae6`)
+
+### 05:15 EST — Phase 1 (batch 83)
+- Achievements (`/achievements`): replaced the bespoke premium header with the shared `PageHeader` for consistency with Phase 1 routes.
+- Achievements: simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5545df4`)
 
 ### 05:45 EST — Phase 1 (batch 74)
 - Players error boundary: standardized to the premium wrapper (shared `PageHeader`, texture, `pb-nav`) and `BottomNav` so recovery screens aren’t dead ends.
@@ -242,9 +301,32 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`e14c286`)
 
+### 06:15 EST — Phase 1 (batch 84)
+- Social Photos (`/social/photos`): migrated off the bespoke premium header onto the shared `PageHeader` for consistency with Phase 1 routes.
+- Social Photos: kept the view toggle + upload actions in `PageHeader.rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d114a9b`)
+
+### 06:50 EST — Phase 1 (batch 85)
+- Matchups (`/matchups`): replaced bespoke header markup with the shared `PageHeader` for consistent premium navigation.
+- Matchups: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3ee6528`)
+
 ### 07:10 EST — Phase 1 (batch 44)
 - Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote into a single clean chronological timeline (deduped mixed-format Phase 1 entries).
 - Commit + push ✅ (`d143e6f`)
+
+### 07:15 EST — Phase 1 (batch 86)
+- Trip Settings (`/trip/[tripId]/settings`): removed an unused `next/link` import (lint hygiene; no UI change).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b152413`)
+
+### 07:45 EST — Phase 1 (batch 87)
+- Trip Awards (`/trip-stats/awards`): replaced bespoke `header-premium` markup with the shared `PageHeader`.
+- Trip Awards: standardized the layout to the usual premium route wrapper + `container-editorial` pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6dacc3c`)
 
 ### 07:55 EST — Phase 1 (batch 45)
 - Profile (`/profile`): keep `BottomNav` visible while editing by lifting the fixed “Save Changes” bar above the nav height.
@@ -254,10 +336,39 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - More (`/more`): when all menu items are filtered out, render an explicit `EmptyStatePremium` instead of an empty page section.
 - Commit + push ✅ (`16f8a0a`)
 
+### 08:25 EST — Phase 1 (batch 88)
+- Trip Stats (`/trip-stats`): removed the “No stats yet” early-return so users can start tracking immediately from an all-zero state (tracking UI renders even before any stats exist).
+- Trip Stats: standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0f1ca16`)
+
+### 08:55 EST — Phase 1 (batch 89)
+- Settings — Backup & Restore (`/settings/backup`): loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"` so the skeleton is correctly labeled and matches the standard list layout.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a838d0e`)
+
+### 09:20 EST — Phase 1 (batch 90)
+- Live Scores (`/live`): replaced the bespoke premium header markup with the shared `PageHeader` for consistent premium navigation.
+- Live Scores: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
+- Live Scores: moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a6555c9`)
+
 ### 09:55 EST — Phase 1 (batch 48)
 - Lineup Session (`/lineup/[sessionId]`): migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, and standardized the wrapper to the premium layout for consistent navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a36bfe2`)
+
+### 10:25 EST — Phase 1 (batch 91)
+- Settings hub (`/settings`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6879433`)
+
+### 10:55 EST — Phase 1 (batch 92)
+- Settings — Notifications (`/settings/notifications`): removed invalid Tailwind “CSS var” class syntax (e.g. `bg-(--masters)`) that could cause the page to render with missing styles.
+- Standardized the page to use CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) and kept the shared `PageHeader` + `BottomNav`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3371b11`)
 
 ### 11:25 EST — Phase 1 (batch 49)
 - Profile (`/profile`): migrated the authenticated state onto the standard premium wrapper (`pb-nav` + texture + premium enter) and replaced the bespoke sticky header with the shared `PageHeader` for consistent navigation.
@@ -268,9 +379,27 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lint hygiene sweep + small correctness hardening (warnings-only).
 - Commit + push ✅ (`0ba1a70`)
 
+### 11:58 EST — Phase 1 (batch 93)
+- Day Summary modal: removed the top-level `if (!currentTrip) return null;` so opening the modal can’t silently do nothing.
+- Added explicit modal body states for **No active trip**, **Generating summary…**, and **No matches found**.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0ab52cd`)
+
+### 12:15 EST — Phase 1 (batch 94)
+- Quick Score modal: added an explicit `useLiveQuery` default value so we can distinguish loading vs not-found.
+- Removed the top-level `if (!match) return null;` and replaced it with explicit in-modal UI for **Loading match…** and **Match unavailable**, so opening Quick Score can’t silently do nothing.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a60c681`)
+
 ### 12:20 EST — Phase 1 (batch 54)
 - Docs: synced Phase 1 worklogs to include the latest shipped batches.
 - Commit + push ✅ (`80e378f`)
+
+### 12:35 EST — Phase 1 (batch 95)
+- Captain checklist (`/captain/checklist`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Captain checklist: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1ac63a6`)
 
 ### 12:45 EST — Phase 1 (batch 55)
 - Spectator mode (`/spectator/[tripId]`): added bottom padding so the fixed “Last updated” footer doesn’t overlap content on smaller screens.
@@ -280,6 +409,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Docs: updated worklogs to include the batch 55 commit hash.
 - Commit + push ✅ (`8503fdf`)
 
+### 13:00 EST — Phase 1 (batch 96)
+- New Course (`/courses/new`): removed invalid Tailwind “CSS var” hover class syntax from the Scan Scorecard CTA and switched to the standard `press-scale` interaction.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cdd0159`)
 ### 13:15 EST — Phase 1 (batch 57)
 - New Session / Lineup (`/lineup/new`): precompute and filter format categories instead of `return null` inside the category map.
 - Commit + push ✅ (`6087b1e`)
@@ -371,136 +504,3 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
 
-### 01:02 EST — Phase 1 (batch 77)
-- Players (`/players`): replaced bespoke header markup with the shared `PageHeader` component so the route matches the standard premium header pattern used across Phase 1 routes.
-- Kept captain actions available via `rightSlot`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`c315aba`)
-
-### 01:30 EST — Phase 1 (batch 78)
-- Score match detail (`/score/[matchId]`): replaced internal `null` sentinels with `undefined` (session/hole-result memos + quick-score pending state), removing the remaining `return null` hits from Phase 1’s route sweep.
-- Bet detail (`/bets/[betId]`): linked-match query returns `undefined` when there’s no `matchId` (no behavior change), avoiding an extra `return null` hit in route code.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`cd811e2`)
-
-### 01:55 EST — Phase 1 — Route sweep verification (no remaining blank-screen patterns)
-- Verified there are no remaining route-level blank-screen patterns in `src/app/**/page.tsx`:
-  - no `return null;` top-level returns
-  - no `return null` hits in route pages (excluding `api/`)
-  - no `Suspense fallback={null}` usage in routes
-- Next: if we want to keep tightening “silent gaps”, consider a component-level sweep for `return null` inside user-facing widgets (separate from the route blank-screen goal).
-
-### 02:30 EST — Phase 1 (batch 79)
-- New Trip (`/trip/new`): removed legacy `AppShell` usage and migrated the route to the standard premium wrapper (`min-h-screen pb-nav page-premium-enter texture-grain`) with the shared `PageHeader`.
-- Kept `BottomNav` always available during the multi-step flow, so creating a trip never becomes a navigation dead end.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`ddb8690`)
-
-### 02:55 EST — Phase 1 (batch 80)
-- Settings hub (`/settings`): updated the Notifications and Data/Storage entries to link to the dedicated `/settings/notifications` and `/settings/backup` pages.
-- Settings — Notifications: standardized the page wrapper to include the premium background canvas.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`7cea01b`)
-
-### 03:25 EST — Docs: Lobster worklog hygiene
-- Fixed the date heading so midnight entries (00:10+) are correctly grouped under 2026-02-06.
-- Commit + push ✅ (`a48b648`)
-
-### 03:50 EST — Docs: daily worklog sync
-- Daily worklog (`Docs/worklogs/alan-rydercup-2026-02-06.md`): synced to include Phase 1 batch 80 + the Lobster worklog date-heading fix.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`6f6ff9a`)
-
-
-### 04:15 EST — Phase 1 (batch 81)
-- Login (`/login`): added the standard premium wrapper enter/texture classes for consistency with Phase 1 routes.
-- Login: fixed a stray “Golf Buddies” copy string so branding matches the app.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`ee6ad19`)
-
-### 04:50 EST — Phase 1 (batch 82)
-- Social (`/social`): migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav` for consistent premium navigation.
-- Social: pinned the message composer above `BottomNav` (fixed bar at `bottom: var(--nav-height)`) and increased feed padding so content never hides behind the composer.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5354ae6`)
-
-### 05:15 EST — Phase 1 (batch 83)
-- Achievements (`/achievements`): replaced the bespoke premium header with the shared `PageHeader` for consistency with Phase 1 routes.
-- Achievements: simplified the loading path to the standard `PageLoadingSkeleton` (grid) instead of custom pulse markup.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5545df4`)
-
-### 06:15 EST — Phase 1 (batch 84)
-- Social Photos (`/social/photos`): migrated off the bespoke premium header onto the shared `PageHeader` for consistency with Phase 1 routes.
-- Social Photos: kept the view toggle + upload actions in `PageHeader.rightSlot`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d114a9b`)
-
-### 06:50 EST — Phase 1 (batch 85)
-- Matchups (`/matchups`): replaced bespoke header markup with the shared `PageHeader` for consistent premium navigation.
-- Matchups: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`3ee6528`)
-
-### 07:15 EST — Phase 1 (batch 86)
-- Trip Settings (`/trip/[tripId]/settings`): removed an unused `next/link` import (lint hygiene; no UI change).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`b152413`)
-
-### 07:45 EST — Phase 1 (batch 87)
-- Trip Awards (`/trip-stats/awards`): replaced bespoke `header-premium` markup with the shared `PageHeader`.
-- Trip Awards: standardized the layout to the usual premium route wrapper + `container-editorial` pattern.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`6dacc3c`)
-
-### 08:25 EST — Phase 1 (batch 88)
-- Trip Stats (`/trip-stats`): removed the “No stats yet” early-return so users can start tracking immediately from an all-zero state (tracking UI renders even before any stats exist).
-- Trip Stats: standardized the no-trip state layout to the standard premium wrapper + `container-editorial`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`0f1ca16`)
-
-### 08:55 EST — Phase 1 (batch 89)
-- Settings — Backup & Restore (`/settings/backup`): loading state now uses `PageLoadingSkeleton title="Backup & Restore" variant="list"` so the skeleton is correctly labeled and matches the standard list layout.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a838d0e`)
-
-### 09:20 EST — Phase 1 (batch 90)
-- Live Scores (`/live`): replaced the bespoke premium header markup with the shared `PageHeader` for consistent premium navigation.
-- Live Scores: replaced the hand-rolled bottom nav markup with the shared `BottomNav` component.
-- Live Scores: moved the sound/fullscreen/refresh controls into `PageHeader.rightSlot`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a6555c9`)
-
-### 10:25 EST — Phase 1 (batch 91)
-- Settings hub (`/settings`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`6879433`)
-
-### 10:55 EST — Phase 1 (batch 92)
-- Settings — Notifications (`/settings/notifications`): removed invalid Tailwind “CSS var” class syntax (e.g. `bg-(--masters)`) that could cause the page to render with missing styles.
-- Standardized the page to use CSS variable inline styles (`var(--masters)`, `var(--surface)`, `var(--rule)`) and kept the shared `PageHeader` + `BottomNav`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`3371b11`)
-
-### 11:58 EST — Phase 1 (batch 93)
-- Day Summary modal: removed the top-level `if (!currentTrip) return null;` so opening the modal can’t silently do nothing.
-- Added explicit modal body states for **No active trip**, **Generating summary…**, and **No matches found**.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`0ab52cd`)
-
-### 12:15 EST — Phase 1 (batch 94)
-- Quick Score modal: added an explicit `useLiveQuery` default value so we can distinguish loading vs not-found.
-- Removed the top-level `if (!match) return null;` and replaced it with explicit in-modal UI for **Loading match…** and **Match unavailable**, so opening Quick Score can’t silently do nothing.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a60c681`)
-
-### 12:35 EST — Phase 1 (batch 95)
-- Captain checklist (`/captain/checklist`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
-- Captain checklist: replaced the hand-rolled bottom nav with the shared `BottomNav` component.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`1ac63a6`)
-
-### 13:00 EST — Phase 1 (batch 96)
-- New Course (`/courses/new`): removed invalid Tailwind “CSS var” hover class syntax from the Scan Scorecard CTA and switched to the standard `press-scale` interaction.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`cdd0159`)
