@@ -236,6 +236,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`2b642bb`)
 
+### 05:45 EST — Phase 1 (batch 74)
+- Players error boundary: standardized to the premium wrapper (shared `PageHeader`, texture, `pb-nav`) and `BottomNav` so recovery screens aren’t dead ends.
+- Standings error boundary: same premium wrapper + `BottomNav`, using shared `ErrorEmpty` for consistent retry messaging.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e14c286`)
+
 ### 07:10 EST — Phase 1 (batch 44)
 - Web worklog hygiene (`golf-ryder-cup-web/WORKLOG.md`): rewrote into a single clean chronological timeline (deduped mixed-format Phase 1 entries).
 - Commit + push ✅ (`d143e6f`)

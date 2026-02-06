@@ -53,7 +53,7 @@ All times America/New_York.
 - 13:45 — Shipped batch: Settings subpages (`/settings/appearance`, `/settings/scoring`) upgraded to the standard premium wrapper + shared `PageHeader` for consistent navigation and layout. Scoring toggles aligned to the actual `ScoringPreferences` keys (no orphan controls). (commit 7a45cc3)
 - 14:01 — Shipped batch: Captain Bets winner selection no longer uses `return null` inside `map()` when a participant record is missing; we now prefilter so the UI never silently drops buttons. (commit 1f44b15)
 - 14:35 — Shipped batch: Standings Fun Stats CTAs now use `router.push()` instead of `window.location.href` to avoid full page reloads and keep navigation consistent. (commit 3d2bac3)
-- 15:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) now uses the standard premium wrapper + shared `PageHeader` (removes bespoke sticky header) for consistent layout/navigation. (commit 354e05a)
+- 15:55 — Shipped batch: Settings — Notifications (`/settings/notifications`) now uses the standard premium wrapper + shared `PageHeader` (removes bespoke sticky header) for consistent Settings navigation. (commit 354e05a)
 - 16:25 — Shipped batch: Captain Bets winner selection buttons now prefilter with `flatMap()` instead of `return null` inside `map()`, avoiding silent render gaps if a participant record is missing. (commit 0805cd2)
 - 16:45 — Shipped batch: Stableford scorecard score input buttons now prefilter valid values instead of `return null` inside `map()` to avoid silent render gaps and keep the Phase 1 “no null map returns” pattern consistent. (commit 22191a2)
 - 18:10 — Shipped batch: Social Stats dashboard leaderboard prefilters valid player rows instead of `return null` inside `map()`, keeping the UI stable and ranks consistent if a player record is missing. (commit 75548bb)
@@ -74,3 +74,4 @@ All times America/New_York.
 - 04:15 — Shipped batch: Login (`/login`) now uses the standard premium wrapper enter/texture classes and fixes a stray “Golf Buddies” string for consistent branding/copy. (commit ee6ad19)
 - 04:50 — Shipped batch: Social (`/social`) migrated off the bespoke header + hand-rolled bottom nav onto the shared `PageHeader` + `BottomNav`, keeping the message composer pinned above nav for consistent premium navigation. (commit 5354ae6)
 - 05:15 — Shipped batch: Achievements (`/achievements`) now uses the shared `PageHeader` and the standard `PageLoadingSkeleton` (grid) instead of bespoke header/loading markup. (commit 5545df4)
+- 05:45 — Shipped batch: Players + Standings error boundaries upgraded to the standard premium wrapper (`PageHeader` + texture + `pb-nav`) and now include `BottomNav` so recovery screens aren’t dead ends. (commit e14c286)
