@@ -17,7 +17,6 @@ import {
   AlertCircle,
   Edit2,
   LogOut,
-  ChevronLeft,
   X,
   Save,
 } from 'lucide-react';
@@ -148,40 +147,51 @@ export default function ProfilePage() {
   const displayName = currentUser.nickname || currentUser.firstName;
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-masters/5 via-surface-50 to-surface-100">
-      {/* Header */}
-      <header
-        className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-      >
-        <div className="px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5 text-surface-600" />
-          </button>
-          <h1 className="text-heading-sm font-semibold text-surface-900">My Profile</h1>
-          {!isEditing ? (
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
+      <PageHeader
+        title="Profile"
+        subtitle={isEditing ? 'Editing' : undefined}
+        icon={<User size={16} style={{ color: 'var(--color-accent)' }} />}
+        onBack={() => router.back()}
+        rightSlot={
+          !isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="p-2 -mr-2 rounded-lg hover:bg-surface-100 transition-colors"
+              className="p-2 -mr-2 press-scale"
+              style={{
+                color: 'var(--ink-secondary)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 'var(--radius-md)',
+              }}
+              aria-label="Edit profile"
             >
-              <Edit2 className="w-5 h-5 text-surface-600" />
+              <Edit2 className="w-5 h-5" />
             </button>
           ) : (
             <button
               onClick={handleCancel}
-              className="p-2 -mr-2 rounded-lg hover:bg-surface-100 transition-colors"
+              className="p-2 -mr-2 press-scale"
+              style={{
+                color: 'var(--ink-secondary)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 'var(--radius-md)',
+              }}
+              aria-label="Cancel editing"
             >
-              <X className="w-5 h-5 text-surface-600" />
+              <X className="w-5 h-5" />
             </button>
-          )}
-        </div>
-      </header>
+          )
+        }
+      />
 
-      {/* Main Content */}
-      <main className="px-4 py-6 pb-nav">
+      <main className="container-editorial py-6">
         <div className="max-w-md mx-auto space-y-6">
           {/* Profile Header Card */}
           <Card variant="elevated" className="overflow-hidden">
