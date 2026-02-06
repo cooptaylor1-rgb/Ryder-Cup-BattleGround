@@ -203,7 +203,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ### 22:55 EST — Phase 1 — Live: explicit empty states
 - Live (`/live`): added explicit premium empty states for **No active session** and **No live matches**, each with clear CTAs to Schedule/Matchups.
-- Commit + push ✅ (`ff1070a`)
+- Commit + push ✅ (`ff1070a` + worklog sync `82c0d70`)
 
 ### 23:05 EST — Phase 1 (batch 26)
 - Trip Awards (per-trip) route (`/trip/[tripId]/awards`): upgraded to the standard premium page wrapper and added `BottomNav`.
