@@ -98,3 +98,4 @@ All times America/New_York.
 
 ## 2026-02-07
 - 10:50 — Shipped batch: Captain Carts (`/captain/carts`) now uses the shared `BottomNav` instead of bespoke nav markup. Also replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) with valid arbitrary-value forms (e.g. `text-[var(--ink-tertiary)]`) in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent silent missing styles. (commit 35d80e6)
+- 17:55 — Shipped batch: Phase 1 (batch 109) — Fixed 30+ remaining invalid Tailwind CSS-var syntax across PremiumComponents, QuickPlayerSwap, CourseSetupConfirmation, MatchCardGenerator. Removed 22 unused imports/variables (lint warnings 72→50). Removed 13 unused Augusta-themed legacy colors from Tailwind config. Migrated `magnolia`→`canvas` and `azalea`→`error` across all components/stories/tests, then removed both legacy aliases. Fixed anonymous default export in PremiumComponents. (commit ba72d57)
