@@ -4,31 +4,27 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button } from '@/components/ui';
-import { GolfersIllustration } from '@/components/ui/illustrations';
 import { BottomNav } from '@/components/layout';
 import {
-  User,
   Mail,
   Hash,
   ArrowLeft,
+  ArrowRight,
   Check,
-  ChevronRight,
-  Shirt,
+  ChevronDown,
   Home,
   Lock,
-  Sparkles,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 /**
- * PROFILE CREATION PAGE
+ * PROFILE CREATION PAGE — Fried Egg Editorial
  *
- * Streamlined profile creation - only 3 essential fields required.
- * Additional details can be completed later in Profile settings.
+ * Warm cream canvas, Instrument Serif display type,
+ * generous whitespace, and confident restraint.
  *
- * UX Improvement: Reduced from 14 fields across 3 steps to just 3 essential fields
- * to minimize abandonment risk for participants joining mid-trip.
+ * Two steps:
+ *  - essential: First name, last name, email, PIN (4-digit)
+ *  - optional: Handicap, GHIN, home course, preferred tees, trip prefs
  */
 
 type Step = 'essential' | 'optional';
@@ -203,83 +199,158 @@ export default function CreateProfilePage() {
     }
   };
 
-  const stepTitles = {
-    essential: 'Create Account',
-    optional: 'Optional Details',
-  };
-
   return (
-    <div className="min-h-screen pb-nav bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col texture-grain page-premium-enter">
-      {/* Header */}
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{
+        background: 'var(--canvas)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* ---- HEADER ---- */}
       <header
-        className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: 'var(--canvas)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+        }}
       >
-        <div className="px-4 py-3 flex items-center gap-3">
+        <div
+          className="container-editorial"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            padding: 'var(--space-3) var(--space-5)',
+          }}
+        >
           <button
             onClick={handleBack}
-            className="p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors"
+            className="press-scale"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              marginLeft: '-8px',
+              background: 'none',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer',
+              color: 'var(--ink-secondary)',
+              transition: 'color 0.15s ease',
+            }}
           >
-            <ArrowLeft className="w-5 h-5 text-surface-600" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-heading-sm font-semibold text-surface-900">{stepTitles[step]}</h1>
-            <p className="text-caption text-surface-500">
-              {step === 'essential' ? 'Just 3 fields to get started' : 'Add more details anytime'}
-            </p>
-          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'var(--text-lg)',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: 'var(--ink)',
+              flex: 1,
+            }}
+          >
+            {step === 'essential' ? 'Create Account' : 'Optional Details'}
+          </h1>
         </div>
-
-        {/* Progress Bar */}
-        <div className="h-1 bg-surface-100">
-          <div
-            className="h-full bg-masters transition-all duration-300"
-            style={{ width: step === 'essential' ? '50%' : '100%' }}
-          />
-        </div>
+        {/* Thin bottom rule */}
+        <div style={{ height: '1px', background: 'var(--rule)' }} />
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-4 py-6 pb-32">
-        <div className="max-w-md mx-auto">
-          {/* Essential Fields (Required) */}
+      {/* ---- MAIN CONTENT ---- */}
+      <main
+        className="container-editorial"
+        style={{
+          flex: 1,
+          paddingTop: 'var(--space-8)',
+          paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))',
+        }}
+      >
+        <div style={{ maxWidth: '420px', margin: '0 auto' }}>
+          {/* ============================================
+              STEP 1: ESSENTIAL FIELDS
+              ============================================ */}
           {step === 'essential' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="text-center mb-8">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-masters/10 flex items-center justify-center">
-                    <User className="w-8 h-8 text-masters" />
-                  </div>
-                </div>
-                <h2 className="text-heading-md font-semibold text-surface-900">Quick start</h2>
-                <p className="text-body-sm text-surface-600 mt-1">
-                  Just 3 fields — you can add more later
+            <div>
+              {/* Hero section */}
+              <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+                {/* Overline */}
+                <p
+                  className="type-overline"
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    letterSpacing: '0.15em',
+                    marginBottom: 'var(--space-3)',
+                  }}
+                >
+                  JOIN THE FIELD
+                </p>
+
+                {/* Serif italic headline */}
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(2rem, 8vw, 2.75rem)',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    color: 'var(--ink)',
+                    lineHeight: 1.1,
+                    marginBottom: 'var(--space-3)',
+                  }}
+                >
+                  Create Your Account
+                </h2>
+
+                {/* Subtitle */}
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--ink-secondary)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Three fields to get started — add more later
                 </p>
               </div>
 
-              <div className="space-y-4">
-                {/* Name Row */}
-                <div className="grid grid-cols-2 gap-3">
-                  <InputField
-                    label="First Name"
-                    value={formData.firstName}
-                    onChange={(v) => updateField('firstName', v)}
-                    placeholder="John"
-                    error={validationErrors.firstName}
-                    required
-                    autoFocus
-                  />
-                  <InputField
-                    label="Last Name"
-                    value={formData.lastName}
-                    onChange={(v) => updateField('lastName', v)}
-                    placeholder="Smith"
-                    error={validationErrors.lastName}
-                    required
-                  />
-                </div>
+              {/* Name fields */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 'var(--space-4)',
+                  marginBottom: 'var(--space-5)',
+                }}
+              >
+                <InputField
+                  label="First Name"
+                  value={formData.firstName}
+                  onChange={(v) => updateField('firstName', v)}
+                  placeholder="John"
+                  error={validationErrors.firstName}
+                  required
+                  autoFocus
+                />
+                <InputField
+                  label="Last Name"
+                  value={formData.lastName}
+                  onChange={(v) => updateField('lastName', v)}
+                  placeholder="Smith"
+                  error={validationErrors.lastName}
+                  required
+                />
+              </div>
 
-                {/* Email */}
+              {/* Email */}
+              <div style={{ marginBottom: 'var(--space-5)' }}>
                 <InputField
                   label="Email"
                   value={formData.email}
@@ -291,122 +362,287 @@ export default function CreateProfilePage() {
                   icon={<Mail className="w-5 h-5" />}
                   hint="Used for trip invites"
                 />
+              </div>
 
-                {/* PIN Section */}
-                <div className="pt-4 border-t border-surface-200">
-                  <h3 className="text-label-lg font-semibold text-surface-800 mb-2 flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-surface-500" />
+              {/* PIN Section — separated by a rule */}
+              <div
+                style={{
+                  borderTop: '1px solid var(--rule)',
+                  paddingTop: 'var(--space-6)',
+                  marginTop: 'var(--space-2)',
+                }}
+              >
+                {/* Section heading in serif italic */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    marginBottom: 'var(--space-2)',
+                  }}
+                >
+                  <Lock
+                    className="w-4 h-4"
+                    style={{ color: 'var(--ink-tertiary)' }}
+                  />
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: 'var(--text-lg)',
+                      fontWeight: 400,
+                      fontStyle: 'italic',
+                      color: 'var(--ink)',
+                    }}
+                  >
                     Create Your PIN
                   </h3>
-                  <p className="text-caption text-surface-500 mb-4">
-                    You&apos;ll use this 4-digit PIN to log in
-                  </p>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <InputField
-                      label="4-Digit PIN"
-                      value={formData.pin}
-                      onChange={(v) => updateField('pin', v.replace(/\D/g, '').slice(0, 4))}
-                      placeholder="••••"
-                      error={validationErrors.pin}
-                      required
-                      inputMode="numeric"
-                      maxLength={4}
-                    />
-                    <InputField
-                      label="Confirm PIN"
-                      value={formData.confirmPin}
-                      onChange={(v) => updateField('confirmPin', v.replace(/\D/g, '').slice(0, 4))}
-                      placeholder="••••"
-                      error={validationErrors.confirmPin}
-                      required
-                      inputMode="numeric"
-                      maxLength={4}
-                    />
-                  </div>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--ink-tertiary)',
+                    marginBottom: 'var(--space-5)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  You&apos;ll use this 4-digit PIN to log in
+                </p>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 'var(--space-4)',
+                  }}
+                >
+                  <InputField
+                    label="4-Digit PIN"
+                    value={formData.pin}
+                    onChange={(v) => updateField('pin', v.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="••••"
+                    error={validationErrors.pin}
+                    required
+                    inputMode="numeric"
+                    maxLength={4}
+                  />
+                  <InputField
+                    label="Confirm PIN"
+                    value={formData.confirmPin}
+                    onChange={(v) => updateField('confirmPin', v.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="••••"
+                    error={validationErrors.confirmPin}
+                    required
+                    inputMode="numeric"
+                    maxLength={4}
+                  />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Optional Fields */}
+          {/* ============================================
+              STEP 2: OPTIONAL FIELDS
+              ============================================ */}
           {step === 'optional' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="text-center mb-6">
-                <div className="flex justify-center mb-4">
-                  <GolfersIllustration size="lg" />
-                </div>
-                <h2 className="text-heading-md font-semibold text-surface-900">Almost there!</h2>
-                <p className="text-body-sm text-surface-600 mt-1">
-                  Optional details for better trip experience
+            <div>
+              {/* Hero section */}
+              <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+                <p
+                  className="type-overline"
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    letterSpacing: '0.15em',
+                    marginBottom: 'var(--space-3)',
+                  }}
+                >
+                  ALMOST THERE
+                </p>
+
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(1.75rem, 7vw, 2.5rem)',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    color: 'var(--ink)',
+                    lineHeight: 1.1,
+                    marginBottom: 'var(--space-3)',
+                  }}
+                >
+                  Fine-Tune Your Profile
+                </h2>
+
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-base)',
+                    color: 'var(--ink-secondary)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Optional details for a better trip experience
                 </p>
               </div>
 
-              {/* Golf Info - Collapsible */}
-              <div className="space-y-4">
+              {/* Golf Profile — collapsible section */}
+              <div style={{ marginBottom: 'var(--space-6)' }}>
                 <button
                   type="button"
                   onClick={() => setShowOptionalExpanded(!showOptionalExpanded)}
-                  className="w-full flex items-center justify-between p-4 rounded-xl bg-surface-50 border border-surface-200 hover:bg-surface-100 transition-colors"
+                  className="press-scale"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: 'var(--space-4) var(--space-5)',
+                    background: 'var(--canvas-raised)',
+                    border: '1px solid var(--rule)',
+                    borderRadius: 'var(--radius-lg)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-masters/10 flex items-center justify-center">
-                      <Hash className="w-5 h-5 text-masters" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: 'var(--radius-full)',
+                        background: 'var(--masters-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Hash className="w-5 h-5" style={{ color: 'var(--masters)' }} />
                     </div>
-                    <div className="text-left">
-                      <p className="font-medium text-surface-900">Golf Profile</p>
-                      <p className="text-caption text-surface-500">Handicap, GHIN, home course</p>
+                    <div style={{ textAlign: 'left' }}>
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--text-base)',
+                          fontWeight: 600,
+                          color: 'var(--ink)',
+                        }}
+                      >
+                        Golf Profile
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--ink-tertiary)',
+                        }}
+                      >
+                        Handicap, GHIN, home course
+                      </p>
                     </div>
                   </div>
-                  <ChevronRight
-                    className={cn(
-                      'w-5 h-5 text-surface-400 transition-transform',
-                      showOptionalExpanded && 'rotate-90'
-                    )}
+                  <ChevronDown
+                    className="w-5 h-5"
+                    style={{
+                      color: 'var(--ink-tertiary)',
+                      transition: 'transform 0.2s ease',
+                      transform: showOptionalExpanded ? 'rotate(180deg)' : 'rotate(0)',
+                    }}
                   />
                 </button>
 
+                {/* Expanded golf fields */}
                 {showOptionalExpanded && (
-                  <div className="space-y-4 pl-4 border-l-2 border-masters/20 ml-5 animate-in fade-in slide-in-from-top-2">
-                    <InputField
-                      label="Handicap Index"
-                      value={formData.handicapIndex}
-                      onChange={(v) => updateField('handicapIndex', v)}
-                      placeholder="12.5"
-                      type="number"
-                      icon={<Hash className="w-5 h-5" />}
-                      hint="For fair match pairing"
-                    />
-                    <InputField
-                      label="GHIN Number"
-                      value={formData.ghin}
-                      onChange={(v) => updateField('ghin', v)}
-                      placeholder="1234567"
-                      hint="Optional - for handicap verification"
-                    />
-                    <InputField
-                      label="Home Course"
-                      value={formData.homeCourse}
-                      onChange={(v) => updateField('homeCourse', v)}
-                      placeholder="Augusta National"
-                      icon={<Home className="w-5 h-5" />}
-                    />
-                    <div className="space-y-2">
-                      <label className="block text-label-md text-surface-700 font-medium">
+                  <div
+                    style={{
+                      paddingTop: 'var(--space-5)',
+                      paddingLeft: 'var(--space-5)',
+                      marginLeft: 'var(--space-5)',
+                      borderLeft: '2px solid var(--masters-subtle)',
+                    }}
+                  >
+                    <div style={{ marginBottom: 'var(--space-5)' }}>
+                      <InputField
+                        label="Handicap Index"
+                        value={formData.handicapIndex}
+                        onChange={(v) => updateField('handicapIndex', v)}
+                        placeholder="12.5"
+                        type="number"
+                        icon={<Hash className="w-5 h-5" />}
+                        hint="For fair match pairing"
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: 'var(--space-5)' }}>
+                      <InputField
+                        label="GHIN Number"
+                        value={formData.ghin}
+                        onChange={(v) => updateField('ghin', v)}
+                        placeholder="1234567"
+                        hint="Optional — for handicap verification"
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: 'var(--space-5)' }}>
+                      <InputField
+                        label="Home Course"
+                        value={formData.homeCourse}
+                        onChange={(v) => updateField('homeCourse', v)}
+                        placeholder="Augusta National"
+                        icon={<Home className="w-5 h-5" />}
+                      />
+                    </div>
+
+                    {/* Preferred Tees */}
+                    <div style={{ marginBottom: 'var(--space-2)' }}>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 500,
+                          color: 'var(--ink-secondary)',
+                          marginBottom: 'var(--space-2)',
+                          letterSpacing: '0.02em',
+                        }}
+                      >
                         Preferred Tees
                       </label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr 1fr',
+                          gap: 'var(--space-2)',
+                        }}
+                      >
                         {(['back', 'middle', 'forward'] as const).map((tee) => (
                           <button
                             key={tee}
                             type="button"
                             onClick={() => updateField('preferredTees', tee)}
-                            className={cn(
-                              'py-2.5 px-3 rounded-xl border-2 font-medium capitalize transition-all text-sm',
-                              formData.preferredTees === tee
-                                ? 'border-masters bg-masters/10 text-masters'
-                                : 'border-surface-200 text-surface-600 hover:border-surface-300'
-                            )}
+                            className="press-scale"
+                            style={{
+                              padding: 'var(--space-3) var(--space-3)',
+                              borderRadius: 'var(--radius-md)',
+                              border:
+                                formData.preferredTees === tee
+                                  ? '2px solid var(--masters)'
+                                  : '1px solid var(--rule)',
+                              background:
+                                formData.preferredTees === tee
+                                  ? 'var(--masters-subtle)'
+                                  : 'var(--canvas-raised)',
+                              color:
+                                formData.preferredTees === tee
+                                  ? 'var(--masters)'
+                                  : 'var(--ink-secondary)',
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: formData.preferredTees === tee ? 600 : 500,
+                              textTransform: 'capitalize',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                            }}
                           >
                             {tee}
                           </button>
@@ -415,102 +651,276 @@ export default function CreateProfilePage() {
                     </div>
                   </div>
                 )}
+              </div>
 
-                {/* Trip Preferences - Preview */}
-                <div className="p-4 rounded-xl bg-surface-50 border border-surface-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                      <Shirt className="w-5 h-5 text-orange-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-surface-900">Trip Preferences</p>
-                      <p className="text-caption text-surface-500">
-                        Shirt size, dietary needs, emergency contact
-                      </p>
-                    </div>
-                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-surface-200 text-surface-600">
-                      Later
+              {/* Trip Preferences — teaser card */}
+              <div
+                style={{
+                  padding: 'var(--space-4) var(--space-5)',
+                  background: 'var(--canvas-raised)',
+                  border: '1px solid var(--rule)',
+                  borderRadius: 'var(--radius-lg)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-3)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--gold-subtle)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--gold)',
+                      }}
+                    >
+                      +
                     </span>
                   </div>
-                  <p className="text-caption text-surface-400 mt-2 ml-13">
-                    Complete in your profile settings before the trip
-                  </p>
+                  <div style={{ flex: 1 }}>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-base)',
+                        fontWeight: 600,
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      Trip Preferences
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                      }}
+                    >
+                      Shirt size, dietary needs, emergency contact
+                    </p>
+                  </div>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 600,
+                      padding: 'var(--space-1) var(--space-3)',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--canvas-sunken)',
+                      color: 'var(--ink-tertiary)',
+                    }}
+                  >
+                    Later
+                  </span>
                 </div>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--ink-faint)',
+                    marginTop: 'var(--space-2)',
+                    paddingLeft: 'calc(40px + var(--space-3))',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Complete in your profile settings before the trip
+                </p>
               </div>
             </div>
           )}
 
-          {/* Error Display */}
+          {/* ---- ERROR DISPLAY ---- */}
           {error && (
-            <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200">
-              <p className="text-sm text-red-700">{error}</p>
+            <div
+              style={{
+                marginTop: 'var(--space-6)',
+                padding: 'var(--space-3) var(--space-4)',
+                background: 'rgba(166, 61, 64, 0.08)',
+                border: '1px solid rgba(166, 61, 64, 0.2)',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--error)',
+                }}
+              >
+                {error}
+              </p>
             </div>
           )}
         </div>
       </main>
 
-      {/* Fixed Bottom Actions */}
+      {/* ---- FIXED BOTTOM ACTION BAR ---- */}
       <div
-        className="fixed left-0 right-0 z-40 bg-white border-t border-surface-200 p-4"
-        // Keep BottomNav visible at all times; lift actions above nav height (80px).
         style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          zIndex: 40,
+          background: 'var(--canvas)',
+          borderTop: '1px solid var(--rule)',
+          padding: 'var(--space-4) var(--space-5)',
           bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
-          paddingBottom: '1rem',
         }}
       >
-        <div className="max-w-md mx-auto">
+        <div style={{ maxWidth: '420px', margin: '0 auto' }}>
           {step === 'essential' ? (
-            <div className="space-y-3">
-              <Button
-                variant="primary"
-                size="lg"
+            <div>
+              {/* Primary action: Create Account */}
+              <button
                 onClick={handleSubmit}
                 disabled={isSubmitting || isLoading}
-                className="w-full"
+                className="btn-premium press-scale"
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-4) var(--space-6)',
+                  background:
+                    isSubmitting || isLoading ? 'var(--rule)' : 'var(--masters)',
+                  color: isSubmitting || isLoading ? 'var(--ink-tertiary)' : 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: 600,
+                  cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)',
+                  transition: 'all 0.2s ease',
+                  marginBottom: 'var(--space-3)',
+                }}
               >
                 {isSubmitting || isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <>
+                    <span
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTopColor: 'white',
+                        borderRadius: '50%',
+                        animation: 'spin 0.6s linear infinite',
+                      }}
+                    />
                     Creating...
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <Sparkles className="w-4 h-4" />
+                  <>
                     Create Account
-                  </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
                 )}
-              </Button>
+              </button>
+
+              {/* Secondary: add optional details */}
               <button
                 onClick={handleContinueToOptional}
-                className="w-full py-2 text-sm text-surface-500 hover:text-masters transition-colors"
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-2) 0',
+                  background: 'none',
+                  border: 'none',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--ink-tertiary)',
+                  cursor: 'pointer',
+                  transition: 'color 0.15s ease',
+                }}
               >
-                Add optional details first →
+                Add optional details first &rarr;
               </button>
             </div>
           ) : (
-            <div className="flex gap-3">
-              <Button variant="secondary" size="lg" onClick={handleBack} className="shrink-0">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
+            <div
+              style={{
+                display: 'flex',
+                gap: 'var(--space-3)',
+              }}
+            >
+              {/* Back button */}
+              <button
+                onClick={handleBack}
+                className="press-scale"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '52px',
+                  flexShrink: 0,
+                  padding: 'var(--space-4)',
+                  background: 'var(--canvas-raised)',
+                  border: '1px solid var(--rule)',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  color: 'var(--ink-secondary)',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+
+              {/* Complete Setup button */}
+              <button
                 onClick={handleSubmit}
                 disabled={isSubmitting || isLoading}
-                className="flex-1"
+                className="btn-premium press-scale"
+                style={{
+                  flex: 1,
+                  padding: 'var(--space-4) var(--space-6)',
+                  background:
+                    isSubmitting || isLoading ? 'var(--rule)' : 'var(--masters)',
+                  color: isSubmitting || isLoading ? 'var(--ink-tertiary)' : 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-base)',
+                  fontWeight: 600,
+                  cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 'var(--space-2)',
+                  transition: 'all 0.2s ease',
+                }}
               >
                 {isSubmitting || isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <>
+                    <span
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTopColor: 'white',
+                        borderRadius: '50%',
+                        animation: 'spin 0.6s linear infinite',
+                      }}
+                    />
                     Creating...
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex items-center justify-center gap-2">
+                  <>
                     <Check className="w-4 h-4" />
                     Complete Setup
-                  </span>
+                  </>
                 )}
-              </Button>
+              </button>
             </div>
           )}
         </div>
@@ -522,7 +932,7 @@ export default function CreateProfilePage() {
 }
 
 // ============================================
-// Input Field Component
+// InputField — Fried Egg Editorial Style
 // ============================================
 
 interface InputFieldProps {
@@ -555,14 +965,38 @@ function InputField({
   maxLength,
 }: InputFieldProps) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-label-md text-surface-700 font-medium">
+    <div>
+      <label
+        style={{
+          display: 'block',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          color: 'var(--ink-secondary)',
+          marginBottom: 'var(--space-2)',
+          letterSpacing: '0.02em',
+        }}
+      >
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
+        {required && (
+          <span style={{ color: 'var(--error)', marginLeft: '2px' }}>*</span>
+        )}
       </label>
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400">{icon}</div>
+          <div
+            style={{
+              position: 'absolute',
+              left: '14px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--ink-tertiary)',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {icon}
+          </div>
         )}
         <input
           type={type}
@@ -572,18 +1006,56 @@ function InputField({
           autoFocus={autoFocus}
           inputMode={inputMode}
           maxLength={maxLength}
-          className={cn(
-            'w-full py-3 rounded-xl border bg-white',
-            'text-body-md placeholder:text-surface-400',
-            'focus:outline-none focus:ring-2 focus:ring-masters/30 focus:border-masters',
-            'transition-all duration-200',
-            icon ? 'pl-11 pr-4' : 'px-4',
-            error ? 'border-red-300' : 'border-surface-200'
-          )}
+          style={{
+            width: '100%',
+            padding: icon ? '14px 16px 14px 44px' : '14px 16px',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-base)',
+            color: 'var(--ink)',
+            background: 'var(--canvas-raised)',
+            border: error
+              ? '1px solid var(--error)'
+              : '1px solid var(--rule)',
+            borderRadius: 'var(--radius-md)',
+            outline: 'none',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--masters)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,102,68,0.1)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = error ? 'var(--error)' : 'var(--rule)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       </div>
-      {error && <p className="text-caption text-red-600">{error}</p>}
-      {hint && !error && <p className="text-caption text-surface-500">{hint}</p>}
+      {error && (
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--error)',
+            marginTop: 'var(--space-1)',
+            lineHeight: 1.4,
+          }}
+        >
+          {error}
+        </p>
+      )}
+      {hint && !error && (
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--ink-tertiary)',
+            marginTop: 'var(--space-1)',
+            lineHeight: 1.4,
+          }}
+        >
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

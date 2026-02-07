@@ -4,20 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button, EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { GolfersIllustration } from '@/components/ui/illustrations';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import {
   Hash,
   Phone,
-  ChevronRight,
+  ChevronDown,
   Shirt,
   Home,
+  ArrowLeft,
   ArrowRight,
-  Sparkles,
   User,
   AlertTriangle,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { BottomNav } from '@/components/layout';
 
 /**
@@ -25,6 +23,8 @@ import { BottomNav } from '@/components/layout';
  *
  * Shown after initial account creation to prompt users
  * to add optional profile details like handicap, phone, etc.
+ *
+ * Fried Egg Editorial Design v3.0
  */
 
 const logger = createLogger('profile-complete');
@@ -183,7 +183,7 @@ export default function CompleteProfilePage() {
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
-            title="You’re all set"
+            title="You're all set"
             description="Your profile onboarding is already complete."
             action={{
               label: 'Continue',
@@ -207,311 +207,776 @@ export default function CompleteProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-masters/5 via-surface-50 to-surface-100 flex flex-col">
-      {/* Header */}
+    <div
+      className="page-premium-enter texture-grain"
+      style={{
+        background: 'var(--canvas)',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* ---- HEADER ---- */}
       <header
-        className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-surface-200"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className="header-premium"
+        style={{
+          paddingTop: 'calc(var(--space-3) + env(safe-area-inset-top, 0px))',
+          paddingBottom: 'var(--space-3)',
+          paddingLeft: 'var(--space-5)',
+          paddingRight: 'var(--space-5)',
+        }}
       >
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-heading-sm font-semibold text-surface-900">
-                Complete Your Profile
-              </h1>
-              <p className="text-caption text-surface-500">
-                Welcome, {currentUser.firstName}! Add a few more details.
-              </p>
-            </div>
-            <button
-              onClick={handleSkip}
-              className="text-sm text-surface-500 hover:text-masters transition-colors"
-            >
-              Skip for now
-            </button>
-          </div>
-        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            maxWidth: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          {/* Back button */}
+          <button
+            onClick={() => router.back()}
+            className="press-scale"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 40,
+              height: 40,
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              color: 'var(--ink-secondary)',
+            }}
+            aria-label="Go back"
+          >
+            <ArrowLeft style={{ width: 20, height: 20 }} />
+          </button>
 
-        {/* Progress indicator */}
-        <div className="h-1 bg-surface-100">
-          <div className="h-full bg-masters transition-all duration-300" style={{ width: '66%' }} />
+          {/* Title */}
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontStyle: 'italic',
+              fontSize: 'var(--text-lg)',
+              fontWeight: 400,
+              color: 'var(--ink)',
+              margin: 0,
+            }}
+          >
+            Complete Your Profile
+          </h1>
+
+          {/* Skip link */}
+          <button
+            onClick={handleSkip}
+            className="press-scale"
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 500,
+              color: 'var(--ink-tertiary)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 'var(--space-2)',
+              transition: 'color 200ms',
+            }}
+          >
+            Skip for now
+          </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-4 py-6 pb-32">
-        <div className="max-w-md mx-auto space-y-4">
-          {/* Welcome Message */}
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <GolfersIllustration size="lg" />
-            </div>
-            <h2 className="text-heading-md font-semibold text-surface-900">
-              Let&apos;s get you set up!
+      {/* ---- MAIN CONTENT ---- */}
+      <main
+        style={{
+          flex: 1,
+          paddingBottom: 140,
+        }}
+      >
+        <div className="container-editorial">
+          {/* Welcome / Hero Block */}
+          <div
+            style={{
+              textAlign: 'center',
+              paddingTop: 'var(--space-10)',
+              paddingBottom: 'var(--space-8)',
+            }}
+          >
+            <p
+              className="type-overline"
+              style={{
+                color: 'var(--ink-tertiary)',
+                letterSpacing: '0.15em',
+                marginBottom: 'var(--space-3)',
+              }}
+            >
+              Complete Your Profile
+            </p>
+            <h2
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 'clamp(2rem, 5vw, 2.75rem)',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                lineHeight: 1.1,
+                margin: 0,
+              }}
+            >
+              Almost There
             </h2>
-            <p className="text-body-sm text-surface-600 mt-1">
-              These details help with trip planning and fair match pairing.
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                color: 'var(--ink-secondary)',
+                marginTop: 'var(--space-3)',
+                lineHeight: 1.5,
+              }}
+            >
+              Welcome, {currentUser.firstName}. A few more details help with
+              trip&nbsp;planning and fair match&nbsp;pairing.
             </p>
           </div>
 
-          {/* Golf Info Section */}
-          <div className="rounded-xl border border-surface-200 bg-white overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection('golf')}
-              className="w-full flex items-center justify-between p-4 hover:bg-surface-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-masters/10 flex items-center justify-center">
-                  <Hash className="w-5 h-5 text-masters" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium text-surface-900">Golf Profile</p>
-                  <p className="text-caption text-surface-500">Handicap, GHIN, home course</p>
-                </div>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'w-5 h-5 text-surface-400 transition-transform',
-                  expandedSection === 'golf' && 'rotate-90'
-                )}
-              />
-            </button>
+          {/* Thin rule divider */}
+          <div
+            style={{
+              height: 1,
+              background: 'var(--rule)',
+              marginBottom: 'var(--space-6)',
+            }}
+          />
 
-            {expandedSection === 'golf' && (
-              <div className="px-4 pb-4 space-y-4 border-t border-surface-100 pt-4 animate-in fade-in slide-in-from-top-2">
-                <InputField
-                  label="Handicap Index"
-                  value={formData.handicapIndex}
-                  onChange={(v) => updateField('handicapIndex', v)}
-                  placeholder="12.5"
-                  type="number"
-                  icon={<Hash className="w-5 h-5" />}
-                  hint="For fair match pairing"
-                />
-                <InputField
-                  label="GHIN Number"
-                  value={formData.ghin}
-                  onChange={(v) => updateField('ghin', v)}
-                  placeholder="1234567"
-                  hint="Optional - for handicap verification"
-                />
-                <InputField
-                  label="Home Course"
-                  value={formData.homeCourse}
-                  onChange={(v) => updateField('homeCourse', v)}
-                  placeholder="Augusta National"
-                  icon={<Home className="w-5 h-5" />}
-                />
-                <div className="space-y-2">
-                  <label className="block text-label-md text-surface-700 font-medium">
-                    Preferred Tees
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['back', 'middle', 'forward'] as const).map((tee) => (
-                      <button
-                        key={tee}
-                        type="button"
-                        onClick={() => updateField('preferredTees', tee)}
-                        className={cn(
-                          'py-2.5 px-3 rounded-xl border-2 font-medium capitalize transition-all text-sm',
-                          formData.preferredTees === tee
-                            ? 'border-masters bg-masters/10 text-masters'
-                            : 'border-surface-200 text-surface-600 hover:border-surface-300'
-                        )}
-                      >
-                        {tee}
-                      </button>
-                    ))}
+          {/* ---- ACCORDION SECTIONS ---- */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            {/* ======== GOLF PROFILE ======== */}
+            <div
+              style={{
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => toggleSection('golf')}
+                className="press-scale"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 'var(--space-5) var(--space-6)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--masters-subtle)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Hash style={{ width: 18, height: 18, color: 'var(--masters)' }} />
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontStyle: 'italic',
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--ink)',
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      Golf Profile
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                        margin: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      Handicap, GHIN, home course
+                    </p>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Personal Info Section */}
-          <div className="rounded-xl border border-surface-200 bg-white overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection('personal')}
-              className="w-full flex items-center justify-between p-4 hover:bg-surface-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <User className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium text-surface-900">Personal Details</p>
-                  <p className="text-caption text-surface-500">Nickname, phone number</p>
-                </div>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'w-5 h-5 text-surface-400 transition-transform',
-                  expandedSection === 'personal' && 'rotate-90'
-                )}
-              />
-            </button>
-
-            {expandedSection === 'personal' && (
-              <div className="px-4 pb-4 space-y-4 border-t border-surface-100 pt-4 animate-in fade-in slide-in-from-top-2">
-                <InputField
-                  label="Nickname"
-                  value={formData.nickname}
-                  onChange={(v) => updateField('nickname', v)}
-                  placeholder="Big Hitter"
-                  hint="What your buddies call you"
-                  icon={<User className="w-5 h-5" />}
+                <ChevronDown
+                  style={{
+                    width: 20,
+                    height: 20,
+                    color: 'var(--ink-tertiary)',
+                    transition: 'transform 200ms',
+                    transform: expandedSection === 'golf' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    flexShrink: 0,
+                  }}
                 />
-                <InputField
-                  label="Phone Number"
-                  value={formData.phoneNumber}
-                  onChange={(v) => updateField('phoneNumber', v)}
-                  placeholder="(555) 123-4567"
-                  type="tel"
-                  icon={<Phone className="w-5 h-5" />}
-                  hint="For trip coordination"
-                />
-              </div>
-            )}
-          </div>
+              </button>
 
-          {/* Trip Preferences Section */}
-          <div className="rounded-xl border border-surface-200 bg-white overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection('trip')}
-              className="w-full flex items-center justify-between p-4 hover:bg-surface-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Shirt className="w-5 h-5 text-orange-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium text-surface-900">Trip Preferences</p>
-                  <p className="text-caption text-surface-500">Shirt size, dietary needs</p>
-                </div>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'w-5 h-5 text-surface-400 transition-transform',
-                  expandedSection === 'trip' && 'rotate-90'
-                )}
-              />
-            </button>
+              {expandedSection === 'golf' && (
+                <div
+                  style={{
+                    padding: '0 var(--space-6) var(--space-6)',
+                    borderTop: '1px solid var(--rule-faint)',
+                    paddingTop: 'var(--space-5)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-5)',
+                  }}
+                >
+                  <InputField
+                    label="Handicap Index"
+                    value={formData.handicapIndex}
+                    onChange={(v) => updateField('handicapIndex', v)}
+                    placeholder="12.5"
+                    type="number"
+                    icon={<Hash style={{ width: 18, height: 18 }} />}
+                    hint="For fair match pairing"
+                  />
+                  <InputField
+                    label="GHIN Number"
+                    value={formData.ghin}
+                    onChange={(v) => updateField('ghin', v)}
+                    placeholder="1234567"
+                    hint="Optional — for handicap verification"
+                  />
+                  <InputField
+                    label="Home Course"
+                    value={formData.homeCourse}
+                    onChange={(v) => updateField('homeCourse', v)}
+                    placeholder="Augusta National"
+                    icon={<Home style={{ width: 18, height: 18 }} />}
+                  />
 
-            {expandedSection === 'trip' && (
-              <div className="px-4 pb-4 space-y-4 border-t border-surface-100 pt-4 animate-in fade-in slide-in-from-top-2">
-                <div className="space-y-2">
-                  <label className="block text-label-md text-surface-700 font-medium">
-                    Shirt Size
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {(['S', 'M', 'L', 'XL', '2XL', '3XL'] as const).map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => updateField('shirtSize', size)}
-                        className={cn(
-                          'py-2.5 px-3 rounded-xl border-2 font-medium transition-all text-sm',
-                          formData.shirtSize === size
-                            ? 'border-orange-500 bg-orange-50 text-orange-600'
-                            : 'border-surface-200 text-surface-600 hover:border-surface-300'
-                        )}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                  {/* Preferred Tees — option chips */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 600,
+                        color: 'var(--ink-secondary)',
+                        marginBottom: 'var(--space-2)',
+                      }}
+                    >
+                      Preferred Tees
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-2)' }}>
+                      {(['back', 'middle', 'forward'] as const).map((tee) => (
+                        <button
+                          key={tee}
+                          type="button"
+                          onClick={() => updateField('preferredTees', tee)}
+                          className="press-scale"
+                          style={{
+                            padding: 'var(--space-3) var(--space-4)',
+                            borderRadius: 'var(--radius-md)',
+                            border:
+                              formData.preferredTees === tee
+                                ? '2px solid var(--masters)'
+                                : '1px solid var(--rule)',
+                            background:
+                              formData.preferredTees === tee
+                                ? 'var(--masters-subtle)'
+                                : 'var(--canvas-raised)',
+                            color:
+                              formData.preferredTees === tee
+                                ? 'var(--masters)'
+                                : 'var(--ink-secondary)',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 600,
+                            textTransform: 'capitalize',
+                            cursor: 'pointer',
+                            transition: 'all 150ms',
+                          }}
+                        >
+                          {tee}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <InputField
-                  label="Dietary Restrictions"
-                  value={formData.dietaryRestrictions}
-                  onChange={(v) => updateField('dietaryRestrictions', v)}
-                  placeholder="Vegetarian, gluten-free, etc."
-                  hint="For meal planning"
-                />
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Emergency Contact Section */}
-          <div className="rounded-xl border border-surface-200 bg-white overflow-hidden">
-            <button
-              type="button"
-              onClick={() => toggleSection('emergency')}
-              className="w-full flex items-center justify-between p-4 hover:bg-surface-50 transition-colors"
+            {/* ======== PERSONAL DETAILS ======== */}
+            <div
+              style={{
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+              }}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+              <button
+                type="button"
+                onClick={() => toggleSection('personal')}
+                className="press-scale"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 'var(--space-5) var(--space-6)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--gold-subtle)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <User style={{ width: 18, height: 18, color: 'var(--gold-dark)' }} />
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontStyle: 'italic',
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--ink)',
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      Personal Details
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                        margin: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      Nickname, phone number
+                    </p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="font-medium text-surface-900">Emergency Contact</p>
-                  <p className="text-caption text-surface-500">In case of emergency</p>
-                </div>
-              </div>
-              <ChevronRight
-                className={cn(
-                  'w-5 h-5 text-surface-400 transition-transform',
-                  expandedSection === 'emergency' && 'rotate-90'
-                )}
-              />
-            </button>
+                <ChevronDown
+                  style={{
+                    width: 20,
+                    height: 20,
+                    color: 'var(--ink-tertiary)',
+                    transition: 'transform 200ms',
+                    transform: expandedSection === 'personal' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    flexShrink: 0,
+                  }}
+                />
+              </button>
 
-            {expandedSection === 'emergency' && (
-              <div className="px-4 pb-4 space-y-4 border-t border-surface-100 pt-4 animate-in fade-in slide-in-from-top-2">
-                <InputField
-                  label="Contact Name"
-                  value={formData.emergencyContactName}
-                  onChange={(v) => updateField('emergencyContactName', v)}
-                  placeholder="Jane Doe"
+              {expandedSection === 'personal' && (
+                <div
+                  style={{
+                    padding: '0 var(--space-6) var(--space-6)',
+                    borderTop: '1px solid var(--rule-faint)',
+                    paddingTop: 'var(--space-5)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-5)',
+                  }}
+                >
+                  <InputField
+                    label="Nickname"
+                    value={formData.nickname}
+                    onChange={(v) => updateField('nickname', v)}
+                    placeholder="Big Hitter"
+                    hint="What your buddies call you"
+                    icon={<User style={{ width: 18, height: 18 }} />}
+                  />
+                  <InputField
+                    label="Phone Number"
+                    value={formData.phoneNumber}
+                    onChange={(v) => updateField('phoneNumber', v)}
+                    placeholder="(555) 123-4567"
+                    type="tel"
+                    icon={<Phone style={{ width: 18, height: 18 }} />}
+                    hint="For trip coordination"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* ======== TRIP PREFERENCES ======== */}
+            <div
+              style={{
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => toggleSection('trip')}
+                className="press-scale"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 'var(--space-5) var(--space-6)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--maroon-subtle)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Shirt style={{ width: 18, height: 18, color: 'var(--maroon)' }} />
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontStyle: 'italic',
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--ink)',
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      Trip Preferences
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                        margin: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      Shirt size, dietary needs
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown
+                  style={{
+                    width: 20,
+                    height: 20,
+                    color: 'var(--ink-tertiary)',
+                    transition: 'transform 200ms',
+                    transform: expandedSection === 'trip' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    flexShrink: 0,
+                  }}
                 />
-                <InputField
-                  label="Contact Phone"
-                  value={formData.emergencyContactPhone}
-                  onChange={(v) => updateField('emergencyContactPhone', v)}
-                  placeholder="(555) 123-4567"
-                  type="tel"
+              </button>
+
+              {expandedSection === 'trip' && (
+                <div
+                  style={{
+                    padding: '0 var(--space-6) var(--space-6)',
+                    borderTop: '1px solid var(--rule-faint)',
+                    paddingTop: 'var(--space-5)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-5)',
+                  }}
+                >
+                  {/* Shirt Size — option chips */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 600,
+                        color: 'var(--ink-secondary)',
+                        marginBottom: 'var(--space-2)',
+                      }}
+                    >
+                      Shirt Size
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-2)' }}>
+                      {(['S', 'M', 'L', 'XL', '2XL', '3XL'] as const).map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => updateField('shirtSize', size)}
+                          className="press-scale"
+                          style={{
+                            padding: 'var(--space-3) var(--space-2)',
+                            borderRadius: 'var(--radius-md)',
+                            border:
+                              formData.shirtSize === size
+                                ? '2px solid var(--masters)'
+                                : '1px solid var(--rule)',
+                            background:
+                              formData.shirtSize === size
+                                ? 'var(--masters-subtle)'
+                                : 'var(--canvas-raised)',
+                            color:
+                              formData.shirtSize === size
+                                ? 'var(--masters)'
+                                : 'var(--ink-secondary)',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 150ms',
+                          }}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <InputField
+                    label="Dietary Restrictions"
+                    value={formData.dietaryRestrictions}
+                    onChange={(v) => updateField('dietaryRestrictions', v)}
+                    placeholder="Vegetarian, gluten-free, etc."
+                    hint="For meal planning"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* ======== EMERGENCY CONTACT ======== */}
+            <div
+              style={{
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => toggleSection('emergency')}
+                className="press-scale"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 'var(--space-5) var(--space-6)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 'var(--radius-full)',
+                      background: 'rgba(166, 61, 64, 0.08)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <AlertTriangle style={{ width: 18, height: 18, color: 'var(--error)' }} />
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-serif)',
+                        fontStyle: 'italic',
+                        fontSize: 'var(--text-lg)',
+                        color: 'var(--ink)',
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      Emergency Contact
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                        margin: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      In case of emergency
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown
+                  style={{
+                    width: 20,
+                    height: 20,
+                    color: 'var(--ink-tertiary)',
+                    transition: 'transform 200ms',
+                    transform: expandedSection === 'emergency' ? 'rotate(180deg)' : 'rotate(0deg)',
+                    flexShrink: 0,
+                  }}
                 />
-                <InputField
-                  label="Relationship"
-                  value={formData.emergencyContactRelationship}
-                  onChange={(v) => updateField('emergencyContactRelationship', v)}
-                  placeholder="Spouse, Parent, etc."
-                />
-              </div>
-            )}
+              </button>
+
+              {expandedSection === 'emergency' && (
+                <div
+                  style={{
+                    padding: '0 var(--space-6) var(--space-6)',
+                    borderTop: '1px solid var(--rule-faint)',
+                    paddingTop: 'var(--space-5)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-5)',
+                  }}
+                >
+                  <InputField
+                    label="Contact Name"
+                    value={formData.emergencyContactName}
+                    onChange={(v) => updateField('emergencyContactName', v)}
+                    placeholder="Jane Doe"
+                  />
+                  <InputField
+                    label="Contact Phone"
+                    value={formData.emergencyContactPhone}
+                    onChange={(v) => updateField('emergencyContactPhone', v)}
+                    placeholder="(555) 123-4567"
+                    type="tel"
+                  />
+                  <InputField
+                    label="Relationship"
+                    value={formData.emergencyContactRelationship}
+                    onChange={(v) => updateField('emergencyContactRelationship', v)}
+                    placeholder="Spouse, Parent, etc."
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Fixed Bottom Actions */}
+      {/* ---- FIXED BOTTOM BAR ---- */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-surface-200 p-4"
-        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: 'var(--canvas)',
+          borderTop: '1px solid var(--rule)',
+          padding: 'var(--space-4) var(--space-5)',
+          paddingBottom: 'max(var(--space-4), env(safe-area-inset-bottom))',
+          zIndex: 30,
+        }}
       >
-        <div className="max-w-md mx-auto">
-          <Button
-            variant="primary"
-            size="lg"
+        <div
+          style={{
+            maxWidth: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+          }}
+        >
+          <button
             onClick={handleSaveAndContinue}
             disabled={isSubmitting || isLoading}
-            className="w-full"
+            className="btn-premium press-scale"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-4) var(--space-6)',
+              fontSize: 'var(--text-base)',
+              opacity: isSubmitting || isLoading ? 0.6 : 1,
+              cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {isSubmitting || isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <>
+                <span
+                  style={{
+                    width: 16,
+                    height: 16,
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: 'var(--radius-full)',
+                    animation: 'spin 0.6s linear infinite',
+                    display: 'inline-block',
+                  }}
+                />
                 Saving...
-              </span>
+              </>
             ) : (
-              <span className="flex items-center justify-center gap-2">
-                <Sparkles className="w-4 h-4" />
+              <>
                 Save &amp; Continue
-                <ArrowRight className="w-4 h-4" />
-              </span>
+                <ArrowRight style={{ width: 16, height: 16 }} />
+              </>
             )}
-          </Button>
+          </button>
+
+          <button
+            onClick={handleSkip}
+            className="press-scale"
+            style={{
+              width: '100%',
+              padding: 'var(--space-2)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 500,
+              color: 'var(--ink-tertiary)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'color 200ms',
+            }}
+          >
+            Skip for now
+          </button>
         </div>
       </div>
     </div>
@@ -519,7 +984,7 @@ export default function CompleteProfilePage() {
 }
 
 // ============================================
-// Input Field Component
+// Input Field Component — Fried Egg Editorial
 // ============================================
 
 interface InputFieldProps {
@@ -542,27 +1007,79 @@ function InputField({
   icon,
 }: InputFieldProps) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-label-md text-surface-700 font-medium">{label}</label>
-      <div className="relative">
+    <div>
+      <label
+        style={{
+          display: 'block',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 600,
+          color: 'var(--ink-secondary)',
+          marginBottom: 'var(--space-2)',
+        }}
+      >
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400">{icon}</div>
+          <div
+            style={{
+              position: 'absolute',
+              left: 'var(--space-3)',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--ink-tertiary)',
+              display: 'flex',
+              alignItems: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            {icon}
+          </div>
         )}
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={cn(
-            'w-full py-3 rounded-xl border bg-white',
-            'text-body-md placeholder:text-surface-400',
-            'focus:outline-none focus:ring-2 focus:ring-masters/30 focus:border-masters',
-            'transition-all duration-200 border-surface-200',
-            icon ? 'pl-11 pr-4' : 'px-4'
-          )}
+          style={{
+            width: '100%',
+            padding: icon
+              ? 'var(--space-3) var(--space-4) var(--space-3) calc(var(--space-3) + 30px)'
+              : 'var(--space-3) var(--space-4)',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-base)',
+            color: 'var(--ink)',
+            background: 'var(--canvas-raised)',
+            border: '1px solid var(--rule)',
+            borderRadius: 'var(--radius-md)',
+            outline: 'none',
+            transition: 'border-color 200ms, box-shadow 200ms',
+            boxSizing: 'border-box',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--masters)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 68, 0.08)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--rule)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       </div>
-      {hint && <p className="text-caption text-surface-500">{hint}</p>}
+      {hint && (
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--ink-tertiary)',
+            margin: 0,
+            marginTop: 'var(--space-1)',
+          }}
+        >
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
