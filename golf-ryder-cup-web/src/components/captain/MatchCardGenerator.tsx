@@ -487,7 +487,7 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
                             }}
                             className={cn(
                                 'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                                currentIndex === idx && 'ring-2 ring-(--masters)',
+                                currentIndex === idx && 'ring-2 ring-[var(--masters)]',
                                 selectedCards.has(match.id) && 'bg-white/10'
                             )}
                             style={{

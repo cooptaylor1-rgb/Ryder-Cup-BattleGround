@@ -139,8 +139,8 @@ export function PremiumLiveMatchBanner({
                                     className={cn(
                                         'font-semibold',
                                         closestMatch.teamAUp
-                                            ? 'text-(--team-usa)'
-                                            : 'text-(--team-europe)'
+                                            ? 'text-[var(--team-usa)]'
+                                            : 'text-[var(--team-europe)]'
                                     )}
                                 >
                                     {closestMatch.score}
@@ -350,8 +350,8 @@ export function AnimatedScore({
     }[size];
 
     const teamColor = {
-        usa: 'text-(--team-usa)',
-        europe: 'text-(--team-europe)',
+        usa: 'text-[var(--team-usa)]',
+        europe: 'text-[var(--team-europe)]',
         neutral: 'text-ink',
     }[team];
 
@@ -433,7 +433,7 @@ export function PremiumStandingsCard({
                 <div className="flex items-center justify-center gap-8">
                     {/* Team A */}
                     <div className="text-center">
-                        <div className="w-4 h-4 rounded-full bg-(--team-usa) mx-auto mb-2 shadow-md" />
+                        <div className="w-4 h-4 rounded-full bg-[var(--team-usa)] mx-auto mb-2 shadow-md" />
                         <p className="type-overline mb-2">{teamAName}</p>
                         <AnimatedScore
                             value={teamAPoints}
@@ -464,7 +464,7 @@ export function PremiumStandingsCard({
 
                     {/* Team B */}
                     <div className="text-center">
-                        <div className="w-4 h-4 rounded-full bg-(--team-europe) mx-auto mb-2 shadow-md" />
+                        <div className="w-4 h-4 rounded-full bg-[var(--team-europe)] mx-auto mb-2 shadow-md" />
                         <p className="type-overline mb-2">{teamBName}</p>
                         <AnimatedScore
                             value={teamBPoints}
@@ -494,12 +494,12 @@ export function PremiumStandingsCard({
             {/* Magic Number Section */}
             <div className="border-t border-rule p-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-4 h-4 text-(--masters)" />
+                    <Target className="w-4 h-4 text-[var(--masters)]" />
                     <span className="type-caption font-semibold">Points to Clinch</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 rounded-xl bg-(--team-usa)/5 border border-(--team-usa)/10">
-                        <p className="text-2xl font-bold text-(--team-usa)">
+                    <div className="text-center p-3 rounded-xl bg-[color:var(--team-usa)]/ border border-[color:var(--team-usa)]/">
+                        <p className="text-2xl font-bold text-[var(--team-usa)]">
                             {teamAClinched ? (
                                 <span className="text-green-600">✓</span>
                             ) : (
@@ -510,8 +510,8 @@ export function PremiumStandingsCard({
                             {teamAClinched ? 'Clinched!' : `${teamAName} needs`}
                         </p>
                     </div>
-                    <div className="text-center p-3 rounded-xl bg-(--team-europe)/5 border border-(--team-europe)/10">
-                        <p className="text-2xl font-bold text-(--team-europe)">
+                    <div className="text-center p-3 rounded-xl bg-[color:var(--team-europe)]/ border border-[color:var(--team-europe)]/">
+                        <p className="text-2xl font-bold text-[var(--team-europe)]">
                             {teamBClinched ? (
                                 <span className="text-green-600">✓</span>
                             ) : (
@@ -604,13 +604,13 @@ export function PremiumMatchCard({
                     className={cn(
                         'flex-1 p-3 rounded-lg border-l-4',
                         leader === 'teamA'
-                            ? 'bg-(--team-usa)/10 border-(--team-usa)'
-                            : 'bg-canvas-sunken/50 border-(--team-usa)/30'
+                            ? 'bg-[color:var(--team-usa)]/ border-[var(--team-usa)]'
+                            : 'bg-canvas-sunken/50 border-[color:var(--team-usa)]/'
                     )}
                 >
                     <div className="flex items-center gap-1.5 mb-1.5">
-                        <Circle className="w-2 h-2 fill-(--team-usa) text-(--team-usa)" />
-                        <span className="type-micro font-semibold text-(--team-usa)">USA</span>
+                        <Circle className="w-2 h-2 fill-[var(--team-usa)] text-[var(--team-usa)]" />
+                        <span className="type-micro font-semibold text-[var(--team-usa)]">USA</span>
                     </div>
                     <div className="space-y-0.5">
                         {teamAPlayers.map((player, i) => (
@@ -626,8 +626,8 @@ export function PremiumMatchCard({
                     <span
                         className={cn(
                             'text-2xl font-bold tabular-nums',
-                            leader === 'teamA' && 'text-(--team-usa)',
-                            leader === 'teamB' && 'text-(--team-europe)',
+                            leader === 'teamA' && 'text-[var(--team-usa)]',
+                            leader === 'teamB' && 'text-[var(--team-europe)]',
                             !leader && 'text-ink-secondary'
                         )}
                     >
@@ -645,13 +645,13 @@ export function PremiumMatchCard({
                     className={cn(
                         'flex-1 p-3 rounded-lg border-r-4 text-right',
                         leader === 'teamB'
-                            ? 'bg-(--team-europe)/10 border-(--team-europe)'
-                            : 'bg-canvas-sunken/50 border-(--team-europe)/30'
+                            ? 'bg-[color:var(--team-europe)]/ border-[var(--team-europe)]'
+                            : 'bg-canvas-sunken/50 border-[color:var(--team-europe)]/'
                     )}
                 >
                     <div className="flex items-center justify-end gap-1.5 mb-1.5">
-                        <span className="type-micro font-semibold text-(--team-europe)">EUR</span>
-                        <Circle className="w-2 h-2 fill-(--team-europe) text-(--team-europe)" />
+                        <span className="type-micro font-semibold text-[var(--team-europe)]">EUR</span>
+                        <Circle className="w-2 h-2 fill-[var(--team-europe)] text-[var(--team-europe)]" />
                     </div>
                     <div className="space-y-0.5">
                         {teamBPlayers.map((player, i) => (
@@ -737,7 +737,7 @@ export function PremiumSectionHeader({
         <div className={cn('flex items-center justify-between mb-4', className)}>
             <div className="flex items-center gap-3">
                 {icon && (
-                    <div className="w-10 h-10 rounded-xl bg-(--masters)/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-[color:var(--masters)]/ flex items-center justify-center">
                         {icon}
                     </div>
                 )}
@@ -749,7 +749,7 @@ export function PremiumSectionHeader({
             {action && (
                 <button
                     onClick={action.onClick}
-                    className="type-caption font-medium text-(--masters) hover:text-(--masters-hover) transition-colors flex items-center gap-1"
+                    className="type-caption font-medium text-[var(--masters)] hover:text-[var(--masters-hover)] transition-colors flex items-center gap-1"
                 >
                     {action.label}
                     <ChevronRight className="w-4 h-4" />

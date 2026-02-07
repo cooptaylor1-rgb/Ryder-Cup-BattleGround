@@ -546,7 +546,7 @@ export function QuickPlayerSwap({
                                                 onClick={() => setReason(r.label)}
                                                 className={cn(
                                                     'p-2 rounded-lg flex items-center gap-2 text-sm transition-colors',
-                                                    reason === r.label ? 'ring-2 ring-(--masters)' : ''
+                                                    reason === r.label ? 'ring-2 ring-[var(--masters)]' : ''
                                                 )}
                                                 style={{
                                                     background: reason === r.label ? 'var(--masters-muted)' : 'var(--surface)',
