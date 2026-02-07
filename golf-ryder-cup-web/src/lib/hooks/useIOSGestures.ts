@@ -264,8 +264,6 @@ export function useSwipeGesture(
 
       const dx = lastX.current - startX.current;
       const dy = lastY.current - startY.current;
-      const _duration = performance.now() - startTime.current; // Prefixed as intentionally unused
-
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
       const velocity = Math.sqrt(gestureState.velocityX ** 2 + gestureState.velocityY ** 2);

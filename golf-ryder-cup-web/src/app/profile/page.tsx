@@ -5,22 +5,19 @@ import { useRouter } from 'next/navigation';
 import NextImage from 'next/image';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { Button, Card, CardContent, EmptyStatePremium, Skeleton } from '@/components/ui';
-import { GolfersIllustration } from '@/components/ui/illustrations';
+import { EmptyStatePremium, Skeleton } from '@/components/ui';
 import {
   User,
   Mail,
   Phone,
   Hash,
   Home,
-  Shirt,
   AlertCircle,
   Edit2,
   LogOut,
   X,
   Save,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
@@ -113,30 +110,62 @@ export default function ProfilePage() {
       >
         <PageHeader
           title="Profile"
-          subtitle={isAuthenticated ? 'Loading your profile…' : undefined}
+          subtitle={isAuthenticated ? 'Loading your profile\u2026' : undefined}
           icon={<User size={16} style={{ color: 'var(--color-accent)' }} />}
           onBack={() => router.push('/more')}
         />
-        <main className="container-editorial py-6">
-          <div className="max-w-md mx-auto space-y-6">
-            {/* Profile Header Skeleton */}
-            <Card variant="elevated" className="overflow-hidden">
-              <div className="bg-linear-to-br from-masters/20 to-masters/5 p-6 text-center">
-                <Skeleton className="w-24 h-24 rounded-full mx-auto mb-4" />
-                <Skeleton className="h-6 w-40 mx-auto mb-2" />
-                <Skeleton className="h-4 w-24 mx-auto mb-3" />
-                <Skeleton className="h-10 w-32 mx-auto rounded-full" />
+        <main className="container-editorial" style={{ paddingTop: 'var(--space-6)' }}>
+          <div style={{ maxWidth: '28rem', marginLeft: 'auto', marginRight: 'auto' }}>
+            {/* Profile Hero Skeleton */}
+            <div
+              style={{
+                background: 'var(--canvas-raised)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-lg)',
+                overflow: 'hidden',
+                marginBottom: 'var(--space-6)',
+              }}
+            >
+              <div
+                style={{
+                  background: 'linear-gradient(to bottom, var(--canvas), var(--canvas-sunken))',
+                  padding: 'var(--space-8) var(--space-6)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <Skeleton className="w-[5.5rem] h-[5.5rem] rounded-full mb-4" />
+                <Skeleton className="h-6 w-40 rounded mb-2" />
+                <Skeleton className="h-4 w-24 rounded mb-4" />
+                <Skeleton className="h-10 w-20 rounded" />
               </div>
-            </Card>
-            {/* Form Section Skeletons */}
-            <Card variant="default">
-              <CardContent className="p-4 space-y-4">
-                <Skeleton className="h-5 w-24" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </CardContent>
-            </Card>
+            </div>
+
+            {/* Section Skeletons */}
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'var(--canvas-raised)',
+                  border: '1px solid var(--rule)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'var(--space-6)',
+                  marginBottom: 'var(--space-6)',
+                }}
+              >
+                <Skeleton className="h-3 w-16 rounded-sm mb-2" />
+                <Skeleton className="h-5 w-32 rounded mb-6" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+                  {[1, 2, 3].map((j) => (
+                    <div key={j}>
+                      <Skeleton className="h-2.5 w-20 rounded-sm mb-2" />
+                      <Skeleton className="h-4 w-full rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </main>
         <BottomNav />
@@ -145,6 +174,7 @@ export default function ProfilePage() {
   }
 
   const displayName = currentUser.nickname || currentUser.firstName;
+  const initials = `${currentUser.firstName?.[0] || '?'}${currentUser.lastName?.[0] || '?'}`;
 
   return (
     <div
@@ -160,8 +190,10 @@ export default function ProfilePage() {
           !isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="p-2 -mr-2 press-scale"
+              className="press-scale"
               style={{
+                padding: 'var(--space-2)',
+                marginRight: '-0.5rem',
                 color: 'var(--ink-secondary)',
                 background: 'transparent',
                 border: 'none',
@@ -170,13 +202,15 @@ export default function ProfilePage() {
               }}
               aria-label="Edit profile"
             >
-              <Edit2 className="w-5 h-5" />
+              <Edit2 style={{ width: '1.25rem', height: '1.25rem' }} />
             </button>
           ) : (
             <button
               onClick={handleCancel}
-              className="p-2 -mr-2 press-scale"
+              className="press-scale"
               style={{
+                padding: 'var(--space-2)',
+                marginRight: '-0.5rem',
                 color: 'var(--ink-secondary)',
                 background: 'transparent',
                 border: 'none',
@@ -185,334 +219,702 @@ export default function ProfilePage() {
               }}
               aria-label="Cancel editing"
             >
-              <X className="w-5 h-5" />
+              <X style={{ width: '1.25rem', height: '1.25rem' }} />
             </button>
           )
         }
       />
 
-      <main className="container-editorial py-6">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Profile Header Card */}
-          <Card variant="elevated" className="overflow-hidden">
-            <div className="bg-linear-to-br from-masters/20 to-masters/5 p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-white mx-auto mb-4 flex items-center justify-center shadow-md overflow-hidden">
+      <main className="container-editorial" style={{ paddingTop: 'var(--space-6)' }}>
+        <div style={{ maxWidth: '28rem', marginLeft: 'auto', marginRight: 'auto' }}>
+          {/* ============================
+              PROFILE HERO CARD
+              ============================ */}
+          <div
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--radius-lg)',
+              overflow: 'hidden',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <div
+              style={{
+                background: 'linear-gradient(to bottom, var(--canvas), var(--canvas-sunken))',
+                padding: 'var(--space-10) var(--space-6) var(--space-8)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+              }}
+            >
+              {/* Avatar */}
+              <div
+                style={{
+                  width: '5.5rem',
+                  height: '5.5rem',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--canvas-raised)',
+                  border: '2px solid var(--rule)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 'var(--space-4)',
+                  boxShadow: 'var(--shadow-md)',
+                  overflow: 'hidden',
+                }}
+              >
                 {currentUser.avatarUrl ? (
                   <NextImage
                     src={currentUser.avatarUrl}
                     alt={displayName}
-                    width={96}
-                    height={96}
-                    className="w-full h-full object-cover"
+                    width={88}
+                    height={88}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     unoptimized
                   />
                 ) : (
-                  <span className="text-4xl font-bold text-masters">
-                    {currentUser.firstName?.[0] || '?'}
-                    {currentUser.lastName?.[0] || '?'}
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: 'clamp(1.75rem, 5vw, 2.25rem)',
+                      fontStyle: 'italic',
+                      color: 'var(--masters)',
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    {initials}
                   </span>
                 )}
               </div>
-              <h2 className="text-heading-md font-semibold text-surface-900">
+
+              {/* Name */}
+              <h2
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'clamp(1.5rem, 5vw, 1.75rem)',
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                }}
+              >
                 {currentUser.firstName} {currentUser.lastName}
               </h2>
+
+              {/* Nickname */}
               {currentUser.nickname && (
-                <p className="text-body-md text-surface-600">
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--ink-tertiary)',
+                    marginTop: 'var(--space-1)',
+                    margin: 0,
+                    paddingTop: 'var(--space-1)',
+                  }}
+                >
                   &ldquo;{currentUser.nickname}&rdquo;
                 </p>
               )}
-              <div className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm">
-                <Hash className="w-4 h-4 text-masters" />
-                <span className="text-heading-sm font-bold text-masters">
-                  {currentUser.handicapIndex?.toFixed(1) || '—'}
+
+              {/* Handicap Badge */}
+              <div
+                style={{
+                  marginTop: 'var(--space-5)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 'var(--space-1)',
+                }}
+              >
+                <span
+                  className="type-overline"
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    letterSpacing: '0.15em',
+                  }}
+                >
+                  Handicap
                 </span>
-                <span className="text-caption text-surface-600">handicap</span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(2rem, 6vw, 2.5rem)',
+                    fontWeight: 400,
+                    color: 'var(--masters)',
+                    lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {currentUser.handicapIndex?.toFixed(1) || '\u2014'}
+                </span>
               </div>
             </div>
-          </Card>
+          </div>
 
-          {/* Basic Info Section */}
-          <Card variant="default">
-            <CardContent className="p-4">
-              <h3 className="text-label-lg font-semibold text-surface-800 mb-4 flex items-center gap-2">
-                <User className="w-4 h-4 text-surface-500" />
-                Basic Info
-              </h3>
+          {/* ============================
+              BASIC INFO SECTION
+              ============================ */}
+          <section
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <span
+              className="type-overline"
+              style={{
+                color: 'var(--ink-tertiary)',
+                letterSpacing: '0.15em',
+                display: 'block',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              Personal
+            </span>
+            <h3
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'var(--text-xl)',
+                fontStyle: 'italic',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                margin: 0,
+                marginBottom: 'var(--space-6)',
+                lineHeight: 1.2,
+              }}
+            >
+              Basic Info
+            </h3>
 
-              <div className="space-y-4">
-                <ProfileField
-                  icon={<User className="w-4 h-4" />}
-                  label="First Name"
-                  value={formData.firstName || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, firstName: v }))}
-                />
-                <ProfileField
-                  icon={<User className="w-4 h-4" />}
-                  label="Last Name"
-                  value={formData.lastName || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, lastName: v }))}
-                />
-                <ProfileField
-                  icon={<User className="w-4 h-4" />}
-                  label="Nickname"
-                  value={formData.nickname || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, nickname: v }))}
-                />
-                <ProfileField
-                  icon={<Mail className="w-4 h-4" />}
-                  label="Email"
-                  value={formData.email || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, email: v }))}
-                  type="email"
-                />
-                <ProfileField
-                  icon={<Phone className="w-4 h-4" />}
-                  label="Phone"
-                  value={formData.phoneNumber || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, phoneNumber: v }))}
-                  type="tel"
-                />
-              </div>
-            </CardContent>
-          </Card>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <ProfileField
+                icon={<User style={{ width: '1rem', height: '1rem' }} />}
+                label="First Name"
+                value={formData.firstName || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, firstName: v }))}
+              />
+              <ProfileField
+                icon={<User style={{ width: '1rem', height: '1rem' }} />}
+                label="Last Name"
+                value={formData.lastName || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, lastName: v }))}
+              />
+              <ProfileField
+                icon={<User style={{ width: '1rem', height: '1rem' }} />}
+                label="Nickname"
+                value={formData.nickname || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, nickname: v }))}
+              />
+              <ProfileField
+                icon={<Mail style={{ width: '1rem', height: '1rem' }} />}
+                label="Email"
+                value={formData.email || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, email: v }))}
+                type="email"
+              />
+              <ProfileField
+                icon={<Phone style={{ width: '1rem', height: '1rem' }} />}
+                label="Phone"
+                value={formData.phoneNumber || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, phoneNumber: v }))}
+                type="tel"
+              />
+            </div>
+          </section>
 
-          {/* Golf Info Section */}
-          <Card variant="default">
-            <CardContent className="p-4">
-              <h3 className="text-label-lg font-semibold text-surface-800 mb-4 flex items-center gap-2">
-                <GolfersIllustration size="sm" animated={false} />
-                Golf Profile
-              </h3>
+          {/* ============================
+              GOLF PROFILE SECTION
+              ============================ */}
+          <section
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <span
+              className="type-overline"
+              style={{
+                color: 'var(--ink-tertiary)',
+                letterSpacing: '0.15em',
+                display: 'block',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              On the Course
+            </span>
+            <h3
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'var(--text-xl)',
+                fontStyle: 'italic',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                margin: 0,
+                marginBottom: 'var(--space-6)',
+                lineHeight: 1.2,
+              }}
+            >
+              Golf Profile
+            </h3>
 
-              <div className="space-y-4">
-                <ProfileField
-                  icon={<Hash className="w-4 h-4" />}
-                  label="Handicap Index"
-                  value={String(formData.handicapIndex || '')}
-                  isEditing={isEditing}
-                  onChange={(v) =>
-                    setFormData((prev) => ({ ...prev, handicapIndex: parseFloat(v) || undefined }))
-                  }
-                  type="number"
-                  min={-10}
-                  max={54}
-                  step={0.1}
-                />
-                <ProfileField
-                  icon={<Hash className="w-4 h-4" />}
-                  label="GHIN Number"
-                  value={formData.ghin || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, ghin: v }))}
-                />
-                <ProfileField
-                  icon={<Home className="w-4 h-4" />}
-                  label="Home Course"
-                  value={formData.homeCourse || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, homeCourse: v }))}
-                />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <ProfileField
+                icon={<Hash style={{ width: '1rem', height: '1rem' }} />}
+                label="Handicap Index"
+                value={String(formData.handicapIndex || '')}
+                isEditing={isEditing}
+                onChange={(v) =>
+                  setFormData((prev) => ({ ...prev, handicapIndex: parseFloat(v) || undefined }))
+                }
+                type="number"
+                min={-10}
+                max={54}
+                step={0.1}
+              />
+              <ProfileField
+                icon={<Hash style={{ width: '1rem', height: '1rem' }} />}
+                label="GHIN Number"
+                value={formData.ghin || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, ghin: v }))}
+              />
+              <ProfileField
+                icon={<Home style={{ width: '1rem', height: '1rem' }} />}
+                label="Home Course"
+                value={formData.homeCourse || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, homeCourse: v }))}
+              />
 
-                {/* Preferred Tees */}
-                <div className="space-y-2">
-                  <label className="text-label-sm text-surface-500 font-medium">
-                    Preferred Tees
-                  </label>
-                  {isEditing ? (
-                    <div className="flex gap-2">
-                      {(['back', 'middle', 'forward'] as const).map((tee) => (
-                        <button
-                          key={tee}
-                          type="button"
-                          onClick={() => setFormData((prev) => ({ ...prev, preferredTees: tee }))}
-                          className={cn(
-                            'flex-1 py-2 px-3 rounded-lg border-2 font-medium capitalize text-sm transition-all',
+              {/* Preferred Tees */}
+              <div>
+                <label
+                  className="type-overline"
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    letterSpacing: '0.15em',
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-xs)',
+                  }}
+                >
+                  Preferred Tees
+                </label>
+                {isEditing ? (
+                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                    {(['back', 'middle', 'forward'] as const).map((tee) => (
+                      <button
+                        key={tee}
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, preferredTees: tee }))}
+                        className="press-scale"
+                        style={{
+                          flex: 1,
+                          padding: 'var(--space-2) var(--space-3)',
+                          borderRadius: 'var(--radius-md)',
+                          border:
                             formData.preferredTees === tee
-                              ? 'border-masters bg-masters/10 text-masters'
-                              : 'border-surface-200 text-surface-600 hover:border-surface-300'
-                          )}
-                        >
-                          {tee}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-body-md text-surface-900 capitalize">
-                      {formData.preferredTees || '—'}
-                    </p>
-                  )}
-                </div>
+                              ? '2px solid var(--masters)'
+                              : '1px solid var(--rule)',
+                          background:
+                            formData.preferredTees === tee
+                              ? 'var(--masters-subtle)'
+                              : 'var(--canvas-raised)',
+                          color:
+                            formData.preferredTees === tee
+                              ? 'var(--masters)'
+                              : 'var(--ink-secondary)',
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 600,
+                          textTransform: 'capitalize',
+                          cursor: 'pointer',
+                          transition: 'all 150ms ease',
+                        }}
+                      >
+                        {tee}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--ink)',
+                      margin: 0,
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {formData.preferredTees || '\u2014'}
+                  </p>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          {/* Trip Info Section */}
-          <Card variant="default">
-            <CardContent className="p-4">
-              <h3 className="text-label-lg font-semibold text-surface-800 mb-4 flex items-center gap-2">
-                <Shirt className="w-4 h-4 text-surface-500" />
-                Trip Details
-              </h3>
+          {/* ============================
+              TRIP DETAILS SECTION
+              ============================ */}
+          <section
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <span
+              className="type-overline"
+              style={{
+                color: 'var(--ink-tertiary)',
+                letterSpacing: '0.15em',
+                display: 'block',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              Logistics
+            </span>
+            <h3
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'var(--text-xl)',
+                fontStyle: 'italic',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                margin: 0,
+                marginBottom: 'var(--space-6)',
+                lineHeight: 1.2,
+              }}
+            >
+              Trip Details
+            </h3>
 
-              <div className="space-y-4">
-                {/* Shirt Size */}
-                <div className="space-y-2">
-                  <label className="text-label-sm text-surface-500 font-medium">Shirt Size</label>
-                  {isEditing ? (
-                    <div className="grid grid-cols-6 gap-1">
-                      {(['XS', 'S', 'M', 'L', 'XL', '2XL'] as const).map((size) => (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => setFormData((prev) => ({ ...prev, shirtSize: size }))}
-                          className={cn(
-                            'py-2 rounded-lg border-2 font-medium text-xs transition-all',
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              {/* Shirt Size */}
+              <div>
+                <label
+                  className="type-overline"
+                  style={{
+                    color: 'var(--ink-tertiary)',
+                    letterSpacing: '0.15em',
+                    display: 'block',
+                    marginBottom: 'var(--space-2)',
+                    fontSize: 'var(--text-xs)',
+                  }}
+                >
+                  Shirt Size
+                </label>
+                {isEditing ? (
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(6, 1fr)',
+                      gap: 'var(--space-1)',
+                    }}
+                  >
+                    {(['XS', 'S', 'M', 'L', 'XL', '2XL'] as const).map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, shirtSize: size }))}
+                        className="press-scale"
+                        style={{
+                          padding: 'var(--space-2) 0',
+                          borderRadius: 'var(--radius-md)',
+                          border:
                             formData.shirtSize === size
-                              ? 'border-masters bg-masters/10 text-masters'
-                              : 'border-surface-200 text-surface-600 hover:border-surface-300'
-                          )}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-body-md text-surface-900">{formData.shirtSize || '—'}</p>
-                  )}
-                </div>
-
-                <ProfileField
-                  icon={<AlertCircle className="w-4 h-4" />}
-                  label="Dietary Restrictions"
-                  value={formData.dietaryRestrictions || ''}
-                  isEditing={isEditing}
-                  onChange={(v) => setFormData((prev) => ({ ...prev, dietaryRestrictions: v }))}
-                />
+                              ? '2px solid var(--masters)'
+                              : '1px solid var(--rule)',
+                          background:
+                            formData.shirtSize === size
+                              ? 'var(--masters-subtle)'
+                              : 'var(--canvas-raised)',
+                          color:
+                            formData.shirtSize === size
+                              ? 'var(--masters)'
+                              : 'var(--ink-secondary)',
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 150ms ease',
+                        }}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'var(--text-base)',
+                      color: 'var(--ink)',
+                      margin: 0,
+                    }}
+                  >
+                    {formData.shirtSize || '\u2014'}
+                  </p>
+                )}
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Emergency Contact Section */}
-          <Card variant="default">
-            <CardContent className="p-4">
-              <h3 className="text-label-lg font-semibold text-surface-800 mb-4 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-500" />
-                Emergency Contact
-              </h3>
+              <ProfileField
+                icon={<AlertCircle style={{ width: '1rem', height: '1rem' }} />}
+                label="Dietary Restrictions"
+                value={formData.dietaryRestrictions || ''}
+                isEditing={isEditing}
+                onChange={(v) => setFormData((prev) => ({ ...prev, dietaryRestrictions: v }))}
+              />
+            </div>
+          </section>
 
-              <div className="space-y-4">
-                <ProfileField
-                  icon={<User className="w-4 h-4" />}
-                  label="Contact Name"
-                  value={formData.emergencyContact?.name || ''}
-                  isEditing={isEditing}
-                  onChange={(v) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: {
-                        ...prev.emergencyContact,
-                        name: v,
-                        phone: prev.emergencyContact?.phone || '',
-                        relationship: prev.emergencyContact?.relationship || '',
-                      },
-                    }))
-                  }
-                />
-                <ProfileField
-                  icon={<Phone className="w-4 h-4" />}
-                  label="Contact Phone"
-                  value={formData.emergencyContact?.phone || ''}
-                  isEditing={isEditing}
-                  onChange={(v) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: {
-                        ...prev.emergencyContact,
-                        phone: v,
-                        name: prev.emergencyContact?.name || '',
-                        relationship: prev.emergencyContact?.relationship || '',
-                      },
-                    }))
-                  }
-                  type="tel"
-                />
-                <ProfileField
-                  icon={<User className="w-4 h-4" />}
-                  label="Relationship"
-                  value={formData.emergencyContact?.relationship || ''}
-                  isEditing={isEditing}
-                  onChange={(v) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: {
-                        ...prev.emergencyContact,
-                        relationship: v,
-                        name: prev.emergencyContact?.name || '',
-                        phone: prev.emergencyContact?.phone || '',
-                      },
-                    }))
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {/* ============================
+              EMERGENCY CONTACT SECTION
+              ============================ */}
+          <section
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <span
+              className="type-overline"
+              style={{
+                color: 'var(--ink-tertiary)',
+                letterSpacing: '0.15em',
+                display: 'block',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              Safety
+            </span>
+            <h3
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'var(--text-xl)',
+                fontStyle: 'italic',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                margin: 0,
+                marginBottom: 'var(--space-6)',
+                lineHeight: 1.2,
+              }}
+            >
+              Emergency Contact
+            </h3>
 
-          {/* Logout Button */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+              <ProfileField
+                icon={<User style={{ width: '1rem', height: '1rem' }} />}
+                label="Contact Name"
+                value={formData.emergencyContact?.name || ''}
+                isEditing={isEditing}
+                onChange={(v) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    emergencyContact: {
+                      ...prev.emergencyContact,
+                      name: v,
+                      phone: prev.emergencyContact?.phone || '',
+                      relationship: prev.emergencyContact?.relationship || '',
+                    },
+                  }))
+                }
+              />
+              <ProfileField
+                icon={<Phone style={{ width: '1rem', height: '1rem' }} />}
+                label="Contact Phone"
+                value={formData.emergencyContact?.phone || ''}
+                isEditing={isEditing}
+                onChange={(v) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    emergencyContact: {
+                      ...prev.emergencyContact,
+                      phone: v,
+                      name: prev.emergencyContact?.name || '',
+                      relationship: prev.emergencyContact?.relationship || '',
+                    },
+                  }))
+                }
+                type="tel"
+              />
+              <ProfileField
+                icon={<User style={{ width: '1rem', height: '1rem' }} />}
+                label="Relationship"
+                value={formData.emergencyContact?.relationship || ''}
+                isEditing={isEditing}
+                onChange={(v) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    emergencyContact: {
+                      ...prev.emergencyContact,
+                      relationship: v,
+                      name: prev.emergencyContact?.name || '',
+                      phone: prev.emergencyContact?.phone || '',
+                    },
+                  }))
+                }
+              />
+            </div>
+          </section>
+
+          {/* ============================
+              SIGN OUT BUTTON
+              ============================ */}
           {!isEditing && (
             <button
               onClick={handleLogout}
-              className={cn(
-                'w-full py-4 px-4 rounded-xl border border-red-200 bg-red-50',
-                'text-red-700 font-medium',
-                'hover:bg-red-100 transition-colors',
-                'flex items-center justify-center gap-2'
-              )}
+              className="press-scale"
+              style={{
+                width: '100%',
+                padding: 'var(--space-4)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--maroon)',
+                background: 'transparent',
+                color: 'var(--maroon)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+                marginBottom: 'var(--space-6)',
+                transition: 'background 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--maroon-subtle)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+              }}
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut style={{ width: '1.25rem', height: '1.25rem' }} />
               Sign Out
             </button>
           )}
         </div>
       </main>
 
-      {/* Fixed Save Button (when editing)
-          Keep BottomNav visible at all times; lift the save bar above the nav height (80px). */}
+      {/* ============================
+          SAVE BAR (when editing)
+          Keep BottomNav visible; lift save bar above nav height (80px).
+          ============================ */}
       {isEditing && (
         <div
-          className="fixed left-0 right-0 z-40 bg-white border-t border-surface-200 p-4"
           style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            zIndex: 40,
+            background: 'var(--canvas)',
+            borderTop: '1px solid var(--rule)',
+            padding: 'var(--space-4)',
             bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
-            paddingBottom: '1rem',
+            paddingBottom: 'var(--space-4)',
           }}
         >
-          <div className="max-w-md mx-auto flex gap-3">
-            <Button variant="secondary" size="lg" onClick={handleCancel} className="shrink-0">
+          <div
+            style={{
+              maxWidth: '28rem',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              display: 'flex',
+              gap: 'var(--space-3)',
+            }}
+          >
+            {/* Cancel Button */}
+            <button
+              onClick={handleCancel}
+              className="press-scale"
+              style={{
+                flexShrink: 0,
+                padding: 'var(--space-3) var(--space-5)',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--rule)',
+                background: 'var(--canvas-raised)',
+                color: 'var(--ink-secondary)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                minHeight: '44px',
+                transition: 'all 150ms ease',
+              }}
+            >
               Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
+            </button>
+
+            {/* Save Button */}
+            <button
               onClick={handleSave}
               disabled={isSaving || isLoading}
-              className="flex-1"
+              className="btn-premium press-scale"
+              style={{
+                flex: 1,
+                opacity: isSaving || isLoading ? 0.6 : 1,
+                cursor: isSaving || isLoading ? 'not-allowed' : 'pointer',
+              }}
             >
               {isSaving ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '1rem',
+                      height: '1rem',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: 'white',
+                      borderRadius: 'var(--radius-full)',
+                      animation: 'spin 0.6s linear infinite',
+                    }}
+                  />
                   Saving...
                 </span>
               ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <Save className="w-4 h-4" />
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <Save style={{ width: '1rem', height: '1rem' }} />
                   Save Changes
                 </span>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       )}
@@ -550,9 +952,22 @@ function ProfileField({
   step,
 }: ProfileFieldProps) {
   return (
-    <div className="space-y-1">
-      <label className="text-label-sm text-surface-500 font-medium flex items-center gap-1.5">
-        <span className="text-surface-400">{icon}</span>
+    <div>
+      <label
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-1)',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-xs)',
+          fontWeight: 600,
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          color: 'var(--ink-tertiary)',
+          marginBottom: 'var(--space-2)',
+        }}
+      >
+        <span style={{ color: 'var(--ink-faint)' }}>{icon}</span>
         {label}
       </label>
       {isEditing ? (
@@ -563,15 +978,40 @@ function ProfileField({
           min={min}
           max={max}
           step={step}
-          className={cn(
-            'w-full py-2 px-3 rounded-lg border border-surface-200 bg-white',
-            'text-body-md placeholder:text-surface-400',
-            'focus:outline-none focus:ring-2 focus:ring-masters/30 focus:border-masters',
-            'transition-all duration-200'
-          )}
+          style={{
+            width: '100%',
+            padding: 'var(--space-2) var(--space-3)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--rule)',
+            background: 'var(--canvas-raised)',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-base)',
+            color: 'var(--ink)',
+            outline: 'none',
+            transition: 'border-color 150ms ease, box-shadow 150ms ease',
+            boxSizing: 'border-box',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--masters)';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 68, 0.08)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--rule)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       ) : (
-        <p className="text-body-md text-surface-900">{value || '—'}</p>
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--text-base)',
+            color: 'var(--ink)',
+            margin: 0,
+            lineHeight: 1.5,
+          }}
+        >
+          {value || '\u2014'}
+        </p>
       )}
     </div>
   );

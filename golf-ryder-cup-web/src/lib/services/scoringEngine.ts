@@ -673,7 +673,6 @@ export async function finalizeMatch(matchId: string): Promise<void> {
   const matchState = calculateMatchState(match, holeResults);
 
   if (matchState.isClosedOut || matchState.holesRemaining === 0) {
-    const _points = calculateMatchPoints(matchState);
     const resultType = calculateMatchResult(matchState);
 
     await db.matches.update(matchId, {

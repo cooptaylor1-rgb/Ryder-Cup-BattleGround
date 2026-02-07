@@ -812,8 +812,6 @@ interface EmptySlotProps {
 }
 
 function EmptySlot({ team, isDropTarget, isSelectTarget }: EmptySlotProps) {
-    const _teamColor = team === 'usa' ? colors.team.usa.primary : colors.team.europe.primary;
-
     return (
         <div
             className={`p-3 rounded-lg border-2 border-dashed transition-colors ${isDropTarget || isSelectTarget

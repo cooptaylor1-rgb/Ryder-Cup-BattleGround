@@ -343,7 +343,6 @@ export function detectDramaticMoment(pathToVictory: PathToVictory): {
   // Comeback territory
   const margin = Math.abs(teamA.currentPoints - teamB.currentPoints);
   const trailing = teamA.currentPoints < teamB.currentPoints ? teamA : teamB;
-  const _leading = teamA.currentPoints < teamB.currentPoints ? teamB : teamA;
 
   if (margin >= 3 && trailing.canClinch && remainingMatches >= margin) {
     return {

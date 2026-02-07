@@ -114,8 +114,6 @@ export function calculateEnhancedPlayerStats(
         const margin = Math.abs(teamAHoles - teamBHoles);
         const winner = teamAHoles > teamBHoles ? 'teamA' : teamBHoles > teamAHoles ? 'teamB' : 'halved';
         const playerWon = (winner === 'teamA' && isTeamA) || (winner === 'teamB' && !isTeamA);
-        const _playerLost = (winner === 'teamA' && !isTeamA) || (winner === 'teamB' && isTeamA);
-
         stats.matchesPlayed++;
 
         if (winner === 'halved') {
@@ -195,7 +193,6 @@ export function calculateEnhancedPlayerStats(
             })[0];
 
         if (bestPartner) {
-            const _partner = players.find(p => p.id === bestPartner[0]);
             stats.bestPartner = {
                 playerId: bestPartner[0],
                 record: `${bestPartner[1].w}-${bestPartner[1].l}-${bestPartner[1].h}`,

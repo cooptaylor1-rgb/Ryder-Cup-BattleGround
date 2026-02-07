@@ -123,10 +123,6 @@ export function StablefordScorecard({
                             .filter((value) => value >= 1)
                             .map((value) => {
                                 const isSelected = currentHoleScore?.grossScore === value;
-                                const _pointsForScore = getPointsDisplay(
-                                    currentHoleScore?.stablefordPoints || 0
-                                );
-
                                 return (
                                     <button
                                         key={value}

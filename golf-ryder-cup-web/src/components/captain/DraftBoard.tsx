@@ -99,7 +99,6 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
   const handlePick = (playerId: string, teamId?: string) => {
     if (!draftState || !config) return;
 
-    const _pickTeam = teamId || config.draftOrder[draftState.currentPick % config.draftOrder.length];
     const auctionPrice = mode === 'auction' ? currentBid : undefined;
 
     const { newState } = makeDraftPick(draftState, playerId, auctionPrice);

@@ -158,12 +158,6 @@ export function CaptainToolkit({
   const renderActiveSection = () => {
     const currentSession = sessions[0];
     const sessionMatches = matches.filter(m => m.sessionId === currentSession?.id);
-    // Find a course from the matches if available
-    const firstMatchWithCourse = sessionMatches.find(m => m.courseId);
-    const _currentCourse = firstMatchWithCourse
-      ? courses.find(c => c.id === firstMatchWithCourse.courseId)
-      : courses[0];
-
     switch (activeSection) {
       case 'preflight':
         return (

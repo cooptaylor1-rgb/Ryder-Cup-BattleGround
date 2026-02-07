@@ -36,7 +36,7 @@ export * from './photoService';
 // Sharing & export services
 export * from './shareService';
 export * from './pdfExportService';
-// shareCardService has duplicate exports with shareService - export selectively
+// shareCardService: selective exports (shareStandings omitted — already in shareService)
 export {
   generateStandingsCard,
   generateSessionCard,
@@ -45,7 +45,6 @@ export {
   shareCard,
   downloadBlob,
   copyCardToClipboard,
-  // shareStandings is already exported from shareService
   shareSession,
   shareAward,
   shareLeaderboard,
@@ -71,7 +70,7 @@ export * from './nemesisService';
 // Path to victory
 export * from './pathToVictoryService';
 
-// Lineup builder - has duplicate calculateFairnessScore with tournamentEngine
+// Lineup builder: selective exports (calculateFairnessScore omitted — already in tournamentEngine)
 export {
   initializeLineupState,
   autoFillLineup,
@@ -80,7 +79,6 @@ export {
   movePlayerToMatch,
   removePlayerFromMatch,
   clearLineup,
-  // calculateFairnessScore is already in tournamentEngine
 } from './lineupBuilderService';
 
 // Trip stats

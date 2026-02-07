@@ -238,18 +238,6 @@ export function calculateNetTotal(grossScores: number[], strokesPerHole: number[
 // ============================================
 
 /**
- * Stableford point values relative to par.
- */
-const _STABLEFORD_POINTS: Record<number, number> = {
-  '-3': 5, // Albatross (double eagle)
-  '-2': 4, // Eagle
-  '-1': 3, // Birdie
-  '0': 2, // Par
-  '1': 1, // Bogey
-  '2': 0, // Double bogey or worse
-};
-
-/**
  * Calculate Stableford points for a hole.
  *
  * Points are based on net score relative to par:

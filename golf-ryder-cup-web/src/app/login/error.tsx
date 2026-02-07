@@ -35,10 +35,16 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
             </div>
 
             <h1
-                className="text-2xl font-semibold mb-3"
-                style={{ color: 'var(--ink)' }}
+                style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    color: 'var(--ink)',
+                    marginBottom: 'var(--space-3)',
+                }}
             >
-                Login Error
+                Something Went Wrong
             </h1>
 
             <p
@@ -80,10 +86,20 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
             <div className="flex gap-4">
                 <button
                     onClick={reset}
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90"
+                    className="btn-premium press-scale"
                     style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        padding: 'var(--space-3) var(--space-6)',
+                        borderRadius: 'var(--radius-md)',
+                        fontFamily: 'var(--font-sans)',
+                        fontWeight: 600,
+                        fontSize: 'var(--text-sm)',
                         background: 'var(--masters)',
                         color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
                     }}
                 >
                     <RefreshCw size={18} />
@@ -92,11 +108,20 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
 
                 <Link
                     href="/"
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90"
+                    className="press-scale"
                     style={{
-                        background: 'var(--surface)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        padding: 'var(--space-3) var(--space-6)',
+                        borderRadius: 'var(--radius-md)',
+                        fontFamily: 'var(--font-sans)',
+                        fontWeight: 500,
+                        fontSize: 'var(--text-sm)',
+                        background: 'var(--canvas-raised)',
                         border: '1px solid var(--rule)',
                         color: 'var(--ink)',
+                        textDecoration: 'none',
                     }}
                 >
                     <Home size={18} />

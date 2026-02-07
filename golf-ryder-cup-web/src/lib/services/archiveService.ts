@@ -66,9 +66,7 @@ export function createTripArchive(
     const winningTeamName = winner === 'A' ? teamA?.name || 'Team A' :
         winner === 'B' ? teamB?.name || 'Team B' : 'Tied';
 
-    // Find MVP
     const mvpAward = awards.find(a => a.type === 'mvp');
-    const _mvpPlayer = mvpAward ? players.find(p => p.id === mvpAward.playerId) : null;
 
     // Generate highlights
     const highlights = generateHighlights(
