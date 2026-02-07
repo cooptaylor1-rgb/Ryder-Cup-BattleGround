@@ -99,3 +99,4 @@ All times America/New_York.
 ## 2026-02-07
 - 10:50 — Shipped batch: Captain Carts (`/captain/carts`) now uses the shared `BottomNav` instead of bespoke nav markup. Also replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) with valid arbitrary-value forms (e.g. `text-[var(--ink-tertiary)]`) in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent silent missing styles. (commit 35d80e6)
 - 12:58 — Shipped batch: fixed remaining invalid Tailwind CSS-var class syntax in `PremiumComponents` + captain UIs (e.g. `text-(--team-usa)`/`bg-(--team-usa)/10` and `ring-(--masters)`) by switching to valid arbitrary-value forms like `text-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/10`, and `ring-[var(--masters)]` so styles don’t silently fail. (commit c5ed264)
+- 13:25 — Docs: added a fast `rg` sweep command to detect invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) that can silently break styles. (commit a9319a2)
