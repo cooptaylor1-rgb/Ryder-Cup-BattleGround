@@ -277,38 +277,54 @@ export default function LineupBuilderPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A]">
+        <div
+            className="min-h-screen pb-nav page-premium-enter texture-grain"
+            style={{ background: 'var(--canvas)' }}
+        >
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-[#141414] border-b border-[#2A2A2A] px-4 py-3">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-2 -ml-2 hover:bg-[#282828] rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-5 h-5 text-[#A0A0A0]" />
-                        </button>
-                        <div>
-                            <h1 className="text-lg font-semibold text-white">
-                                Lineup Builder
-                            </h1>
-                            <p className="text-xs text-[#707070]">
-                                {lineupState.sessionType} • {lineupState.playersPerMatch}v{lineupState.playersPerMatch}
-                            </p>
+            <header
+                className="sticky top-0 z-40 border-b"
+                style={{ background: 'var(--canvas)', borderColor: 'var(--rule)' }}
+            >
+                <div className="container-editorial" style={{ padding: 'var(--space-3) 0' }}>
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <button
+                                onClick={() => router.back()}
+                                className="p-2 -ml-2 rounded-xl press-scale"
+                                aria-label="Back"
+                            >
+                                <ArrowLeft className="w-5 h-5" style={{ color: 'var(--ink-secondary)' }} />
+                            </button>
+                            <div className="min-w-0">
+                                <h1 className="type-title">Lineup Builder</h1>
+                                <p className="type-caption truncate">
+                                    {lineupState.sessionType} • {lineupState.playersPerMatch}v{lineupState.playersPerMatch}
+                                </p>
+                            </div>
                         </div>
+
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="btn-premium press-scale"
+                            style={{
+                                padding: 'var(--space-2) var(--space-4)',
+                                borderRadius: 'var(--radius-md)',
+                                opacity: saving ? 0.7 : 1,
+                            }}
+                        >
+                            {saving ? (
+                                <div
+                                    className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
+                                    aria-hidden
+                                />
+                            ) : (
+                                <Save className="w-4 h-4" />
+                            )}
+                            <span>Save</span>
+                        </button>
                     </div>
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="px-4 py-2 bg-[#004225] text-white rounded-lg flex items-center gap-2 hover:bg-[#2E7D32] transition-colors disabled:opacity-50"
-                    >
-                        {saving ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                            <Save className="w-4 h-4" />
-                        )}
-                        Save
-                    </button>
                 </div>
             </header>
 
@@ -343,14 +359,14 @@ export default function LineupBuilderPage() {
                                             : fairnessScore.overall >= 60
                                                 ? colors.semantic.warning
                                                 : colors.semantic.error,
-                                    color: '#FFFFFF',
+                                    color: 'white',
                                 }}
                             >
                                 {fairnessScore.overall}
                             </div>
                             <div>
-                                <h3 className="font-medium text-white">Fairness Score</h3>
-                                <p className="text-sm text-[#A0A0A0]">
+                                <h3 className="font-medium text-[var(--ink)]">Fairness Score</h3>
+                                <p className="text-sm text-[var(--ink-tertiary)]">
                                     {fairnessScore.favoredTeam === 'balanced'
                                         ? 'Well balanced lineup'
                                         : `${fairnessScore.favoredTeam === 'usa' ? 'USA' : 'Europe'} favored by ${fairnessScore.advantageStrokes} strokes`}
@@ -358,12 +374,12 @@ export default function LineupBuilderPage() {
                             </div>
                         </div>
                         <ChevronRight
-                            className={`w-5 h-5 text-[#707070] transition-transform ${showFairnessDetails ? 'rotate-90' : ''}`}
+                            className={`w-5 h-5 text-[var(--ink-tertiary)] transition-transform ${showFairnessDetails ? 'rotate-90' : ''}`}
                         />
                     </div>
 
                     {showFairnessDetails && (
-                        <div className="mt-4 pt-4 border-t border-[#2A2A2A] space-y-3">
+                        <div className="mt-4 pt-4 border-t border-[var(--rule)] space-y-3">
                             <ScoreBar label="Handicap Balance" value={fairnessScore.handicapBalance} />
                             <ScoreBar label="Pairing Variety" value={fairnessScore.pairingVariety} />
                             <ScoreBar label="Matchup Balance" value={fairnessScore.matchupBalance} />
@@ -399,14 +415,14 @@ export default function LineupBuilderPage() {
                 <button
                     onClick={handleAutoFill}
                     disabled={loading}
-                    className="flex-1 py-3 bg-[#141414] border border-[#2A2A2A] rounded-xl flex items-center justify-center gap-2 text-[#FFD54F] hover:bg-[#1A1A1A] transition-colors"
+                    className="flex-1 py-3 bg-[var(--surface)] border border-[var(--rule)] rounded-xl flex items-center justify-center gap-2 text-[var(--gold)] hover:bg-[var(--surface-elevated)] transition-colors"
                 >
                     <Sparkles className="w-5 h-5" />
                     Auto-Fill
                 </button>
                 <button
                     onClick={handleClear}
-                    className="flex-1 py-3 bg-[#141414] border border-[#2A2A2A] rounded-xl flex items-center justify-center gap-2 text-[#A0A0A0] hover:bg-[#1A1A1A] transition-colors"
+                    className="flex-1 py-3 bg-[var(--surface)] border border-[var(--rule)] rounded-xl flex items-center justify-center gap-2 text-[var(--ink-tertiary)] hover:bg-[var(--surface-elevated)] transition-colors"
                 >
                     <RotateCcw className="w-5 h-5" />
                     Clear
@@ -415,7 +431,7 @@ export default function LineupBuilderPage() {
 
             {/* Selected Player Indicator */}
             {selectedPlayer && (
-                <div className="mx-4 mt-4 p-3 bg-[#004225] rounded-xl flex items-center justify-between">
+                <div className="mx-4 mt-4 p-3 bg-[var(--masters)] rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Check className="w-5 h-5 text-white" />
                         <span className="text-white font-medium">
@@ -424,7 +440,7 @@ export default function LineupBuilderPage() {
                     </div>
                     <button
                         onClick={() => setSelectedPlayer(null)}
-                        className="text-white/70 text-sm"
+                        className="text-white/80 text-sm"
                     >
                         Cancel
                     </button>
@@ -467,7 +483,7 @@ export default function LineupBuilderPage() {
 
             {/* Available Players */}
             <div className="p-4 pb-24">
-                <h3 className="text-sm font-medium text-[#A0A0A0] mb-3">Available Players</h3>
+                <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-3">Available Players</h3>
                 <div className="grid grid-cols-2 gap-4">
                     {/* Team USA */}
                     <div className="space-y-2">
@@ -486,7 +502,7 @@ export default function LineupBuilderPage() {
                                 />
                             ))}
                             {lineupState.availableTeamA.length === 0 && (
-                                <p className="text-xs text-[#505050] italic">All players assigned</p>
+                                <p className="text-xs text-[var(--ink-tertiary)] italic">All players assigned</p>
                             )}
                         </div>
                     </div>
@@ -508,12 +524,14 @@ export default function LineupBuilderPage() {
                                 />
                             ))}
                             {lineupState.availableTeamB.length === 0 && (
-                                <p className="text-xs text-[#505050] italic">All players assigned</p>
+                                <p className="text-xs text-[var(--ink-tertiary)] italic">All players assigned</p>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            <BottomNav />
         </div>
     );
 }
@@ -526,10 +544,10 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
     return (
         <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-                <span className="text-[#A0A0A0]">{label}</span>
-                <span className="text-white font-medium">{value}</span>
+                <span className="text-[var(--ink-tertiary)]">{label}</span>
+                <span className="text-[var(--ink)] font-medium">{value}</span>
             </div>
-            <div className="h-1.5 bg-[#282828] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[var(--surface-elevated)] rounded-full overflow-hidden">
                 <div
                     className="h-full rounded-full transition-all duration-300"
                     style={{
@@ -593,13 +611,13 @@ function MatchSlot({
     const canAddToTeamB = teamBPlayers.length < playersPerMatch && !isLocked;
 
     return (
-        <div className="bg-[#141414] rounded-xl border border-[#2A2A2A] overflow-hidden">
+        <div className="bg-[var(--surface)] rounded-xl border border-[var(--rule)] overflow-hidden">
             {/* Match Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-[#1A1A1A] border-b border-[#2A2A2A]">
+            <div className="flex items-center justify-between px-4 py-2 bg-[var(--surface-elevated)] border-b border-[var(--rule)]">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-white">Match {matchNumber}</span>
+                    <span className="text-sm font-medium text-[var(--ink)]">Match {matchNumber}</span>
                     {isLocked && (
-                        <Lock className="w-3.5 h-3.5 text-[#707070]" />
+                        <Lock className="w-3.5 h-3.5 text-[var(--ink-tertiary)]" />
                     )}
                 </div>
                 {teamAPlayers.length > 0 && teamBPlayers.length > 0 && (
@@ -626,11 +644,11 @@ function MatchSlot({
             </div>
 
             {/* Match Content */}
-            <div className="grid grid-cols-2 gap-px bg-[#2A2A2A]">
+            <div className="grid grid-cols-2 gap-px bg-[var(--rule)]">
                 {/* Team A Side */}
                 <div
-                    className={`bg-[#141414] p-3 transition-colors ${isTeamADragTarget ? 'bg-[#1565C0]/20' : ''
-                        } ${canAddToTeamA && selectedPlayer?.player.teamColor === 'usa' ? 'ring-2 ring-inset ring-[#1565C0]/50' : ''}`}
+                    className={`bg-[var(--surface)] p-3 transition-colors ${isTeamADragTarget ? 'bg-[color:var(--team-usa)]/15' : ''
+                        } ${canAddToTeamA && selectedPlayer?.player.teamColor === 'usa' ? 'ring-2 ring-inset ring-[color:var(--team-usa)]/50' : ''}`}
                     onDragOver={(e) => canAddToTeamA && onDragOver(e, matchNumber, 'teamA')}
                     onDragLeave={onDragLeave}
                     onDrop={() => canAddToTeamA && onDrop(matchNumber, 'teamA')}
@@ -657,7 +675,7 @@ function MatchSlot({
                                 (_, i) => (
                                     <EmptySlot
                                         key={i}
-                                        team="usa"
+                                        _team="usa"
                                         isDropTarget={isTeamADragTarget}
                                         isSelectTarget={selectedPlayer?.player.teamColor === 'usa'}
                                     />
@@ -668,8 +686,8 @@ function MatchSlot({
 
                 {/* Team B Side */}
                 <div
-                    className={`bg-[#141414] p-3 transition-colors ${isTeamBDragTarget ? 'bg-[#C62828]/20' : ''
-                        } ${canAddToTeamB && selectedPlayer?.player.teamColor === 'europe' ? 'ring-2 ring-inset ring-[#C62828]/50' : ''}`}
+                    className={`bg-[var(--surface)] p-3 transition-colors ${isTeamBDragTarget ? 'bg-[color:var(--team-europe)]/15' : ''
+                        } ${canAddToTeamB && selectedPlayer?.player.teamColor === 'europe' ? 'ring-2 ring-inset ring-[color:var(--team-europe)]/50' : ''}`}
                     onDragOver={(e) => canAddToTeamB && onDragOver(e, matchNumber, 'teamB')}
                     onDragLeave={onDragLeave}
                     onDrop={() => canAddToTeamB && onDrop(matchNumber, 'teamB')}
@@ -696,7 +714,7 @@ function MatchSlot({
                                 (_, i) => (
                                     <EmptySlot
                                         key={i}
-                                        team="europe"
+                                        _team="europe"
                                         isDropTarget={isTeamBDragTarget}
                                         isSelectTarget={selectedPlayer?.player.teamColor === 'europe'}
                                     />
@@ -725,7 +743,7 @@ function PlayerChip({ player, isSelected, onDragStart, onTap }: PlayerChipProps)
             draggable
             onDragStart={onDragStart}
             onClick={onTap}
-            className={`p-3 rounded-lg cursor-grab active:cursor-grabbing transition-all select-none ${isSelected ? 'ring-2 ring-[#FFD54F] ring-offset-1 ring-offset-[#0A0A0A]' : ''
+            className={`p-3 rounded-lg cursor-grab active:cursor-grabbing transition-all select-none ${isSelected ? 'ring-2 ring-[var(--gold)] ring-offset-1 ring-offset-[var(--canvas)]' : ''
                 }`}
             style={{
                 backgroundColor: `${teamColor}20`,
@@ -734,10 +752,10 @@ function PlayerChip({ player, isSelected, onDragStart, onTap }: PlayerChipProps)
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <GripVertical className="w-4 h-4 text-[#505050]" />
-                    <span className="text-sm font-medium text-white">{player.firstName}</span>
+                    <GripVertical className="w-4 h-4 text-[var(--ink-tertiary)]" />
+                    <span className="text-sm font-medium text-[var(--ink)]">{player.firstName}</span>
                 </div>
-                <span className="text-xs font-mono text-[#A0A0A0]">
+                <span className="text-xs font-mono text-[var(--ink-tertiary)]">
                     {player.handicap !== null ? player.handicap.toFixed(1) : '-'}
                 </span>
             </div>
@@ -773,7 +791,7 @@ function PlayerInMatch({
                 e.stopPropagation();
                 if (!locked) onTap(player, matchNumber);
             }}
-            className={`p-2 rounded-lg transition-colors select-none ${locked ? 'opacity-75' : 'cursor-grab active:cursor-grabbing hover:bg-[#282828]'
+            className={`p-2 rounded-lg transition-colors select-none ${locked ? 'opacity-75' : 'cursor-grab active:cursor-grabbing hover:bg-[var(--surface-elevated)]'
                 }`}
             style={{
                 backgroundColor: `${teamColor}20`,
@@ -781,11 +799,11 @@ function PlayerInMatch({
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    {!locked && <GripVertical className="w-3.5 h-3.5 text-[#505050]" />}
-                    <span className="text-sm font-medium text-white">{player.firstName}</span>
+                    {!locked && <GripVertical className="w-3.5 h-3.5 text-[var(--ink-tertiary)]" />}
+                    <span className="text-sm font-medium text-[var(--ink)]">{player.firstName}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-[#A0A0A0]">
+                    <span className="text-xs font-mono text-[var(--ink-tertiary)]">
                         {player.handicap !== null ? player.handicap.toFixed(1) : '-'}
                     </span>
                     {!locked && (
@@ -794,9 +812,9 @@ function PlayerInMatch({
                                 e.stopPropagation();
                                 onRemove(player.id, matchNumber);
                             }}
-                            className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                            className="p-1 hover:bg-[var(--surface-elevated)] rounded transition-colors"
                         >
-                            <span className="text-xs text-[#707070]">×</span>
+                            <span className="text-xs text-[var(--ink-tertiary)]">×</span>
                         </button>
                     )}
                 </div>
@@ -806,20 +824,21 @@ function PlayerInMatch({
 }
 
 interface EmptySlotProps {
-    team: 'usa' | 'europe';
+    _team: 'usa' | 'europe';
     isDropTarget: boolean;
     isSelectTarget: boolean;
 }
 
-function EmptySlot({ team, isDropTarget, isSelectTarget }: EmptySlotProps) {
+function EmptySlot({ _team, isDropTarget, isSelectTarget }: EmptySlotProps) {
+    void _team;
     return (
         <div
             className={`p-3 rounded-lg border-2 border-dashed transition-colors ${isDropTarget || isSelectTarget
-                ? 'border-[#FFD54F] bg-[#FFD54F]/10'
-                : 'border-[#3A3A3A]'
+                ? 'border-[var(--gold)] bg-[color:var(--gold)]/10'
+                : 'border-[var(--rule)]'
                 }`}
         >
-            <div className="flex items-center justify-center gap-2 text-[#505050]">
+            <div className="flex items-center justify-center gap-2 text-[var(--ink-tertiary)]">
                 <Users className="w-4 h-4" />
                 <span className="text-xs">Drop player here</span>
             </div>
