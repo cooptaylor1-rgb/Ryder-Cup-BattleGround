@@ -595,3 +595,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lineup Builder: ensured `BottomNav` renders in the main state (previously only in early-return states), so the page is never a navigation dead end.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`22c5064`)
+
+### 14:55 EST — Phase 1 (batch 111)
+- Momentum Meter (compact mode): replaced the silent `return null` when no holes have been played with a small explicit placeholder (“No holes yet”), so embedding the compact widget never results in a confusing “missing” UI section.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`40653c1`)

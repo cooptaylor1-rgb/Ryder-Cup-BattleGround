@@ -12,3 +12,8 @@
 - Lineup Builder: ensured `BottomNav` renders in the main state (previously only present in early-return states), so the page is never a navigation dead end.
 - Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
 - Commit: `22c5064`
+
+## 14:55 EST — Phase 1 (batch 111)
+- Momentum Meter (compact mode): replaced the silent `return null` when no holes have been played with a small explicit placeholder (“No holes yet”), so embedding the compact widget never results in a confusing “missing” UI section.
+- Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
+- Commit: `40653c1`
