@@ -64,6 +64,12 @@ Extra sweep commands (useful for catching true “blank screen” component retu
 rg "^\\s*return null;\\s*$" golf-ryder-cup-web/src/app -n --glob '**/page.tsx' --glob '!**/api/**'
 ```
 
+CSS var Tailwind syntax sweep (catches invalid forms like `text-(--ink-tertiary)` that silently fail to apply):
+
+```bash
+rg "\\w+\\-\\(--" golf-ryder-cup-web/src -n
+```
+
 Pattern:
 - `undefined` (loading) → `PageLoadingSkeleton`
 - `[]` / no rows (empty) → `EmptyStatePremium`

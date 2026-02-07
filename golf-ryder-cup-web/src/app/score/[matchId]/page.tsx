@@ -796,7 +796,7 @@ export default function EnhancedMatchScoringPage() {
   // Loading / error / missing states
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pb-nav bg-canvas font-sans">
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -825,7 +825,7 @@ export default function EnhancedMatchScoringPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen pb-nav bg-canvas font-sans"
+        className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -847,7 +847,7 @@ export default function EnhancedMatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <div
-        className="min-h-screen pb-nav bg-canvas font-sans"
+        className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -867,7 +867,7 @@ export default function EnhancedMatchScoringPage() {
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
   return (
-    <div className="min-h-screen pb-nav bg-canvas font-sans">
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
       {/* Celebration Overlay - Lazy loaded for performance */}
       <AnimatePresence>
         {celebration && (

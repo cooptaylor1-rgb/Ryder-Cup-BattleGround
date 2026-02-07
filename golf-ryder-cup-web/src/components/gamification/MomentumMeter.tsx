@@ -162,7 +162,11 @@ function CompactMomentum({
     className?: string;
 }) {
     if (momentum.lastFiveResults.length === 0) {
-        return null;
+        return (
+            <div className={cn('text-xs text-surface-400', className)}>
+                No holes yet
+            </div>
+        );
     }
 
     return (

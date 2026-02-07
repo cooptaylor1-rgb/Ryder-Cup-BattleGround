@@ -493,6 +493,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`75548bb`)
 
+### 18:40 EST — Phase 1 (batch 105)
+- Captain Emergency Contacts: removed `return null` inside the player-group `map()` by prefiltering empty groups for stable rendering.
+- Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`44c8299`)
+
 ### 18:45 EST — Phase 1 (batch 65)
 - Trip Stats: replaced bespoke header/back button markup with the shared `PageHeader` component to match the standard premium wrapper pattern.
 - Trip Stats: applied the same `PageHeader` pattern for **no active trip**, **no stats yet**, and the main view so the page remains consistent across states.
@@ -503,6 +509,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Global error page (`/global-error`): replaced `window.location.href = '/'` with `router.push('/')` so recovery navigation uses App Router semantics.
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`2d4641c`)
+
+### 19:10 EST — Phase 1 (batch 106)
+- Home — Side Bets section (`SideBetsSection`): removed the silent early-return when there are zero active bets and captain mode is off.
+- The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d01e942`)
 
 ### 19:25 EST — Phase 1 (batch 66)
 - Settings — Backup & Restore (`/settings/backup`): upgraded to the standard premium wrapper (canvas background + `pb-nav page-premium-enter texture-grain`) to match the rest of Settings.
@@ -555,20 +567,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
 
-
-
-### 18:40 EST — Phase 1 (batch 105)
-- Captain Emergency Contacts: removed `return null` inside the player-group `map()` by prefiltering empty groups for stable rendering.
-- Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`44c8299`)
-
-### 19:10 EST — Phase 1 (batch 106)
-- Home — Side Bets section (`SideBetsSection`): removed the silent early-return when there are zero active bets and captain mode is off.
-- The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d01e942`)
-
 ## 2026-02-07
 
 ### 10:30 EST — Phase 1 (batch 107)
@@ -581,3 +579,42 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - UI components: replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`, `ring-(--masters)`) with valid arbitrary-value forms like `text-[var(--ink-tertiary)]`, `ring-[var(--masters)]` in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent styles silently failing to apply.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`35d80e6`)
+
+### 12:58 EST — Phase 1 (batch 109)
+- UI components (`PremiumComponents`): replaced remaining invalid Tailwind CSS-var class syntax (e.g. `text-(--team-usa)`, `bg-(--team-usa)/10`) with valid arbitrary-value forms like `text-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/10` so styles don’t silently fail.
+- Captain components: replaced `ring-(--masters)` with `ring-[var(--masters)]` in `MatchCardGenerator`, `CourseSetupConfirmation`, and `QuickPlayerSwap`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c5ed264`)
+
+### 13:20 EST — Docs — Phase 1 sweep: add invalid Tailwind CSS-var syntax detection
+- Lobster improvement plan: added a dedicated `rg` sweep to detect invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) that can cause styles to silently fail.
+
+### 13:55 EST — Phase 1 (batch 110)
+- Lineup Builder (`/lineup/builder`): migrated the main view to the standard premium wrapper (`pb-nav page-premium-enter texture-grain`) so it matches the Phase 1 navigation pattern.
+- Lineup Builder: replaced legacy hard-coded dark theme colors with CSS variable equivalents (`var(--canvas)`, `var(--surface)`, `var(--rule)`, `var(--team-usa)`, `var(--team-europe)`, `var(--gold)`), improving theming consistency.
+- Lineup Builder: ensured `BottomNav` renders in the main state (previously only in early-return states), so the page is never a navigation dead end.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`22c5064`)
+
+### 14:55 EST — Phase 1 (batch 111)
+- Momentum Meter (compact mode): replaced the silent `return null` when no holes have been played with a small explicit placeholder (“No holes yet”), so embedding the compact widget never results in a confusing “missing” UI section.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`40653c1`)
+
+### 15:20 EST — Phase 1 (batch 112)
+- Home (`/`): migrated from bespoke `header-premium` markup to the shared `PageHeader` for consistent premium navigation.
+- Home: standardized the loading state to `PageLoadingSkeleton title="Home"` (no more hand-rolled skeleton markup).
+- Home: updated the wrapper to the standard premium page classes (`min-h-screen pb-nav page-premium-enter texture-grain`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5720717`)
+
+### 15:55 EST — Phase 1 (batch 113)
+- Scoring match detail (`/score/[matchId]`): standardized the outer wrappers to include the premium enter/texture classes (`page-premium-enter texture-grain`) so the scoring experience matches the Phase 1 navigation polish.
+- Applied consistently across signed-out, error, missing-match, and main states (no behavior change; visual consistency).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dba3aa9`)
+
+### 16:40 EST — Phase 1 (batch 114)
+- Players (`/players`) + Standings (`/standings`): when there is **no active trip**, the premium empty state now includes the shared `PageHeader` (Back + icon + subtitle) so the screen matches the standard Phase 1 navigation pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6b37c01`)

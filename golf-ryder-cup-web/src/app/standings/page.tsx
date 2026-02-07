@@ -103,6 +103,13 @@ export default function StandingsPage() {
   if (!currentTrip) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Standings"
+          subtitle="No active trip"
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
+          onBack={() => router.back()}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
