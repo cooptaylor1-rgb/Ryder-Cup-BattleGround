@@ -18,10 +18,9 @@ export function SideBetsSection({ sideBets, isCaptainMode }: SideBetsSectionProp
     const activeBets = sideBets.filter(b => b.status === 'active');
     const activeSideBetsCount = activeBets.length;
 
-    // Only show if there are active bets or captain mode is on
-    if (activeSideBetsCount === 0 && !isCaptainMode) {
-        return null;
-    }
+    // Even when there are no active bets (and captain mode is off), render an
+    // explicit empty state so Home never has a “silent gap” where a section
+    // disappears without explanation.
 
     return (
         <section className="section-sm">
@@ -32,7 +31,7 @@ export function SideBetsSection({ sideBets, isCaptainMode }: SideBetsSectionProp
                     className="type-caption"
                     style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--masters)' }}
                 >
-                    {activeSideBetsCount > 0 ? 'View All' : 'Create'} <ChevronRight size={14} />
+                    {activeSideBetsCount > 0 ? 'View All' : isCaptainMode ? 'Create' : 'View Bets'} <ChevronRight size={14} />
                 </Link>
             </div>
             {activeSideBetsCount > 0 ? (
