@@ -41,10 +41,10 @@ export function YourMatchCard({
     onEnterScore,
 }: YourMatchCardProps) {
     // Determine which team the user is on
-    const userTeam = useMemo(() => {
+    const userTeam = useMemo<undefined | 'A' | 'B'>(() => {
         if (match.teamAPlayerIds.includes(currentUserPlayer.id)) return 'A';
         if (match.teamBPlayerIds.includes(currentUserPlayer.id)) return 'B';
-        return null;
+        return undefined;
     }, [match, currentUserPlayer]);
 
     // Get partner and opponents
@@ -98,6 +98,9 @@ export function YourMatchCard({
 
     const isLive = match.status === 'inProgress';
     const formatLabel = session.sessionType.charAt(0).toUpperCase() + session.sessionType.slice(1);
+
+    const resolvedUserTeamName = userTeam === 'A' ? teamAName : userTeam === 'B' ? teamBName : 'Teams TBD';
+    const resolvedOpponentTeamName = userTeam === 'A' ? teamBName : userTeam === 'B' ? teamAName : 'Teams TBD';
 
     return (
         <button
@@ -182,8 +185,19 @@ export function YourMatchCard({
                         <p style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '4px', fontSize: '16px' }}>
                             You{partner && ` & ${formatPlayerName(partner.firstName, partner.lastName, 'short')}`}
                         </p>
-                        <p style={{ fontSize: '13px', fontWeight: 600, color: userTeam === 'A' ? 'var(--team-usa)' : 'var(--team-europe)' }}>
-                            {userTeam === 'A' ? teamAName : teamBName}
+                        <p
+                            style={{
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color:
+                                    userTeam === 'A'
+                                        ? 'var(--team-usa)'
+                                        : userTeam === 'B'
+                                            ? 'var(--team-europe)'
+                                            : 'var(--ink-secondary)',
+                            }}
+                        >
+                            {resolvedUserTeamName}
                         </p>
                     </div>
 
@@ -202,10 +216,23 @@ export function YourMatchCard({
                     {/* Opponents */}
                     <div style={{ flex: 1, textAlign: 'right' }}>
                         <p style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '4px', fontSize: '16px' }}>
-                            {opponents.map(o => formatPlayerName(o.firstName, o.lastName, 'short')).join(' & ')}
+                            {opponents.length > 0
+                                ? opponents.map(o => formatPlayerName(o.firstName, o.lastName, 'short')).join(' & ')
+                                : 'TBD'}
                         </p>
-                        <p style={{ fontSize: '13px', fontWeight: 600, color: userTeam === 'A' ? 'var(--team-europe)' : 'var(--team-usa)' }}>
-                            {userTeam === 'A' ? teamBName : teamAName}
+                        <p
+                            style={{
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color:
+                                    userTeam === 'A'
+                                        ? 'var(--team-europe)'
+                                        : userTeam === 'B'
+                                            ? 'var(--team-usa)'
+                                            : 'var(--ink-secondary)',
+                            }}
+                        >
+                            {resolvedOpponentTeamName}
                         </p>
                     </div>
                 </div>
@@ -225,11 +252,20 @@ export function YourMatchCard({
                     <p
                         className="score-large"
                         style={{
-                            color: matchState.currentScore > 0
-                                ? (userTeam === 'A' ? 'var(--team-usa)' : 'var(--team-europe)')
-                                : matchState.currentScore < 0
-                                    ? (userTeam === 'A' ? 'var(--team-europe)' : 'var(--team-usa)')
-                                    : 'var(--ink-secondary)',
+                            color:
+                                matchState.currentScore > 0
+                                    ? userTeam === 'A'
+                                        ? 'var(--team-usa)'
+                                        : userTeam === 'B'
+                                            ? 'var(--team-europe)'
+                                            : 'var(--ink-secondary)'
+                                    : matchState.currentScore < 0
+                                        ? userTeam === 'A'
+                                            ? 'var(--team-europe)'
+                                            : userTeam === 'B'
+                                                ? 'var(--team-usa)'
+                                                : 'var(--ink-secondary)'
+                                        : 'var(--ink-secondary)',
                         }}
                     >
                         {matchState.displayScore}
