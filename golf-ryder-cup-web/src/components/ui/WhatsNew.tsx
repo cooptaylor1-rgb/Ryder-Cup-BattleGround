@@ -163,7 +163,7 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
 
           <h2
             className="text-xl font-semibold mb-1"
-            style={{ fontFamily: "'Instrument Serif', Georgia, serif", color: 'var(--cream)' }}
+            style={{ fontFamily: 'var(--font-serif)', color: 'var(--cream)' }}
           >
             What&apos;s New
           </h2>

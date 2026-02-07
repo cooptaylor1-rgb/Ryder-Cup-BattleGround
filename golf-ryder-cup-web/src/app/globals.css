@@ -1,106 +1,113 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap');
 @import 'tailwindcss';
 
 /* ============================================
-   RYDER CUP TRACKER — DESIGN SYSTEM v2.1
+   RYDER CUP TRACKER — DESIGN SYSTEM v3.0
+   "The Fried Egg" Editorial Redesign
 
    Philosophy:
-   - Calm authority, not busy dashboard
-   - Numbers are sacred, typography is everything
-   - Team identity is subtle but unmistakable
-   - White space is a feature, not emptiness
+   - Editorial warmth meets Swiss precision
+   - Numbers are sacred, typography has character
+   - Restraint over maximalism
+   - White space is the luxury
+   - Warm paper, not sterile screens
 
-   Inspired by: The Masters app, NYT Sports,
-   Wimbledon scoring, classic golf scorecards
+   Inspired by: The Fried Egg Golf, The Golfer's
+   Journal, Augusta National scoreboard, NYT Sports
    ============================================ */
 
 /* ============================================
    CUSTOM FONTS
 
-   We use two fonts strategically:
-   - Inter: Clean, legible UI text (loaded via next/font)
-   - Instrument Serif: Elegant, warm display numbers
+   Two fonts with character:
+   - Plus Jakarta Sans: Warm grotesque with personality
+     (inspired by Fried Egg's LL Grey)
+   - Instrument Serif: Elegant display & scores
+     (warm editorial serif with attitude)
    ============================================ */
-/* Instrument Serif loaded via Google Fonts import above */
 
 /* ============================================
-   DESIGN TOKENS
-
-   Single source of truth.
-   Change here, change everywhere.
+   DESIGN TOKENS — Single source of truth
    ============================================ */
 :root {
+  /* ---- FONT FAMILIES ---- */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', Monaco, Consolas, monospace;
+
   /* ---- CANVAS ----
-     Warm, paper-like surfaces.
-     Not stark white, not cold gray. */
-  --canvas: #fdfcfa;
-  --canvas-rgb: 253, 252, 250;
-  --canvas-raised: #ffffff;
-  --canvas-sunken: #f7f6f3;
-  --canvas-warm: #faf9f6;
+     Warm parchment surfaces.
+     Like quality paper, not a screen. */
+  --canvas: #FAF8F5;
+  --canvas-rgb: 250, 248, 245;
+  --canvas-raised: #FFFFFF;
+  --canvas-sunken: #F4F1ED;
+  --canvas-warm: #F0EDE8;
 
   /* ---- INK ----
      Text hierarchy with warmth.
      True black is too harsh. */
-  --ink: #1c1917;
-  --ink-secondary: #57534e;
-  --ink-tertiary: #a8a29e;
-  --ink-faint: #d6d3d1;
+  --ink: #1A1815;
+  --ink-secondary: #6B6560;
+  --ink-tertiary: #A39E98;
+  --ink-faint: #D4CFC9;
 
   /* ---- RULE ----
      Dividers that whisper, not shout */
-  --rule: #e7e5e4;
-  --rule-strong: #d6d3d1;
-  --rule-faint: #f5f5f4;
+  --rule: #E8E4DF;
+  --rule-strong: #D4CFC9;
+  --rule-faint: #F0EDE8;
 
   /* ---- BRAND ----
-     Masters green — timeless, dignified */
+     Three-color system: green, gold, maroon
+     Each has a specific role */
   --masters: #006644;
   --masters-rgb: 0, 102, 68;
-  --masters-hover: #007a52;
-  --masters-deep: #004d33;
-  --masters-subtle: #e8f5f0;
+  --masters-hover: #007A52;
+  --masters-deep: #004D33;
+  --masters-subtle: #E6F2ED;
   --masters-glow: rgba(0, 102, 68, 0.08);
 
-  /* ============================================
-     TEAM IDENTITY SYSTEM — v2.1 Upgrade
+  /* Gold accent — the "fried egg" warmth */
+  --gold: #C9A227;
+  --gold-light: #D4B84A;
+  --gold-dark: #A88A1E;
+  --gold-subtle: rgba(201, 162, 39, 0.12);
 
-     Each team has a rich, multi-layered palette.
-     Colors evoke historic rivalry and prestige.
-     ============================================ */
+  /* Maroon — depth, captain mode, hover states */
+  --maroon: #722F37;
+  --maroon-light: #8B3D47;
+  --maroon-dark: #5A252C;
+  --maroon-subtle: rgba(114, 47, 55, 0.08);
 
-  /* ---- TEAM USA ----
-     Navy & Gold: Timeless American elegance
-     Deep enough for reverence, not harsh */
-  --team-usa: #1e3a5f;
-  --team-usa-deep: #152b47;
-  --team-usa-light: #e8eef4;
-  --team-usa-muted: #4a6b8a;
-  --team-usa-glow: rgba(30, 58, 95, 0.12);
-  --team-usa-gradient-start: #1e3a5f;
-  --team-usa-gradient-end: #2a4a73;
-  --team-usa-accent: #c9a227;
+  /* ---- TEAM IDENTITY ----
+     USA: Navy & Gold — timeless American elegance
+     Europe: Burgundy & Gold — continental sophistication */
+  --team-usa: #1E3A5F;
+  --team-usa-deep: #152B47;
+  --team-usa-light: #EBF0F5;
+  --team-usa-muted: #4A6B8A;
+  --team-usa-glow: rgba(30, 58, 95, 0.10);
+  --team-usa-gradient-start: #1E3A5F;
+  --team-usa-gradient-end: #2A4A73;
+  --team-usa-accent: #C9A227;
 
-  /* ---- TEAM EUROPE ----
-     Burgundy & Gold: Continental sophistication
-     Wine-rich, warm, dignified */
-  --team-europe: #722f37;
-  --team-europe-deep: #5a252c;
-  --team-europe-light: #f4ebec;
-  --team-europe-muted: #9a5a63;
-  --team-europe-glow: rgba(114, 47, 55, 0.12);
-  --team-europe-gradient-start: #722f37;
-  --team-europe-gradient-end: #8b3d47;
-  --team-europe-accent: #d4af37;
+  --team-europe: #722F37;
+  --team-europe-deep: #5A252C;
+  --team-europe-light: #F5ECEE;
+  --team-europe-muted: #9A5A63;
+  --team-europe-glow: rgba(114, 47, 55, 0.10);
+  --team-europe-gradient-start: #722F37;
+  --team-europe-gradient-end: #8B3D47;
+  --team-europe-accent: #D4AF37;
 
-  /* ---- SEMANTIC ---- */
-  --success: #166534;
-  --warning: #a16207;
-  --error: #991b1b;
+  /* ---- SEMANTIC — Muted, not alarming ---- */
+  --success: #2D7A4F;
+  --warning: #B8860B;
+  --error: #A63D40;
 
   /* ---- SPACING ----
-     8px grid, generous rhythm.
-     Mobile first but breathing room. */
+     8px grid. Generous editorial rhythm. */
   --space-0: 0px;
   --space-1: 4px;
   --space-2: 8px;
@@ -116,43 +123,32 @@
   --space-24: 96px;
 
   /* ---- TYPOGRAPHY SCALE ----
-     Modular scale (1.25 ratio)
-     With optical adjustments */
-  --text-xs: 11px;
-  --text-sm: 13px;
-  --text-base: 15px;
-  --text-lg: 17px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 32px;
-  --text-4xl: 40px;
-  --text-5xl: 56px;
-  --text-6xl: 72px;
-  --text-7xl: 96px;
+     Fluid where possible, fixed where precise */
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-lg: 1.0625rem;   /* 17px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 2rem;       /* 32px */
+  --text-4xl: 2.5rem;     /* 40px */
+  --text-5xl: 3.5rem;     /* 56px */
+  --text-6xl: 4.5rem;     /* 72px */
+  --text-7xl: 6rem;       /* 96px */
 
   /* ---- MOTION ----
-     Premium, physics-based animation system.
-     Every interaction should feel inevitable. */
-
-  /* Core easings - natural physics */
+     Restrained, editorial. Not playful. */
   --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  /* Premium easings - world-class feel */
-  --ease-bounce: cubic-bezier(0.34, 1.8, 0.64, 1);
-  --ease-snap: cubic-bezier(0.2, 1.4, 0.4, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-decel: cubic-bezier(0, 0, 0.2, 1);
-  --ease-accel: cubic-bezier(0.4, 0, 1, 1);
 
-  /* Duration scale - purposeful timing */
   --duration-instant: 50ms;
   --duration-fast: 100ms;
   --duration-normal: 200ms;
   --duration-slow: 350ms;
   --duration-slower: 500ms;
-  --duration-slowest: 700ms;
 
   /* ---- RADII ---- */
   --radius-sm: 4px;
@@ -162,25 +158,25 @@
   --radius-full: 9999px;
 
   /* ---- SHADOWS ----
-     Soft, warm shadows */
-  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
-  --shadow-md: 0 2px 8px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
-  --shadow-lg: 0 8px 24px rgba(28, 25, 23, 0.08), 0 2px 6px rgba(28, 25, 23, 0.04);
+     Warm and subtle. Three levels only. */
+  --shadow-sm: 0 1px 2px rgba(26, 24, 21, 0.04);
+  --shadow-md: 0 2px 8px rgba(26, 24, 21, 0.06), 0 1px 2px rgba(26, 24, 21, 0.03);
+  --shadow-lg: 0 8px 24px rgba(26, 24, 21, 0.08), 0 2px 6px rgba(26, 24, 21, 0.03);
+  --shadow-focus: 0 0 0 3px rgba(0, 102, 68, 0.12);
   --shadow-glow-masters: 0 0 0 3px var(--masters-glow);
-  --shadow-glow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
+  --shadow-glow-gold: 0 0 16px rgba(201, 162, 39, 0.2);
   --shadow-card-sm: var(--shadow-sm);
   --shadow-card-md: var(--shadow-md);
   --shadow-card-lg: var(--shadow-lg);
 
   /* ---- SKELETON ---- */
-  --shimmer-color: rgba(0, 0, 0, 0.08);
+  --shimmer-color: rgba(0, 0, 0, 0.06);
 
-  /* ---- SEMANTIC ALIASES ----
-     Self-documenting design tokens */
+  /* ---- SEMANTIC ALIASES ---- */
   --color-primary: var(--masters);
   --color-primary-hover: var(--masters-hover);
-  --color-accent: #d4af37;
-  --color-accent-subtle: rgba(212, 175, 55, 0.2);
+  --color-accent: var(--gold);
+  --color-accent-subtle: var(--gold-subtle);
   --background-base: var(--canvas);
   --background-elevated: var(--canvas-raised);
   --background-muted: var(--canvas-sunken);
@@ -209,14 +205,7 @@ html {
 body {
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(
-    --font-inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    system-ui,
-    sans-serif
-  );
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: 1.6;
   font-feature-settings:
@@ -397,8 +386,8 @@ textarea:focus-visible {
    Instrument Serif brings warmth and elegance. */
 
 .score-monumental {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  font-size: var(--text-7xl);
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 12vw, 6rem);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.04em;
@@ -406,7 +395,7 @@ textarea:focus-visible {
 }
 
 .score-hero {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-serif);
   font-size: var(--text-6xl);
   font-weight: 400;
   line-height: 1;
@@ -415,7 +404,7 @@ textarea:focus-visible {
 }
 
 .score-large {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-serif);
   font-size: var(--text-4xl);
   font-weight: 400;
   line-height: 1;
@@ -424,7 +413,7 @@ textarea:focus-visible {
 }
 
 .score-medium {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   font-weight: 400;
   line-height: 1;
@@ -433,7 +422,7 @@ textarea:focus-visible {
 }
 
 .score-small {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-lg);
   font-weight: 600;
   line-height: 1;
@@ -445,7 +434,7 @@ textarea:focus-visible {
    Tournament names, major headlines */
 
 .type-display {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-serif);
   font-size: var(--text-3xl);
   font-weight: 400;
   line-height: 1.15;
@@ -453,7 +442,7 @@ textarea:focus-visible {
 }
 
 .type-display-sm {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   font-weight: 400;
   line-height: 1.2;
@@ -464,7 +453,7 @@ textarea:focus-visible {
    Section headers, modal titles */
 
 .type-title {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-lg);
   font-weight: 600;
   line-height: 1.3;
@@ -473,7 +462,7 @@ textarea:focus-visible {
 }
 
 .type-title-sm {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 600;
   line-height: 1.3;
@@ -484,14 +473,14 @@ textarea:focus-visible {
 /* ---- BODY TYPOGRAPHY ---- */
 
 .type-body {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: 1.6;
   color: var(--ink);
 }
 
 .type-body-sm {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--ink-secondary);
@@ -501,7 +490,7 @@ textarea:focus-visible {
    Labels, timestamps, supporting info */
 
 .type-caption {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: 1.4;
   color: var(--ink-secondary);
@@ -509,7 +498,7 @@ textarea:focus-visible {
 }
 
 .type-micro {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   line-height: 1.3;
   color: var(--ink-tertiary);
@@ -520,7 +509,7 @@ textarea:focus-visible {
    Section labels, categories */
 
 .type-overline {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
   line-height: 1;
@@ -531,7 +520,7 @@ textarea:focus-visible {
 
 /* Alias for backwards compatibility */
 .type-headline {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   font-weight: 400;
   line-height: 1.2;
@@ -539,7 +528,7 @@ textarea:focus-visible {
 }
 
 .type-meta {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: 1.4;
   color: var(--ink-secondary);
@@ -552,7 +541,7 @@ textarea:focus-visible {
 /* Editorial container - comfortable reading width */
 .container-editorial {
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   padding-left: var(--space-5);
@@ -567,15 +556,30 @@ textarea:focus-visible {
   padding-right: var(--space-5);
 }
 
-/* Section with generous padding */
+/* Section hierarchy — editorial breathing room */
 .section {
-  padding-top: var(--space-10);
-  padding-bottom: var(--space-10);
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-12);
 }
 
 .section-sm {
-  padding-top: var(--space-6);
-  padding-bottom: var(--space-6);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.section-xs {
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+
+/* Editorial section with bottom border */
+.section-editorial {
+  padding: var(--space-10) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-editorial:last-child {
+  border-bottom: none;
 }
 
 /* Divider - subtle horizontal rule */
@@ -598,6 +602,225 @@ textarea:focus-visible {
   background: var(--rule-faint);
   border: none;
   margin: var(--space-6) 0;
+}
+
+/* ---- EDITORIAL CARD SYSTEM ----
+   Clean, warm, understated */
+.card-editorial {
+  background: var(--canvas-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.card-editorial:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Interactive card with press feedback */
+.card-interactive {
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.card-interactive:active {
+  transform: scale(0.98);
+  opacity: 0.95;
+}
+
+/* Captain mode accent card */
+.card-captain {
+  background: var(--canvas-raised);
+  border: 1px solid var(--maroon-subtle);
+  border-left: 3px solid var(--maroon);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+/* Live indicator — refined pulse */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--error);
+}
+
+.live-indicator::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--error);
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Score display — monumental, breathing */
+.score-display {
+  text-align: center;
+  padding: var(--space-10) 0;
+}
+
+.score-display-number {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.score-display-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: var(--space-3);
+}
+
+/* Press scale utility */
+.press-scale {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.press-scale:active {
+  transform: scale(0.97);
+}
+
+/* Quick action button — editorial style */
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--canvas-raised);
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--ink);
+  transition: all var(--duration-fast) var(--ease-out);
+  min-height: 72px;
+  justify-content: center;
+}
+
+.quick-action-btn:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--rule-strong);
+}
+
+/* Header — premium editorial */
+.header-premium {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(250, 248, 245, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  padding: var(--space-3) 0;
+}
+
+/* Navigation — refined bottom bar */
+.nav-premium {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--rule);
+}
+
+/* Premium button — Masters green CTA */
+.btn-premium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--masters);
+  color: white;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  min-height: 44px;
+}
+
+.btn-premium:hover {
+  background: var(--masters-hover);
+}
+
+.btn-premium:active {
+  transform: scale(0.96);
+}
+
+/* Card premium — clean surface */
+.card-premium {
+  background: var(--canvas-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xl);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.card-premium:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Card — standard surface */
+.card {
+  background: var(--canvas-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+
+/* Texture grain — subtle paper feel */
+.texture-grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Page entrance animation */
+.page-premium-enter {
+  animation: pageEnter var(--duration-slow) var(--ease-out);
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Stagger animation for lists */
+.stagger-fast .stagger-item {
+  animation: fadeInUp var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ============================================
@@ -706,7 +929,7 @@ textarea:focus-visible {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-4) var(--space-5);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 600;
   line-height: 1;
@@ -799,7 +1022,7 @@ textarea:focus-visible {
 .input {
   width: 100%;
   padding: var(--space-4);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: 16px;
   /* Prevents iOS zoom on focus */
   line-height: 1.5;
@@ -867,14 +1090,14 @@ textarea:focus-visible {
 }
 
 .score-btn-label {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .score-btn-hint {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 500;
   opacity: 0.8;
@@ -933,7 +1156,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
   flex-shrink: 0;
@@ -1022,7 +1245,7 @@ textarea:focus-visible {
 }
 
 .leaderboard-rank {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink-tertiary);
@@ -1055,7 +1278,7 @@ textarea:focus-visible {
 }
 
 .empty-state-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-xl);
   font-weight: 400;
   color: var(--ink);
@@ -1063,7 +1286,7 @@ textarea:focus-visible {
 }
 
 .empty-state-text {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--ink-secondary);
   margin-bottom: var(--space-8);
@@ -1103,7 +1326,7 @@ textarea:focus-visible {
 }
 
 .modal-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   font-weight: 400;
   color: var(--ink);
@@ -1182,7 +1405,7 @@ textarea:focus-visible {
   color: var(--canvas);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-lg);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 500;
   z-index: 60;
@@ -1284,7 +1507,7 @@ textarea:focus-visible {
 }
 
 .error-boundary-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-3xl);
   font-weight: 400;
   color: var(--ink);
@@ -1292,7 +1515,7 @@ textarea:focus-visible {
 }
 
 .error-boundary-description {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--ink-secondary);
   max-width: 320px;
@@ -1312,7 +1535,7 @@ textarea:focus-visible {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 500;
   border: none;
@@ -1608,7 +1831,7 @@ textarea:focus-visible {
 }
 
 .success-overlay-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   color: var(--ink);
   margin-bottom: var(--space-2);
@@ -1639,7 +1862,7 @@ textarea:focus-visible {
 }
 
 .victory-celebration-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-4xl);
   font-weight: 400;
   margin-top: var(--space-4);
@@ -1668,7 +1891,7 @@ textarea:focus-visible {
 }
 
 .victory-score-team {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-6xl);
   font-weight: 400;
   line-height: 1;
@@ -1681,7 +1904,7 @@ textarea:focus-visible {
 
 .victory-celebration-button {
   padding: var(--space-4) var(--space-10);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--cream);
@@ -1701,7 +1924,7 @@ textarea:focus-visible {
 /* Point scored floating text */
 .point-scored {
   position: fixed;
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-3xl);
   font-weight: 400;
   pointer-events: none;
@@ -1767,7 +1990,7 @@ textarea:focus-visible {
 }
 
 .achievement-badge-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-base);
   font-weight: 400;
   color: var(--ink);
@@ -2007,7 +2230,7 @@ textarea:focus-visible {
   gap: var(--space-2);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -2207,7 +2430,7 @@ textarea:focus-visible {
 .score-vs-divider {
   display: flex;
   align-items: center;
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   color: var(--ink-faint);
 }
@@ -2279,12 +2502,12 @@ textarea:focus-visible {
 html.outdoor,
 html.outdoor:root {
   /* ---- CANVAS (Outdoor) ----
-     Pure white backgrounds for maximum brightness */
-  --canvas: #ffffff !important;
+     Bright surfaces for sunlight visibility */
+  --canvas: #FFFFFF !important;
   --canvas-rgb: 255, 255, 255 !important;
-  --canvas-raised: #ffffff !important;
-  --canvas-sunken: #f5f5f5 !important;
-  --canvas-warm: #ffffff !important;
+  --canvas-raised: #FFFFFF !important;
+  --canvas-sunken: #F5F5F3 !important;
+  --canvas-warm: #FAFAF8 !important;
 
   /* ---- INK (Outdoor) ----
      Maximum contrast text */
@@ -2295,17 +2518,17 @@ html.outdoor:root {
 
   /* ---- RULE (Outdoor) ----
      More visible dividers */
-  --rule: #cccccc !important;
+  --rule: #CCCCCC !important;
   --rule-strong: #999999 !important;
-  --rule-faint: #e5e5e5 !important;
+  --rule-faint: #E5E5E5 !important;
 
   /* ---- BRAND (Outdoor) ----
      Deeper green for sunlight visibility */
-  --masters: #004d33 !important;
+  --masters: #004D33 !important;
   --masters-rgb: 0, 77, 51 !important;
   --masters-hover: #006644 !important;
-  --masters-deep: #003d29 !important;
-  --masters-subtle: #e8f5f0 !important;
+  --masters-deep: #003D29 !important;
+  --masters-subtle: #E6F2ED !important;
   --masters-glow: rgba(0, 77, 51, 0.15) !important;
 
   /* ---- SURFACE ---- */
@@ -2994,7 +3217,7 @@ html.dark body {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -4479,7 +4702,7 @@ html.dark body {
 
 /* Title with serif elegance */
 .empty-state-premium .empty-state-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
   font-weight: 400;
   color: var(--ink);
@@ -4489,7 +4712,7 @@ html.dark body {
 
 /* Description with warmth */
 .empty-state-premium .empty-state-text {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--ink-secondary);
   max-width: 300px;
@@ -4499,7 +4722,7 @@ html.dark body {
 
 /* Motivational subtext */
 .empty-state-hint {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   color: var(--ink-tertiary);
   font-style: italic;
@@ -4515,7 +4738,7 @@ html.dark body {
   padding: var(--space-4) var(--space-8);
   background: var(--masters);
   color: var(--cream);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 500;
   border: none;
@@ -4543,7 +4766,7 @@ html.dark body {
   padding: var(--space-3) var(--space-5);
   background: transparent;
   color: var(--ink-secondary);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 500;
   border: 1px solid var(--stroke);
@@ -4649,7 +4872,7 @@ html.dark body {
 }
 
 .onboarding-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: clamp(1.75rem, 5vw, 2.25rem);
   font-weight: 400;
   color: var(--ink);
@@ -4659,7 +4882,7 @@ html.dark body {
 }
 
 .onboarding-subtitle {
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--ink-secondary);
   max-width: 300px;
@@ -4749,7 +4972,7 @@ html.dark body {
   padding: var(--space-4);
   background: linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%);
   color: var(--cream);
-  font-family: var(--font-inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   font-weight: 600;
   border: none;
@@ -4827,7 +5050,7 @@ html.dark body {
 }
 
 .onboarding-card-title {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-lg);
   color: var(--ink);
   margin-bottom: var(--space-2);
@@ -5531,7 +5754,7 @@ html.dark body {
 }
 
 .standings-score {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-6xl);
   font-weight: 400;
   line-height: 1;
@@ -5565,7 +5788,7 @@ html.dark body {
 }
 
 .versus-text {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: var(--text-sm);
   color: var(--ink-tertiary);
   text-transform: uppercase;

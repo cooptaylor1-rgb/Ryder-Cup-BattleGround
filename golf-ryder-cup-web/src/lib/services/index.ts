@@ -86,6 +86,9 @@ export {
 // Trip stats
 export * from './tripStatsService';
 
+// Narrative / editorial recaps
+export * from './narrativeService';
+
 export { default as HandicapCalculator } from './handicapCalculator';
 export { default as ScoringEngine } from './scoringEngine';
 export { default as TournamentEngine } from './tournamentEngine';

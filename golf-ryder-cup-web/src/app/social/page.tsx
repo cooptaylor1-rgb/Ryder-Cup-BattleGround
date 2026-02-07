@@ -263,7 +263,7 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
     gap: 'var(--space-2)',
     padding: 'var(--space-2) var(--space-4)',
     borderRadius: 'var(--radius-full)',
-    fontSize: 'var(--font-sm)',
+    fontSize: 'var(--text-sm)',
     fontWeight: 500,
     transition: 'all 0.2s ease',
     background: active ? 'var(--masters)' : 'var(--canvas-raised)',

@@ -17,7 +17,7 @@ import {
   QrCode,
   Settings,
   ChevronRight,
-    ChevronDown,
+  ChevronDown,
   Plus,
   AlertTriangle,
   CheckCircle2,
@@ -35,12 +35,12 @@ import {
 /**
  * CAPTAIN COMMAND CENTER
  *
- * The hub for all captain operations. Masters-inspired design with
- * clear information hierarchy and quick access to essential tools.
+ * The hub for all captain operations. Editorial design with maroon accent
+ * to visually distinguish captain mode from the rest of the app.
  *
  * Features:
  * - Trip status overview
- * - Quick actions grid
+ * - Editorial tool index with clean typography
  * - Session management
  * - Pre-round checklist access
  * - Player availability
@@ -66,7 +66,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: "Track who's here",
     icon: UserCheck,
     href: '/captain/availability',
-    color: '#22c55e',
+    color: 'var(--maroon)',
     priority: true,
   },
   {
@@ -75,7 +75,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Build match pairings',
     icon: Users,
     href: '/lineup/new',
-    color: 'var(--masters)',
+    color: 'var(--maroon)',
     priority: true,
   },
   {
@@ -84,7 +84,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Edit matches & players',
     icon: Sliders,
     href: '/captain/manage',
-    color: '#ef4444',
+    color: 'var(--maroon)',
     priority: true,
   },
   {
@@ -93,7 +93,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Review scoring changes',
     icon: Shield,
     href: '/captain/audit',
-    color: '#0ea5e9',
+    color: 'var(--maroon)',
     priority: true,
   },
   {
@@ -102,7 +102,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: "Verify everything's ready",
     icon: ClipboardCheck,
     href: '/captain/checklist',
-    color: '#3b82f6',
+    color: 'var(--maroon)',
     priority: true,
   },
   // Setup Actions (typically done before day-of)
@@ -112,7 +112,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Assign players to teams',
     icon: Shuffle,
     href: '/captain/draft',
-    color: '#8b5cf6',
+    color: 'var(--maroon-light)',
   },
   {
     id: 'messages',
@@ -120,7 +120,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Send announcements',
     icon: MessageSquare,
     href: '/captain/messages',
-    color: '#f59e0b',
+    color: 'var(--maroon-light)',
   },
   {
     id: 'bets',
@@ -128,7 +128,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Create & manage bets',
     icon: DollarSign,
     href: '/captain/bets',
-    color: '#10b981',
+    color: 'var(--maroon-light)',
   },
   {
     id: 'invites',
@@ -136,7 +136,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Manage trip invites',
     icon: QrCode,
     href: '/captain/invites',
-    color: '#ec4899',
+    color: 'var(--maroon-light)',
   },
   {
     id: 'carts',
@@ -144,7 +144,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Assign golf carts',
     icon: Car,
     href: '/captain/carts',
-    color: '#06b6d4',
+    color: 'var(--maroon-light)',
   },
   {
     id: 'contacts',
@@ -152,7 +152,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Emergency & venue',
     icon: Phone,
     href: '/captain/contacts',
-    color: '#64748b',
+    color: 'var(--maroon-light)',
   },
 ];
 
@@ -252,15 +252,22 @@ export default function CaptainPage() {
     (readinessItems.filter((r) => r.done).length / readinessItems.length) * 100
   );
 
+  const priorityActions = QUICK_ACTIONS.filter((a) => a.priority);
+  const secondaryActions = QUICK_ACTIONS.filter((a) => !a.priority);
+
   return (
     <div
       className="min-h-screen pb-nav page-premium-enter texture-grain"
       style={{ background: 'var(--canvas)' }}
     >
-            <PageHeader
+      <PageHeader
         title="Captain Command"
         subtitle={currentTrip.name}
-        icon={<Shield size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Shield size={16} style={{ color: 'white' }} />}
+        iconContainerStyle={{
+          background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)',
+          boxShadow: '0 0 0 3px rgba(114, 47, 55, 0.12)',
+        }}
         onBack={() => router.back()}
         rightSlot={
           <Link
@@ -275,39 +282,60 @@ export default function CaptainPage() {
 
       <main className="container-editorial">
         {/* Trip Readiness */}
-        <section className="section">
+        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
           <div
-            className="card"
+            className="card-captain"
             style={{
-              padding: 'var(--space-5)',
               background:
                 readinessPercent === 100
-                  ? 'linear-gradient(135deg, rgba(0, 103, 71, 0.1) 0%, rgba(0, 103, 71, 0.05) 100%)'
-                  : 'var(--surface)',
+                  ? 'linear-gradient(135deg, rgba(0, 103, 71, 0.06) 0%, rgba(0, 103, 71, 0.02) 100%)'
+                  : 'var(--canvas-raised)',
             }}
           >
             <div
-              className="flex items-center justify-between"
-              style={{ marginBottom: 'var(--space-4)' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--space-4)',
+              }}
             >
-              <div className="flex items-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                 {readinessPercent === 100 ? (
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'var(--masters)' }}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--masters)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
                     <Zap size={20} style={{ color: 'white' }} />
                   </div>
                 ) : (
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'var(--warning)', opacity: 0.9 }}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--warning)',
+                      opacity: 0.9,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
                     <AlertTriangle size={20} style={{ color: 'white' }} />
                   </div>
                 )}
                 <div>
-                  <p className="type-title-sm">
+                  <p
+                    className="type-title-sm"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
                     {readinessPercent === 100 ? 'Ready to Play' : 'Setup Required'}
                   </p>
                   <p className="type-caption">{readinessPercent}% complete</p>
@@ -316,7 +344,7 @@ export default function CaptainPage() {
               <Link
                 href="/captain/checklist"
                 className="type-meta"
-                style={{ color: 'var(--masters)' }}
+                style={{ color: 'var(--maroon)', fontWeight: 600 }}
               >
                 Details
               </Link>
@@ -324,28 +352,41 @@ export default function CaptainPage() {
 
             {/* Progress bar */}
             <div
-              className="w-full h-2 rounded-full overflow-hidden"
-              style={{ background: 'var(--rule)' }}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                overflow: 'hidden',
+                background: 'var(--rule)',
+              }}
             >
               <div
-                className="h-full rounded-full transition-all duration-500"
                 style={{
+                  height: '100%',
+                  borderRadius: '3px',
+                  transition: 'width 500ms ease',
                   width: `${readinessPercent}%`,
-                  background: readinessPercent === 100 ? 'var(--masters)' : 'var(--warning)',
+                  background: readinessPercent === 100 ? 'var(--masters)' : 'var(--maroon)',
                 }}
               />
             </div>
 
             {/* Readiness items */}
-            <div className="flex gap-4 mt-4">
+            <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
               {readinessItems.map((item) => (
-                <div key={item.label} className="flex items-center gap-2">
+                <div
+                  key={item.label}
+                  style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                >
                   {item.done ? (
                     <CheckCircle2 size={14} style={{ color: 'var(--success)' }} />
                   ) : (
                     <Clock size={14} style={{ color: 'var(--ink-tertiary)' }} />
                   )}
-                  <span className="type-micro">
+                  <span
+                    className="type-micro"
+                    style={{ fontFamily: 'var(--font-sans)' }}
+                  >
                     {item.label}: <strong>{item.count}</strong>
                   </span>
                 </div>
@@ -354,71 +395,198 @@ export default function CaptainPage() {
           </div>
         </section>
 
-        {/* Quick Actions Grid - P0-7: Simplified with expandable section */}
-        <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
-            Quick Actions
+        {/* Captain Tools Index -- Editorial list layout */}
+        <section style={{ paddingBottom: 'var(--space-6)' }}>
+          <h2
+            className="type-overline"
+            style={{
+              color: 'var(--maroon)',
+              marginBottom: 'var(--space-5)',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            Captain Tools
           </h2>
 
-          {/* Priority Actions (always visible) */}
-          <div className="grid grid-cols-2 gap-3">
-            {QUICK_ACTIONS.filter((a) => a.priority).map((action) => (
+          {/* Priority Actions -- editorial index rows */}
+          <div
+            style={{
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--maroon-subtle)',
+              borderLeft: '3px solid var(--maroon)',
+              borderRadius: 'var(--radius-lg)',
+              overflow: 'hidden',
+            }}
+          >
+            {priorityActions.map((action, index) => (
               <Link
                 key={action.id}
                 href={action.href}
-                className="card press-scale"
-                style={{ padding: 'var(--space-4)' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-4)',
+                  padding: 'var(--space-4) var(--space-5)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  borderBottom:
+                    index < priorityActions.length - 1
+                      ? '1px solid var(--rule-faint)'
+                      : 'none',
+                  transition: 'background 150ms ease',
+                }}
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                  style={{ background: `${action.color}15`, color: action.color }}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--maroon-subtle)',
+                    color: 'var(--maroon)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
                 >
-                  <action.icon size={20} />
+                  <action.icon size={18} strokeWidth={1.75} />
                 </div>
-                <p className="type-title-sm">{action.label}</p>
-                <p className="type-micro" style={{ marginTop: '2px' }}>
-                  {action.description}
-                </p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontWeight: 600,
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--ink-primary)',
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {action.label}
+                  </p>
+                  <p
+                    className="type-micro"
+                    style={{
+                      color: 'var(--ink-tertiary)',
+                      marginTop: '2px',
+                      fontFamily: 'var(--font-sans)',
+                    }}
+                  >
+                    {action.description}
+                  </p>
+                </div>
+                <ChevronRight
+                  size={16}
+                  strokeWidth={1.5}
+                  style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
+                />
               </Link>
             ))}
           </div>
 
           {/* Expandable Secondary Actions */}
-          <div className="mt-3">
+          <div style={{ marginTop: 'var(--space-4)' }}>
             <button
               onClick={() => setShowAllActions(!showAllActions)}
-              className="w-full py-3 flex items-center justify-center gap-2 text-sm font-medium
-                       rounded-lg border border-gray-200 dark:border-gray-700
-                       hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-              style={{ color: 'var(--ink-secondary)' }}
+              style={{
+                width: '100%',
+                padding: 'var(--space-3) var(--space-4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 500,
+                color: 'var(--maroon)',
+                background: 'transparent',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--radius-md)',
+                cursor: 'pointer',
+                transition: 'background 150ms ease',
+              }}
             >
-              <span>{showAllActions ? 'Show Less' : 'Show More Actions'}</span>
+              <span>{showAllActions ? 'Show Less' : 'More Tools'}</span>
               <ChevronDown
                 size={16}
-                className={`transition-transform duration-200 ${showAllActions ? 'rotate-180' : ''}`}
+                style={{
+                  transition: 'transform 200ms ease',
+                  transform: showAllActions ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
               />
             </button>
 
-            {/* Secondary Actions (collapsible) */}
+            {/* Secondary Actions list */}
             {showAllActions && (
-              <div className="grid grid-cols-2 gap-3 mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                {QUICK_ACTIONS.filter((a) => !a.priority).map((action) => (
+              <div
+                style={{
+                  marginTop: 'var(--space-3)',
+                  background: 'var(--canvas-raised)',
+                  border: '1px solid var(--rule)',
+                  borderRadius: 'var(--radius-lg)',
+                  overflow: 'hidden',
+                }}
+              >
+                {secondaryActions.map((action, index) => (
                   <Link
                     key={action.id}
                     href={action.href}
-                    className="card press-scale"
-                    style={{ padding: 'var(--space-4)' }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-4)',
+                      padding: 'var(--space-4) var(--space-5)',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      borderBottom:
+                        index < secondaryActions.length - 1
+                          ? '1px solid var(--rule-faint)'
+                          : 'none',
+                      transition: 'background 150ms ease',
+                    }}
                   >
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                      style={{ background: `${action.color}15`, color: action.color }}
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--maroon-subtle)',
+                        color: 'var(--maroon-light)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
                     >
-                      <action.icon size={20} />
+                      <action.icon size={18} strokeWidth={1.75} />
                     </div>
-                    <p className="type-title-sm">{action.label}</p>
-                    <p className="type-micro" style={{ marginTop: '2px' }}>
-                      {action.description}
-                    </p>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontWeight: 600,
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--ink-primary)',
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {action.label}
+                      </p>
+                      <p
+                        className="type-micro"
+                        style={{
+                          color: 'var(--ink-tertiary)',
+                          marginTop: '2px',
+                          fontFamily: 'var(--font-sans)',
+                        }}
+                      >
+                        {action.description}
+                      </p>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      strokeWidth={1.5}
+                      style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
+                    />
                   </Link>
                 ))}
               </div>
@@ -426,13 +594,23 @@ export default function CaptainPage() {
           </div>
         </section>
 
-        <hr className="divider-lg" />
+        <hr className="divider-subtle" />
 
         {/* Active Sessions */}
         {activeSessions.length > 0 && (
-          <section className="section-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="type-overline" style={{ color: 'var(--masters)' }}>
+          <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              <h2
+                className="type-overline"
+                style={{ color: 'var(--masters)', fontFamily: 'var(--font-sans)' }}
+              >
                 Live Sessions
               </h2>
               <span className="live-badge">
@@ -440,18 +618,30 @@ export default function CaptainPage() {
                 {activeSessions.length} Active
               </span>
             </div>
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {activeSessions.map((session) => (
                 <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'var(--masters)', color: 'white' }}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--masters)',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
                     <Zap size={18} />
                   </div>
-                  <div className="flex-1">
-                    <p className="type-title-sm">{session.name}</p>
-                    <p className="type-micro capitalize">{session.sessionType}</p>
+                  <div style={{ flex: 1 }}>
+                    <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                      {session.name}
+                    </p>
+                    <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                      {session.sessionType}
+                    </p>
                   </div>
                   <ChevronRight size={20} style={{ color: 'var(--ink-tertiary)' }} />
                 </Link>
@@ -461,44 +651,77 @@ export default function CaptainPage() {
         )}
 
         {/* Upcoming Sessions */}
-        <section className="section-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="type-overline">Upcoming Sessions</h2>
+        <section style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-6)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
+            <h2
+              className="type-overline"
+              style={{ color: 'var(--maroon)', fontFamily: 'var(--font-sans)' }}
+            >
+              Upcoming Sessions
+            </h2>
             <Link
               href="/lineup/new"
-              className="flex items-center gap-1"
-              style={{ color: 'var(--masters)', fontWeight: 500, fontSize: 'var(--text-sm)' }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: 'var(--maroon)',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 600,
+                fontSize: 'var(--text-sm)',
+                textDecoration: 'none',
+              }}
             >
               <Plus size={16} strokeWidth={2} />
               New
             </Link>
           </div>
           {upcomingSessions.length > 0 ? (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {upcomingSessions.map((session) => (
                 <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: 'var(--canvas-sunken)' }}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--canvas-sunken)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
                     <Calendar size={18} style={{ color: 'var(--ink-secondary)' }} />
                   </div>
-                  <div className="flex-1">
-                    <p className="type-title-sm">{session.name}</p>
-                    <p className="type-micro capitalize">
-                      {session.sessionType} •{' '}
+                  <div style={{ flex: 1 }}>
+                    <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                      {session.name}
+                    </p>
+                    <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                      {session.sessionType} &middot;{' '}
                       {session.scheduledDate
                         ? new Date(session.scheduledDate).toLocaleDateString()
                         : 'No date'}
                     </p>
                   </div>
                   <span
-                    className="type-caption px-2 py-1 rounded-full"
                     style={{
-                      background: session.isLocked ? 'var(--masters)' : 'var(--canvas-sunken)',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      background: session.isLocked ? 'var(--maroon)' : 'var(--canvas-sunken)',
                       color: session.isLocked ? 'white' : 'var(--ink-tertiary)',
+                      fontFamily: 'var(--font-sans)',
                       fontSize: '10px',
                       fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
                     }}
                   >
                     {session.isLocked ? 'Locked' : 'Draft'}
@@ -508,18 +731,42 @@ export default function CaptainPage() {
               ))}
             </div>
           ) : (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
+            <div
+              className="card-captain"
+              style={{ textAlign: 'center', padding: 'var(--space-8)' }}
+            >
               <Calendar
                 size={32}
                 style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }}
               />
-              <p className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
+              <p
+                className="type-title-sm"
+                style={{
+                  marginBottom: 'var(--space-2)',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
                 No Sessions Yet
               </p>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
+              <p
+                className="type-caption"
+                style={{
+                  marginBottom: 'var(--space-4)',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
                 Create your first session to start building lineups
               </p>
-              <Link href="/lineup/new" className="btn btn-primary inline-flex items-center gap-2">
+              <Link
+                href="/lineup/new"
+                className="btn btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  background: 'var(--maroon)',
+                }}
+              >
                 <Plus size={16} />
                 Create Session
               </Link>
@@ -528,57 +775,118 @@ export default function CaptainPage() {
         </section>
 
         {/* Team Overview */}
-        <hr className="divider" />
-        <section className="section-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="type-overline">Team Overview</h2>
-            <Link href="/players" className="type-meta" style={{ color: 'var(--masters)' }}>
+        <hr className="divider-subtle" />
+        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
+            <h2
+              className="type-overline"
+              style={{ color: 'var(--maroon)', fontFamily: 'var(--font-sans)' }}
+            >
+              Team Overview
+            </h2>
+            <Link
+              href="/players"
+              className="type-meta"
+              style={{ color: 'var(--maroon)', fontWeight: 600, textDecoration: 'none' }}
+            >
               Manage
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
             {/* Team A */}
             <div className="card team-bg-usa" style={{ padding: 'var(--space-4)' }}>
-              <div className="flex items-center gap-2 mb-3">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  marginBottom: 'var(--space-3)',
+                }}
+              >
                 <span className="team-dot team-dot-usa" />
-                <span className="type-overline" style={{ color: 'var(--team-usa)' }}>
+                <span
+                  className="type-overline"
+                  style={{ color: 'var(--team-usa)', fontFamily: 'var(--font-sans)' }}
+                >
                   {teamA?.name || 'Team USA'}
                 </span>
               </div>
-              <p className="type-headline-sm">{teamAPlayers.length}</p>
-              <p className="type-micro">players</p>
+              <p
+                className="type-headline-sm"
+                style={{ fontFamily: 'var(--font-serif)' }}
+              >
+                {teamAPlayers.length}
+              </p>
+              <p className="type-micro" style={{ fontFamily: 'var(--font-sans)' }}>
+                players
+              </p>
             </div>
 
             {/* Team B */}
             <div className="card team-bg-europe" style={{ padding: 'var(--space-4)' }}>
-              <div className="flex items-center gap-2 mb-3">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)',
+                  marginBottom: 'var(--space-3)',
+                }}
+              >
                 <span className="team-dot team-dot-europe" />
-                <span className="type-overline" style={{ color: 'var(--team-europe)' }}>
+                <span
+                  className="type-overline"
+                  style={{ color: 'var(--team-europe)', fontFamily: 'var(--font-sans)' }}
+                >
                   {teamB?.name || 'Team Europe'}
                 </span>
               </div>
-              <p className="type-headline-sm">{teamBPlayers.length}</p>
-              <p className="type-micro">players</p>
+              <p
+                className="type-headline-sm"
+                style={{ fontFamily: 'var(--font-serif)' }}
+              >
+                {teamBPlayers.length}
+              </p>
+              <p className="type-micro" style={{ fontFamily: 'var(--font-sans)' }}>
+                players
+              </p>
             </div>
           </div>
 
           {unassignedPlayers.length > 0 && (
             <div
-              className="card mt-4"
+              className="card-captain"
               style={{
-                padding: 'var(--space-4)',
-                background: 'var(--warning)',
-                opacity: 0.9,
+                marginTop: 'var(--space-4)',
+                background: 'var(--maroon-subtle)',
               }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <AlertTriangle size={20} style={{ color: 'white' }} />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <AlertTriangle size={20} style={{ color: 'var(--maroon)' }} />
                   <div>
-                    <p className="type-title-sm" style={{ color: 'white' }}>
+                    <p
+                      className="type-title-sm"
+                      style={{ color: 'var(--maroon-dark)', fontFamily: 'var(--font-sans)' }}
+                    >
                       {unassignedPlayers.length} Unassigned
                     </p>
-                    <p className="type-micro" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                    <p
+                      className="type-micro"
+                      style={{ color: 'var(--maroon-light)', fontFamily: 'var(--font-sans)' }}
+                    >
                       Players need team assignment
                     </p>
                   </div>
@@ -586,7 +894,11 @@ export default function CaptainPage() {
                 <Link
                   href="/captain/draft"
                   className="btn btn-sm"
-                  style={{ background: 'white', color: 'var(--warning)' }}
+                  style={{
+                    background: 'var(--maroon)',
+                    color: 'white',
+                    fontFamily: 'var(--font-sans)',
+                  }}
                 >
                   Assign
                 </Link>
@@ -598,23 +910,41 @@ export default function CaptainPage() {
         {/* Completed Sessions */}
         {completedSessions.length > 0 && (
           <>
-            <hr className="divider" />
-            <section className="section-sm">
-              <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+            <hr className="divider-subtle" />
+            <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
+              <h2
+                className="type-overline"
+                style={{
+                  marginBottom: 'var(--space-4)',
+                  color: 'var(--ink-secondary)',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
                 Completed Sessions
               </h2>
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 {completedSessions.slice(0, 3).map((session) => (
                   <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(34, 197, 94, 0.1)' }}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
                     >
                       <Trophy size={18} style={{ color: 'var(--success)' }} />
                     </div>
-                    <div className="flex-1">
-                      <p className="type-title-sm">{session.name}</p>
-                      <p className="type-micro capitalize">{session.sessionType}</p>
+                    <div style={{ flex: 1 }}>
+                      <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                        {session.name}
+                      </p>
+                      <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                        {session.sessionType}
+                      </p>
                     </div>
                     <CheckCircle2 size={18} style={{ color: 'var(--success)' }} />
                   </Link>
@@ -625,7 +955,7 @@ export default function CaptainPage() {
         )}
       </main>
 
-            <BottomNav />
+      <BottomNav />
     </div>
   );
 }

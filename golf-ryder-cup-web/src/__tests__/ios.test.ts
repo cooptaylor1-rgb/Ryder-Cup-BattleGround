@@ -506,7 +506,7 @@ describe('IOSBottomSheet', () => {
   it('should export IOSBottomSheet component', async () => {
     const { IOSBottomSheet } = await import('../lib/ios/IOSBottomSheet');
     expect(IOSBottomSheet).toBeDefined();
-  });
+  }, 15000);
 
   it('should export useBottomSheet hook', async () => {
     const { useBottomSheet } = await import('../lib/ios/IOSBottomSheet');

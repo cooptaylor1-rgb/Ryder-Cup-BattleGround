@@ -201,26 +201,26 @@ describe('BottomNav Component', () => {
     it('all nav items are buttons', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
-      // 5 nav items + 1 keyboard shortcuts button (hidden on mobile, visible on md+)
-      expect(buttons).toHaveLength(6);
+      // 5 nav items
+      expect(buttons).toHaveLength(5);
     });
 
     it('nav buttons have minimum touch target size', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
 
-      // Only check the 5 main nav buttons (exclude the keyboard hint button)
-      const navButtons = buttons.slice(0, 5);
-      navButtons.forEach((button) => {
+      // All 5 buttons are nav buttons
+      buttons.forEach((button) => {
         expect(button).toHaveClass('min-w-[56px]');
         expect(button).toHaveClass('min-h-[56px]');
       });
     });
 
-    it('keyboard shortcuts button has accessible label', () => {
+    it('nav items have accessible aria-current for active state', () => {
+      mockPathname.mockReturnValue('/');
       render(<BottomNav />);
-      const helpButton = screen.getByLabelText(/keyboard shortcuts/i);
-      expect(helpButton).toBeInTheDocument();
+      const todayButton = screen.getByText('Today').closest('button');
+      expect(todayButton).toHaveAttribute('aria-current', 'page');
     });
   });
 });
