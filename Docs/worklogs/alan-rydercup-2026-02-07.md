@@ -30,3 +30,8 @@
 - Applied consistently across signed-out, error, missing-match, and main states.
 - Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
 - Commit: `dba3aa9`
+
+## 16:40 EST — Phase 1 (batch 114)
+- Players (`/players`) + Standings (`/standings`): no-active-trip premium empty states now include the shared `PageHeader` (Back + icon + subtitle) so these states match the standard Phase 1 navigation pattern.
+- Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
+- Commit: `6b37c01`

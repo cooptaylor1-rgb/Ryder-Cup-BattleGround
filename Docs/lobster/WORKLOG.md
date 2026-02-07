@@ -613,3 +613,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Applied consistently across signed-out, error, missing-match, and main states (no behavior change; visual consistency).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`dba3aa9`)
+
+### 16:40 EST — Phase 1 (batch 114)
+- Players (`/players`) + Standings (`/standings`): when there is **no active trip**, the premium empty state now includes the shared `PageHeader` (Back + icon + subtitle) so the screen matches the standard Phase 1 navigation pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6b37c01`)
