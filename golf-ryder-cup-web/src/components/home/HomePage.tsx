@@ -26,9 +26,10 @@ import {
   YourMatchCard,
   CaptainToggle,
   ContinueScoringBanner,
+  PageLoadingSkeleton,
 } from '@/components/ui';
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
-import { BottomNav, type NavBadges } from '@/components/layout';
+import { BottomNav, PageHeader, type NavBadges } from '@/components/layout';
 
 /**
  * HOME PAGE — The Daily Edition
@@ -149,32 +150,22 @@ export default function HomePage() {
     return `${leader} leads by ${diff} point${diff !== 1 ? 's' : ''}`;
   };
 
+  const headerSubtitle = activeTrip
+    ? (getScoreNarrative() ?? activeTrip.name)
+    : hasTrips
+      ? 'Select a trip to get started'
+      : 'Your daily edition';
+
   // Loading state
   if (isLoading) {
-    return (
-      <div className="pb-nav" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
-        <header className="header-premium">
-          <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--ink)' }}>
-              Ryder Cup Tracker
-            </span>
-          </div>
-        </header>
-        <main className="container-editorial" style={{ paddingTop: 'var(--space-8)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-            <div className="skeleton" style={{ height: '20px', width: '80px', borderRadius: 'var(--radius-sm)' }} />
-            <div className="skeleton" style={{ height: '32px', width: '200px', borderRadius: 'var(--radius-md)' }} />
-            <div className="skeleton" style={{ height: '200px', borderRadius: 'var(--radius-xl)' }} />
-            <div className="skeleton" style={{ height: '80px', borderRadius: 'var(--radius-lg)' }} />
-          </div>
-        </main>
-        <BottomNav badges={navBadges} activeMatchId={activeMatchId} />
-      </div>
-    );
+    return <PageLoadingSkeleton title="Home" showBackButton={false} variant="default" />;
   }
 
   return (
-    <div className="pb-nav page-premium-enter" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
+    <div
+      className="min-h-screen pb-nav page-premium-enter texture-grain"
+      style={{ background: 'var(--canvas)' }}
+    >
       {/* Modals */}
       {showQuickStart && (
         <QuickStartWizard
@@ -192,17 +183,11 @@ export default function HomePage() {
       />
       <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
 
-      {/* ── HEADER ── */}
-      <header className="header-premium">
-        <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--ink)' }}>
-            Ryder Cup Tracker
-          </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            {hasTrips && <CaptainToggle />}
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Ryder Cup Tracker"
+        subtitle={headerSubtitle}
+        rightSlot={hasTrips ? <CaptainToggle /> : null}
+      />
 
       {/* ── CONTINUE SCORING BANNER ── */}
       {userMatchData?.match?.status === 'inProgress' && (
