@@ -811,7 +811,7 @@ interface EmptySlotProps {
     isSelectTarget: boolean;
 }
 
-function EmptySlot({ team, isDropTarget, isSelectTarget }: EmptySlotProps) {
+function EmptySlot({ isDropTarget, isSelectTarget }: EmptySlotProps) {
     return (
         <div
             className={`p-3 rounded-lg border-2 border-dashed transition-colors ${isDropTarget || isSelectTarget

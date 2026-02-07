@@ -9,7 +9,6 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import {
-  BarChart3,
   Check,
   Clock,
   Plus,
@@ -36,7 +35,7 @@ interface PollCardProps {
 export function PollCard({
   poll,
   currentPlayerId,
-  currentPlayerName,
+  currentPlayerName: _currentPlayerName,
   onVote,
   onClose,
   onOptionAdded,

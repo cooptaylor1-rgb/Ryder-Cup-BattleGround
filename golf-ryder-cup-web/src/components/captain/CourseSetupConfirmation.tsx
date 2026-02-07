@@ -457,7 +457,7 @@ export function CourseSetupConfirmation({
                                                 key={hole.number}
                                                 className={cn(
                                                     'p-2 rounded-lg text-center',
-                                                    hole.isStartingHole && 'ring-2 ring-(--masters)'
+                                                    hole.isStartingHole && 'ring-2 ring-[var(--masters)]'
                                                 )}
                                                 style={{
                                                     background: hole.isStartingHole ? 'var(--masters-muted)' : 'var(--surface)',

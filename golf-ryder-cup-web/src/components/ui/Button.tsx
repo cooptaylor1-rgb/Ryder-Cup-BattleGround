@@ -79,7 +79,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ],
 
                     variant === 'secondary' && [
-                        'bg-surface-elevated text-magnolia',
+                        'bg-surface-elevated text-canvas',
                         'border border-surface-border',
                         'hover:bg-surface-highlight hover:border-gold/40',
                         'shadow-sm hover:shadow-md',
@@ -87,18 +87,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
                     variant === 'ghost' && [
                         'bg-transparent text-text-secondary',
-                        'hover:bg-surface-highlight hover:text-magnolia',
+                        'hover:bg-surface-highlight hover:text-canvas',
                     ],
 
                     variant === 'danger' && [
-                        'bg-azalea text-white',
-                        'hover:bg-azalea/90',
+                        'bg-error text-white',
+                        'hover:bg-error/90',
                         'shadow-sm hover:shadow-lg',
                         'active:shadow-inner',
                     ],
 
                     variant === 'outline' && [
-                        'bg-transparent text-magnolia',
+                        'bg-transparent text-canvas',
                         'border border-surface-border',
                         'hover:bg-surface-highlight hover:border-gold/40',
                     ],
