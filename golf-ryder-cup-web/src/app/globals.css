@@ -5582,11 +5582,6 @@ html.dark body {
    Elevated with glass effect */
 
 .nav-premium {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
   display: flex;
   justify-content: space-around;
   padding: var(--space-2) 0;
