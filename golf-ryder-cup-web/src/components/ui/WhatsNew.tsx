@@ -1,14 +1,9 @@
 /**
- * What's New Component
+ * What's New Component — Fried Egg Editorial
  *
  * Shows new features and updates to returning users.
- * Designed to educate users about capabilities they might have missed.
- *
- * Features:
- * - Modal overlay with feature highlights
- * - Progressive disclosure of features
- * - Remembers which updates have been seen
- * - One-tap dismissal
+ * Clean editorial design: serif headings, warm canvas,
+ * rule dividers, overline labels.
  */
 
 'use client';
@@ -17,7 +12,6 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
   X,
-  Sparkles,
   Tv,
   MessageCircle,
   CloudSun,
@@ -121,102 +115,142 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
     <div
       className={cn(
         'fixed inset-0 z-50 flex items-center justify-center p-4',
-        'bg-black/40 backdrop-blur-sm',
         isExiting ? 'animate-fade-out' : 'animate-fade-in'
       )}
+      style={{ background: 'rgba(15, 13, 10, 0.5)', backdropFilter: 'blur(4px)' }}
       onClick={handleDismiss}
     >
       <div
         className={cn(
-          'w-full max-w-md rounded-2xl overflow-hidden shadow-xl',
+          'w-full max-w-md overflow-hidden',
           isExiting ? 'animate-slide-down' : 'animate-slide-up'
         )}
         style={{
-          background: 'var(--canvas-raised)',
-          border: '1px solid var(--stroke-light)',
+          background: 'var(--canvas)',
+          border: '1px solid var(--rule)',
+          borderRadius: 'var(--radius-xl)',
           maxHeight: '85vh',
+          boxShadow: '0 24px 48px rgba(15, 13, 10, 0.2)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
-          className="relative p-6 text-center"
           style={{
-            background: 'linear-gradient(180deg, var(--masters) 0%, var(--masters-deep) 50%, var(--canvas-warm) 100%)',
+            padding: 'var(--space-6) var(--space-6) var(--space-5)',
+            borderBottom: '1px solid var(--rule)',
+            position: 'relative',
           }}
         >
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-2 rounded-full transition-colors"
-            style={{ background: 'rgba(255,255,255,0.15)', color: 'var(--cream)' }}
+            style={{
+              position: 'absolute',
+              top: 'var(--space-4)',
+              right: 'var(--space-4)',
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--ink-tertiary)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+            }}
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div
-            className="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)' }}
+          <p
+            className="type-overline"
+            style={{
+              letterSpacing: '0.15em',
+              color: 'var(--masters)',
+              marginBottom: 'var(--space-2)',
+            }}
           >
-            <Sparkles className="w-7 h-7" />
-          </div>
-
+            Latest Updates
+          </p>
           <h2
-            className="text-xl font-semibold mb-1"
-            style={{ fontFamily: 'var(--font-serif)', color: 'var(--cream)' }}
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
+              fontWeight: 400,
+              color: 'var(--ink)',
+              lineHeight: 1.2,
+            }}
           >
             What&apos;s New
           </h2>
           <p
-            className="text-sm"
-            style={{ color: 'rgba(255,255,255,0.8)' }}
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--ink-secondary)',
+              marginTop: 'var(--space-1)',
+            }}
           >
-            Check out the latest features and improvements
+            Fresh features for the field
           </p>
         </div>
 
         {/* Features List */}
         <div
-          className="p-4 space-y-2 overflow-y-auto"
-          style={{ maxHeight: 'calc(85vh - 220px)', background: 'var(--canvas)' }}
+          style={{
+            maxHeight: 'calc(85vh - 250px)',
+            overflowY: 'auto',
+          }}
         >
           {latestFeatures.map((feature, index) => (
             <div
               key={feature.id}
-              className="flex items-start gap-3 p-3 rounded-xl transition-colors"
               style={{
-                background: 'var(--canvas-raised)',
-                border: '1px solid var(--stroke-light)',
-                animationDelay: `${index * 50}ms`,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 'var(--space-4)',
+                padding: 'var(--space-4) var(--space-6)',
+                borderBottom: index < latestFeatures.length - 1 ? '1px solid var(--rule)' : 'none',
               }}
             >
               <div
-                className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{
-                  background: feature.isNew
-                    ? 'linear-gradient(135deg, var(--masters-soft) 0%, var(--canvas-warm) 100%)'
-                    : 'var(--canvas)',
-                  color: feature.isNew ? 'var(--masters)' : 'var(--ink-tertiary)',
-                  border: feature.isNew ? 'none' : '1px solid var(--stroke-light)',
+                  flexShrink: 0,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: 'var(--radius-md)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: feature.isNew ? 'var(--masters)' : 'var(--canvas-raised)',
+                  color: feature.isNew ? 'white' : 'var(--ink-tertiary)',
+                  border: feature.isNew ? 'none' : '1px solid var(--rule)',
                 }}
               >
                 {feature.icon}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: '2px' }}>
                   <h3
-                    className="font-medium text-sm"
-                    style={{ color: 'var(--ink)' }}
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: 'var(--ink)',
+                    }}
                   >
                     {feature.title}
                   </h3>
                   {feature.isNew && (
                     <span
-                      className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase"
                       style={{
+                        padding: '1px 6px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.6rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase' as const,
                         background: 'var(--masters)',
-                        color: 'var(--cream)',
+                        color: 'white',
                       }}
                     >
                       New
@@ -224,8 +258,11 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
                   )}
                 </div>
                 <p
-                  className="text-xs leading-relaxed"
-                  style={{ color: 'var(--ink-secondary)' }}
+                  style={{
+                    fontSize: '0.8rem',
+                    lineHeight: 1.5,
+                    color: 'var(--ink-secondary)',
+                  }}
                 >
                   {feature.description}
                 </p>
@@ -235,14 +272,30 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t" style={{ borderColor: 'var(--stroke-light)', background: 'var(--canvas-raised)' }}>
+        <div
+          style={{
+            padding: 'var(--space-4) var(--space-6)',
+            borderTop: '1px solid var(--rule)',
+          }}
+        >
           <button
             onClick={handleDismiss}
-            className="w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 press-scale"
+            className="btn-premium press-scale"
             style={{
-              background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-              color: 'var(--cream)',
-              boxShadow: '0 4px 14px rgba(22, 101, 52, 0.3)',
+              width: '100%',
+              padding: 'var(--space-3) var(--space-4)',
+              borderRadius: 'var(--radius-lg)',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              background: 'var(--masters)',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(0, 77, 51, 0.25)',
             }}
           >
             Got it, let&apos;s go!
@@ -277,52 +330,86 @@ export function FeatureCard({
 }: FeatureCardProps) {
   return (
     <div
-      className="relative p-4 rounded-xl"
       style={{
-        background: 'linear-gradient(135deg, var(--masters-soft) 0%, var(--canvas-warm) 100%)',
-        border: '1px solid var(--stroke-light)',
+        position: 'relative',
+        padding: 'var(--space-4)',
+        borderRadius: 'var(--radius-lg)',
+        background: 'var(--canvas-raised)',
+        border: '1px solid var(--rule)',
       }}
     >
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="absolute top-2 right-2 p-1 rounded-full transition-colors"
-          style={{ color: 'var(--ink-tertiary)' }}
+          style={{
+            position: 'absolute',
+            top: 'var(--space-2)',
+            right: 'var(--space-2)',
+            padding: 'var(--space-1)',
+            color: 'var(--ink-tertiary)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
           aria-label="Dismiss"
         >
           <X className="w-4 h-4" />
         </button>
       )}
 
-      <div className="flex items-start gap-3">
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
         <div
-          className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
           style={{
+            flexShrink: 0,
+            width: '40px',
+            height: '40px',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             background: 'var(--masters)',
-            color: 'var(--cream)',
+            color: 'white',
           }}
         >
           {icon}
         </div>
 
-        <div className="flex-1 min-w-0 pr-6">
+        <div style={{ flex: 1, minWidth: 0, paddingRight: 'var(--space-6)' }}>
           <h3
-            className="font-medium text-sm mb-1"
-            style={{ color: 'var(--ink)' }}
+            style={{
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: 'var(--ink)',
+              marginBottom: 'var(--space-1)',
+            }}
           >
             {title}
           </h3>
           <p
-            className="text-xs mb-3 leading-relaxed"
-            style={{ color: 'var(--ink-secondary)' }}
+            style={{
+              fontSize: '0.8rem',
+              lineHeight: 1.5,
+              color: 'var(--ink-secondary)',
+              marginBottom: 'var(--space-3)',
+            }}
           >
             {description}
           </p>
           {action && (
             <button
               onClick={action.onClick}
-              className="text-xs font-semibold flex items-center gap-1"
-              style={{ color: 'var(--masters)' }}
+              style={{
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: 'var(--masters)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
             >
               {action.label}
               <ChevronRight className="w-4 h-4" />
