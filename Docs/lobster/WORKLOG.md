@@ -587,3 +587,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain components: replaced `ring-(--masters)` with `ring-[var(--masters)]` in `MatchCardGenerator`, `CourseSetupConfirmation`, and `QuickPlayerSwap`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c5ed264`)
+
+### 13:20 EST — Docs — Phase 1 sweep: add invalid Tailwind CSS-var syntax detection
+- Lobster improvement plan: added a dedicated `rg` sweep to detect invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) that can cause styles to silently fail.
