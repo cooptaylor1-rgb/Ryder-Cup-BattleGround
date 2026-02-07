@@ -95,3 +95,6 @@ All times America/New_York.
 - 16:15 — Shipped batch: Captain Messages, Draft, and Captain Settings now use the shared `PageHeader` and shared `BottomNav` (replacing bespoke header and hand-rolled nav markup) for consistent premium navigation across captain tools. (commit 842aa60)
 - 16:50 — Shipped batch: Bets list + Bet Detail migrated from bespoke `header-premium` markup onto the shared `PageHeader`, and Standings loading state now uses the standard `PageLoadingSkeleton` for consistent premium navigation + loading behavior. (commit 47e8ac0)
 - 18:40 — Shipped batch: removed remaining `return null` inside list `map()` calls in two UI components (Captain Emergency Contacts player groups; Side Bet Opt-In categories) by prefiltering empty groups/categories for stable rendering. (commit 44c8299)
+
+## 2026-02-07
+- 10:50 — Shipped batch: Captain Carts (`/captain/carts`) now uses the shared `BottomNav` instead of bespoke nav markup. Also replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) with valid arbitrary-value forms (e.g. `text-[var(--ink-tertiary)]`) in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent silent missing styles. (commit 35d80e6)

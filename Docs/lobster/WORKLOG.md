@@ -568,3 +568,16 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d01e942`)
+
+## 2026-02-07
+
+### 10:30 EST — Phase 1 (batch 107)
+- Your Match Card: now handles unassigned teams without rendering a confusing blank-ish state.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a89ab90`)
+
+### 10:50 EST — Phase 1 (batch 108)
+- Captain Carts (`/captain/carts`): replaced bespoke bottom nav markup with the shared `BottomNav` for consistent navigation.
+- UI components: replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`, `ring-(--masters)`) with valid arbitrary-value forms like `text-[var(--ink-tertiary)]`, `ring-[var(--masters)]` in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent styles silently failing to apply.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`35d80e6`)
