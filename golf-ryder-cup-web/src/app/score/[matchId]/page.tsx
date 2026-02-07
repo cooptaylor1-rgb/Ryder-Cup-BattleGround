@@ -797,7 +797,7 @@ export default function EnhancedMatchScoringPage() {
   if (!isAuthenticated) {
     return (
       <div
-        className="min-h-screen pb-nav"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
       >
         <main className="container-editorial py-12">
@@ -828,7 +828,7 @@ export default function EnhancedMatchScoringPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen pb-nav"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
         role="alert"
       >
@@ -852,7 +852,7 @@ export default function EnhancedMatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <div
-        className="min-h-screen pb-nav"
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
         style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
         role="alert"
       >
@@ -873,7 +873,7 @@ export default function EnhancedMatchScoringPage() {
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
   return (
-    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}>
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}>
       {/* Celebration Overlay - Lazy loaded for performance */}
       <AnimatePresence>
         {celebration && (
