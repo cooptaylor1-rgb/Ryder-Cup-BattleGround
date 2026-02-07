@@ -590,3 +590,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ### 13:20 EST — Docs — Phase 1 sweep: add invalid Tailwind CSS-var syntax detection
 - Lobster improvement plan: added a dedicated `rg` sweep to detect invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`) that can cause styles to silently fail.
+
+### 13:55 EST — Phase 1 (batch 110)
+- Lineup Builder (`/lineup/builder`): migrated the main view to the standard premium wrapper (`pb-nav page-premium-enter texture-grain`) so it matches the Phase 1 navigation pattern.
+- Lineup Builder: replaced legacy hard-coded dark theme colors with CSS variable equivalents (`var(--canvas)`, `var(--surface)`, `var(--rule)`, `var(--team-usa)`, `var(--team-europe)`, `var(--gold)`), improving theming consistency.
+- Lineup Builder: ensured `BottomNav` renders in the main state (previously only in early-return states), so the page is never a navigation dead end.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`22c5064`)
