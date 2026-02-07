@@ -581,3 +581,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - UI components: replaced invalid Tailwind CSS-var class syntax (e.g. `text-(--ink-tertiary)`, `ring-(--masters)`) with valid arbitrary-value forms like `text-[var(--ink-tertiary)]`, `ring-[var(--masters)]` in `StandingsCard`, `HoleIndicator`, and `MatchPredictions` to prevent styles silently failing to apply.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`35d80e6`)
+
+### 12:58 EST — Phase 1 (batch 109)
+- UI components (`PremiumComponents`): replaced remaining invalid Tailwind CSS-var class syntax (e.g. `text-(--team-usa)`, `bg-(--team-usa)/10`) with valid arbitrary-value forms like `text-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/10` so styles don’t silently fail.
+- Captain components: replaced `ring-(--masters)` with `ring-[var(--masters)]` in `MatchCardGenerator`, `CourseSetupConfirmation`, and `QuickPlayerSwap`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c5ed264`)
