@@ -316,3 +316,10 @@
   - Loading state now uses `PageLoadingSkeleton title="Trip Settings" variant="form"` for a self-labeled, consistent premium loading screen.
 - Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
 - Commit + push ✅ (`8f55e29`)
+
+### Phase 1 (batch 106): Home — Side Bets section explicit empty state (no silent gap)
+- `golf-ryder-cup-web/src/components/home/SideBetsSection.tsx`
+  - Removed the silent early-return when there are zero active bets and captain mode is off.
+  - The section now renders an explicit empty state and a clear link to Bets so Home doesn’t have an unexplained “missing” section.
+- Checkpoint: `lint` + `typecheck` ✅ (Lobster approval gate run)
+- Commit + push ✅ (`d01e942`)

@@ -562,3 +562,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`44c8299`)
+
+### 19:10 EST — Phase 1 (batch 106)
+- Home — Side Bets section (`SideBetsSection`): removed the silent early-return when there are zero active bets and captain mode is off.
+- The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d01e942`)
