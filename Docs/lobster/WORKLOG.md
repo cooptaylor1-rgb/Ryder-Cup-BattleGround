@@ -607,3 +607,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Home: updated the wrapper to the standard premium page classes (`min-h-screen pb-nav page-premium-enter texture-grain`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5720717`)
+
+### 15:55 EST — Phase 1 (batch 113)
+- Scoring match detail (`/score/[matchId]`): standardized the outer wrappers to include the premium enter/texture classes (`page-premium-enter texture-grain`) so the scoring experience matches the Phase 1 navigation polish.
+- Applied consistently across signed-out, error, missing-match, and main states (no behavior change; visual consistency).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dba3aa9`)

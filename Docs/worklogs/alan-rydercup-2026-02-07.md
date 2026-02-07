@@ -24,3 +24,9 @@
 - Home: updated the wrapper to the standard premium page classes (`min-h-screen pb-nav page-premium-enter texture-grain`).
 - Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
 - Commit: `5720717`
+
+## 15:55 EST — Phase 1 (batch 113)
+- Scoring match detail (`/score/[matchId]`): standardized the outer wrappers to include the premium enter/texture classes (`page-premium-enter texture-grain`) so the scoring experience matches the Phase 1 navigation polish.
+- Applied consistently across signed-out, error, missing-match, and main states.
+- Checks: lint + typecheck ✅; pre-push typecheck + tests + build ✅.
+- Commit: `dba3aa9`
