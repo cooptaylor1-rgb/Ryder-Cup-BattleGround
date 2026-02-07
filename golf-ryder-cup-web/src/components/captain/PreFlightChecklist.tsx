@@ -120,28 +120,6 @@ export function PreFlightChecklist({
     });
   };
 
-  const _getStatusIcon = (status: 'pass' | 'warning' | 'fail') => {
-    switch (status) {
-      case 'pass':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'fail':
-        return <XCircle className="w-5 h-5 text-red-500" />;
-    }
-  };
-
-  const _getStatusColor = (status: 'pass' | 'warning' | 'fail') => {
-    switch (status) {
-      case 'pass':
-        return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800';
-      case 'warning':
-        return 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800';
-      case 'fail':
-        return 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800';
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -156,9 +134,6 @@ export function PreFlightChecklist({
   }
 
   const summary = getPreFlightSummary(result);
-  const allItems = [...result.errors, ...result.warnings, ...result.info];
-  const _categories = [...new Set(allItems.map((item) => item.category))];
-
   return (
     <div className="space-y-4">
       {/* Summary Header */}

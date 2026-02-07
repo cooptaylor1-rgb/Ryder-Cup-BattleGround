@@ -127,8 +127,7 @@ describe('QuickScoreModal Component', () => {
         it('shows close button', () => {
             render(<QuickScoreModal {...defaultProps} />);
             // Should have a close mechanism
-            const _closeButton = screen.queryByRole('button', { name: /close/i });
-            // Button may or may not exist based on mock implementation
+            // Close mechanism may or may not exist based on mock implementation
             expect(document.body).toBeInTheDocument();
         });
     });

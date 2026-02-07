@@ -362,7 +362,7 @@ export interface NassauConfig {
     frontNineValue: number;
     backNineValue: number;
     overallValue: number;
-    autoPressAt: number; // Press when down by X
+    autoPressAt: number;
     maxPresses: number;
 }
 

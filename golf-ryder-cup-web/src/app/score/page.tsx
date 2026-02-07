@@ -141,7 +141,6 @@ export default function ScorePage() {
     // BUG-014 FIX: Distinguish loading state (undefined) from empty state ([] with length 0)
     // useLiveQuery returns undefined while loading, empty array when no data
     const isLoading = matches === undefined || holeResults === undefined;
-    const _hasNoMatches = !isLoading && matches.length === 0; // Used for future empty state UI
 
     if (!isAuthenticated) {
         return (

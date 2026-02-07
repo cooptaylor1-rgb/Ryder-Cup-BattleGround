@@ -375,7 +375,6 @@ export function StrokeHolesMiniMap({
 
           let bgColor = 'var(--canvas-sunken)';
           let textColor = 'var(--ink-tertiary)';
-          let _borderColor = 'transparent';
 
           if (aStrokes > 0 && bStrokes > 0) {
             // Both teams get strokes
@@ -386,10 +385,6 @@ export function StrokeHolesMiniMap({
           } else if (bStrokes > 0) {
             bgColor = 'rgba(0, 39, 118, 0.15)';
             textColor = 'var(--team-europe)';
-          }
-
-          if (isCurrent) {
-            _borderColor = 'var(--masters)';
           }
 
           return (

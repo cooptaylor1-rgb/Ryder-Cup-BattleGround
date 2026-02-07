@@ -100,7 +100,6 @@ export function wolfChoosesPartner(
     partnerId?: UUID,
     isPig: boolean = false
 ): WolfGame {
-    const _config = { ...DEFAULT_WOLF_CONFIG };
     const isLoneWolf = !partnerId;
 
     // Update wolf's stats
@@ -1058,7 +1057,6 @@ export function generateTripSettlement(
             const toPlayer = players.find(p => p.id === creditor.id);
 
             const fromBreakdown = breakdowns.get(debtor.id)!;
-            const _toBreakdown = breakdowns.get(creditor.id)!;
 
             const gameBreakdown: SettlementGameItem[] = [];
             if (fromBreakdown.wolf !== 0) {

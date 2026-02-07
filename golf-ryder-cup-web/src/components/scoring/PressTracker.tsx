@@ -69,22 +69,9 @@ export function PressTracker({
 
   // Calculate active presses
   const activePresses = presses.filter(p => p.status === 'active');
-  const _closedPresses = presses.filter(p => p.status === 'closed');
-
   // Calculate total exposure
   const totalPresses = presses.length;
   const totalValue = totalPresses * betAmount;
-
-  // Get team's active press status
-  const getTeamPressStatus = (team: 'teamA' | 'teamB') => {
-    const teamPresses = activePresses.filter(p => p.pressedBy === team);
-    const winning = teamPresses.filter(p => team === 'teamA' ? p.score > 0 : p.score < 0);
-    const losing = teamPresses.filter(p => team === 'teamA' ? p.score < 0 : p.score > 0);
-    return { total: teamPresses.length, winning: winning.length, losing: losing.length };
-  };
-
-  const _teamAPressStatus = getTeamPressStatus('teamA');
-  const _teamBPressStatus = getTeamPressStatus('teamB');
 
   if (betAmount === 0 && presses.length === 0) {
     return null; // Don't show if no bets configured

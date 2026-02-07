@@ -66,8 +66,6 @@ export type PermissionState = 'default' | 'granted' | 'denied';
 
 const DEFAULT_ICON = '/icons/icon-192.png';
 const DEFAULT_BADGE = '/icons/icon-72.png';
-const _DEFAULT_VIBRATE = [200, 100, 200]; // Prefixed with _ to indicate intentionally unused for now
-
 // ============================================
 // CAPABILITY DETECTION
 // ============================================

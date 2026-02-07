@@ -212,7 +212,6 @@ export async function computeTripRecords(tripId: string): Promise<TripRecords> {
     const trip = await db.trips.get(tripId);
     if (!trip) throw new Error('Trip not found');
 
-    const _teams = await db.teams.where('tripId').equals(tripId).toArray();
     const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
     const sessionIds = sessions.map(s => s.id);
     const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
