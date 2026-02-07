@@ -796,10 +796,7 @@ export default function EnhancedMatchScoringPage() {
   // Loading / error / missing states
   if (!isAuthenticated) {
     return (
-      <div
-        className="min-h-screen pb-nav"
-        style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
-      >
+      <div className="min-h-screen pb-nav bg-canvas font-sans">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -828,8 +825,7 @@ export default function EnhancedMatchScoringPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen pb-nav"
-        style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
+        className="min-h-screen pb-nav bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -837,8 +833,7 @@ export default function EnhancedMatchScoringPage() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => router.push('/score')}
-              className="px-4 py-2 rounded-xl font-medium"
-              style={{ background: 'var(--canvas-raised)', border: '1px solid var(--rule)', fontFamily: 'var(--font-sans)' }}
+              className="px-4 py-2 rounded-xl font-medium bg-canvas-raised border border-rule font-sans"
             >
               Back to Score
             </button>
@@ -852,8 +847,7 @@ export default function EnhancedMatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <div
-        className="min-h-screen pb-nav"
-        style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
+        className="min-h-screen pb-nav bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -873,28 +867,21 @@ export default function EnhancedMatchScoringPage() {
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
   return (
-    <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}>
+    <div className="min-h-screen pb-nav bg-canvas font-sans">
       {/* Celebration Overlay - Lazy loaded for performance */}
       <AnimatePresence>
         {celebration && (
           <Suspense
             fallback={
               <div
-                className="fixed inset-0 z-50 flex items-center justify-center"
-                style={{ background: 'rgba(0,0,0,0.35)' }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/35"
                 role="status"
                 aria-live="polite"
                 aria-label="Loading celebration"
               >
-                <div
-                  className="flex items-center gap-2 px-4 py-2 rounded-full"
-                  style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}
-                >
-                  <span
-                    className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                    style={{ borderColor: 'var(--masters)', borderTopColor: 'transparent' }}
-                  />
-                  <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-canvas border border-rule">
+                  <span className="w-3 h-3 border-2 border-masters border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm text-ink-secondary">
                     Loading…
                   </span>
                 </div>
@@ -950,17 +937,15 @@ export default function EnhancedMatchScoringPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="w-full max-w-sm mx-4 p-6 rounded-2xl"
-              style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}
+              className="w-full max-w-sm mx-4 p-6 rounded-2xl bg-canvas border border-rule"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-lg)', fontWeight: 400, color: 'var(--ink)' }}>Voice Score</h3>
+                <h3 className="font-serif text-[length:var(--text-lg)] font-normal text-ink">Voice Score</h3>
                 <button
                   onClick={() => setShowVoiceModal(false)}
-                  className="p-2 rounded-xl"
-                  style={{ transition: 'opacity 0.15s ease' }}
+                  className="p-2 rounded-xl transition-opacity"
                 >
-                  <X size={18} style={{ color: 'var(--ink-secondary)' }} />
+                  <X size={18} className="text-ink-secondary" />
                 </button>
               </div>
               <VoiceScoring
@@ -996,30 +981,23 @@ export default function EnhancedMatchScoringPage() {
         )}
 
       {/* Header — minimal chrome, editorial restraint */}
-      <header
-        className="sticky top-0 z-30 border-b"
-        style={{
-          background: 'var(--canvas)',
-          borderColor: 'var(--rule)',
-        }}
-      >
-        <div className="container-editorial" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }}>
+      <header className="sticky top-0 z-30 border-b bg-canvas border-rule">
+        <div className="container-editorial py-[var(--space-3)]">
           <div className="flex items-center justify-between">
             {/* Back + Title */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => router.push('/score')}
-                className="p-2 -ml-2 rounded-xl"
-                style={{ transition: 'opacity 0.15s ease' }}
+                className="p-2 -ml-2 rounded-xl transition-opacity"
                 aria-label="Back"
               >
-                <ChevronLeft size={20} style={{ color: 'var(--ink-secondary)' }} />
+                <ChevronLeft size={20} className="text-ink-secondary" />
               </button>
               <div>
-                <p className="type-overline" style={{ color: 'var(--masters)' }}>
+                <p className="type-overline text-masters">
                   Match {activeMatch.matchOrder}
                 </p>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)' }}>
+                <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary">
                   {teamAPlayers
                     .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
                     .join(' & ')}{' '}
@@ -1036,29 +1014,25 @@ export default function EnhancedMatchScoringPage() {
               {/* Voice */}
               <button
                 onClick={() => setShowVoiceModal(true)}
-                className="p-2 rounded-xl"
-                style={{ transition: 'opacity 0.15s ease' }}
+                className="p-2 rounded-xl transition-opacity"
                 aria-label="Voice scoring"
               >
-                <Mic size={18} style={{ color: 'var(--ink-secondary)' }} />
+                <Mic size={18} className="text-ink-secondary" />
               </button>
 
               {/* Undo */}
               <button
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-xl"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-sans transition-[opacity,background-color] duration-150 ${
+                  undoStack.length > 0
+                    ? 'text-masters bg-[var(--gold-subtle)] opacity-100'
+                    : 'text-ink-tertiary bg-transparent opacity-50'
+                }`}
                 aria-label={`Undo last action${undoStack.length > 0 ? ` (${undoStack.length} available)` : ''}`}
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  color: undoStack.length > 0 ? 'var(--masters)' : 'var(--ink-tertiary)',
-                  opacity: undoStack.length === 0 ? 0.5 : 1,
-                  background: undoStack.length > 0 ? 'var(--gold-subtle)' : 'transparent',
-                  transition: 'opacity 0.15s ease, background 0.15s ease',
-                }}
               >
                 <Undo2 size={14} />
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 500 }}>Undo</span>
+                <span className="text-[length:var(--text-xs)] font-medium">Undo</span>
               </button>
             </div>
           </div>
@@ -1067,7 +1041,7 @@ export default function EnhancedMatchScoringPage() {
 
       <main className="container-editorial">
         {/* Score Hero — Monumental serif display, editorial whitespace */}
-        <section style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)', textAlign: 'center' }}>
+        <section className="pt-[var(--space-8)] pb-[var(--space-6)] text-center">
           <div className="flex items-center justify-center gap-8">
             {/* Team A */}
             <div className="flex-1 text-right">
@@ -1077,7 +1051,7 @@ export default function EnhancedMatchScoringPage() {
               >
                 {teamAName}
               </p>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                 {matchState.teamAHolesWon} holes
               </p>
             </div>
@@ -1103,14 +1077,11 @@ export default function EnhancedMatchScoringPage() {
               >
                 {matchState.displayScore}
               </p>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                 thru {matchState.holesPlayed}
               </p>
               {matchState.isDormie && (
-                <p
-                  className="flex items-center justify-center gap-1"
-                  style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--gold)', marginTop: '4px' }}
-                >
+                <p className="flex items-center justify-center gap-1 font-sans text-[length:var(--text-xs)] text-gold mt-xs">
                   <AlertCircle size={12} />
                   Dormie
                 </p>
@@ -1125,7 +1096,7 @@ export default function EnhancedMatchScoringPage() {
               >
                 {teamBName}
               </p>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                 {matchState.teamBHolesWon} holes
               </p>
             </div>
@@ -1153,8 +1124,7 @@ export default function EnhancedMatchScoringPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit"
-              style={{ background: 'var(--masters)', color: 'white' }}
+              className="mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit bg-masters text-white"
             >
               <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               <span className="text-sm font-medium">{savingIndicator}</span>
@@ -1166,28 +1136,21 @@ export default function EnhancedMatchScoringPage() {
         {!isMatchComplete ? (
           <section className="space-y-4">
             {/* Hole Navigation Header — immersive, focused */}
-            <div className="flex items-center justify-between" style={{ padding: '0 var(--space-2)' }}>
+            <div className="flex items-center justify-between px-[var(--space-2)]">
               <button
                 onClick={prevHole}
                 disabled={currentHole <= 1}
-                className="p-3 rounded-xl"
-                style={{ opacity: currentHole <= 1 ? 0.3 : 1, transition: 'opacity 0.15s ease' }}
+                className={`p-3 rounded-xl transition-opacity ${currentHole <= 1 ? 'opacity-30' : 'opacity-100'}`}
               >
-                <ChevronLeft size={24} style={{ color: 'var(--ink-secondary)' }} />
+                <ChevronLeft size={24} className="text-ink-secondary" />
               </button>
 
               <div className="text-center">
-                <p style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: 'var(--text-2xl)',
-                  fontWeight: 400,
-                  letterSpacing: '-0.01em',
-                  color: 'var(--ink)',
-                }}>
+                <p className="font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.01em] text-ink">
                   Hole {currentHole}
                 </p>
                 {currentHoleResult && currentHoleResult.winner !== 'none' && (
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--ink-tertiary)', marginTop: '2px' }}>
+                  <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary mt-xxs">
                     {currentHoleResult.winner === 'halved'
                       ? 'Halved'
                       : currentHoleResult.winner === 'teamA'
@@ -1200,10 +1163,9 @@ export default function EnhancedMatchScoringPage() {
               <button
                 onClick={nextHole}
                 disabled={currentHole >= 18}
-                className="p-3 rounded-xl"
-                style={{ opacity: currentHole >= 18 ? 0.3 : 1, transition: 'opacity 0.15s ease' }}
+                className={`p-3 rounded-xl transition-opacity ${currentHole >= 18 ? 'opacity-30' : 'opacity-100'}`}
               >
-                <ChevronRight size={24} style={{ color: 'var(--ink-secondary)' }} />
+                <ChevronRight size={24} className="text-ink-secondary" />
               </button>
             </div>
 
@@ -1211,39 +1173,34 @@ export default function EnhancedMatchScoringPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => handleQuickScoreTap('teamA')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors"
+                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[rgba(0,71,171,0.08)]"
                   style={{
                     borderColor: teamAColor,
                     color: teamAColor,
-                    background: 'rgba(0, 71, 171, 0.08)',
                   }}
                   aria-label={`Quick score ${teamAName}`}
                 >
                   <p className="text-sm font-semibold uppercase tracking-wide">{teamAName}</p>
-                  <p className="text-xs mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+                  <p className="text-xs mt-2 text-ink-tertiary">
                     {quickScorePending?.team === 'teamA' ? 'Tap again to confirm' : 'Tap to score'}
                   </p>
                 </button>
                 <button
                   onClick={() => handleQuickScoreTap('teamB')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors"
+                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[rgba(139,0,0,0.08)]"
                   style={{
                     borderColor: teamBColor,
                     color: teamBColor,
-                    background: 'rgba(139, 0, 0, 0.08)',
                   }}
                   aria-label={`Quick score ${teamBName}`}
                 >
                   <p className="text-sm font-semibold uppercase tracking-wide">{teamBName}</p>
-                  <p className="text-xs mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+                  <p className="text-xs mt-2 text-ink-tertiary">
                     {quickScorePending?.team === 'teamB' ? 'Tap again to confirm' : 'Tap to score'}
                   </p>
                 </button>
                 {quickScorePending && (
-                  <p
-                    className="col-span-2 text-center text-xs"
-                    style={{ color: 'var(--ink-tertiary)' }}
-                  >
+                  <p className="col-span-2 text-center text-xs text-ink-tertiary">
                     Quick Score armed for{' '}
                     {quickScorePending.team === 'teamA' ? teamAName : teamBName}.
                   </p>
@@ -1315,11 +1272,8 @@ export default function EnhancedMatchScoringPage() {
                   {/* Show current hole gross/net if already scored */}
                   {currentHoleResult &&
                     (currentHoleResult.teamAScore || currentHoleResult.teamBScore) && (
-                      <div
-                        className="mt-4 p-3 rounded-xl"
-                        style={{ background: 'var(--canvas-sunken)' }}
-                      >
-                        <p className="text-xs text-center" style={{ color: 'var(--ink-tertiary)' }}>
+                      <div className="mt-4 p-3 rounded-xl bg-canvas-sunken">
+                        <p className="text-xs text-center text-ink-tertiary">
                           Previous score: {teamAName} {currentHoleResult.teamAScore} -{' '}
                           {currentHoleResult.teamBScore} {teamBName}
                         </p>
@@ -1363,7 +1317,7 @@ export default function EnhancedMatchScoringPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  style={{ minHeight: '50vh' }}
+                  className="min-h-[50vh]"
                 >
                   <OneHandedScoringPanel
                     holeNumber={currentHole}
@@ -1396,64 +1350,48 @@ export default function EnhancedMatchScoringPage() {
                     <button
                       onClick={() => handleScore('teamA')}
                       disabled={isSaving}
-                      className="py-4 px-4 rounded-xl text-white"
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontWeight: 600,
-                        background: teamAColor,
-                        opacity: isSaving ? 0.5 : 1,
-                        border: currentHoleResult?.winner === 'teamA'
-                          ? `3px solid var(--gold)`
-                          : '3px solid transparent',
-                        transition: 'opacity 0.15s ease, border-color 0.15s ease',
-                      }}
+                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition ${
+                        isSaving ? 'opacity-50' : 'opacity-100'
+                      } ${
+                        currentHoleResult?.winner === 'teamA' ? 'border-gold' : 'border-transparent'
+                      }`}
+                      style={{ background: teamAColor }}
                       aria-pressed={currentHoleResult?.winner === 'teamA'}
                       aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
                     >
-                      <span className="block" style={{ fontSize: 'var(--text-lg)' }}>{teamAName}</span>
-                      <span className="block mt-0.5" style={{ fontSize: 'var(--text-xs)', opacity: 0.8 }}>wins hole</span>
+                      <span className="block text-[length:var(--text-lg)]">{teamAName}</span>
+                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-80">wins hole</span>
                     </button>
 
                     <button
                       onClick={() => handleScore('halved')}
                       disabled={isSaving}
-                      className="py-4 px-4 rounded-xl"
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontWeight: 600,
-                        background: 'var(--canvas-raised)',
-                        border: currentHoleResult?.winner === 'halved'
-                          ? '3px solid var(--gold)'
-                          : '3px solid var(--rule)',
-                        opacity: isSaving ? 0.5 : 1,
-                        transition: 'opacity 0.15s ease, border-color 0.15s ease',
-                      }}
+                      className={`py-4 px-4 rounded-xl font-sans font-semibold bg-canvas-raised border-[3px] transition ${
+                        isSaving ? 'opacity-50' : 'opacity-100'
+                      } ${
+                        currentHoleResult?.winner === 'halved' ? 'border-gold' : 'border-rule'
+                      }`}
                       aria-pressed={currentHoleResult?.winner === 'halved'}
                       aria-label={`Score hole: Halved${currentHoleResult?.winner === 'halved' ? ' (selected)' : ''}`}
                     >
-                      <span className="block" style={{ fontSize: 'var(--text-lg)' }}>Halve</span>
-                      <span className="block mt-0.5" style={{ fontSize: 'var(--text-xs)', opacity: 0.6 }}>tie hole</span>
+                      <span className="block text-[length:var(--text-lg)]">Halve</span>
+                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-60">tie hole</span>
                     </button>
 
                     <button
                       onClick={() => handleScore('teamB')}
                       disabled={isSaving}
-                      className="py-4 px-4 rounded-xl text-white"
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontWeight: 600,
-                        background: teamBColor,
-                        opacity: isSaving ? 0.5 : 1,
-                        border: currentHoleResult?.winner === 'teamB'
-                          ? `3px solid var(--gold)`
-                          : '3px solid transparent',
-                        transition: 'opacity 0.15s ease, border-color 0.15s ease',
-                      }}
+                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition ${
+                        isSaving ? 'opacity-50' : 'opacity-100'
+                      } ${
+                        currentHoleResult?.winner === 'teamB' ? 'border-gold' : 'border-transparent'
+                      }`}
+                      style={{ background: teamBColor }}
                       aria-pressed={currentHoleResult?.winner === 'teamB'}
                       aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
                     >
-                      <span className="block" style={{ fontSize: 'var(--text-lg)' }}>{teamBName}</span>
-                      <span className="block mt-0.5" style={{ fontSize: 'var(--text-xs)', opacity: 0.8 }}>wins hole</span>
+                      <span className="block text-[length:var(--text-lg)]">{teamBName}</span>
+                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-80">wins hole</span>
                     </button>
                   </div>
                 </motion.div>
@@ -1461,7 +1399,7 @@ export default function EnhancedMatchScoringPage() {
             </AnimatePresence>
 
             {/* Advanced Tools (Presses, Side Bets) */}
-            <div className="rounded-2xl border" style={{ borderColor: 'var(--rule)' }}>
+            <div className="rounded-2xl border border-rule">
               <button
                 onClick={() => setShowAdvancedTools((prev) => !prev)}
                 className="w-full flex items-center justify-between px-4 py-3"
@@ -1469,17 +1407,16 @@ export default function EnhancedMatchScoringPage() {
                 aria-controls="advanced-scoring-tools"
               >
                 <div className="text-left">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+                  <p className="text-sm font-semibold text-ink">
                     Advanced tools
                   </p>
-                  <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                  <p className="text-xs text-ink-tertiary">
                     Press tracker and side bets
                   </p>
                 </div>
                 <ChevronRight
                   size={18}
-                  className={`transition-transform ${showAdvancedTools ? 'rotate-90' : ''}`}
-                  style={{ color: 'var(--ink-tertiary)' }}
+                  className={`transition-transform text-ink-tertiary ${showAdvancedTools ? 'rotate-90' : ''}`}
                 />
               </button>
 
@@ -1507,7 +1444,7 @@ export default function EnhancedMatchScoringPage() {
             </div>
 
             {/* Scoring Mode Toggle — editorial pill selector */}
-            <div className="flex justify-center pt-2 relative" style={{ fontFamily: 'var(--font-sans)' }}>
+            <div className="flex justify-center pt-2 relative font-sans">
               {/* First-time onboarding tooltip */}
               <AnimatePresence>
                 {showScoringModeTip && (
@@ -1516,107 +1453,85 @@ export default function EnhancedMatchScoringPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 6 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 p-3 rounded-xl z-50"
-                    style={{
-                      background: 'var(--canvas-raised)',
-                      border: '1px solid var(--rule)',
-                      boxShadow: 'var(--shadow-md)',
-                    }}
+                    className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 p-3 rounded-xl z-50 bg-canvas-raised border border-rule shadow-card"
                   >
                     <div className="flex items-start gap-2">
                       <Sparkles
                         size={16}
-                        className="shrink-0 mt-0.5"
-                        style={{ color: 'var(--masters)' }}
+                        className="shrink-0 mt-0.5 text-masters"
                       />
                       <div>
-                        <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>
+                        <p className="text-sm font-medium text-ink">
                           Multiple scoring modes!
                         </p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--ink-secondary)' }}>
+                        <p className="text-xs mt-1 text-ink-secondary">
                           Try <strong>Swipe</strong> for fast scoring, <strong>Strokes</strong> for
                           detailed entry, or <strong>One-Hand</strong> while holding a beer.
                         </p>
                         <button
                           onClick={dismissScoringModeTip}
-                          className="mt-2 text-xs font-medium px-2 py-1 rounded"
-                          style={{ background: 'var(--masters)', color: 'white' }}
+                          className="mt-2 text-xs font-medium px-2 py-1 rounded bg-masters text-white"
                         >
                           Got it!
                         </button>
                       </div>
                     </div>
                     {/* Arrow pointing down */}
-                    <div
-                      className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 rotate-45"
-                      style={{
-                        background: 'var(--surface-card)',
-                        borderRight: '1px solid var(--rule)',
-                        borderBottom: '1px solid var(--rule)',
-                      }}
-                    />
+                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 rotate-45 bg-surface-card border-r border-b border-rule" />
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
-                style={{ background: 'var(--canvas-sunken)' }}
-              >
+              <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-canvas-sunken">
                 <button
                   onClick={() => handleScoringModeChange('swipe')}
-                  className="px-3 py-1 rounded-full transition-all"
-                  style={{
-                    background: scoringMode === 'swipe' ? 'var(--canvas)' : 'transparent',
-                    color: scoringMode === 'swipe' ? 'var(--ink)' : 'var(--ink-tertiary)',
-                    boxShadow: scoringMode === 'swipe' ? 'var(--shadow-sm)' : 'none',
-                  }}
+                  className={`px-3 py-1 rounded-full transition-all ${
+                    scoringMode === 'swipe'
+                      ? 'bg-canvas text-ink shadow-card-sm'
+                      : 'bg-transparent text-ink-tertiary shadow-none'
+                  }`}
                 >
                   Swipe
                 </button>
                 <button
                   onClick={() => handleScoringModeChange('buttons')}
-                  className="px-3 py-1 rounded-full transition-all"
-                  style={{
-                    background: scoringMode === 'buttons' ? 'var(--canvas)' : 'transparent',
-                    color: scoringMode === 'buttons' ? 'var(--ink)' : 'var(--ink-tertiary)',
-                    boxShadow: scoringMode === 'buttons' ? 'var(--shadow-sm)' : 'none',
-                  }}
+                  className={`px-3 py-1 rounded-full transition-all ${
+                    scoringMode === 'buttons'
+                      ? 'bg-canvas text-ink shadow-card-sm'
+                      : 'bg-transparent text-ink-tertiary shadow-none'
+                  }`}
                 >
                   Buttons
                 </button>
                 <button
                   onClick={() => handleScoringModeChange('strokes')}
-                  className="px-3 py-1 rounded-full transition-all"
-                  style={{
-                    background: scoringMode === 'strokes' ? 'var(--canvas)' : 'transparent',
-                    color: scoringMode === 'strokes' ? 'var(--ink)' : 'var(--ink-tertiary)',
-                    boxShadow: scoringMode === 'strokes' ? 'var(--shadow-sm)' : 'none',
-                  }}
+                  className={`px-3 py-1 rounded-full transition-all ${
+                    scoringMode === 'strokes'
+                      ? 'bg-canvas text-ink shadow-card-sm'
+                      : 'bg-transparent text-ink-tertiary shadow-none'
+                  }`}
                 >
                   Strokes
                 </button>
                 {isFourball && (
                   <button
                     onClick={() => handleScoringModeChange('fourball')}
-                    className="px-3 py-1 rounded-full transition-all"
-                    style={{
-                      background: scoringMode === 'fourball' ? 'var(--masters)' : 'transparent',
-                      color: scoringMode === 'fourball' ? 'white' : 'var(--ink-tertiary)',
-                      boxShadow: scoringMode === 'fourball' ? 'var(--shadow-sm)' : 'none',
-                    }}
+                    className={`px-3 py-1 rounded-full transition-all ${
+                      scoringMode === 'fourball'
+                        ? 'bg-masters text-white shadow-card-sm'
+                        : 'bg-transparent text-ink-tertiary shadow-none'
+                    }`}
                   >
                     Best Ball
                   </button>
                 )}
                 <button
                   onClick={() => handleScoringModeChange('oneHanded')}
-                  className="px-3 py-1 rounded-full transition-all"
-                  style={{
-                    background: scoringMode === 'oneHanded' ? 'var(--masters)' : 'transparent',
-                    color: scoringMode === 'oneHanded' ? 'white' : 'var(--ink-tertiary)',
-                    boxShadow: scoringMode === 'oneHanded' ? 'var(--shadow-sm)' : 'none',
-                  }}
+                  className={`px-3 py-1 rounded-full transition-all ${
+                    scoringMode === 'oneHanded'
+                      ? 'bg-masters text-white shadow-card-sm'
+                      : 'bg-transparent text-ink-tertiary shadow-none'
+                  }`}
                 >
                   ✋ One-Hand
                 </button>
@@ -1625,7 +1540,7 @@ export default function EnhancedMatchScoringPage() {
           </section>
         ) : (
           /* Match Complete State — Editorial, restrained celebration */
-          <section style={{ paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-8)', textAlign: 'center' }}>
+          <section className="pt-[var(--space-10)] pb-[var(--space-8)] text-center">
             {/* Restrained confetti — fewer pieces, no glow */}
             {!prefersReducedMotion && (
               <motion.div
@@ -1636,7 +1551,13 @@ export default function EnhancedMatchScoringPage() {
                 {confettiPieces.slice(0, 12).map((piece) => (
                   <motion.div
                     key={piece.i}
-                    className="absolute w-2 h-2 rounded-full"
+                    className={`absolute w-2 h-2 rounded-full ${
+                      piece.i % 3 === 0
+                        ? 'bg-masters'
+                        : piece.i % 3 === 1
+                          ? 'bg-gold'
+                          : 'bg-maroon'
+                    }`}
                     initial={{
                       opacity: 1,
                       x: '50%',
@@ -1655,14 +1576,6 @@ export default function EnhancedMatchScoringPage() {
                       delay: piece.i * 0.06,
                       ease: 'easeOut',
                     }}
-                    style={{
-                      background:
-                        piece.i % 3 === 0
-                          ? 'var(--masters)'
-                          : piece.i % 3 === 1
-                            ? 'var(--gold)'
-                            : 'var(--maroon)',
-                    }}
                   />
                 ))}
               </motion.div>
@@ -1676,9 +1589,8 @@ export default function EnhancedMatchScoringPage() {
             >
               {/* Trophy Icon — clean, no glow */}
               <div
-                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto"
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-[var(--space-6)]"
                 style={{
-                  marginBottom: 'var(--space-6)',
                   background:
                     matchState.winningTeam === 'teamA'
                       ? teamAColor
@@ -1691,16 +1603,7 @@ export default function EnhancedMatchScoringPage() {
               </div>
 
               {/* Winner Announcement — serif display */}
-              <h2
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontSize: 'var(--text-3xl)',
-                  fontWeight: 400,
-                  letterSpacing: '-0.02em',
-                  color: 'var(--ink)',
-                  marginBottom: 'var(--space-2)',
-                }}
-              >
+              <h2 className="font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.02em] text-ink mb-[var(--space-2)]">
                 {matchState.winningTeam === 'halved'
                   ? 'Match Halved'
                   : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} Wins`}
@@ -1708,9 +1611,8 @@ export default function EnhancedMatchScoringPage() {
 
               {/* Final Score — monumental serif */}
               <p
-                className="score-monumental"
+                className="score-monumental mb-[var(--space-8)]"
                 style={{
-                  marginBottom: 'var(--space-8)',
                   color:
                     matchState.winningTeam === 'teamA'
                       ? teamAColor
@@ -1723,56 +1625,48 @@ export default function EnhancedMatchScoringPage() {
               </p>
 
               {/* Match Stats Card — editorial card */}
-              <div
-                className="card-editorial mx-auto max-w-sm"
-                style={{ marginBottom: 'var(--space-6)' }}
-              >
+              <div className="card-editorial mx-auto max-w-sm mb-[var(--space-6)]">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', color: teamAColor }}>
+                    <p className="font-serif text-[length:var(--text-2xl)]" style={{ color: teamAColor }}>
                       {matchState.teamAHolesWon}
                     </p>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+                    <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                       {teamAName} Holes
                     </p>
                   </div>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', color: 'var(--ink-tertiary)' }}>
+                    <p className="font-serif text-[length:var(--text-2xl)] text-ink-tertiary">
                       {matchState.holeResults.filter((r) => r.winner === 'halved').length}
                     </p>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+                    <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                       Halved
                     </p>
                   </div>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', color: teamBColor }}>
+                    <p className="font-serif text-[length:var(--text-2xl)]" style={{ color: teamBColor }}>
                       {matchState.teamBHolesWon}
                     </p>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', marginTop: '4px' }}>
+                    <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                       {teamBName} Holes
                     </p>
                   </div>
                 </div>
-                <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--rule)' }}>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--ink-secondary)' }}>
+                <div className="mt-[var(--space-4)] pt-[var(--space-4)] border-t border-rule">
+                  <p className="font-sans text-[length:var(--text-sm)] text-ink-secondary">
                     Completed through hole {matchState.holesPlayed}
                   </p>
                 </div>
               </div>
 
-              <div
-                className="card-editorial mx-auto max-w-sm text-left"
-                style={{ marginBottom: 'var(--space-6)' }}
-              >
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--ink)' }}>
+              <div className="card-editorial mx-auto max-w-sm text-left mb-[var(--space-6)]">
+                <p className="font-sans text-[length:var(--text-sm)] font-semibold text-ink">
                   Match Summary
                 </p>
-                <p
-                  style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--ink-tertiary)', whiteSpace: 'pre-line', marginTop: 'var(--space-2)' }}
-                >
+                <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary whitespace-pre-line mt-[var(--space-2)]">
                   {buildMatchSummaryText()}
                 </p>
-                <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <div className="mt-[var(--space-4)] flex flex-col gap-[var(--space-2)]">
                   <button
                     onClick={() => {
                       const shareText = buildMatchSummaryText();
@@ -1783,16 +1677,14 @@ export default function EnhancedMatchScoringPage() {
                         showToast('success', 'Summary copied to clipboard!');
                       }
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2"
-                    style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, background: 'var(--canvas)', border: '1px solid var(--rule)' }}
+                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-canvas border border-rule"
                   >
                     <Share2 size={16} />
                     Share Summary
                   </button>
                   <button
                     onClick={handleExportSummary}
-                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2"
-                    style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, background: 'var(--masters)', color: 'white' }}
+                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-masters text-white"
                   >
                     <Trophy size={16} />
                     Export PDF Keepsake
@@ -1806,8 +1698,7 @@ export default function EnhancedMatchScoringPage() {
                 {nextIncompleteMatch && (
                   <button
                     onClick={() => router.push(`/score/${nextIncompleteMatch.id}`)}
-                    className="w-full py-4 px-6 rounded-xl flex items-center justify-center gap-2"
-                    style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, background: 'var(--masters)', color: 'white' }}
+                    className="w-full py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-semibold bg-masters text-white"
                   >
                     Score Next Match
                     <ArrowRight size={20} />
@@ -1817,21 +1708,11 @@ export default function EnhancedMatchScoringPage() {
                 {/* View Standings */}
                 <button
                   onClick={() => router.push('/standings')}
-                  className="w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2"
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontWeight: nextIncompleteMatch ? 500 : 600,
-                    ...(nextIncompleteMatch
-                      ? {
-                          background: 'var(--canvas-raised)',
-                          border: '1px solid var(--rule)',
-                          color: 'var(--ink)',
-                        }
-                      : {
-                          background: 'var(--masters)',
-                          color: 'white',
-                        }),
-                  }}
+                  className={`w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2 font-sans ${
+                    nextIncompleteMatch
+                      ? 'font-medium bg-canvas-raised border border-rule text-ink'
+                      : 'font-semibold bg-masters text-white'
+                  }`}
                 >
                   <BarChart3 size={nextIncompleteMatch ? 18 : 20} />
                   View Standings
@@ -1853,14 +1734,7 @@ export default function EnhancedMatchScoringPage() {
                       showToast('success', 'Result copied to clipboard!');
                     }
                   }}
-                  className="w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2"
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontWeight: 500,
-                    background: 'var(--canvas-raised)',
-                    border: '1px solid var(--rule)',
-                    color: 'var(--ink)',
-                  }}
+                  className="w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-canvas-raised border border-rule text-ink"
                 >
                   <Share2 size={18} />
                   Share Result
@@ -1869,8 +1743,7 @@ export default function EnhancedMatchScoringPage() {
                 {/* Back to Matches */}
                 <button
                   onClick={() => router.push('/score')}
-                  className="w-full py-3 px-6 rounded-xl text-center"
-                  style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, color: 'var(--ink-secondary)' }}
+                  className="w-full py-3 px-6 rounded-xl text-center font-sans font-medium text-ink-secondary"
                 >
                   Back to Matches
                 </button>
@@ -1903,13 +1776,7 @@ export default function EnhancedMatchScoringPage() {
         <div className="fixed bottom-24 right-4 z-40">
           <button
             onClick={() => setShowVoiceModal(true)}
-            className="w-14 h-14 rounded-full flex items-center justify-center"
-            style={{
-              background: 'var(--masters)',
-              color: 'white',
-              boxShadow: '0 2px 8px rgba(0, 102, 68, 0.2)',
-              transition: 'opacity 0.15s ease',
-            }}
+            className="w-14 h-14 rounded-full flex items-center justify-center bg-masters text-white shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity"
             aria-label="Voice scoring"
           >
             <Mic size={24} />

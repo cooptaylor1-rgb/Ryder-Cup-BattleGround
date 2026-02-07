@@ -257,25 +257,18 @@ export default function AdminPage() {
   // Redirect if not in admin mode
   if (!isAdminMode) {
     return (
-      <div
-        className="min-h-screen pb-nav flex items-center justify-center"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav flex items-center justify-center bg-[var(--canvas)]">
         <div className="text-center p-8">
-          <div
-            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-            style={{ background: 'var(--surface-elevated)' }}
-          >
-            <Lock size={32} style={{ color: 'var(--ink-tertiary)' }} />
+          <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-[var(--surface-elevated)]">
+            <Lock size={32} className="text-[var(--ink-tertiary)]" />
           </div>
           <h2 className="type-title-lg mb-2">Admin Mode Required</h2>
-          <p className="type-body mb-6" style={{ color: 'var(--ink-secondary)' }}>
+          <p className="type-body mb-6 text-[var(--ink-secondary)]">
             Enable Admin Mode from the More menu to access these features.
           </p>
           <Link
             href="/more"
-            className="btn-premium"
-            style={{ padding: 'var(--space-3) var(--space-5)' }}
+            className="btn-premium py-[var(--space-3)] px-[var(--space-5)]"
           >
             Go to More
           </Link>
@@ -287,10 +280,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       {ConfirmDialogComponent}
 
       {/* Header */}
@@ -299,39 +289,24 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-none cursor-pointer"
             >
               <ChevronLeft size={22} strokeWidth={1.75} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div className="flex items-center gap-[var(--space-3)]">
               <div
+                className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center shadow-[0_2px_8px_rgba(220,38,38,0.3)]"
                 style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
                   background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
                 }}
               >
-                <Shield size={16} style={{ color: 'white' }} />
+                <Shield size={16} className="text-white" />
               </div>
               <div>
-                <span
-                  className="type-overline"
-                  style={{ letterSpacing: '0.1em', color: '#dc2626' }}
-                >
+                <span className="type-overline tracking-[0.1em] text-[#dc2626]">
                   Admin Mode
                 </span>
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                <p className="type-caption truncate mt-[2px]">
                   Data management
                 </p>
               </div>
@@ -347,29 +322,16 @@ export default function AdminPage() {
           animate={{ opacity: 1, y: 0 }}
           className="section-sm"
         >
-          <div
-            style={{
-              background: 'rgba(220, 38, 38, 0.1)',
-              border: '1px solid rgba(220, 38, 38, 0.2)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-4)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--space-3)',
-            }}
-          >
+          <div className="bg-[rgba(220,38,38,0.1)] border border-[rgba(220,38,38,0.2)] rounded-[var(--radius-lg)] p-[var(--space-4)] flex items-start gap-[var(--space-3)]">
             <AlertTriangle
               size={20}
-              style={{ color: '#dc2626', flexShrink: 0, marginTop: '2px' }}
+              className="text-[#dc2626] shrink-0 mt-[2px]"
             />
             <div>
-              <p className="type-body" style={{ fontWeight: 600, color: '#dc2626' }}>
+              <p className="type-body font-semibold text-[#dc2626]">
                 Admin Mode Active
               </p>
-              <p
-                className="type-caption"
-                style={{ color: 'var(--ink-secondary)', marginTop: '4px' }}
-              >
+              <p className="type-caption text-[var(--ink-secondary)] mt-[4px]">
                 Actions here can permanently delete data. Use with caution.
               </p>
             </div>
@@ -379,46 +341,40 @@ export default function AdminPage() {
         {/* Database Stats */}
         <section className="section">
           <h2 className="type-overline mb-3">Database Statistics</h2>
-          <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 'var(--space-4)',
-              }}
-            >
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--masters)' }}>
+          <div className="card p-[var(--space-4)]">
+            <div className="grid grid-cols-3 gap-[var(--space-4)]">
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--masters)]">
                   {dbStats.trips}
                 </div>
                 <div className="type-caption">Trips</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--masters)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--masters)]">
                   {dbStats.players}
                 </div>
                 <div className="type-caption">Players</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--masters)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--masters)]">
                   {dbStats.matches}
                 </div>
                 <div className="type-caption">Matches</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {dbStats.sessions}
                 </div>
                 <div className="type-caption">Sessions</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {dbStats.holeResults}
                 </div>
                 <div className="type-caption">Hole Results</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {dbStats.teams}
                 </div>
                 <div className="type-caption">Teams</div>
@@ -430,51 +386,44 @@ export default function AdminPage() {
         {/* Sync Reliability */}
         <section className="section">
           <h2 className="type-overline mb-3">Sync Reliability</h2>
-          <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 'var(--space-4)',
-              }}
-            >
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--masters)' }}>
+          <div className="card p-[var(--space-4)]">
+            <div className="grid grid-cols-3 gap-[var(--space-4)]">
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--masters)]">
                   {syncMetrics.total}
                 </div>
                 <div className="type-caption">Queue Depth</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
+              <div className="text-center">
                 <div
-                  className="type-display-sm"
-                  style={{ color: syncMetrics.failed > 0 ? '#dc2626' : 'var(--ink-secondary)' }}
+                  className={`type-display-sm ${syncMetrics.failed > 0 ? 'text-[#dc2626]' : 'text-[var(--ink-secondary)]'}`}
                 >
                   {syncMetrics.failed}
                 </div>
                 <div className="type-caption">Failed Items</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {syncMetrics.pending}
                 </div>
                 <div className="type-caption">Pending Items</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {syncMetrics.oldestPending
                     ? Math.max(1, Math.round((Date.now() - syncMetrics.oldestPending) / 60000))
                     : 0}
                 </div>
                 <div className="type-caption">Oldest Pending (min)</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {syncMetrics.averageRetry}
                 </div>
                 <div className="type-caption">Avg Retry Count</div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <div className="type-display-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="text-center">
+                <div className="type-display-sm text-[var(--ink-secondary)]">
                   {syncMetrics.lastAttempt
                     ? new Date(syncMetrics.lastAttempt).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -491,16 +440,15 @@ export default function AdminPage() {
         {/* Data Cleanup */}
         <section className="section">
           <h2 className="type-overline mb-3">Data Cleanup</h2>
-          <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className="card p-[var(--space-4)]">
+            <div className="flex flex-col gap-[var(--space-3)]">
               <button
                 onClick={scanForOrphans}
-                className="match-row"
-                style={{ width: '100%', justifyContent: 'flex-start' }}
+                className="match-row w-full justify-start"
               >
-                <Database size={18} style={{ color: 'var(--masters)' }} />
-                <div style={{ flex: 1, textAlign: 'left' }}>
-                  <p style={{ fontWeight: 500 }}>Scan for Orphaned Data</p>
+                <Database size={18} className="text-[var(--masters)]" />
+                <div className="flex-1 text-left">
+                  <p className="font-medium">Scan for Orphaned Data</p>
                   <p className="type-meta">Find records without parent references</p>
                 </div>
               </button>
@@ -509,26 +457,22 @@ export default function AdminPage() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  style={{
-                    background: 'var(--surface-elevated)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: 'var(--space-3)',
-                  }}
+                  className="bg-[var(--surface-elevated)] rounded-[var(--radius-md)] p-[var(--space-3)]"
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div className="flex flex-col gap-[var(--space-2)]">
+                    <div className="flex justify-between">
                       <span className="type-caption">Orphaned Matches:</span>
                       <span className={orphanStats.orphanedMatches > 0 ? 'text-red-600' : ''}>
                         {orphanStats.orphanedMatches}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="flex justify-between">
                       <span className="type-caption">Orphaned Hole Results:</span>
                       <span className={orphanStats.orphanedHoleResults > 0 ? 'text-red-600' : ''}>
                         {orphanStats.orphanedHoleResults}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="flex justify-between">
                       <span className="type-caption">Orphaned Team Members:</span>
                       <span className={orphanStats.orphanedTeamMembers > 0 ? 'text-red-600' : ''}>
                         {orphanStats.orphanedTeamMembers}
@@ -540,12 +484,7 @@ export default function AdminPage() {
                       <button
                         onClick={cleanOrphanedData}
                         disabled={isCleaningOrphans}
-                        className="btn-premium mt-2"
-                        style={{
-                          background: '#dc2626',
-                          padding: 'var(--space-2) var(--space-3)',
-                          opacity: isCleaningOrphans ? 0.6 : 1,
-                        }}
+                        className={`btn-premium mt-2 bg-[#dc2626] py-[var(--space-2)] px-[var(--space-3)] ${isCleaningOrphans ? 'opacity-60' : ''}`}
                       >
                         <Zap size={14} />
                         {isCleaningOrphans ? 'Cleaning...' : 'Clean Orphaned Data'}
@@ -561,7 +500,7 @@ export default function AdminPage() {
         {/* Trip Management */}
         <section className="section">
           <h2 className="type-overline mb-3">All Trips ({allTrips.length})</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className="flex flex-col gap-[var(--space-3)]">
             <AnimatePresence mode="popLayout">
               {allTrips.map((trip) => (
                 <motion.div
@@ -570,94 +509,58 @@ export default function AdminPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95, height: 0 }}
-                  className="card"
-                  style={{
-                    padding: 'var(--space-4)',
-                    border: currentTrip?.id === trip.id ? '2px solid var(--masters)' : undefined,
-                  }}
+                  className={`card p-[var(--space-4)] ${currentTrip?.id === trip.id ? 'border-2 border-[var(--masters)]' : ''}`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-2)',
-                          marginBottom: '4px',
-                        }}
-                      >
+                  <div className="flex items-start gap-[var(--space-3)]">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-[var(--space-2)] mb-[4px]">
                         <h3 className="type-title-sm">{trip.name}</h3>
                         {currentTrip?.id === trip.id && (
-                          <span
-                            style={{
-                              background: 'var(--masters)',
-                              color: 'white',
-                              fontSize: '10px',
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              fontWeight: 600,
-                            }}
-                          >
+                          <span className="bg-[var(--masters)] text-white text-[10px] px-[6px] py-[2px] rounded-[4px] font-semibold">
                             ACTIVE
                           </span>
                         )}
                       </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: 'var(--space-3)',
-                          marginTop: 'var(--space-2)',
-                        }}
-                      >
+                      <div className="flex flex-wrap gap-[var(--space-3)] mt-[var(--space-2)]">
                         {trip.location && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <MapPin size={12} style={{ color: 'var(--ink-tertiary)' }} />
+                          <div className="flex items-center gap-1">
+                            <MapPin size={12} className="text-[var(--ink-tertiary)]" />
                             <span className="type-caption">{trip.location}</span>
                           </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Calendar size={12} style={{ color: 'var(--ink-tertiary)' }} />
+                        <div className="flex items-center gap-1">
+                          <Calendar size={12} className="text-[var(--ink-tertiary)]" />
                           <span className="type-caption">
                             {new Date(trip.startDate).toLocaleDateString()}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div className="flex items-center gap-1">
                           {trip.isCaptainModeEnabled ? (
-                            <CheckCircle size={12} style={{ color: 'var(--success)' }} />
+                            <CheckCircle size={12} className="text-[var(--success)]" />
                           ) : (
-                            <XCircle size={12} style={{ color: 'var(--ink-tertiary)' }} />
+                            <XCircle size={12} className="text-[var(--ink-tertiary)]" />
                           )}
                           <span className="type-caption">
                             Captain Mode {trip.isCaptainModeEnabled ? 'On' : 'Off'}
                           </span>
                         </div>
                       </div>
-                      <p className="type-meta mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+                      <p className="type-meta mt-2 text-[var(--ink-tertiary)]">
                         ID: {trip.id.slice(0, 8)}...
                       </p>
                     </div>
                     <button
                       onClick={() => handleDeleteTrip(trip)}
                       disabled={deletingTripId === trip.id}
-                      className="press-scale"
-                      style={{
-                        background: 'rgba(220, 38, 38, 0.1)',
-                        border: 'none',
-                        borderRadius: 'var(--radius-md)',
-                        padding: 'var(--space-2)',
-                        cursor: 'pointer',
-                        opacity: deletingTripId === trip.id ? 0.5 : 1,
-                      }}
+                      className={`press-scale bg-[rgba(220,38,38,0.1)] border-none rounded-[var(--radius-md)] p-[var(--space-2)] cursor-pointer ${deletingTripId === trip.id ? 'opacity-50' : ''}`}
                     >
                       {deletingTripId === trip.id ? (
                         <RefreshCcw
                           size={18}
-                          style={{ color: '#dc2626' }}
-                          className="animate-spin"
+                          className="animate-spin text-[#dc2626]"
                         />
                       ) : (
-                        <Trash2 size={18} style={{ color: '#dc2626' }} />
+                        <Trash2 size={18} className="text-[#dc2626]" />
                       )}
                     </button>
                   </div>
@@ -666,18 +569,12 @@ export default function AdminPage() {
             </AnimatePresence>
 
             {allTrips.length === 0 && (
-              <div
-                className="card"
-                style={{
-                  padding: 'var(--space-6)',
-                  textAlign: 'center',
-                }}
-              >
+              <div className="card p-[var(--space-6)] text-center">
                 <HardDrive
                   size={32}
-                  style={{ color: 'var(--ink-tertiary)', margin: '0 auto 12px' }}
+                  className="text-[var(--ink-tertiary)] mx-auto mb-3"
                 />
-                <p className="type-body" style={{ color: 'var(--ink-secondary)' }}>
+                <p className="type-body text-[var(--ink-secondary)]">
                   No trips found
                 </p>
               </div>
@@ -688,27 +585,27 @@ export default function AdminPage() {
         {/* Quick Actions */}
         <section className="section">
           <h2 className="type-overline mb-3">Quick Actions</h2>
-          <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <Link href="/trip/new" className="match-row" style={{ textDecoration: 'none' }}>
-              <Users size={18} style={{ color: 'var(--masters)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Create New Trip</p>
+          <div className="card p-[var(--space-4)]">
+            <Link href="/trip/new" className="match-row no-underline">
+              <Users size={18} className="text-[var(--masters)]" />
+              <div className="flex-1">
+                <p className="font-medium">Create New Trip</p>
                 <p className="type-meta">Start a new golf trip</p>
               </div>
               <ChevronLeft
                 size={18}
-                style={{ color: 'var(--ink-tertiary)', transform: 'rotate(180deg)' }}
+                className="text-[var(--ink-tertiary)] rotate-180"
               />
             </Link>
-            <Link href="/settings/backup" className="match-row" style={{ textDecoration: 'none' }}>
-              <Database size={18} style={{ color: 'var(--ink-secondary)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Backup & Export</p>
+            <Link href="/settings/backup" className="match-row no-underline">
+              <Database size={18} className="text-[var(--ink-secondary)]" />
+              <div className="flex-1">
+                <p className="font-medium">Backup & Export</p>
                 <p className="type-meta">Save your data</p>
               </div>
               <ChevronLeft
                 size={18}
-                style={{ color: 'var(--ink-tertiary)', transform: 'rotate(180deg)' }}
+                className="text-[var(--ink-tertiary)] rotate-180"
               />
             </Link>
           </div>

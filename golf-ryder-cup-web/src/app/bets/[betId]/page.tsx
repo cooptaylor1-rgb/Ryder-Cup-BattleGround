@@ -146,14 +146,11 @@ export default function BetDetailPage() {
 
     if (!currentTrip) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Bets"
                     subtitle="No active trip"
-                    icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
                     onBack={() => router.back()}
                 />
                 <main className="container-editorial py-12">
@@ -179,14 +176,11 @@ export default function BetDetailPage() {
 
     if (bet === undefined) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Bet Details"
                     subtitle={currentTrip.name}
-                    icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
                     onBack={() => router.push('/bets')}
                 />
                 <main className="container-editorial py-12">
@@ -243,7 +237,7 @@ export default function BetDetailPage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title={bet.name}
                 subtitle={bet.description}
@@ -259,58 +253,53 @@ export default function BetDetailPage() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowEditModal(true)}
-                            className="p-2 rounded-lg hover:bg-muted transition-colors"
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                            className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
                             aria-label="Edit"
                         >
-                            <Edit2 size={20} style={{ color: 'var(--ink-secondary)' }} />
+                            <Edit2 size={20} className="text-[var(--ink-secondary)]" />
                         </button>
                         <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors"
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors bg-transparent border-none cursor-pointer"
                             aria-label="Delete"
                         >
-                            <Trash2 size={20} style={{ color: 'var(--error)' }} />
+                            <Trash2 size={20} className="text-[var(--error)]" />
                         </button>
                     </div>
                 }
             />
 
-            <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
+            <main className="container-editorial pt-[var(--space-4)]">
                 {/* Pot Card */}
                 <div
-                    className="card text-center"
+                    className="card text-center text-white p-[var(--space-6)] mb-[var(--space-4)]"
                     style={{
                         background: bet.status === 'completed'
                             ? 'linear-gradient(135deg, var(--success) 0%, #059669 100%)'
                             : 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
-                        color: 'white',
-                        padding: 'var(--space-6)',
-                        marginBottom: 'var(--space-4)',
                     }}
                 >
                     {bet.status === 'completed' && winner ? (
                         <>
-                            <Crown size={32} style={{ margin: '0 auto var(--space-2)' }} />
-                            <h2 className="type-title-lg" style={{ marginBottom: 'var(--space-1)' }}>
+                            <Crown size={32} className="mx-auto mb-[var(--space-2)]" />
+                            <h2 className="type-title-lg mb-[var(--space-1)]">
                                 {winner.firstName} {winner.lastName} Wins!
                             </h2>
                             <p className="score-large">${bet.pot || 0}</p>
                         </>
                     ) : bet.status === 'completed' && isNassau ? (
                         <>
-                            <Trophy size={32} style={{ margin: '0 auto var(--space-2)' }} />
-                            <h2 className="type-title-lg" style={{ marginBottom: 'var(--space-1)' }}>
+                            <Trophy size={32} className="mx-auto mb-[var(--space-2)]" />
+                            <h2 className="type-title-lg mb-[var(--space-1)]">
                                 Nassau Complete!
                             </h2>
                             <p className="score-large">${bet.pot || 0}</p>
                         </>
                     ) : (
                         <>
-                            <DollarSign size={32} style={{ margin: '0 auto var(--space-2)', opacity: 0.9 }} />
-                            <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>${bet.pot || 0}</h2>
-                            <p className="type-body" style={{ opacity: 0.8 }}>
+                            <DollarSign size={32} className="mx-auto mb-[var(--space-2)] opacity-90" />
+                            <h2 className="score-large mb-[var(--space-1)]">${bet.pot || 0}</h2>
+                            <p className="type-body opacity-80">
                                 {isSkins
                                     ? `$${bet.perHole || 5} per hole`
                                     : isNassau
@@ -324,14 +313,11 @@ export default function BetDetailPage() {
 
                 {/* Linked Match */}
                 {bet.matchId && linkedMatch === undefined && (
-                    <div
-                        className="card"
-                        style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}
-                    >
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
                         <div className="flex items-center gap-3 animate-pulse">
-                            <Flag size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                            <Flag size={20} className="text-[var(--ink-tertiary)]" />
                             <div className="flex-1">
-                                <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+                                <p className="type-caption text-[var(--ink-tertiary)]">
                                     Loading linked match…
                                 </p>
                             </div>
@@ -340,18 +326,15 @@ export default function BetDetailPage() {
                 )}
 
                 {bet.matchId && linkedMatch === null && (
-                    <div
-                        className="card"
-                        style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}
-                    >
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
                         <div className="flex items-start gap-3">
-                            <AlertCircle size={20} style={{ color: 'var(--warning)', marginTop: 2 }} />
+                            <AlertCircle size={20} className="text-[var(--warning)] mt-[2px]" />
                             <div className="flex-1">
-                                <p className="type-body-sm" style={{ fontWeight: 600 }}>
+                                <p className="type-body-sm font-semibold">
                                     Linked match not found
                                 </p>
-                                <p className="type-caption mt-1" style={{ color: 'var(--ink-tertiary)' }}>
-                                    This bet is linked to a match that isn’t available on this device yet.
+                                <p className="type-caption mt-1 text-[var(--ink-tertiary)]">
+                                    This bet is linked to a match that isn&apos;t available on this device yet.
                                 </p>
                             </div>
                         </div>
@@ -359,14 +342,11 @@ export default function BetDetailPage() {
                 )}
 
                 {linkedMatch && (
-                    <div
-                        className="card"
-                        style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}
-                    >
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
                         <div className="flex items-center gap-3">
-                            <Flag size={20} style={{ color: 'var(--masters)' }} />
+                            <Flag size={20} className="text-[var(--masters)]" />
                             <div className="flex-1">
-                                <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>Linked to Match</p>
+                                <p className="type-caption text-[var(--ink-tertiary)]">Linked to Match</p>
                                 <p className="type-body-sm">Match #{linkedMatch.matchOrder}</p>
                             </div>
                             <Link
@@ -381,31 +361,25 @@ export default function BetDetailPage() {
 
                 {/* Nassau Scorecard (2v2 match format) */}
                 {isNassau && (
-                    <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-                        <h3 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Nassau Results</h3>
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
+                        <h3 className="type-overline mb-[var(--space-4)]">Nassau Results</h3>
 
                         {/* Teams Display */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                        <div className="grid grid-cols-[1fr_auto_1fr] gap-[var(--space-3)] mb-[var(--space-4)]">
                             <div className="text-center">
-                                <div
-                                    className="p-3 rounded-lg"
-                                    style={{ background: 'var(--team-usa)', color: 'white' }}
-                                >
-                                    <p className="type-overline" style={{ marginBottom: 'var(--space-1)', opacity: 0.9 }}>Team A</p>
+                                <div className="p-3 rounded-lg bg-[var(--team-usa)] text-white">
+                                    <p className="type-overline mb-[var(--space-1)] opacity-90">Team A</p>
                                     {teamAPlayers.map(p => (
                                         <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
                                     ))}
                                 </div>
                             </div>
                             <div className="flex items-center justify-center">
-                                <span className="type-title-lg" style={{ color: 'var(--ink-tertiary)' }}>vs</span>
+                                <span className="type-title-lg text-[var(--ink-tertiary)]">vs</span>
                             </div>
                             <div className="text-center">
-                                <div
-                                    className="p-3 rounded-lg"
-                                    style={{ background: 'var(--team-europe)', color: 'white' }}
-                                >
-                                    <p className="type-overline" style={{ marginBottom: 'var(--space-1)', opacity: 0.9 }}>Team B</p>
+                                <div className="p-3 rounded-lg bg-[var(--team-europe)] text-white">
+                                    <p className="type-overline mb-[var(--space-1)] opacity-90">Team B</p>
                                     {teamBPlayers.map(p => (
                                         <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
                                     ))}
@@ -423,29 +397,22 @@ export default function BetDetailPage() {
                             return (
                                 <div
                                     key={segment}
-                                    className="p-3 rounded-lg"
-                                    style={{
-                                        background: 'var(--surface)',
-                                        marginBottom: 'var(--space-3)',
-                                        border: '1px solid var(--rule)',
-                                    }}
+                                    className="p-3 rounded-lg bg-[var(--surface)] mb-[var(--space-3)] border border-[var(--rule)]"
                                 >
-                                    <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
+                                    <div className="flex items-center justify-between mb-[var(--space-2)]">
                                         <span className="type-body-sm font-medium">{segmentLabel}</span>
-                                        <span className="type-caption" style={{ color: 'var(--success)' }}>${potPerSegment}</span>
+                                        <span className="type-caption text-[var(--success)]">${potPerSegment}</span>
                                     </div>
 
                                     {result ? (
                                         <div
-                                            className="p-2 rounded text-center"
-                                            style={{
-                                                background: result === 'push'
-                                                    ? 'var(--warning)'
+                                            className={`p-2 rounded text-center text-white ${
+                                                result === 'push'
+                                                    ? 'bg-[var(--warning)]'
                                                     : result === 'teamA'
-                                                        ? 'var(--team-usa)'
-                                                        : 'var(--team-europe)',
-                                                color: 'white',
-                                            }}
+                                                        ? 'bg-[var(--team-usa)]'
+                                                        : 'bg-[var(--team-europe)]'
+                                            }`}
                                         >
                                             <span className="type-body-sm font-medium">
                                                 {result === 'push'
@@ -457,32 +424,29 @@ export default function BetDetailPage() {
                                             </span>
                                         </div>
                                     ) : bet.status === 'active' ? (
-                                        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                                        <div className="flex gap-[var(--space-2)]">
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'teamA')}
-                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90"
-                                                style={{ background: 'var(--team-usa)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-usa)] text-white border-none cursor-pointer"
                                             >
                                                 Team A
                                             </button>
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'push')}
-                                                className="px-3 py-2 rounded-lg transition-all hover:opacity-90"
-                                                style={{ background: 'var(--warning)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                                className="px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--warning)] text-white border-none cursor-pointer"
                                             >
                                                 Push
                                             </button>
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'teamB')}
-                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90"
-                                                style={{ background: 'var(--team-europe)', color: 'white', border: 'none', cursor: 'pointer' }}
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-europe)] text-white border-none cursor-pointer"
                                             >
                                                 Team B
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="p-2 rounded text-center" style={{ background: 'var(--muted)' }}>
-                                            <span className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>No result</span>
+                                        <div className="p-2 rounded text-center bg-[var(--muted)]">
+                                            <span className="type-caption text-[var(--ink-tertiary)]">No result</span>
                                         </div>
                                     )}
                                 </div>
@@ -509,23 +473,23 @@ export default function BetDetailPage() {
                                 if (teamAWins > 0 || teamBWins > 0) {
                                     return (
                                         <>
-                                            <hr className="divider-lg" style={{ margin: 'var(--space-3) 0' }} />
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div className="text-center" style={{ flex: 1 }}>
-                                                    <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>Team A</p>
-                                                    <p className="type-title" style={{ color: 'var(--team-usa)' }}>
+                                            <hr className="divider-lg my-[var(--space-3)]" />
+                                            <div className="flex justify-between items-center">
+                                                <div className="text-center flex-1">
+                                                    <p className="type-caption text-[var(--ink-tertiary)]">Team A</p>
+                                                    <p className="type-title text-[var(--team-usa)]">
                                                         {teamAWins} win{teamAWins !== 1 ? 's' : ''}
                                                     </p>
-                                                    <p className="type-body-sm" style={{ color: 'var(--success)' }}>
+                                                    <p className="type-body-sm text-[var(--success)]">
                                                         ${teamAWins * potPerSegment}
                                                     </p>
                                                 </div>
-                                                <div className="text-center" style={{ flex: 1 }}>
-                                                    <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>Team B</p>
-                                                    <p className="type-title" style={{ color: 'var(--team-europe)' }}>
+                                                <div className="text-center flex-1">
+                                                    <p className="type-caption text-[var(--ink-tertiary)]">Team B</p>
+                                                    <p className="type-title text-[var(--team-europe)]">
                                                         {teamBWins} win{teamBWins !== 1 ? 's' : ''}
                                                     </p>
-                                                    <p className="type-body-sm" style={{ color: 'var(--success)' }}>
+                                                    <p className="type-body-sm text-[var(--success)]">
                                                         ${teamBWins * potPerSegment}
                                                     </p>
                                                 </div>
@@ -535,12 +499,9 @@ export default function BetDetailPage() {
                                 }
                                 return (
                                   <>
-                                    <hr
-                                      className="divider-lg"
-                                      style={{ margin: 'var(--space-3) 0' }}
-                                    />
-                                    <div className="text-center" style={{ padding: 'var(--space-2) 0' }}>
-                                      <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+                                    <hr className="divider-lg my-[var(--space-3)]" />
+                                    <div className="text-center py-[var(--space-2)]">
+                                      <p className="type-caption text-[var(--ink-tertiary)]">
                                         All segments were halved — no payouts.
                                       </p>
                                     </div>
@@ -553,9 +514,9 @@ export default function BetDetailPage() {
 
                 {/* Status Actions (for CTP, Long Drive, Custom - not Skins or Nassau) */}
                 {bet.status === 'active' && !isSkins && !isNassau && (
-                    <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-                        <h3 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Set Winner</h3>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
+                        <h3 className="type-overline mb-[var(--space-3)]">Set Winner</h3>
+                        <div className="flex flex-wrap gap-[var(--space-2)]">
                             {participants.map(player => (
                                 <button
                                     key={player.id}
@@ -572,8 +533,7 @@ export default function BetDetailPage() {
                 {bet.status === 'completed' && (
                     <button
                         onClick={handleReopenBet}
-                        className="btn btn-secondary w-full"
-                        style={{ marginBottom: 'var(--space-4)' }}
+                        className="btn btn-secondary w-full mb-[var(--space-4)]"
                     >
                         Reopen Bet
                     </button>
@@ -581,11 +541,11 @@ export default function BetDetailPage() {
 
                 {/* Skins Scorecard */}
                 {isSkins && (
-                    <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-                        <h3 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Skins Scorecard</h3>
+                    <div className="card p-[var(--space-4)] mb-[var(--space-4)]">
+                        <h3 className="type-overline mb-[var(--space-3)]">Skins Scorecard</h3>
 
                         {/* Hole Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'var(--space-2)' }}>
+                        <div className="grid grid-cols-6 gap-[var(--space-2)]">
                             {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
                                 const result = bet.results?.find(r => r.holeNumber === hole);
                                 const holeWinner = result?.winnerId ? getPlayer(result.winnerId) : null;
@@ -597,26 +557,22 @@ export default function BetDetailPage() {
                                             setSelectedHole(hole);
                                             setShowRecordWinner(true);
                                         }}
-                                        className="aspect-square rounded-lg flex flex-col items-center justify-center transition-all hover:scale-105"
-                                        style={{
-                                            background: result?.winnerId
-                                                ? 'var(--success)'
+                                        className={`aspect-square rounded-lg flex flex-col items-center justify-center transition-all hover:scale-105 border-none cursor-pointer ${
+                                            result?.winnerId
+                                                ? 'bg-[var(--success)] text-white'
                                                 : result
-                                                    ? 'var(--warning)'
-                                                    : 'var(--surface)',
-                                            color: result?.winnerId ? 'white' : result ? 'white' : 'var(--ink)',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                        }}
+                                                    ? 'bg-[var(--warning)] text-white'
+                                                    : 'bg-[var(--surface)] text-[var(--ink)]'
+                                        }`}
                                     >
                                         <span className="type-micro font-bold">{hole}</span>
                                         {holeWinner && (
-                                            <span className="type-micro" style={{ fontSize: '8px' }}>
+                                            <span className="type-micro text-[8px]">
                                                 {holeWinner.lastName.slice(0, 3)}
                                             </span>
                                         )}
                                         {result && !result.winnerId && (
-                                            <span className="type-micro" style={{ fontSize: '8px' }}>CO</span>
+                                            <span className="type-micro text-[8px]">CO</span>
                                         )}
                                     </button>
                                 );
@@ -626,28 +582,21 @@ export default function BetDetailPage() {
                         {/* Standings */}
                         {skinsStandings.length > 0 && (
                             <>
-                                <hr className="divider-lg" style={{ margin: 'var(--space-4) 0' }} />
-                                <h4 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>Standings</h4>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                                <hr className="divider-lg my-[var(--space-4)]" />
+                                <h4 className="type-overline mb-[var(--space-3)]">Standings</h4>
+                                <div className="flex flex-col gap-[var(--space-2)]">
                                     {skinsStandings.map((standing, i) => (
                                         <div
                                             key={standing.playerId}
-                                            className="flex items-center justify-between"
-                                            style={{ padding: 'var(--space-2) 0' }}
+                                            className="flex items-center justify-between py-[var(--space-2)]"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <span
-                                                    className="type-body-sm font-bold"
-                                                    style={{
-                                                        width: '24px',
-                                                        height: '24px',
-                                                        borderRadius: '50%',
-                                                        background: i === 0 ? 'var(--success)' : 'var(--muted)',
-                                                        color: i === 0 ? 'white' : 'var(--ink-secondary)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                    }}
+                                                    className={`type-body-sm font-bold size-6 rounded-full flex items-center justify-center ${
+                                                        i === 0
+                                                            ? 'bg-[var(--success)] text-white'
+                                                            : 'bg-[var(--muted)] text-[var(--ink-secondary)]'
+                                                    }`}
                                                 >
                                                     {i + 1}
                                                 </span>
@@ -655,7 +604,7 @@ export default function BetDetailPage() {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <span className="type-caption">{standing.skins} skin{standing.skins !== 1 ? 's' : ''}</span>
-                                                <span className="type-body-sm font-bold" style={{ color: 'var(--success)' }}>
+                                                <span className="type-body-sm font-bold text-[var(--success)]">
                                                     ${standing.winnings}
                                                 </span>
                                             </div>
@@ -668,40 +617,29 @@ export default function BetDetailPage() {
                 )}
 
                 {/* Participants */}
-                <div className="card" style={{ padding: 'var(--space-4)' }}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)' }}>
+                <div className="card p-[var(--space-4)]">
+                    <div className="flex items-center justify-between mb-[var(--space-3)]">
                         <h3 className="type-overline">Participants ({participants.length})</h3>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    <div className="flex flex-col gap-[var(--space-2)]">
                         {participants.map(player => (
                             <div
                                 key={player.id}
-                                className="flex items-center gap-3"
-                                style={{ padding: 'var(--space-2) 0' }}
+                                className="flex items-center gap-3 py-[var(--space-2)]"
                             >
-                                <div
-                                    style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        background: 'var(--surface)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    <Users size={16} style={{ color: 'var(--ink-secondary)' }} />
+                                <div className="size-8 rounded-full bg-[var(--surface)] flex items-center justify-center">
+                                    <Users size={16} className="text-[var(--ink-secondary)]" />
                                 </div>
                                 <div className="flex-1">
                                     <p className="type-body-sm">{player.firstName} {player.lastName}</p>
                                     {player.handicapIndex && (
-                                        <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                                        <p className="type-micro text-[var(--ink-tertiary)]">
                                             HCP: {player.handicapIndex}
                                         </p>
                                     )}
                                 </div>
                                 {bet.winnerId === player.id && (
-                                    <Crown size={18} style={{ color: 'var(--success)' }} />
+                                    <Crown size={18} className="text-[var(--success)]" />
                                 )}
                             </div>
                         ))}
@@ -716,42 +654,26 @@ export default function BetDetailPage() {
                         className="absolute inset-0 bg-black/50"
                         onClick={() => setShowRecordWinner(false)}
                     />
-                    <div
-                        className="relative w-full max-w-lg bg-background rounded-t-3xl p-6 animate-slide-up"
-                        style={{ maxHeight: '80vh', overflowY: 'auto' }}
-                    >
+                    <div className="relative w-full max-w-lg bg-background rounded-t-3xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="type-title">Hole {selectedHole} Winner</h2>
                             <button
                                 onClick={() => setShowRecordWinner(false)}
-                                className="p-2 rounded-full hover:bg-muted"
-                                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                                className="p-2 rounded-full hover:bg-muted bg-transparent border-none cursor-pointer"
                             >
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <div className="flex flex-col gap-[var(--space-3)]">
                             {participants.map(player => (
                                 <button
                                     key={player.id}
                                     onClick={() => handleRecordHoleWinner(selectedHole, player.id)}
-                                    className="card press-scale w-full text-left"
-                                    style={{ padding: 'var(--space-4)', border: 'none', cursor: 'pointer' }}
+                                    className="card press-scale w-full text-left p-[var(--space-4)] border-none cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div
-                                            style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                borderRadius: '50%',
-                                                background: 'var(--success)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: 'white',
-                                            }}
-                                        >
+                                        <div className="size-10 rounded-full bg-[var(--success)] flex items-center justify-center text-white">
                                             <Trophy size={20} />
                                         </div>
                                         <span className="type-body">{player.firstName} {player.lastName}</span>
@@ -761,22 +683,10 @@ export default function BetDetailPage() {
 
                             <button
                                 onClick={() => handleRecordHoleWinner(selectedHole, null)}
-                                className="card press-scale w-full text-left"
-                                style={{ padding: 'var(--space-4)', border: 'none', cursor: 'pointer' }}
+                                className="card press-scale w-full text-left p-[var(--space-4)] border-none cursor-pointer"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div
-                                        style={{
-                                            width: '40px',
-                                            height: '40px',
-                                            borderRadius: '50%',
-                                            background: 'var(--warning)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: 'white',
-                                        }}
-                                    >
+                                    <div className="size-10 rounded-full bg-[var(--warning)] flex items-center justify-center text-white">
                                         <TrendingUp size={20} />
                                     </div>
                                     <span className="type-body">Push (Carry Over)</span>
@@ -796,7 +706,7 @@ export default function BetDetailPage() {
                     />
                     <div className="relative bg-background rounded-2xl p-6 max-w-sm w-full">
                         <h2 className="type-title mb-2">Delete Bet?</h2>
-                        <p className="type-body mb-6" style={{ color: 'var(--ink-secondary)' }}>
+                        <p className="type-body mb-6 text-[var(--ink-secondary)]">
                             This action cannot be undone.
                         </p>
                         <div className="flex gap-3">
@@ -808,8 +718,7 @@ export default function BetDetailPage() {
                             </button>
                             <button
                                 onClick={handleDeleteBet}
-                                className="btn flex-1"
-                                style={{ background: 'var(--error)', color: 'white' }}
+                                className="btn flex-1 bg-[var(--error)] text-white"
                             >
                                 Delete
                             </button>
