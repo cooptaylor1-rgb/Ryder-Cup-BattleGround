@@ -600,3 +600,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Momentum Meter (compact mode): replaced the silent `return null` when no holes have been played with a small explicit placeholder (“No holes yet”), so embedding the compact widget never results in a confusing “missing” UI section.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`40653c1`)
+
+### 15:20 EST — Phase 1 (batch 112)
+- Home (`/`): migrated from bespoke `header-premium` markup to the shared `PageHeader` for consistent premium navigation.
+- Home: standardized the loading state to `PageLoadingSkeleton title="Home"` (no more hand-rolled skeleton markup).
+- Home: updated the wrapper to the standard premium page classes (`min-h-screen pb-nav page-premium-enter texture-grain`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5720717`)
