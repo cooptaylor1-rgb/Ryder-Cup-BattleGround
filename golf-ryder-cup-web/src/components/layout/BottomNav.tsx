@@ -1,14 +1,11 @@
 /**
- * Bottom Navigation Component
+ * Bottom Navigation — Fried Egg Editorial
  *
- * Mobile-first bottom tab bar.
- * Masters-inspired: restrained, functional, quietly confident.
+ * Clean, warm, understated. The navigation should
+ * feel like a quiet anchor, not a busy dashboard.
  *
- * Design principles:
- * - Large touch targets for outdoor use
- * - Clear active state without being loud
- * - Information hierarchy in color, not size
- * - Notification badges for timely alerts
+ * Design: Warm cream surface, subtle active indicator,
+ * characterful typography via Plus Jakarta Sans.
  */
 
 'use client';
@@ -16,7 +13,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
-import { Target, Trophy, Home, Settings, Shield, HelpCircle, BookOpen } from 'lucide-react';
+import { Target, Trophy, Home, Settings, Shield, BookOpen } from 'lucide-react';
 
 interface NavItem {
   href: string;
@@ -25,7 +22,6 @@ interface NavItem {
   badgeKey?: 'today' | 'score' | 'standings' | 'journal' | 'more';
 }
 
-// Phase 1 navigation spine: Today / Score / Standings / Journal / More
 const navItems: NavItem[] = [
   { href: '/', label: 'Today', icon: Home, badgeKey: 'today' },
   { href: '/score', label: 'Score', icon: Target, badgeKey: 'score' },
@@ -44,7 +40,6 @@ export interface NavBadges {
 
 interface BottomNavProps {
   badges?: NavBadges;
-  /** If provided, Score button goes directly to this match (power user optimization) */
   activeMatchId?: string;
 }
 
@@ -63,10 +58,8 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
     return badges[item.badgeKey];
   };
 
-  // Power user: Smart routing for Score button
   const handleNavClick = (item: NavItem) => {
     if (item.href === '/score' && activeMatchId) {
-      // Skip the score list and go directly to the active match
       router.push(`/score/${activeMatchId}`);
     } else {
       router.push(item.href);
@@ -75,19 +68,15 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
 
   return (
     <nav
-      className={cn(
-        'nav-premium',
-        'lg:hidden',
-        'fixed bottom-0 left-0 right-0 z-50',
-        'flex items-stretch justify-around',
-        'h-20 px-1',
-        'safe-bottom'
-      )}
+      className={cn('nav-premium', 'lg:hidden', 'fixed bottom-0 left-0 right-0 z-50')}
       style={{
-        background: 'linear-gradient(180deg, var(--surface) 0%, var(--canvas) 100%)',
-        borderTop: '1px solid var(--rule)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'space-around',
+        height: '72px',
+        paddingLeft: 'var(--space-1)',
+        paddingRight: 'var(--space-1)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
       aria-label="Main navigation"
     >
@@ -109,34 +98,57 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
               'rounded-xl'
             )}
             style={{
-              color: active ? 'var(--masters, #006747)' : 'var(--ink-tertiary, #807868)',
-              transitionDuration: '150ms',
+              color: active ? 'var(--masters)' : 'var(--ink-tertiary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
             }}
             aria-current={active ? 'page' : undefined}
           >
-            {/* Active indicator */}
+            {/* Active indicator — refined gold bar */}
             {active && (
               <span
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
-                style={{ background: 'var(--masters, #006747)' }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '24px',
+                  height: '2px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--masters)',
+                }}
                 aria-hidden="true"
               />
             )}
 
-            {/* Icon with badge */}
+            {/* Icon */}
             <div className="relative">
               <Icon
-                className={cn('w-6 h-6', active && 'scale-110')}
-                strokeWidth={active ? 2 : 1.75}
+                className={cn('w-[22px] h-[22px]', active && 'scale-110')}
+                strokeWidth={active ? 2 : 1.5}
               />
 
-              {/* Notification badge */}
+              {/* Badge */}
               {badgeCount !== undefined && badgeCount > 0 && (
                 <span
-                  className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full text-[10px] font-bold"
                   style={{
-                    background: 'var(--error, #DC2626)',
+                    position: 'absolute',
+                    top: '-6px',
+                    right: '-8px',
+                    minWidth: '16px',
+                    height: '16px',
+                    padding: '0 4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 'var(--radius-full)',
+                    background: 'var(--error)',
                     color: 'white',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    lineHeight: 1,
                   }}
                   aria-label={`${badgeCount} notifications`}
                 >
@@ -144,11 +156,11 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
                 </span>
               )}
 
-              {/* Captain badge on More (only if no notification badge) */}
+              {/* Captain indicator */}
               {item.href === '/more' && isCaptainMode && !badgeCount && (
                 <Shield
                   className="absolute -top-0.5 -right-1.5 w-2.5 h-2.5"
-                  style={{ color: 'var(--masters, #006747)' }}
+                  style={{ color: 'var(--maroon)' }}
                   aria-hidden="true"
                 />
               )}
@@ -156,36 +168,19 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
 
             {/* Label */}
             <span
-              className={cn('text-[11px] mt-0.5 font-medium tracking-wide', active && 'font-bold')}
+              style={{
+                fontSize: '10px',
+                marginTop: '2px',
+                fontWeight: active ? 700 : 500,
+                fontFamily: 'var(--font-sans)',
+                letterSpacing: '0.02em',
+              }}
             >
               {item.label}
             </span>
           </button>
         );
       })}
-
-      {/* Keyboard Shortcuts Hint - Power User Feature */}
-      <button
-        onClick={() => {
-          window.dispatchEvent(new CustomEvent('show-keyboard-help'));
-        }}
-        className={cn(
-          'hidden md:flex flex-col items-center justify-center',
-          'min-w-[40px] min-h-[40px] py-1.5',
-          'transition-all duration-150',
-          'focus-visible:outline-none',
-          'active:scale-95 active:opacity-80',
-          'rounded-xl'
-        )}
-        style={{
-          color: 'var(--ink-tertiary, #807868)',
-        }}
-        aria-label="Show keyboard shortcuts (press ?)"
-        title="Keyboard shortcuts — Press ?"
-      >
-        <HelpCircle size={18} strokeWidth={1.5} />
-        <span className="text-[9px] mt-0.5 opacity-70">?</span>
-      </button>
     </nav>
   );
 }

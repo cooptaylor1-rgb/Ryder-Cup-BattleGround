@@ -1,8 +1,9 @@
 /**
  * Empty State Component
  *
+ * Basic empty state with editorial design.
+ * Serif titles, warm cream tones, restrained layout.
  * Re-exports from EmptyStatePremium for backwards compatibility.
- * Use EmptyStatePremium directly for the best experience with illustrations.
  */
 
 'use client';
@@ -56,45 +57,59 @@ export function EmptyState({
   children,
 }: EmptyStateProps) {
   return (
-    <div className={cn('py-12 px-4 text-center', className)}>
+    <div className={cn('py-16 px-6 text-center', className)}>
+      {/* Single icon -- restrained, warm background */}
       <div
-        className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+        className="w-14 h-14 mx-auto mb-6 rounded-2xl flex items-center justify-center"
         style={{
-          background: 'var(--surface, #1E1C18)',
-          border: '1px solid var(--rule, #3A3530)',
+          background: 'var(--canvas-warm, #F0EDE8)',
+          border: '1px solid var(--rule, #E8E4DF)',
         }}
       >
         <Icon
-          className="w-8 h-8"
-          style={{ color: 'var(--ink-tertiary, #807868)' }}
+          className="w-7 h-7"
+          style={{ color: 'var(--ink-tertiary, #A39E98)' }}
         />
       </div>
+
+      {/* Title -- serif for editorial warmth */}
       <h3
-        className="text-lg font-semibold mb-1"
-        style={{ color: 'var(--ink, #F5F1E8)' }}
+        className="text-xl mb-2"
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontWeight: 400,
+          color: 'var(--ink, #1A1815)',
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em',
+        }}
       >
         {title}
       </h3>
+
+      {/* Description -- sans for readability */}
       {description && (
         <p
           className="text-sm max-w-xs mx-auto"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+          style={{
+            fontFamily: 'var(--font-sans)',
+            color: 'var(--ink-secondary, #6B6560)',
+            lineHeight: 1.6,
+          }}
         >
           {description}
         </p>
       )}
+
+      {/* Action -- btn-premium for Masters green CTA */}
       {action && (
         <button
           onClick={action.onClick}
-          className="mt-4 px-4 py-2 rounded-lg font-medium transition-colors"
-          style={{
-            background: 'var(--masters, #006747)',
-            color: 'white',
-          }}
+          className="btn-premium mt-6"
         >
           {action.label}
         </button>
       )}
+
       {children}
     </div>
   );

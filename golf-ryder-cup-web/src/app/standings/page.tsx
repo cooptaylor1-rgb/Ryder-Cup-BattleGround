@@ -34,7 +34,10 @@ import { BottomNav, PageHeader } from '@/components/layout';
 /**
  * STANDINGS PAGE — The Complete Leaderboard
  *
- * Design Philosophy:
+ * Fried Egg Golf Editorial Design:
+ * - Cream canvas, warm ink, generous whitespace
+ * - Instrument Serif for monumental scores
+ * - Plus Jakarta Sans for UI and captions
  * - Team scores dominate the viewport, monumental and unmissable
  * - Individual leaders feel prestigious, like a major leaderboard
  * - Fun stats add personality and memorable moments
@@ -277,7 +280,6 @@ function TabButton({
     <button
       onClick={onClick}
       className="press-scale"
-      // BUG-022 FIX: Add aria-label and role for accessibility
       aria-label={`${label} tab`}
       aria-selected={active}
       role="tab"
@@ -288,11 +290,12 @@ function TabButton({
         justifyContent: 'center',
         gap: 'var(--space-2)',
         padding: 'var(--space-3) var(--space-4)',
-        borderRadius: 'var(--radius-md)',
-        border: 'none',
+        borderRadius: 'var(--radius-full)',
+        border: active ? 'none' : '1px solid var(--rule)',
         background: active ? 'var(--masters)' : 'transparent',
         color: active ? 'white' : 'var(--ink-secondary)',
-        fontWeight: 500,
+        fontFamily: 'var(--font-sans)',
+        fontWeight: active ? 600 : 500,
         fontSize: 'var(--text-sm)',
         cursor: 'pointer',
         transition: 'all 0.2s ease',

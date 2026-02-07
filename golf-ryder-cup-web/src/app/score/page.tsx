@@ -22,11 +22,12 @@ import { BottomNav } from '@/components/layout';
 /**
  * SCORE PAGE — Match List
  *
- * Design Philosophy:
- * - Each match is a dignified row, not a cramped card
- * - Scores use the serif font for warmth
- * - Team colors identify sides at a glance
- * - Status is clear without visual clutter
+ * Fried Egg Golf Editorial Design:
+ * - Cream canvas (#FAF8F5), warm ink (#1A1815)
+ * - var(--font-serif) for display scores, var(--font-sans) for UI
+ * - card-editorial for match cards, container-editorial for width
+ * - Generous whitespace, restrained animations, no glow effects
+ * - Active match uses score-monumental class for prominence
  */
 
 const logger = createLogger('score');
@@ -145,13 +146,13 @@ export default function ScorePage() {
     if (!isAuthenticated) {
         return (
             <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
+                className="min-h-screen pb-nav"
+                style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
             >
                 <PageHeader
                     title="Score"
                     subtitle="Sign in required"
-                    icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
                     onBack={() => router.back()}
                 />
 
@@ -175,13 +176,13 @@ export default function ScorePage() {
     if (!currentTrip) {
         return (
             <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
+                className="min-h-screen pb-nav"
+                style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
             >
                 <PageHeader
                     title="Score"
                     subtitle="No active trip"
-                    icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
                     onBack={() => router.back()}
                 />
 
@@ -203,25 +204,25 @@ export default function ScorePage() {
     }
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}>
             <PageHeader
                 title="Score"
                 subtitle={currentTrip.name}
-                icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+                icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
                 onBack={() => router.back()}
             />
 
             <main className="container-editorial">
                 {/* Session Header */}
                 {activeSession && (
-                    <section className="section">
-                        <div className="live-indicator" style={{ marginBottom: 'var(--space-3)' }}>
+                    <section style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
+                        <p className="type-overline" style={{ color: 'var(--masters)', marginBottom: 'var(--space-3)' }}>
                             Session {activeSession.sessionNumber}
-                        </div>
+                        </p>
                         <h1 className="type-display capitalize">
                             {activeSession.sessionType}
                         </h1>
-                        <p className="type-caption" style={{ marginTop: 'var(--space-2)' }}>
+                        <p className="type-caption" style={{ marginTop: 'var(--space-2)', color: 'var(--ink-secondary)' }}>
                             {activeSession.status === 'inProgress' ? 'In Progress' :
                                 activeSession.status === 'completed' ? 'Complete' : 'Scheduled'}
                         </p>
@@ -231,27 +232,24 @@ export default function ScorePage() {
                 <hr className="divider" />
 
                 {/* Matches - BUG-011 FIX: Wrap with ErrorBoundary for graceful error handling */}
-                <section className="section-sm">
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
+                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
+                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)', color: 'var(--ink-secondary)' }}>
                         Matches
                     </h2>
 
                     <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
                         {isLoading ? (
-                            <div className="skeleton-group" style={{ padding: 'var(--space-8) 0' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-8) 0' }}>
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="player-row">
-                                        <div className="skeleton" style={{ width: '24px', height: '16px' }} />
-                                        <div className="flex-1">
-                                            <div className="skeleton" style={{ width: '60%', height: '16px', marginBottom: '8px' }} />
-                                            <div className="skeleton" style={{ width: '50%', height: '16px' }} />
-                                        </div>
-                                        <div className="skeleton" style={{ width: '40px', height: '24px' }} />
+                                    <div key={i} className="card-editorial" style={{ padding: 'var(--space-5)' }}>
+                                        <div className="skeleton" style={{ width: '40%', height: '12px', marginBottom: '12px' }} />
+                                        <div className="skeleton" style={{ width: '70%', height: '16px', marginBottom: '8px' }} />
+                                        <div className="skeleton" style={{ width: '60%', height: '16px' }} />
                                     </div>
                                 ))}
                             </div>
                         ) : matchStates.length > 0 ? (
-                            <div className="stagger-fast">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                                 {matchStates.map((matchState, index) => {
                                     // Check if current user is in this match (P0-3)
                                     const isUserMatch = currentUserPlayer && (
@@ -267,7 +265,6 @@ export default function ScorePage() {
                                             teamAPlayers={getMatchPlayers(matchState.match.teamAPlayerIds)}
                                             teamBPlayers={getMatchPlayers(matchState.match.teamBPlayerIds)}
                                             onClick={() => handleMatchSelect(matchState.match.id)}
-                                            animationDelay={index * 50}
                                             isUserMatch={isUserMatch || false}
                                         />
                                     );
@@ -283,8 +280,8 @@ export default function ScorePage() {
                 {sessions.length > 1 && (
                     <>
                         <hr className="divider" />
-                        <section className="section-sm">
-                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+                        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
+                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)', color: 'var(--ink-secondary)' }}>
                                 Sessions
                             </h2>
                             <div
@@ -296,7 +293,7 @@ export default function ScorePage() {
                                         key={session.id}
                                         onClick={() => setSelectedSessionId(session.id)}
                                         className={session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-                                        style={{ whiteSpace: 'nowrap' }}
+                                        style={{ whiteSpace: 'nowrap', fontFamily: 'var(--font-sans)' }}
                                     >
                                         Session {session.sessionNumber}
                                     </button>
@@ -314,7 +311,8 @@ export default function ScorePage() {
 }
 
 /* ============================================
-   Match Row — Dignified Match Display
+   Match Card — Editorial Design System
+   card-editorial for structure, score-monumental for active match prominence
    ============================================ */
 interface MatchRowProps {
     matchState: MatchState;
@@ -322,47 +320,30 @@ interface MatchRowProps {
     teamAPlayers: Player[];
     teamBPlayers: Player[];
     onClick: () => void;
-    animationDelay?: number;
     isUserMatch?: boolean; // P0-3: Highlight user's match
 }
 
-function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick, animationDelay = 0, isUserMatch = false }: MatchRowProps) {
+function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick, isUserMatch = false }: MatchRowProps) {
     const { currentScore, holesPlayed, status, displayScore } = matchState;
+    const isActive = status === 'inProgress';
 
     const formatPlayers = (playerList: Player[]) => {
-        if (playerList.length === 0) return '—';
+        if (playerList.length === 0) return '\u2014';
         return playerList
             .map(p => formatPlayerName(p.firstName, p.lastName, 'short'))
             .join(' / ');
     };
 
-    // Determine leading team for row styling
-    const isUSALeading = currentScore > 0;
-    const isEuropeLeading = currentScore < 0;
-    const teamRowClass = isUSALeading
-        ? 'team-row team-row-usa team-row-accent team-row-accent-usa'
-        : isEuropeLeading
-            ? 'team-row team-row-europe team-row-accent team-row-accent-europe'
-            : '';
-
     return (
         <button
             onClick={onClick}
-            className={`match-row row-interactive w-full text-left stagger-item ${teamRowClass} active:scale-[0.98]`}
+            className="card-editorial card-interactive w-full text-left"
             style={{
-                paddingLeft: 'var(--space-4)',
-                paddingRight: 'var(--space-4)',
-                paddingTop: 'var(--space-4)',
-                paddingBottom: 'var(--space-4)',
-                marginLeft: 'calc(-1 * var(--space-4))',
-                marginRight: 'calc(-1 * var(--space-4))',
-                borderRadius: 'var(--radius-lg)',
-                border: isUserMatch ? '2px solid var(--masters)' : undefined,
-                background: isUserMatch ? 'rgba(var(--masters-rgb), 0.08)' : undefined,
+                padding: isActive ? 'var(--space-6)' : 'var(--space-5)',
                 position: 'relative',
-                animationDelay: `${animationDelay}ms`,
-                minHeight: '72px',
-                transition: 'transform 0.1s ease, background 0.15s ease',
+                borderColor: isUserMatch ? 'var(--masters)' : undefined,
+                borderWidth: isUserMatch ? '2px' : undefined,
+                transition: 'box-shadow 0.15s ease',
             }}
         >
             {/* Your Match Badge (P0-3) */}
@@ -377,91 +358,147 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                         background: 'var(--masters)',
                         color: 'white',
                         fontSize: '10px',
+                        fontFamily: 'var(--font-sans)',
                         fontWeight: 700,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
+                        letterSpacing: '0.08em',
                         borderRadius: 'var(--radius-full)',
                         whiteSpace: 'nowrap',
-                        boxShadow: '0 2px 4px rgba(0, 103, 71, 0.3)',
                     }}
                 >
                     Your Match
                 </div>
             )}
 
-            {/* Match number */}
-            <span
-                style={{
-                    width: '32px',
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    color: isUserMatch ? 'var(--masters)' : 'var(--ink-secondary)',
-                    textAlign: 'center'
-                }}
-            >
-                {matchNumber}
-            </span>
-
-            {/* Players */}
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                    <span className={`team-dot team-dot-usa ${status === 'inProgress' && isUSALeading ? 'team-dot-pulse' : ''}`} />
-                    <span
-                        className="truncate text-base"
-                        style={{ fontWeight: currentScore > 0 ? 700 : 500 }}
-                    >
-                        {formatPlayers(teamAPlayers)}
-                    </span>
-                    {currentScore > 0 && (
-                        <span className="team-badge team-badge-solid-usa" style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700 }}>
-                            UP
-                        </span>
-                    )}
-                </div>
-                <div className="flex items-center gap-2" style={{ marginTop: 'var(--space-2)' }}>
-                    <span className={`team-dot team-dot-europe ${status === 'inProgress' && isEuropeLeading ? 'team-dot-pulse' : ''}`} />
-                    <span
-                        className="truncate text-base"
-                        style={{ fontWeight: currentScore < 0 ? 700 : 500 }}
-                    >
-                        {formatPlayers(teamBPlayers)}
-                    </span>
-                    {currentScore < 0 && (
-                        <span className="team-badge team-badge-solid-europe" style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700 }}>
-                            UP
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            {/* Score */}
-            <div className="text-right" style={{ minWidth: '70px' }}>
+            {/* Card header: match number + status */}
+            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
                 <span
-                    className="text-2xl font-bold"
-                    style={{
-                        fontFamily: "'Instrument Serif', Georgia, serif",
-                        color: currentScore > 0 ? 'var(--team-usa)' :
-                            currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-secondary)'
-                    }}
+                    className="type-overline"
+                    style={{ color: isUserMatch ? 'var(--masters)' : 'var(--ink-tertiary)' }}
                 >
-                    {displayScore}
+                    Match {matchNumber}
                 </span>
-                {holesPlayed > 0 && (
-                    <p className="text-sm font-medium" style={{ marginTop: '4px', color: 'var(--ink-secondary)' }}>
-                        {status === 'completed' ? 'Final' : `thru ${holesPlayed}`}
-                    </p>
+                {status === 'inProgress' && (
+                    <span
+                        className="type-overline"
+                        style={{ color: 'var(--masters)' }}
+                    >
+                        Live
+                    </span>
                 )}
-                {status === 'scheduled' && holesPlayed === 0 && (
-                    <p className="text-sm font-medium" style={{ color: 'var(--ink-tertiary)' }}>Not started</p>
+                {status === 'completed' && (
+                    <span
+                        className="type-overline"
+                        style={{ color: 'var(--ink-tertiary)' }}
+                    >
+                        Final
+                    </span>
                 )}
             </div>
 
-            <ChevronRight
-                size={20}
-                strokeWidth={1.5}
-                className="row-chevron"
-                style={{ color: 'var(--ink-tertiary)', marginLeft: 'var(--space-2)' }}
-            />
+            {/* Players + Score row */}
+            <div className="flex items-center gap-4">
+                {/* Players */}
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2" style={{ marginBottom: 'var(--space-2)' }}>
+                        <span className="team-dot team-dot-usa" />
+                        <span
+                            className="truncate"
+                            style={{
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: 'var(--text-base)',
+                                fontWeight: currentScore > 0 ? 700 : 500,
+                                color: 'var(--ink)',
+                            }}
+                        >
+                            {formatPlayers(teamAPlayers)}
+                        </span>
+                        {currentScore > 0 && (
+                            <span style={{
+                                fontSize: '10px',
+                                fontFamily: 'var(--font-sans)',
+                                fontWeight: 700,
+                                color: 'var(--team-usa)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                            }}>
+                                UP
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="team-dot team-dot-europe" />
+                        <span
+                            className="truncate"
+                            style={{
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: 'var(--text-base)',
+                                fontWeight: currentScore < 0 ? 700 : 500,
+                                color: 'var(--ink)',
+                            }}
+                        >
+                            {formatPlayers(teamBPlayers)}
+                        </span>
+                        {currentScore < 0 && (
+                            <span style={{
+                                fontSize: '10px',
+                                fontFamily: 'var(--font-sans)',
+                                fontWeight: 700,
+                                color: 'var(--team-europe)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                            }}>
+                                UP
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Score — monumental for active matches, serif for all */}
+                <div className="text-right" style={{ minWidth: '70px' }}>
+                    <span
+                        className={isActive ? 'score-monumental' : ''}
+                        style={{
+                            fontFamily: 'var(--font-serif)',
+                            fontSize: isActive ? undefined : 'var(--text-2xl)',
+                            fontWeight: 400,
+                            lineHeight: 1,
+                            letterSpacing: '-0.02em',
+                            color: currentScore > 0 ? 'var(--team-usa)' :
+                                currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-tertiary)',
+                            display: 'block',
+                        }}
+                    >
+                        {displayScore}
+                    </span>
+                    {holesPlayed > 0 && status !== 'completed' && (
+                        <p style={{
+                            marginTop: '4px',
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 500,
+                            color: 'var(--ink-tertiary)',
+                        }}>
+                            thru {holesPlayed}
+                        </p>
+                    )}
+                    {status === 'scheduled' && holesPlayed === 0 && (
+                        <p style={{
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: 'var(--text-sm)',
+                            color: 'var(--ink-tertiary)',
+                        }}>
+                            Not started
+                        </p>
+                    )}
+                </div>
+
+                <ChevronRight
+                    size={18}
+                    strokeWidth={1.5}
+                    style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
+                />
+            </div>
         </button>
     );
 }

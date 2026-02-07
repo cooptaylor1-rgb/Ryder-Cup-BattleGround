@@ -46,10 +46,11 @@ import { BottomNav } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui';
 
 /**
- * MORE PAGE — Redesigned Hub
+ * MORE PAGE -- Editorial Hub
  *
  * Clean, organized access to all features, settings, and account management.
- * Groups related items together with clear visual hierarchy.
+ * Uses the Fried Egg Golf editorial design system with warm typography,
+ * cream canvas, and clean list rows instead of grids.
  */
 
 // ============================================
@@ -390,12 +391,12 @@ export default function MorePage() {
           borderBottom: '1px solid var(--rule)',
         }}
       >
-        <div
+        <div className="container-editorial"
           style={{
-            padding: '12px 16px',
+            padding: '14px 0',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: 'var(--space-3)',
           }}
         >
           <button
@@ -406,25 +407,37 @@ export default function MorePage() {
               border: 'none',
               cursor: 'pointer',
               color: 'var(--ink-secondary)',
-              borderRadius: '8px',
+              borderRadius: 'var(--radius-md)',
+              marginLeft: '-8px',
+            }}
+            aria-label="Back"
+          >
+            <ChevronLeft size={22} strokeWidth={1.75} />
+          </button>
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '1.375rem',
+              fontWeight: 400,
+              color: 'var(--ink-primary)',
+              letterSpacing: '-0.01em',
             }}
           >
-            <ChevronLeft size={20} />
-          </button>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>More</h1>
+            More
+          </h1>
         </div>
       </header>
 
-      <main style={{ padding: '16px', maxWidth: '600px', margin: '0 auto' }}>
+      <main className="container-editorial" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         {/* Account Card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            background: 'var(--surface-card)',
-            borderRadius: '16px',
-            padding: '16px',
-            marginBottom: '24px',
+            background: 'var(--canvas-raised)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            marginBottom: 'var(--space-6)',
             border: '1px solid var(--rule)',
           }}
         >
@@ -434,7 +447,7 @@ export default function MorePage() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
+                gap: 'var(--space-4)',
                 textDecoration: 'none',
                 color: 'inherit',
               }}
@@ -450,6 +463,7 @@ export default function MorePage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 700,
                   fontSize: '16px',
                 }}
@@ -458,17 +472,31 @@ export default function MorePage() {
                 {currentUser.lastName?.[0] || '?'}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 600, fontSize: '1rem' }}>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    color: 'var(--ink-primary)',
+                  }}
+                >
                   {currentUser.firstName} {currentUser.lastName}
                 </p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)' }}>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.875rem',
+                    color: 'var(--ink-secondary)',
+                    marginTop: '2px',
+                  }}
+                >
                   {currentUser.email}
                 </p>
               </div>
               <ChevronRight size={20} style={{ color: 'var(--ink-tertiary)' }} />
             </Link>
           ) : (
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
               <Link
                 href="/login"
                 style={{
@@ -480,7 +508,8 @@ export default function MorePage() {
                   padding: '12px',
                   background: 'var(--masters)',
                   color: 'white',
-                  borderRadius: '10px',
+                  borderRadius: 'var(--radius-md)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   fontSize: '0.875rem',
                   textDecoration: 'none',
@@ -498,10 +527,11 @@ export default function MorePage() {
                   justifyContent: 'center',
                   gap: '8px',
                   padding: '12px',
-                  background: 'var(--surface-raised)',
+                  background: 'var(--canvas-raised)',
                   border: '1px solid var(--rule)',
                   color: 'var(--ink-primary)',
-                  borderRadius: '10px',
+                  borderRadius: 'var(--radius-md)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   fontSize: '0.875rem',
                   textDecoration: 'none',
@@ -522,9 +552,9 @@ export default function MorePage() {
             transition={{ delay: 0.05 }}
             style={{
               background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-              borderRadius: '16px',
-              padding: '16px',
-              marginBottom: '24px',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--space-5)',
+              marginBottom: 'var(--space-6)',
               color: 'white',
             }}
           >
@@ -532,16 +562,42 @@ export default function MorePage() {
               style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}
             >
               <div>
-                <p style={{ fontSize: '0.75rem', opacity: 0.8, marginBottom: '4px' }}>
-                  CURRENT TRIP
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    opacity: 0.8,
+                    marginBottom: '4px',
+                  }}
+                >
+                  Current Trip
                 </p>
-                <p style={{ fontWeight: 700, fontSize: '1.125rem' }}>{currentTrip.name}</p>
-                <p style={{ fontSize: '0.875rem', opacity: 0.9, marginTop: '4px' }}>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontWeight: 400,
+                    fontSize: '1.25rem',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {currentTrip.name}
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '0.875rem',
+                    opacity: 0.9,
+                    marginTop: '6px',
+                  }}
+                >
                   {new Date(currentTrip.startDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                   })}{' '}
-                  –{' '}
+                  &ndash;{' '}
                   {new Date(currentTrip.endDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -558,8 +614,9 @@ export default function MorePage() {
                   padding: '8px 12px',
                   background: 'rgba(255,255,255,0.15)',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-md)',
                   color: 'white',
+                  fontFamily: 'var(--font-sans)',
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -572,7 +629,7 @@ export default function MorePage() {
           </motion.div>
         )}
 
-        {/* Captain Mode Quick Toggle */}
+        {/* Captain Mode Toggle */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -582,12 +639,12 @@ export default function MorePage() {
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            padding: '16px',
-            background: isCaptainMode ? 'var(--masters-subtle)' : 'var(--surface-card)',
-            border: isCaptainMode ? '2px solid var(--masters)' : '1px solid var(--rule)',
-            borderRadius: '16px',
-            marginBottom: '12px',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-4) var(--space-5)',
+            background: isCaptainMode ? 'var(--maroon-subtle)' : 'var(--canvas-raised)',
+            border: isCaptainMode ? '2px solid var(--maroon)' : '1px solid var(--rule)',
+            borderRadius: 'var(--radius-lg)',
+            marginBottom: 'var(--space-3)',
             cursor: 'pointer',
             textAlign: 'left',
           }}
@@ -596,26 +653,44 @@ export default function MorePage() {
             style={{
               width: '44px',
               height: '44px',
-              borderRadius: '12px',
-              background: isCaptainMode ? 'var(--masters)' : 'var(--surface-raised)',
+              borderRadius: 'var(--radius-md)',
+              background: isCaptainMode
+                ? 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)'
+                : 'var(--canvas-sunken)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: isCaptainMode ? 'white' : 'var(--ink-secondary)',
+              flexShrink: 0,
             }}
           >
             {isCaptainMode ? <Unlock size={22} /> : <Lock size={22} />}
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 600, color: 'var(--ink-primary)' }}>Captain Mode</p>
-            <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)' }}>
-              {isCaptainMode ? 'Enabled — Full editing access' : 'Tap to unlock editing'}
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 600,
+                color: isCaptainMode ? 'var(--maroon-dark)' : 'var(--ink-primary)',
+              }}
+            >
+              Captain Mode
+            </p>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.875rem',
+                color: 'var(--ink-secondary)',
+                marginTop: '2px',
+              }}
+            >
+              {isCaptainMode ? 'Enabled -- Full editing access' : 'Tap to unlock editing'}
             </p>
           </div>
-          <Toggle enabled={isCaptainMode} />
+          <Toggle enabled={isCaptainMode} color={isCaptainMode ? 'var(--maroon)' : undefined} />
         </motion.button>
 
-        {/* Admin Mode Quick Toggle */}
+        {/* Admin Mode Toggle */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -625,12 +700,12 @@ export default function MorePage() {
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            padding: '16px',
-            background: isAdminMode ? 'rgba(220, 38, 38, 0.1)' : 'var(--surface-card)',
+            gap: 'var(--space-4)',
+            padding: 'var(--space-4) var(--space-5)',
+            background: isAdminMode ? 'rgba(220, 38, 38, 0.06)' : 'var(--canvas-raised)',
             border: isAdminMode ? '2px solid #dc2626' : '1px solid var(--rule)',
-            borderRadius: '16px',
-            marginBottom: '24px',
+            borderRadius: 'var(--radius-lg)',
+            marginBottom: 'var(--space-8)',
             cursor: 'pointer',
             textAlign: 'left',
           }}
@@ -639,22 +714,36 @@ export default function MorePage() {
             style={{
               width: '44px',
               height: '44px',
-              borderRadius: '12px',
-              background: isAdminMode ? '#dc2626' : 'var(--surface-raised)',
+              borderRadius: 'var(--radius-md)',
+              background: isAdminMode ? '#dc2626' : 'var(--canvas-sunken)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: isAdminMode ? 'white' : 'var(--ink-secondary)',
+              flexShrink: 0,
             }}
           >
             <Shield size={22} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontWeight: 600, color: isAdminMode ? '#dc2626' : 'var(--ink-primary)' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 600,
+                color: isAdminMode ? '#dc2626' : 'var(--ink-primary)',
+              }}
+            >
               Admin Mode
             </p>
-            <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)' }}>
-              {isAdminMode ? 'Enabled — Data management access' : 'Delete trips & manage data'}
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.875rem',
+                color: 'var(--ink-secondary)',
+                marginTop: '2px',
+              }}
+            >
+              {isAdminMode ? 'Enabled -- Data management access' : 'Delete trips & manage data'}
             </p>
           </div>
           <Toggle enabled={isAdminMode} color={isAdminMode ? '#dc2626' : undefined} />
@@ -692,7 +781,7 @@ export default function MorePage() {
                   };
 
             return (
-              <div style={{ marginTop: '24px' }}>
+              <div style={{ marginTop: 'var(--space-6)' }}>
                 <EmptyStatePremium
                   illustration="flag"
                   title={emptyCopy.title}
@@ -713,8 +802,10 @@ export default function MorePage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-                style={{ marginBottom: '24px' }}
+                style={{ marginBottom: 'var(--space-6)' }}
               >
+                {/* Section header with divider */}
+                {sectionIndex > 0 && <hr className="divider-subtle" style={{ marginBottom: 'var(--space-5)' }} />}
                 <button
                   onClick={() => toggleSection(section.id)}
                   style={{
@@ -722,20 +813,17 @@ export default function MorePage() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     width: '100%',
-                    padding: '8px 4px',
+                    padding: '0',
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    marginBottom: '8px',
+                    marginBottom: 'var(--space-3)',
                   }}
                 >
                   <h2
+                    className="type-overline"
                     style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      color: 'var(--ink-tertiary)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
+                      fontFamily: 'var(--font-sans)',
                     }}
                   >
                     {section.title}
@@ -761,8 +849,8 @@ export default function MorePage() {
                     >
                       <div
                         style={{
-                          background: 'var(--surface-card)',
-                          borderRadius: '16px',
+                          background: 'var(--canvas-raised)',
+                          borderRadius: 'var(--radius-lg)',
                           border: '1px solid var(--rule)',
                           overflow: 'hidden',
                         }}
@@ -785,54 +873,92 @@ export default function MorePage() {
         })()}
 
         {/* About Section */}
+        <hr className="divider-subtle" />
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           style={{
-            background: 'var(--surface-card)',
-            borderRadius: '16px',
-            padding: '20px',
+            background: 'var(--canvas-raised)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-6)',
             border: '1px solid var(--rule)',
-            marginBottom: '24px',
+            marginTop: 'var(--space-6)',
+            marginBottom: 'var(--space-6)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
             <div
               style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '14px',
+                width: '52px',
+                height: '52px',
+                borderRadius: 'var(--radius-lg)',
                 background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'white',
-                fontWeight: 800,
+                fontFamily: 'var(--font-serif)',
+                fontWeight: 400,
                 fontSize: '20px',
-                boxShadow: '0 4px 12px rgba(0, 66, 37, 0.3)',
+                letterSpacing: '-0.02em',
+                boxShadow: '0 4px 12px rgba(0, 66, 37, 0.25)',
               }}
             >
               RC
             </div>
             <div>
-              <p style={{ fontWeight: 700, fontSize: '1.125rem' }}>Golf Ryder Cup</p>
-              <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)' }}>Version 1.1.0</p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontWeight: 400,
+                  fontSize: '1.125rem',
+                  color: 'var(--ink-primary)',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Golf Ryder Cup
+              </p>
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.8125rem',
+                  color: 'var(--ink-tertiary)',
+                  marginTop: '2px',
+                }}
+              >
+                Version 1.1.0
+              </p>
             </div>
           </div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', lineHeight: 1.5 }}>
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.875rem',
+              color: 'var(--ink-secondary)',
+              lineHeight: 1.6,
+            }}
+          >
             Offline-first match play scoring for your Ryder Cup format golf trip. Track scores,
             manage lineups, and celebrate with friends.
           </p>
           <div
             style={{
-              marginTop: '16px',
-              paddingTop: '16px',
+              marginTop: 'var(--space-4)',
+              paddingTop: 'var(--space-4)',
               borderTop: '1px solid var(--rule)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               color: 'var(--ink-tertiary)',
+              fontFamily: 'var(--font-sans)',
               fontSize: '0.75rem',
             }}
           >
@@ -846,11 +972,25 @@ export default function MorePage() {
       <AnimatePresence>
         {showCaptainModal && (
           <Modal onClose={() => setShowCaptainModal(false)}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px' }}>
+            <h2
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '1.25rem',
+                fontWeight: 400,
+                marginBottom: '8px',
+                color: 'var(--ink-primary)',
+              }}
+            >
               Enable Captain Mode
             </h2>
             <p
-              style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', marginBottom: '20px' }}
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.875rem',
+                color: 'var(--ink-secondary)',
+                marginBottom: '20px',
+                lineHeight: 1.5,
+              }}
             >
               Enter a PIN to unlock captain features like editing lineups and managing players.
             </p>
@@ -863,10 +1003,11 @@ export default function MorePage() {
               style={{
                 width: '100%',
                 padding: '14px 16px',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '1rem',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--rule)',
-                background: 'var(--surface-raised)',
+                background: 'var(--canvas-raised)',
                 color: 'var(--ink-primary)',
                 marginBottom: '16px',
               }}
@@ -880,10 +1021,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--rule)',
-                  background: 'var(--surface-raised)',
+                  background: 'var(--canvas-raised)',
                   color: 'var(--ink-primary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -896,10 +1038,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: 'none',
-                  background: captainPin.length >= 4 ? 'var(--masters)' : 'var(--rule)',
+                  background: captainPin.length >= 4 ? 'var(--maroon)' : 'var(--rule)',
                   color: captainPin.length >= 4 ? 'white' : 'var(--ink-tertiary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: captainPin.length >= 4 ? 'pointer' : 'not-allowed',
                 }}
@@ -928,20 +1071,24 @@ export default function MorePage() {
             </div>
             <h2
               style={{
+                fontFamily: 'var(--font-serif)',
                 fontSize: '1.25rem',
-                fontWeight: 700,
+                fontWeight: 400,
                 textAlign: 'center',
                 marginBottom: '8px',
+                color: 'var(--ink-primary)',
               }}
             >
               Clear All Data?
             </h2>
             <p
               style={{
+                fontFamily: 'var(--font-sans)',
                 fontSize: '0.875rem',
                 color: 'var(--ink-secondary)',
                 textAlign: 'center',
                 marginBottom: '20px',
+                lineHeight: 1.5,
               }}
             >
               This will permanently delete all trips, players, matches, and scores. This cannot be
@@ -953,10 +1100,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--rule)',
-                  background: 'var(--surface-raised)',
+                  background: 'var(--canvas-raised)',
                   color: 'var(--ink-primary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -968,10 +1116,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: 'none',
                   background: 'var(--error)',
                   color: 'white',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -984,11 +1133,25 @@ export default function MorePage() {
 
         {showExitTripConfirm && (
           <Modal onClose={() => setShowExitTripConfirm(false)}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px' }}>
+            <h2
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: '1.25rem',
+                fontWeight: 400,
+                marginBottom: '8px',
+                color: 'var(--ink-primary)',
+              }}
+            >
               Exit Trip?
             </h2>
             <p
-              style={{ fontSize: '0.875rem', color: 'var(--ink-secondary)', marginBottom: '20px' }}
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.875rem',
+                color: 'var(--ink-secondary)',
+                marginBottom: '20px',
+                lineHeight: 1.5,
+              }}
             >
               You&apos;ll return to the trip selector. Your data is saved and you can return
               anytime.
@@ -999,10 +1162,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--rule)',
-                  background: 'var(--surface-raised)',
+                  background: 'var(--canvas-raised)',
                   color: 'var(--ink-primary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -1014,10 +1178,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: 'none',
                   background: 'var(--masters)',
                   color: 'white',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -1046,20 +1211,24 @@ export default function MorePage() {
             </div>
             <h2
               style={{
+                fontFamily: 'var(--font-serif)',
                 fontSize: '1.25rem',
-                fontWeight: 700,
+                fontWeight: 400,
                 marginBottom: '8px',
                 textAlign: 'center',
+                color: 'var(--ink-primary)',
               }}
             >
               Enable Admin Mode
             </h2>
             <p
               style={{
+                fontFamily: 'var(--font-sans)',
                 fontSize: '0.875rem',
                 color: 'var(--ink-secondary)',
                 marginBottom: '20px',
                 textAlign: 'center',
+                lineHeight: 1.5,
               }}
             >
               Admin mode allows you to delete trips, clean up data, and access advanced management
@@ -1074,10 +1243,11 @@ export default function MorePage() {
               style={{
                 width: '100%',
                 padding: '14px 16px',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '1rem',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--rule)',
-                background: 'var(--surface-raised)',
+                background: 'var(--canvas-raised)',
                 color: 'var(--ink-primary)',
                 marginBottom: '16px',
               }}
@@ -1091,10 +1261,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--rule)',
-                  background: 'var(--surface-raised)',
+                  background: 'var(--canvas-raised)',
                   color: 'var(--ink-primary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -1107,10 +1278,11 @@ export default function MorePage() {
                 style={{
                   flex: 1,
                   padding: '14px',
-                  borderRadius: '12px',
+                  borderRadius: 'var(--radius-md)',
                   border: 'none',
                   background: adminPin.length >= 4 ? '#dc2626' : 'var(--rule)',
                   color: adminPin.length >= 4 ? 'white' : 'var(--ink-tertiary)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: 600,
                   cursor: adminPin.length >= 4 ? 'pointer' : 'not-allowed',
                 }}
@@ -1146,8 +1318,8 @@ function MenuItemRow({
         style={{
           width: '36px',
           height: '36px',
-          borderRadius: '10px',
-          background: item.destructive ? 'var(--error-subtle)' : 'var(--surface-raised)',
+          borderRadius: 'var(--radius-md)',
+          background: item.destructive ? 'var(--error-subtle)' : 'var(--canvas-sunken)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1160,7 +1332,9 @@ function MenuItemRow({
       <div style={{ flex: 1, minWidth: 0 }}>
         <p
           style={{
+            fontFamily: 'var(--font-sans)',
             fontWeight: 500,
+            fontSize: '0.9375rem',
             color: item.destructive ? 'var(--error)' : 'var(--ink-primary)',
           }}
         >
@@ -1169,9 +1343,11 @@ function MenuItemRow({
         {item.description && (
           <p
             style={{
+              fontFamily: 'var(--font-sans)',
               fontSize: '0.8125rem',
               color: 'var(--ink-tertiary)',
               marginTop: '2px',
+              lineHeight: 1.4,
             }}
           >
             {item.description}
@@ -1181,24 +1357,34 @@ function MenuItemRow({
       {item.badge && (
         <span
           style={{
-            padding: '4px 8px',
+            padding: '3px 8px',
             borderRadius: '6px',
             background: item.badgeColor || 'var(--masters)',
             color: 'white',
+            fontFamily: 'var(--font-sans)',
             fontSize: '0.6875rem',
             fontWeight: 600,
             textTransform: 'uppercase',
+            letterSpacing: '0.04em',
           }}
         >
           {item.badge}
         </span>
       )}
       {isLoading ? (
-        <span style={{ fontSize: '0.8125rem', color: 'var(--ink-tertiary)' }}>Loading…</span>
+        <span
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.8125rem',
+            color: 'var(--ink-tertiary)',
+          }}
+        >
+          Loading...
+        </span>
       ) : item.external ? (
-        <ExternalLink size={18} style={{ color: 'var(--ink-tertiary)' }} />
+        <ExternalLink size={18} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
       ) : item.href ? (
-        <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)' }} />
+        <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
       ) : null}
     </>
   );
@@ -1206,16 +1392,17 @@ function MenuItemRow({
   const style: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    padding: '14px 16px',
+    gap: 'var(--space-3)',
+    padding: 'var(--space-4) var(--space-5)',
     width: '100%',
     textAlign: 'left',
     textDecoration: 'none',
     color: 'inherit',
     background: 'transparent',
     border: 'none',
-    borderBottom: isLast ? 'none' : '1px solid var(--rule)',
+    borderBottom: isLast ? 'none' : '1px solid var(--rule-faint)',
     cursor: 'pointer',
+    transition: 'background 150ms ease',
   };
 
   if (item.href) {
@@ -1273,7 +1460,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0, 0, 0, 0.6)',
+        background: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -1287,12 +1474,13 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: 'var(--surface-card)',
-          borderRadius: '20px',
-          padding: '24px',
+          background: 'var(--canvas-raised)',
+          borderRadius: 'var(--radius-xl, 20px)',
+          padding: 'var(--space-6)',
           width: '100%',
           maxWidth: '360px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
+          border: '1px solid var(--rule)',
         }}
       >
         {children}

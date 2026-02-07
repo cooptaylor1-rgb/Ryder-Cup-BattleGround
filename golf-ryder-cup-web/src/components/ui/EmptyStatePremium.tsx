@@ -1,9 +1,9 @@
 /**
  * Premium Empty State Component
  *
- * World-class empty states with beautiful illustrations,
- * animations, and contextual guidance. Makes "nothing here"
- * feel like an invitation, not a dead end.
+ * Editorial empty states with warm, restrained design.
+ * Serif titles, generous whitespace, and a publication feel.
+ * Makes "nothing here" feel like an invitation, not a dead end.
  */
 
 'use client';
@@ -21,7 +21,7 @@ import {
     GolfSwingIllustration,
     CelebrationIllustration,
 } from './illustrations';
-import { Plus, ArrowRight, Sparkles, Trophy, Users, Calendar, MapPin, Target, Check, DollarSign, MessageCircle, Camera, RefreshCw } from 'lucide-react';
+import { Plus, ArrowRight, Trophy, Users, Calendar, MapPin, Target, Check, DollarSign, MessageCircle, Camera, RefreshCw } from 'lucide-react';
 
 // ============================================
 // TYPES
@@ -100,7 +100,7 @@ export function EmptyStatePremium({
     children,
 }: EmptyStatePremiumProps) {
     const IllustrationComponent = illustrationMap[illustration];
-    const illustrationSize = variant === 'compact' ? 'md' : variant === 'large' ? 'xl' : 'lg';
+    const illustrationSize = variant === 'compact' ? 'sm' : variant === 'large' ? 'lg' : 'md';
 
     return (
         <div
@@ -109,28 +109,92 @@ export function EmptyStatePremium({
                 variant,
                 className
             )}
+            style={{ background: 'transparent' }}
         >
-            {/* Illustration */}
-            <div className="empty-state-illustration">
+            {/* Single illustration -- restrained, not clustered */}
+            <div className="empty-state-illustration" style={{ marginBottom: 'var(--space-8)' }}>
                 {customIllustration || (
                     <IllustrationComponent size={illustrationSize} animated={animated} />
                 )}
             </div>
 
-            {/* Title */}
-            <h3 className="empty-state-title">{title}</h3>
+            {/* Title -- serif for editorial warmth */}
+            <h3
+                className="empty-state-title"
+                style={{
+                    fontFamily: 'var(--font-serif)',
+                    color: 'var(--ink)',
+                    fontSize: variant === 'large' ? 'var(--text-3xl, 1.875rem)' : 'var(--text-2xl)',
+                    fontWeight: 400,
+                    lineHeight: 1.2,
+                    marginBottom: 'var(--space-3)',
+                    letterSpacing: '-0.01em',
+                }}
+            >
+                {title}
+            </h3>
 
-            {/* Description */}
+            {/* Description -- sans for readability */}
             {description && (
-                <p className="empty-state-text">{description}</p>
+                <p
+                    className="empty-state-text"
+                    style={{
+                        fontFamily: 'var(--font-sans)',
+                        color: 'var(--ink-secondary)',
+                        fontSize: 'var(--text-base)',
+                        lineHeight: 1.65,
+                        maxWidth: '320px',
+                        marginBottom: 'var(--space-8)',
+                    }}
+                >
+                    {description}
+                </p>
             )}
 
-            {/* Feature hints */}
+            {/* Feature hints -- clean, minimal list */}
             {features && features.length > 0 && (
-                <div className="empty-state-features">
+                <div
+                    className="empty-state-features"
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--space-3)',
+                        textAlign: 'left',
+                        marginBottom: 'var(--space-8)',
+                        padding: 'var(--space-5) var(--space-6)',
+                        background: 'var(--canvas-warm)',
+                        borderRadius: 'var(--radius-lg)',
+                        maxWidth: '300px',
+                        border: '1px solid var(--rule-faint)',
+                    }}
+                >
                     {features.map((feature, index) => (
-                        <div key={index} className="empty-state-feature">
-                            <span className="empty-state-feature-icon">
+                        <div
+                            key={index}
+                            className="empty-state-feature"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 'var(--space-3)',
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: 'var(--text-sm)',
+                                color: 'var(--ink-secondary)',
+                            }}
+                        >
+                            <span
+                                className="empty-state-feature-icon"
+                                style={{
+                                    flexShrink: 0,
+                                    width: 20,
+                                    height: 20,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'var(--masters)',
+                                    color: 'white',
+                                    borderRadius: 'var(--radius-full)',
+                                }}
+                            >
                                 {feature.icon || <Check className="w-3 h-3" />}
                             </span>
                             <span>{feature.text}</span>
@@ -139,31 +203,57 @@ export function EmptyStatePremium({
                 </div>
             )}
 
-            {/* Primary action */}
+            {/* Primary action -- btn-premium for Masters green CTA */}
             {action && (
                 <button
                     onClick={action.onClick}
-                    className="empty-state-action press-scale"
+                    className="btn-premium"
                 >
                     {action.icon}
                     {action.label}
                 </button>
             )}
 
-            {/* Secondary action */}
+            {/* Secondary action -- understated, editorial link style */}
             {secondaryAction && (
                 <button
                     onClick={secondaryAction.onClick}
-                    className="empty-state-action-secondary press-scale-sm"
+                    className="empty-state-action-secondary"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-1)',
+                        padding: 'var(--space-3) var(--space-5)',
+                        background: 'transparent',
+                        color: 'var(--ink-secondary)',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 500,
+                        border: '1px solid var(--rule)',
+                        borderRadius: 'var(--radius-full)',
+                        cursor: 'pointer',
+                        marginTop: 'var(--space-3)',
+                    }}
                 >
                     {secondaryAction.label}
                     <ArrowRight className="w-4 h-4" />
                 </button>
             )}
 
-            {/* Hint text */}
+            {/* Hint text -- quiet, italic aside */}
             {hint && (
-                <p className="empty-state-hint">{hint}</p>
+                <p
+                    className="empty-state-hint"
+                    style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-tertiary)',
+                        fontStyle: 'italic',
+                        marginTop: 'var(--space-6)',
+                    }}
+                >
+                    {hint}
+                </p>
             )}
 
             {/* Custom children */}
@@ -174,12 +264,12 @@ export function EmptyStatePremium({
 
 // ============================================
 // PRE-BUILT EMPTY STATES
-// Best-in-class experiences for common scenarios
+// Editorial, warm, restrained
 // ============================================
 
 /**
  * No Tournaments Yet
- * First thing users see - make it inviting!
+ * First thing users see -- make it inviting!
  */
 export function NoTournamentsEmpty({
     onCreateTrip,
@@ -261,7 +351,7 @@ export function NoSessionsEmpty({
                     }
                     : undefined
             }
-            hint={isCaptain ? "Try: Day 1 - Four-ball, Day 2 - Singles" : undefined}
+            hint={isCaptain ? "Try: Day 1 -- Four-ball, Day 2 -- Singles" : undefined}
         />
     );
 }
@@ -379,7 +469,7 @@ export function NoSearchResultsEmpty({
 
 /**
  * Tournament Complete
- * All matches finished - celebration time!
+ * All matches finished -- celebration time!
  */
 export function TournamentCompleteEmpty({
     winner,
@@ -472,7 +562,7 @@ export function NoBetsEmpty({
             title={isActive ? "Make it interesting" : "No completed bets"}
             description={
                 isActive
-                    ? "Add side bets for skins, closest to pin, long drives, and more. Make every hole count!"
+                    ? "Add side bets for skins, closest to pin, long drives, and more."
                     : "Completed bets and winners will appear here."
             }
             features={isActive ? [
@@ -508,12 +598,7 @@ export function NoMessagesEmpty({
         <EmptyStatePremium
             illustration="golfers"
             title="The 19th hole awaits"
-            description="Start the conversation! Talk smack, celebrate big shots, and keep the banter going."
-            features={[
-                { icon: <MessageCircle className="w-3 h-3" />, text: 'Team trash talk' },
-                { icon: <Sparkles className="w-3 h-3" />, text: 'React to big moments' },
-                { icon: <Trophy className="w-3 h-3" />, text: 'Celebrate victories' },
-            ]}
+            description="Start the conversation. Talk smack, celebrate big shots, and keep the banter going."
             action={
                 onStartChat
                     ? {
@@ -541,12 +626,7 @@ export function NoPhotosEmpty({
         <EmptyStatePremium
             illustration="celebration"
             title="Capture the memories"
-            description="Upload photos from your golf trip. Great shots, funny moments, and everything in between!"
-            features={[
-                { icon: <Camera className="w-3 h-3" />, text: 'Share course photos' },
-                { icon: <Users className="w-3 h-3" />, text: 'Team moments' },
-                { icon: <Trophy className="w-3 h-3" />, text: 'Victory celebrations' },
-            ]}
+            description="Upload photos from your golf trip. Great shots, funny moments, and everything in between."
             action={
                 onUploadPhoto
                     ? {
