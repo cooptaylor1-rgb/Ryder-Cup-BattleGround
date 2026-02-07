@@ -1,14 +1,10 @@
 /**
- * Quick Start Wizard Component
+ * Quick Start Wizard — Fried Egg Editorial
  *
- * A guided, step-by-step flow for creating a new golf trip.
- * Reduces friction for first-time users by breaking down the process.
- *
- * Features:
- * - Progressive disclosure
- * - Smart defaults
- * - Inline validation
- * - Encouraging copy
+ * Step-by-step trip creation with editorial warmth:
+ * - Serif italic headings, overline labels
+ * - Warm cream canvas with rule dividers
+ * - Clean progress bar, always-visible Continue button
  */
 
 'use client';
@@ -26,10 +22,6 @@ import {
   Check,
   Sparkles,
 } from 'lucide-react';
-import {
-  GolfersIllustration,
-  TrophyIllustration,
-} from './illustrations';
 
 interface QuickStartWizardProps {
   onComplete: (tripData: TripData) => void;
@@ -112,102 +104,147 @@ export function QuickStartWizard({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex flex-col',
+        'fixed inset-0 z-[60] flex flex-col',
         isExiting ? 'animate-fade-out' : 'animate-fade-in',
         className
       )}
-      style={{ background: 'var(--canvas, #0F0D0A)' }}
+      style={{ background: 'var(--canvas)' }}
     >
       {/* Header */}
       <header
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid var(--rule, #3A3530)' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: 'var(--space-4) var(--space-5)',
+          paddingTop: 'calc(var(--space-4) + env(safe-area-inset-top, 0px))',
+          borderBottom: '1px solid var(--rule)',
+        }}
       >
         <button
           onClick={handleCancel}
-          className="p-2 -ml-2 rounded-lg transition-colors"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+          style={{
+            padding: 'var(--space-2)',
+            marginLeft: 'calc(-1 * var(--space-2))',
+            color: 'var(--ink-secondary)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            borderRadius: 'var(--radius-md)',
+          }}
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
 
-        {/* Progress */}
-        <div className="flex items-center gap-2">
+        {/* Step indicators */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
           {steps.map((step, index) => (
             <div
               key={step}
-              className={cn(
-                'w-8 h-1 rounded-full transition-colors',
-              )}
               style={{
-                background: index <= currentStepIndex
-                  ? 'var(--masters, #006747)'
-                  : 'var(--rule, #3A3530)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-1)',
               }}
-            />
+            >
+              <div
+                style={{
+                  width: index <= currentStepIndex ? '32px' : '20px',
+                  height: '3px',
+                  borderRadius: '2px',
+                  background: index <= currentStepIndex ? 'var(--masters)' : 'var(--rule)',
+                  transition: 'all 300ms ease',
+                }}
+              />
+            </div>
           ))}
         </div>
 
-        <div className="w-10" /> {/* Spacer for centering */}
+        {/* Step label */}
+        <span
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            color: 'var(--ink-tertiary)',
+            minWidth: '40px',
+            textAlign: 'right',
+          }}
+        >
+          {currentStepIndex + 1}/{steps.length}
+        </span>
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-8">
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 'var(--space-8) var(--space-6)',
+        }}
+      >
         {currentStep === 'basics' && (
-          <StepBasics
-            tripData={tripData}
-            updateField={updateField}
-          />
+          <StepBasics tripData={tripData} updateField={updateField} />
         )}
-
         {currentStep === 'dates' && (
-          <StepDates
-            tripData={tripData}
-            updateField={updateField}
-          />
+          <StepDates tripData={tripData} updateField={updateField} />
         )}
-
         {currentStep === 'teams' && (
-          <StepTeams
-            tripData={tripData}
-            updateField={updateField}
-          />
+          <StepTeams tripData={tripData} updateField={updateField} />
         )}
-
-        {currentStep === 'confirm' && (
-          <StepConfirm tripData={tripData} />
-        )}
+        {currentStep === 'confirm' && <StepConfirm tripData={tripData} />}
       </div>
 
-      {/* Footer */}
+      {/* Footer — always visible */}
       <div
-        className="px-6 py-4 flex gap-3"
-        style={{ borderTop: '1px solid var(--rule, #3A3530)' }}
+        style={{
+          padding: 'var(--space-4) var(--space-6)',
+          paddingBottom: 'calc(var(--space-4) + env(safe-area-inset-bottom, 0px))',
+          borderTop: '1px solid var(--rule)',
+          display: 'flex',
+          gap: 'var(--space-3)',
+          background: 'var(--canvas)',
+        }}
       >
         {!isFirstStep && (
           <button
             onClick={handleBack}
-            className="p-4 rounded-xl transition-colors"
+            className="press-scale"
             style={{
-              background: 'var(--surface, #1A1814)',
-              color: 'var(--ink-secondary, #B8B0A0)',
+              padding: 'var(--space-3) var(--space-4)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'var(--canvas-raised)',
+              border: '1px solid var(--rule)',
+              color: 'var(--ink-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         )}
 
         <button
           onClick={handleNext}
           disabled={!canProceed()}
-          className={cn(
-            'flex-1 py-4 rounded-xl font-semibold transition-all',
-            'flex items-center justify-center gap-2',
-            !canProceed() && 'opacity-50 cursor-not-allowed'
-          )}
+          className="btn-premium press-scale"
           style={{
-            background: canProceed() ? 'var(--masters, #006747)' : 'var(--surface, #1A1814)',
-            color: canProceed() ? 'white' : 'var(--ink-tertiary, #807868)',
+            flex: 1,
+            padding: 'var(--space-3) var(--space-4)',
+            borderRadius: 'var(--radius-lg)',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-2)',
+            background: canProceed() ? 'var(--masters)' : 'var(--rule)',
+            color: canProceed() ? 'white' : 'var(--ink-tertiary)',
+            border: 'none',
+            cursor: canProceed() ? 'pointer' : 'not-allowed',
+            opacity: canProceed() ? 1 : 0.6,
+            transition: 'all 200ms ease',
+            boxShadow: canProceed() ? '0 4px 14px rgba(0, 77, 51, 0.25)' : 'none',
           }}
         >
           {isLastStep ? (
@@ -227,78 +264,131 @@ export function QuickStartWizard({
   );
 }
 
+/* ── Shared types ── */
+
 interface StepProps {
   tripData: TripData;
   updateField: <K extends keyof TripData>(field: K, value: TripData[K]) => void;
 }
 
+/* ── Input styling helper ── */
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: 'var(--space-3) var(--space-4)',
+  borderRadius: 'var(--radius-md)',
+  fontSize: '1rem',
+  fontFamily: 'var(--font-sans)',
+  background: 'var(--canvas-raised)',
+  border: '1px solid var(--rule)',
+  color: 'var(--ink)',
+  outline: 'none',
+  transition: 'border-color 200ms ease, box-shadow 200ms ease',
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.7rem',
+  fontWeight: 600,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  color: 'var(--ink-secondary)',
+  marginBottom: 'var(--space-2)',
+};
+
+/* ── Step 1: Basics ── */
+
 function StepBasics({ tripData, updateField }: StepProps) {
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(0,103,71,0.15)' }}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
         >
-          <Flag className="w-10 h-10" style={{ color: 'var(--masters, #006747)' }} />
+          <Flag className="w-8 h-8" style={{ color: 'var(--masters)' }} />
         </div>
+        <p
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
+        >
+          Step 1 of 4
+        </p>
         <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
         >
           Name Your Tournament
         </h1>
-        <p
-          className="text-sm max-w-xs mx-auto"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-        >
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
           Give your trip a memorable name. This is what you&apos;ll see on the leaderboard.
         </p>
       </div>
 
-      <div className="space-y-4">
+      {/* Fields */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-          >
-            Tournament Name
-          </label>
+          <label style={labelStyle}>Tournament Name</label>
           <input
             type="text"
             value={tripData.name}
             onChange={(e) => updateField('name', e.target.value)}
-            placeholder="e.g., The Annual Buddies Cup 2024"
-            className="w-full px-4 py-3 rounded-xl text-base"
-            style={{
-              background: 'var(--surface, #1A1814)',
-              border: '1px solid var(--rule, #3A3530)',
-              color: 'var(--ink, #F5F1E8)',
+            placeholder="e.g., The Annual Buddies Cup 2026"
+            style={inputStyle}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--masters)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--rule)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
 
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-          >
-            Location (Optional)
-          </label>
-          <div className="relative">
+          <label style={labelStyle}>Location (Optional)</label>
+          <div style={{ position: 'relative' }}>
             <MapPin
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
-              style={{ color: 'var(--ink-tertiary, #807868)' }}
+              className="w-5 h-5"
+              style={{
+                position: 'absolute',
+                left: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--ink-tertiary)',
+                pointerEvents: 'none',
+              }}
             />
             <input
               type="text"
               value={tripData.location}
               onChange={(e) => updateField('location', e.target.value)}
               placeholder="e.g., Pebble Beach, CA"
-              className="w-full pl-12 pr-4 py-3 rounded-xl text-base"
-              style={{
-                background: 'var(--surface, #1A1814)',
-                border: '1px solid var(--rule, #3A3530)',
-                color: 'var(--ink, #F5F1E8)',
+              style={{ ...inputStyle, paddingLeft: 'calc(var(--space-3) + 28px)' }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--masters)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--rule)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -308,72 +398,89 @@ function StepBasics({ tripData, updateField }: StepProps) {
   );
 }
 
+/* ── Step 2: Dates ── */
+
 function StepDates({ tripData, updateField }: StepProps) {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(0,103,71,0.15)' }}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
         >
-          <Calendar className="w-10 h-10" style={{ color: 'var(--masters, #006747)' }} />
+          <Calendar className="w-8 h-8" style={{ color: 'var(--masters)' }} />
         </div>
+        <p
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
+        >
+          Step 2 of 4
+        </p>
         <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
         >
           When&apos;s the Trip?
         </h1>
-        <p
-          className="text-sm max-w-xs mx-auto"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-        >
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
           Set the dates for your tournament. You can play multiple rounds across these days.
         </p>
       </div>
 
-      <div className="space-y-4">
+      {/* Fields */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-          >
-            Start Date
-          </label>
+          <label style={labelStyle}>Start Date</label>
           <input
             type="date"
             value={tripData.startDate}
             min={today}
             onChange={(e) => updateField('startDate', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-base"
-            style={{
-              background: 'var(--surface, #1A1814)',
-              border: '1px solid var(--rule, #3A3530)',
-              color: 'var(--ink, #F5F1E8)',
-              colorScheme: 'dark',
+            style={inputStyle}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--masters)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--rule)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
 
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-          >
-            End Date
-          </label>
+          <label style={labelStyle}>End Date</label>
           <input
             type="date"
             value={tripData.endDate}
             min={tripData.startDate || today}
             onChange={(e) => updateField('endDate', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl text-base"
-            style={{
-              background: 'var(--surface, #1A1814)',
-              border: '1px solid var(--rule, #3A3530)',
-              color: 'var(--ink, #F5F1E8)',
-              colorScheme: 'dark',
+            style={inputStyle}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--masters)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--rule)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -381,6 +488,8 @@ function StepDates({ tripData, updateField }: StepProps) {
     </div>
   );
 }
+
+/* ── Step 3: Teams ── */
 
 function StepTeams({ tripData, updateField }: StepProps) {
   const presets = [
@@ -391,98 +500,118 @@ function StepTeams({ tripData, updateField }: StepProps) {
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(0,103,71,0.15)' }}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
         >
-          <Users className="w-10 h-10" style={{ color: 'var(--masters, #006747)' }} />
+          <Users className="w-8 h-8" style={{ color: 'var(--masters)' }} />
         </div>
+        <p
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
+        >
+          Step 3 of 4
+        </p>
         <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
         >
           Name Your Teams
         </h1>
-        <p
-          className="text-sm max-w-xs mx-auto"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-        >
-          Customize your team names or use the classic Ryder Cup format.
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
+          Customize your team names or pick a classic preset.
         </p>
       </div>
 
-      {/* Illustration */}
-      <div className="flex justify-center">
-        <GolfersIllustration size="lg" />
-      </div>
-
       {/* Presets */}
-      <div className="flex flex-wrap gap-2 justify-center">
-        {presets.map((preset) => (
-          <button
-            key={`${preset.a}-${preset.b}`}
-            onClick={() => {
-              updateField('teamAName', preset.a);
-              updateField('teamBName', preset.b);
-            }}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
-            )}
-            style={{
-              background: tripData.teamAName === preset.a && tripData.teamBName === preset.b
-                ? 'var(--masters, #006747)'
-                : 'var(--surface, #1A1814)',
-              color: tripData.teamAName === preset.a && tripData.teamBName === preset.b
-                ? 'white'
-                : 'var(--ink-secondary, #B8B0A0)',
-              border: '1px solid var(--rule, #3A3530)',
-            }}
-          >
-            {preset.a} vs {preset.b}
-          </button>
-        ))}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center' }}>
+        {presets.map((preset) => {
+          const isActive = tripData.teamAName === preset.a && tripData.teamBName === preset.b;
+          return (
+            <button
+              key={`${preset.a}-${preset.b}`}
+              onClick={() => {
+                updateField('teamAName', preset.a);
+                updateField('teamBName', preset.b);
+              }}
+              className="press-scale"
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                background: isActive ? 'var(--masters)' : 'var(--canvas-raised)',
+                color: isActive ? 'white' : 'var(--ink-secondary)',
+                border: isActive ? '1px solid var(--masters)' : '1px solid var(--rule)',
+                transition: 'all 200ms ease',
+              }}
+            >
+              {preset.a} vs {preset.b}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Team inputs */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--team-usa, #B91C1C)' }}
-          >
-            Team 1
-          </label>
+          <label style={{ ...labelStyle, color: 'var(--team-usa, #B91C1C)' }}>Team 1</label>
           <input
             type="text"
             value={tripData.teamAName}
             onChange={(e) => updateField('teamAName', e.target.value)}
             placeholder="Team A"
-            className="w-full px-4 py-3 rounded-xl text-base text-center"
             style={{
-              background: 'var(--surface, #1A1814)',
-              border: '2px solid var(--team-usa, #B91C1C)',
-              color: 'var(--ink, #F5F1E8)',
+              ...inputStyle,
+              textAlign: 'center',
+              borderColor: 'var(--team-usa, #B91C1C)',
+              borderWidth: '2px',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(185, 28, 28, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
-
         <div>
-          <label
-            className="block text-xs font-medium uppercase tracking-wide mb-2"
-            style={{ color: 'var(--team-europe, #1D4ED8)' }}
-          >
-            Team 2
-          </label>
+          <label style={{ ...labelStyle, color: 'var(--team-europe, #1D4ED8)' }}>Team 2</label>
           <input
             type="text"
             value={tripData.teamBName}
             onChange={(e) => updateField('teamBName', e.target.value)}
             placeholder="Team B"
-            className="w-full px-4 py-3 rounded-xl text-base text-center"
             style={{
-              background: 'var(--surface, #1A1814)',
-              border: '2px solid var(--team-europe, #1D4ED8)',
-              color: 'var(--ink, #F5F1E8)',
+              ...inputStyle,
+              textAlign: 'center',
+              borderColor: 'var(--team-europe, #1D4ED8)',
+              borderWidth: '2px',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(29, 78, 216, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -490,6 +619,8 @@ function StepTeams({ tripData, updateField }: StepProps) {
     </div>
   );
 }
+
+/* ── Step 4: Confirm ── */
 
 function StepConfirm({ tripData }: { tripData: TripData }) {
   const formatDate = (dateStr: string) => {
@@ -502,93 +633,110 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-          style={{ background: 'rgba(0,103,71,0.15)' }}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
         >
-          <Check className="w-10 h-10" style={{ color: 'var(--masters, #006747)' }} />
+          <Check className="w-8 h-8" style={{ color: 'var(--masters)' }} />
         </div>
-        <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
-        >
-          Ready to Go!
-        </h1>
         <p
-          className="text-sm max-w-xs mx-auto"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
+          Ready to Go
+        </p>
+        <h1
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
+        >
+          Looking Good!
+        </h1>
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
           Here&apos;s a summary of your tournament. You can add players and matches after creating it.
         </p>
       </div>
 
-      {/* Trophy Illustration */}
-      <div className="flex justify-center">
-        <TrophyIllustration size="lg" />
-      </div>
-
       {/* Summary Card */}
-      <div className="card-premium rounded-xl overflow-hidden">
+      <div
+        style={{
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--rule)',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Card header */}
         <div
-          className="px-4 py-3"
           style={{
-            background: 'var(--canvas-sunken)',
+            padding: 'var(--space-4)',
+            background: 'var(--canvas-raised)',
             borderBottom: '1px solid var(--rule)',
           }}
         >
           <h2
-            className="font-bold"
-            style={{ color: 'var(--ink)' }}
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontStyle: 'italic',
+              fontSize: '1.25rem',
+              fontWeight: 400,
+              color: 'var(--ink)',
+            }}
           >
-            {tripData.name}
+            {tripData.name || 'Untitled Tournament'}
           </h2>
           {tripData.location && (
             <p
-              className="text-sm flex items-center gap-1 mt-1"
-              style={{ color: 'var(--ink-secondary)' }}
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--ink-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                marginTop: 'var(--space-1)',
+              }}
             >
-              <MapPin className="w-3 h-3" />
+              <MapPin className="w-3.5 h-3.5" />
               {tripData.location}
             </p>
           )}
         </div>
 
-        <div className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span
-              className="text-sm"
-              style={{ color: 'var(--ink-secondary)' }}
-            >
-              Dates
-            </span>
-            <span
-              className="text-sm font-medium"
-              style={{ color: 'var(--ink)' }}
-            >
-              {formatDate(tripData.startDate)} - {formatDate(tripData.endDate)}
+        {/* Details */}
+        <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--ink-secondary)' }}>Dates</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>
+              {formatDate(tripData.startDate)} – {formatDate(tripData.endDate)}
             </span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span
-              className="text-sm"
-              style={{ color: 'var(--ink-secondary)' }}
-            >
-              Teams
-            </span>
-            <div className="flex items-center gap-2">
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--team-usa)' }}
-              >
+          <div style={{ height: '1px', background: 'var(--rule)' }} />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--ink-secondary)' }}>Teams</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--team-usa, #B91C1C)' }}>
                 {tripData.teamAName}
               </span>
-              <span style={{ color: 'var(--ink-tertiary)' }}>vs</span>
-              <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--team-europe)' }}
-              >
+              <span style={{ fontSize: '0.75rem', color: 'var(--ink-tertiary)' }}>vs</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--team-europe, #1D4ED8)' }}>
                 {tripData.teamBName}
               </span>
             </div>
