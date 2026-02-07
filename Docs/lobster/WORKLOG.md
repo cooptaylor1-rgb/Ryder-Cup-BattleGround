@@ -493,6 +493,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`75548bb`)
 
+### 18:40 EST — Phase 1 (batch 105)
+- Captain Emergency Contacts: removed `return null` inside the player-group `map()` by prefiltering empty groups for stable rendering.
+- Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`44c8299`)
+
 ### 18:45 EST — Phase 1 (batch 65)
 - Trip Stats: replaced bespoke header/back button markup with the shared `PageHeader` component to match the standard premium wrapper pattern.
 - Trip Stats: applied the same `PageHeader` pattern for **no active trip**, **no stats yet**, and the main view so the page remains consistent across states.
@@ -503,6 +509,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Global error page (`/global-error`): replaced `window.location.href = '/'` with `router.push('/')` so recovery navigation uses App Router semantics.
 - Lobster checkpoint: `lint` + `typecheck` ✅
 - Commit + push ✅ (`2d4641c`)
+
+### 19:10 EST — Phase 1 (batch 106)
+- Home — Side Bets section (`SideBetsSection`): removed the silent early-return when there are zero active bets and captain mode is off.
+- The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d01e942`)
 
 ### 19:25 EST — Phase 1 (batch 66)
 - Settings — Backup & Restore (`/settings/backup`): upgraded to the standard premium wrapper (canvas background + `pb-nav page-premium-enter texture-grain`) to match the rest of Settings.
@@ -554,20 +566,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Bets no-trip state now consistently uses the standard premium wrapper + shared `PageHeader` and includes `BottomNav`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0ed199a`)
-
-
-
-### 18:40 EST — Phase 1 (batch 105)
-- Captain Emergency Contacts: removed `return null` inside the player-group `map()` by prefiltering empty groups for stable rendering.
-- Player onboarding — Side Bet Opt-In: removed `return null` inside category `map()` by prefiltering categories with zero bets.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`44c8299`)
-
-### 19:10 EST — Phase 1 (batch 106)
-- Home — Side Bets section (`SideBetsSection`): removed the silent early-return when there are zero active bets and captain mode is off.
-- The section now renders an explicit empty state with a clear link to Bets so Home doesn’t have an unexplained “missing” section.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d01e942`)
 
 ## 2026-02-07
 
