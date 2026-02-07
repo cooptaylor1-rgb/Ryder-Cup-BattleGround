@@ -102,11 +102,11 @@ export function StandingsCard({
                                 boxShadow: '0 2px 8px var(--team-usa-glow)',
                             }}
                         />
-                        <p className="type-overline text-(--ink-tertiary) mb-2">{teamAName}</p>
+                        <p className="type-overline text-[var(--ink-tertiary)] mb-2">{teamAName}</p>
                         <p
                             className={cn(
                                 'standings-score tabular-nums',
-                                leader === 'teamA' ? 'text-(--team-usa)' : 'text-(--ink-secondary)',
+                                leader === 'teamA' ? 'text-[var(--team-usa)]' : 'text-[var(--ink-secondary)]',
                                 scoreChanged && leader === 'teamA' && 'animate-score-win'
                             )}
                         >
@@ -118,17 +118,17 @@ export function StandingsCard({
                     <div className="flex flex-col items-center gap-1 min-w-20">
                         <span className="versus-text text-center">
                             {leader ? (
-                                <span className={leader === 'teamA' ? 'text-(--team-usa)' : 'text-(--team-europe)'}>
+                                <span className={leader === 'teamA' ? 'text-[var(--team-usa)]' : 'text-[var(--team-europe)]'}>
                                     {leader === 'teamA' ? teamAName : teamBName}
                                     <br />
-                                    <span className="text-(--ink-tertiary)">leads</span>
+                                    <span className="text-[var(--ink-tertiary)]">leads</span>
                                 </span>
                             ) : (
                                 'Tied'
                             )}
                         </span>
                         {margin > 0 && (
-                            <span className="text-xl font-bold text-(--ink-secondary) mt-1">
+                            <span className="text-xl font-bold text-[var(--ink-secondary)] mt-1">
                                 +{margin}
                             </span>
                         )}
@@ -143,11 +143,11 @@ export function StandingsCard({
                                 boxShadow: '0 2px 8px var(--team-europe-glow)',
                             }}
                         />
-                        <p className="type-overline text-(--ink-tertiary) mb-2">{teamBName}</p>
+                        <p className="type-overline text-[var(--ink-tertiary)] mb-2">{teamBName}</p>
                         <p
                             className={cn(
                                 'standings-score tabular-nums',
-                                leader === 'teamB' ? 'text-(--team-europe)' : 'text-(--ink-secondary)',
+                                leader === 'teamB' ? 'text-[var(--team-europe)]' : 'text-[var(--ink-secondary)]',
                                 scoreChanged && leader === 'teamB' && 'animate-score-win'
                             )}
                         >
@@ -162,7 +162,7 @@ export function StandingsCard({
                 <div>
                     <div className="flex justify-between items-center text-xs mb-1.5">
                         <span className="type-caption font-medium">{teamAName}</span>
-                        <span className="type-caption text-(--ink-tertiary)">
+                        <span className="type-caption text-[var(--ink-tertiary)]">
                             {formatScore(teamAPoints)}/{pointsToWin} to win
                         </span>
                     </div>
@@ -181,7 +181,7 @@ export function StandingsCard({
                 <div>
                     <div className="flex justify-between items-center text-xs mb-1.5">
                         <span className="type-caption font-medium">{teamBName}</span>
-                        <span className="type-caption text-(--ink-tertiary)">
+                        <span className="type-caption text-[var(--ink-tertiary)]">
                             {formatScore(teamBPoints)}/{pointsToWin} to win
                         </span>
                     </div>
@@ -200,9 +200,9 @@ export function StandingsCard({
             </div>
 
             {/* Magic Number Section */}
-            <div className="border-t border-(--rule) p-4">
+            <div className="border-t border-[var(--rule)] p-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-4 h-4 text-(--masters)" />
+                    <Target className="w-4 h-4 text-[var(--masters)]" />
                     <span className="type-caption font-semibold">Points to Clinch</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -211,13 +211,13 @@ export function StandingsCard({
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamAClinched
                                 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                : 'bg-(--team-usa)/5 border-(--team-usa)/10'
+                                : 'bg-[var(--team-usa)]/5 border-[var(--team-usa)]/10'
                         )}
                     >
                         <p
                             className={cn(
                                 'text-2xl font-bold',
-                                magicNumber.teamAClinched ? 'text-green-600 dark:text-green-400' : 'text-(--team-usa)'
+                                magicNumber.teamAClinched ? 'text-green-600 dark:text-green-400' : 'text-[var(--team-usa)]'
                             )}
                         >
                             {magicNumber.teamAClinched ? '✓' : magicNumber.teamANeeded.toFixed(1)}
@@ -231,13 +231,13 @@ export function StandingsCard({
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamBClinched
                                 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                : 'bg-(--team-europe)/5 border-(--team-europe)/10'
+                                : 'bg-[var(--team-europe)]/5 border-[var(--team-europe)]/10'
                         )}
                     >
                         <p
                             className={cn(
                                 'text-2xl font-bold',
-                                magicNumber.teamBClinched ? 'text-green-600 dark:text-green-400' : 'text-(--team-europe)'
+                                magicNumber.teamBClinched ? 'text-green-600 dark:text-green-400' : 'text-[var(--team-europe)]'
                             )}
                         >
                             {magicNumber.teamBClinched ? '✓' : magicNumber.teamBNeeded.toFixed(1)}

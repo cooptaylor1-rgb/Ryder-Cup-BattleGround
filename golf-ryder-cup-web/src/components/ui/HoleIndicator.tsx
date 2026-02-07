@@ -62,7 +62,7 @@ export function HoleIndicator({
                     'shadow-[var(--shadow-glow-gold)]'
                 );
             default:
-                return 'bg-(--canvas-sunken) text-(--ink-tertiary) dark:bg-(--surface-muted)';
+                return 'bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)] dark:bg-[var(--surface-muted)]';
         }
     };
 
@@ -80,13 +80,13 @@ export function HoleIndicator({
                 getWinnerClasses(),
                 // Current hole premium styling
                 isCurrentHole && [
-                    'ring-2 ring-(--masters) ring-offset-2 ring-offset-[var(--canvas)]',
+                    'ring-2 ring-[var(--masters)] ring-offset-2 ring-offset-[var(--canvas)]',
                     'scale-110',
                     'animate-[currentHolePulse_2s_ease-in-out_infinite]',
                 ],
                 // Enhanced interaction feedback
                 onClick && 'cursor-pointer hover:scale-105 active:scale-95',
-                onClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2',
+                onClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2',
                 !onClick && 'cursor-default',
                 // Premium hover effect
                 winner !== 'none' && onClick && 'hover:shadow-lg'

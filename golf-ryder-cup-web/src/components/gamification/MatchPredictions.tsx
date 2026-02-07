@@ -250,7 +250,7 @@ export function MatchPredictionCard({
                     onClick={() => onPredict?.('teamA')}
                     disabled={disabled || isLocked || !!userPrediction}
                     className={`w-full py-3 px-4 rounded-xl flex items-center justify-between transition-all ${userPrediction?.predictedWinner === 'teamA'
-                        ? 'ring-2 ring-(--team-usa) bg-(--team-usa-light)'
+                        ? 'ring-2 ring-[var(--team-usa)] bg-[var(--team-usa-light)]'
                         : 'bg-muted hover:bg-muted/80'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
@@ -286,7 +286,7 @@ export function MatchPredictionCard({
                     onClick={() => onPredict?.('teamB')}
                     disabled={disabled || isLocked || !!userPrediction}
                     className={`w-full py-3 px-4 rounded-xl flex items-center justify-between transition-all ${userPrediction?.predictedWinner === 'teamB'
-                        ? 'ring-2 ring-(--team-europe) bg-(--team-europe-light)'
+                        ? 'ring-2 ring-[var(--team-europe)] bg-[var(--team-europe-light)]'
                         : 'bg-muted hover:bg-muted/80'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
@@ -457,7 +457,7 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                             <button
                                 onClick={() => setSelectedTab('predict')}
                                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${selectedTab === 'predict'
-                                    ? 'bg-(--masters) text-white'
+                                    ? 'bg-[var(--masters)] text-white'
                                     : 'bg-muted hover:bg-muted/80'
                                     }`}
                             >
@@ -466,7 +466,7 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                             <button
                                 onClick={() => setSelectedTab('leaderboard')}
                                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${selectedTab === 'leaderboard'
-                                    ? 'bg-(--masters) text-white'
+                                    ? 'bg-[var(--masters)] text-white'
                                     : 'bg-muted hover:bg-muted/80'
                                     }`}
                             >
