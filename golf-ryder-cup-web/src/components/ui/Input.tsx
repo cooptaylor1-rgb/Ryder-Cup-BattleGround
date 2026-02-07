@@ -84,8 +84,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                             // Error state - high contrast for visibility
                             error && [
-                                'border-azalea focus:ring-azalea focus:border-azalea',
-                                'bg-azalea/5',
+                                'border-error focus:ring-error focus:border-error',
+                                'bg-error/5',
                             ],
 
                             // Disabled state
@@ -114,7 +114,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         id={error ? `${inputId}-error` : `${inputId}-hint`}
                         className={cn(
                             'mt-1.5 text-xs',
-                            error ? 'text-azalea' : 'text-text-tertiary',
+                            error ? 'text-error' : 'text-text-tertiary',
                         )}
                     >
                         {error || hint}

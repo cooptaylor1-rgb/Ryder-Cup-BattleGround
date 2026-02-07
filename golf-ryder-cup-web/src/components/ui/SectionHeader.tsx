@@ -48,7 +48,7 @@ export function SectionHeader({
                 )}
                 <div className="min-w-0">
                     <h2 className={cn(
-                        'font-serif font-semibold text-magnolia truncate',
+                        'font-serif font-semibold text-canvas truncate',
                         size === 'sm' && 'text-sm',
                         size === 'md' && 'text-base',
                         size === 'lg' && 'text-xl',

@@ -108,10 +108,7 @@ export default function CaptainBetsPage() {
 
     if (!currentTrip) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="golf-ball"
@@ -132,10 +129,7 @@ export default function CaptainBetsPage() {
 
     if (!isCaptainMode) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -264,34 +258,23 @@ export default function CaptainBetsPage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
             {/* Header */}
             <header className="header-premium">
                 <div className="container-editorial flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => router.back()}
-                            className="p-2 -ml-2 press-scale"
-                            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                            className="p-2 -ml-2 press-scale text-ink-secondary bg-transparent border-none cursor-pointer"
                         >
                             <ChevronLeft size={22} />
                         </button>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                            <div
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: 'var(--radius-md)',
-                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <DollarSign size={16} style={{ color: 'white' }} />
+                        <div className="flex items-center gap-[var(--space-3)]">
+                            <div className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center [background:linear-gradient(135deg,#10b981_0%,#059669_100%)]">
+                                <DollarSign size={16} className="text-white" />
                             </div>
                             <div>
-                                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Side Bets</span>
+                                <span className="type-overline tracking-[0.1em]">Side Bets</span>
                                 <p className="type-caption">{activeBets.length} active</p>
                             </div>
                         </div>
@@ -299,34 +282,20 @@ export default function CaptainBetsPage() {
                 </div>
             </header>
 
-            <main className="container-editorial" style={{ paddingTop: 'var(--space-4)' }}>
+            <main className="container-editorial pt-[var(--space-4)]">
                 {/* Quick Create Section */}
                 <section className="section">
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Quick Create</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
+                    <h2 className="type-overline mb-[var(--space-4)]">Quick Create</h2>
+                    <div className="grid grid-cols-2 gap-[var(--space-3)]">
                         {BET_TYPES.map((betType) => (
                             <button
                                 key={betType.type}
                                 onClick={() => openCreateModal(betType.type)}
-                                className="card-premium press-scale"
-                                style={{
-                                    padding: 'var(--space-4)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-3)',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    border: 'none',
-                                }}
+                                className="card-premium press-scale p-[var(--space-4)] flex items-center gap-[var(--space-3)] text-left cursor-pointer border-none"
                             >
                                 <div
+                                    className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center"
                                     style={{
-                                        width: '44px',
-                                        height: '44px',
-                                        borderRadius: 'var(--radius-lg)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
                                         background: `color-mix(in srgb, ${betType.color} 15%, transparent)`,
                                         color: betType.color,
                                     }}
@@ -334,8 +303,8 @@ export default function CaptainBetsPage() {
                                     <betType.icon size={22} />
                                 </div>
                                 <div>
-                                    <p style={{ fontWeight: 600, color: 'var(--ink)' }}>{betType.label}</p>
-                                    <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>{betType.description}</p>
+                                    <p className="font-semibold text-ink">{betType.label}</p>
+                                    <p className="type-micro text-ink-tertiary">{betType.description}</p>
                                 </div>
                             </button>
                         ))}
@@ -346,14 +315,14 @@ export default function CaptainBetsPage() {
 
                 {/* Active Bets */}
                 <section className="section">
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+                    <h2 className="type-overline mb-[var(--space-4)]">
                         Active Bets ({activeBets.length})
                     </h2>
                     {activeBets.length === 0 ? (
-                        <div className="card-premium" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-                            <DollarSign size={32} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }} />
-                            <p style={{ color: 'var(--ink-secondary)' }}>No active bets</p>
-                            <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>
+                        <div className="card-premium p-[var(--space-6)] text-center">
+                            <DollarSign size={32} className="text-ink-tertiary mx-auto mb-[var(--space-3)]" />
+                            <p className="text-ink-secondary">No active bets</p>
+                            <p className="type-meta mt-[var(--space-2)]">
                                 Create a bet above to get started
                             </p>
                         </div>
@@ -388,7 +357,7 @@ export default function CaptainBetsPage() {
                     <>
                         <hr className="divider" />
                         <section className="section">
-                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+                            <h2 className="type-overline mb-[var(--space-4)]">
                                 Completed ({completedBets.length})
                             </h2>
                             <div className="space-y-3">
@@ -413,34 +382,18 @@ export default function CaptainBetsPage() {
             {/* Create/Edit Modal */}
             {showCreateModal && (
                 <div
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.7)',
-                        zIndex: 100,
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                    }}
+                    className="fixed inset-0 bg-black/70 z-[100] flex items-end justify-center"
                     onClick={() => {
                         setShowCreateModal(false);
                         resetForm();
                     }}
                 >
                     <div
-                        className="card-premium"
-                        style={{
-                            width: '100%',
-                            maxWidth: '500px',
-                            maxHeight: '85vh',
-                            overflow: 'auto',
-                            borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0',
-                            padding: 'var(--space-5)',
-                        }}
+                        className="card-premium w-full max-w-[500px] max-h-[85vh] overflow-auto rounded-t-[var(--radius-xl)] rounded-b-none p-[var(--space-5)]"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-                            <h2 style={{ fontWeight: 700, fontSize: '1.25rem' }}>
+                        <div className="flex justify-between items-center mb-[var(--space-4)]">
+                            <h2 className="font-bold text-xl">
                                 {editingBet ? 'Edit Bet' : 'Create Bet'}
                             </h2>
                             <button
@@ -448,9 +401,9 @@ export default function CaptainBetsPage() {
                                     setShowCreateModal(false);
                                     resetForm();
                                 }}
-                                style={{ padding: 'var(--space-2)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                                className="p-[var(--space-2)] bg-transparent border-none cursor-pointer"
                             >
-                                <X size={24} style={{ color: 'var(--ink-tertiary)' }} />
+                                <X size={24} className="text-ink-tertiary" />
                             </button>
                         </div>
 
@@ -458,10 +411,10 @@ export default function CaptainBetsPage() {
                             {/* Bet Type (only for new bets) */}
                             {!editingBet && (
                                 <div>
-                                    <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    <label className="type-meta block mb-[var(--space-2)]">
                                         Bet Type
                                     </label>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                                    <div className="flex flex-wrap gap-[var(--space-2)]">
                                         {BET_TYPES.map((bt) => (
                                             <button
                                                 key={bt.type}
@@ -474,16 +427,10 @@ export default function CaptainBetsPage() {
                                                         setNewBetDescription(bt.description);
                                                     }
                                                 }}
-                                                className="press-scale"
+                                                className="press-scale py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-[length:var(--text-sm)] font-medium"
                                                 style={{
-                                                    padding: 'var(--space-2) var(--space-3)',
-                                                    borderRadius: 'var(--radius-full)',
                                                     background: newBetType === bt.type ? bt.color : 'var(--canvas-sunken)',
                                                     color: newBetType === bt.type ? 'white' : 'var(--ink-secondary)',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    fontSize: 'var(--text-sm)',
-                                                    fontWeight: 500,
                                                 }}
                                             >
                                                 {bt.label}
@@ -495,62 +442,58 @@ export default function CaptainBetsPage() {
 
                             {/* Name */}
                             <div>
-                                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                <label className="type-meta block mb-[var(--space-2)]">
                                     Name
                                 </label>
                                 <input
                                     type="text"
                                     value={newBetName}
                                     onChange={(e) => setNewBetName(e.target.value)}
-                                    className="input"
+                                    className="input w-full"
                                     placeholder="e.g., Skins Game"
-                                    style={{ width: '100%' }}
                                 />
                             </div>
 
                             {/* Description */}
                             <div>
-                                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                <label className="type-meta block mb-[var(--space-2)]">
                                     Description
                                 </label>
                                 <input
                                     type="text"
                                     value={newBetDescription}
                                     onChange={(e) => setNewBetDescription(e.target.value)}
-                                    className="input"
+                                    className="input w-full"
                                     placeholder="e.g., $5 per hole, carry-overs"
-                                    style={{ width: '100%' }}
                                 />
                             </div>
 
                             {/* Amount / Pot */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                            <div className="grid grid-cols-2 gap-[var(--space-3)]">
                                 <div>
-                                    <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    <label className="type-meta block mb-[var(--space-2)]">
                                         Pot Amount ($)
                                     </label>
                                     <input
                                         type="number"
                                         value={newBetPot}
                                         onChange={(e) => setNewBetPot(Number(e.target.value))}
-                                        className="input"
+                                        className="input w-full"
                                         min={0}
-                                        style={{ width: '100%' }}
                                     />
                                 </div>
                                 <div>
-                                    <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    <label className="type-meta block mb-[var(--space-2)]">
                                         Hole # (optional)
                                     </label>
                                     <input
                                         type="number"
                                         value={newBetHole || ''}
                                         onChange={(e) => setNewBetHole(e.target.value ? Number(e.target.value) : undefined)}
-                                        className="input"
+                                        className="input w-full"
                                         min={1}
                                         max={18}
                                         placeholder="Any"
-                                        style={{ width: '100%' }}
                                     />
                                 </div>
                             </div>
@@ -558,23 +501,18 @@ export default function CaptainBetsPage() {
                             {/* Participants */}
                             {!editingBet && (
                                 <div>
-                                    <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
+                                    <label className="type-meta block mb-[var(--space-2)]">
                                         Participants
                                     </label>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                                    <div className="flex flex-wrap gap-[var(--space-2)]">
                                         <button
                                             onClick={() => setSelectedParticipants(
                                                 selectedParticipants.length === players.length ? [] : players.map(p => p.id)
                                             )}
-                                            className="press-scale"
+                                            className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
                                             style={{
-                                                padding: 'var(--space-1) var(--space-2)',
-                                                borderRadius: 'var(--radius-md)',
                                                 background: selectedParticipants.length === players.length ? 'var(--masters)' : 'var(--canvas-sunken)',
                                                 color: selectedParticipants.length === players.length ? 'white' : 'var(--ink-secondary)',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                fontSize: 'var(--text-xs)',
                                             }}
                                         >
                                             {selectedParticipants.length === players.length ? '✓ All' : 'Select All'}
@@ -587,15 +525,10 @@ export default function CaptainBetsPage() {
                                                         ? prev.filter(id => id !== player.id)
                                                         : [...prev, player.id]
                                                 )}
-                                                className="press-scale"
+                                                className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
                                                 style={{
-                                                    padding: 'var(--space-1) var(--space-2)',
-                                                    borderRadius: 'var(--radius-md)',
                                                     background: selectedParticipants.includes(player.id) ? 'var(--masters)' : 'var(--canvas-sunken)',
                                                     color: selectedParticipants.includes(player.id) ? 'white' : 'var(--ink-secondary)',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    fontSize: 'var(--text-xs)',
                                                 }}
                                             >
                                                 {player.firstName}
@@ -606,22 +539,13 @@ export default function CaptainBetsPage() {
                             )}
 
                             {/* Actions */}
-                            <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
+                            <div className="flex gap-[var(--space-3)] mt-[var(--space-4)]">
                                 <button
                                     onClick={() => {
                                         setShowCreateModal(false);
                                         resetForm();
                                     }}
-                                    className="press-scale"
-                                    style={{
-                                        flex: 1,
-                                        padding: 'var(--space-3)',
-                                        background: 'var(--canvas-sunken)',
-                                        border: '1px solid var(--rule)',
-                                        borderRadius: 'var(--radius-lg)',
-                                        cursor: 'pointer',
-                                        fontWeight: 500,
-                                    }}
+                                    className="press-scale flex-1 p-[var(--space-3)] bg-canvas-sunken border border-rule rounded-[var(--radius-lg)] cursor-pointer font-medium"
                                 >
                                     Cancel
                                 </button>
@@ -640,15 +564,7 @@ export default function CaptainBetsPage() {
                                             handleCreateBet();
                                         }
                                     }}
-                                    className="btn-premium press-scale"
-                                    style={{
-                                        flex: 1,
-                                        padding: 'var(--space-3)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: 'var(--space-2)',
-                                    }}
+                                    className="btn-premium press-scale flex-1 p-[var(--space-3)] flex items-center justify-center gap-[var(--space-2)]"
                                 >
                                     <Save size={18} />
                                     {editingBet ? 'Save Changes' : 'Create Bet'}
@@ -721,17 +637,12 @@ function BetManagementCard({
     const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
 
     return (
-        <div className="card-premium" style={{ padding: 'var(--space-4)' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+        <div className="card-premium p-[var(--space-4)]">
+            <div className="flex items-start gap-[var(--space-3)]">
                 {/* Icon */}
                 <div
+                    className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center"
                     style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: 'var(--radius-lg)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         background: isCompleted ? 'var(--success)' : `color-mix(in srgb, ${getBetColor(bet.type)} 20%, transparent)`,
                         color: isCompleted ? 'white' : getBetColor(bet.type),
                     }}
@@ -740,37 +651,37 @@ function BetManagementCard({
                 </div>
 
                 {/* Content */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <h3 style={{ fontWeight: 600 }}>{bet.name}</h3>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{bet.name}</h3>
                         {bet.pot && (
-                            <span style={{ fontWeight: 700, color: 'var(--success)' }}>
+                            <span className="font-bold text-success">
                                 ${bet.pot}
                             </span>
                         )}
                     </div>
                     {bet.description && (
-                        <p className="type-caption" style={{ marginTop: 'var(--space-1)' }}>{bet.description}</p>
+                        <p className="type-caption mt-[var(--space-1)]">{bet.description}</p>
                     )}
                     {bet.hole && (
-                        <p className="type-micro" style={{ marginTop: 'var(--space-1)', color: 'var(--ink-tertiary)' }}>
+                        <p className="type-micro mt-[var(--space-1)] text-ink-tertiary">
                             Hole #{bet.hole}
                         </p>
                     )}
 
                     {/* Status */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
+                    <div className="flex items-center gap-[var(--space-2)] mt-[var(--space-2)]">
                         {isCompleted && winner ? (
                             <>
-                                <Crown size={14} style={{ color: 'var(--success)' }} />
-                                <span className="type-micro" style={{ color: 'var(--success)' }}>
+                                <Crown size={14} className="text-success" />
+                                <span className="type-micro text-success">
                                     Won by {winner.firstName}
                                 </span>
                             </>
                         ) : (
                             <>
-                                <Clock size={14} style={{ color: 'var(--warning)' }} />
-                                <span className="type-micro" style={{ color: 'var(--warning)' }}>
+                                <Clock size={14} className="text-warning" />
+                                <span className="type-micro text-warning">
                                     In Progress • {bet.participantIds.length} players
                                 </span>
                             </>
@@ -781,24 +692,11 @@ function BetManagementCard({
 
             {/* Actions */}
             {!isCompleted && (
-                <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--rule-faint)' }}>
+                <div className="flex gap-[var(--space-2)] mt-[var(--space-3)] pt-[var(--space-3)] border-t border-t-rule-faint">
                     {onEdit && (
                         <button
                             onClick={onEdit}
-                            className="press-scale"
-                            style={{
-                                flex: 1,
-                                padding: 'var(--space-2)',
-                                background: 'var(--canvas-sunken)',
-                                border: '1px solid var(--rule)',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 'var(--space-1)',
-                                fontSize: 'var(--text-sm)',
-                            }}
+                            className="press-scale flex-1 p-[var(--space-2)] bg-canvas-sunken border border-rule rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)]"
                         >
                             <Edit3 size={14} />
                             Edit
@@ -807,22 +705,7 @@ function BetManagementCard({
                     {onComplete && !showWinnerSelect && (
                         <button
                             onClick={() => setShowWinnerSelect(true)}
-                            className="press-scale"
-                            style={{
-                                flex: 1,
-                                padding: 'var(--space-2)',
-                                background: 'var(--success)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 'var(--space-1)',
-                                fontSize: 'var(--text-sm)',
-                                fontWeight: 500,
-                            }}
+                            className="press-scale flex-1 p-[var(--space-2)] bg-success text-white border-none rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)] font-medium"
                         >
                             <Check size={14} />
                             Complete
@@ -830,15 +713,7 @@ function BetManagementCard({
                     )}
                     <button
                         onClick={onDelete}
-                        className="press-scale"
-                        style={{
-                            padding: 'var(--space-2)',
-                            background: 'transparent',
-                            border: '1px solid var(--error)',
-                            color: 'var(--error)',
-                            borderRadius: 'var(--radius-md)',
-                            cursor: 'pointer',
-                        }}
+                        className="press-scale p-[var(--space-2)] bg-transparent border border-error text-error rounded-[var(--radius-md)] cursor-pointer"
                     >
                         <Trash2 size={14} />
                     </button>
@@ -847,9 +722,9 @@ function BetManagementCard({
 
             {/* Winner Selection */}
             {showWinnerSelect && onComplete && (
-                <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--rule-faint)' }}>
-                    <p className="type-meta" style={{ marginBottom: 'var(--space-2)' }}>Select Winner:</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                <div className="mt-[var(--space-3)] pt-[var(--space-3)] border-t border-t-rule-faint">
+                    <p className="type-meta mb-[var(--space-2)]">Select Winner:</p>
+                    <div className="flex flex-wrap gap-[var(--space-2)]">
                         {bet.participantIds
                             .flatMap((id) => {
                                 const player = getPlayer(id);
@@ -862,16 +737,7 @@ function BetManagementCard({
                                         onComplete(id);
                                         setShowWinnerSelect(false);
                                     }}
-                                    className="press-scale"
-                                    style={{
-                                        padding: 'var(--space-2) var(--space-3)',
-                                        background: 'var(--masters)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: 'var(--radius-md)',
-                                        cursor: 'pointer',
-                                        fontSize: 'var(--text-sm)',
-                                    }}
+                                    className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-masters text-white border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                                 >
                                     {player.firstName}
                                 </button>
@@ -881,30 +747,13 @@ function BetManagementCard({
                                 onComplete();
                                 setShowWinnerSelect(false);
                             }}
-                            className="press-scale"
-                            style={{
-                                padding: 'var(--space-2) var(--space-3)',
-                                background: 'var(--ink-tertiary)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                fontSize: 'var(--text-sm)',
-                            }}
+                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-ink-tertiary text-white border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                         >
                             No Winner
                         </button>
                         <button
                             onClick={() => setShowWinnerSelect(false)}
-                            className="press-scale"
-                            style={{
-                                padding: 'var(--space-2) var(--space-3)',
-                                background: 'transparent',
-                                border: '1px solid var(--rule)',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                fontSize: 'var(--text-sm)',
-                            }}
+                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-transparent border border-rule rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                         >
                             Cancel
                         </button>

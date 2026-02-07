@@ -498,7 +498,7 @@ export function PremiumStandingsCard({
                     <span className="type-caption font-semibold">Points to Clinch</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 rounded-xl bg-[color:var(--team-usa)]/ border border-[color:var(--team-usa)]/">
+                    <div className="text-center p-3 rounded-xl bg-[var(--team-usa)]/5 border border-[var(--team-usa)]/10">
                         <p className="text-2xl font-bold text-[var(--team-usa)]">
                             {teamAClinched ? (
                                 <span className="text-green-600">✓</span>
@@ -510,7 +510,7 @@ export function PremiumStandingsCard({
                             {teamAClinched ? 'Clinched!' : `${teamAName} needs`}
                         </p>
                     </div>
-                    <div className="text-center p-3 rounded-xl bg-[color:var(--team-europe)]/ border border-[color:var(--team-europe)]/">
+                    <div className="text-center p-3 rounded-xl bg-[var(--team-europe)]/5 border border-[var(--team-europe)]/10">
                         <p className="text-2xl font-bold text-[var(--team-europe)]">
                             {teamBClinched ? (
                                 <span className="text-green-600">✓</span>
@@ -604,8 +604,8 @@ export function PremiumMatchCard({
                     className={cn(
                         'flex-1 p-3 rounded-lg border-l-4',
                         leader === 'teamA'
-                            ? 'bg-[color:var(--team-usa)]/ border-[var(--team-usa)]'
-                            : 'bg-canvas-sunken/50 border-[color:var(--team-usa)]/'
+                            ? 'bg-[var(--team-usa)]/10 border-[var(--team-usa)]'
+                            : 'bg-canvas-sunken/50 border-[var(--team-usa)]/30'
                     )}
                 >
                     <div className="flex items-center gap-1.5 mb-1.5">
@@ -645,8 +645,8 @@ export function PremiumMatchCard({
                     className={cn(
                         'flex-1 p-3 rounded-lg border-r-4 text-right',
                         leader === 'teamB'
-                            ? 'bg-[color:var(--team-europe)]/ border-[var(--team-europe)]'
-                            : 'bg-canvas-sunken/50 border-[color:var(--team-europe)]/'
+                            ? 'bg-[var(--team-europe)]/10 border-[var(--team-europe)]'
+                            : 'bg-canvas-sunken/50 border-[var(--team-europe)]/30'
                     )}
                 >
                     <div className="flex items-center justify-end gap-1.5 mb-1.5">
@@ -737,7 +737,7 @@ export function PremiumSectionHeader({
         <div className={cn('flex items-center justify-between mb-4', className)}>
             <div className="flex items-center gap-3">
                 {icon && (
-                    <div className="w-10 h-10 rounded-xl bg-[color:var(--masters)]/ flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--masters)]/10 flex items-center justify-center">
                         {icon}
                     </div>
                 )}
@@ -803,7 +803,7 @@ export function PremiumEmptyState({
 // EXPORTS
 // ============================================
 
-export default {
+const PremiumComponents = {
     PremiumLiveMatchBanner,
     HoleProgressStrip,
     PremiumProgressBar,
@@ -814,3 +814,5 @@ export default {
     PremiumSectionHeader,
     PremiumEmptyState,
 };
+
+export default PremiumComponents;

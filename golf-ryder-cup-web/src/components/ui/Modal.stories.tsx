@@ -223,7 +223,7 @@ const ShareDemo = () => {
           <div className="p-4 bg-surface-card rounded-lg text-center">
             <div className="text-2xl font-bold text-masters-green mb-1">USA 15½</div>
             <div className="text-text-muted">defeats</div>
-            <div className="text-2xl font-bold text-azalea mt-1">EUR 12½</div>
+            <div className="text-2xl font-bold text-error mt-1">EUR 12½</div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">

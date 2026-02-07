@@ -36,7 +36,7 @@ export function calculateEnhancedPlayerStats(
     matches: Match[],
     sessions: RyderCupSession[],
     holeResults: HoleResult[],
-    players: Player[]
+    _players: Player[]
 ): PlayerStatistics {
     // Get all matches this player participated in
     const playerMatches = matches.filter(

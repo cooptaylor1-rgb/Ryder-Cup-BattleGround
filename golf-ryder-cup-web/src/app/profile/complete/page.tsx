@@ -149,10 +149,7 @@ export default function CompleteProfilePage() {
 
   if (!isAuthenticated) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -176,10 +173,7 @@ export default function CompleteProfilePage() {
 
   if (currentUser?.hasCompletedOnboarding) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -207,85 +201,28 @@ export default function CompleteProfilePage() {
   }
 
   return (
-    <div
-      className="page-premium-enter texture-grain"
-      style={{
-        background: 'var(--canvas)',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className="page-premium-enter texture-grain bg-canvas min-h-screen flex flex-col">
       {/* ---- HEADER ---- */}
-      <header
-        className="header-premium"
-        style={{
-          paddingTop: 'calc(var(--space-3) + env(safe-area-inset-top, 0px))',
-          paddingBottom: 'var(--space-3)',
-          paddingLeft: 'var(--space-5)',
-          paddingRight: 'var(--space-5)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            maxWidth: 600,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        >
+      <header className="header-premium pt-[calc(var(--space-3)+env(safe-area-inset-top,0px))] pb-[var(--space-3)] px-[var(--space-5)]">
+        <div className="flex items-center justify-between max-w-[600px] mx-auto">
           {/* Back button */}
           <button
             onClick={() => router.back()}
-            className="press-scale"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--radius-md)',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: 'var(--ink-secondary)',
-            }}
+            className="press-scale flex items-center justify-center w-[40px] h-[40px] rounded-[var(--radius-md)] border-none bg-transparent cursor-pointer text-ink-secondary"
             aria-label="Go back"
           >
-            <ArrowLeft style={{ width: 20, height: 20 }} />
+            <ArrowLeft className="w-5 h-5" />
           </button>
 
           {/* Title */}
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontStyle: 'italic',
-              fontSize: 'var(--text-lg)',
-              fontWeight: 400,
-              color: 'var(--ink)',
-              margin: 0,
-            }}
-          >
+          <h1 className="font-serif italic text-[length:var(--text-lg)] font-normal text-ink m-0">
             Complete Your Profile
           </h1>
 
           {/* Skip link */}
           <button
             onClick={handleSkip}
-            className="press-scale"
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 500,
-              color: 'var(--ink-tertiary)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 'var(--space-2)',
-              transition: 'color 200ms',
-            }}
+            className="press-scale font-sans text-[length:var(--text-sm)] font-medium text-ink-tertiary bg-transparent border-none cursor-pointer p-[var(--space-2)] transition-colors duration-200"
           >
             Skip for now
           </button>
@@ -293,165 +230,61 @@ export default function CompleteProfilePage() {
       </header>
 
       {/* ---- MAIN CONTENT ---- */}
-      <main
-        style={{
-          flex: 1,
-          paddingBottom: 140,
-        }}
-      >
+      <main className="flex-1 pb-[140px]">
         <div className="container-editorial">
           {/* Welcome / Hero Block */}
-          <div
-            style={{
-              textAlign: 'center',
-              paddingTop: 'var(--space-10)',
-              paddingBottom: 'var(--space-8)',
-            }}
-          >
-            <p
-              className="type-overline"
-              style={{
-                color: 'var(--ink-tertiary)',
-                letterSpacing: '0.15em',
-                marginBottom: 'var(--space-3)',
-              }}
-            >
+          <div className="text-center pt-[var(--space-10)] pb-[var(--space-8)]">
+            <p className="type-overline text-ink-tertiary tracking-[0.15em] mb-[var(--space-3)]">
               Complete Your Profile
             </p>
-            <h2
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontStyle: 'italic',
-                fontSize: 'clamp(2rem, 5vw, 2.75rem)',
-                fontWeight: 400,
-                color: 'var(--ink)',
-                lineHeight: 1.1,
-                margin: 0,
-              }}
-            >
+            <h2 className="font-serif italic text-[length:clamp(2rem,5vw,2.75rem)] font-normal text-ink leading-[1.1] m-0">
               Almost There
             </h2>
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-base)',
-                color: 'var(--ink-secondary)',
-                marginTop: 'var(--space-3)',
-                lineHeight: 1.5,
-              }}
-            >
+            <p className="font-sans text-[length:var(--text-base)] text-ink-secondary mt-[var(--space-3)] leading-normal">
               Welcome, {currentUser.firstName}. A few more details help with
               trip&nbsp;planning and fair match&nbsp;pairing.
             </p>
           </div>
 
           {/* Thin rule divider */}
-          <div
-            style={{
-              height: 1,
-              background: 'var(--rule)',
-              marginBottom: 'var(--space-6)',
-            }}
-          />
+          <div className="h-px bg-rule mb-[var(--space-6)]" />
 
           {/* ---- ACCORDION SECTIONS ---- */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div className="flex flex-col gap-[var(--space-4)]">
             {/* ======== GOLF PROFILE ======== */}
-            <div
-              style={{
-                background: 'var(--canvas-raised)',
-                border: '1px solid var(--rule)',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-              }}
-            >
+            <div className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggleSection('golf')}
-                className="press-scale"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: 'var(--space-5) var(--space-6)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className="press-scale w-full flex items-center justify-between py-[var(--space-5)] px-[var(--space-6)] bg-transparent border-none cursor-pointer text-left"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 'var(--radius-full)',
-                      background: 'var(--masters-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Hash style={{ width: 18, height: 18, color: 'var(--masters)' }} />
+                <div className="flex items-center gap-[var(--space-4)]">
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-masters-subtle flex items-center justify-center shrink-0">
+                    <Hash className="w-[18px] h-[18px] text-masters" />
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontStyle: 'italic',
-                        fontSize: 'var(--text-lg)',
-                        color: 'var(--ink)',
-                        margin: 0,
-                        lineHeight: 1.3,
-                      }}
-                    >
+                    <p className="font-serif italic text-[length:var(--text-lg)] text-ink m-0 leading-[1.3]">
                       Golf Profile
                     </p>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        color: 'var(--ink-tertiary)',
-                        margin: 0,
-                        marginTop: 2,
-                      }}
-                    >
+                    <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary m-0 mt-[2px]">
                       Handicap, GHIN, home course
                     </p>
                   </div>
                 </div>
                 <ChevronDown
-                  style={{
-                    width: 20,
-                    height: 20,
-                    color: 'var(--ink-tertiary)',
-                    transition: 'transform 200ms',
-                    transform: expandedSection === 'golf' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    flexShrink: 0,
-                  }}
+                  className={`w-5 h-5 text-ink-tertiary transition-transform duration-200 shrink-0 ${expandedSection === 'golf' ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {expandedSection === 'golf' && (
-                <div
-                  style={{
-                    padding: '0 var(--space-6) var(--space-6)',
-                    borderTop: '1px solid var(--rule-faint)',
-                    paddingTop: 'var(--space-5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-5)',
-                  }}
-                >
+                <div className="pt-[var(--space-5)] px-[var(--space-6)] pb-[var(--space-6)] border-t border-rule-faint flex flex-col gap-[var(--space-5)]">
                   <InputField
                     label="Handicap Index"
                     value={formData.handicapIndex}
                     onChange={(v) => updateField('handicapIndex', v)}
                     placeholder="12.5"
                     type="number"
-                    icon={<Hash style={{ width: 18, height: 18 }} />}
+                    icon={<Hash className="w-[18px] h-[18px]" />}
                     hint="For fair match pairing"
                   />
                   <InputField
@@ -466,52 +299,25 @@ export default function CompleteProfilePage() {
                     value={formData.homeCourse}
                     onChange={(v) => updateField('homeCourse', v)}
                     placeholder="Augusta National"
-                    icon={<Home style={{ width: 18, height: 18 }} />}
+                    icon={<Home className="w-[18px] h-[18px]" />}
                   />
 
                   {/* Preferred Tees — option chips */}
                   <div>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 600,
-                        color: 'var(--ink-secondary)',
-                        marginBottom: 'var(--space-2)',
-                      }}
-                    >
+                    <label className="block font-sans text-[length:var(--text-sm)] font-semibold text-ink-secondary mb-[var(--space-2)]">
                       Preferred Tees
                     </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-2)' }}>
+                    <div className="grid grid-cols-3 gap-[var(--space-2)]">
                       {(['back', 'middle', 'forward'] as const).map((tee) => (
                         <button
                           key={tee}
                           type="button"
                           onClick={() => updateField('preferredTees', tee)}
-                          className="press-scale"
-                          style={{
-                            padding: 'var(--space-3) var(--space-4)',
-                            borderRadius: 'var(--radius-md)',
-                            border:
-                              formData.preferredTees === tee
-                                ? '2px solid var(--masters)'
-                                : '1px solid var(--rule)',
-                            background:
-                              formData.preferredTees === tee
-                                ? 'var(--masters-subtle)'
-                                : 'var(--canvas-raised)',
-                            color:
-                              formData.preferredTees === tee
-                                ? 'var(--masters)'
-                                : 'var(--ink-secondary)',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 600,
-                            textTransform: 'capitalize',
-                            cursor: 'pointer',
-                            transition: 'all 150ms',
-                          }}
+                          className={`press-scale py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-md)] font-sans text-[length:var(--text-sm)] font-semibold capitalize cursor-pointer transition-all duration-150 ${
+                            formData.preferredTees === tee
+                              ? 'border-2 border-masters bg-masters-subtle text-masters'
+                              : 'border border-rule bg-canvas-raised text-ink-secondary'
+                          }`}
                         >
                           {tee}
                         </button>
@@ -523,101 +329,39 @@ export default function CompleteProfilePage() {
             </div>
 
             {/* ======== PERSONAL DETAILS ======== */}
-            <div
-              style={{
-                background: 'var(--canvas-raised)',
-                border: '1px solid var(--rule)',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-              }}
-            >
+            <div className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggleSection('personal')}
-                className="press-scale"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: 'var(--space-5) var(--space-6)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className="press-scale w-full flex items-center justify-between py-[var(--space-5)] px-[var(--space-6)] bg-transparent border-none cursor-pointer text-left"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 'var(--radius-full)',
-                      background: 'var(--gold-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <User style={{ width: 18, height: 18, color: 'var(--gold-dark)' }} />
+                <div className="flex items-center gap-[var(--space-4)]">
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-[var(--gold-subtle)] flex items-center justify-center shrink-0">
+                    <User className="w-[18px] h-[18px] text-gold-dark" />
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontStyle: 'italic',
-                        fontSize: 'var(--text-lg)',
-                        color: 'var(--ink)',
-                        margin: 0,
-                        lineHeight: 1.3,
-                      }}
-                    >
+                    <p className="font-serif italic text-[length:var(--text-lg)] text-ink m-0 leading-[1.3]">
                       Personal Details
                     </p>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        color: 'var(--ink-tertiary)',
-                        margin: 0,
-                        marginTop: 2,
-                      }}
-                    >
+                    <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary m-0 mt-[2px]">
                       Nickname, phone number
                     </p>
                   </div>
                 </div>
                 <ChevronDown
-                  style={{
-                    width: 20,
-                    height: 20,
-                    color: 'var(--ink-tertiary)',
-                    transition: 'transform 200ms',
-                    transform: expandedSection === 'personal' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    flexShrink: 0,
-                  }}
+                  className={`w-5 h-5 text-ink-tertiary transition-transform duration-200 shrink-0 ${expandedSection === 'personal' ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {expandedSection === 'personal' && (
-                <div
-                  style={{
-                    padding: '0 var(--space-6) var(--space-6)',
-                    borderTop: '1px solid var(--rule-faint)',
-                    paddingTop: 'var(--space-5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-5)',
-                  }}
-                >
+                <div className="pt-[var(--space-5)] px-[var(--space-6)] pb-[var(--space-6)] border-t border-rule-faint flex flex-col gap-[var(--space-5)]">
                   <InputField
                     label="Nickname"
                     value={formData.nickname}
                     onChange={(v) => updateField('nickname', v)}
                     placeholder="Big Hitter"
                     hint="What your buddies call you"
-                    icon={<User style={{ width: 18, height: 18 }} />}
+                    icon={<User className="w-[18px] h-[18px]" />}
                   />
                   <InputField
                     label="Phone Number"
@@ -625,7 +369,7 @@ export default function CompleteProfilePage() {
                     onChange={(v) => updateField('phoneNumber', v)}
                     placeholder="(555) 123-4567"
                     type="tel"
-                    icon={<Phone style={{ width: 18, height: 18 }} />}
+                    icon={<Phone className="w-[18px] h-[18px]" />}
                     hint="For trip coordination"
                   />
                 </div>
@@ -633,136 +377,48 @@ export default function CompleteProfilePage() {
             </div>
 
             {/* ======== TRIP PREFERENCES ======== */}
-            <div
-              style={{
-                background: 'var(--canvas-raised)',
-                border: '1px solid var(--rule)',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-              }}
-            >
+            <div className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggleSection('trip')}
-                className="press-scale"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: 'var(--space-5) var(--space-6)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className="press-scale w-full flex items-center justify-between py-[var(--space-5)] px-[var(--space-6)] bg-transparent border-none cursor-pointer text-left"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 'var(--radius-full)',
-                      background: 'var(--maroon-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Shirt style={{ width: 18, height: 18, color: 'var(--maroon)' }} />
+                <div className="flex items-center gap-[var(--space-4)]">
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-[var(--maroon-subtle)] flex items-center justify-center shrink-0">
+                    <Shirt className="w-[18px] h-[18px] text-maroon" />
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontStyle: 'italic',
-                        fontSize: 'var(--text-lg)',
-                        color: 'var(--ink)',
-                        margin: 0,
-                        lineHeight: 1.3,
-                      }}
-                    >
+                    <p className="font-serif italic text-[length:var(--text-lg)] text-ink m-0 leading-[1.3]">
                       Trip Preferences
                     </p>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        color: 'var(--ink-tertiary)',
-                        margin: 0,
-                        marginTop: 2,
-                      }}
-                    >
+                    <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary m-0 mt-[2px]">
                       Shirt size, dietary needs
                     </p>
                   </div>
                 </div>
                 <ChevronDown
-                  style={{
-                    width: 20,
-                    height: 20,
-                    color: 'var(--ink-tertiary)',
-                    transition: 'transform 200ms',
-                    transform: expandedSection === 'trip' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    flexShrink: 0,
-                  }}
+                  className={`w-5 h-5 text-ink-tertiary transition-transform duration-200 shrink-0 ${expandedSection === 'trip' ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {expandedSection === 'trip' && (
-                <div
-                  style={{
-                    padding: '0 var(--space-6) var(--space-6)',
-                    borderTop: '1px solid var(--rule-faint)',
-                    paddingTop: 'var(--space-5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-5)',
-                  }}
-                >
+                <div className="pt-[var(--space-5)] px-[var(--space-6)] pb-[var(--space-6)] border-t border-rule-faint flex flex-col gap-[var(--space-5)]">
                   {/* Shirt Size — option chips */}
                   <div>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 600,
-                        color: 'var(--ink-secondary)',
-                        marginBottom: 'var(--space-2)',
-                      }}
-                    >
+                    <label className="block font-sans text-[length:var(--text-sm)] font-semibold text-ink-secondary mb-[var(--space-2)]">
                       Shirt Size
                     </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-2)' }}>
+                    <div className="grid grid-cols-4 gap-[var(--space-2)]">
                       {(['S', 'M', 'L', 'XL', '2XL', '3XL'] as const).map((size) => (
                         <button
                           key={size}
                           type="button"
                           onClick={() => updateField('shirtSize', size)}
-                          className="press-scale"
-                          style={{
-                            padding: 'var(--space-3) var(--space-2)',
-                            borderRadius: 'var(--radius-md)',
-                            border:
-                              formData.shirtSize === size
-                                ? '2px solid var(--masters)'
-                                : '1px solid var(--rule)',
-                            background:
-                              formData.shirtSize === size
-                                ? 'var(--masters-subtle)'
-                                : 'var(--canvas-raised)',
-                            color:
-                              formData.shirtSize === size
-                                ? 'var(--masters)'
-                                : 'var(--ink-secondary)',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            transition: 'all 150ms',
-                          }}
+                          className={`press-scale py-[var(--space-3)] px-[var(--space-2)] rounded-[var(--radius-md)] font-sans text-[length:var(--text-sm)] font-semibold cursor-pointer transition-all duration-150 ${
+                            formData.shirtSize === size
+                              ? 'border-2 border-masters bg-masters-subtle text-masters'
+                              : 'border border-rule bg-canvas-raised text-ink-secondary'
+                          }`}
                         >
                           {size}
                         </button>
@@ -782,94 +438,32 @@ export default function CompleteProfilePage() {
             </div>
 
             {/* ======== EMERGENCY CONTACT ======== */}
-            <div
-              style={{
-                background: 'var(--canvas-raised)',
-                border: '1px solid var(--rule)',
-                borderRadius: 'var(--radius-lg)',
-                overflow: 'hidden',
-              }}
-            >
+            <div className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggleSection('emergency')}
-                className="press-scale"
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: 'var(--space-5) var(--space-6)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className="press-scale w-full flex items-center justify-between py-[var(--space-5)] px-[var(--space-6)] bg-transparent border-none cursor-pointer text-left"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 'var(--radius-full)',
-                      background: 'rgba(166, 61, 64, 0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <AlertTriangle style={{ width: 18, height: 18, color: 'var(--error)' }} />
+                <div className="flex items-center gap-[var(--space-4)]">
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-[rgba(166,61,64,0.08)] flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-[18px] h-[18px] text-error" />
                   </div>
                   <div>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-serif)',
-                        fontStyle: 'italic',
-                        fontSize: 'var(--text-lg)',
-                        color: 'var(--ink)',
-                        margin: 0,
-                        lineHeight: 1.3,
-                      }}
-                    >
+                    <p className="font-serif italic text-[length:var(--text-lg)] text-ink m-0 leading-[1.3]">
                       Emergency Contact
                     </p>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--text-sm)',
-                        color: 'var(--ink-tertiary)',
-                        margin: 0,
-                        marginTop: 2,
-                      }}
-                    >
+                    <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary m-0 mt-[2px]">
                       In case of emergency
                     </p>
                   </div>
                 </div>
                 <ChevronDown
-                  style={{
-                    width: 20,
-                    height: 20,
-                    color: 'var(--ink-tertiary)',
-                    transition: 'transform 200ms',
-                    transform: expandedSection === 'emergency' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    flexShrink: 0,
-                  }}
+                  className={`w-5 h-5 text-ink-tertiary transition-transform duration-200 shrink-0 ${expandedSection === 'emergency' ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {expandedSection === 'emergency' && (
-                <div
-                  style={{
-                    padding: '0 var(--space-6) var(--space-6)',
-                    borderTop: '1px solid var(--rule-faint)',
-                    paddingTop: 'var(--space-5)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-5)',
-                  }}
-                >
+                <div className="pt-[var(--space-5)] px-[var(--space-6)] pb-[var(--space-6)] border-t border-rule-faint flex flex-col gap-[var(--space-5)]">
                   <InputField
                     label="Contact Name"
                     value={formData.emergencyContactName}
@@ -897,83 +491,31 @@ export default function CompleteProfilePage() {
       </main>
 
       {/* ---- FIXED BOTTOM BAR ---- */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'var(--canvas)',
-          borderTop: '1px solid var(--rule)',
-          padding: 'var(--space-4) var(--space-5)',
-          paddingBottom: 'max(var(--space-4), env(safe-area-inset-bottom))',
-          zIndex: 30,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 600,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--space-3)',
-          }}
-        >
+      <div className="fixed bottom-0 left-0 right-0 bg-canvas border-t border-rule py-[var(--space-4)] px-[var(--space-5)] pb-[max(var(--space-4),env(safe-area-inset-bottom))] z-30">
+        <div className="max-w-[600px] mx-auto flex flex-col gap-[var(--space-3)]">
           <button
             onClick={handleSaveAndContinue}
             disabled={isSubmitting || isLoading}
-            className="btn-premium press-scale"
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'var(--space-2)',
-              padding: 'var(--space-4) var(--space-6)',
-              fontSize: 'var(--text-base)',
-              opacity: isSubmitting || isLoading ? 0.6 : 1,
-              cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
-            }}
+            className={`btn-premium press-scale w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-4)] px-[var(--space-6)] text-[length:var(--text-base)] ${
+              isSubmitting || isLoading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+            }`}
           >
             {isSubmitting || isLoading ? (
               <>
-                <span
-                  style={{
-                    width: 16,
-                    height: 16,
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: 'white',
-                    borderRadius: 'var(--radius-full)',
-                    animation: 'spin 0.6s linear infinite',
-                    display: 'inline-block',
-                  }}
-                />
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite] inline-block" />
                 Saving...
               </>
             ) : (
               <>
                 Save &amp; Continue
-                <ArrowRight style={{ width: 16, height: 16 }} />
+                <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
 
           <button
             onClick={handleSkip}
-            className="press-scale"
-            style={{
-              width: '100%',
-              padding: 'var(--space-2)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 500,
-              color: 'var(--ink-tertiary)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'color 200ms',
-            }}
+            className="press-scale w-full p-[var(--space-2)] font-sans text-[length:var(--text-sm)] font-medium text-ink-tertiary bg-transparent border-none cursor-pointer transition-colors duration-200"
           >
             Skip for now
           </button>
@@ -1008,32 +550,12 @@ function InputField({
 }: InputFieldProps) {
   return (
     <div>
-      <label
-        style={{
-          display: 'block',
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 600,
-          color: 'var(--ink-secondary)',
-          marginBottom: 'var(--space-2)',
-        }}
-      >
+      <label className="block font-sans text-[length:var(--text-sm)] font-semibold text-ink-secondary mb-[var(--space-2)]">
         {label}
       </label>
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         {icon && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 'var(--space-3)',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--ink-tertiary)',
-              display: 'flex',
-              alignItems: 'center',
-              pointerEvents: 'none',
-            }}
-          >
+          <div className="absolute left-[var(--space-3)] top-1/2 -translate-y-1/2 text-ink-tertiary flex items-center pointer-events-none">
             {icon}
           </div>
         )}
@@ -1042,41 +564,15 @@ function InputField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          style={{
-            width: '100%',
-            padding: icon
-              ? 'var(--space-3) var(--space-4) var(--space-3) calc(var(--space-3) + 30px)'
-              : 'var(--space-3) var(--space-4)',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-base)',
-            color: 'var(--ink)',
-            background: 'var(--canvas-raised)',
-            border: '1px solid var(--rule)',
-            borderRadius: 'var(--radius-md)',
-            outline: 'none',
-            transition: 'border-color 200ms, box-shadow 200ms',
-            boxSizing: 'border-box',
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--masters)';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 102, 68, 0.08)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--rule)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
+          className={`w-full font-sans text-[length:var(--text-base)] text-ink bg-canvas-raised border border-rule rounded-[var(--radius-md)] outline-none transition-[border-color,box-shadow] duration-200 box-border focus:border-masters focus:shadow-[0_0_0_3px_rgba(0,102,68,0.08)] ${
+            icon
+              ? 'py-[var(--space-3)] pr-[var(--space-4)] pl-[calc(var(--space-3)+30px)]'
+              : 'py-[var(--space-3)] px-[var(--space-4)]'
+          }`}
         />
       </div>
       {hint && (
-        <p
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-xs)',
-            color: 'var(--ink-tertiary)',
-            margin: 0,
-            marginTop: 'var(--space-1)',
-          }}
-        >
+        <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-1)]">
           {hint}
         </p>
       )}

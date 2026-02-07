@@ -110,7 +110,7 @@ export const MatchCard: Story = {
           </div>
           <div className="text-text-muted">UP</div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-azalea">1</div>
+            <div className="text-2xl font-bold text-error">1</div>
             <div className="text-sm text-text-muted">EUR</div>
           </div>
         </div>
@@ -139,7 +139,7 @@ export const PlayerCard: Story = {
             JS
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-magnolia">John Smith</div>
+            <div className="font-semibold text-canvas">John Smith</div>
             <div className="text-sm text-text-muted">Team USA • +3.2 HCP</div>
           </div>
           <Badge variant="primary">Captain</Badge>

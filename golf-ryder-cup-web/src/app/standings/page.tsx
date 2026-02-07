@@ -102,14 +102,11 @@ export default function StandingsPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Standings"
           subtitle="No active trip"
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -201,29 +198,18 @@ export default function StandingsPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Standings"
         subtitle={currentTrip.name}
-        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
       {/* Tab Navigation */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          background: 'var(--canvas)',
-          borderBottom: '1px solid var(--rule)',
-        }}
-      >
+      <div className="sticky top-0 z-10 bg-[var(--canvas)] border-b border-[var(--rule)]">
         <div className="container-editorial">
-          <div className="flex gap-1" style={{ padding: 'var(--space-2) 0' }}>
+          <div className="flex gap-1 py-[var(--space-2)]">
             <TabButton
               active={activeTab === 'competition'}
               onClick={() => setActiveTab('competition')}
@@ -286,27 +272,14 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className="press-scale"
+      className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
+        active
+          ? 'border-0 bg-[var(--masters)] text-white font-semibold'
+          : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
+      }`}
       aria-label={`${label} tab`}
       aria-selected={active}
       role="tab"
-      style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 'var(--space-2)',
-        padding: 'var(--space-3) var(--space-4)',
-        borderRadius: 'var(--radius-full)',
-        border: active ? 'none' : '1px solid var(--rule)',
-        background: active ? 'var(--masters)' : 'transparent',
-        color: active ? 'white' : 'var(--ink-secondary)',
-        fontFamily: 'var(--font-sans)',
-        fontWeight: active ? 600 : 500,
-        fontSize: 'var(--text-sm)',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
     >
       {icon}
       <span>{label}</span>
@@ -341,12 +314,9 @@ function CompetitionTab({
   return (
     <>
       {/* HERO — Team Score Display */}
-      <section
-        className="section text-center"
-        style={{ paddingTop: 'var(--space-12)', paddingBottom: 'var(--space-12)' }}
-      >
+      <section className="section text-center pt-[var(--space-12)] pb-[var(--space-12)]">
         {/* Points to Win Context */}
-        <p className="type-caption" style={{ marginBottom: 'var(--space-8)' }}>
+        <p className="type-caption mb-[var(--space-8)]">
           {magicNumber.pointsToWin} points to win
         </p>
 
@@ -357,27 +327,18 @@ function CompetitionTab({
             className={`score-vs-team score-vs-usa ${standings.teamAPoints >= standings.teamBPoints ? 'leading' : ''}`}
           >
             <span
-              className={`team-dot team-dot-xl team-dot-usa ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
-              style={{ display: 'inline-block', marginBottom: 'var(--space-4)' }}
+              className={`team-dot team-dot-xl team-dot-usa inline-block mb-[var(--space-4)] ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
             />
             <p
-              className="score-monumental"
-              style={{
-                color:
-                  standings.teamAPoints >= standings.teamBPoints
-                    ? 'var(--team-usa)'
-                    : 'var(--ink-tertiary)',
-              }}
+              className={`score-monumental ${
+                standings.teamAPoints >= standings.teamBPoints
+                  ? 'text-[var(--team-usa)]'
+                  : 'text-[var(--ink-tertiary)]'
+              }`}
             >
               {standings.teamAPoints}
             </p>
-            <p
-              className="type-overline"
-              style={{
-                marginTop: 'var(--space-3)',
-                color: 'var(--team-usa)',
-              }}
-            >
+            <p className="type-overline mt-[var(--space-3)] text-[var(--team-usa)]">
               {teamAName}
             </p>
           </div>
@@ -390,27 +351,18 @@ function CompetitionTab({
             className={`score-vs-team score-vs-europe ${standings.teamBPoints > standings.teamAPoints ? 'leading' : ''}`}
           >
             <span
-              className={`team-dot team-dot-xl team-dot-europe ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
-              style={{ display: 'inline-block', marginBottom: 'var(--space-4)' }}
+              className={`team-dot team-dot-xl team-dot-europe inline-block mb-[var(--space-4)] ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
             />
             <p
-              className="score-monumental"
-              style={{
-                color:
-                  standings.teamBPoints > standings.teamAPoints
-                    ? 'var(--team-europe)'
-                    : 'var(--ink-tertiary)',
-              }}
+              className={`score-monumental ${
+                standings.teamBPoints > standings.teamAPoints
+                  ? 'text-[var(--team-europe)]'
+                  : 'text-[var(--ink-tertiary)]'
+              }`}
             >
               {standings.teamBPoints}
             </p>
-            <p
-              className="type-overline"
-              style={{
-                marginTop: 'var(--space-3)',
-                color: 'var(--team-europe)',
-              }}
-            >
+            <p className="type-overline mt-[var(--space-3)] text-[var(--team-europe)]">
               {teamBName}
             </p>
           </div>
@@ -419,27 +371,19 @@ function CompetitionTab({
         {/* Victory Banner or Magic Number */}
         {magicNumber.hasClinched ? (
           <div
-            className={`victory-banner ${magicNumber.clinchingTeam === 'A' ? 'victory-usa' : 'victory-europe'}`}
-            style={{ marginTop: 'var(--space-10)', display: 'inline-block' }}
+            className={`victory-banner mt-[var(--space-10)] inline-block ${magicNumber.clinchingTeam === 'A' ? 'victory-usa' : 'victory-europe'}`}
           >
             <div className="victory-icon">
               <Trophy size={18} strokeWidth={1.75} />
             </div>
-            <p style={{ fontWeight: 600, fontSize: 'var(--text-base)' }}>
+            <p className="font-semibold text-base">
               {magicNumber.clinchingTeam === 'A' ? teamAName : teamBName} Wins
             </p>
           </div>
         ) : (
           (magicNumber.teamANeeded <= 3 || magicNumber.teamBNeeded <= 3) &&
           standings.leader && (
-            <p
-              className="type-caption"
-              style={{
-                marginTop: 'var(--space-8)',
-                color: 'var(--masters)',
-                fontWeight: 500,
-              }}
-            >
+            <p className="type-caption mt-[var(--space-8)] text-[var(--masters)] font-medium">
               Magic Number:{' '}
               {standings.leader === 'teamA' ? magicNumber.teamANeeded : magicNumber.teamBNeeded}
             </p>
@@ -447,14 +391,14 @@ function CompetitionTab({
         )}
 
         {/* Progress */}
-        <p className="type-micro" style={{ marginTop: 'var(--space-8)' }}>
+        <p className="type-micro mt-[var(--space-8)]">
           {standings.matchesCompleted} of {standings.totalMatches} matches complete
         </p>
       </section>
 
       {/* Path to Victory */}
       {standings.remainingMatches > 0 && !magicNumber.hasClinched && (
-        <section className="section-sm" style={{ paddingBottom: 0 }}>
+        <section className="section-sm pb-0">
           <PathToVictoryCard
             standings={standings}
             pointsToWin={pointsToWin}
@@ -468,7 +412,7 @@ function CompetitionTab({
 
       {/* LEADERBOARD — Individual Leaders */}
       <section className="section-sm">
-        <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
+        <h2 className="type-overline mb-[var(--space-6)]">
           Individual Leaders
         </h2>
 
@@ -485,7 +429,7 @@ function CompetitionTab({
             ))}
           </div>
         ) : (
-          <p className="type-caption text-center" style={{ padding: 'var(--space-10) 0' }}>
+          <p className="type-caption text-center py-[var(--space-10)] px-0">
             Complete matches to see individual standings
           </p>
         )}
@@ -588,11 +532,11 @@ function FunStatsTab({
   return (
     <section className="section-sm">
       {!hasAnyStats || (!hasDisplayableStats && highlightStats.length === 0) ? (
-        <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div className="mb-[var(--space-8)]">
           <EmptyStatePremium
             illustration="podium"
             title="No trip stats yet"
-            description="As soon as scores and side stats are entered, you’ll see leaders and highlights here."
+            description="As soon as scores and side stats are entered, you'll see leaders and highlights here."
             action={{
               label: 'Go score a match',
               onClick: () => {
@@ -608,38 +552,24 @@ function FunStatsTab({
       {/* Quick Highlights */}
       {highlightStats.length > 0 && (
         <>
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
+          <h2 className="type-overline mb-[var(--space-4)]">
             Trip Highlights
           </h2>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 'var(--space-3)',
-              marginBottom: 'var(--space-8)',
-            }}
-          >
+          <div className="grid grid-cols-3 gap-[var(--space-3)] mb-[var(--space-8)]">
             {highlightStats.slice(0, 6).map((stat) => (
               <div
                 key={stat.type}
-                className="card"
-                style={{
-                  padding: 'var(--space-3)',
-                  textAlign: 'center',
-                }}
+                className="card p-[var(--space-3)] text-center"
               >
-                <span style={{ fontSize: '24px' }}>{stat.emoji}</span>
-                <p className="type-title-lg" style={{ marginTop: 'var(--space-1)' }}>
+                <span className="text-2xl">{stat.emoji}</span>
+                <p className="type-title-lg mt-[var(--space-1)]">
                   {stat.value}
                 </p>
-                <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                <p className="type-micro text-[var(--ink-tertiary)]">
                   {stat.label}
                 </p>
                 {stat.leader && (
-                  <p
-                    className="type-micro"
-                    style={{ color: 'var(--masters)', marginTop: 'var(--space-1)' }}
-                  >
+                  <p className="type-micro text-[var(--masters)] mt-[var(--space-1)]">
                     👑 {stat.leader}
                   </p>
                 )}
@@ -653,16 +583,8 @@ function FunStatsTab({
       {/* Stats by Category */}
       {hasDisplayableStats && displayCategories.length > 0 ? (
         displayCategories.map(({ category, stats }) => (
-          <div key={category.key} style={{ marginBottom: 'var(--space-8)' }}>
-            <h3
-              className="type-overline"
-              style={{
-                marginBottom: 'var(--space-4)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)',
-              }}
-            >
+          <div key={category.key} className="mb-[var(--space-8)]">
+            <h3 className="type-overline mb-[var(--space-4)] flex items-center gap-[var(--space-2)]">
               <span>{category.emoji}</span>
               <span>{category.label}</span>
             </h3>
@@ -670,32 +592,25 @@ function FunStatsTab({
               {stats.map((stat) => (
                 <div
                   key={stat.statType}
-                  className="card"
-                  style={{
-                    padding: 'var(--space-3) var(--space-4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
+                  className="card py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-between"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <span style={{ fontSize: '20px' }}>{stat.emoji}</span>
+                  <div className="flex items-center gap-[var(--space-3)]">
+                    <span className="text-xl">{stat.emoji}</span>
                     <div>
                       <p className="type-body-sm">{stat.label}</p>
-                      <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                      <p className="type-micro text-[var(--ink-tertiary)]">
                         {stat.description}
                       </p>
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
+                  <div className="text-right">
                     <p
-                      className="type-title"
-                      style={{ color: stat.isNegative ? 'var(--error)' : 'var(--masters)' }}
+                      className={`type-title ${stat.isNegative ? 'text-[var(--error)]' : 'text-[var(--masters)]'}`}
                     >
                       {stat.total}
                     </p>
                     {stat.leader && (
-                      <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+                      <p className="type-micro text-[var(--ink-tertiary)]">
                         👑 {stat.leader}
                       </p>
                     )}
@@ -706,7 +621,7 @@ function FunStatsTab({
           </div>
         ))
       ) : (
-        <div style={{ marginBottom: 'var(--space-8)' }}>
+        <div className="mb-[var(--space-8)]">
           <EmptyStatePremium
             illustration="trophy"
             title="No stats yet"
@@ -727,22 +642,13 @@ function FunStatsTab({
       {hasDisplayableStats && (
         <Link
           href="/trip-stats"
-          className="card press-scale"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: 'var(--space-4)',
-            marginTop: 'var(--space-4)',
-            textDecoration: 'none',
-            color: 'inherit',
-          }}
+          className="card press-scale flex items-center justify-between p-[var(--space-4)] mt-[var(--space-4)] no-underline text-inherit"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <Star size={20} style={{ color: 'var(--masters)' }} />
+          <div className="flex items-center gap-[var(--space-3)]">
+            <Star size={20} className="text-[var(--masters)]" />
             <span className="type-body-sm">View All Stats & Track More</span>
           </div>
-          <span style={{ color: 'var(--ink-tertiary)' }}>→</span>
+          <span className="text-[var(--ink-tertiary)]">→</span>
         </Link>
       )}
     </section>
@@ -756,21 +662,21 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
   const getAwardIcon = (type: string) => {
     switch (type) {
       case 'mvp':
-        return <Crown size={24} style={{ color: 'var(--color-accent)' }} />;
+        return <Crown size={24} className="text-[var(--color-accent)]" />;
       case 'best-record':
-        return <TrendingUp size={24} style={{ color: 'var(--masters)' }} />;
+        return <TrendingUp size={24} className="text-[var(--masters)]" />;
       case 'most-wins':
-        return <Trophy size={24} style={{ color: 'var(--masters)' }} />;
+        return <Trophy size={24} className="text-[var(--masters)]" />;
       case 'most-halves':
-        return <Medal size={24} style={{ color: 'var(--ink-secondary)' }} />;
+        return <Medal size={24} className="text-[var(--ink-secondary)]" />;
       case 'biggest-win':
-        return <Flame size={24} style={{ color: 'var(--error)' }} />;
+        return <Flame size={24} className="text-[var(--error)]" />;
       case 'iron-man':
-        return <Zap size={24} style={{ color: 'var(--team-usa)' }} />;
+        return <Zap size={24} className="text-[var(--team-usa)]" />;
       case 'streak-master':
-        return <TrendingUp size={24} style={{ color: 'var(--team-europe)' }} />;
+        return <TrendingUp size={24} className="text-[var(--team-europe)]" />;
       default:
-        return <AwardIcon size={24} style={{ color: 'var(--masters)' }} />;
+        return <AwardIcon size={24} className="text-[var(--masters)]" />;
     }
   };
 
@@ -778,33 +684,23 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
 
   return (
     <section className="section-sm">
-      <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
+      <h2 className="type-overline mb-[var(--space-6)]">
         Trip Superlatives
       </h2>
 
-      <div
-        className="card"
-        style={{
-          padding: 'var(--space-4)',
-          marginBottom: 'var(--space-5)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-3)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <Crown size={24} style={{ color: 'var(--color-accent)' }} />
+      <div className="card p-[var(--space-4)] mb-[var(--space-5)] flex flex-col gap-[var(--space-3)]">
+        <div className="flex items-center gap-[var(--space-3)]">
+          <Crown size={24} className="text-[var(--color-accent)]" />
           <div>
             <p className="type-title-sm">End-of-Trip Highlights</p>
-            <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+            <p className="type-caption text-[var(--ink-tertiary)]">
               Vote for MVP and crown the trip superlatives.
             </p>
           </div>
         </div>
         <Link
           href="/trip-stats/awards"
-          className="btn-premium"
-          style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center' }}
+          className="btn-premium py-[var(--space-3)] px-[var(--space-4)] text-center"
         >
           Vote for MVP & Awards
         </Link>
@@ -815,89 +711,51 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
           {awards.map((award) => (
             <div
               key={award.type}
-              className="card"
-              style={{
-                padding: 'var(--space-4)',
-                opacity: award.winner ? 1 : 0.5,
-              }}
+              className={`card p-[var(--space-4)] ${award.winner ? '' : 'opacity-50'}`}
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)' }}>
+              <div className="flex items-start gap-[var(--space-4)]">
                 <div
+                  className="w-12 h-12 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0"
                   style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: 'var(--radius-lg)',
                     background: award.winner
                       ? 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)'
                       : 'var(--surface-elevated)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
                   }}
                 >
                   {getAwardIcon(award.type)}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1 min-w-0">
                   <h3 className="type-title-sm">{award.title}</h3>
-                  <p
-                    className="type-micro"
-                    style={{ color: 'var(--ink-tertiary)', marginTop: '2px' }}
-                  >
+                  <p className="type-micro text-[var(--ink-tertiary)] mt-0.5">
                     {award.description}
                   </p>
                   {award.winner ? (
-                    <div style={{ marginTop: 'var(--space-3)' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 'var(--space-2)',
-                        }}
-                      >
+                    <div className="mt-[var(--space-3)]">
+                      <div className="flex items-center gap-[var(--space-2)]">
                         <span
-                          className={`team-dot team-dot-${award.winner.teamColor}`}
-                          style={{ width: '8px', height: '8px' }}
+                          className={`team-dot team-dot-${award.winner.teamColor} w-2 h-2`}
                         />
-                        <span className="type-body-sm" style={{ fontWeight: 600 }}>
+                        <span className="type-body-sm font-semibold">
                           {award.winner.playerName}
                         </span>
-                        <span
-                          className="type-caption"
-                          style={{
-                            color: 'var(--masters)',
-                            marginLeft: 'auto',
-                          }}
-                        >
+                        <span className="type-caption text-[var(--masters)] ml-auto">
                           {award.winner.value}
                         </span>
                       </div>
                       {award.runnerUp && (
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 'var(--space-2)',
-                            marginTop: 'var(--space-2)',
-                            opacity: 0.7,
-                          }}
-                        >
+                        <div className="flex items-center gap-[var(--space-2)] mt-[var(--space-2)] opacity-70">
                           <span
-                            className={`team-dot team-dot-${award.runnerUp.teamColor}`}
-                            style={{ width: '6px', height: '6px' }}
+                            className={`team-dot team-dot-${award.runnerUp.teamColor} w-1.5 h-1.5`}
                           />
                           <span className="type-micro">{award.runnerUp.playerName}</span>
-                          <span className="type-micro" style={{ marginLeft: 'auto' }}>
+                          <span className="type-micro ml-auto">
                             {award.runnerUp.value}
                           </span>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p
-                      className="type-micro"
-                      style={{ color: 'var(--ink-tertiary)', marginTop: 'var(--space-2)' }}
-                    >
+                    <p className="type-micro text-[var(--ink-tertiary)] mt-[var(--space-2)]">
                       Not yet awarded
                     </p>
                   )}
@@ -907,12 +765,12 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
           ))}
         </div>
       ) : (
-        <div className="text-center" style={{ padding: 'var(--space-12) var(--space-4)' }}>
-          <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>🏆</div>
-          <h3 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>
+        <div className="text-center py-[var(--space-12)] px-[var(--space-4)]">
+          <div className="text-5xl mb-[var(--space-4)]">🏆</div>
+          <h3 className="type-title mb-[var(--space-2)]">
             Awards Coming Soon
           </h3>
-          <p className="type-body" style={{ color: 'var(--ink-tertiary)' }}>
+          <p className="type-body text-[var(--ink-tertiary)]">
             Complete some matches to unlock trip superlatives and see who earns the bragging rights!
           </p>
         </div>
@@ -921,17 +779,11 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
       {/* Additional Records Section */}
       {playerStats.length > 0 && (
         <>
-          <hr className="divider-lg" style={{ margin: 'var(--space-8) 0' }} />
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
+          <hr className="divider-lg my-[var(--space-8)]" />
+          <h2 className="type-overline mb-[var(--space-6)]">
             Player Records
           </h2>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 'var(--space-3)',
-            }}
-          >
+          <div className="grid grid-cols-2 gap-[var(--space-3)]">
             <RecordCard
               label="Most Points"
               emoji="🏆"
@@ -967,22 +819,13 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
       {/* Link to achievements */}
       <Link
         href="/achievements"
-        className="card press-scale"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: 'var(--space-4)',
-          marginTop: 'var(--space-6)',
-          textDecoration: 'none',
-          color: 'inherit',
-        }}
+        className="card press-scale flex items-center justify-between p-[var(--space-4)] mt-[var(--space-6)] no-underline text-inherit"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-          <Medal size={20} style={{ color: 'var(--color-accent)' }} />
+        <div className="flex items-center gap-[var(--space-3)]">
+          <Medal size={20} className="text-[var(--color-accent)]" />
           <span className="type-body-sm">View All Achievements & Badges</span>
         </div>
-        <span style={{ color: 'var(--ink-tertiary)' }}>→</span>
+        <span className="text-[var(--ink-tertiary)]">→</span>
       </Link>
     </section>
   );
@@ -1009,19 +852,9 @@ function RecordCard({
 
   if (!leader || getValue(leader) === 0) {
     return (
-      <div
-        className="card"
-        style={{
-          padding: 'var(--space-3)',
-          textAlign: 'center',
-          opacity: 0.5,
-        }}
-      >
-        <span style={{ fontSize: '20px' }}>{emoji}</span>
-        <p
-          className="type-micro"
-          style={{ marginTop: 'var(--space-1)', color: 'var(--ink-tertiary)' }}
-        >
+      <div className="card p-[var(--space-3)] text-center opacity-50">
+        <span className="text-xl">{emoji}</span>
+        <p className="type-micro mt-[var(--space-1)] text-[var(--ink-tertiary)]">
           {label}
         </p>
         <p className="type-micro">-</p>
@@ -1030,35 +863,17 @@ function RecordCard({
   }
 
   return (
-    <div
-      className="card"
-      style={{
-        padding: 'var(--space-3)',
-        textAlign: 'center',
-      }}
-    >
-      <span style={{ fontSize: '20px' }}>{emoji}</span>
-      <p
-        className="type-micro"
-        style={{ marginTop: 'var(--space-1)', color: 'var(--ink-tertiary)' }}
-      >
+    <div className="card p-[var(--space-3)] text-center">
+      <span className="text-xl">{emoji}</span>
+      <p className="type-micro mt-[var(--space-1)] text-[var(--ink-tertiary)]">
         {label}
       </p>
-      <p className="type-title-sm" style={{ color: 'var(--masters)' }}>
+      <p className="type-title-sm text-[var(--masters)]">
         {formatValue(getValue(leader))}
       </p>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 'var(--space-1)',
-          marginTop: 'var(--space-1)',
-        }}
-      >
+      <div className="flex items-center justify-center gap-[var(--space-1)] mt-[var(--space-1)]">
         <span
-          className={`team-dot team-dot-${leader.teamColor}`}
-          style={{ width: '6px', height: '6px' }}
+          className={`team-dot team-dot-${leader.teamColor} w-1.5 h-1.5`}
         />
         <p className="type-micro">{leader.playerName.split(' ')[0]}</p>
       </div>
@@ -1084,34 +899,19 @@ function PlayerRow({ entry, rank, isTeamA, animationDelay = 0 }: PlayerRowProps)
 
   return (
     <div
-      className={`player-row team-row team-row-accent row-interactive stagger-item ${teamClass}`}
-      style={{
-        gap: 'var(--space-4)',
-        paddingLeft: 'var(--space-3)',
-        paddingRight: 'var(--space-3)',
-        marginLeft: 'calc(-1 * var(--space-3))',
-        marginRight: 'calc(-1 * var(--space-3))',
-        borderRadius: 'var(--radius-md)',
-        animationDelay: `${animationDelay}ms`,
-      }}
+      className={`player-row team-row team-row-accent row-interactive stagger-item gap-[var(--space-4)] px-[var(--space-3)] -mx-[var(--space-3)] rounded-[var(--radius-md)] ${teamClass}`}
+      style={{ animationDelay: `${animationDelay}ms` }}
     >
       {/* Rank */}
       <span
-        style={{
-          width: '28px',
-          fontWeight: 600,
-          fontSize: 'var(--text-sm)',
-          color: isTopThree ? 'var(--masters)' : 'var(--ink-tertiary)',
-          textAlign: 'center',
-        }}
+        className={`w-7 font-semibold text-sm text-center ${isTopThree ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'}`}
       >
         {rank}
       </span>
 
       {/* Team Badge */}
       <span
-        className={isTeamA ? 'team-badge team-badge-usa' : 'team-badge team-badge-europe'}
-        style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-1) var(--space-2)' }}
+        className={`${isTeamA ? 'team-badge team-badge-usa' : 'team-badge team-badge-europe'} text-xs py-[var(--space-1)] px-[var(--space-2)]`}
       >
         {isTeamA ? 'USA' : 'EUR'}
       </span>
@@ -1119,15 +919,14 @@ function PlayerRow({ entry, rank, isTeamA, animationDelay = 0 }: PlayerRowProps)
       {/* Player Info */}
       <div className="flex-1 min-w-0">
         <p className="type-title-sm">{entry.playerName}</p>
-        <p className="type-micro" style={{ marginTop: '2px' }}>
+        <p className="type-micro mt-0.5">
           {entry.record} · {entry.matchesPlayed} {entry.matchesPlayed === 1 ? 'match' : 'matches'}
         </p>
       </div>
 
       {/* Points */}
       <span
-        className="score-medium"
-        style={{ color: isTopThree ? 'var(--masters)' : 'var(--ink)' }}
+        className={`score-medium ${isTopThree ? 'text-[var(--masters)]' : 'text-[var(--ink)]'}`}
       >
         {entry.points}
       </span>
@@ -1140,12 +939,9 @@ function PlayerRow({ entry, rank, isTeamA, animationDelay = 0 }: PlayerRowProps)
    ============================================ */
 function _LoadingState() {
   return (
-    <div className="section text-center" style={{ padding: 'var(--space-20) 0' }}>
-      <div
-        className="skeleton"
-        style={{ width: '120px', height: '80px', margin: '0 auto var(--space-4)' }}
-      />
-      <div className="skeleton" style={{ width: '200px', height: '16px', margin: '0 auto' }} />
+    <div className="section text-center py-[var(--space-20)] px-0">
+      <div className="skeleton w-[120px] h-20 mx-auto mb-[var(--space-4)]" />
+      <div className="skeleton w-[200px] h-4 mx-auto" />
     </div>
   );
 }

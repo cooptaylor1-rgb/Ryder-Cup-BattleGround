@@ -104,22 +104,6 @@ const config: Config = {
                     light: 'var(--gold-light)',
                     dark: 'var(--gold-dark)',
                 },
-                magnolia: 'var(--canvas)',
-                azalea: 'var(--error)',
-                'amen-corner': 'var(--canvas-warm)',
-                'rae-creek': '#5B8FA8',
-                dogwood: '#FEFEFE',
-                patrons: 'var(--masters-hover)',
-                'sunday-red': '#C62828',
-                fairway: 'var(--success)',
-                bunker: 'var(--canvas-warm)',
-                water: '#5B8FA8',
-                rough: '#6B8E5B',
-                'putting-green': 'var(--masters-hover)',
-                platinum: '#E5E4E2',
-                bronze: '#CD7F32',
-                silver: '#C0C0C0',
-
                 // Surface aliases
                 surface: {
                     DEFAULT: 'var(--canvas-raised)',

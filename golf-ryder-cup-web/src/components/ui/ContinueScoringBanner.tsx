@@ -15,7 +15,7 @@
 
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Play, ChevronRight, Target } from 'lucide-react';
+import { Play, ChevronRight } from 'lucide-react';
 import type { MatchState } from '@/lib/types/computed';
 import type { Match } from '@/lib/types/models';
 

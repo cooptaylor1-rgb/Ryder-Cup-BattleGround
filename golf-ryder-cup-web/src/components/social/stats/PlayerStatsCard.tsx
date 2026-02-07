@@ -11,11 +11,8 @@ import {
   Trophy,
   Target,
   TrendingUp,
-  TrendingDown,
   Users,
   Zap,
-  Star,
-  Medal,
   Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -12,7 +12,6 @@ import {
   Plus,
   Trash2,
   Clock,
-  Users,
   Utensils,
   Calendar,
   Trophy,
@@ -45,7 +44,7 @@ export function CreatePollModal({
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState<string[]>(['', '']);
   const [pollType, setPollType] = useState<PollType>('single');
-  const [category, setCategory] = useState<PollCategory>('other');
+  const [category] = useState<PollCategory>('other');
   const [allowAddOptions, setAllowAddOptions] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [expiresIn, setExpiresIn] = useState<number | null>(null); // Hours

@@ -169,7 +169,7 @@ export const States: Story = {
 export const RealWorldExamples: Story = {
   render: () => (
     <div className="flex flex-col gap-6 p-6 bg-surface-base rounded-xl w-96">
-      <h3 className="text-lg font-semibold text-magnolia">Player Registration</h3>
+      <h3 className="text-lg font-semibold text-canvas">Player Registration</h3>
 
       <Input
         label="Full Name"

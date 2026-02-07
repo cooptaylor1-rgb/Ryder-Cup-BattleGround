@@ -133,10 +133,7 @@ export default function CaptainManagePage() {
 
     if (!currentTrip) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="golf-ball"
@@ -157,10 +154,7 @@ export default function CaptainManagePage() {
 
     if (!isCaptainMode) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -266,37 +260,28 @@ export default function CaptainManagePage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             {/* Premium Header */}
             <header className="header-premium">
                 <div className="container-editorial flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => router.back()}
-                            className="p-2 -ml-2 press-scale"
-                            style={{ color: 'var(--ink-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                            className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-none cursor-pointer"
                             aria-label="Back"
                         >
                             <ChevronLeft size={22} strokeWidth={1.75} />
                         </button>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                        <div className="flex items-center gap-[var(--space-3)]">
                             <div
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: 'var(--radius-md)',
-                                    background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    boxShadow: 'var(--shadow-glow-green)',
-                                }}
+                                className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center [box-shadow:var(--shadow-glow-green)]"
+                                style={{ background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)' }}
                             >
-                                <Settings size={16} style={{ color: 'var(--color-accent)' }} />
+                                <Settings size={16} className="text-[var(--color-accent)]" />
                             </div>
                             <div>
-                                <span className="type-overline" style={{ letterSpacing: '0.1em' }}>Manage Trip</span>
-                                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                                <span className="type-overline tracking-[0.1em]">Manage Trip</span>
+                                <p className="type-caption truncate mt-[2px]">
                                     Sessions, Matches & Players
                                 </p>
                             </div>
@@ -308,12 +293,11 @@ export default function CaptainManagePage() {
             <main className="container-editorial">
                 {/* Sessions Section */}
                 <section className="section">
-                    <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+                    <div className="flex items-center justify-between mb-[var(--space-4)]">
                         <h2 className="type-overline">Sessions & Matches</h2>
                         <Link
                             href="/lineup/new"
-                            className="btn-premium"
-                            style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                            className="btn-premium py-[var(--space-2)] px-[var(--space-3)] flex items-center gap-[var(--space-2)]"
                         >
                             <Plus size={16} />
                             New Session
@@ -321,57 +305,46 @@ export default function CaptainManagePage() {
                     </div>
 
                     {sessionsWithMatches.length === 0 ? (
-                        <div className="card-premium" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-                            <CalendarDays size={32} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }} />
-                            <p style={{ color: 'var(--ink-secondary)' }}>No sessions yet</p>
-                            <p className="type-meta" style={{ marginTop: 'var(--space-2)' }}>
+                        <div className="card-premium p-[var(--space-6)] text-center">
+                            <CalendarDays size={32} className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-3)]" />
+                            <p className="text-[var(--ink-secondary)]">No sessions yet</p>
+                            <p className="type-meta mt-[var(--space-2)]">
                                 Create a lineup to add sessions and matches
                             </p>
                         </div>
                     ) : (
                         <div className="space-y-3">
                             {sessionsWithMatches.map((session) => (
-                                <div key={session.id} className="card-premium" style={{ overflow: 'hidden' }}>
+                                <div key={session.id} className="card-premium overflow-hidden">
                                     {/* Session Header */}
                                     <button
                                         onClick={() => toggleSession(session.id)}
-                                        className="w-full press-scale"
-                                        style={{
-                                            padding: 'var(--space-4)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 'var(--space-3)',
-                                            background: 'transparent',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            textAlign: 'left',
-                                        }}
+                                        className="w-full press-scale p-[var(--space-4)] flex items-center gap-[var(--space-3)] bg-transparent border-none cursor-pointer text-left"
                                     >
                                         {getStatusIcon(session.status)}
-                                        <div style={{ flex: 1 }}>
-                                            <p style={{ fontWeight: 600, color: 'var(--ink)' }}>{session.name}</p>
+                                        <div className="flex-1">
+                                            <p className="font-semibold text-[var(--ink)]">{session.name}</p>
                                             <p className="type-meta">
                                                 {session.matches.length} match{session.matches.length !== 1 ? 'es' : ''} • {session.sessionType}
                                                 {session.scheduledDate && ` • ${new Date(session.scheduledDate).toLocaleDateString()}`}
                                             </p>
                                         </div>
                                         {expandedSessions.has(session.id) ? (
-                                            <ChevronUp size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                                            <ChevronUp size={20} className="text-[var(--ink-tertiary)]" />
                                         ) : (
-                                            <ChevronDown size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                                            <ChevronDown size={20} className="text-[var(--ink-tertiary)]" />
                                         )}
                                     </button>
 
                                     {/* Expanded Session Content */}
                                     {expandedSessions.has(session.id) && (
-                                        <div style={{ borderTop: '1px solid var(--rule-faint)' }}>
+                                        <div className="border-t border-t-[var(--rule-faint)]">
                                             {/* Session Actions */}
-                                            <div style={{ padding: 'var(--space-3) var(--space-4)', background: 'var(--canvas-sunken)', display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                            <div className="py-[var(--space-3)] px-[var(--space-4)] bg-[var(--canvas-sunken)] flex gap-[var(--space-2)] flex-wrap">
                                                 <select
                                                     value={session.status}
                                                     onChange={(e) => handleUpdateSession(session.id, { status: e.target.value as RyderCupSession['status'] })}
-                                                    className="input"
-                                                    style={{ padding: 'var(--space-2)', fontSize: 'var(--text-sm)', width: 'auto' }}
+                                                    className="input p-[var(--space-2)] text-[length:var(--text-sm)] w-auto"
                                                 >
                                                     <option value="scheduled">Scheduled</option>
                                                     <option value="inProgress">In Progress</option>
@@ -382,24 +355,11 @@ export default function CaptainManagePage() {
                                                     placeholder="Points/match"
                                                     value={session.pointsPerMatch || ''}
                                                     onChange={(e) => handleUpdateSession(session.id, { pointsPerMatch: Number(e.target.value) || undefined })}
-                                                    className="input"
-                                                    style={{ padding: 'var(--space-2)', fontSize: 'var(--text-sm)', width: '120px' }}
+                                                    className="input p-[var(--space-2)] text-[length:var(--text-sm)] w-[120px]"
                                                 />
                                                 <button
                                                     onClick={() => handleDeleteSession(session.id)}
-                                                    className="press-scale"
-                                                    style={{
-                                                        padding: 'var(--space-2)',
-                                                        background: 'var(--error)',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: 'var(--radius-md)',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 'var(--space-1)',
-                                                        fontSize: 'var(--text-sm)',
-                                                    }}
+                                                    className="press-scale p-[var(--space-2)] bg-[var(--error)] text-white border-none rounded-[var(--radius-md)] cursor-pointer flex items-center gap-[var(--space-1)] text-[length:var(--text-sm)]"
                                                 >
                                                     <Trash2 size={14} />
                                                     Delete
@@ -407,10 +367,10 @@ export default function CaptainManagePage() {
                                             </div>
 
                                             {/* Matches List */}
-                                            <div style={{ padding: 'var(--space-3) var(--space-4)' }}>
-                                                <p className="type-overline" style={{ marginBottom: 'var(--space-3)', fontSize: '11px' }}>Matches</p>
+                                            <div className="py-[var(--space-3)] px-[var(--space-4)]">
+                                                <p className="type-overline mb-[var(--space-3)] text-[11px]">Matches</p>
                                                 {session.matches.length === 0 ? (
-                                                    <p className="type-meta" style={{ color: 'var(--ink-tertiary)' }}>No matches in this session</p>
+                                                    <p className="type-meta text-[var(--ink-tertiary)]">No matches in this session</p>
                                                 ) : (
                                                     <div className="space-y-2">
                                                         {session.matches.map((match) => (
@@ -441,7 +401,7 @@ export default function CaptainManagePage() {
 
                 {/* Players Section */}
                 <section className="section">
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Player Handicaps</h2>
+                    <h2 className="type-overline mb-[var(--space-4)]">Player Handicaps</h2>
 
                     <div className="space-y-2">
                         {players.map((player) => (
@@ -457,9 +417,9 @@ export default function CaptainManagePage() {
                     </div>
 
                     {players.length === 0 && (
-                        <div className="card-premium" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-                            <Users size={32} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }} />
-                            <p style={{ color: 'var(--ink-secondary)' }}>No players yet</p>
+                        <div className="card-premium p-[var(--space-6)] text-center">
+                            <Users size={32} className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-3)]" />
+                            <p className="text-[var(--ink-secondary)]">No players yet</p>
                         </div>
                     )}
                 </section>
@@ -523,15 +483,14 @@ function MatchEditor({ match, players: _players, getPlayerNames, isEditing, onEd
 
     if (isEditing) {
         return (
-            <div className="card" style={{ padding: 'var(--space-3)', background: 'var(--canvas-raised)', border: '2px solid var(--masters)' }}>
+            <div className="card p-[var(--space-3)] bg-[var(--canvas-raised)] border-2 border-[var(--masters)]">
                 <div className="space-y-3">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span className="type-meta" style={{ fontWeight: 600 }}>Match #{match.matchOrder}</span>
+                    <div className="flex justify-between items-center">
+                        <span className="type-meta font-semibold">Match #{match.matchOrder}</span>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value as Match['status'])}
-                            className="input"
-                            style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--text-sm)', width: 'auto' }}
+                            className="input py-[var(--space-1)] px-[var(--space-2)] text-[length:var(--text-sm)] w-auto"
                         >
                             <option value="scheduled">Scheduled</option>
                             <option value="inProgress">In Progress</option>
@@ -539,60 +498,49 @@ function MatchEditor({ match, players: _players, getPlayerNames, isEditing, onEd
                         </select>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                    <div className="grid grid-cols-2 gap-[var(--space-3)]">
                         <div>
-                            <label className="type-micro" style={{ display: 'block', marginBottom: 'var(--space-1)', color: 'var(--team-usa)' }}>
+                            <label className="type-micro block mb-[var(--space-1)] text-[var(--team-usa)]">
                                 Team USA: {teamANames || 'TBD'}
                             </label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <div className="flex items-center gap-[var(--space-2)]">
                                 <span className="type-micro">Strokes:</span>
                                 <input
                                     type="number"
                                     value={teamAAllowance}
                                     onChange={(e) => setTeamAAllowance(Number(e.target.value))}
-                                    className="input"
-                                    style={{ padding: 'var(--space-1) var(--space-2)', width: '60px', textAlign: 'center' }}
+                                    className="input py-[var(--space-1)] px-[var(--space-2)] w-[60px] text-center"
                                     min={0}
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="type-micro" style={{ display: 'block', marginBottom: 'var(--space-1)', color: 'var(--team-europe)' }}>
+                            <label className="type-micro block mb-[var(--space-1)] text-[var(--team-europe)]">
                                 Team EUR: {teamBNames || 'TBD'}
                             </label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <div className="flex items-center gap-[var(--space-2)]">
                                 <span className="type-micro">Strokes:</span>
                                 <input
                                     type="number"
                                     value={teamBAllowance}
                                     onChange={(e) => setTeamBAllowance(Number(e.target.value))}
-                                    className="input"
-                                    style={{ padding: 'var(--space-1) var(--space-2)', width: '60px', textAlign: 'center' }}
+                                    className="input py-[var(--space-1)] px-[var(--space-2)] w-[60px] text-center"
                                     min={0}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+                    <div className="flex gap-[var(--space-2)] justify-end">
                         <button
                             onClick={onCancel}
-                            className="press-scale"
-                            style={{
-                                padding: 'var(--space-2) var(--space-3)',
-                                background: 'var(--canvas-sunken)',
-                                border: '1px solid var(--rule)',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                fontSize: 'var(--text-sm)',
-                            }}
+                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-[var(--canvas-sunken)] border border-[var(--rule)] rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={() => onSave({ teamAHandicapAllowance: teamAAllowance, teamBHandicapAllowance: teamBAllowance, status })}
-                            className="btn-premium press-scale"
-                            style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
+                            className="btn-premium press-scale py-[var(--space-2)] px-[var(--space-3)] flex items-center gap-[var(--space-1)]"
                         >
                             <Save size={14} />
                             Save
@@ -605,14 +553,13 @@ function MatchEditor({ match, players: _players, getPlayerNames, isEditing, onEd
 
     return (
         <div
-            className="match-row press-scale"
-            style={{ cursor: 'pointer' }}
+            className="match-row press-scale cursor-pointer"
             onClick={onEdit}
         >
-            <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
-                    <Hash size={14} style={{ color: 'var(--ink-tertiary)' }} />
-                    <span className="type-meta" style={{ fontWeight: 600 }}>Match {match.matchOrder}</span>
+            <div className="flex-1">
+                <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-1)]">
+                    <Hash size={14} className="text-[var(--ink-tertiary)]" />
+                    <span className="type-meta font-semibold">Match {match.matchOrder}</span>
                     <span className={`type-micro px-2 py-0.5 rounded-full ${match.status === 'completed' ? 'bg-green-500/20 text-green-600' :
                         match.status === 'inProgress' ? 'bg-amber-500/20 text-amber-600' :
                             'bg-gray-500/20 text-gray-500'
@@ -620,36 +567,34 @@ function MatchEditor({ match, players: _players, getPlayerNames, isEditing, onEd
                         {match.status}
                     </span>
                 </div>
-                <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+                <div className="flex gap-[var(--space-4)]">
                     <span className="type-caption">
-                        <span style={{ color: 'var(--team-usa)' }}>{teamANames || 'TBD'}</span>
+                        <span className="text-[var(--team-usa)]">{teamANames || 'TBD'}</span>
                         {match.teamAHandicapAllowance > 0 && (
-                            <span className="type-micro" style={{ marginLeft: 'var(--space-1)' }}>({match.teamAHandicapAllowance} strokes)</span>
+                            <span className="type-micro ml-[var(--space-1)]">({match.teamAHandicapAllowance} strokes)</span>
                         )}
                     </span>
-                    <span className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>vs</span>
+                    <span className="type-caption text-[var(--ink-tertiary)]">vs</span>
                     <span className="type-caption">
-                        <span style={{ color: 'var(--team-europe)' }}>{teamBNames || 'TBD'}</span>
+                        <span className="text-[var(--team-europe)]">{teamBNames || 'TBD'}</span>
                         {match.teamBHandicapAllowance > 0 && (
-                            <span className="type-micro" style={{ marginLeft: 'var(--space-1)' }}>({match.teamBHandicapAllowance} strokes)</span>
+                            <span className="type-micro ml-[var(--space-1)]">({match.teamBHandicapAllowance} strokes)</span>
                         )}
                     </span>
                 </div>
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            <div className="flex gap-[var(--space-2)]">
                 <button
                     onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                    className="press-scale"
-                    style={{ padding: 'var(--space-2)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    className="press-scale p-[var(--space-2)] bg-transparent border-none cursor-pointer"
                 >
-                    <Edit3 size={16} style={{ color: 'var(--masters)' }} />
+                    <Edit3 size={16} className="text-[var(--masters)]" />
                 </button>
                 <button
                     onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                    className="press-scale"
-                    style={{ padding: 'var(--space-2)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    className="press-scale p-[var(--space-2)] bg-transparent border-none cursor-pointer"
                 >
-                    <Trash2 size={16} style={{ color: 'var(--error)' }} />
+                    <Trash2 size={16} className="text-[var(--error)]" />
                 </button>
             </div>
         </div>
@@ -674,62 +619,50 @@ function PlayerEditor({ player, isEditing, onEdit, onSave, onCancel }: PlayerEdi
 
     if (isEditing) {
         return (
-            <div className="card" style={{ padding: 'var(--space-3)', background: 'var(--canvas-raised)', border: '2px solid var(--masters)' }}>
+            <div className="card p-[var(--space-3)] bg-[var(--canvas-raised)] border-2 border-[var(--masters)]">
                 <div className="space-y-3">
-                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                        <div style={{ flex: 1 }}>
-                            <label className="type-micro" style={{ display: 'block', marginBottom: 'var(--space-1)' }}>First Name</label>
+                    <div className="flex gap-[var(--space-2)]">
+                        <div className="flex-1">
+                            <label className="type-micro block mb-[var(--space-1)]">First Name</label>
                             <input
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="input"
-                                style={{ width: '100%' }}
+                                className="input w-full"
                             />
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <label className="type-micro" style={{ display: 'block', marginBottom: 'var(--space-1)' }}>Last Name</label>
+                        <div className="flex-1">
+                            <label className="type-micro block mb-[var(--space-1)]">Last Name</label>
                             <input
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="input"
-                                style={{ width: '100%' }}
+                                className="input w-full"
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="type-micro" style={{ display: 'block', marginBottom: 'var(--space-1)' }}>Handicap Index</label>
+                        <label className="type-micro block mb-[var(--space-1)]">Handicap Index</label>
                         <input
                             type="number"
                             value={handicap}
                             onChange={(e) => setHandicap(Number(e.target.value))}
-                            className="input"
-                            style={{ width: '100px' }}
+                            className="input w-[100px]"
                             step={0.1}
                             min={0}
                             max={54}
                         />
                     </div>
-                    <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
+                    <div className="flex gap-[var(--space-2)] justify-end">
                         <button
                             onClick={onCancel}
-                            className="press-scale"
-                            style={{
-                                padding: 'var(--space-2) var(--space-3)',
-                                background: 'var(--canvas-sunken)',
-                                border: '1px solid var(--rule)',
-                                borderRadius: 'var(--radius-md)',
-                                cursor: 'pointer',
-                                fontSize: 'var(--text-sm)',
-                            }}
+                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-[var(--canvas-sunken)] border border-[var(--rule)] rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={() => onSave({ firstName, lastName, handicapIndex: handicap })}
-                            className="btn-premium press-scale"
-                            style={{ padding: 'var(--space-2) var(--space-3)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
+                            className="btn-premium press-scale py-[var(--space-2)] px-[var(--space-3)] flex items-center gap-[var(--space-1)]"
                         >
                             <Save size={14} />
                             Save
@@ -742,18 +675,17 @@ function PlayerEditor({ player, isEditing, onEdit, onSave, onCancel }: PlayerEdi
 
     return (
         <div
-            className="match-row press-scale"
-            style={{ cursor: 'pointer' }}
+            className="match-row press-scale cursor-pointer"
             onClick={onEdit}
         >
-            <UserCheck size={18} style={{ color: 'var(--masters)' }} />
-            <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>{player.firstName} {player.lastName}</p>
+            <UserCheck size={18} className="text-[var(--masters)]" />
+            <div className="flex-1">
+                <p className="font-medium">{player.firstName} {player.lastName}</p>
                 <p className="type-meta">
                     Handicap: {player.handicapIndex !== undefined && player.handicapIndex !== null ? player.handicapIndex : 'Not set'}
                 </p>
             </div>
-            <Edit3 size={16} style={{ color: 'var(--ink-tertiary)' }} />
+            <Edit3 size={16} className="text-[var(--ink-tertiary)]" />
         </div>
     );
 }

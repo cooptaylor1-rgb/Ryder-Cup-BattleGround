@@ -37,7 +37,7 @@ describe('Button Component', () => {
         it('renders danger variant', () => {
             render(<Button variant="danger">Danger</Button>);
             const button = screen.getByRole('button');
-            expect(button).toHaveClass('bg-azalea');
+            expect(button).toHaveClass('bg-error');
         });
 
         it('renders outline variant', () => {

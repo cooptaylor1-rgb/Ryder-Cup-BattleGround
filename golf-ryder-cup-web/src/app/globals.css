@@ -1448,7 +1448,7 @@ textarea:focus-visible {
 }
 
 .toast-error {
-  background: var(--azalea);
+  background: var(--error);
 }
 
 .toast-error::before {
@@ -1591,7 +1591,7 @@ textarea:focus-visible {
 }
 
 .error-boundary-error-name {
-  color: var(--azalea);
+  color: var(--error);
   font-weight: 500;
   margin-bottom: var(--space-2);
 }
@@ -1611,7 +1611,7 @@ textarea:focus-visible {
   padding: var(--space-4);
   background: var(--canvas-warm);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--azalea-light);
+  border: 1px solid var(--error);
 }
 
 /* Error card */

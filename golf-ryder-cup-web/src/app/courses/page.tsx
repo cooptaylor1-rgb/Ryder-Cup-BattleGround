@@ -54,7 +54,7 @@ function CourseCard({
                         <Flag className="w-6 h-6 text-masters-green-light" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-magnolia truncate">{course.name}</h3>
+                        <h3 className="font-semibold text-canvas truncate">{course.name}</h3>
                         {course.location && (
                             <div className="flex items-center gap-1 text-sm text-text-secondary mt-1">
                                 <MapPin className="w-4 h-4" />
@@ -101,7 +101,7 @@ function CourseCard({
                             e.stopPropagation();
                             setShowDeleteConfirm(true);
                         }}
-                        className="p-2 text-azalea hover:bg-azalea/10 rounded-lg transition-colors"
+                        className="p-2 text-error hover:bg-error/10 rounded-lg transition-colors"
                     >
                         <Trash2 className="w-4 h-4" />
                     </button>
@@ -110,7 +110,7 @@ function CourseCard({
                         <span className="text-sm text-text-secondary">Delete?</span>
                         <button
                             onClick={handleDelete}
-                            className="px-3 py-1 bg-azalea text-white text-sm rounded-lg hover:bg-azalea/90"
+                            className="px-3 py-1 bg-error text-white text-sm rounded-lg hover:bg-error/90"
                         >
                             Yes
                         </button>
@@ -257,7 +257,7 @@ export default function CourseLibraryPage() {
               className="min-h-screen pb-nav page-premium-enter texture-grain"
               style={{ background: 'var(--canvas)' }}
             >
-                <header className="bg-masters-green text-magnolia px-4 py-4 shadow-lg">
+                <header className="bg-masters-green text-canvas px-4 py-4 shadow-lg">
                     <div className="max-w-4xl mx-auto flex items-center gap-3">
                         <button
                             onClick={() => setShowDatabaseSearch(false)}
@@ -285,7 +285,7 @@ export default function CourseLibraryPage() {
           style={{ background: 'var(--canvas)' }}
         >
             {/* Header */}
-            <header className="bg-masters-green text-magnolia px-4 py-4 shadow-lg">
+            <header className="bg-masters-green text-canvas px-4 py-4 shadow-lg">
                 <div className="max-w-4xl mx-auto flex items-center gap-3">
                     <Link href="/more" className="p-2 hover:bg-white/10 rounded-lg">
                         <ArrowLeft className="w-5 h-5" />
@@ -368,7 +368,7 @@ export default function CourseLibraryPage() {
                         )}
                     >
                         <Globe className={cn("w-6 h-6 mb-2", apiConfigured ? "text-masters-green-light" : "text-text-tertiary")} />
-                        <div className="font-medium text-magnolia">Search Database</div>
+                        <div className="font-medium text-canvas">Search Database</div>
                         <div className="text-xs text-text-secondary mt-1">
                             {apiConfigured ? "Import from 30,000+ courses" : "API not configured"}
                         </div>
@@ -378,7 +378,7 @@ export default function CourseLibraryPage() {
                         className="p-4 bg-surface-card rounded-xl border-2 border-dashed border-surface-border text-left hover:border-gold hover:bg-gold/5 transition-colors"
                     >
                         <Plus className="w-6 h-6 mb-2 text-text-tertiary" />
-                        <div className="font-medium text-magnolia">Add Manually</div>
+                        <div className="font-medium text-canvas">Add Manually</div>
                         <div className="text-xs text-text-secondary mt-1">Enter course details</div>
                     </Link>
                 </div>

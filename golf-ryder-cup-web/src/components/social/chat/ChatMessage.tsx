@@ -7,9 +7,9 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { MoreHorizontal, Reply, Smile, Edit, Trash2 } from 'lucide-react';
+import { Reply, Smile, Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ChatMessage as ChatMessageType, MessageReaction } from '@/lib/types/social';
+import type { ChatMessage as ChatMessageType } from '@/lib/types/social';
 import { addReaction, removeReaction, editMessage, deleteMessage } from '@/lib/services/socialService';
 
 interface ChatMessageProps {
@@ -27,7 +27,7 @@ const QUICK_REACTIONS = ['👍', '😂', '🔥', '❤️', '⛳', '💪'];
 export function ChatMessage({
   message,
   currentPlayerId,
-  currentPlayerName,
+  currentPlayerName: _currentPlayerName,
   onReply,
   onReactionChange,
   compact = false,
@@ -46,7 +46,7 @@ export function ChatMessage({
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   };
 
-  const formatDate = (timestamp: string) => {
+  const _formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));

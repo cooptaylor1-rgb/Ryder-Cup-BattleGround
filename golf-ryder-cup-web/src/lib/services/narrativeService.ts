@@ -125,7 +125,7 @@ export function generateScoreOneLiner(
   teamAName = 'USA',
   teamBName = 'Europe',
 ): string {
-  const { teamAPoints, teamBPoints, leader, margin, matchesCompleted } = standings;
+  const { teamAPoints, leader, margin, matchesCompleted } = standings;
 
   if (matchesCompleted === 0) return 'First matches coming up';
 

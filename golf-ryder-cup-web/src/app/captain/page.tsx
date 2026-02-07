@@ -168,10 +168,7 @@ export default function CaptainPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -192,10 +189,7 @@ export default function CaptainPage() {
 
   if (!isCaptainMode) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -256,14 +250,11 @@ export default function CaptainPage() {
   const secondaryActions = QUICK_ACTIONS.filter((a) => !a.priority);
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Captain Command"
         subtitle={currentTrip.name}
-        icon={<Shield size={16} style={{ color: 'white' }} />}
+        icon={<Shield size={16} className="text-white" />}
         iconContainerStyle={{
           background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)',
           boxShadow: '0 0 0 3px rgba(114, 47, 55, 0.12)',
@@ -272,8 +263,7 @@ export default function CaptainPage() {
         rightSlot={
           <Link
             href="/captain/settings"
-            className="p-2 press-scale"
-            style={{ color: 'var(--ink-secondary)' }}
+            className="p-2 press-scale text-[var(--ink-secondary)]"
           >
             <Settings size={20} strokeWidth={1.75} />
           </Link>
@@ -282,7 +272,7 @@ export default function CaptainPage() {
 
       <main className="container-editorial">
         {/* Trip Readiness */}
-        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
+        <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
           <div
             className="card-captain"
             style={{
@@ -292,50 +282,19 @@ export default function CaptainPage() {
                   : 'var(--canvas-raised)',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-4)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div className="flex items-center justify-between mb-[var(--space-4)]">
+              <div className="flex items-center gap-[var(--space-3)]">
                 {readinessPercent === 100 ? (
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--masters)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Zap size={20} style={{ color: 'white' }} />
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] flex items-center justify-center">
+                    <Zap size={20} className="text-white" />
                   </div>
                 ) : (
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--warning)',
-                      opacity: 0.9,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <AlertTriangle size={20} style={{ color: 'white' }} />
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--warning)] opacity-90 flex items-center justify-center">
+                    <AlertTriangle size={20} className="text-white" />
                   </div>
                 )}
                 <div>
-                  <p
-                    className="type-title-sm"
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
+                  <p className="type-title-sm font-[family-name:var(--font-sans)]">
                     {readinessPercent === 100 ? 'Ready to Play' : 'Setup Required'}
                   </p>
                   <p className="type-caption">{readinessPercent}% complete</p>
@@ -343,28 +302,17 @@ export default function CaptainPage() {
               </div>
               <Link
                 href="/captain/checklist"
-                className="type-meta"
-                style={{ color: 'var(--maroon)', fontWeight: 600 }}
+                className="type-meta text-[var(--maroon)] font-semibold"
               >
                 Details
               </Link>
             </div>
 
             {/* Progress bar */}
-            <div
-              style={{
-                width: '100%',
-                height: '6px',
-                borderRadius: '3px',
-                overflow: 'hidden',
-                background: 'var(--rule)',
-              }}
-            >
+            <div className="w-full h-[6px] rounded-[3px] overflow-hidden bg-[var(--rule)]">
               <div
+                className="h-full rounded-[3px] transition-[width] duration-500 ease-in-out"
                 style={{
-                  height: '100%',
-                  borderRadius: '3px',
-                  transition: 'width 500ms ease',
                   width: `${readinessPercent}%`,
                   background: readinessPercent === 100 ? 'var(--masters)' : 'var(--maroon)',
                 }}
@@ -372,21 +320,18 @@ export default function CaptainPage() {
             </div>
 
             {/* Readiness items */}
-            <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
+            <div className="flex gap-[var(--space-4)] mt-[var(--space-4)]">
               {readinessItems.map((item) => (
                 <div
                   key={item.label}
-                  style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                  className="flex items-center gap-[var(--space-2)]"
                 >
                   {item.done ? (
-                    <CheckCircle2 size={14} style={{ color: 'var(--success)' }} />
+                    <CheckCircle2 size={14} className="text-[var(--success)]" />
                   ) : (
-                    <Clock size={14} style={{ color: 'var(--ink-tertiary)' }} />
+                    <Clock size={14} className="text-[var(--ink-tertiary)]" />
                   )}
-                  <span
-                    className="type-micro"
-                    style={{ fontFamily: 'var(--font-sans)' }}
-                  >
+                  <span className="type-micro font-[family-name:var(--font-sans)]">
                     {item.label}: <strong>{item.count}</strong>
                   </span>
                 </div>
@@ -396,120 +341,55 @@ export default function CaptainPage() {
         </section>
 
         {/* Captain Tools Index -- Editorial list layout */}
-        <section style={{ paddingBottom: 'var(--space-6)' }}>
-          <h2
-            className="type-overline"
-            style={{
-              color: 'var(--maroon)',
-              marginBottom: 'var(--space-5)',
-              fontFamily: 'var(--font-sans)',
-            }}
-          >
+        <section className="pb-[var(--space-6)]">
+          <h2 className="type-overline text-[var(--maroon)] mb-[var(--space-5)] font-[family-name:var(--font-sans)]">
             Captain Tools
           </h2>
 
           {/* Priority Actions -- editorial index rows */}
-          <div
-            style={{
-              background: 'var(--canvas-raised)',
-              border: '1px solid var(--maroon-subtle)',
-              borderLeft: '3px solid var(--maroon)',
-              borderRadius: 'var(--radius-lg)',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="bg-[var(--canvas-raised)] border border-[var(--maroon-subtle)] border-l-[3px] border-l-[var(--maroon)] rounded-[var(--radius-lg)] overflow-hidden">
             {priorityActions.map((action, index) => (
               <Link
                 key={action.id}
                 href={action.href}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-4)',
-                  padding: 'var(--space-4) var(--space-5)',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  borderBottom:
-                    index < priorityActions.length - 1
-                      ? '1px solid var(--rule-faint)'
-                      : 'none',
-                  transition: 'background 150ms ease',
-                }}
+                className="flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150"
+                style={
+                  index < priorityActions.length - 1
+                    ? { borderBottom: '1px solid var(--rule-faint)' }
+                    : undefined
+                }
               >
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'var(--maroon-subtle)',
-                    color: 'var(--maroon)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
+                <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon)] flex items-center justify-center shrink-0">
                   <action.icon size={18} strokeWidth={1.75} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontWeight: 600,
-                      fontSize: 'var(--text-sm)',
-                      color: 'var(--ink-primary)',
-                      lineHeight: 1.3,
-                    }}
-                  >
+                <div className="flex-1 min-w-0">
+                  <p className="font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] text-[color:var(--ink-primary)] leading-[1.3]">
                     {action.label}
                   </p>
-                  <p
-                    className="type-micro"
-                    style={{
-                      color: 'var(--ink-tertiary)',
-                      marginTop: '2px',
-                      fontFamily: 'var(--font-sans)',
-                    }}
-                  >
+                  <p className="type-micro text-[var(--ink-tertiary)] mt-[2px] font-[family-name:var(--font-sans)]">
                     {action.description}
                   </p>
                 </div>
                 <ChevronRight
                   size={16}
                   strokeWidth={1.5}
-                  style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
+                  className="text-[var(--ink-tertiary)] shrink-0"
                 />
               </Link>
             ))}
           </div>
 
           {/* Expandable Secondary Actions */}
-          <div style={{ marginTop: 'var(--space-4)' }}>
+          <div className="mt-[var(--space-4)]">
             <button
               onClick={() => setShowAllActions(!showAllActions)}
-              style={{
-                width: '100%',
-                padding: 'var(--space-3) var(--space-4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                color: 'var(--maroon)',
-                background: 'transparent',
-                border: '1px solid var(--rule)',
-                borderRadius: 'var(--radius-md)',
-                cursor: 'pointer',
-                transition: 'background 150ms ease',
-              }}
+              className="w-full py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-center gap-[var(--space-2)] font-[family-name:var(--font-sans)] text-[length:var(--text-sm)] font-medium text-[color:var(--maroon)] bg-transparent border border-[var(--rule)] rounded-[var(--radius-md)] cursor-pointer transition-[background] duration-150"
             >
               <span>{showAllActions ? 'Show Less' : 'More Tools'}</span>
               <ChevronDown
                 size={16}
+                className="transition-transform duration-200"
                 style={{
-                  transition: 'transform 200ms ease',
                   transform: showAllActions ? 'rotate(180deg)' : 'rotate(0deg)',
                 }}
               />
@@ -517,75 +397,33 @@ export default function CaptainPage() {
 
             {/* Secondary Actions list */}
             {showAllActions && (
-              <div
-                style={{
-                  marginTop: 'var(--space-3)',
-                  background: 'var(--canvas-raised)',
-                  border: '1px solid var(--rule)',
-                  borderRadius: 'var(--radius-lg)',
-                  overflow: 'hidden',
-                }}
-              >
+              <div className="mt-[var(--space-3)] bg-[var(--canvas-raised)] border border-[var(--rule)] rounded-[var(--radius-lg)] overflow-hidden">
                 {secondaryActions.map((action, index) => (
                   <Link
                     key={action.id}
                     href={action.href}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 'var(--space-4)',
-                      padding: 'var(--space-4) var(--space-5)',
-                      textDecoration: 'none',
-                      color: 'inherit',
-                      borderBottom:
-                        index < secondaryActions.length - 1
-                          ? '1px solid var(--rule-faint)'
-                          : 'none',
-                      transition: 'background 150ms ease',
-                    }}
+                    className="flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150"
+                    style={
+                      index < secondaryActions.length - 1
+                        ? { borderBottom: '1px solid var(--rule-faint)' }
+                        : undefined
+                    }
                   >
-                    <div
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'var(--maroon-subtle)',
-                        color: 'var(--maroon-light)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
+                    <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon-light)] flex items-center justify-center shrink-0">
                       <action.icon size={18} strokeWidth={1.75} />
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          fontFamily: 'var(--font-sans)',
-                          fontWeight: 600,
-                          fontSize: 'var(--text-sm)',
-                          color: 'var(--ink-primary)',
-                          lineHeight: 1.3,
-                        }}
-                      >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] text-[color:var(--ink-primary)] leading-[1.3]">
                         {action.label}
                       </p>
-                      <p
-                        className="type-micro"
-                        style={{
-                          color: 'var(--ink-tertiary)',
-                          marginTop: '2px',
-                          fontFamily: 'var(--font-sans)',
-                        }}
-                      >
+                      <p className="type-micro text-[var(--ink-tertiary)] mt-[2px] font-[family-name:var(--font-sans)]">
                         {action.description}
                       </p>
                     </div>
                     <ChevronRight
                       size={16}
                       strokeWidth={1.5}
-                      style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
+                      className="text-[var(--ink-tertiary)] shrink-0"
                     />
                   </Link>
                 ))}
@@ -598,19 +436,9 @@ export default function CaptainPage() {
 
         {/* Active Sessions */}
         {activeSessions.length > 0 && (
-          <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-4)',
-              }}
-            >
-              <h2
-                className="type-overline"
-                style={{ color: 'var(--masters)', fontFamily: 'var(--font-sans)' }}
-              >
+          <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
+            <div className="flex items-center justify-between mb-[var(--space-4)]">
+              <h2 className="type-overline text-[var(--masters)] font-[family-name:var(--font-sans)]">
                 Live Sessions
               </h2>
               <span className="live-badge">
@@ -618,32 +446,21 @@ export default function CaptainPage() {
                 {activeSessions.length} Active
               </span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div className="flex flex-col gap-[var(--space-3)]">
               {activeSessions.map((session) => (
                 <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--masters)',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] text-white flex items-center justify-center">
                     <Zap size={18} />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                  <div className="flex-1">
+                    <p className="type-title-sm font-[family-name:var(--font-sans)]">
                       {session.name}
                     </p>
-                    <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                    <p className="type-micro capitalize">
                       {session.sessionType}
                     </p>
                   </div>
-                  <ChevronRight size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                  <ChevronRight size={20} className="text-[var(--ink-tertiary)]" />
                 </Link>
               ))}
             </div>
@@ -651,60 +468,31 @@ export default function CaptainPage() {
         )}
 
         {/* Upcoming Sessions */}
-        <section style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-6)' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 'var(--space-4)',
-            }}
-          >
-            <h2
-              className="type-overline"
-              style={{ color: 'var(--maroon)', fontFamily: 'var(--font-sans)' }}
-            >
+        <section className="pt-[var(--space-4)] pb-[var(--space-6)]">
+          <div className="flex items-center justify-between mb-[var(--space-4)]">
+            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
               Upcoming Sessions
             </h2>
             <Link
               href="/lineup/new"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                color: 'var(--maroon)',
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 600,
-                fontSize: 'var(--text-sm)',
-                textDecoration: 'none',
-              }}
+              className="inline-flex items-center gap-[4px] text-[color:var(--maroon)] font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] no-underline"
             >
               <Plus size={16} strokeWidth={2} />
               New
             </Link>
           </div>
           {upcomingSessions.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div className="flex flex-col gap-[var(--space-3)]">
               {upcomingSessions.map((session) => (
                 <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--canvas-sunken)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Calendar size={18} style={{ color: 'var(--ink-secondary)' }} />
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--canvas-sunken)] flex items-center justify-center">
+                    <Calendar size={18} className="text-[var(--ink-secondary)]" />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                  <div className="flex-1">
+                    <p className="type-title-sm font-[family-name:var(--font-sans)]">
                       {session.name}
                     </p>
-                    <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                    <p className="type-micro capitalize">
                       {session.sessionType} &middot;{' '}
                       {session.scheduledDate
                         ? new Date(session.scheduledDate).toLocaleDateString()
@@ -712,60 +500,33 @@ export default function CaptainPage() {
                     </p>
                   </div>
                   <span
-                    style={{
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      background: session.isLocked ? 'var(--maroon)' : 'var(--canvas-sunken)',
-                      color: session.isLocked ? 'white' : 'var(--ink-tertiary)',
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
+                    className={`py-[3px] px-[8px] rounded-[6px] font-[family-name:var(--font-sans)] text-[10px] font-semibold uppercase tracking-[0.05em] ${
+                      session.isLocked
+                        ? 'bg-[var(--maroon)] text-white'
+                        : 'bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
+                    }`}
                   >
                     {session.isLocked ? 'Locked' : 'Draft'}
                   </span>
-                  <ChevronRight size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                  <ChevronRight size={20} className="text-[var(--ink-tertiary)]" />
                 </Link>
               ))}
             </div>
           ) : (
-            <div
-              className="card-captain"
-              style={{ textAlign: 'center', padding: 'var(--space-8)' }}
-            >
+            <div className="card-captain text-center p-[var(--space-8)]">
               <Calendar
                 size={32}
-                style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }}
+                className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-3)]"
               />
-              <p
-                className="type-title-sm"
-                style={{
-                  marginBottom: 'var(--space-2)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
+              <p className="type-title-sm mb-[var(--space-2)] font-[family-name:var(--font-sans)]">
                 No Sessions Yet
               </p>
-              <p
-                className="type-caption"
-                style={{
-                  marginBottom: 'var(--space-4)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
+              <p className="type-caption mb-[var(--space-4)] font-[family-name:var(--font-sans)]">
                 Create your first session to start building lineups
               </p>
               <Link
                 href="/lineup/new"
-                className="btn btn-primary"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  background: 'var(--maroon)',
-                }}
+                className="btn btn-primary inline-flex items-center gap-[var(--space-2)] bg-[var(--maroon)]"
               >
                 <Plus size={16} />
                 Create Session
@@ -776,129 +537,69 @@ export default function CaptainPage() {
 
         {/* Team Overview */}
         <hr className="divider-subtle" />
-        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 'var(--space-4)',
-            }}
-          >
-            <h2
-              className="type-overline"
-              style={{ color: 'var(--maroon)', fontFamily: 'var(--font-sans)' }}
-            >
+        <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
+          <div className="flex items-center justify-between mb-[var(--space-4)]">
+            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
               Team Overview
             </h2>
             <Link
               href="/players"
-              className="type-meta"
-              style={{ color: 'var(--maroon)', fontWeight: 600, textDecoration: 'none' }}
+              className="type-meta text-[var(--maroon)] font-semibold no-underline"
             >
               Manage
             </Link>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+          <div className="grid grid-cols-2 gap-[var(--space-4)]">
             {/* Team A */}
-            <div className="card team-bg-usa" style={{ padding: 'var(--space-4)' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  marginBottom: 'var(--space-3)',
-                }}
-              >
+            <div className="card team-bg-usa p-[var(--space-4)]">
+              <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-3)]">
                 <span className="team-dot team-dot-usa" />
-                <span
-                  className="type-overline"
-                  style={{ color: 'var(--team-usa)', fontFamily: 'var(--font-sans)' }}
-                >
+                <span className="type-overline text-[var(--team-usa)] font-[family-name:var(--font-sans)]">
                   {teamA?.name || 'Team USA'}
                 </span>
               </div>
-              <p
-                className="type-headline-sm"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
+              <p className="type-headline-sm font-[family-name:var(--font-serif)]">
                 {teamAPlayers.length}
               </p>
-              <p className="type-micro" style={{ fontFamily: 'var(--font-sans)' }}>
+              <p className="type-micro font-[family-name:var(--font-sans)]">
                 players
               </p>
             </div>
 
             {/* Team B */}
-            <div className="card team-bg-europe" style={{ padding: 'var(--space-4)' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  marginBottom: 'var(--space-3)',
-                }}
-              >
+            <div className="card team-bg-europe p-[var(--space-4)]">
+              <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-3)]">
                 <span className="team-dot team-dot-europe" />
-                <span
-                  className="type-overline"
-                  style={{ color: 'var(--team-europe)', fontFamily: 'var(--font-sans)' }}
-                >
+                <span className="type-overline text-[var(--team-europe)] font-[family-name:var(--font-sans)]">
                   {teamB?.name || 'Team Europe'}
                 </span>
               </div>
-              <p
-                className="type-headline-sm"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
+              <p className="type-headline-sm font-[family-name:var(--font-serif)]">
                 {teamBPlayers.length}
               </p>
-              <p className="type-micro" style={{ fontFamily: 'var(--font-sans)' }}>
+              <p className="type-micro font-[family-name:var(--font-sans)]">
                 players
               </p>
             </div>
           </div>
 
           {unassignedPlayers.length > 0 && (
-            <div
-              className="card-captain"
-              style={{
-                marginTop: 'var(--space-4)',
-                background: 'var(--maroon-subtle)',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <AlertTriangle size={20} style={{ color: 'var(--maroon)' }} />
+            <div className="card-captain mt-[var(--space-4)] bg-[var(--maroon-subtle)]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-[var(--space-3)]">
+                  <AlertTriangle size={20} className="text-[var(--maroon)]" />
                   <div>
-                    <p
-                      className="type-title-sm"
-                      style={{ color: 'var(--maroon-dark)', fontFamily: 'var(--font-sans)' }}
-                    >
+                    <p className="type-title-sm text-[var(--maroon-dark)] font-[family-name:var(--font-sans)]">
                       {unassignedPlayers.length} Unassigned
                     </p>
-                    <p
-                      className="type-micro"
-                      style={{ color: 'var(--maroon-light)', fontFamily: 'var(--font-sans)' }}
-                    >
+                    <p className="type-micro text-[var(--maroon-light)] font-[family-name:var(--font-sans)]">
                       Players need team assignment
                     </p>
                   </div>
                 </div>
                 <Link
                   href="/captain/draft"
-                  className="btn btn-sm"
-                  style={{
-                    background: 'var(--maroon)',
-                    color: 'white',
-                    fontFamily: 'var(--font-sans)',
-                  }}
+                  className="btn btn-sm bg-[var(--maroon)] text-white font-[family-name:var(--font-sans)]"
                 >
                   Assign
                 </Link>
@@ -911,42 +612,25 @@ export default function CaptainPage() {
         {completedSessions.length > 0 && (
           <>
             <hr className="divider-subtle" />
-            <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-              <h2
-                className="type-overline"
-                style={{
-                  marginBottom: 'var(--space-4)',
-                  color: 'var(--ink-secondary)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
+            <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
+              <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)] font-[family-name:var(--font-sans)]">
                 Completed Sessions
               </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div className="flex flex-col gap-[var(--space-3)]">
                 {completedSessions.slice(0, 3).map((session) => (
                   <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'rgba(34, 197, 94, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Trophy size={18} style={{ color: 'var(--success)' }} />
+                    <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[rgba(34,197,94,0.1)] flex items-center justify-center">
+                      <Trophy size={18} className="text-[var(--success)]" />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <p className="type-title-sm" style={{ fontFamily: 'var(--font-sans)' }}>
+                    <div className="flex-1">
+                      <p className="type-title-sm font-[family-name:var(--font-sans)]">
                         {session.name}
                       </p>
-                      <p className="type-micro" style={{ textTransform: 'capitalize' }}>
+                      <p className="type-micro capitalize">
                         {session.sessionType}
                       </p>
                     </div>
-                    <CheckCircle2 size={18} style={{ color: 'var(--success)' }} />
+                    <CheckCircle2 size={18} className="text-[var(--success)]" />
                   </Link>
                 ))}
               </div>

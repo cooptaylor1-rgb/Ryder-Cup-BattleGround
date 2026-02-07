@@ -10,15 +10,13 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   Send,
   Smile,
-  ImageIcon,
   Hash,
-  AtSign,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { db, useLiveQuery } from '@/lib/db';
-import type { ChatMessage as ChatMessageType, ChatThread } from '@/lib/types/social';
-import { sendMessage, getMessages, createDefaultThreads, getTripThreads, createCustomThread } from '@/lib/services/socialService';
+import { useLiveQuery } from '@/lib/db';
+import type { ChatMessage as ChatMessageType } from '@/lib/types/social';
+import { sendMessage, getMessages, createDefaultThreads, getTripThreads } from '@/lib/services/socialService';
 import { ChatMessage } from './ChatMessage';
 
 interface ChatRoomProps {

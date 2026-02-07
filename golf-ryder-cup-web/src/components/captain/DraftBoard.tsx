@@ -96,7 +96,7 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
     ));
   };
 
-  const handlePick = (playerId: string, teamId?: string) => {
+  const handlePick = (playerId: string, _teamId?: string) => {
     if (!draftState || !config) return;
 
     const auctionPrice = mode === 'auction' ? currentBid : undefined;

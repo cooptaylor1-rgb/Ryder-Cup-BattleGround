@@ -75,8 +75,8 @@ export function Badge({
                 ],
 
                 variant === 'error' && [
-                    'bg-azalea/10 text-azalea',
-                    'border border-azalea/20',
+                    'bg-error/10 text-error',
+                    'border border-error/20',
                 ],
 
                 variant === 'info' && [
@@ -95,8 +95,8 @@ export function Badge({
                 ],
 
                 variant === 'live' && [
-                    'bg-azalea/15 text-azalea',
-                    'border border-azalea/30',
+                    'bg-error/15 text-error',
+                    'border border-error/30',
                 ],
 
                 className
