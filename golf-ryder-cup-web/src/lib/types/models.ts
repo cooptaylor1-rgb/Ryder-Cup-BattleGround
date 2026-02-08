@@ -95,6 +95,7 @@ export type ExtendedSessionType =
   | 'cha-cha-cha'
   | 'irish-fourball'
   | 'waltz'
+  | 'one-two-three'
   // Custom
   | 'custom';
 

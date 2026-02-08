@@ -71,9 +71,10 @@ export type MatchFormat =
     // Rotating/Hybrid Formats
     | 'six-six-six'       // Format changes every 6 holes
     | 'round-robin'       // Partners rotate through round
-    | 'cha-cha-cha'       // Best 1/2/3 balls progression
+    | 'cha-cha-cha'       // Best 1/2/3 balls progression (3 players)
     | 'irish-fourball'    // Best 2 of 4 on holes 1-6, etc.
     | 'waltz'             // 1-2-3 best balls rotation
+    | 'one-two-three'     // Best 1/2/3 of 4 balls progression
 
     // Custom/Other
     | 'custom';           // User-defined format
@@ -1012,6 +1013,32 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         tags: ['pattern', 'trio', 'creative'],
     },
 
+    'one-two-three': {
+        id: 'one-two-three',
+        name: '1-2-3',
+        shortName: '1-2-3',
+        category: 'teamPlay',
+        description: 'Progressive best ball for foursomes: 1 net ball on 1-6, 2 on 7-12, 3 on 13-18.',
+        rules: [
+            'Holes 1-6: Best 1 of 4 net scores counts',
+            'Holes 7-12: Best 2 of 4 net scores count',
+            'Holes 13-18: Best 3 of 4 net scores count',
+            'Increasing pressure through the round',
+            'Full individual handicap strokes apply',
+        ],
+        playersPerTeam: 4,
+        teamsRequired: 0,
+        handicapMethod: 'full',
+        scoringType: 'strokePlay',
+        holesPerMatch: 18,
+        requiresCourse: true,
+        icon: 'TrendingUp',
+        color: 'bg-rose-600',
+        popularity: 3,
+        complexity: 'intermediate',
+        tags: ['progressive', 'quartet', 'net', 'team'],
+    },
+
     // ========== ADDITIONAL FORMATS ==========
     scramble: {
         id: 'scramble',
@@ -1308,4 +1335,65 @@ export function getRecommendedFormats(playerCount: number): FormatConfig[] {
     return Object.values(FORMAT_CONFIGS)
         .filter(f => isFormatCompatible(f.id, playerCount))
         .sort((a, b) => b.popularity - a.popularity);
+}
+
+// ============================================
+// PROGRESSIVE FORMAT SCORING
+// ============================================
+
+/**
+ * Progressive format definitions.
+ * Maps hole ranges to how many net scores count.
+ */
+export interface ProgressiveSegment {
+    startHole: number;
+    endHole: number;
+    ballsToCount: number;
+}
+
+const PROGRESSIVE_FORMATS: Partial<Record<MatchFormat, ProgressiveSegment[]>> = {
+    'one-two-three': [
+        { startHole: 1, endHole: 6, ballsToCount: 1 },
+        { startHole: 7, endHole: 12, ballsToCount: 2 },
+        { startHole: 13, endHole: 18, ballsToCount: 3 },
+    ],
+    'cha-cha-cha': [
+        { startHole: 1, endHole: 6, ballsToCount: 1 },
+        { startHole: 7, endHole: 12, ballsToCount: 2 },
+        { startHole: 13, endHole: 18, ballsToCount: 3 },
+    ],
+    'irish-fourball': [
+        { startHole: 1, endHole: 6, ballsToCount: 2 },
+        { startHole: 7, endHole: 12, ballsToCount: 3 },
+        { startHole: 13, endHole: 18, ballsToCount: 4 },
+    ],
+};
+
+/**
+ * Get the progressive segments for a format, or null if not progressive.
+ */
+export function getProgressiveSegments(format: MatchFormat): ProgressiveSegment[] | null {
+    return PROGRESSIVE_FORMATS[format] ?? null;
+}
+
+/**
+ * Get how many net balls count for a given hole in a progressive format.
+ * Returns null if the format is not progressive.
+ */
+export function getBallsToCountForHole(format: MatchFormat, holeNumber: number): number | null {
+    const segments = PROGRESSIVE_FORMATS[format];
+    if (!segments) return null;
+    const segment = segments.find(s => holeNumber >= s.startHole && holeNumber <= s.endHole);
+    return segment?.ballsToCount ?? null;
+}
+
+/**
+ * Score a hole in a progressive format.
+ * Takes an array of net scores and returns the sum of the best N.
+ */
+export function scoreProgressiveHole(netScores: number[], ballsToCount: number): number {
+    if (netScores.length === 0) return 0;
+    const sorted = [...netScores].sort((a, b) => a - b);
+    const count = Math.min(ballsToCount, sorted.length);
+    return sorted.slice(0, count).reduce((sum, s) => sum + s, 0);
 }
