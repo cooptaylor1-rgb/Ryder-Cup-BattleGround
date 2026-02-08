@@ -94,6 +94,7 @@ export interface FormatConfig {
     teamsRequired: number;                     // 2 for vs format, 0 for individual
     handicapMethod: HandicapMethod;
     scoringType: ScoringType;
+    scoringMode: 'net' | 'gross' | 'both';    // Net (handicapped), gross (scratch), or user choice
     holesPerMatch: 9 | 18;                    // Standard hole count
     allowsPress?: boolean;                    // Can press bets
     requiresCourse?: boolean;                 // Needs course data
@@ -142,6 +143,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'low-ball',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'User',
@@ -167,6 +169,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'full',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'Users',
@@ -192,6 +195,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'average',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'Repeat',
@@ -218,6 +222,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'percentage',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'GitMerge',
@@ -244,6 +249,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'percentage',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'Shuffle',
@@ -269,6 +275,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'average',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'Skull',
@@ -294,6 +301,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 2,
         handicapMethod: 'percentage',
         scoringType: 'matchPlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         allowsPress: true,
         icon: 'GitFork',
@@ -321,6 +329,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Users',
@@ -346,6 +355,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Users',
@@ -372,6 +382,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Users',
@@ -397,6 +408,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Star',
@@ -422,6 +434,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'SunMedium',
@@ -448,6 +461,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Split',
@@ -476,6 +490,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'points',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Target',
@@ -504,6 +519,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'none',
         scoringType: 'points',
+        scoringMode: 'gross',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Zap',
@@ -529,6 +545,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Hash',
@@ -554,6 +571,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Medal',
@@ -580,6 +598,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'points',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Equal',
@@ -606,6 +625,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Users',
@@ -631,6 +651,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Users',
@@ -656,6 +677,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'combined',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'ThumbsDown',
@@ -681,6 +703,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         teamsRequired: 0,
         handicapMethod: 'full',
         scoringType: 'strokePlay',
+        scoringMode: 'both',
         holesPerMatch: 18,
         requiresCourse: true,
         icon: 'Plus',
@@ -712,6 +735,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-yellow-600',
         popularity: 5,
         complexity: 'beginner',
+        scoringMode: 'both',
         tags: ['gambling', 'carryover', 'exciting'],
     },
 
@@ -738,6 +762,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-green-500',
         popularity: 5,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['betting', 'classic', 'press'],
     },
 
@@ -763,6 +788,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-gray-700',
         popularity: 4,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['gambling', 'strategy', 'social'],
     },
 
@@ -788,6 +814,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-pink-600',
         popularity: 3,
         complexity: 'intermediate',
+        scoringMode: 'gross',
         tags: ['gambling', 'wild', 'team'],
     },
 
@@ -813,6 +840,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-amber-400',
         popularity: 4,
         complexity: 'beginner',
+        scoringMode: 'gross',
         tags: ['points', 'fun', 'varied'],
     },
 
@@ -838,6 +866,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-cyan-500',
         popularity: 3,
         complexity: 'beginner',
+        scoringMode: 'gross',
         tags: ['points', 'achievements', 'fun'],
     },
 
@@ -862,6 +891,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-pink-400',
         popularity: 3,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['gambling', 'chase', 'exciting'],
     },
 
@@ -886,6 +916,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-green-700',
         popularity: 4,
         complexity: 'beginner',
+        scoringMode: 'gross',
         tags: ['gambling', 'putting', 'pressure'],
     },
 
@@ -911,6 +942,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-violet-600',
         popularity: 3,
         complexity: 'advanced',
+        scoringMode: 'both',
         tags: ['hybrid', 'varied', 'fun'],
     },
 
@@ -935,6 +967,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-orange-600',
         popularity: 3,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['rotation', 'social', 'fair'],
     },
 
@@ -960,6 +993,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-rose-500',
         popularity: 2,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['progressive', 'trio', 'challenge'],
     },
 
@@ -985,6 +1019,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-green-700',
         popularity: 2,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['progressive', 'team', 'quartet'],
     },
 
@@ -1010,6 +1045,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-fuchsia-500',
         popularity: 2,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['pattern', 'trio', 'creative'],
     },
 
@@ -1036,6 +1072,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-rose-600',
         popularity: 3,
         complexity: 'intermediate',
+        scoringMode: 'both',
         tags: ['progressive', 'quartet', 'net', 'team'],
     },
 
@@ -1063,6 +1100,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-emerald-500',
         popularity: 5,
         complexity: 'beginner',
+        scoringMode: 'both',
         tags: ['scramble', 'team', 'popular'],
     },
 
@@ -1088,6 +1126,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-blue-500',
         popularity: 5,
         complexity: 'beginner',
+        scoringMode: 'net',
         tags: ['handicap', 'net', 'fair'],
     },
 
@@ -1114,6 +1153,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-green-600',
         popularity: 3,
         complexity: 'beginner',
+        scoringMode: 'both',
         tags: ['par', 'simple', 'quick'],
     },
 
@@ -1140,6 +1180,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-blue-600',
         popularity: 4,
         complexity: 'beginner',
+        scoringMode: 'both',
         tags: ['team', 'forgiving', 'quartet'],
     },
 
@@ -1165,6 +1206,7 @@ export const FORMAT_CONFIGS: Record<MatchFormat, FormatConfig> = {
         color: 'bg-gray-500',
         popularity: 3,
         complexity: 'advanced',
+        scoringMode: 'both',
         tags: ['custom', 'flexible', 'creative'],
     },
 };
