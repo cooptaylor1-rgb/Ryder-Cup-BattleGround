@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   handleGoHome = (): void => {
-    window.location.href = '/';
+    window.location.assign('/');
   };
 
   render(): ReactNode {
@@ -132,31 +132,21 @@ export function ErrorFallback({
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        isFullscreen && 'fixed inset-0 z-50',
+        isFullscreen && 'fixed inset-0 z-50 bg-[var(--canvas)]',
         isCompact ? 'p-4' : 'p-8',
-        !isFullscreen && 'rounded-2xl',
+        !isFullscreen && 'rounded-2xl bg-[var(--surface)] border border-[var(--rule)]',
       )}
-      style={{
-        background: isFullscreen ? 'var(--canvas, #0F0D0A)' : 'var(--surface, #1A1814)',
-        border: !isFullscreen ? '1px solid var(--rule, #3A3530)' : undefined,
-      }}
       role="alert"
       aria-live="assertive"
     >
       {/* Icon */}
       <div
         className={cn(
-          'flex items-center justify-center rounded-2xl mb-4',
+          'flex items-center justify-center rounded-2xl mb-4 bg-[rgba(220,38,38,0.1)]',
           isCompact ? 'w-12 h-12' : 'w-16 h-16',
         )}
-        style={{
-          background: 'rgba(220, 38, 38, 0.1)',
-        }}
       >
-        <AlertTriangle
-          className={isCompact ? 'w-6 h-6' : 'w-8 h-8'}
-          style={{ color: '#DC2626' }}
-        />
+        <AlertTriangle className={cn(isCompact ? 'w-6 h-6' : 'w-8 h-8', 'text-[#DC2626]')} />
       </div>
 
       {/* Title */}
@@ -189,12 +179,9 @@ export function ErrorFallback({
             className={cn(
               'flex items-center justify-center gap-2 px-4 py-2 rounded-lg',
               'font-medium transition-colors',
+              'bg-[var(--masters)] text-white',
               isCompact ? 'text-sm' : 'text-base',
             )}
-            style={{
-              background: 'var(--masters, #006747)',
-              color: 'white',
-            }}
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
@@ -207,13 +194,9 @@ export function ErrorFallback({
             className={cn(
               'flex items-center justify-center gap-2 px-4 py-2 rounded-lg',
               'font-medium transition-colors',
+              'bg-[var(--surface-elevated)] border border-[var(--rule)] text-[var(--ink)]',
               isCompact ? 'text-sm' : 'text-base',
             )}
-            style={{
-              background: 'var(--surface-elevated, #1E1C18)',
-              border: '1px solid var(--rule, #3A3530)',
-              color: 'var(--ink, #F5F1E8)',
-            }}
           >
             <Home className="w-4 h-4" />
             Go Home
@@ -223,39 +206,19 @@ export function ErrorFallback({
 
       {/* Error Details (Development) */}
       {showDetails && errorInfo && (
-        <details
-          className="mt-6 w-full max-w-lg text-left"
-          style={{
-            background: 'var(--surface-elevated, #1E1C18)',
-            border: '1px solid var(--rule, #3A3530)',
-            borderRadius: '0.5rem',
-          }}
-        >
-          <summary
-            className="px-4 py-2 cursor-pointer flex items-center gap-2 text-sm font-medium"
-            style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-          >
+        <details className="mt-6 w-full max-w-lg text-left bg-[var(--surface-elevated)] border border-[var(--rule)] rounded-lg">
+          <summary className="px-4 py-2 cursor-pointer flex items-center gap-2 text-sm font-medium text-[var(--ink-secondary)]">
             <ChevronRight className="w-4 h-4" />
             Error Details
           </summary>
           <div className="px-4 pb-4">
             <pre
-              className="text-xs overflow-auto p-3 rounded mt-2"
-              style={{
-                background: 'var(--canvas, #0F0D0A)',
-                color: 'var(--ink-tertiary, #807868)',
-                maxHeight: '200px',
-              }}
+              className="text-xs overflow-auto p-3 rounded mt-2 bg-[var(--canvas)] text-[var(--ink-tertiary)] max-h-[200px]"
             >
               {error?.stack || 'No stack trace available'}
             </pre>
             <pre
-              className="text-xs overflow-auto p-3 rounded mt-2"
-              style={{
-                background: 'var(--canvas, #0F0D0A)',
-                color: 'var(--ink-tertiary, #807868)',
-                maxHeight: '200px',
-              }}
+              className="text-xs overflow-auto p-3 rounded mt-2 bg-[var(--canvas)] text-[var(--ink-tertiary)] max-h-[200px]"
             >
               {errorInfo.componentStack}
             </pre>
@@ -306,20 +269,13 @@ export function MiniErrorFallback({
   onRetry?: () => void;
 }) {
   return (
-    <div
-      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-      style={{
-        background: 'rgba(220, 38, 38, 0.1)',
-        border: '1px solid rgba(220, 38, 38, 0.2)',
-      }}
-    >
-      <AlertTriangle className="w-4 h-4" style={{ color: '#DC2626' }} />
-      <span style={{ color: 'var(--ink, #F5F1E8)' }}>{message}</span>
+    <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[rgba(220,38,38,0.1)] border border-[rgba(220,38,38,0.2)]">
+      <AlertTriangle className="w-4 h-4 text-[#DC2626]" />
+      <span className="text-[var(--ink)]">{message}</span>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="ml-auto flex items-center gap-1 text-xs font-medium"
-          style={{ color: 'var(--masters, #006747)' }}
+          className="ml-auto flex items-center gap-1 text-xs font-medium text-[var(--masters)]"
         >
           <RefreshCw className="w-3 h-3" />
           Retry
@@ -344,40 +300,29 @@ export function ErrorCard({
   return (
     <div
       className={cn(
-        'p-4 rounded-xl flex flex-col items-center text-center',
+        'p-4 rounded-xl flex flex-col items-center text-center bg-[var(--surface)] border border-[var(--rule)]',
         className
       )}
-      style={{
-        background: 'var(--surface, #1A1814)',
-        border: '1px solid var(--rule, #3A3530)',
-      }}
     >
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center mb-3"
-        style={{ background: 'rgba(220, 38, 38, 0.1)' }}
+        className="w-10 h-10 rounded-full flex items-center justify-center mb-3 bg-[rgba(220,38,38,0.1)]"
       >
-        <AlertTriangle className="w-5 h-5" style={{ color: '#DC2626' }} />
+        <AlertTriangle className="w-5 h-5 text-[#DC2626]" />
       </div>
       <h3
-        className="font-medium text-sm mb-1"
-        style={{ color: 'var(--ink, #F5F1E8)' }}
+        className="font-medium text-sm mb-1 text-[var(--ink)]"
       >
         {title}
       </h3>
       <p
-        className="text-xs mb-3"
-        style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
+        className="text-xs mb-3 text-[var(--ink-secondary)]"
       >
         {message}
       </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-          style={{
-            background: 'var(--masters, #006747)',
-            color: 'white',
-          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--masters)] text-white"
         >
           <RefreshCw className="w-3 h-3" />
           Try Again
