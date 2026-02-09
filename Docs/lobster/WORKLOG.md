@@ -722,4 +722,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats (`/trip-stats`): replaced non-standard Tailwind theme-token classnames (e.g. `bg-masters-green`, `text-text-primary`) with CSS-variable-based Tailwind arbitrary values (e.g. `bg-[var(--masters)]`, `text-[var(--ink)]`) so styles can’t silently fail in production builds.
 - Trip Stats: standardized card + surface tokens to `card` + `var(--surface-elevated)` and replaced an invalid border token class with `border-[var(--rule)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`2c83876`)
+- Commit + push ✅ (`c770e5c`)
