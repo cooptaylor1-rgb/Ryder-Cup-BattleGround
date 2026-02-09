@@ -282,7 +282,7 @@ export default function BackupRestorePage() {
                 <PageHeader
                     title="Backup & Restore"
                     subtitle="Trip data management"
-                    icon={<HardDrive className="w-4 h-4 text-white" />}
+                    icon={<HardDrive size={16} style={{ color: 'var(--color-accent)' }} />}
                     onBack={() => router.push('/settings')}
                 />
 
@@ -303,83 +303,93 @@ export default function BackupRestorePage() {
             <PageHeader
                 title="Backup & Restore"
                 subtitle="Export and import trip data"
-                icon={<HardDrive className="w-4 h-4 text-white" />}
+                icon={<HardDrive size={16} style={{ color: 'var(--color-accent)' }} />}
                 onBack={() => router.push('/settings')}
             />
 
-            <main className="container-editorial py-6 space-y-6 pb-8">
-                {/* Export Section */}
-                <section className="bg-[#141414] rounded-2xl border border-[#2A2A2A] overflow-hidden">
-                    <div className="p-4 border-b border-[#2A2A2A]">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-[#004225]/20 flex items-center justify-center">
-                                <Download className="w-5 h-5 text-[#4CAF50]" />
+            <main className="container-editorial pb-8">
+                <div className="space-y-6">
+                    {/* Export */}
+                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                        <div className="flex items-start gap-3">
+                            <div
+                                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                                style={{
+                                    background:
+                                        'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                                    boxShadow: 'var(--shadow-glow-green)',
+                                }}
+                            >
+                                <Download className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
                             </div>
-                            <div>
-                                <h2 className="font-semibold text-white">Export Trip</h2>
-                                <p className="text-sm text-[#707070]">Download trip data as JSON file</p>
+                            <div className="min-w-0">
+                                <p className="type-title-sm">Export trip</p>
+                                <p className="type-caption">Download trip data as a JSON backup file.</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Success message */}
-                    {exportSuccess && (
-                        <div className="mx-4 mt-4 p-3 bg-[#4CAF50]/10 border border-[#4CAF50]/30 rounded-xl flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-[#4CAF50]" />
-                            <span className="text-[#4CAF50] text-sm">{exportSuccess}</span>
-                        </div>
-                    )}
+                        {exportSuccess ? (
+                            <div
+                                className="mt-4 px-4 py-3 rounded-xl flex items-center gap-2"
+                                style={{
+                                    background: 'rgba(16,185,129,0.12)',
+                                    border: '1px solid rgba(16,185,129,0.35)',
+                                    color: 'var(--ink)',
+                                }}
+                                role="status"
+                                aria-live="polite"
+                            >
+                                <CheckCircle className="w-5 h-5" style={{ color: 'rgba(16,185,129,1)' }} />
+                                <span className="text-sm" style={{ color: 'var(--ink)' }}>
+                                    {exportSuccess}
+                                </span>
+                            </div>
+                        ) : null}
 
-                    {/* Trip list */}
-                    <div className="p-4 space-y-2">
-                        {trips.length === 0 ? (
-                            <div className="py-8">
+                        <div className="mt-5 space-y-2">
+                            {trips.length === 0 ? (
                                 <EmptyStatePremium
                                     illustration="trophy"
                                     title="No trips yet"
                                     description="Create your first tournament to enable backups and sharing."
-                                    action={{
-                                        label: 'Create a Trip',
-                                        onClick: () => router.push('/trip/new'),
-                                    }}
-                                    secondaryAction={{
-                                        label: 'Go Home',
-                                        onClick: () => router.push('/'),
-                                    }}
+                                    action={{ label: 'Create a Trip', onClick: () => router.push('/trip/new') }}
+                                    secondaryAction={{ label: 'Go Home', onClick: () => router.push('/') }}
                                     variant="compact"
                                 />
-                            </div>
-                        ) : (
-                            trips.map((trip) => (
-                                <TripCard
-                                    key={trip.id}
-                                    trip={trip}
-                                    isSelected={selectedTripId === trip.id}
-                                    onSelect={() => setSelectedTripId(trip.id)}
-                                    onExport={() => handleExport(trip.id)}
-                                    onShare={() => handleShareSummary(trip.id)}
-                                    isExporting={isExporting && selectedTripId === trip.id}
-                                />
-                            ))
-                        )}
-                    </div>
-                </section>
+                            ) : (
+                                trips.map((trip) => (
+                                    <TripCard
+                                        key={trip.id}
+                                        trip={trip}
+                                        isSelected={selectedTripId === trip.id}
+                                        onSelect={() => setSelectedTripId(trip.id)}
+                                        onExport={() => handleExport(trip.id)}
+                                        onShare={() => handleShareSummary(trip.id)}
+                                        isExporting={isExporting && selectedTripId === trip.id}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </section>
 
-                {/* Import Section */}
-                <section className="bg-[#141414] rounded-2xl border border-[#2A2A2A] overflow-hidden">
-                    <div className="p-4 border-b border-[#2A2A2A]">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-[#64B5F6]/20 flex items-center justify-center">
-                                <Upload className="w-5 h-5 text-[#64B5F6]" />
+                    {/* Import */}
+                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                        <div className="flex items-start gap-3">
+                            <div
+                                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                                style={{
+                                    background: 'rgba(100,181,246,0.14)',
+                                    border: '1px solid rgba(100,181,246,0.25)',
+                                }}
+                            >
+                                <Upload className="w-5 h-5" style={{ color: 'rgba(100,181,246,1)' }} />
                             </div>
-                            <div>
-                                <h2 className="font-semibold text-white">Import Trip</h2>
-                                <p className="text-sm text-[#707070]">Restore from backup file</p>
+                            <div className="min-w-0">
+                                <p className="type-title-sm">Import trip</p>
+                                <p className="type-caption">Restore from a JSON backup file.</p>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="p-4">
                         {/* Hidden file input */}
                         <input
                             ref={fileInputRef}
@@ -389,138 +399,176 @@ export default function BackupRestorePage() {
                             className="hidden"
                         />
 
-                        {/* Import preview */}
-                        {importPreview && (
-                            <div className="mb-4">
-                                {importPreview.valid ? (
-                                    <div className="p-4 bg-[#4CAF50]/10 border border-[#4CAF50]/30 rounded-xl">
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <FileJson className="w-5 h-5 text-[#4CAF50] mt-0.5" />
-                                            <div>
-                                                <h4 className="font-medium text-white">{importPreview.tripName}</h4>
-                                                <p className="text-sm text-[#A0A0A0]">Ready to import</p>
+                        <div className="mt-5">
+                            {importPreview ? (
+                                importPreview.valid ? (
+                                    <div
+                                        className="p-4 rounded-xl"
+                                        style={{
+                                            background: 'rgba(16,185,129,0.10)',
+                                            border: '1px solid rgba(16,185,129,0.25)',
+                                        }}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <FileJson className="w-5 h-5 mt-0.5" style={{ color: 'rgba(16,185,129,1)' }} />
+                                            <div className="min-w-0">
+                                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                                    {importPreview.tripName}
+                                                </p>
+                                                <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+                                                    Ready to import
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-3 gap-2 text-center mb-4">
-                                            <div className="p-2 bg-[#1A1A1A] rounded-lg">
-                                                <p className="text-lg font-bold text-white">{importPreview.stats?.players}</p>
-                                                <p className="text-xs text-[#707070]">Players</p>
-                                            </div>
-                                            <div className="p-2 bg-[#1A1A1A] rounded-lg">
-                                                <p className="text-lg font-bold text-white">{importPreview.stats?.sessions}</p>
-                                                <p className="text-xs text-[#707070]">Sessions</p>
-                                            </div>
-                                            <div className="p-2 bg-[#1A1A1A] rounded-lg">
-                                                <p className="text-lg font-bold text-white">{importPreview.stats?.matches}</p>
-                                                <p className="text-xs text-[#707070]">Matches</p>
-                                            </div>
+
+                                        <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                                            {(
+                                                [
+                                                    { label: 'Players', value: importPreview.stats?.players ?? 0 },
+                                                    { label: 'Sessions', value: importPreview.stats?.sessions ?? 0 },
+                                                    { label: 'Matches', value: importPreview.stats?.matches ?? 0 },
+                                                ] as const
+                                            ).map((item) => (
+                                                <div
+                                                    key={item.label}
+                                                    className="rounded-lg px-2 py-2"
+                                                    style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+                                                >
+                                                    <p className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
+                                                        {item.value}
+                                                    </p>
+                                                    <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                                                        {item.label}
+                                                    </p>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="flex gap-2">
+
+                                        <div className="mt-4 flex gap-2">
                                             <button
                                                 onClick={handleConfirmImport}
                                                 disabled={isImporting}
-                                                className="flex-1 py-2 bg-[#4CAF50] text-white rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                                                className="flex-1 btn-primary"
+                                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}
                                             >
                                                 {isImporting ? (
                                                     <RefreshCw className="w-4 h-4 animate-spin" />
                                                 ) : (
                                                     <CheckCircle className="w-4 h-4" />
                                                 )}
-                                                {isImporting ? 'Importing...' : 'Confirm Import'}
+                                                {isImporting ? 'Importing…' : 'Confirm import'}
                                             </button>
-                                            <button
-                                                onClick={handleCancelImport}
-                                                className="px-4 py-2 bg-[#2A2A2A] text-[#A0A0A0] rounded-lg"
-                                            >
+                                            <button onClick={handleCancelImport} className="btn-secondary">
                                                 Cancel
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="p-4 bg-[#EF5350]/10 border border-[#EF5350]/30 rounded-xl">
+                                    <div
+                                        className="p-4 rounded-xl"
+                                        style={{
+                                            background: 'rgba(239,68,68,0.10)',
+                                            border: '1px solid rgba(239,68,68,0.25)',
+                                        }}
+                                    >
                                         <div className="flex items-start gap-3">
-                                            <XCircle className="w-5 h-5 text-[#EF5350] mt-0.5" />
-                                            <div>
-                                                <h4 className="font-medium text-white">Invalid File</h4>
+                                            <XCircle className="w-5 h-5 mt-0.5" style={{ color: 'rgba(239,68,68,1)' }} />
+                                            <div className="min-w-0">
+                                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                                    Invalid file
+                                                </p>
                                                 <ul className="mt-2 space-y-1">
-                                                    {importPreview.errors.map((error, i) => (
-                                                        <li key={i} className="text-sm text-[#EF5350]">• {error}</li>
+                                                    {importPreview.errors.map((errorText, i) => (
+                                                        <li key={i} className="text-sm" style={{ color: 'rgba(239,68,68,1)' }}>
+                                                            • {errorText}
+                                                        </li>
                                                     ))}
                                                 </ul>
                                                 <button
                                                     onClick={handleCancelImport}
-                                                    className="mt-3 text-sm text-[#A0A0A0] underline"
+                                                    className="mt-3 text-sm underline"
+                                                    style={{ color: 'var(--ink-tertiary)' }}
                                                 >
                                                     Try another file
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Import result */}
-                        {importResult && (
-                            <div className={`mb-4 p-4 rounded-xl border ${importResult.success
-                                ? 'bg-[#4CAF50]/10 border-[#4CAF50]/30'
-                                : 'bg-[#EF5350]/10 border-[#EF5350]/30'
-                                }`}>
-                                <div className="flex items-start gap-3">
-                                    {importResult.success ? (
-                                        <CheckCircle className="w-5 h-5 text-[#4CAF50]" />
-                                    ) : (
-                                        <XCircle className="w-5 h-5 text-[#EF5350]" />
-                                    )}
-                                    <div>
-                                        <p className={importResult.success ? 'text-[#4CAF50]' : 'text-[#EF5350]'}>
-                                            {importResult.message}
-                                        </p>
-                                        {importResult.tripId && (
-                                            <button
-                                                onClick={() => router.push(`/trip/${importResult.tripId}/settings`)}
-                                                className="mt-2 text-sm text-[#64B5F6] flex items-center gap-1"
-                                            >
-                                                <ExternalLink className="w-3 h-3" />
-                                                Open Trip
-                                            </button>
+                                )
+                            ) : importResult ? (
+                                <div
+                                    className="p-4 rounded-xl"
+                                    style={{
+                                        background: importResult.success
+                                            ? 'rgba(16,185,129,0.10)'
+                                            : 'rgba(239,68,68,0.10)',
+                                        border: importResult.success
+                                            ? '1px solid rgba(16,185,129,0.25)'
+                                            : '1px solid rgba(239,68,68,0.25)',
+                                    }}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        {importResult.success ? (
+                                            <CheckCircle className="w-5 h-5" style={{ color: 'rgba(16,185,129,1)' }} />
+                                        ) : (
+                                            <XCircle className="w-5 h-5" style={{ color: 'rgba(239,68,68,1)' }} />
                                         )}
+                                        <div>
+                                            <p style={{ color: 'var(--ink)' }}>{importResult.message}</p>
+                                            {importResult.tripId ? (
+                                                <button
+                                                    onClick={() => router.push(`/trip/${importResult.tripId}/settings`)}
+                                                    className="mt-2 text-sm inline-flex items-center gap-1"
+                                                    style={{ color: 'var(--masters)' }}
+                                                >
+                                                    <ExternalLink className="w-3 h-3" />
+                                                    Open trip
+                                                </button>
+                                            ) : null}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Drop zone */}
-                        {!importPreview && !importResult && (
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="w-full p-8 border-2 border-dashed border-[#3A3A3A] rounded-xl hover:border-[#64B5F6] hover:bg-[#64B5F6]/5 transition-colors"
-                            >
-                                <div className="text-center">
-                                    <Upload className="w-10 h-10 text-[#505050] mx-auto mb-3" />
-                                    <p className="text-white font-medium mb-1">Click to select file</p>
-                                    <p className="text-sm text-[#707070]">JSON backup files only</p>
-                                </div>
-                            </button>
-                        )}
-                    </div>
-                </section>
-
-                {/* Info Box */}
-                <div className="p-4 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]">
-                    <div className="flex items-start gap-3">
-                        <HardDrive className="w-5 h-5 text-[#707070] mt-0.5" />
-                        <div className="text-sm text-[#707070]">
-                            <p className="mb-2">
-                                <strong className="text-[#A0A0A0]">About Backups:</strong>
-                            </p>
-                            <ul className="space-y-1">
-                                <li>• Exports include all trip data: players, teams, sessions, matches, and scores</li>
-                                <li>• Imported trips create new copies with fresh IDs</li>
-                                <li>• Store backups securely - they contain all your tournament data</li>
-                            </ul>
+                            ) : (
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full rounded-xl"
+                                    style={{
+                                        padding: 'var(--space-6)',
+                                        border: '2px dashed var(--rule)',
+                                        background: 'var(--surface)',
+                                        transition: 'border-color 150ms ease, background 150ms ease',
+                                    }}
+                                >
+                                    <div className="text-center">
+                                        <Upload className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--ink-tertiary)' }} />
+                                        <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                            Select a JSON file
+                                        </p>
+                                        <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+                                            Backup files only
+                                        </p>
+                                    </div>
+                                </button>
+                            )}
                         </div>
-                    </div>
+                    </section>
+
+                    {/* Info */}
+                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                        <div className="flex items-start gap-3">
+                            <HardDrive className="w-5 h-5 mt-0.5" style={{ color: 'var(--ink-tertiary)' }} />
+                            <div className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                    About backups
+                                </p>
+                                <ul className="mt-2 space-y-1" style={{ color: 'var(--ink-tertiary)' }}>
+                                    <li>• Exports include players, teams, sessions, matches, and scores</li>
+                                    <li>• Imported trips create new copies with fresh IDs</li>
+                                    <li>• Store backups securely — they contain your tournament data</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </main>
 
@@ -558,42 +606,47 @@ function TripCard({
 
     return (
         <div
-            className={`p-4 rounded-xl border transition-colors cursor-pointer ${isSelected
-                ? 'border-[#004225] bg-[#004225]/10'
-                : 'border-[#2A2A2A] hover:border-[#3A3A3A]'
-                }`}
+            className="rounded-xl border transition-colors cursor-pointer"
+            style={{
+                padding: 'var(--space-4)',
+                borderColor: isSelected ? 'var(--masters)' : 'var(--rule)',
+                background: isSelected ? 'var(--masters-subtle, rgba(0,103,71,0.10))' : 'var(--surface)',
+            }}
             onClick={onSelect}
         >
-            <div className="flex items-start justify-between">
-                <div className="flex-1">
-                    <h3 className="font-medium text-white mb-1">{trip.name}</h3>
-                    <div className="flex items-center gap-3 text-xs text-[#707070]">
-                        <span className="flex items-center gap-1">
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate" style={{ color: 'var(--ink)' }}>
+                        {trip.name}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                        <span className="inline-flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {formatDate(trip.startDate)}
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span className="inline-flex items-center gap-1">
                             <Users className="w-3 h-3" />
                             {trip.playerCount} players
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span className="inline-flex items-center gap-1">
                             <Trophy className="w-3 h-3" />
                             {trip.matchCount} matches
                         </span>
                     </div>
                 </div>
 
-                {isSelected && (
-                    <div className="flex items-center gap-2">
+                {isSelected ? (
+                    <div className="flex items-center gap-2 shrink-0">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onShare();
                             }}
-                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
-                            title="Copy Summary"
+                            className="btn-secondary"
+                            style={{ padding: 'var(--space-2)' }}
+                            title="Copy summary"
                         >
-                            <Copy className="w-4 h-4 text-[#A0A0A0]" />
+                            <Copy className="w-4 h-4" />
                         </button>
                         <button
                             onClick={(e) => {
@@ -601,7 +654,8 @@ function TripCard({
                                 onExport();
                             }}
                             disabled={isExporting}
-                            className="px-3 py-1.5 bg-[#004225] text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-[#2E7D32] transition-colors disabled:opacity-50"
+                            className="btn-primary"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}
                         >
                             {isExporting ? (
                                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -611,7 +665,7 @@ function TripCard({
                             Export
                         </button>
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
     );
