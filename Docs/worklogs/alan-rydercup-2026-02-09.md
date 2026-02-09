@@ -181,3 +181,8 @@
 - Removed an unused `_getPlayabilityColor` helper and simplified the recommendation copy (removed emoji prefix).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`762b54e`)
+
+## 14:58 EST — Docs — Lobster worklog chronology cleanup
+- `Docs/lobster/WORKLOG.md`: moved the stray top-of-file 2026-02-09 block into the correct 2026-02-09 section so the Lobster worklog reads chronologically (no duplicate date headings).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`92d6cec`)
