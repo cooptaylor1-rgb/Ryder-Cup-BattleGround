@@ -15,6 +15,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ### 12:50 EST — Phase 1 (batch 146)
 - Section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain): replaced the older `PageSkeleton` `Suspense` fallback with the standard `PageLoadingSkeleton` so layout-level suspense renders match the premium wrapper + BottomNav experience.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`17977f0`)
 
 ## 2026-02-04
 
