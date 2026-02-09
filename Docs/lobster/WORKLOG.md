@@ -665,14 +665,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a95a0bb`)
 
+## 2026-02-10
+
 ### 00:15 EST — Phase 1 (batch 121)
 - Settings (`/settings`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
 - Settings → Notifications (`/settings/notifications`): standardized the premium wrapper to use `bg-[var(--canvas)]` (removes inline background style).
 - Notifications: migrated most surface panels to the shared `card` + `btn-primary` styles to match the rest of the premium UI.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d4a1412`)
-
-## 2026-02-09
 
 ### 00:45 EST — Phase 1 (batch 122)
 - Finances (`/finances`): replaced a silent `return null` ledger section with an explicit compact `EmptyStatePremium` so the Overview tab never renders a confusing blank area.
@@ -741,8 +741,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Checklist (`/captain/checklist`): standardized wrappers to `bg-[var(--canvas)]` and migrated remaining icon/padding/background inline styles to token utilities.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`4786187`)
-
-## 2026-02-09
 
 ### 06:25 EST — Phase 1 (batch 134)
 - Lineup Builder (`/lineup/builder`): removed inline `style={{ background: 'var(--canvas)' }}` and standardized the premium wrapper to `bg-[var(--canvas)]`.
