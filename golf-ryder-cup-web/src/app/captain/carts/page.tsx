@@ -25,10 +25,7 @@ export default function CartsPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -49,10 +46,7 @@ export default function CartsPage() {
 
   if (!isCaptainMode) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -97,7 +91,7 @@ export default function CartsPage() {
   const teamB = teams.find(t => t.name?.toLowerCase().includes('europe') || t.name?.toLowerCase().includes('eur') || t.name === 'B');
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Cart Assignments"
         subtitle="Assign golf carts"
