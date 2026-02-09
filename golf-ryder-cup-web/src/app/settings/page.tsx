@@ -77,10 +77,7 @@ export default function SettingsPage() {
   const { theme } = useUIStore();
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Settings"
         subtitle="App preferences"

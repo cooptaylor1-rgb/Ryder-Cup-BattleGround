@@ -24,14 +24,6 @@ import {
 import { useTripStore } from '@/lib/stores';
 import { BottomNav, PageHeader } from '@/components/layout';
 
-function surfaceCardStyle() {
-  return {
-    background: 'var(--surface)',
-    border: '1px solid var(--rule)',
-    borderRadius: 'var(--radius-lg)',
-  } as const;
-}
-
 export default function NotificationSettingsPage() {
   const router = useRouter();
   const { currentTrip } = useTripStore();
@@ -100,10 +92,7 @@ export default function NotificationSettingsPage() {
   };
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Notifications"
         subtitle={currentTrip?.name ? currentTrip.name : 'Preferences'}
@@ -140,7 +129,7 @@ export default function NotificationSettingsPage() {
             description="Notifications are blocked for this site. Please enable them in your browser settings."
           />
         ) : permissionStatus === 'granted' && preferences.enabled ? (
-          <div style={{ ...surfaceCardStyle(), borderColor: 'rgba(34,197,94,0.35)' }} className="p-4">
+          <div className="card p-4" style={{ borderColor: 'rgba(34,197,94,0.35)' }}>
             <div className="flex items-start gap-3">
               <Bell className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'rgb(34,197,94)' }} />
               <div className="flex-1">
@@ -163,7 +152,7 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
         ) : (
-          <div style={surfaceCardStyle()} className="p-4">
+          <div className="card p-4">
             <div className="flex items-start gap-3">
               <Bell className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--ink-tertiary)' }} />
               <div className="flex-1">
@@ -178,8 +167,7 @@ export default function NotificationSettingsPage() {
             <button
               onClick={handleEnableNotifications}
               disabled={isRequesting}
-              className="mt-4 w-full py-3 rounded-xl text-white font-semibold transition-colors disabled:opacity-50"
-              style={{ background: 'var(--masters)' }}
+              className="btn-primary mt-4 w-full py-3"
             >
               {isRequesting ? 'Requesting…' : 'Enable Notifications'}
             </button>
@@ -196,7 +184,7 @@ export default function NotificationSettingsPage() {
               Notification types
             </h2>
             <div className="space-y-2">
-              <div style={surfaceCardStyle()} className="p-4">
+              <div className="card p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
@@ -214,7 +202,10 @@ export default function NotificationSettingsPage() {
                       </p>
                     </div>
                   </div>
-                  <ToggleSwitch checked={preferences.teeTimeReminders} onChange={() => handleToggle('teeTimeReminders')} />
+                  <ToggleSwitch
+                    checked={preferences.teeTimeReminders}
+                    onChange={() => handleToggle('teeTimeReminders')}
+                  />
                 </div>
 
                 {preferences.teeTimeReminders ? (
@@ -294,7 +285,10 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
       aria-checked={checked}
       onClick={onChange}
       className="relative w-12 h-7 rounded-full transition-colors"
-      style={{ background: checked ? 'var(--masters)' : 'var(--surface-card)', border: '1px solid var(--rule)' }}
+      style={{
+        background: checked ? 'var(--masters)' : 'var(--surface-card)',
+        border: '1px solid var(--rule)',
+      }}
     >
       <span
         className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform"
@@ -320,7 +314,7 @@ function SettingToggle({
   onChange: () => void;
 }) {
   return (
-    <div className="p-4" style={surfaceCardStyle()}>
+    <div className="card p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
@@ -356,7 +350,7 @@ function InfoCard({
   description: string;
 }) {
   return (
-    <div className="p-4" style={surfaceCardStyle()}>
+    <div className="card p-4">
       <div className="flex items-start gap-3">
         <Icon className="w-5 h-5 shrink-0 mt-0.5" style={{ color: iconColor }} />
         <div>
