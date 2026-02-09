@@ -18,7 +18,7 @@ import {
   Tv,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   NoTournamentsEmpty,
   WhatsNew,
@@ -150,19 +150,20 @@ export default function HomePage() {
     score: liveMatchesCount > 0 ? liveMatchesCount : undefined,
   };
 
-  // Compute score narrative
-  const getScoreNarrative = () => {
-    if (!standings) return null;
+  const scoreNarrative = useMemo(() => {
+    if (!standings) return undefined;
+
     const diff = Math.abs(standings.teamAPoints - standings.teamBPoints);
     if (diff === 0) return 'All square';
-    const leader = standings.teamAPoints > standings.teamBPoints
-      ? (teamAName || 'USA')
-      : (teamBName || 'Europe');
+
+    const leader =
+      standings.teamAPoints > standings.teamBPoints ? teamAName || 'USA' : teamBName || 'Europe';
+
     return `${leader} leads by ${diff} point${diff !== 1 ? 's' : ''}`;
-  };
+  }, [standings, teamAName, teamBName]);
 
   const headerSubtitle = activeTrip
-    ? (getScoreNarrative() ?? activeTrip.name)
+    ? (scoreNarrative ?? activeTrip.name)
     : hasTrips
       ? 'Select a trip to get started'
       : 'Your daily edition';
@@ -316,16 +317,19 @@ export default function HomePage() {
                   </div>
 
                   {/* Score narrative */}
-                  {getScoreNarrative() && (
-                    <p className="type-body-sm" style={{
-                      textAlign: 'center',
-                      marginTop: 'var(--space-6)',
-                      color: 'var(--ink-secondary)',
-                      fontStyle: 'italic',
-                    }}>
-                      {getScoreNarrative()}
+                  {scoreNarrative ? (
+                    <p
+                      className="type-body-sm"
+                      style={{
+                        textAlign: 'center',
+                        marginTop: 'var(--space-6)',
+                        color: 'var(--ink-secondary)',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {scoreNarrative}
                     </p>
-                  )}
+                  ) : null}
 
                   {/* View standings CTA */}
                   <div style={{
