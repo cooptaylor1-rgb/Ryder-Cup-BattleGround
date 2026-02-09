@@ -257,7 +257,7 @@ export default function BetsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Side Bets"
         subtitle={`${activeBets.length} active`}

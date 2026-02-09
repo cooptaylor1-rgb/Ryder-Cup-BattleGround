@@ -152,7 +152,7 @@ export default function TripSettingsPage() {
 
   if (tripLookupError) {
     return (
-      <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
           <PageHeader
@@ -198,7 +198,7 @@ export default function TripSettingsPage() {
 
   if (!tripName) {
     return (
-      <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+      <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
           <PageHeader
@@ -240,7 +240,7 @@ export default function TripSettingsPage() {
   }
 
   return (
-    <main className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <div className="absolute inset-0 bg-linear-to-b from-masters-green/15 via-transparent to-transparent pointer-events-none" />
       <div className="relative page-container">
         <PageHeader

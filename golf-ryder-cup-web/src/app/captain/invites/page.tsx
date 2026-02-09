@@ -115,7 +115,7 @@ export default function InvitesPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Invitations"
         subtitle="Manage trip invites"
