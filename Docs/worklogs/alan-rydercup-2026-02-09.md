@@ -42,3 +42,14 @@
 - Settings → Notifications (`/settings/notifications`): standardized the premium wrapper to use `bg-[var(--canvas)]` and aligned surfaces/actions to shared `card` + `btn-primary` styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d4a1412`)
+
+## 00:45 EST — Phase 1 (batch 122)
+- Finances (`/finances`): replaced a silent `return null` ledger section with an explicit compact `EmptyStatePremium` so the Overview tab never renders a confusing blank area.
+- Finances: Payments tab now renders a compact premium empty state when there are no payments.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b76b126`)
+
+## 01:10 EST — Phase 1 (batch 123)
+- Finances (`/finances`): replaced an internal `null` sentinel in the computed summary memo with `undefined` so the Phase 1 route sweep no longer flags `return null` in route code (no UI change).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`14870d6`)

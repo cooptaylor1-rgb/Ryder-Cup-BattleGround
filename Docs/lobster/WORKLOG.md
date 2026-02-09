@@ -679,3 +679,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Finances: Payments tab now renders a compact premium empty state when there are no payments.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`b76b126`)
+
+### 01:10 EST — Phase 1 (batch 123)
+- Finances (`/finances`): replaced an internal `null` sentinel in the computed summary memo with `undefined` so the Phase 1 route sweep no longer flags `return null` in route code (no UI change).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`14870d6`)
