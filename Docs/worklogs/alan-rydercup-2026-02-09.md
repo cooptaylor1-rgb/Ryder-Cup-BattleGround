@@ -23,4 +23,4 @@
 - Home: standardized the Continue Scoring sticky banner wrapper to use Tailwind arbitrary values (e.g. `py-[var(--space-2)]`) instead of inline padding/background styles.
 - UI skeletons: standardized full-page skeleton wrappers to use `bg-[var(--canvas)]` instead of inline style props.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`5cea7dd`)
