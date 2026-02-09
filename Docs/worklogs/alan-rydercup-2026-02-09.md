@@ -186,3 +186,11 @@
 - `Docs/lobster/WORKLOG.md`: moved the stray top-of-file 2026-02-09 block into the correct 2026-02-09 section so the Lobster worklog reads chronologically (no duplicate date headings).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`92d6cec`)
+
+## 15:35 EST — Phase 1 (batch 150)
+- Captain components: removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers in a few key Captain UI surfaces.
+- DirectMessage message history cards now use `bg-[var(--canvas)]`.
+- Lineup Builder `LineupCanvas` player pool wrapper now uses `bg-[var(--canvas)] border-[var(--rule)]`.
+- Attendance Check-In sticky team headers + ETA modal wrapper now use `bg-[var(--canvas)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`190db5a`)

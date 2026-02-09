@@ -653,6 +653,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1b54a2b`)
 
+### 15:35 EST — Phase 1 (batch 150)
+- Captain components: removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers in a few key Captain UI surfaces.
+- DirectMessage: message history cards now use `bg-[var(--canvas)]`.
+- Lineup Builder `LineupCanvas`: player pool wrapper now uses `bg-[var(--canvas)] border-[var(--rule)]`.
+- Attendance Check-In: sticky team headers + ETA modal wrapper now use `bg-[var(--canvas)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`190db5a`)
 
 ### 20:55 EST — Phase 1 (batch 115)
 - Admin (`/admin`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
