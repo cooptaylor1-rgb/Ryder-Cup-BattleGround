@@ -132,10 +132,7 @@ export default function LivePage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -158,10 +155,7 @@ export default function LivePage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Live Scores"
         subtitle={currentTrip.name}
@@ -171,22 +165,14 @@ export default function LivePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-lg transition-colors"
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--rule)',
-              }}
+              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
               aria-label={soundEnabled ? 'Mute' : 'Unmute'}
             >
               {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-2 rounded-lg transition-colors"
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--rule)',
-              }}
+              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
               aria-label="Toggle fullscreen"
             >
               <Maximize2 size={18} />
@@ -196,11 +182,7 @@ export default function LivePage() {
                 if (activeSession) loadSessionMatches(activeSession.id);
                 setLastUpdate(new Date());
               }}
-              className="p-2 rounded-lg transition-colors"
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--rule)',
-              }}
+              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
               aria-label="Refresh"
             >
               <RefreshCw size={18} />

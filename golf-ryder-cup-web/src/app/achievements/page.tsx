@@ -205,10 +205,7 @@ export default function AchievementsPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -230,10 +227,7 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Achievements"
         subtitle={`${unlockedCount} of ${totalCount} unlocked`}
@@ -241,10 +235,7 @@ export default function AchievementsPage() {
         onBack={() => router.back()}
       />
 
-      <main
-        className="container-editorial"
-        style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}
-      >
+      <main className="container-editorial py-4">
         {/* Progress Overview */}
         <div
           className="card text-center"
