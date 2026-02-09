@@ -671,3 +671,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Notifications: migrated most surface panels to the shared `card` + `btn-primary` styles to match the rest of the premium UI.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d4a1412`)
+
+## 2026-02-09
+
+### 00:45 EST — Phase 1 (batch 122)
+- Finances (`/finances`): replaced a silent `return null` ledger section with an explicit compact `EmptyStatePremium` so the Overview tab never renders a confusing blank area.
+- Finances: Payments tab now renders a compact premium empty state when there are no payments.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5b5bf48`)

@@ -475,7 +475,18 @@ function OverviewTab({
   // Only show players who have dues
   const playersWithDues = summary.playerSummaries.filter((p) => p.totalDues > 0);
 
-  if (playersWithDues.length === 0) return null;
+  if (playersWithDues.length === 0) {
+    return (
+      <section className="section-sm">
+        <EmptyStatePremium
+          illustration="golf-ball"
+          title="No player ledger yet"
+          description="Charges exist, but none are currently assigned to active players."
+          variant="compact"
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="section-sm">
@@ -811,7 +822,7 @@ function PaymentsTab({
     return (
       <section className="section-sm pt-[var(--space-8)]">
         <EmptyStatePremium
-          illustration="scorecard"
+          illustration="golf-ball"
           title="No payments recorded"
           description="Payments will appear here as players settle their dues."
           variant="compact"
