@@ -9,6 +9,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Draft (`/captain/draft`): added the shared `PageHeader` to the **No active trip** and **Captain mode required** screens so access-gated states retain consistent premium navigation.
 - Commit + push ✅ (`7c2ea89`)
 
+### 17:45 EST — Phase 1 — Not Found: token-driven styles
+- Not Found (`/_not-found`): replaced inline `style={{ background/color: 'var(--...)' }}` usage with token-driven Tailwind classes (e.g. `bg-[var(--masters-light)]`, `text-[var(--ink-secondary)]`) for consistency.
+- Uses shared `btn` variants for the primary/secondary CTAs.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`354b670`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
