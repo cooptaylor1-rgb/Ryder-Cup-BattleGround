@@ -811,3 +811,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Attendance (`/captain/availability`), Captain Audit Log (`/captain/audit`), and Captain Invitations (`/captain/invites`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
 - Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and can’t silently drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f2a5fa8`)
