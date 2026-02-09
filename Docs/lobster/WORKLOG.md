@@ -749,3 +749,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - New Trip (`/trip/new`): removed inline `style={{ background: 'var(--canvas)' }}` and replaced a `paddingTop` style prop with `pt-6`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c270f9a`)
+
+### 06:45 EST — Phase 1 (batch 135)
+- Course Library (`/courses`), New Course (`/courses/new`), and Trip Awards (`/trip-stats/awards`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized them to `bg-[var(--canvas)]` so the premium theme can’t silently drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9c29d8b`)

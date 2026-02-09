@@ -255,10 +255,7 @@ export default function CourseLibraryPage() {
     // Database search modal
     if (showDatabaseSearch) {
         return (
-            <div
-              className="min-h-screen pb-nav page-premium-enter texture-grain"
-              style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Search Courses"
                     subtitle="Course database"
@@ -277,10 +274,7 @@ export default function CourseLibraryPage() {
     }
 
     return (
-        <div
-          className="min-h-screen pb-nav page-premium-enter texture-grain"
-          style={{ background: 'var(--canvas)' }}
-        >
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Course Library"
                 subtitle="Reusable course profiles"

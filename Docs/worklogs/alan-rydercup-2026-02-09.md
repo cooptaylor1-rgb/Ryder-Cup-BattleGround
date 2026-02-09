@@ -104,3 +104,8 @@
 - Captain Checklist (`/captain/checklist`): standardized all wrapper states to `bg-[var(--canvas)]` and migrated remaining icon/padding/background inline styles to Tailwind token utilities.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`4786187`)
+
+## 06:45 EST — Phase 1 (batch 135)
+- Course Library (`/courses`), New Course (`/courses/new`), and Trip Awards (`/trip-stats/awards`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized them to `bg-[var(--canvas)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9c29d8b`)

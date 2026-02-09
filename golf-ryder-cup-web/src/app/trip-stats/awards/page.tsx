@@ -231,10 +231,7 @@ export default function TripAwardsPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Awards"
           subtitle="No active trip"
@@ -261,10 +258,7 @@ export default function TripAwardsPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Trip Awards"
         subtitle={currentTrip.name}
