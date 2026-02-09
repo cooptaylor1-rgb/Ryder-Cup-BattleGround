@@ -627,3 +627,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Manage (`/captain/manage`) + Captain Side Bets (`/captain/bets`): migrated bespoke `header-premium` markup to the shared `PageHeader`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`67b5fc4`)
+
+### 21:20 EST — Phase 1 (batch 116)
+- Course Library (`/courses`): replaced bespoke header markup with the shared `PageHeader` for consistent premium navigation.
+- Course Library: the in-page “Search Course Database” view now also uses `PageHeader` (instead of a special green header), keeping the screen consistent with the rest of Phase 1.
+- Lineup Builder (`/lineup/builder`): replaced the bespoke sticky header with `PageHeader`, keeping the Save affordance in `rightSlot`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1251567`)
