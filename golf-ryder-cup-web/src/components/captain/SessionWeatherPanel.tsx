@@ -121,7 +121,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
   }, [fetchWeather]);
 
   const getWeatherIcon = (forecast?: WeatherForecast) => {
-    if (!forecast) return <Cloud className="w-8 h-8 text-gray-400" />;
+    if (!forecast) return <Cloud className="w-8 h-8 text-[var(--ink-tertiary)]" />;
 
     const iconName = forecast.icon?.toLowerCase() || '';
 
@@ -135,27 +135,6 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
       return <Cloud className="w-8 h-8 text-gray-500" />;
     }
     return <Sun className="w-8 h-8 text-yellow-500" />;
-  };
-
-  const _getPlayabilityColor = (forecast?: WeatherForecast) => {
-    if (!forecast) return 'text-gray-500';
-
-    const temp = forecast.temperature?.high || 70;
-    const wind = forecast.wind?.speed || 0;
-    const precip = forecast.precipitation?.chance || 0;
-
-    // Perfect conditions
-    if (temp >= 60 && temp <= 85 && wind < 15 && precip < 20) {
-      return 'text-green-600 dark:text-green-400';
-    }
-
-    // Challenging but playable
-    if (temp >= 45 && temp <= 95 && wind < 25 && precip < 50) {
-      return 'text-yellow-600 dark:text-yellow-400';
-    }
-
-    // Difficult conditions
-    return 'text-red-600 dark:text-red-400';
   };
 
   const getRecommendationText = (sessionWeather?: SessionWeather): string => {
@@ -209,12 +188,12 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
 
   if (loading) {
     return (
-      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse">
+      <div className="card p-4 animate-pulse">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full" />
+          <div className="w-8 h-8 bg-[var(--surface-tertiary)] rounded-full" />
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+            <div className="h-4 bg-[var(--surface-tertiary)] rounded w-1/2 mb-2" />
+            <div className="h-3 bg-[var(--surface-tertiary)] rounded w-3/4" />
           </div>
         </div>
       </div>
@@ -243,32 +222,32 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
   const forecast = weather?.forecast;
 
   return (
-    <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="card overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
       >
         <div className="flex items-center gap-4">
           {getWeatherIcon(forecast)}
           <div className="text-left">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">
+              <span className="text-2xl font-bold text-[var(--ink-primary)]">
                 {forecast?.temperature?.high
                   ? `${Math.round(forecast.temperature.high)}°${forecast.temperature.unit || 'F'}`
                   : '--°F'}
               </span>
               {weather && getRecommendationBadge(weather.recommendation)}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-[var(--ink-tertiary)]">
               {session.name} • {formatSessionDate()}
             </p>
           </div>
         </div>
         {expanded ? (
-          <ChevronUp className="w-5 h-5 text-gray-400" />
+          <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400" />
+          <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
         )}
       </button>
 
@@ -294,7 +273,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
                       }`} />
                     <span className="font-medium text-sm">{alert.title}</span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-300">{alert.description}</p>
+                  <p className="text-xs text-[var(--ink-secondary)]">{alert.description}</p>
                 </div>
               ))}
             </div>
@@ -302,42 +281,42 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
 
           {/* Weather Stats */}
           <div className="grid grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-3 bg-[var(--surface-secondary)] rounded-lg">
               <Wind className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-[var(--ink-primary)]">
                 {forecast.wind?.speed ?? '--'} mph
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Wind</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Wind</p>
             </div>
 
-            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-3 bg-[var(--surface-secondary)] rounded-lg">
               <Droplets className="w-5 h-5 text-cyan-500 mx-auto mb-1" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-[var(--ink-primary)]">
                 {forecast.humidity ?? '--'}%
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Humidity</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Humidity</p>
             </div>
 
-            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-3 bg-[var(--surface-secondary)] rounded-lg">
               <Umbrella className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-[var(--ink-primary)]">
                 {forecast.precipitation?.chance ?? '--'}%
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Rain</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Rain</p>
             </div>
 
-            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-3 bg-[var(--surface-secondary)] rounded-lg">
               <Sun className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-[var(--ink-primary)]">
                 {forecast.uvIndex ?? '--'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">UV Index</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">UV Index</p>
             </div>
           </div>
 
           {/* Temperature Range */}
           {forecast.temperature && (
-            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-3 text-sm text-[var(--ink-secondary)]">
               <Thermometer className="w-4 h-4" />
               <span>
                 High: {forecast.temperature.high}°{forecast.temperature.unit} /
@@ -348,7 +327,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
 
           {/* Wind Direction */}
           {forecast.wind?.direction && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-2 text-sm text-[var(--ink-secondary)]">
               <Wind className="w-4 h-4" />
               Wind from {forecast.wind.direction}
               {forecast.wind.gusts && ` (gusts to ${forecast.wind.gusts} mph)`}
@@ -357,7 +336,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
 
           {/* Sunrise/Sunset */}
           {(forecast.sunrise || forecast.sunset) && (
-            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-[var(--ink-tertiary)]">
               {forecast.sunrise && <span>☀️ Sunrise: {forecast.sunrise}</span>}
               {forecast.sunset && <span>🌙 Sunset: {forecast.sunset}</span>}
             </div>
@@ -366,18 +345,18 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
           {/* Recommendation */}
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-300">
-              💡 {getRecommendationText(weather ?? undefined)}
+              {getRecommendationText(weather ?? undefined)}
             </p>
           </div>
 
           {/* Refresh */}
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs text-[var(--ink-tertiary)]">
             <span>
               Updated: {weather?.lastUpdated ? new Date(weather.lastUpdated).toLocaleTimeString() : 'Unknown'}
             </span>
             <button
               onClick={fetchWeather}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1"
+              className="text-[var(--ink-tertiary)] hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1"
             >
               <RefreshCw className="w-3 h-3" />
               Refresh
