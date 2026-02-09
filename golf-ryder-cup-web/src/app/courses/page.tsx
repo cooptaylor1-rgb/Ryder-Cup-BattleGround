@@ -2,7 +2,8 @@
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, MapPin, Flag, Trash2, Copy, ChevronRight, Globe, Camera, Sparkles, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, MapPin, Flag, Trash2, Copy, ChevronRight, Globe, Camera, Sparkles, Plus } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { deleteCourseProfile, createCourseProfile } from '@/lib/services/courseLibraryService';
@@ -13,7 +14,7 @@ import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import { NoCoursesPremiumEmpty, NoSearchResultsEmpty } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 
 /**
  * COURSE LIBRARY PAGE - Masters-inspired design
@@ -128,6 +129,7 @@ function CourseCard({
 }
 
 export default function CourseLibraryPage() {
+    const router = useRouter();
     const { showToast } = useUIStore();
     const [searchQuery, setSearchQuery] = useState('');
     const [showDatabaseSearch, setShowDatabaseSearch] = useState(false);
@@ -257,17 +259,12 @@ export default function CourseLibraryPage() {
               className="min-h-screen pb-nav page-premium-enter texture-grain"
               style={{ background: 'var(--canvas)' }}
             >
-                <header className="bg-masters-green text-canvas px-4 py-4 shadow-lg">
-                    <div className="max-w-4xl mx-auto flex items-center gap-3">
-                        <button
-                            onClick={() => setShowDatabaseSearch(false)}
-                            className="p-2 hover:bg-white/10 rounded-lg"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <h1 className="font-serif text-lg font-semibold">Search Course Database</h1>
-                    </div>
-                </header>
+                <PageHeader
+                    title="Search Courses"
+                    subtitle="Course database"
+                    icon={<Globe size={16} style={{ color: 'var(--color-accent)' }} />}
+                    onBack={() => setShowDatabaseSearch(false)}
+                />
                 <main className="max-w-4xl mx-auto">
                     <CourseSearch
                         onSelectCourse={handleImportFromDatabase}
@@ -284,15 +281,12 @@ export default function CourseLibraryPage() {
           className="min-h-screen pb-nav page-premium-enter texture-grain"
           style={{ background: 'var(--canvas)' }}
         >
-            {/* Header */}
-            <header className="bg-masters-green text-canvas px-4 py-4 shadow-lg">
-                <div className="max-w-4xl mx-auto flex items-center gap-3">
-                    <Link href="/more" className="p-2 hover:bg-white/10 rounded-lg">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <h1 className="font-serif text-lg font-semibold flex-1">Course Library</h1>
-                </div>
-            </header>
+            <PageHeader
+                title="Course Library"
+                subtitle="Reusable course profiles"
+                icon={<Flag size={16} style={{ color: 'var(--color-accent)' }} />}
+                onBack={() => router.back()}
+            />
 
             <main className="max-w-4xl mx-auto p-4 space-y-4">
                 {/* Search */}

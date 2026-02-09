@@ -13,7 +13,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    ArrowLeft,
     Sparkles,
     RotateCcw,
     Save,
@@ -40,7 +39,7 @@ import {
 } from '@/lib/services/lineupBuilderService';
 
 import { useTripStore } from '@/lib/stores';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 
 // Extended type for drag operations
@@ -281,52 +280,34 @@ export default function LineupBuilderPage() {
             className="min-h-screen pb-nav page-premium-enter texture-grain"
             style={{ background: 'var(--canvas)' }}
         >
-            {/* Header */}
-            <header
-                className="sticky top-0 z-40 border-b"
-                style={{ background: 'var(--canvas)', borderColor: 'var(--rule)' }}
-            >
-                <div className="container-editorial" style={{ padding: 'var(--space-3) 0' }}>
-                    <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                            <button
-                                onClick={() => router.back()}
-                                className="p-2 -ml-2 rounded-xl press-scale"
-                                aria-label="Back"
-                            >
-                                <ArrowLeft className="w-5 h-5" style={{ color: 'var(--ink-secondary)' }} />
-                            </button>
-                            <div className="min-w-0">
-                                <h1 className="type-title">Lineup Builder</h1>
-                                <p className="type-caption truncate">
-                                    {lineupState.sessionType} • {lineupState.playersPerMatch}v{lineupState.playersPerMatch}
-                                </p>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="btn-premium press-scale"
-                            style={{
-                                padding: 'var(--space-2) var(--space-4)',
-                                borderRadius: 'var(--radius-md)',
-                                opacity: saving ? 0.7 : 1,
-                            }}
-                        >
-                            {saving ? (
-                                <div
-                                    className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
-                                    aria-hidden
-                                />
-                            ) : (
-                                <Save className="w-4 h-4" />
-                            )}
-                            <span>Save</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <PageHeader
+                title="Lineup Builder"
+                subtitle={`${lineupState.sessionType} • ${lineupState.playersPerMatch}v${lineupState.playersPerMatch}`}
+                icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+                onBack={() => router.back()}
+                rightSlot={
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="btn-premium press-scale"
+                        style={{
+                            padding: 'var(--space-2) var(--space-4)',
+                            borderRadius: 'var(--radius-md)',
+                            opacity: saving ? 0.7 : 1,
+                        }}
+                    >
+                        {saving ? (
+                            <div
+                                className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
+                                aria-hidden
+                            />
+                        ) : (
+                            <Save className="w-4 h-4" />
+                        )}
+                        <span>Save</span>
+                    </button>
+                }
+            />
 
             {/* Fairness Score Banner */}
             {fairnessScore && (
