@@ -741,3 +741,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain Checklist (`/captain/checklist`): standardized wrappers to `bg-[var(--canvas)]` and migrated remaining icon/padding/background inline styles to token utilities.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`4786187`)
+
+## 2026-02-09
+
+### 06:25 EST — Phase 1 (batch 134)
+- Lineup Builder (`/lineup/builder`): removed inline `style={{ background: 'var(--canvas)' }}` and standardized the premium wrapper to `bg-[var(--canvas)]`.
+- New Trip (`/trip/new`): removed inline `style={{ background: 'var(--canvas)' }}` and replaced a `paddingTop` style prop with `pt-6`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c270f9a`)
