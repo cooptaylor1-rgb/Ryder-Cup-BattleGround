@@ -139,3 +139,9 @@
 - No behavior change; small correctness/perf polish for the Home header/subtitle.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1de1730`)
+
+## 10:15 EST — Phase 1 (batch 142)
+- Route error boundaries: standardized Matchups (`/matchups`), Schedule (`/schedule`), and Login (`/login`) error screens to the Phase 1 premium pattern.
+- Each now uses the standard premium wrapper + shared `PageHeader`, renders shared `ErrorEmpty` messaging, and includes `BottomNav` so recovery screens aren’t dead ends.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
