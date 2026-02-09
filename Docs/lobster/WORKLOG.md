@@ -779,3 +779,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and can’t silently drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d07d039`)
+
+### 09:00 EST — Phase 1 (batch 140)
+- Join (`/join`): added a real `Suspense` fallback so the route never renders a momentary blank screen while `useSearchParams()` resolves.
+- Join: refactored the loading UI into a shared `JoinLoading` component used by both the route body and the `Suspense` fallback.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`86fe2f4`)
