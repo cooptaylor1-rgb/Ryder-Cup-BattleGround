@@ -760,4 +760,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized wrappers to `bg-[var(--canvas)]` so the premium theme can’t silently drift.
 - Live Scores: replaced inline `background`/`border` styles on PageHeader action buttons with tokenized Tailwind classes (`bg-[var(--surface-card)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`6ea1243`)
