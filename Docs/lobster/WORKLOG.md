@@ -2,38 +2,6 @@
 
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
-## 2026-02-09
-
-### 11:22 EST — Phase 1 (batch 46)
-- Join deep-link (`/join?code=...`): replaced the bespoke loading spinner with the shared `PageLoadingSkeleton` so the loading UX matches the premium design system.
-
-### 12:25 EST — Phase 1 (batch 145)
-- Login (`/login`), Create Profile (`/profile/create`), Complete Profile (`/profile/complete`), Lineup Builder (`/lineup/builder`): wrapped route bodies in `Suspense` with real `PageLoadingSkeleton` fallbacks.
-- Prevents momentary blank screens / Next.js `useSearchParams()` suspense warnings while search params resolve.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`bff33e6`)
-
-### 12:50 EST — Phase 1 (batch 146)
-- Section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain): replaced the older `PageSkeleton` `Suspense` fallback with the standard `PageLoadingSkeleton` so layout-level suspense renders match the premium wrapper + BottomNav experience.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`17977f0`)
-
-### 13:25 EST — Phase 1 (batch 147)
-- Captain Draft (`/captain/draft`), Captain Pairings (`/captain/pairings`), Captain Settings (`/captain/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
-- Standardized wrappers to use `bg-[var(--canvas)]` so premium theming stays token-driven and consistent.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`754632f`)
-
-### 13:55 EST — Phase 1 (batch 148)
-- Captain `SessionWeatherPanel`: migrated hard-coded gray/dark styles onto token-driven premium styles (`card`, `bg-[var(--surface-secondary)]`, `text-[var(--ink-*)]`) so it matches the Phase 1 theming system.
-- Removed an unused `_getPlayabilityColor` helper.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`762b54e`)
-
-### 14:55 EST — Phase 1 (batch 149)
-- Lineup (`/lineup/new`, `/lineup/[sessionId]`), Trip Awards (`/trip/[tripId]/awards`), and Settings → Backup (`/settings/backup`): removed inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized to `bg-[var(--canvas)]` for consistent premium theming.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`1b54a2b`)
 
 ## 2026-02-04
 
@@ -653,6 +621,38 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Commit + push ✅ (`6b37c01`)
 
 ## 2026-02-09
+
+### 11:22 EST — Phase 1 (batch 46)
+- Join deep-link (`/join?code=...`): replaced the bespoke loading spinner with the shared `PageLoadingSkeleton` so the loading UX matches the premium design system.
+
+### 12:25 EST — Phase 1 (batch 145)
+- Login (`/login`), Create Profile (`/profile/create`), Complete Profile (`/profile/complete`), Lineup Builder (`/lineup/builder`): wrapped route bodies in `Suspense` with real `PageLoadingSkeleton` fallbacks.
+- Prevents momentary blank screens / Next.js `useSearchParams()` suspense warnings while search params resolve.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`bff33e6`)
+
+### 12:50 EST — Phase 1 (batch 146)
+- Section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain): replaced the older `PageSkeleton` `Suspense` fallback with the standard `PageLoadingSkeleton` so layout-level suspense renders match the premium wrapper + BottomNav experience.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`17977f0`)
+
+### 13:25 EST — Phase 1 (batch 147)
+- Captain Draft (`/captain/draft`), Captain Pairings (`/captain/pairings`), Captain Settings (`/captain/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
+- Standardized wrappers to use `bg-[var(--canvas)]` so premium theming stays token-driven and consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`754632f`)
+
+### 13:55 EST — Phase 1 (batch 148)
+- Captain `SessionWeatherPanel`: migrated hard-coded gray/dark styles onto token-driven premium styles (`card`, `bg-[var(--surface-secondary)]`, `text-[var(--ink-*)]`) so it matches the Phase 1 theming system.
+- Removed an unused `_getPlayabilityColor` helper.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`762b54e`)
+
+### 14:55 EST — Phase 1 (batch 149)
+- Lineup (`/lineup/new`, `/lineup/[sessionId]`), Trip Awards (`/trip/[tripId]/awards`), and Settings → Backup (`/settings/backup`): removed inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized to `bg-[var(--canvas)]` for consistent premium theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1b54a2b`)
+
 
 ### 20:55 EST — Phase 1 (batch 115)
 - Admin (`/admin`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
