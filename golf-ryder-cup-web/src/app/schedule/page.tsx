@@ -269,10 +269,7 @@ export default function SchedulePage() {
   // If not signed in, render an explicit empty state (no blank redirects).
   if (!isAuthenticated) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Schedule"
           subtitle="Sign in required"
@@ -304,10 +301,7 @@ export default function SchedulePage() {
     }
 
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Schedule"
           subtitle="No active trip"
@@ -341,10 +335,7 @@ export default function SchedulePage() {
   const hasUserSchedule = mySchedule.length > 0;
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Schedule"
         subtitle={currentTrip.name}
@@ -352,14 +343,7 @@ export default function SchedulePage() {
         onBack={() => router.back()}
         rightSlot={
           currentUserPlayer ? (
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--rule)',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface-card)] border border-[var(--rule)] shadow-sm">
               <User size={14} style={{ color: 'var(--masters)' }} />
               <span className="text-xs font-medium">{currentUserPlayer.firstName}</span>
             </div>

@@ -53,3 +53,10 @@
 - Finances (`/finances`): replaced an internal `null` sentinel in the computed summary memo with `undefined` so the Phase 1 route sweep no longer flags `return null` in route code (no UI change).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`14870d6`)
+
+## 01:35 EST — Phase 1 (batch 124)
+- Schedule (`/schedule`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Trip Stats (`/trip-stats`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Schedule: migrated the current-user badge in the header to Tailwind token classes (removes inline background/border/boxShadow styles).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (pending)
