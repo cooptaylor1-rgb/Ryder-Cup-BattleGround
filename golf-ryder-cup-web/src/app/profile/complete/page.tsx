@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
@@ -43,7 +43,7 @@ interface FormData {
   emergencyContactRelationship: string;
 }
 
-export default function CompleteProfilePage() {
+function CompleteProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentUser, isAuthenticated, updateProfile, completeOnboarding, isLoading } =
@@ -510,6 +510,14 @@ export default function CompleteProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CompleteProfilePage() {
+  return (
+    <Suspense fallback={<PageLoadingSkeleton title="Loading profile…" variant="form" showBackButton={false} />}>
+      <CompleteProfilePageContent />
+    </Suspense>
   );
 }
 

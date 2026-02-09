@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from 'lucide-react';
 import { BottomNav } from '@/components/layout';
+import { PageLoadingSkeleton } from '@/components/ui';
 
 /**
  * LOGIN PAGE — Fried Egg Editorial
@@ -13,7 +14,7 @@ import { BottomNav } from '@/components/layout';
  * generous whitespace, and confident restraint.
  */
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, isAuthenticated, currentUser, isLoading, error, clearError } = useAuthStore();
@@ -384,5 +385,13 @@ export default function LoginPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<PageLoadingSkeleton title="Loading sign in…" showBackButton={false} />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

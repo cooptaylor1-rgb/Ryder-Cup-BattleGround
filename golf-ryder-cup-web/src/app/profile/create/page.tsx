@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { BottomNav } from '@/components/layout';
+import { PageLoadingSkeleton } from '@/components/ui';
 import {
   Mail,
   Hash,
@@ -72,7 +73,7 @@ const initialFormData: FormData = {
   emergencyContactRelationship: '',
 };
 
-export default function CreateProfilePage() {
+function CreateProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError } =
@@ -200,14 +201,7 @@ export default function CreateProfilePage() {
   };
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{
-        background: 'var(--canvas)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       {/* ---- HEADER ---- */}
       <header
         style={{
@@ -928,6 +922,14 @@ export default function CreateProfilePage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+export default function CreateProfilePage() {
+  return (
+    <Suspense fallback={<PageLoadingSkeleton title="Loading account creation…" variant="form" showBackButton={false} />}>
+      <CreateProfilePageContent />
+    </Suspense>
   );
 }
 

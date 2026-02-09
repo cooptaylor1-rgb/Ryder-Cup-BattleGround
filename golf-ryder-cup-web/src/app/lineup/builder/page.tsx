@@ -10,7 +10,7 @@
  * - Touch-friendly interactions
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     Sparkles,
@@ -49,7 +49,7 @@ type DraggedPlayer = LineupPlayer & { matchNumber?: number };
 // MAIN COMPONENT
 // ============================================
 
-export default function LineupBuilderPage() {
+function LineupBuilderPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('sessionId');
@@ -505,6 +505,18 @@ export default function LineupBuilderPage() {
 
             <BottomNav />
         </div>
+    );
+}
+
+export default function LineupBuilderPage() {
+    return (
+        <Suspense
+            fallback={
+                <PageLoadingSkeleton title="Loading lineup builder…" showBackButton={false} />
+            }
+        >
+            <LineupBuilderPageContent />
+        </Suspense>
     );
 }
 
