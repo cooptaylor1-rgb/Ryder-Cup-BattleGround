@@ -3,7 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-09
-- 11:22 — Shipped batch: Join deep-link (`/join?code=...`) now uses the shared `PageLoadingSkeleton` instead of a bespoke spinner, keeping loading states consistent with the premium design system. (commit 367f8a8)
+- 11:22 — Shipped batch: Join deep-link (`/join?code=...`) now uses the shared `PageLoadingSkeleton` instead of a bespoke spinner, keeping loading states consistent with the premium design system. (commit a43f657)
 
 ## 2026-02-04
 - 18:00 — Started NOW batch: Phase 1 sweep (blank-screen `return null`), PageHeader unification, token audit (RGB vars), Score page perf (holeResults index).
