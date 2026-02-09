@@ -16,6 +16,8 @@ import {
 import { Users, AlertTriangle, CheckCircle2, Info, Zap, ChevronDown } from 'lucide-react';
 import type { SessionType } from '@/lib/types';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
+import { FORMAT_CONFIGS } from '@/lib/types/matchFormats';
+import type { MatchFormat } from '@/lib/types/matchFormats';
 import { EmptyStatePremium } from '@/components/ui';
 import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -46,9 +48,14 @@ interface FormatOption {
   defaultMatches: number;
   category: FormatCategory;
   isTeamBased: boolean;
-  scoringMode?: ScoringMode | 'both';
   icon: string;
   comingSoon?: boolean;
+}
+
+/** Derive scoringMode from the canonical FORMAT_CONFIGS */
+function getScoringMode(formatValue: string): ScoringMode | 'both' | undefined {
+  const config = FORMAT_CONFIGS[formatValue as MatchFormat];
+  return config?.scoringMode;
 }
 
 const ALL_FORMATS: FormatOption[] = [
@@ -113,7 +120,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 2,
     category: 'match_play',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '🤝',
   },
   {
@@ -124,7 +130,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 2,
     category: 'match_play',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '🤠',
   },
   {
@@ -135,7 +140,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 2,
     category: 'match_play',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '🌟',
   },
 
@@ -148,7 +152,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'match_play',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '✌️',
   },
   {
@@ -159,7 +162,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'match_play',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '💃',
   },
   {
@@ -182,7 +184,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'side_game',
     isTeamBased: false,
-    scoringMode: 'both',
     icon: '💰',
   },
   {
@@ -193,7 +194,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'side_game',
     isTeamBased: true,
-    scoringMode: 'net',
     icon: '🎲',
   },
   {
@@ -204,7 +204,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'side_game',
     isTeamBased: false,
-    scoringMode: 'net',
     icon: '🐺',
   },
   {
@@ -215,7 +214,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 2,
     category: 'side_game',
     isTeamBased: true,
-    scoringMode: 'gross',
     icon: '🎰',
   },
   {
@@ -226,7 +224,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'side_game',
     isTeamBased: false,
-    scoringMode: 'gross',
     icon: '🎉',
   },
 
@@ -239,7 +236,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'individual',
     isTeamBased: false,
-    scoringMode: 'gross',
     icon: '🏌️',
   },
   {
@@ -250,7 +246,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'individual',
     isTeamBased: false,
-    scoringMode: 'net',
     icon: '📉',
   },
   {
@@ -261,7 +256,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'individual',
     isTeamBased: false,
-    scoringMode: 'net',
     icon: '📊',
   },
   {
@@ -272,7 +266,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'individual',
     isTeamBased: false,
-    scoringMode: 'gross',
     icon: '⚡',
   },
   {
@@ -283,7 +276,6 @@ const ALL_FORMATS: FormatOption[] = [
     defaultMatches: 1,
     category: 'individual',
     isTeamBased: false,
-    scoringMode: 'net',
     icon: '🎯',
   },
 ];
@@ -765,6 +757,7 @@ export default function NewLineupPage() {
                             const isMatchPlay = ['foursomes', 'fourball', 'singles'].includes(
                               format.value
                             );
+                            const scoringMode = getScoringMode(format.value);
 
                             return (
                               <button
@@ -801,23 +794,23 @@ export default function NewLineupPage() {
                                             Coming Soon
                                           </span>
                                         )}
-                                        {format.scoringMode && (
+                                        {scoringMode && (
                                           <span
                                             className="px-2 py-0.5 rounded text-[10px] font-medium"
                                             style={{
                                               background:
-                                                format.scoringMode === 'net'
+                                                scoringMode === 'net'
                                                   ? 'rgba(0, 103, 71, 0.1)'
                                                   : 'rgba(59, 130, 246, 0.1)',
                                               color:
-                                                format.scoringMode === 'net'
+                                                scoringMode === 'net'
                                                   ? 'var(--masters)'
                                                   : '#3b82f6',
                                             }}
                                           >
-                                            {format.scoringMode === 'net'
+                                            {scoringMode === 'net'
                                               ? 'Net'
-                                              : format.scoringMode === 'both'
+                                              : scoringMode === 'both'
                                                 ? 'Gross/Net'
                                                 : 'Gross'}
                                           </span>

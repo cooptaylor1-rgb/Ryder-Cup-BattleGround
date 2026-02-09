@@ -162,17 +162,19 @@ export default function HomePage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
-      {/* Modals */}
+    <>
+      {/* Full-screen overlays — must be outside the page wrapper to escape its stacking context */}
       {showQuickStart && (
         <QuickStartWizard
           onComplete={handleQuickStartComplete}
           onCancel={() => setShowQuickStart(false)}
         />
       )}
+
+      <div
+        className="min-h-screen pb-nav page-premium-enter texture-grain"
+        style={{ background: 'var(--canvas)' }}
+      >
       <JoinTripModal
         isOpen={showJoinTrip}
         onClose={() => setShowJoinTrip(false)}
@@ -542,6 +544,7 @@ export default function HomePage() {
 
       <BottomNav badges={navBadges} activeMatchId={activeMatchId} />
     </div>
+    </>
   );
 }
 
