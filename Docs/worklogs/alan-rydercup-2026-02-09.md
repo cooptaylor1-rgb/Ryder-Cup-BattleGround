@@ -121,3 +121,9 @@
 - This prevents potential setState-after-unmount issues and avoids stacking multiple timeouts.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3a84d53`)
+
+## 08:40 EST — Phase 1 (batch 139)
+- Bets (`/bets`) + Settings subpages (`/settings/appearance`, `/settings/scoring`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
+- Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d07d039`)
