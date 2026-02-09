@@ -30,6 +30,7 @@ import {
   Phone,
   Sliders,
   DollarSign,
+  Printer,
 } from 'lucide-react';
 
 /**
@@ -152,6 +153,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Emergency & venue',
     icon: Phone,
     href: '/captain/contacts',
+    color: 'var(--maroon-light)',
+  },
+  {
+    id: 'pairings',
+    label: 'Print Pairings',
+    description: 'Printable match sheet',
+    icon: Printer,
+    href: '/captain/pairings',
     color: 'var(--maroon-light)',
   },
 ];

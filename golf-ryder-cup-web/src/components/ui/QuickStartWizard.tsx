@@ -23,7 +23,12 @@ import {
   Sparkles,
   Search,
   Navigation,
+  Layers,
+  Trophy,
 } from 'lucide-react';
+import type { TripTemplate, TemplateConfig } from '@/lib/types/templates';
+import { calculateTemplateTotalMatches, calculateTemplateDays } from '@/lib/types/templates';
+import { TemplatePicker } from '@/components/ui/TemplatePicker';
 
 interface QuickStartWizardProps {
   onComplete: (tripData: TripData) => void;
@@ -39,6 +44,8 @@ interface TripData {
   courseName: string;
   teamAName: string;
   teamBName: string;
+  /** Template config if a template was selected */
+  templateConfig?: TemplateConfig;
 }
 
 type Step = 'basics' | 'dates' | 'course' | 'teams' | 'confirm';
@@ -52,6 +59,7 @@ export function QuickStartWizard({
 }: QuickStartWizardProps) {
   const [currentStep, setCurrentStep] = useState<Step>('basics');
   const [isExiting, setIsExiting] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<TripTemplate | null>(null);
   const [tripData, setTripData] = useState<TripData>({
     name: '',
     location: '',
@@ -61,6 +69,26 @@ export function QuickStartWizard({
     teamAName: 'USA',
     teamBName: 'Europe',
   });
+
+  /** Called when a template is picked from the TemplatePicker */
+  const handleTemplateSelect = useCallback((template: TripTemplate) => {
+    setSelectedTemplate(template);
+    setTripData((prev) => ({
+      ...prev,
+      teamAName: template.config.teamAName,
+      teamBName: template.config.teamBName,
+      templateConfig: template.config,
+    }));
+  }, []);
+
+  /** Clear the selected template */
+  const handleTemplateClear = useCallback(() => {
+    setSelectedTemplate(null);
+    setTripData((prev) => ({
+      ...prev,
+      templateConfig: undefined,
+    }));
+  }, []);
 
   const currentStepIndex = steps.indexOf(currentStep);
   const isFirstStep = currentStepIndex === 0;
@@ -189,7 +217,13 @@ export function QuickStartWizard({
         }}
       >
         {currentStep === 'basics' && (
-          <StepBasics tripData={tripData} updateField={updateField} />
+          <StepBasics
+            tripData={tripData}
+            updateField={updateField}
+            selectedTemplate={selectedTemplate}
+            onTemplateSelect={handleTemplateSelect}
+            onTemplateClear={handleTemplateClear}
+          />
         )}
         {currentStep === 'dates' && (
           <StepDates tripData={tripData} updateField={updateField} />
@@ -307,7 +341,21 @@ const labelStyle: React.CSSProperties = {
 
 /* ── Step 1: Basics ── */
 
-function StepBasics({ tripData, updateField }: StepProps) {
+interface StepBasicsProps extends StepProps {
+  selectedTemplate: TripTemplate | null;
+  onTemplateSelect: (template: TripTemplate) => void;
+  onTemplateClear: () => void;
+}
+
+function StepBasics({
+  tripData,
+  updateField,
+  selectedTemplate,
+  onTemplateSelect,
+  onTemplateClear,
+}: StepBasicsProps) {
+  const [showPicker, setShowPicker] = useState(false);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
       {/* Hero */}
@@ -402,6 +450,164 @@ function StepBasics({ tripData, updateField }: StepProps) {
             />
           </div>
         </div>
+      </div>
+
+      {/* Start from Template section */}
+      <div>
+        <div
+          style={{
+            height: '1px',
+            background: 'var(--rule)',
+            marginBottom: 'var(--space-5)',
+          }}
+        />
+        <p
+          style={{
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--ink-secondary)',
+            marginBottom: 'var(--space-3)',
+          }}
+        >
+          Start from Template
+        </p>
+
+        {selectedTemplate ? (
+          /* Selected template summary card */
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'rgba(0, 77, 51, 0.04)',
+              border: '1px solid var(--masters)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              <h4
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontStyle: 'italic',
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
+                }}
+              >
+                {selectedTemplate.name}
+              </h4>
+              <button
+                type="button"
+                onClick={onTemplateClear}
+                style={{
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'transparent',
+                  border: '1px solid var(--rule)',
+                  color: 'var(--ink-secondary)',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                Change
+              </button>
+            </div>
+            {selectedTemplate.description && (
+              <p
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--ink-secondary)',
+                  marginBottom: 'var(--space-2)',
+                  lineHeight: 1.4,
+                }}
+              >
+                {selectedTemplate.description}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Layers className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {selectedTemplate.config.sessions.length} sessions
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Trophy className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {calculateTemplateTotalMatches(selectedTemplate.config)} matches
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {calculateTemplateDays(selectedTemplate.config)} day{calculateTemplateDays(selectedTemplate.config) !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        ) : showPicker ? (
+          /* Expanded template picker */
+          <TemplatePicker
+            onSelect={(template) => {
+              onTemplateSelect(template);
+              setShowPicker(false);
+            }}
+            onCustom={() => setShowPicker(false)}
+            selectedId={undefined}
+          />
+        ) : (
+          /* Collapsed: show a button to open the picker */
+          <button
+            type="button"
+            onClick={() => setShowPicker(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              width: '100%',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'var(--canvas-raised)',
+              border: '1px dashed var(--rule)',
+              color: 'var(--ink-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              fontFamily: 'var(--font-sans)',
+              transition: 'border-color 200ms ease',
+            }}
+          >
+            <Layers className="w-4 h-4" />
+            Choose a Tournament Format
+          </button>
+        )}
       </div>
     </div>
   );

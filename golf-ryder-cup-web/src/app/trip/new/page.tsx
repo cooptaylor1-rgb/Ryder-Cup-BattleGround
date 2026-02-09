@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TripTemplatePicker } from '@/components/trip-setup';
-import type { TripTemplate } from '@/lib/types/templates';
+import type { LegacyTripTemplate as TripTemplate } from '@/lib/types/templates';
 import { createTripFromTemplate, previewTemplateTrip } from '@/lib/services/tripTemplateService';
 import { useUIStore } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';

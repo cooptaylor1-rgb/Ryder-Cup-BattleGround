@@ -15,7 +15,7 @@ import type {
     Player,
     TeamMember,
 } from '../types/models';
-import { getTemplateById } from '../types/templates';
+import { getTemplateById } from '@/lib/types/templates';
 
 /**
  * Options for creating a trip from template

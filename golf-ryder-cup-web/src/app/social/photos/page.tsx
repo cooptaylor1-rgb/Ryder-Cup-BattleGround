@@ -2,17 +2,11 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import {
-  Home,
-  Target,
-  Users,
-  Trophy,
-  MoreHorizontal,
   Camera,
   Plus,
   X,
@@ -22,11 +16,10 @@ import {
   MessageCircle,
   Grid,
   LayoutGrid,
-  CalendarDays,
 } from 'lucide-react';
 
 /**
- * PHOTOS PAGE — Trip Photo Gallery
+ * PHOTOS PAGE -- Trip Photo Gallery
  *
  * Capture and share memories from your golf trip
  */
@@ -47,7 +40,7 @@ function createDemoPhotos(players: { id?: string }[]): Photo[] {
     {
       id: '1',
       url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800',
-      caption: 'First tee vibes 🏌️',
+      caption: 'First tee vibes',
       uploadedBy: players[0]?.id || '',
       createdAt: new Date(now - 1000 * 60 * 30).toISOString(),
       likes: 8,
@@ -63,7 +56,7 @@ function createDemoPhotos(players: { id?: string }[]): Photo[] {
     {
       id: '3',
       url: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=800',
-      caption: 'Eagle on 15! 🦅',
+      caption: 'Eagle on 15!',
       uploadedBy: players[2]?.id || '',
       createdAt: new Date(now - 1000 * 60 * 90).toISOString(),
       likes: 24,
@@ -79,7 +72,7 @@ function createDemoPhotos(players: { id?: string }[]): Photo[] {
     {
       id: '5',
       url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800',
-      caption: '19th hole celebrations 🍻',
+      caption: '19th hole celebrations',
       uploadedBy: players[1]?.id || '',
       createdAt: new Date(now - 1000 * 60 * 180).toISOString(),
       likes: 31,
@@ -105,7 +98,7 @@ export default function PhotosPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // No redirect when no trip is selected — render a premium empty state instead.
+  // No redirect when no trip is selected -- render a premium empty state instead.
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -300,33 +293,7 @@ export default function PhotosPage() {
         </div>
       )}
 
-      {/* Bottom Navigation */}
-      <nav className="nav-premium bottom-nav">
-        <Link href="/" className="nav-item">
-          <Home size={22} strokeWidth={1.75} />
-          <span>Home</span>
-        </Link>
-        <Link href="/schedule" className="nav-item">
-          <CalendarDays size={22} strokeWidth={1.75} />
-          <span>Schedule</span>
-        </Link>
-        <Link href="/score" className="nav-item">
-          <Target size={22} strokeWidth={1.75} />
-          <span>Score</span>
-        </Link>
-        <Link href="/matchups" className="nav-item">
-          <Users size={22} strokeWidth={1.75} />
-          <span>Matches</span>
-        </Link>
-        <Link href="/standings" className="nav-item">
-          <Trophy size={22} strokeWidth={1.75} />
-          <span>Standings</span>
-        </Link>
-        <Link href="/more" className="nav-item">
-          <MoreHorizontal size={22} strokeWidth={1.75} />
-          <span>More</span>
-        </Link>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

@@ -23,7 +23,9 @@ import {
     Trophy,
     Target,
 } from 'lucide-react';
-import { TripTemplate, TRIP_TEMPLATES } from '@/lib/types/templates';
+import { type LegacyTripTemplate, TRIP_TEMPLATES } from '@/lib/types/templates';
+
+type TripTemplate = LegacyTripTemplate;
 
 // Colors
 const COLORS = {

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
+import { shareBanterPost } from '@/lib/utils/share';
 import { EmptyStatePremium, NoMessagesEmpty } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import {
@@ -16,15 +17,19 @@ import {
   Smile,
   Image as ImageIcon,
   Flame,
+  Share2,
 } from 'lucide-react';
 import type { Player, BanterPost } from '@/lib/types/models';
 
 /**
- * SOCIAL PAGE — Trash Talk & Team Banter
+ * SOCIAL PAGE -- Trash Talk & Team Banter
  *
  * The social hub for your golf trip. Talk smack,
  * celebrate wins, and keep the competition fun!
  */
+
+// Golf-themed reaction emoji set used across the social feed
+const GOLF_REACTIONS = ['\u26F3', '\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\uD83C\uDFC6'];
 
 export default function SocialPage() {
   const router = useRouter();
@@ -33,7 +38,7 @@ export default function SocialPage() {
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
 
-  // No redirect when no trip is selected — render a premium empty state instead.
+  // No redirect when no trip is selected -- render a premium empty state instead.
 
   // Get real banter posts from database
   const banterPosts = useLiveQuery(
@@ -53,10 +58,12 @@ export default function SocialPage() {
     return players.find((p) => p.id === id);
   };
 
+  // Get the current user ID (first player as default)
+  const currentUserId = players[0]?.id;
+
   const handleSend = async () => {
     if (!message.trim() || !currentTrip) return;
 
-    // Get first player as default author (in real app, would use auth context)
     const author = players[0];
 
     if (!author) {
@@ -83,7 +90,53 @@ export default function SocialPage() {
     }
   };
 
-  const quickReactions = ['🔥', '👏', '😂', '💪', '⛳', '🎯'];
+  // Toggle a reaction on a banter post
+  const handleToggleReaction = useCallback(
+    async (postId: string, emoji: string) => {
+      if (!currentUserId) return;
+
+      try {
+        const post = await db.banterPosts.get(postId);
+        if (!post) return;
+
+        const reactions = { ...(post.reactions || {}) };
+        const currentReactors = reactions[emoji] ? [...reactions[emoji]] : [];
+        const alreadyReacted = currentReactors.includes(currentUserId);
+
+        if (alreadyReacted) {
+          reactions[emoji] = currentReactors.filter((id) => id !== currentUserId);
+          // Remove the key entirely if no reactors remain
+          if (reactions[emoji].length === 0) {
+            delete reactions[emoji];
+          }
+        } else {
+          reactions[emoji] = [...currentReactors, currentUserId];
+        }
+
+        await db.banterPosts.update(postId, { reactions });
+      } catch (error) {
+        uiLogger.error('Failed to toggle reaction:', error);
+      }
+    },
+    [currentUserId]
+  );
+
+  // Share a banter post using the native share utility
+  const handleSharePost = useCallback(
+    async (post: BanterPost) => {
+      const authorName = post.authorName || 'Unknown';
+      const result = await shareBanterPost(authorName, post.content);
+
+      if (result.shared && result.method === 'clipboard') {
+        showToast('success', 'Copied to clipboard');
+      } else if (!result.shared) {
+        showToast('error', 'Could not share post');
+      }
+    },
+    [showToast]
+  );
+
+  const quickEmojis = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
 
   if (!currentTrip) {
     return (
@@ -150,7 +203,16 @@ export default function SocialPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           {banterPosts.map((post) => {
             const player = post.authorId ? getPlayer(post.authorId) : undefined;
-            return <PostCard key={post.id} post={post} player={player} />;
+            return (
+              <PostCard
+                key={post.id}
+                post={post}
+                player={player}
+                currentUserId={currentUserId}
+                onToggleReaction={handleToggleReaction}
+                onShare={handleSharePost}
+              />
+            );
           })}
         </div>
 
@@ -173,7 +235,7 @@ export default function SocialPage() {
         {/* Quick Reactions */}
         {showEmojis && (
           <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-3)', borderBottom: '1px solid var(--rule)' }}>
-            {quickReactions.map((emoji) => (
+            {quickEmojis.map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => {
@@ -294,17 +356,20 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
 interface PostCardProps {
   post: BanterPost;
   player?: Player;
+  currentUserId?: string;
+  onToggleReaction: (postId: string, emoji: string) => void;
+  onShare: (post: BanterPost) => void;
 }
 
-function PostCard({ post, player }: PostCardProps) {
-  // Store current time to avoid calling Date.now() during render
+function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: PostCardProps) {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
 
   // Update time periodically for "time ago" display
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 60000); // Update every minute
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -325,6 +390,12 @@ function PostCard({ post, player }: PostCardProps) {
     : post.authorName || 'Unknown';
 
   const initials = displayName.charAt(0).toUpperCase();
+
+  // Build reaction display data from the post's reactions map
+  const reactions = post.reactions || {};
+  const activeReactions = Object.entries(reactions).filter(
+    ([, reactorIds]) => reactorIds.length > 0
+  );
 
   return (
     <div
@@ -367,6 +438,22 @@ function PostCard({ post, player }: PostCardProps) {
             {post.postType}
           </span>
         )}
+        {/* Share Button */}
+        <button
+          onClick={() => onShare(post)}
+          aria-label="Share post"
+          style={{
+            padding: 'var(--space-2)',
+            borderRadius: 'var(--radius-sm)',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--ink-tertiary)',
+            transition: 'color 0.15s ease',
+          }}
+        >
+          <Share2 size={16} />
+        </button>
       </div>
 
       {/* Content */}
@@ -378,6 +465,110 @@ function PostCard({ post, player }: PostCardProps) {
           <span style={{ fontSize: '1.5rem' }}>{post.emoji}</span>
         </div>
       )}
+
+      {/* Reactions Display & Picker */}
+      <div
+        style={{
+          marginTop: 'var(--space-3)',
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 'var(--space-1)',
+        }}
+      >
+        {/* Existing reactions */}
+        {activeReactions.map(([emoji, reactorIds]) => {
+          const hasReacted = currentUserId ? reactorIds.includes(currentUserId) : false;
+          return (
+            <button
+              key={emoji}
+              onClick={() => onToggleReaction(post.id, emoji)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-1)',
+                padding: '2px var(--space-2)',
+                borderRadius: 'var(--radius-full)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 500,
+                background: hasReacted ? 'var(--masters)' : 'var(--canvas-raised)',
+                color: hasReacted ? 'white' : 'var(--ink-secondary)',
+                border: hasReacted ? '1px solid var(--masters)' : '1px solid var(--rule)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>{emoji}</span>
+              <span>{reactorIds.length}</span>
+            </button>
+          );
+        })}
+
+        {/* Add reaction toggle */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setShowReactionPicker(!showReactionPicker)}
+            aria-label="Add reaction"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              borderRadius: 'var(--radius-full)',
+              background: showReactionPicker ? 'var(--masters)' : 'var(--canvas-raised)',
+              color: showReactionPicker ? 'white' : 'var(--ink-tertiary)',
+              border: '1px solid var(--rule)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {showReactionPicker ? '\u2715' : '+'}
+          </button>
+
+          {/* Inline reaction picker */}
+          {showReactionPicker && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '100%',
+                left: 0,
+                marginBottom: 'var(--space-2)',
+                display: 'flex',
+                gap: 'var(--space-1)',
+                padding: 'var(--space-2)',
+                borderRadius: 'var(--radius-lg)',
+                background: 'var(--canvas)',
+                border: '1px solid var(--rule)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
+                zIndex: 10,
+              }}
+            >
+              {GOLF_REACTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => {
+                    onToggleReaction(post.id, emoji);
+                    setShowReactionPicker(false);
+                  }}
+                  style={{
+                    fontSize: '1.25rem',
+                    padding: 'var(--space-1)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'transform 0.1s ease',
+                  }}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

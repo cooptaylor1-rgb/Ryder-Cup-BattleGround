@@ -8,10 +8,7 @@ import { useTripStore, useUIStore, useAuthStore } from '@/lib/stores';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import { createLogger } from '@/lib/utils/logger';
 import {
-  // Navigation & UI
   ChevronRight,
-  ChevronLeft,
-  ChevronDown,
   // Account & Auth
   User,
   LogIn,
@@ -20,37 +17,34 @@ import {
   Shield,
   Lock,
   Unlock,
-  Users,
   MapPin,
-  // Features
-  Award,
-  Camera,
-  Coins,
-  BarChart3,
+  DollarSign,
   CalendarDays,
-  Eye,
-  ExternalLink,
-  Sparkles,
+  // Social
+  MessageSquare,
+  BarChart3,
+  Award,
+  Coins,
   // Settings
   Palette,
   Bell,
   Target,
+  HardDrive,
   // Data
   Database,
   Trash2,
-  HardDrive,
   // Info
   Heart,
+  Info,
 } from 'lucide-react';
-import { BottomNav } from '@/components/layout';
-import { EmptyStatePremium } from '@/components/ui';
+import { PageHeader, BottomNav } from '@/components/layout';
 
 /**
- * MORE PAGE -- Editorial Hub
+ * MORE PAGE -- Organized Settings & Hub
  *
- * Clean, organized access to all features, settings, and account management.
- * Uses the Fried Egg Golf editorial design system with warm typography,
- * cream canvas, and clean list rows instead of grids.
+ * Clean, section-based layout with Trip Management, Social,
+ * Settings, and Account groups. Uses the Fried Egg Golf
+ * editorial design system.
  */
 
 // ============================================
@@ -73,9 +67,6 @@ interface MenuItem {
   badge?: string;
   badgeColor?: string;
   destructive?: boolean;
-  requiresTrip?: boolean;
-  requiresCaptain?: boolean;
-  external?: boolean;
 }
 
 // ============================================
@@ -103,22 +94,10 @@ export default function MorePage() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showExitTripConfirm, setShowExitTripConfirm] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    features: true,
-    manage: true,
-    settings: false,
-    data: false,
-    admin: true,
-  });
-
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
-  };
 
   // Handlers
   const handleEnableCaptainMode = async () => {
     if (captainPin.length < 4) return;
-
     try {
       await enableCaptainMode(captainPin);
       setShowCaptainModal(false);
@@ -131,7 +110,6 @@ export default function MorePage() {
 
   const handleEnableAdminMode = async () => {
     if (adminPin.length < 4) return;
-
     try {
       await enableAdminMode(adminPin);
       setShowAdminModal(false);
@@ -179,220 +157,207 @@ export default function MorePage() {
   // MENU SECTIONS
   // ============================================
 
-  const menuSections: MenuSection[] = [
-    // Features & Activities
-    {
-      id: 'features',
-      title: 'Features',
-      items: [
-        {
-          id: 'achievements',
-          label: 'Achievements',
-          description: 'Badges & milestones',
-          icon: <Award size={20} />,
-          href: '/achievements',
-          badge: 'New',
-          badgeColor: 'var(--masters)',
-        },
-        {
-          id: 'social',
-          label: 'Social & Photos',
-          description: 'Share memories',
-          icon: <Camera size={20} />,
-          href: '/social',
-        },
-        {
-          id: 'bets',
-          label: 'Side Bets',
-          description: 'Fun wagers & pools',
-          icon: <Coins size={20} />,
-          href: '/bets',
-          requiresTrip: true,
-        },
-        {
-          id: 'trip-stats',
-          label: 'Trip Stats',
-          description: 'Beverages, mishaps & more',
-          icon: <BarChart3 size={20} />,
-          href: '/trip-stats',
-          requiresTrip: true,
-        },
-        {
-          id: 'schedule',
-          label: 'Schedule',
-          description: 'Sessions & tee times',
-          icon: <CalendarDays size={20} />,
-          href: '/schedule',
-          requiresTrip: true,
-        },
-        {
-          id: 'stats-hub',
-          label: 'Stats',
-          description: 'Trip tallies & awards',
-          icon: <BarChart3 size={20} />,
-          href: '/stats',
-        },
-        {
-          id: 'live',
-          label: 'Live Leaderboard',
-          description: 'Real-time scores',
-          icon: <Sparkles size={20} />,
-          href: '/live',
-          requiresTrip: true,
-        },
-      ],
-    },
-    // Management (Trip-specific)
-    ...(currentTrip
-      ? [
+  const tripManagementSection: MenuSection = {
+    id: 'trip-management',
+    title: 'Trip Management',
+    items: [
+      ...(isCaptainMode
+        ? [
+            {
+              id: 'captain',
+              label: 'Captain Dashboard',
+              description: 'Lineups, settings & admin',
+              icon: <Shield size={20} />,
+              href: '/captain',
+              badge: 'Active',
+              badgeColor: 'var(--success)',
+            },
+          ]
+        : []),
+      {
+        id: 'finances',
+        label: 'Finances',
+        description: 'Expenses & settling up',
+        icon: <DollarSign size={20} />,
+        href: '/finances',
+      },
+      {
+        id: 'schedule',
+        label: 'Schedule',
+        description: 'Sessions & tee times',
+        icon: <CalendarDays size={20} />,
+        href: '/schedule',
+      },
+      {
+        id: 'courses',
+        label: 'Courses',
+        description: 'View & add courses',
+        icon: <MapPin size={20} />,
+        href: '/courses',
+      },
+    ],
+  };
+
+  const socialSection: MenuSection = {
+    id: 'social',
+    title: 'Social',
+    items: [
+      {
+        id: 'banter',
+        label: 'Banter / Journal',
+        description: 'Trip talk & memories',
+        icon: <MessageSquare size={20} />,
+        href: '/social',
+      },
+      {
+        id: 'trip-stats',
+        label: 'Trip Stats',
+        description: 'Beverages, mishaps & more',
+        icon: <BarChart3 size={20} />,
+        href: '/trip-stats',
+      },
+      {
+        id: 'awards',
+        label: 'Awards',
+        description: 'Badges & milestones',
+        icon: <Award size={20} />,
+        href: '/trip-stats/awards',
+      },
+      {
+        id: 'bets',
+        label: 'Bets & Side Games',
+        description: 'Fun wagers & pools',
+        icon: <Coins size={20} />,
+        href: '/bets',
+      },
+    ],
+  };
+
+  const settingsSection: MenuSection = {
+    id: 'settings',
+    title: 'Settings',
+    items: [
+      {
+        id: 'appearance',
+        label: 'Appearance',
+        description: 'Theme & display',
+        icon: <Palette size={20} />,
+        href: '/settings/appearance',
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        description: 'Alerts & reminders',
+        icon: <Bell size={20} />,
+        href: '/settings/notifications',
+      },
+      {
+        id: 'scoring',
+        label: 'Scoring Preferences',
+        description: 'Rules & behavior',
+        icon: <Target size={20} />,
+        href: '/settings/scoring',
+      },
+      {
+        id: 'backup',
+        label: 'Backup & Export',
+        description: 'Save your data',
+        icon: <HardDrive size={20} />,
+        href: '/settings/backup',
+      },
+    ],
+  };
+
+  const accountSection: MenuSection = {
+    id: 'account',
+    title: 'Account',
+    items: [
+      {
+        id: 'profile',
+        label: 'My Profile',
+        description: 'View & edit your info',
+        icon: <User size={20} />,
+        href: '/profile',
+      },
+      {
+        id: 'about',
+        label: 'About',
+        description: 'Version 1.1.0',
+        icon: <Info size={20} />,
+        // No href -- rendered inline with version info below
+      },
+    ],
+  };
+
+  // Developer tools (development only)
+  const devToolsSection: MenuSection | null =
+    process.env.NODE_ENV === 'development'
+      ? {
+          id: 'dev-tools',
+          title: 'Developer Tools',
+          items: [
+            {
+              id: 'demo',
+              label: 'Load Demo Data',
+              description: 'Try with sample trip',
+              icon: <Database size={20} />,
+              action: handleSeedData,
+            },
+            {
+              id: 'clear-dev',
+              label: 'Clear All Data',
+              description: 'Start fresh',
+              icon: <Trash2 size={20} />,
+              action: () => setShowClearConfirm(true),
+              destructive: true,
+            },
+          ],
+        }
+      : null;
+
+  // Admin tools (only when admin mode is active)
+  const adminToolsSection: MenuSection | null = isAdminMode
+    ? {
+        id: 'admin-tools',
+        title: 'Admin Tools',
+        items: [
           {
-            id: 'manage',
-            title: 'Trip Management',
-            items: [
-              {
-                id: 'captain-center',
-                label: 'Captain Command',
-                description: 'Lineups, settings & more',
-                icon: <Shield size={20} />,
-                href: '/captain',
-                requiresCaptain: true,
-                badge: isCaptainMode ? 'Active' : undefined,
-                badgeColor: 'var(--success)',
-              },
-              {
-                id: 'players',
-                label: 'Players',
-                description: 'Manage roster',
-                icon: <Users size={20} />,
-                href: '/players',
-              },
-              {
-                id: 'courses',
-                label: 'Courses',
-                description: 'View & add courses',
-                icon: <MapPin size={20} />,
-                href: '/courses',
-              },
-              {
-                id: 'spectator',
-                label: 'Spectator Link',
-                description: 'Share live scores',
-                icon: <Eye size={20} />,
-                href: `/spectator/${currentTrip.id}`,
-                external: true,
-              },
-            ],
+            id: 'admin-panel',
+            label: 'Admin Panel',
+            description: 'Delete trips & manage data',
+            icon: <Shield size={20} />,
+            href: '/admin',
+            badge: 'Admin',
+            badgeColor: '#dc2626',
           },
-        ]
-      : []),
-    // Settings
-    {
-      id: 'settings',
-      title: 'Settings',
-      items: [
-        {
-          id: 'scoring',
-          label: 'Scoring Preferences',
-          description: 'Rules & behavior',
-          icon: <Target size={20} />,
-          href: '/settings/scoring',
-        },
-        {
-          id: 'notifications',
-          label: 'Notifications',
-          description: 'Alerts & reminders',
-          icon: <Bell size={20} />,
-          href: '/settings/notifications',
-        },
-        {
-          id: 'appearance',
-          label: 'Appearance',
-          description: 'Theme & display',
-          icon: <Palette size={20} />,
-          href: '/settings/appearance',
-        },
-        {
-          id: 'backup',
-          label: 'Backup & Export',
-          description: 'Save your data',
-          icon: <HardDrive size={20} />,
-          href: '/settings/backup',
-        },
-      ],
-    },
-    // Data & Developer (only show in development)
-    ...(process.env.NODE_ENV === 'development'
-      ? [
           {
-            id: 'data',
-            title: 'Developer Tools',
-            items: [
-              {
-                id: 'demo',
-                label: 'Load Demo Data',
-                description: 'Try with sample trip',
-                icon: <Database size={20} />,
-                action: handleSeedData,
-              },
-              {
-                id: 'clear',
-                label: 'Clear All Data',
-                description: 'Start fresh',
-                icon: <Trash2 size={20} />,
-                action: () => setShowClearConfirm(true),
-                destructive: true,
-              },
-            ],
+            id: 'clear-admin',
+            label: 'Clear All Data',
+            description: 'Start fresh',
+            icon: <Trash2 size={20} />,
+            action: () => setShowClearConfirm(true),
+            destructive: true,
           },
-        ]
-      : []),
-    // Admin (only show when admin mode is enabled)
-    ...(isAdminMode
-      ? [
-          {
-            id: 'admin',
-            title: 'Admin Tools',
-            items: [
-              {
-                id: 'admin-panel',
-                label: 'Admin Panel',
-                description: 'Delete trips & manage data',
-                icon: <Shield size={20} />,
-                href: '/admin',
-                badge: 'Admin',
-                badgeColor: '#dc2626',
-              },
-              {
-                id: 'clear-admin',
-                label: 'Clear All Data',
-                description: 'Start fresh',
-                icon: <Trash2 size={20} />,
-                action: () => setShowClearConfirm(true),
-                destructive: true,
-              },
-            ],
-          },
-        ]
-      : []),
+        ],
+      }
+    : null;
+
+  const allSections: MenuSection[] = [
+    tripManagementSection,
+    socialSection,
+    settingsSection,
+    accountSection,
+    ...(devToolsSection ? [devToolsSection] : []),
+    ...(adminToolsSection ? [adminToolsSection] : []),
   ];
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[var(--canvas)] border-b border-[var(--rule)]">
-        <div className="container-editorial flex items-center gap-[var(--space-3)] py-[14px] px-0">
-          <button
-            onClick={() => router.push('/')}
-            className="p-2 bg-transparent border-none cursor-pointer text-[var(--ink-secondary)] rounded-[var(--radius-md)] -ml-2"
-            aria-label="Back"
-          >
-            <ChevronLeft size={22} strokeWidth={1.75} />
-          </button>
-          <h1 className="font-[var(--font-serif)] text-[1.375rem] font-normal text-[var(--ink-primary)] tracking-[-0.01em]">
-            More
-          </h1>
-        </div>
-      </header>
+      <PageHeader
+        title="More"
+        onBack={() => router.push('/')}
+      />
 
       <main className="container-editorial pt-[var(--space-6)] pb-[var(--space-6)]">
         {/* Account Card */}
@@ -560,106 +525,34 @@ export default function MorePage() {
           <Toggle enabled={isAdminMode} color={isAdminMode ? '#dc2626' : undefined} />
         </motion.button>
 
-        {/* Menu Sections */}
-        {(() => {
-          const visibleSections = menuSections
-            .map((section) => {
-              const filteredItems = section.items.filter(
-                (item) =>
-                  (!item.requiresTrip || currentTrip) && (!item.requiresCaptain || isCaptainMode)
-              );
-              return { section, filteredItems };
-            })
-            .filter(({ filteredItems }) => filteredItems.length > 0);
+        {/* Organized Menu Sections */}
+        {allSections.map((section, sectionIndex) => (
+          <motion.section
+            key={section.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 + sectionIndex * 0.05 }}
+            className="mb-[var(--space-6)]"
+          >
+            {sectionIndex > 0 && <hr className="divider-subtle mb-[var(--space-5)]" />}
+            <h2 className="type-overline font-[var(--font-sans)] mb-[var(--space-3)]">
+              {section.title}
+            </h2>
 
-          if (visibleSections.length === 0) {
-            const emptyCopy = !isAuthenticated
-              ? {
-                  title: 'Sign in to continue',
-                  description: 'Log in to access your account, trips, and settings.',
-                  action: { label: 'Sign In', onClick: () => router.push('/login') },
-                }
-              : !currentTrip
-                ? {
-                    title: 'No trip selected',
-                    description: 'Select or create a trip to unlock tournament tools and stats.',
-                    action: { label: 'Go Home', onClick: () => router.push('/') },
-                  }
-                : {
-                    title: 'Nothing to show yet',
-                    description: 'More tools will appear here as your tournament fills in.',
-                    action: { label: 'Go Home', onClick: () => router.push('/') },
-                  };
-
-            return (
-              <div className="mt-[var(--space-6)]">
-                <EmptyStatePremium
-                  illustration="flag"
-                  title={emptyCopy.title}
-                  description={emptyCopy.description}
-                  action={emptyCopy.action}
-                  variant="large"
+            <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden">
+              {section.items.map((item, index) => (
+                <MenuItemRow
+                  key={item.id}
+                  item={item}
+                  isLast={index === section.items.length - 1}
+                  isLoading={item.id === 'demo' && isSeeding}
                 />
-              </div>
-            );
-          }
+              ))}
+            </div>
+          </motion.section>
+        ))}
 
-          return visibleSections.map(({ section, filteredItems }, sectionIndex) => {
-            const isExpanded = expandedSections[section.id] ?? true;
-
-            return (
-              <motion.section
-                key={section.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-                className="mb-[var(--space-6)]"
-              >
-                {/* Section header with divider */}
-                {sectionIndex > 0 && <hr className="divider-subtle mb-[var(--space-5)]" />}
-                <button
-                  onClick={() => toggleSection(section.id)}
-                  className="flex items-center justify-between w-full p-0 bg-transparent border-none cursor-pointer mb-[var(--space-3)]"
-                >
-                  <h2 className="type-overline font-[var(--font-sans)]">
-                    {section.title}
-                  </h2>
-                  <ChevronDown
-                    size={16}
-                    className={`text-[var(--ink-tertiary)] transition-transform duration-200 ${
-                      isExpanded ? 'rotate-180' : 'rotate-0'
-                    }`}
-                  />
-                </button>
-
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden">
-                        {filteredItems.map((item, index) => (
-                          <MenuItemRow
-                            key={item.id}
-                            item={item}
-                            isLast={index === filteredItems.length - 1}
-                            isLoading={item.id === 'demo' && isSeeding}
-                          />
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.section>
-            );
-          });
-        })()}
-
-        {/* About Section */}
+        {/* About Section -- inline version info */}
         <hr className="divider-subtle" />
         <motion.section
           initial={{ opacity: 0, y: 10 }}
@@ -893,8 +786,6 @@ function MenuItemRow({
         <span className="font-[var(--font-sans)] text-[0.8125rem] text-[var(--ink-tertiary)]">
           Loading...
         </span>
-      ) : item.external ? (
-        <ExternalLink size={18} className="text-[var(--ink-tertiary)] shrink-0" />
       ) : item.href ? (
         <ChevronRight size={18} className="text-[var(--ink-tertiary)] shrink-0" />
       ) : null}
@@ -913,10 +804,19 @@ function MenuItemRow({
     );
   }
 
+  if (item.action) {
+    return (
+      <button onClick={item.action} className={itemClassName} disabled={isLoading}>
+        {content}
+      </button>
+    );
+  }
+
+  // Inert row (e.g. About -- no link, no action)
   return (
-    <button onClick={item.action} className={itemClassName} disabled={isLoading}>
+    <div className={itemClassName}>
       {content}
-    </button>
+    </div>
   );
 }
 

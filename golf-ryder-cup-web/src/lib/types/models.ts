@@ -479,6 +479,8 @@ export interface BanterPost {
   authorName: string;
   postType: BanterPostType;
   emoji?: string;
+  /** Emoji reactions: maps emoji string to array of player IDs who reacted */
+  reactions?: Record<string, string[]>;
   relatedMatchId?: UUID;
   timestamp: ISODateString;
 }

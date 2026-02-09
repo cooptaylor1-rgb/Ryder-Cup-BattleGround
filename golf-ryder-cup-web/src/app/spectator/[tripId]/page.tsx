@@ -24,10 +24,11 @@ import {
     WifiOff,
     Flag,
     Target,
+    Share2,
 } from 'lucide-react';
 import { colors } from '@/lib/design-system/tokens';
 import { db } from '@/lib/db';
-import { buildSpectatorView } from '@/lib/services/spectatorService';
+import { buildSpectatorView, generateScoreboardText } from '@/lib/services/spectatorService';
 import { tripLogger } from '@/lib/utils/logger';
 import type { SpectatorView, SpectatorMatch } from '@/lib/types/captain';
 
@@ -135,6 +136,34 @@ export default function SpectatorPage() {
     };
 
     // ============================================
+    // SHARE SCOREBOARD
+    // ============================================
+
+    const handleShare = useCallback(async () => {
+        if (!spectatorView) return;
+        const text = generateScoreboardText(spectatorView);
+        const shareUrl = window.location.href;
+
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+                await navigator.share({
+                    title: `${spectatorView.tripName} — Live Scoreboard`,
+                    text,
+                    url: shareUrl,
+                });
+            } catch {
+                // User cancelled or share failed
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(`${text}\n\n${shareUrl}`);
+            } catch {
+                // Clipboard not available
+            }
+        }
+    }, [spectatorView]);
+
+    // ============================================
     // RENDER
     // ============================================
 
@@ -216,6 +245,15 @@ export default function SpectatorPage() {
                         <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${isOnline ? 'text-green-400' : 'text-red-400'}`}>
                             {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
                         </div>
+
+                        {/* Share Button */}
+                        <button
+                            onClick={handleShare}
+                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
+                            title="Share scoreboard"
+                        >
+                            <Share2 className="w-4 h-4 text-[#A0A0A0]" />
+                        </button>
 
                         {/* Refresh Button */}
                         <button

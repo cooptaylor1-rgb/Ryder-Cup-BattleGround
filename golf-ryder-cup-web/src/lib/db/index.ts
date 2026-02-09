@@ -48,6 +48,7 @@ import type {
 } from '@/lib/types/sideGames';
 import type { SyncQueueItem } from '@/lib/types/sync';
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
+import type { TripTemplate } from '@/lib/types/templates';
 
 /**
  * Course Library Sync Queue Entry
@@ -137,6 +138,9 @@ export class GolfTripDB extends Dexie {
   // Finances (v10)
   duesLineItems!: Table<DuesLineItem>;
   paymentRecords!: Table<PaymentRecord>;
+
+  // Trip Templates (v11)
+  tripTemplates!: Table<TripTemplate>;
 
   constructor() {
     super('GolfTripDB');
@@ -261,6 +265,11 @@ export class GolfTripDB extends Dexie {
     this.version(10).stores({
       duesLineItems: 'id, tripId, playerId, category, status, [tripId+playerId], [tripId+status], [tripId+category]',
       paymentRecords: 'id, tripId, fromPlayerId, createdAt, [tripId+fromPlayerId]',
+    });
+
+    // Schema version 11 - Trip Templates
+    this.version(11).stores({
+      tripTemplates: 'id, name, isBuiltin, useCount, createdAt',
     });
   }
 }
