@@ -102,10 +102,7 @@ export default function ScoringSettingsPage() {
   const { scoringPreferences, updateScoringPreference, resetScoringPreferences } = useUIStore();
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Scoring"
         subtitle="Rules & preferences"
