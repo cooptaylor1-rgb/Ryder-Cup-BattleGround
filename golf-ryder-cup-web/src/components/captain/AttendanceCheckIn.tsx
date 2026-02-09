@@ -331,7 +331,7 @@ export function AttendanceCheckIn({
             <div className="flex-1 overflow-y-auto px-4 pb-4">
                 {/* Team A */}
                 <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1" style={{ background: 'var(--canvas)' }}>
+                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
                         <span className="w-3 h-3 rounded-full bg-red-500" />
                         <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                             Team A ({groupedByTeam.teamA.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamA.length})
@@ -357,7 +357,7 @@ export function AttendanceCheckIn({
 
                 {/* Team B */}
                 <div>
-                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1" style={{ background: 'var(--canvas)' }}>
+                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
                         <span className="w-3 h-3 rounded-full bg-blue-500" />
                         <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                             Team B ({groupedByTeam.teamB.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamB.length})
@@ -592,8 +592,7 @@ function ETAModal({ player, onSetETA, onClose }: ETAModalProps) {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="relative w-full max-w-sm rounded-2xl overflow-hidden"
-                style={{ background: 'var(--canvas)' }}
+                className="relative w-full max-w-sm rounded-2xl overflow-hidden bg-[var(--canvas)]"
             >
                 <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
                     <div className="flex items-center justify-between">

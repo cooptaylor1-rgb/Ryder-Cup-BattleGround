@@ -133,7 +133,7 @@ function PlayerPool({
     isLocked: _isLocked,
 }: PlayerPoolProps) {
     return (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}>
+        <div className="rounded-2xl overflow-hidden bg-[var(--canvas)] border border-[var(--rule)]">
             {/* Header */}
             <button
                 onClick={onToggle}

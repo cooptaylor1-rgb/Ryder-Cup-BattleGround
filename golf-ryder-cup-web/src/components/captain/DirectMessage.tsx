@@ -295,8 +295,7 @@ export function DirectMessage({
                                     {sentMessages.slice(0, 5).map(msg => (
                                         <div
                                             key={msg.id}
-                                            className="p-3 rounded-lg"
-                                            style={{ background: 'var(--canvas)' }}
+                                            className="p-3 rounded-lg bg-[var(--canvas)]"
                                         >
                                             <p className="text-sm" style={{ color: 'var(--ink)' }}>
                                                 {msg.message}
