@@ -114,3 +114,4 @@ All times America/New_York.
 - 22:25 — Shipped batch: Score (match list) (`/score`) now uses the standard premium wrapper classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline styles for consistent theming/navigation. (commit dfe9fc5)
 - 22:45 — Shipped batch: Home (`/`) standardized the premium wrapper and skeleton backgrounds to use `bg-[var(--canvas)]` and Tailwind arbitrary values (e.g. `py-[var(--space-2)]`) instead of inline style props for consistent theming. (commit 5cea7dd)
 - 23:20 — Shipped batch: Settings → Backup (`/settings/backup`) refreshed to match the standard premium UI (shared `PageHeader`, card surfaces, theme tokens, and shared button styles) instead of hard-coded dark colors. (commit d97d892)
+- 04:10 — Shipped batch: Matchups (`/matchups`) removed inline `style={{ background: 'var(--canvas)' }}` usage and standardized the premium wrapper to `bg-[var(--canvas)]` for consistent theming. (commit fec733f)
