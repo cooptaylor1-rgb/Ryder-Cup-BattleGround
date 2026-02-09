@@ -678,4 +678,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Finances (`/finances`): replaced a silent `return null` ledger section with an explicit compact `EmptyStatePremium` so the Overview tab never renders a confusing blank area.
 - Finances: Payments tab now renders a compact premium empty state when there are no payments.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5b5bf48`)
+- Commit + push ✅ (`b76b126`)
