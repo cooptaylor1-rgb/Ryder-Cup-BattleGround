@@ -254,10 +254,7 @@ export default function PlayersPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Players"
           subtitle="No active trip"
@@ -286,10 +283,7 @@ export default function PlayersPage() {
   const unassignedPlayers = players.filter((p) => !getPlayerTeam(p.id));
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Players"
         subtitle={`${players.length} player${players.length === 1 ? '' : 's'}`}
@@ -345,7 +339,7 @@ export default function PlayersPage() {
         }
       />
 
-      <main className="container-editorial" style={{ paddingBottom: 'var(--space-8)' }}>
+      <main className="container-editorial pb-[var(--space-8)]">
         {/* Team A */}
         <section className="section">
           <h2

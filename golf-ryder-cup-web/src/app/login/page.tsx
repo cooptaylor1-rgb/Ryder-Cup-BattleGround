@@ -59,14 +59,7 @@ export default function LoginPage() {
   const canSubmit = email && pin.length === 4 && !isSubmitting && !isLoading;
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{
-        background: 'var(--canvas)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       {/* Editorial Header */}
       <header
         className="container-editorial"

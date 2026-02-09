@@ -71,3 +71,10 @@
 - Affected components: `PageLoadingSkeleton`, `AppOnboardingProvider` (loading gate), `QuickStartWizard` overlay.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`babd3ce`)
+
+## 03:15 EST — Phase 1 (batch 127)
+- Players (`/players`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Players: replaced the main container’s inline bottom padding style with Tailwind token class (`pb-[var(--space-8)]`).
+- Login (`/login`): standardized the premium wrapper to use `bg-[var(--canvas)]` + Tailwind `flex flex-col` instead of inline layout/background styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (pending)
