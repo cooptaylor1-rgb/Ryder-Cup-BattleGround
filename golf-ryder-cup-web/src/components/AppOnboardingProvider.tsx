@@ -22,8 +22,7 @@ export function AppOnboardingProvider({ children }: AppOnboardingProviderProps) 
     if (isLoading) {
         return (
             <div
-                className="min-h-screen flex items-center justify-center"
-                style={{ background: 'var(--canvas)' }}
+                className="min-h-screen flex items-center justify-center texture-grain bg-[var(--canvas)]"
             >
                 <div className="animate-pulse">
                     <div className="w-16 h-16 rounded-full bg-masters/20" />

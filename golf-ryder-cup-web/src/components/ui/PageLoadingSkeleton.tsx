@@ -57,8 +57,7 @@ export function PageLoadingSkeleton({
 }: PageLoadingSkeletonProps) {
   return (
     <div
-      className="min-h-screen pb-nav page-premium-enter"
-      style={{ background: 'var(--canvas)' }}
+      className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]"
       role="progressbar"
       aria-busy="true"
       aria-label={title}

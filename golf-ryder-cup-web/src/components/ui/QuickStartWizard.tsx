@@ -138,11 +138,10 @@ export function QuickStartWizard({
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[60] flex flex-col',
+        'fixed inset-0 z-[60] flex flex-col bg-[var(--canvas)]',
         isExiting ? 'animate-fade-out' : 'animate-fade-in',
         className
       )}
-      style={{ background: 'var(--canvas)' }}
     >
       {/* Header */}
       <header
