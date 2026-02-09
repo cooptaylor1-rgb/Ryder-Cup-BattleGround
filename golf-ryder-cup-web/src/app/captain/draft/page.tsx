@@ -66,6 +66,13 @@ export default function DraftPage() {
   if (!currentTrip) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Team Draft"
+          subtitle="No active trip"
+          onBack={() => router.back()}
+          icon={<Shuffle size={16} style={{ color: 'white' }} />}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -79,6 +86,7 @@ export default function DraftPage() {
             variant="large"
           />
         </main>
+
         <BottomNav />
       </div>
     );
@@ -87,6 +95,13 @@ export default function DraftPage() {
   if (!isCaptainMode) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Team Draft"
+          subtitle="Captain mode required"
+          onBack={() => router.back()}
+          icon={<Shuffle size={16} style={{ color: 'white' }} />}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -104,6 +119,7 @@ export default function DraftPage() {
             variant="large"
           />
         </main>
+
         <BottomNav />
       </div>
     );
