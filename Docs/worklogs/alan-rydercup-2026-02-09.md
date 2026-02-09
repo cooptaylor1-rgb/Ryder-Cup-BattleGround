@@ -157,3 +157,9 @@
 - Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`f2a5fa8`)
+
+## 12:25 EST — Phase 1 (batch 145)
+- Login (`/login`), Create Profile (`/profile/create`), Complete Profile (`/profile/complete`), Lineup Builder (`/lineup/builder`): wrapped route bodies in `Suspense` with real `PageLoadingSkeleton` fallbacks.
+- Prevents momentary blank screens / Next.js `useSearchParams()` suspense warnings while search params resolve.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`bff33e6`)

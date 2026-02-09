@@ -7,6 +7,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 11:22 EST — Phase 1 (batch 46)
 - Join deep-link (`/join?code=...`): replaced the bespoke loading spinner with the shared `PageLoadingSkeleton` so the loading UX matches the premium design system.
 
+### 12:25 EST — Phase 1 (batch 145)
+- Login (`/login`), Create Profile (`/profile/create`), Complete Profile (`/profile/complete`), Lineup Builder (`/lineup/builder`): wrapped route bodies in `Suspense` with real `PageLoadingSkeleton` fallbacks.
+- Prevents momentary blank screens / Next.js `useSearchParams()` suspense warnings while search params resolve.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`bff33e6`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
