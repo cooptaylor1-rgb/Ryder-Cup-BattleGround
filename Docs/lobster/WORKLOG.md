@@ -24,6 +24,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`754632f`)
 
+### 13:55 EST — Phase 1 (batch 148)
+- Captain `SessionWeatherPanel`: migrated hard-coded gray/dark styles onto token-driven premium styles (`card`, `bg-[var(--surface-secondary)]`, `text-[var(--ink-*)]`) so it matches the Phase 1 theming system.
+- Removed an unused `_getPlayabilityColor` helper.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`762b54e`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)

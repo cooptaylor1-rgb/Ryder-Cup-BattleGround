@@ -175,3 +175,9 @@
 - Standardized wrappers to use `bg-[var(--canvas)]` so premium theming stays token-driven and consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`754632f`)
+
+## 13:55 EST — Phase 1 (batch 148)
+- Captain `SessionWeatherPanel`: migrated hard-coded gray/dark classes onto token-driven premium styles (`card`, `bg-[var(--surface-secondary)]`, `text-[var(--ink-*)]`) so the panel better matches Phase 1 theming.
+- Removed an unused `_getPlayabilityColor` helper and simplified the recommendation copy (removed emoji prefix).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`762b54e`)
