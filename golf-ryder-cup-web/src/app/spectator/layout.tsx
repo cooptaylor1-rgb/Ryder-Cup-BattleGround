@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/utils/metadata';
-import { PageSkeleton, ErrorBoundary } from '@/components/ui';
+import { ErrorBoundary, PageLoadingSkeleton } from '@/components/ui';
 
 export const metadata: Metadata = pageMetadata.spectator;
 
@@ -12,7 +12,15 @@ export default function SpectatorLayout({
 }) {
     return (
         <ErrorBoundary variant="compact">
-            <Suspense fallback={<PageSkeleton />}>
+            <Suspense
+                fallback={
+                    <PageLoadingSkeleton
+                        title="Loading spectator view…"
+                        showBackButton={false}
+                        variant="default"
+                    />
+                }
+            >
                 {children}
             </Suspense>
         </ErrorBoundary>
