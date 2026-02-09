@@ -144,14 +144,11 @@ export default function ScorePage() {
 
     if (!isAuthenticated) {
         return (
-            <div
-                className="min-h-screen pb-nav"
-                style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Score"
                     subtitle="Sign in required"
-                    icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
+                    icon={<Target size={16} className="text-[var(--masters)]" />}
                     onBack={() => router.back()}
                 />
 
@@ -174,14 +171,11 @@ export default function ScorePage() {
 
     if (!currentTrip) {
         return (
-            <div
-                className="min-h-screen pb-nav"
-                style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Score"
                     subtitle="No active trip"
-                    icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
+                    icon={<Target size={16} className="text-[var(--masters)]" />}
                     onBack={() => router.back()}
                 />
 
@@ -203,11 +197,11 @@ export default function ScorePage() {
     }
 
     return (
-        <div className="min-h-screen pb-nav" style={{ background: 'var(--canvas)', fontFamily: 'var(--font-sans)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Score"
                 subtitle={currentTrip.name}
-                icon={<Target size={16} style={{ color: 'var(--masters)' }} />}
+                icon={<Target size={16} className="text-[var(--masters)]" />}
                 onBack={() => router.back()}
             />
 

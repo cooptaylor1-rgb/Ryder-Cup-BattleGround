@@ -639,3 +639,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Daily worklog (`Docs/worklogs/alan-rydercup-2026-02-09.md`): added the missing Phase 1 batch 116 entry for completeness.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6358c0b`)
+
+### 22:25 EST — Phase 1 (batch 117)
+- Score (match list) (`/score`): standardized the outer wrappers to include the premium layout classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline style props.
+- No behavior change; this is purely for visual/navigation consistency with the rest of Phase 1.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

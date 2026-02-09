@@ -12,3 +12,8 @@
 - Lineup Builder (`/lineup/builder`): replaced the bespoke sticky header with `PageHeader`, keeping the Save affordance in `rightSlot`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1251567`)
+
+## 22:25 EST — Phase 1 (batch 117)
+- Score (match list) (`/score`): standardized the wrapper to the standard premium layout classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (TBD)

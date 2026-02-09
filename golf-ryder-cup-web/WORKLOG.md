@@ -109,3 +109,4 @@ All times America/New_York.
 ## 2026-02-09
 - 20:55 — Shipped batch: Admin (`/admin`), Captain Manage (`/captain/manage`), and Captain Side Bets (`/captain/bets`) migrated off bespoke `header-premium` markup onto the shared `PageHeader` for consistent premium navigation (including the Admin Mode Required gate state). (commit 67b5fc4)
 - 21:20 — Shipped batch: Course Library (`/courses`) and its “Search Course Database” view migrated off bespoke header markup onto the shared `PageHeader`. Lineup Builder (`/lineup/builder`) also now uses `PageHeader`, keeping the Save button in `rightSlot` so navigation is consistent. (commit 1251567)
+- 22:25 — Shipped batch: Score (match list) (`/score`) now uses the standard premium wrapper classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline styles for consistent theming/navigation. (commit TBD)
