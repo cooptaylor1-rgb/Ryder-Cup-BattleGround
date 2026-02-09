@@ -690,4 +690,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats (`/trip-stats`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
 - Schedule: migrated the current-user badge in the header to Tailwind token classes (removes inline background/border/boxShadow styles).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`7aeca76`)
