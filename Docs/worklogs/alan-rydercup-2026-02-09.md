@@ -206,3 +206,9 @@
 - ErrorBoundary: replaced `window.location.href = '/'` with `window.location.assign('/')` for a slightly safer navigation call.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8d128ce`)
+
+## 17:45 EST — Phase 1 (batch 153)
+- Not Found (`/_not-found`): replaced remaining inline `style={{ background/color: 'var(--...)' }}` usage with token-driven Tailwind classes (e.g. `bg-[var(--masters-light)]`, `text-[var(--ink-secondary)]`) for consistency.
+- Uses shared `btn` variants (`btn-primary` / `btn-secondary`) for the primary/secondary CTAs.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`354b670`)
