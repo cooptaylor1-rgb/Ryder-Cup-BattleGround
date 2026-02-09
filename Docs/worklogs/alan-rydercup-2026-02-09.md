@@ -60,3 +60,8 @@
 - Schedule: migrated the current-user badge in the header to Tailwind token classes (removes inline background/border/boxShadow styles).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`7aeca76`)
+
+## 01:55 EST — Phase 1 (batch 125)
+- Quick Score FAB: replaced inline `style={{ ... }}` usage with Tailwind arbitrary values (`bg-[var(--masters)]`, `shadow-[...]`, `bg-[rgba(...)]`) for consistency and to avoid silent styling drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`31a2360`)
