@@ -11,12 +11,12 @@ import {
   ChevronDown,
   Shirt,
   Home,
-  ArrowLeft,
   ArrowRight,
   User,
   AlertTriangle,
 } from 'lucide-react';
 import { BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
  * COMPLETE PROFILE PAGE
@@ -202,32 +202,20 @@ export default function CompleteProfilePage() {
 
   return (
     <div className="page-premium-enter texture-grain bg-canvas min-h-screen flex flex-col">
-      {/* ---- HEADER ---- */}
-      <header className="header-premium pt-[calc(var(--space-3)+env(safe-area-inset-top,0px))] pb-[var(--space-3)] px-[var(--space-5)]">
-        <div className="flex items-center justify-between max-w-[600px] mx-auto">
-          {/* Back button */}
+      <PageHeader
+        title="Complete your profile"
+        onBack={() => router.back()}
+        rightSlot={
           <button
-            onClick={() => router.back()}
-            className="press-scale flex items-center justify-center w-[40px] h-[40px] rounded-[var(--radius-md)] border-none bg-transparent cursor-pointer text-ink-secondary"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          {/* Title */}
-          <h1 className="font-serif italic text-[length:var(--text-lg)] font-normal text-ink m-0">
-            Complete Your Profile
-          </h1>
-
-          {/* Skip link */}
-          <button
+            type="button"
             onClick={handleSkip}
-            className="press-scale font-sans text-[length:var(--text-sm)] font-medium text-ink-tertiary bg-transparent border-none cursor-pointer p-[var(--space-2)] transition-colors duration-200"
+            className="btn-ghost press-scale"
+            style={{ padding: 'var(--space-2)' }}
           >
-            Skip for now
+            Skip
           </button>
-        </div>
-      </header>
+        }
+      />
 
       {/* ---- MAIN CONTENT ---- */}
       <main className="flex-1 pb-[140px]">

@@ -658,3 +658,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Backup: improved import/export previews and actions using shared button styles (`btn-primary` / `btn-secondary`) and consistent success/error panels.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d97d892`)
+
+### 23:50 EST — Phase 1 (batch 120)
+- Complete Profile (`/profile/complete`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Complete Profile: standardized the “Skip” affordance to the shared `btn-ghost` style.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
