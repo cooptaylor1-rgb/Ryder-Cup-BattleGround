@@ -84,3 +84,10 @@
 - Setup steps: replaced inline badge/row styling with utility classes via the shared `cn` helper so success and default states honor theme tokens (including hover states).
 - Notification permission banner: moved its icon background + CTA buttons onto tokenized utility classes (`btn-primary`/`btn-ghost`) instead of inline styles so the prompt matches the premium button system.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`13721d2`)
+
+## 05:10 EST — Phase 1 (batch 131)
+- Bets (`/bets`), Captain Invitations (`/captain/invites`), and Trip Settings (`/trip/[tripId]/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
+- Standardized wrappers to use `bg-[var(--canvas)]` so theming can’t silently drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3526c94`)

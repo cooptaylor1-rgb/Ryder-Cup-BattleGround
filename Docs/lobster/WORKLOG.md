@@ -723,3 +723,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Stats: standardized card + surface tokens to `card` + `var(--surface-elevated)` and replaced an invalid border token class with `border-[var(--rule)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c770e5c`)
+
+### 05:10 EST — Phase 1 (batch 131)
+- Bets (`/bets`), Captain Invitations (`/captain/invites`), and Trip Settings (`/trip/[tripId]/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
+- Standardized wrappers to use `bg-[var(--canvas)]` so theming can’t silently drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3526c94`)
