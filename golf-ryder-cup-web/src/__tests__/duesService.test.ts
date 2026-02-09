@@ -26,7 +26,6 @@ import {
   getPayPalLink,
 } from '../lib/services/duesService';
 import type { Player } from '../lib/types/models';
-import type { DuesLineItem } from '../lib/types/finances';
 
 // ============================================
 // HELPERS

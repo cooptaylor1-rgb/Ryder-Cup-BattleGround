@@ -24,7 +24,6 @@ import {
   Clock,
   Trophy,
   Home,
-  MoreHorizontal,
   Zap,
   Car,
   Phone,

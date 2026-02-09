@@ -65,10 +65,6 @@ function createRNG(seed: number) {
 
 const rng = createRNG(42); // Fixed seed for reproducibility
 
-function randomChoice<T>(arr: T[]): T {
-  return arr[Math.floor(rng() * arr.length)];
-}
-
 function shuffle<T>(arr: T[]): T[] {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1263,7 +1259,7 @@ describe('100-User × 100-Trip Stress Simulation', () => {
       hrByMatchHole.set(key, (hrByMatchHole.get(key) || 0) + 1);
     }
 
-    for (const [key, count] of hrByMatchHole) {
+    for (const [_key, count] of hrByMatchHole) {
       if (count > 1) {
         // This is not necessarily a bug if deduplication is handled at query time
         // But it's worth tracking since it can cause inconsistent UI

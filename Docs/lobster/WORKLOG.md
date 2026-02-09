@@ -797,3 +797,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Each now uses the standard premium wrapper + shared `PageHeader`, renders shared `ErrorEmpty` messaging, and includes `BottomNav` so recovery screens aren’t dead ends.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`493ba7f`)
+
+### 10:35 EST — Phase 1 (batch 143)
+- Captain Command Center (`/captain`): removed an unused `MoreHorizontal` icon import (lint hygiene).
+- Tests: removed unused types/helpers (`DuesLineItem`, `randomChoice`) and renamed an unused loop key to `_key`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
