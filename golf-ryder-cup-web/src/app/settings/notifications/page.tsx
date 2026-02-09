@@ -10,7 +10,7 @@
  * - Lineup announcements
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, BellOff, Clock, Zap, Trophy, ClipboardList, Check, AlertCircle } from 'lucide-react';
 import {
@@ -38,11 +38,25 @@ export default function NotificationSettingsPage() {
   const [isRequesting, setIsRequesting] = useState(false);
   const [pendingCount, setPendingCount] = useState(() => getPendingNotificationCount());
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const savedTimeoutRef = useRef<number | null>(null);
 
   const showSaved = (message: string) => {
     setSavedMessage(message);
-    setTimeout(() => setSavedMessage(null), 2000);
+
+    if (savedTimeoutRef.current) {
+      window.clearTimeout(savedTimeoutRef.current);
+    }
+
+    savedTimeoutRef.current = window.setTimeout(() => setSavedMessage(null), 2000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (savedTimeoutRef.current) {
+        window.clearTimeout(savedTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const isNotificationsSupported = typeof window !== 'undefined' && 'Notification' in window;
 
