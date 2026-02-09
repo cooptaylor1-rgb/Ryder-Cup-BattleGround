@@ -30,11 +30,7 @@ export default function PlayersError({ error, reset }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-      role="alert"
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Players"
         subtitle="Something went wrong"

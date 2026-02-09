@@ -53,10 +53,7 @@ export default function MatchScoringError({ error, reset }: ErrorPageProps) {
   }, [error, matchId]);
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center p-6"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
       {/* Icon */}
       <div
         className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"

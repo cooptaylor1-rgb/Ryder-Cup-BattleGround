@@ -23,10 +23,7 @@ export default function LineupError({ error, reset }: ErrorPageProps) {
     }, [error]);
 
     return (
-        <div
-            className="min-h-screen flex flex-col items-center justify-center p-6"
-            style={{ background: 'var(--canvas)' }}
-        >
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
             <div
                 className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
                 style={{ background: 'rgba(239, 68, 68, 0.1)' }}
