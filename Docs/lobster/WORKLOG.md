@@ -18,6 +18,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`17977f0`)
 
+### 13:25 EST — Phase 1 (batch 147)
+- Captain Draft (`/captain/draft`), Captain Pairings (`/captain/pairings`), Captain Settings (`/captain/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
+- Standardized wrappers to use `bg-[var(--canvas)]` so premium theming stays token-driven and consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`754632f`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)

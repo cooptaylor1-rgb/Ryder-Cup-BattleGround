@@ -163,3 +163,15 @@
 - Prevents momentary blank screens / Next.js `useSearchParams()` suspense warnings while search params resolve.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`bff33e6`)
+
+## 12:50 EST — Phase 1 (batch 146)
+- Section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain): replaced the older `PageSkeleton` `Suspense` fallback with the standard `PageLoadingSkeleton`.
+- Keeps layout-level suspense renders consistent with the Phase 1 premium wrapper + BottomNav experience.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`17977f0`)
+
+## 13:25 EST — Phase 1 (batch 147)
+- Captain Draft (`/captain/draft`), Captain Pairings (`/captain/pairings`), Captain Settings (`/captain/settings`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
+- Standardized wrappers to use `bg-[var(--canvas)]` so premium theming stays token-driven and consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`754632f`)
