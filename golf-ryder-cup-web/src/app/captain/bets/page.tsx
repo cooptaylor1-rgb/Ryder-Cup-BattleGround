@@ -7,12 +7,11 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { betsLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { SideBet, SideBetType, Player } from '@/lib/types/models';
 import {
-    ChevronLeft,
     Home,
     Target,
     Users,
@@ -259,28 +258,15 @@ export default function CaptainBetsPage() {
 
     return (
         <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
-            {/* Header */}
-            <header className="header-premium">
-                <div className="container-editorial flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-2 -ml-2 press-scale text-ink-secondary bg-transparent border-none cursor-pointer"
-                        >
-                            <ChevronLeft size={22} />
-                        </button>
-                        <div className="flex items-center gap-[var(--space-3)]">
-                            <div className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center [background:linear-gradient(135deg,#10b981_0%,#059669_100%)]">
-                                <DollarSign size={16} className="text-white" />
-                            </div>
-                            <div>
-                                <span className="type-overline tracking-[0.1em]">Side Bets</span>
-                                <p className="type-caption">{activeBets.length} active</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <PageHeader
+                title="Side Bets"
+                subtitle={`${activeBets.length} active`}
+                icon={<DollarSign size={16} style={{ color: 'white' }} />}
+                iconContainerStyle={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                }}
+                onBack={() => router.back()}
+            />
 
             <main className="container-editorial pt-[var(--space-4)]">
                 {/* Quick Create Section */}

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { BottomNav } from '@/components/layout/BottomNav';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { createLogger } from '@/lib/utils/logger';
 import {
   ChevronLeft,
@@ -257,22 +257,28 @@ export default function AdminPage() {
   // Redirect if not in admin mode
   if (!isAdminMode) {
     return (
-      <div className="min-h-screen pb-nav flex items-center justify-center bg-[var(--canvas)]">
-        <div className="text-center p-8">
-          <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-[var(--surface-elevated)]">
-            <Lock size={32} className="text-[var(--ink-tertiary)]" />
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Admin"
+          subtitle="Admin Mode Required"
+          icon={<Lock size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+
+        <main className="container-editorial py-12 flex items-center justify-center">
+          <div className="text-center" style={{ maxWidth: 520 }}>
+            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-[var(--surface-elevated)]">
+              <Lock size={32} className="text-[var(--ink-tertiary)]" />
+            </div>
+            <h2 className="type-title-lg mb-2">Admin Mode Required</h2>
+            <p className="type-body mb-6 text-[var(--ink-secondary)]">
+              Enable Admin Mode from the More menu to access these features.
+            </p>
+            <Link href="/more" className="btn-premium py-[var(--space-3)] px-[var(--space-5)]">
+              Go to More
+            </Link>
           </div>
-          <h2 className="type-title-lg mb-2">Admin Mode Required</h2>
-          <p className="type-body mb-6 text-[var(--ink-secondary)]">
-            Enable Admin Mode from the More menu to access these features.
-          </p>
-          <Link
-            href="/more"
-            className="btn-premium py-[var(--space-3)] px-[var(--space-5)]"
-          >
-            Go to More
-          </Link>
-        </div>
+        </main>
 
         <BottomNav />
       </div>
@@ -283,37 +289,16 @@ export default function AdminPage() {
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       {ConfirmDialogComponent}
 
-      {/* Header */}
-      <header className="header-premium">
-        <div className="container-editorial flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-none cursor-pointer"
-            >
-              <ChevronLeft size={22} strokeWidth={1.75} />
-            </button>
-            <div className="flex items-center gap-[var(--space-3)]">
-              <div
-                className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center shadow-[0_2px_8px_rgba(220,38,38,0.3)]"
-                style={{
-                  background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-                }}
-              >
-                <Shield size={16} className="text-white" />
-              </div>
-              <div>
-                <span className="type-overline tracking-[0.1em] text-[#dc2626]">
-                  Admin Mode
-                </span>
-                <p className="type-caption truncate mt-[2px]">
-                  Data management
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Admin Mode"
+        subtitle="Data management"
+        icon={<Shield size={16} style={{ color: 'white' }} />}
+        iconContainerStyle={{
+          background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+          boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+        }}
+        onBack={() => router.back()}
+      />
 
       <main className="container-editorial">
         {/* Warning Banner */}

@@ -8,11 +8,10 @@ import { db } from '@/lib/db';
 import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
+import { BottomNav, PageHeader } from '@/components/layout';
 import { captainLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import {
-    ChevronLeft,
     Settings,
     Users,
     Home,
@@ -261,34 +260,16 @@ export default function CaptainManagePage() {
 
     return (
         <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
-            {/* Premium Header */}
-            <header className="header-premium">
-                <div className="container-editorial flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.back()}
-                            className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-none cursor-pointer"
-                            aria-label="Back"
-                        >
-                            <ChevronLeft size={22} strokeWidth={1.75} />
-                        </button>
-                        <div className="flex items-center gap-[var(--space-3)]">
-                            <div
-                                className="w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center [box-shadow:var(--shadow-glow-green)]"
-                                style={{ background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)' }}
-                            >
-                                <Settings size={16} className="text-[var(--color-accent)]" />
-                            </div>
-                            <div>
-                                <span className="type-overline tracking-[0.1em]">Manage Trip</span>
-                                <p className="type-caption truncate mt-[2px]">
-                                    Sessions, Matches & Players
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <PageHeader
+                title="Manage Trip"
+                subtitle="Sessions, Matches & Players"
+                icon={<Settings size={16} style={{ color: 'var(--color-accent)' }} />}
+                iconContainerStyle={{
+                    background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                    boxShadow: 'var(--shadow-glow-green)',
+                }}
+                onBack={() => router.back()}
+            />
 
             <main className="container-editorial">
                 {/* Sessions Section */}
