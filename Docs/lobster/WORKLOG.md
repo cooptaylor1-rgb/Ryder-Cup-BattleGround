@@ -644,3 +644,5 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Score (match list) (`/score`): standardized the outer wrappers to include the premium layout classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline style props.
 - No behavior change; this is purely for visual/navigation consistency with the rest of Phase 1.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ ()
+- Commit + push ✅ (`dfe9fc5`)
