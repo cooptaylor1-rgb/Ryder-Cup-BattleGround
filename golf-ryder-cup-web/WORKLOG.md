@@ -108,6 +108,7 @@ All times America/New_York.
 
 ## 2026-02-09
 - 00:45 — Shipped batch: Finances (`/finances`) Overview tab no longer returns `null` when there are no player-assigned dues; we now render a compact `EmptyStatePremium` so the tab never feels blank. Payments tab also uses a compact premium empty state when there are no payments. (commit b76b126)
+- 02:55 — Shipped batch: standardized the premium wrapper backgrounds on Stats (`/stats`), Join (`/join`), and Not Found (`/_not-found`) to use `bg-[var(--canvas)]` instead of inline `style={{ background: 'var(--canvas)' }}` for consistency. (commit ca9de1f)
 - 20:55 — Shipped batch: Admin (`/admin`), Captain Manage (`/captain/manage`), and Captain Side Bets (`/captain/bets`) migrated off bespoke `header-premium` markup onto the shared `PageHeader` for consistent premium navigation (including the Admin Mode Required gate state). (commit 67b5fc4)
 - 21:20 — Shipped batch: Course Library (`/courses`) and its “Search Course Database” view migrated off bespoke header markup onto the shared `PageHeader`. Lineup Builder (`/lineup/builder`) also now uses `PageHeader`, keeping the Save button in `rightSlot` so navigation is consistent. (commit 1251567)
 - 22:25 — Shipped batch: Score (match list) (`/score`) now uses the standard premium wrapper classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline styles for consistent theming/navigation. (commit dfe9fc5)

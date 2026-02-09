@@ -702,3 +702,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Affected components: `PageLoadingSkeleton`, `AppOnboardingProvider` (loading gate), `QuickStartWizard` overlay.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`babd3ce`)
+
+### 02:55 EST — Phase 1 (batch 127)
+- Stats (`/stats`), Join (`/join`), and Not Found (`/_not-found`): standardized the premium wrapper backgrounds to use `bg-[var(--canvas)]` instead of inline `style={{ background: 'var(--canvas)' }}`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ca9de1f`)
