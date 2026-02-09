@@ -275,10 +275,7 @@ export default function BackupRestorePage() {
 
     if (loadError) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Backup & Restore"
                     subtitle="Trip data management"
@@ -296,10 +293,7 @@ export default function BackupRestorePage() {
     }
 
     return (
-        <div
-            className="min-h-screen pb-nav page-premium-enter texture-grain"
-            style={{ background: 'var(--canvas)' }}
-        >
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Backup & Restore"
                 subtitle="Export and import trip data"

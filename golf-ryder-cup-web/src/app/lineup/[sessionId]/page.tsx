@@ -253,10 +253,7 @@ export default function SessionPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -274,8 +271,7 @@ export default function SessionPage() {
   if (!session) {
     return (
       <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
+        className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -297,10 +293,7 @@ export default function SessionPage() {
   const canStart = isCaptainMode && session.status === 'scheduled' && matches.length > 0;
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title={session.name}
         subtitle={`${session.sessionType} • ${session.pointsPerMatch} pt${session.pointsPerMatch !== 1 ? 's' : ''} each`}
