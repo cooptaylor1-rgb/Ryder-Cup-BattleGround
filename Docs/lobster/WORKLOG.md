@@ -735,3 +735,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized recovery screen wrappers to use `bg-[var(--canvas)]` so theme tokens are applied consistently.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`e4c589b`)
+
+### 06:10 EST — Phase 1 (batch 133)
+- Social (`/social`) + Social Photos (`/social/photos`): standardized wrappers to use token-driven Tailwind classes (`bg-[var(--canvas)]`, `flex flex-col`) instead of inline `style={{ background: 'var(--canvas)' }}` / layout styles.
+- Captain Checklist (`/captain/checklist`): standardized wrappers to `bg-[var(--canvas)]` and migrated remaining icon/padding/background inline styles to token utilities.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4786187`)

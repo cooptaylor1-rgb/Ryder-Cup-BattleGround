@@ -97,3 +97,10 @@
 - Standardized to token-driven Tailwind (`bg-[var(--canvas)]`) so recovery screens can’t silently drift off-theme.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`e4c589b`)
+
+## 06:10 EST — Phase 1 (batch 133)
+- Social (`/social`): replaced remaining inline wrapper/background/layout styles with the standard premium wrapper classes (`bg-[var(--canvas)]`, `flex flex-col`) and tokenized container spacing.
+- Social Photos (`/social/photos`): standardized the wrapper background to `bg-[var(--canvas)]` and removed small inline padding overrides in the header actions.
+- Captain Checklist (`/captain/checklist`): standardized all wrapper states to `bg-[var(--canvas)]` and migrated remaining icon/padding/background inline styles to Tailwind token utilities.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4786187`)
