@@ -127,3 +127,15 @@
 - Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d07d039`)
+
+## 09:00 EST — Phase 1 (batch 140)
+- Join (`/join`): added a real `Suspense` fallback so the route never renders a momentary blank screen while `useSearchParams()` resolves.
+- Join: refactored the loading UI into a shared `JoinLoading` component used by both the route body and the `Suspense` fallback.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`86fe2f4`)
+
+## 09:35 EST — Phase 1 (batch 141)
+- Home: memoized the score narrative computation so we don’t compute it multiple times during render and avoid `null` sentinels.
+- No behavior change; small correctness/perf polish for the Home header/subtitle.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1de1730`)

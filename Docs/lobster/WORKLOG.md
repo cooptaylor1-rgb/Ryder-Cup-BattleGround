@@ -785,3 +785,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Join: refactored the loading UI into a shared `JoinLoading` component used by both the route body and the `Suspense` fallback.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`86fe2f4`)
+
+### 09:35 EST — Phase 1 (batch 141)
+- Home: memoized the score narrative computation so we don’t compute it multiple times during render and avoid `null` sentinels.
+- No behavior change; this is a small correctness/perf polish for the Home header/subtitle.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1de1730`)
