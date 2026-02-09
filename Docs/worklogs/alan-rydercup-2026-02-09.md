@@ -35,4 +35,4 @@
 - Complete Profile (`/profile/complete`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
 - Complete Profile: standardized the “Skip” affordance to the shared `btn-ghost` style.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`a95a0bb`)
