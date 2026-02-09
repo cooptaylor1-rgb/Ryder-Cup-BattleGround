@@ -652,3 +652,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - UI skeletons: standardized full-page skeleton wrappers to use `bg-[var(--canvas)]` instead of inline style props.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5cea7dd`)
+
+### 23:20 EST — Phase 1 (batch 119)
+- Settings → Backup (`/settings/backup`): refreshed the UI to match the standard premium page styling (shared `PageHeader`, `card` surfaces, and theme tokens) instead of hard-coded dark colors.
+- Backup: improved import/export previews and actions using shared button styles (`btn-primary` / `btn-secondary`) and consistent success/error panels.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d97d892`)
