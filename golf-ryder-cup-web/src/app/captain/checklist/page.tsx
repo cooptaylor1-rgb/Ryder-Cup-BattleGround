@@ -33,10 +33,7 @@ export default function ChecklistPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -57,10 +54,7 @@ export default function ChecklistPage() {
 
   if (!isCaptainMode) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -84,15 +78,12 @@ export default function ChecklistPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Pre-Flight Check"
         subtitle="Verify trip setup"
         onBack={() => router.back()}
-        icon={<Rocket size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Rocket size={16} className="text-[var(--color-accent)]" />}
       />
 
       <main className="container-editorial">
@@ -112,21 +103,12 @@ export default function ChecklistPage() {
         </section>
 
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
-            Quick Fixes
-          </h2>
+          <h2 className="type-overline mb-[var(--space-4)]">Quick Fixes</h2>
 
           <div className="space-y-3">
-            <Link
-              href="/players"
-              className="card flex items-center gap-4 press-scale"
-              style={{ padding: 'var(--space-4)' }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(0, 103, 71, 0.1)' }}
-              >
-                <Users size={20} style={{ color: 'var(--masters)' }} />
+            <Link href="/players" className="card flex items-center gap-4 press-scale p-[var(--space-4)]">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(0,103,71,0.1)]">
+                <Users size={20} className="text-[var(--masters)]" />
               </div>
               <div className="flex-1">
                 <p className="type-title-sm">Manage Players</p>
@@ -134,16 +116,9 @@ export default function ChecklistPage() {
               </div>
             </Link>
 
-            <Link
-              href="/captain"
-              className="card flex items-center gap-4 press-scale"
-              style={{ padding: 'var(--space-4)' }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(0, 103, 71, 0.1)' }}
-              >
-                <Shield size={20} style={{ color: 'var(--masters)' }} />
+            <Link href="/captain" className="card flex items-center gap-4 press-scale p-[var(--space-4)]">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(0,103,71,0.1)]">
+                <Shield size={20} className="text-[var(--masters)]" />
               </div>
               <div className="flex-1">
                 <p className="type-title-sm">Captain Command</p>

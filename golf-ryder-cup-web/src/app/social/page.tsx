@@ -140,10 +140,7 @@ export default function SocialPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -166,29 +163,22 @@ export default function SocialPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)', display: 'flex', flexDirection: 'column' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       <PageHeader
         title="Trash Talk"
         subtitle={currentTrip.name}
-        icon={<MessageCircle size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<MessageCircle size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
-          <Link
-            href="/social/photos"
-            className="btn-premium"
-            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)' }}
-          >
+          <Link href="/social/photos" className="btn-premium p-2 rounded-[var(--radius-md)]">
             <Camera size={20} />
           </Link>
         }
       />
 
       {/* Quick Tabs */}
-      <div className="container-editorial" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }}>
-        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+      <div className="container-editorial py-[var(--space-3)]">
+        <div className="flex gap-[var(--space-2)]">
           <TabButton active label="All" icon={<MessageCircle size={16} />} />
           <TabButton label="Photos" icon={<ImageIcon size={16} />} href="/social/photos" />
           <TabButton label="Highlights" icon={<Flame size={16} />} />
@@ -196,11 +186,8 @@ export default function SocialPage() {
       </div>
 
       {/* Comments Feed */}
-      <main
-        className="container-editorial"
-        style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(var(--space-4) + 64px)' }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <main className="container-editorial flex-1 overflow-y-auto pb-[calc(var(--space-4)+64px)]">
+        <div className="flex flex-col gap-[var(--space-4)]">
           {banterPosts.map((post) => {
             const player = post.authorId ? getPlayer(post.authorId) : undefined;
             return (

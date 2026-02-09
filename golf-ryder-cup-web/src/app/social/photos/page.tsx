@@ -121,10 +121,7 @@ export default function PhotosPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="celebration"
@@ -147,29 +144,24 @@ export default function PhotosPage() {
   }
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Photos"
         subtitle={currentTrip.name}
-        icon={<Camera size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Camera size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === 'grid' ? 'masonry' : 'grid')}
-              className="btn-secondary press-scale"
-              style={{ padding: 'var(--space-2)' }}
+              className="btn-secondary press-scale p-2"
               aria-label={viewMode === 'grid' ? 'Switch to masonry view' : 'Switch to grid view'}
             >
               {viewMode === 'grid' ? <LayoutGrid size={18} /> : <Grid size={18} />}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="btn-premium press-scale"
-              style={{ padding: 'var(--space-2)' }}
+              className="btn-premium press-scale p-2"
               aria-label="Add photo"
             >
               <Plus size={18} />
