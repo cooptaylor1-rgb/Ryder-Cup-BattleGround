@@ -65,3 +65,9 @@
 - Quick Score FAB: replaced inline `style={{ ... }}` usage with Tailwind arbitrary values (`bg-[var(--masters)]`, `shadow-[...]`, `bg-[rgba(...)]`) for consistency and to avoid silent styling drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`31a2360`)
+
+## 02:25 EST — Phase 1 (batch 126)
+- UI overlays/skeletons: replaced remaining full-screen `style={{ background: 'var(--canvas)' }}` usage with the standard Tailwind token classes (`bg-[var(--canvas)]`, `texture-grain` where appropriate) for consistency.
+- Affected components: `PageLoadingSkeleton`, `AppOnboardingProvider` (loading gate), `QuickStartWizard` overlay.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`babd3ce`)
