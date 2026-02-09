@@ -107,17 +107,14 @@ export default function NewTripPage() {
     step === 'select' ? 'New Trip' : step === 'configure' ? 'Configure Trip' : 'Review & Create';
 
   return (
-    <div
-      className="min-h-screen pb-nav page-premium-enter texture-grain"
-      style={{ background: 'var(--canvas)' }}
-    >
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title={headerTitle}
         icon={<Plus size={16} style={{ color: 'var(--color-accent)' }} />}
         onBack={handleBack}
       />
 
-      <main className="container-editorial" style={{ paddingTop: 'var(--space-6)' }}>
+      <main className="container-editorial pt-6">
         {/* Step: Select Template */}
         {step === 'select' && (
           <section className="section-sm">

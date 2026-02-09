@@ -232,10 +232,7 @@ export default function LineupBuilderPage() {
 
     if (!trip) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -256,10 +253,7 @@ export default function LineupBuilderPage() {
 
     if (!sessionId || !lineupState) {
         return (
-            <div
-                className="min-h-screen pb-nav page-premium-enter texture-grain"
-                style={{ background: 'var(--canvas)' }}
-            >
+            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="calendar"
@@ -276,10 +270,7 @@ export default function LineupBuilderPage() {
     }
 
     return (
-        <div
-            className="min-h-screen pb-nav page-premium-enter texture-grain"
-            style={{ background: 'var(--canvas)' }}
-        >
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Lineup Builder"
                 subtitle={`${lineupState.sessionType} • ${lineupState.playersPerMatch}v${lineupState.playersPerMatch}`}
