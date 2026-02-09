@@ -160,11 +160,8 @@ export function KeyboardShortcutsHelp() {
                 </div>
 
                 {/* Footer */}
-                <div
-                    className="p-4 text-center type-caption border-t"
-                    style={{ borderColor: 'var(--rule)' }}
-                >
-                    Press <kbd className="px-1.5 py-0.5 mx-1 text-xs rounded" style={{ background: 'var(--canvas)', border: '1px solid var(--rule)' }}>?</kbd> anytime to show shortcuts
+                <div className="p-4 text-center type-caption border-t border-[var(--rule)]">
+                    Press <kbd className="px-1.5 py-0.5 mx-1 text-xs rounded bg-[var(--canvas)] border border-[var(--rule)]">?</kbd> anytime to show shortcuts
                 </div>
             </div>
         </div>

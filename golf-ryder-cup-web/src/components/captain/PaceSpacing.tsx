@@ -146,22 +146,20 @@ function PaceGroupCard({ group, calculatedInterval, teeTime, settings }: PaceGro
 
     return (
         <div
-            className="p-4 rounded-xl"
-            style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
+            className="p-4 rounded-xl bg-[var(--surface)] border border-[rgba(128,120,104,0.2)]"
         >
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                     <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold"
-                        style={{ background: 'var(--canvas)', color: 'var(--ink)' }}
+                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold bg-[var(--canvas)] text-[var(--ink)]"
                     >
                         #{group.matchNumber}
                     </div>
                     <div>
-                        <p className="font-semibold" style={{ color: 'var(--ink)' }}>
+                        <p className="font-semibold text-[var(--ink)]">
                             {teeTime}
                         </p>
-                        <p className="text-sm capitalize" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm capitalize text-[var(--ink-muted)]">
                             {group.format}
                         </p>
                     </div>
@@ -180,8 +178,7 @@ function PaceGroupCard({ group, calculatedInterval, teeTime, settings }: PaceGro
                 {group.players.map(player => (
                     <span
                         key={player.id}
-                        className="px-2 py-1 rounded text-sm"
-                        style={{ background: 'var(--canvas)', color: 'var(--ink)' }}
+                        className="px-2 py-1 rounded text-sm bg-[var(--canvas)] text-[var(--ink)]"
                     >
                         {player.name} ({player.handicapIndex})
                     </span>
@@ -189,7 +186,7 @@ function PaceGroupCard({ group, calculatedInterval, teeTime, settings }: PaceGro
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--ink-muted)' }}>
+            <div className="flex items-center gap-4 text-sm text-[var(--ink-muted)]">
                 <span className="flex items-center gap-1">
                     <BarChart3 className="w-4 h-4" />
                     Avg HCP: {avgHandicap.toFixed(1)}
@@ -446,9 +443,8 @@ export function PaceSpacing({
                             <div key={group.id} className="relative pl-12">
                                 {/* Timeline dot */}
                                 <div
-                                    className="absolute left-3 top-5 w-4 h-4 rounded-full border-2"
+                                    className="absolute left-3 top-5 w-4 h-4 rounded-full border-2 bg-[var(--canvas)]"
                                     style={{
-                                        background: 'var(--canvas)',
                                         borderColor: getPaceIndicator(group.suggestedInterval || 10, localSettings.baseInterval).color,
                                     }}
                                 />
@@ -456,8 +452,7 @@ export function PaceSpacing({
                                 {/* Interval indicator */}
                                 {idx > 0 && (
                                     <div
-                                        className="absolute left-8 -top-2 text-xs px-1.5 py-0.5 rounded"
-                                        style={{ background: 'var(--canvas)', color: 'var(--ink-muted)' }}
+                                        className="absolute left-8 -top-2 text-xs px-1.5 py-0.5 rounded bg-[var(--canvas)] text-[var(--ink-muted)]"
                                     >
                                         +{group.suggestedInterval}m
                                     </div>
@@ -476,8 +471,8 @@ export function PaceSpacing({
             </div>
 
             {/* Info Footer */}
-            <div className="p-4 border-t" style={{ borderColor: 'rgba(128, 120, 104, 0.2)', background: 'var(--surface)' }}>
-                <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--ink-muted)' }}>
+            <div className="p-4 border-t border-[rgba(128,120,104,0.2)] bg-[var(--surface)]">
+                <div className="flex items-start gap-2 text-sm text-[var(--ink-muted)]">
                     <Info className="w-4 h-4 mt-0.5 shrink-0" />
                     <p>
                         Intervals are calculated based on format, average handicap, and course difficulty.

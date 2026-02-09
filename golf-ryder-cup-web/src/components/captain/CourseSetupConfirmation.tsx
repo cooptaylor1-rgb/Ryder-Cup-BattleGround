@@ -185,28 +185,31 @@ function SetupItemCard({ item, onToggle }: SetupItemCardProps) {
                 ) : item.status === 'issue' ? (
                     <AlertTriangle className="w-5 h-5 text-red-500" />
                 ) : (
-                    <Circle className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
+                    <Circle className="w-5 h-5 text-[var(--ink-muted)]" />
                 )}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                     <p
-                        className={cn('font-medium', item.status === 'confirmed' && 'line-through')}
-                        style={{ color: item.status === 'confirmed' ? 'var(--ink-muted)' : 'var(--ink)' }}
+                        className={cn(
+                            'font-medium',
+                            item.status === 'confirmed' && 'line-through text-[var(--ink-muted)]',
+                            item.status !== 'confirmed' && 'text-[var(--ink)]'
+                        )}
                     >
                         {item.title}
                     </p>
                     {item.required && (
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--canvas)', color: 'var(--ink-muted)' }}>
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--canvas)] text-[var(--ink-muted)]">
                             Required
                         </span>
                     )}
                 </div>
-                <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                <p className="text-sm text-[var(--ink-muted)]">
                     {item.description}
                 </p>
                 {item.value && (
-                    <p className="text-sm font-medium mt-1" style={{ color: 'var(--masters)' }}>
+                    <p className="text-sm font-medium mt-1 text-[var(--masters)]">
                         {item.value}
                     </p>
                 )}
@@ -304,7 +307,7 @@ export function CourseSetupConfirmation({
                         <h2 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
                             Course Setup
                         </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-muted)]">
                             {courseName}
                         </p>
                     </div>
@@ -384,7 +387,7 @@ export function CourseSetupConfirmation({
                                         <p className="font-medium" style={{ color: 'var(--ink)' }}>
                                             {getCategoryLabel(category)}
                                         </p>
-                                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                                        <p className="text-sm text-[var(--ink-muted)]">
                                             {categoryConfirmed}/{items.length} confirmed
                                         </p>
                                     </div>
@@ -431,7 +434,7 @@ export function CourseSetupConfirmation({
                                 <p className="font-medium" style={{ color: 'var(--ink)' }}>
                                     Hole-by-Hole Setup
                                 </p>
-                                <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                                <p className="text-sm text-[var(--ink-muted)]">
                                     {holes.length} holes configured
                                 </p>
                             </div>

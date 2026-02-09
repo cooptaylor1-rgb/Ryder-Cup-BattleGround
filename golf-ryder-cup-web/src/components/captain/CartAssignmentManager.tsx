@@ -98,8 +98,7 @@ function CartCard({
 
     return (
         <div
-            className="rounded-xl overflow-hidden"
-            style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
+            className="rounded-xl overflow-hidden bg-[var(--surface)] border border-[rgba(128,120,104,0.2)]"
         >
             {/* Header */}
             <div
@@ -108,21 +107,31 @@ function CartCard({
             >
                 <div className="flex items-center gap-3">
                     <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{
-                            background: isEmpty ? 'var(--canvas)' : isFull ? 'var(--masters-muted)' : 'rgba(251, 191, 36, 0.2)',
-                        }}
+                        className={cn(
+                            'w-10 h-10 rounded-lg flex items-center justify-center',
+                            isEmpty
+                                ? 'bg-[var(--canvas)]'
+                                : isFull
+                                  ? 'bg-[var(--masters-muted)]'
+                                  : 'bg-amber-500/20'
+                        )}
                     >
                         <Car
-                            className="w-5 h-5"
-                            style={{ color: isEmpty ? 'var(--ink-muted)' : isFull ? 'var(--masters)' : '#f59e0b' }}
+                            className={cn(
+                                'w-5 h-5',
+                                isEmpty
+                                    ? 'text-[var(--ink-muted)]'
+                                    : isFull
+                                      ? 'text-[var(--masters)]'
+                                      : 'text-amber-500'
+                            )}
                         />
                     </div>
                     <div>
-                        <p className="font-semibold" style={{ color: 'var(--ink)' }}>
+                        <p className="font-semibold text-[var(--ink)]">
                             {cart.number}
                         </p>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-muted)]">
                             {cart.players.length}/{cart.maxCapacity} players
                         </p>
                     </div>
@@ -146,9 +155,9 @@ function CartCard({
                         </div>
                     )}
                     {expanded ? (
-                        <ChevronUp className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
+                        <ChevronUp className="w-5 h-5 text-[var(--ink-muted)]" />
                     ) : (
-                        <ChevronDown className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
+                        <ChevronDown className="w-5 h-5 text-[var(--ink-muted)]" />
                     )}
                 </div>
             </div>
@@ -168,18 +177,17 @@ function CartCard({
                                 {cart.players.map(player => (
                                     <div
                                         key={player.id}
-                                        className="flex items-center justify-between p-2 rounded-lg"
-                                        style={{ background: 'var(--canvas)' }}
+                                        className="flex items-center justify-between p-2 rounded-lg bg-[var(--canvas)]"
                                     >
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-3 h-3 rounded-full"
                                                 style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
                                             />
-                                            <span style={{ color: 'var(--ink)' }}>
+                                            <span className="text-[var(--ink)]">
                                                 {player.firstName} {player.lastName}
                                             </span>
-                                            <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>
+                                            <span className="text-xs text-[var(--ink-muted)]">
                                                 {player.teamId === 'A' ? teamAName : teamBName}
                                             </span>
                                         </div>
@@ -196,7 +204,7 @@ function CartCard({
                                 ))}
 
                                 {isEmpty && (
-                                    <p className="text-center py-4 text-sm" style={{ color: 'var(--ink-muted)' }}>
+                                    <p className="text-center py-4 text-sm text-[var(--ink-muted)]">
                                         No players assigned
                                     </p>
                                 )}
@@ -207,11 +215,7 @@ function CartCard({
                                 <div>
                                     <button
                                         onClick={() => setShowPlayerPicker(!showPlayerPicker)}
-                                        className="w-full p-2 rounded-lg text-sm font-medium border-2 border-dashed transition-colors hover:border-solid"
-                                        style={{
-                                            borderColor: 'rgba(128, 120, 104, 0.3)',
-                                            color: 'var(--ink-muted)',
-                                        }}
+                                        className="w-full p-2 rounded-lg text-sm font-medium border-2 border-dashed transition-colors hover:border-solid border-[rgba(128,120,104,0.3)] text-[var(--ink-muted)]"
                                     >
                                         + Add Player
                                     </button>
@@ -222,11 +226,10 @@ function CartCard({
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: 'auto', opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="mt-2 max-h-48 overflow-y-auto rounded-lg"
-                                                style={{ background: 'var(--canvas)' }}
+                                                className="mt-2 max-h-48 overflow-y-auto rounded-lg bg-[var(--canvas)]"
                                             >
                                                 {availablePlayers.length === 0 ? (
-                                                    <p className="p-3 text-center text-sm" style={{ color: 'var(--ink-muted)' }}>
+                                                    <p className="p-3 text-center text-sm text-[var(--ink-muted)]">
                                                         All players assigned
                                                     </p>
                                                 ) : (
@@ -243,7 +246,7 @@ function CartCard({
                                                                 className="w-3 h-3 rounded-full"
                                                                 style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
                                                             />
-                                                            <span style={{ color: 'var(--ink)' }}>
+                                                            <span className="text-[var(--ink)]">
                                                                 {player.firstName} {player.lastName}
                                                             </span>
                                                         </button>
@@ -474,7 +477,7 @@ export function CartAssignmentManager({
                         <h2 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
                             Cart Assignments
                         </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-muted)]">
                             {totalAssigned}/{players.length} players assigned • {carts.length} carts
                         </p>
                     </div>
@@ -519,22 +522,21 @@ export function CartAssignmentManager({
 
             {/* Unassigned Players */}
             {unassignedPlayers.length > 0 && (
-                <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)', background: 'var(--surface)' }}>
-                    <p className="text-sm font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>
+                <div className="p-4 border-b border-[rgba(128,120,104,0.2)] bg-[var(--surface)]">
+                    <p className="text-sm font-medium mb-2 text-[var(--ink-muted)]">
                         Unassigned Players
                     </p>
                     <div className="flex flex-wrap gap-2">
                         {unassignedPlayers.map(player => (
                             <span
                                 key={player.id}
-                                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-sm"
-                                style={{ background: 'var(--canvas)' }}
+                                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-sm bg-[var(--canvas)]"
                             >
                                 <div
                                     className="w-2 h-2 rounded-full"
                                     style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
                                 />
-                                <span style={{ color: 'var(--ink)' }}>
+                                <span className="text-[var(--ink)]">
                                     {player.firstName} {player.lastName}
                                 </span>
                             </span>

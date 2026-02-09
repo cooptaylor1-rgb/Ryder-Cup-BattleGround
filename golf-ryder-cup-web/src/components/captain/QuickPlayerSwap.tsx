@@ -658,8 +658,7 @@ export function PlayerSwapModal({
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 100 }}
-                className="relative w-full max-w-lg max-h-[85vh] sm:max-h-[70vh] rounded-t-2xl sm:rounded-2xl overflow-hidden"
-                style={{ background: 'var(--canvas)' }}
+                className="relative w-full max-w-lg max-h-[85vh] sm:max-h-[70vh] rounded-t-2xl sm:rounded-2xl overflow-hidden bg-[var(--canvas)]"
             >
                 {selectedMatch ? (
                     <QuickPlayerSwap

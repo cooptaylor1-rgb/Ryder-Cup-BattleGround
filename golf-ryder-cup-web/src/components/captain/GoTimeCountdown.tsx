@@ -424,8 +424,7 @@ export function GoTimeCountdown({
                     </button>
                     <button
                         onClick={handleReset}
-                        className="p-4 rounded-full hover:bg-white/10 transition-colors"
-                        style={{ background: 'var(--surface)' }}
+                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-white/10 transition-colors"
                     >
                         <RotateCcw className="w-6 h-6" style={{ color: 'var(--ink-muted)' }} />
                     </button>
@@ -439,19 +438,17 @@ export function GoTimeCountdown({
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="border-t overflow-hidden"
-                        style={{ borderColor: 'rgba(128, 120, 104, 0.2)', background: 'var(--surface)' }}
+                        className="border-t overflow-hidden border-[rgba(128,120,104,0.2)] bg-[var(--surface)]"
                     >
                         <div className="p-4">
-                            <p className="text-sm font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>
+                            <p className="text-sm font-medium mb-3 text-[var(--ink-muted)]">
                                 Alert Schedule
                             </p>
                             <div className="space-y-2">
                                 {alerts.map((alert, idx) => (
                                     <div
                                         key={idx}
-                                        className="flex items-center justify-between p-2 rounded-lg"
-                                        style={{ background: 'var(--canvas)' }}
+                                        className="flex items-center justify-between p-2 rounded-lg bg-[var(--canvas)]"
                                     >
                                         <div className="flex items-center gap-3">
                                             {alert.played ? (
@@ -461,7 +458,7 @@ export function GoTimeCountdown({
                                             ) : (
                                                 <BellOff className="w-4 h-4" style={{ color: 'var(--ink-muted)' }} />
                                             )}
-                                            <span className="text-sm" style={{ color: 'var(--ink)' }}>
+                                            <span className="text-sm text-[var(--ink)]">
                                                 {alert.label}
                                             </span>
                                         </div>
@@ -469,9 +466,10 @@ export function GoTimeCountdown({
                                             onClick={() => toggleAlert(idx)}
                                             className={cn(
                                                 'px-2 py-1 rounded text-xs',
-                                                alert.sound ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20'
+                                                alert.sound
+                                                    ? 'bg-green-500/20 text-green-500'
+                                                    : 'bg-gray-500/20 text-[var(--ink-muted)]'
                                             )}
-                                            style={{ color: alert.sound ? undefined : 'var(--ink-muted)' }}
                                         >
                                             {alert.sound ? 'ON' : 'OFF'}
                                         </button>

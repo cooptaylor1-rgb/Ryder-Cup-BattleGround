@@ -101,8 +101,7 @@ function ContactCard({
 
     return (
         <div
-            className="flex items-center justify-between p-3 rounded-lg transition-colors"
-            style={{ background: 'var(--surface)' }}
+            className="flex items-center justify-between p-3 rounded-lg transition-colors bg-[var(--surface)]"
         >
             <div className="flex items-center gap-3">
                 {teamIndicator && (
@@ -126,23 +125,22 @@ function ContactCard({
                 )}
                 {!teamIndicator && !isPrimary && (
                     <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: 'var(--canvas)' }}
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--canvas)]"
                     >
-                        <Phone className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
+                        <Phone className="w-5 h-5 text-[var(--ink-muted)]" />
                     </div>
                 )}
                 <div>
-                    <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                    <p className="font-medium text-[var(--ink)]">
                         {name}
                     </p>
                     {subtitle && (
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-muted)]">
                             {subtitle}
                         </p>
                     )}
                     {hasPhone && (
-                        <p className="text-sm font-mono" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm font-mono text-[var(--ink-muted)]">
                             {phone}
                         </p>
                     )}
@@ -154,12 +152,11 @@ function ContactCard({
                     onClick={onText}
                     disabled={!hasPhone}
                     className={cn(
-                        'p-2 rounded-lg transition-colors',
+                        'p-2 rounded-lg transition-colors bg-[var(--canvas)]',
                         hasPhone ? 'hover:bg-white/10' : 'opacity-30'
                     )}
-                    style={{ background: 'var(--canvas)' }}
                 >
-                    <MessageSquare className="w-5 h-5" style={{ color: 'var(--masters)' }} />
+                    <MessageSquare className="w-5 h-5 text-[var(--masters)]" />
                 </button>
                 <button
                     onClick={onCall}
@@ -284,7 +281,7 @@ export function EmergencyContacts({
                         <h2 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
                             Emergency Contacts
                         </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-muted)]">
                             {players.length} players • Quick access to everyone
                         </p>
                     </div>
