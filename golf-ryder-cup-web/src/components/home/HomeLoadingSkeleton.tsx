@@ -14,7 +14,7 @@ interface HomeLoadingSkeletonProps {
 
 export function HomeLoadingSkeleton({ navBadges = {} }: HomeLoadingSkeletonProps) {
     return (
-        <div className="pb-nav page-premium-enter texture-grain" style={{ minHeight: '100vh', background: 'var(--canvas)' }}>
+        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
             <header className="header-premium">
                 <div className="container-editorial" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>

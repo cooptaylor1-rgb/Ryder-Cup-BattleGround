@@ -353,7 +353,7 @@ export function PageSkeleton({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen bg-[var(--canvas)]">
       {showHeader && (
         <div
           className="h-14 px-4 flex items-center gap-3"

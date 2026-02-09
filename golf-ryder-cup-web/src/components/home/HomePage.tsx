@@ -171,10 +171,7 @@ export default function HomePage() {
         />
       )}
 
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <JoinTripModal
         isOpen={showJoinTrip}
         onClose={() => setShowJoinTrip(false)}
@@ -193,7 +190,7 @@ export default function HomePage() {
 
       {/* ── CONTINUE SCORING BANNER ── */}
       {userMatchData?.match?.status === 'inProgress' && (
-        <div className="sticky top-0 z-40" style={{ background: 'var(--canvas)', padding: 'var(--space-2) var(--space-4)' }}>
+        <div className="sticky top-0 z-40 bg-[var(--canvas)] py-[var(--space-2)] px-[var(--space-4)]">
           <ContinueScoringBanner
             match={userMatchData.match}
             matchState={userMatchData.matchState || undefined}

@@ -644,5 +644,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Score (match list) (`/score`): standardized the outer wrappers to include the premium layout classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline style props.
 - No behavior change; this is purely for visual/navigation consistency with the rest of Phase 1.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ ()
 - Commit + push ✅ (`dfe9fc5`)
+
+### 22:45 EST — Phase 1 (batch 118)
+- Home: standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Home: standardized the Continue Scoring sticky banner wrapper to use Tailwind arbitrary values (e.g. `py-[var(--space-2)]`) instead of inline padding/background styles.
+- UI skeletons: standardized full-page skeleton wrappers to use `bg-[var(--canvas)]` instead of inline style props.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)

@@ -16,4 +16,11 @@
 ## 22:25 EST — Phase 1 (batch 117)
 - Score (match list) (`/score`): standardized the wrapper to the standard premium layout classes (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`) instead of inline styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ ()
+- Commit + push ✅ (`dfe9fc5`)
+
+## 22:45 EST — Phase 1 (batch 118)
+- Home: standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Home: standardized the Continue Scoring sticky banner wrapper to use Tailwind arbitrary values (e.g. `py-[var(--space-2)]`) instead of inline padding/background styles.
+- UI skeletons: standardized full-page skeleton wrappers to use `bg-[var(--canvas)]` instead of inline style props.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
