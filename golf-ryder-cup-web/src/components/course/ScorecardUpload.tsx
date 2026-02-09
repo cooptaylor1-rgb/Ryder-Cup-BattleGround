@@ -163,40 +163,25 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] backdrop-blur-[4px] p-4"
     >
-      <div
-        className="w-full max-w-lg rounded-2xl shadow-xl"
-        style={{ background: 'var(--surface-card)', maxHeight: '90vh', overflow: 'auto' }}
-      >
+      <div className="w-full max-w-lg rounded-2xl shadow-xl bg-[var(--surface-card)] max-h-[90vh] overflow-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: 'var(--rule)' }}>
+        <div className="flex items-center justify-between p-4 border-b border-[var(--rule)]">
           <div className="flex items-center gap-3">
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Camera size={20} style={{ color: 'var(--color-accent)' }} />
+            <div className="h-10 w-10 rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] flex items-center justify-center">
+              <Camera size={20} className="text-[var(--color-accent)]" />
             </div>
             <div>
               <h3 className="type-title-sm">Scan Scorecard</h3>
-              <p className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+              <p className="type-caption text-[var(--ink-tertiary)]">
                 Upload a photo
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg transition-colors"
-            style={{ color: 'var(--ink-tertiary)' }}
+            className="p-2 rounded-lg transition-colors text-[var(--ink-tertiary)] hover:bg-[var(--surface-elevated)]"
           >
             <X size={20} />
           </button>
@@ -211,15 +196,14 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={() => fileInputRef.current?.click()}
-                className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors hover:border-[var(--masters)]"
-                style={{ borderColor: 'var(--rule)', background: 'var(--surface-elevated)' }}
+                className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors border-[var(--rule)] bg-[var(--surface-elevated)] hover:border-[var(--masters)]"
               >
-                <Upload size={48} className="mx-auto mb-4" style={{ color: 'var(--ink-tertiary)' }} />
+                <Upload size={48} className="mx-auto mb-4 text-[var(--ink-tertiary)]" />
                 <p className="type-body font-medium mb-2">Drop scorecard image here</p>
                 <p className="type-caption mb-4" style={{ color: 'var(--ink-tertiary)' }}>
                   or click to browse
                 </p>
-                <div className="flex items-center justify-center gap-4 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                <div className="flex items-center justify-center gap-4 text-xs text-[var(--ink-muted)]">
                   <span className="flex items-center gap-1">
                     <FileImage size={14} />
                     JPEG, PNG, HEIC
@@ -235,9 +219,9 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
               </div>
 
               {/* Tips */}
-              <div className="mt-4 p-3 rounded-lg" style={{ background: 'var(--surface-elevated)' }}>
+              <div className="mt-4 p-3 rounded-lg bg-[var(--surface-elevated)]">
                 <p className="type-meta font-medium mb-2">Tips for best results:</p>
-                <ul className="type-caption space-y-1" style={{ color: 'var(--ink-secondary)' }}>
+                <ul className="type-caption space-y-1 text-[var(--ink-secondary)]">
                   <li>- Take a clear, well-lit photo of the scorecard</li>
                   <li>- Make sure all hole numbers, pars, and handicaps are visible</li>
                   <li>- Include the tee name and rating/slope if available</li>
@@ -248,11 +232,11 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
           {(status === 'uploading' || status === 'processing') && (
             <div className="py-12 text-center">
-              <Loader2 size={48} className="mx-auto mb-4 animate-spin" style={{ color: 'var(--masters)' }} />
+              <Loader2 size={48} className="mx-auto mb-4 animate-spin text-[var(--masters)]" />
               <p className="type-body font-medium">
                 {status === 'uploading' ? 'Uploading...' : 'Analyzing scorecard...'}
               </p>
-              <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+              <p className="type-caption mt-2 text-[var(--ink-tertiary)]">
                 This may take a few seconds
               </p>
               {preview && (
@@ -266,11 +250,11 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
           {status === 'error' && (
             <div className="py-8">
               <div className="text-center mb-6">
-                <AlertCircle size={48} className="mx-auto mb-4" style={{ color: 'var(--error)' }} />
-                <p className="type-body font-medium" style={{ color: 'var(--error)' }}>
+                <AlertCircle size={48} className="mx-auto mb-4 text-[var(--error)]" />
+                <p className="type-body font-medium text-[var(--error)]">
                   Upload Failed
                 </p>
-                <p className="type-caption mt-2" style={{ color: 'var(--ink-tertiary)' }}>
+                <p className="type-caption mt-2 text-[var(--ink-tertiary)]">
                   {error}
                 </p>
               </div>
@@ -286,12 +270,12 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
           {status === 'success' && extractedData && (
             <div className="py-4">
               <div className="text-center mb-4">
-                <Check size={48} className="mx-auto mb-3" style={{ color: 'var(--success)' }} />
+                <Check size={48} className="mx-auto mb-3 text-[var(--success)]" />
                 <p className="type-body font-medium">Scorecard Analyzed!</p>
               </div>
 
               {/* Preview extracted data */}
-              <div className="p-4 rounded-lg mb-4" style={{ background: 'var(--surface-elevated)' }}>
+              <div className="p-4 rounded-lg mb-4 bg-[var(--surface-elevated)]">
                 {extractedData.courseName && (
                   <p className="type-title-sm mb-2">{extractedData.courseName}</p>
                 )}
@@ -299,15 +283,14 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 {/* Tee Sets Summary */}
                 {extractedData.teeSets && extractedData.teeSets.length > 0 ? (
                   <div className="mb-3">
-                    <p className="type-meta font-medium mb-2" style={{ color: 'var(--ink-secondary)' }}>
+                    <p className="type-meta font-medium mb-2 text-[var(--ink-secondary)]">
                       {extractedData.teeSets.length} Tee Set{extractedData.teeSets.length > 1 ? 's' : ''} Found:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {extractedData.teeSets.map((tee, i) => (
                         <span
                           key={i}
-                          className="type-meta px-2 py-1 rounded flex items-center gap-1"
-                          style={{ background: 'var(--surface-card)' }}
+                          className="type-meta px-2 py-1 rounded flex items-center gap-1 bg-[var(--surface-card)]"
                         >
                           {tee.color && (
                             <span
@@ -322,7 +305,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                           )}
                           {tee.name}
                           {tee.rating && tee.slope && (
-                            <span style={{ color: 'var(--ink-tertiary)', fontSize: '10px' }}>
+                            <span className="text-[10px] text-[var(--ink-tertiary)]">
                               ({tee.rating}/{tee.slope})
                             </span>
                           )}
@@ -332,16 +315,16 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                   </div>
                 ) : extractedData.teeName && (
                   <div className="flex flex-wrap gap-3 mb-3">
-                    <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
+                    <span className="type-meta px-2 py-1 rounded bg-[var(--surface-card)]">
                       {extractedData.teeName} Tees
                     </span>
                     {extractedData.rating && (
-                      <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
+                      <span className="type-meta px-2 py-1 rounded bg-[var(--surface-card)]">
                         Rating: {extractedData.rating}
                       </span>
                     )}
                     {extractedData.slope && (
-                      <span className="type-meta px-2 py-1 rounded" style={{ background: 'var(--surface-card)' }}>
+                      <span className="type-meta px-2 py-1 rounded bg-[var(--surface-card)]">
                         Slope: {extractedData.slope}
                       </span>
                     )}
@@ -420,7 +403,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                   </div>
                 )}
 
-                <p className="type-caption mt-3 text-center" style={{ color: 'var(--ink-tertiary)' }}>
+                <p className="type-caption mt-3 text-center text-[var(--ink-tertiary)]">
                   Total Par: {extractedData.holes.reduce((s, h) => s + h.par, 0)} |
                   {' '}{extractedData.teeSets?.[0]?.yardages?.reduce((s: number, y) => s + (y || 0), 0) ||
                     extractedData.holes.reduce((s, h) => s + (h.yardage || 0), 0)} yards

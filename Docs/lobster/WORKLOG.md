@@ -15,6 +15,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`354b670`)
 
+### 18:10 EST — Phase 1 — Scorecard Upload: remove inline token styles (batch)
+- Scorecard Upload modal (`ScorecardUpload`): replaced common inline `style={{ ...var(--token) }}` usages with token-driven Tailwind classes for the overlay, modal surface, header, and idle/processing/error/success text panels.
+- No behavior change; improves consistency and reduces the chance of silent style drift.
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
