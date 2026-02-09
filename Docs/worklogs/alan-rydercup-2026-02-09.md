@@ -115,3 +115,9 @@
 - Standardized wrappers to use `bg-[var(--canvas)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`028ccfe`)
+
+## 08:05 EST — Phase 1 (batch 138)
+- Settings — Notifications (`/settings/notifications`): hardened the “Settings saved” toast behavior by managing the timeout via a ref and clearing it on re-trigger/unmount.
+- This prevents potential setState-after-unmount issues and avoids stacking multiple timeouts.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3a84d53`)
