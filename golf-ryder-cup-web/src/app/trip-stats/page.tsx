@@ -69,8 +69,8 @@ function CategoryTabs({
               text-sm font-medium transition-all
               ${
                 isActive
-                  ? 'bg-masters-green/20 text-masters-green shadow-md ring-2 ring-masters-green'
-                  : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight'
+                  ? 'bg-[color-mix(in_srgb,var(--masters)_18%,transparent)] text-[var(--masters)] shadow-md ring-2 ring-[color-mix(in_srgb,var(--masters)_35%,transparent)]'
+                  : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)] hover:bg-[var(--surface)]'
               }
             `}
           >
@@ -108,36 +108,36 @@ function StatCard({
   const leaderPlayer = leader ? players.find((p) => p.id === leader[0]) : null;
 
   return (
-    <div className="card-surface rounded-xl overflow-hidden">
+    <div className="card rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
+        className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface)] transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">{definition.emoji}</span>
           <div className="text-left">
-            <div className="font-medium text-text-primary">{definition.label}</div>
-            <div className="text-sm text-text-tertiary">{definition.description}</div>
+            <div className="font-medium text-[var(--ink)]">{definition.label}</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">{definition.description}</div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xl font-bold text-text-primary">
+          <div className="text-xl font-bold text-[var(--ink)]">
             {formatStatValue(total, definition.unit)}
           </div>
           {leaderPlayer && leader && leader[1] > 0 && (
-            <div className="text-xs text-text-tertiary">👑 {leaderPlayer.firstName}</div>
+            <div className="text-xs text-[var(--ink-tertiary)]">👑 {leaderPlayer.firstName}</div>
           )}
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t border-surface-border p-4 space-y-3">
+        <div className="border-t border-[var(--rule)] p-4 space-y-3">
           {players.map((player) => {
             const value = playerStats.get(player.id) ?? 0;
             return (
               <div key={player.id} className="flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-text-primary truncate">
+                  <div className="font-medium text-[var(--ink)] truncate">
                     {getPlayerName(player)}
                   </div>
                 </div>
@@ -148,14 +148,14 @@ function StatCard({
                       onDecrement(player.id);
                     }}
                     disabled={value === 0}
-                    className="w-10 h-10 rounded-full bg-surface-elevated text-text-primary
+                    className="w-10 h-10 rounded-full bg-[var(--surface-elevated)] text-[var(--ink)]
                              flex items-center justify-center text-xl font-bold
                              disabled:opacity-30 disabled:cursor-not-allowed
-                             hover:bg-surface-highlight active:scale-95 transition-all"
+                             hover:bg-[var(--surface)] active:scale-95 transition-all"
                   >
                     −
                   </button>
-                  <div className="w-16 text-center font-bold text-lg text-text-primary">
+                  <div className="w-16 text-center font-bold text-lg text-[var(--ink)]">
                     {formatStatValue(value, definition.unit)}
                   </div>
                   <button
@@ -163,9 +163,9 @@ function StatCard({
                       e.stopPropagation();
                       onIncrement(player.id);
                     }}
-                    className="w-10 h-10 rounded-full bg-masters-green text-white
+                    className="w-10 h-10 rounded-full bg-[var(--masters)] text-white
                              flex items-center justify-center text-xl font-bold
-                             hover:bg-masters-green/90 active:scale-95 transition-all"
+                             hover:opacity-90 active:scale-95 transition-all"
                   >
                     +
                   </button>
@@ -213,8 +213,8 @@ function QuickTrack({
   };
 
   return (
-    <div className="card-elevated rounded-xl p-4">
-      <h3 className="text-sm font-semibold text-text-secondary mb-3">⚡ Quick Track</h3>
+    <div className="card rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-[var(--ink-secondary)] mb-3">⚡ Quick Track</h3>
 
       <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
         {players.map((player) => (
@@ -225,8 +225,8 @@ function QuickTrack({
               px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
               ${
                 selectedPlayer === player.id
-                  ? 'bg-masters-green/20 text-masters-green ring-2 ring-masters-green'
-                  : 'bg-surface-elevated text-text-secondary hover:bg-surface-highlight'
+                  ? 'bg-[color-mix(in_srgb,var(--masters)_18%,transparent)] text-[var(--masters)] ring-2 ring-[color-mix(in_srgb,var(--masters)_35%,transparent)]'
+                  : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)] hover:bg-[var(--surface)]'
               }
             `}
           >
@@ -242,8 +242,8 @@ function QuickTrack({
             onClick={() => handleQuickTrack(action.statType)}
             disabled={!selectedPlayer}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg
-                     bg-surface-elevated text-text-primary
-                     hover:bg-surface-highlight active:scale-95
+                     bg-[var(--surface-elevated)] text-[var(--ink)]
+                     hover:bg-[var(--surface)] active:scale-95
                      disabled:opacity-40 disabled:cursor-not-allowed
                      transition-all"
           >
@@ -254,7 +254,7 @@ function QuickTrack({
       </div>
 
       {!selectedPlayer && (
-        <p className="text-xs text-text-tertiary mt-3 text-center">
+        <p className="text-xs text-[var(--ink-tertiary)] mt-3 text-center">
           Select a player to quick-track stats
         </p>
       )}
@@ -298,18 +298,18 @@ function CategoryLeaderboard({
 
   if (sorted.length === 0 || sorted.every(([, v]) => v === 0)) {
     return (
-      <div className="card-surface rounded-xl p-4">
-        <h3 className="text-sm font-semibold text-text-secondary mb-2">
+      <div className="card rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-[var(--ink-secondary)] mb-2">
           {categoryDef.emoji} {categoryDef.label} Leaders
         </h3>
-        <p className="text-sm text-text-tertiary">No leaders yet — start tracking to spark a rivalry.</p>
+        <p className="text-sm text-[var(--ink-tertiary)]">No leaders yet — start tracking to spark a rivalry.</p>
       </div>
     );
   }
 
   return (
-    <div className="card-surface rounded-xl p-4">
-      <h3 className="text-sm font-semibold text-text-secondary mb-3">
+    <div className="card rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-[var(--ink-secondary)] mb-3">
         {categoryDef.emoji} {categoryDef.label} Leaders
       </h3>
       <div className="space-y-2">
@@ -322,13 +322,13 @@ function CategoryLeaderboard({
           .filter((row) => row.player && row.total > 0)
           .map((row, index) => (
             <div key={row.playerId} className="flex items-center gap-3">
-              <div className="w-6 text-center font-bold text-text-tertiary">
+              <div className="w-6 text-center font-bold text-[var(--ink-tertiary)]">
                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
               </div>
-              <div className="flex-1 font-medium text-text-primary">
+              <div className="flex-1 font-medium text-[var(--ink)]">
                 {getPlayerName(row.player!)}
               </div>
-              <div className="font-bold text-text-secondary">{row.total}</div>
+              <div className="font-bold text-[var(--ink-secondary)]">{row.total}</div>
             </div>
           ))}
       </div>
@@ -490,41 +490,41 @@ export default function TripStatsPage() {
 
           <CategoryLeaderboard category={activeCategory} tripId={currentTrip.id} players={players} />
 
-          <div className="card-surface rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-text-secondary mb-3">📊 Trip Totals</h3>
+          <div className="card rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-[var(--ink-secondary)] mb-3">📊 Trip Totals</h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl">🍺</div>
-                <div className="text-xl font-bold text-text-primary">{totalBeers}</div>
-                <div className="text-xs text-text-tertiary">Beers</div>
+                <div className="text-xl font-bold text-[var(--ink)]">{totalBeers}</div>
+                <div className="text-xs text-[var(--ink-tertiary)]">Beers</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl">⚪</div>
-                <div className="text-xl font-bold text-text-primary">{totalBallsLost}</div>
-                <div className="text-xs text-text-tertiary">Balls Lost</div>
+                <div className="text-xl font-bold text-[var(--ink)]">{totalBallsLost}</div>
+                <div className="text-xs text-[var(--ink-tertiary)]">Balls Lost</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl">🔄</div>
-                <div className="text-xl font-bold text-text-primary">{totalMulligans}</div>
-                <div className="text-xs text-text-tertiary">Mulligans</div>
+                <div className="text-xl font-bold text-[var(--ink)]">{totalMulligans}</div>
+                <div className="text-xs text-[var(--ink-tertiary)]">Mulligans</div>
               </div>
             </div>
           </div>
 
           <Link
             href="/trip-stats/awards"
-            className="card-elevated rounded-xl p-4 flex items-center gap-4 hover:bg-surface-highlight transition-colors"
+            className="card rounded-xl p-4 flex items-center gap-4 hover:bg-[var(--surface)] transition-colors"
           >
             <div className="w-12 h-12 rounded-full bg-masters/10 flex items-center justify-center">
               <Trophy size={24} className="text-masters" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-text-primary">Trip Awards</h3>
-              <p className="text-sm text-text-secondary">
+              <h3 className="font-semibold text-[var(--ink)]">Trip Awards</h3>
+              <p className="text-sm text-[var(--ink-secondary)]">
                 Vote for superlatives: MVP, best dressed, and more!
               </p>
             </div>
-            <ChevronRight size={20} className="text-text-tertiary" />
+            <ChevronRight size={20} className="text-[var(--ink-tertiary)]" />
           </Link>
         </div>
       </main>
