@@ -661,6 +661,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`190db5a`)
 
+### 16:30 EST — Phase 1 (batch 151)
+- Captain components: replaced remaining inline `style={{ background: 'var(--canvas)' }}` / `style={{ color: 'var(--ink*)' }}` usages with token-driven Tailwind classes.
+- Affected surfaces: Pace Spacing, Go Time Countdown (alert schedule), Emergency Contacts, Cart Assignment Manager, Course Setup Confirmation, Quick Player Swap modal wrapper, Keyboard Shortcuts Help.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b8353ca`)
+
 ### 20:55 EST — Phase 1 (batch 115)
 - Admin (`/admin`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
 - Admin: the “Admin Mode Required” gate now uses the standard premium wrapper + `PageHeader` so the screen isn’t a visual outlier.

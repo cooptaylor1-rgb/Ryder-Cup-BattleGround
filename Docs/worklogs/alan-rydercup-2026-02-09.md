@@ -194,3 +194,9 @@
 - Attendance Check-In sticky team headers + ETA modal wrapper now use `bg-[var(--canvas)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`190db5a`)
+
+## 16:30 EST — Phase 1 (batch 151)
+- Captain components: replaced remaining inline `style={{ background: 'var(--canvas)' }}` / `style={{ color: 'var(--ink*)' }}` usages with token-driven Tailwind classes.
+- Affected surfaces: Pace Spacing, Go Time Countdown (alert schedule), Emergency Contacts, Cart Assignment Manager, Course Setup Confirmation, Quick Player Swap modal wrapper, Keyboard Shortcuts Help.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b8353ca`)
