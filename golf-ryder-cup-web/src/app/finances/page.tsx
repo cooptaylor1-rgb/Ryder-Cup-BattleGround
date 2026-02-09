@@ -96,8 +96,8 @@ export default function FinancesPage() {
   );
 
   // Compute financial summary from live data
-  const summary: TripFinancialSummary | null = useMemo(() => {
-    if (!currentTrip || !duesItems) return null;
+  const summary: TripFinancialSummary | undefined = useMemo(() => {
+    if (!currentTrip || !duesItems) return undefined;
     const playerSummaries: PlayerFinancialSummary[] = players.map((player) => {
       const items = duesItems.filter((d) => d.playerId === player.id);
       const playerPayments = (paymentRecords ?? []).filter((p) => p.fromPlayerId === player.id);
