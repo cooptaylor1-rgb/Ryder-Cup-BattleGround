@@ -133,25 +133,13 @@ export function QuickScoreFAB() {
                 onMouseDown={handleTouchStart}
                 onMouseUp={handleTouchEnd}
                 onMouseLeave={handleTouchEnd}
-                className="fixed bottom-28 right-4 z-40 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-xl animate-in slide-in-from-bottom-4 fade-in duration-300 active:scale-95 transition-transform"
-                style={{
-                    background: 'var(--masters)',
-                    color: 'white',
-                    boxShadow: '0 6px 24px rgba(0, 103, 71, 0.5)',
-                    minHeight: '56px',
-                }}
+                className="fixed bottom-28 right-4 z-40 flex min-h-[56px] items-center gap-3 rounded-2xl bg-[var(--masters)] px-5 py-4 text-white shadow-[0_6px_24px_rgba(0,103,71,0.5)] animate-in slide-in-from-bottom-4 fade-in duration-300 transition-transform active:scale-95"
                 aria-label="Quick score - tap to enter score, hold for full scorecard"
             >
                 {/* Pulse indicator */}
                 <div className="relative">
-                    <span
-                        className="absolute inset-0 rounded-full animate-ping opacity-75"
-                        style={{ background: 'rgba(255, 255, 255, 0.4)' }}
-                    />
-                    <div
-                        className="relative w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: 'rgba(255, 255, 255, 0.2)' }}
-                    >
+                    <span className="absolute inset-0 animate-ping rounded-full bg-[rgba(255,255,255,0.4)] opacity-75" />
+                    <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(255,255,255,0.2)]">
                         <Zap size={20} />
                     </div>
                 </div>
@@ -160,10 +148,7 @@ export function QuickScoreFAB() {
                 <div className="text-left">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold">{activeMatch.displayScore}</span>
-                        <span
-                            className="text-xs px-1.5 py-0.5 rounded"
-                            style={{ background: 'rgba(255, 255, 255, 0.2)' }}
-                        >
+                        <span className="rounded bg-[rgba(255,255,255,0.2)] px-1.5 py-0.5 text-xs">
                             LIVE
                         </span>
                     </div>
