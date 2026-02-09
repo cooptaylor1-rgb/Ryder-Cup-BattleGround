@@ -39,10 +39,7 @@ export default function MatchupsPage() {
 
   if (!currentTrip) {
     return (
-      <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain"
-        style={{ background: 'var(--canvas)' }}
-      >
+      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -59,7 +56,7 @@ export default function MatchupsPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Matchups"
         subtitle={currentTrip.name}
