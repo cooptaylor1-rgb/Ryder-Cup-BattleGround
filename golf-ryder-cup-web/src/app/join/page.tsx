@@ -20,7 +20,7 @@ function JoinPageInner() {
   }, [code, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--canvas)' }}>
+    <div className="min-h-screen flex items-center justify-center page-premium-enter texture-grain bg-[var(--canvas)]">
       <div style={{ textAlign: 'center' }}>
         <div className="animate-pulse" style={{ fontSize: '3rem' }}>
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ margin: '0 auto' }}>

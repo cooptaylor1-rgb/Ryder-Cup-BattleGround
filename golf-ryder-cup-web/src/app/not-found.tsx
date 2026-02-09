@@ -16,8 +16,7 @@ export default function NotFound() {
 
     return (
         <div
-            className="min-h-screen pb-nav page-premium-enter texture-grain flex flex-col items-center justify-center p-6"
-            style={{ background: 'var(--canvas)' }}
+            className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col items-center justify-center p-6"
         >
             {/* Golf Flag Icon */}
             <div
