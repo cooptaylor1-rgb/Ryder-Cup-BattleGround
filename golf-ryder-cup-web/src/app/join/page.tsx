@@ -1,34 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense } from 'react';
-
-function JoinLoading() {
-  return (
-    <div className="min-h-screen flex items-center justify-center page-premium-enter texture-grain bg-[var(--canvas)]">
-      <div style={{ textAlign: 'center' }}>
-        <div className="animate-pulse" style={{ fontSize: '3rem' }}>
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ margin: '0 auto' }}>
-            <circle cx="24" cy="24" r="20" stroke="var(--masters)" strokeWidth="2" fill="none" />
-            <path
-              d="M24 14v20M14 24h20"
-              stroke="var(--masters)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-        <p
-          className="type-body-sm"
-          style={{ marginTop: 'var(--space-4)', color: 'var(--ink-secondary)' }}
-        >
-          Joining trip...
-        </p>
-      </div>
-    </div>
-  );
-}
+import { PageLoadingSkeleton } from '@/components/ui';
 
 function JoinPageInner() {
   const searchParams = useSearchParams();
@@ -36,21 +10,20 @@ function JoinPageInner() {
   const code = searchParams.get('code');
 
   useEffect(() => {
+    // Store the code and redirect to home where JoinTripModal can pick it up.
+    // If there is no code, just go home.
     if (code) {
-      // Store the code and redirect to home where JoinTripModal can pick it up
       sessionStorage.setItem('pendingJoinCode', code);
-      router.replace('/');
-    } else {
-      router.replace('/');
     }
+    router.replace('/');
   }, [code, router]);
 
-  return <JoinLoading />;
+  return <PageLoadingSkeleton title="Joining trip…" showBackButton={false} variant="default" />;
 }
 
 export default function JoinPage() {
   return (
-    <Suspense fallback={<JoinLoading />}>
+    <Suspense fallback={<PageLoadingSkeleton title="Joining trip…" showBackButton={false} variant="default" />}>
       <JoinPageInner />
     </Suspense>
   );

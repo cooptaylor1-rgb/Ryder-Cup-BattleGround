@@ -2,6 +2,11 @@
 
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
+## 2026-02-09
+
+### 11:22 EST — Phase 1 (batch 46)
+- Join deep-link (`/join?code=...`): replaced the bespoke loading spinner with the shared `PageLoadingSkeleton` so the loading UX matches the premium design system.
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
