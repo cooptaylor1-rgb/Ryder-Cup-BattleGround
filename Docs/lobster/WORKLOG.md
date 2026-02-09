@@ -761,3 +761,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Live Scores: replaced inline `background`/`border` styles on PageHeader action buttons with tokenized Tailwind classes (`bg-[var(--surface-card)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6ea1243`)
+
+### 07:45 EST — Phase 1 (batch 137)
+- Captain Carts (`/captain/carts`), Contacts (`/captain/contacts`), and Messages (`/captain/messages`): removed inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
+- Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme can’t silently drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`028ccfe`)

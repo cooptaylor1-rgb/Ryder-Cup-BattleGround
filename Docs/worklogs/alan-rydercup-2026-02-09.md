@@ -109,3 +109,9 @@
 - Course Library (`/courses`), New Course (`/courses/new`), and Trip Awards (`/trip-stats/awards`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized them to `bg-[var(--canvas)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`97977f4`)
+
+## 07:45 EST — Phase 1 (batch 137)
+- Captain Carts (`/captain/carts`), Contacts (`/captain/contacts`), and Messages (`/captain/messages`): removed inline `style={{ background: 'var(--canvas)' }}` wrapper usage.
+- Standardized wrappers to use `bg-[var(--canvas)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`028ccfe`)
