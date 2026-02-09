@@ -47,6 +47,7 @@ import type {
   SettlementTransaction,
 } from '@/lib/types/sideGames';
 import type { SyncQueueItem } from '@/lib/types/sync';
+import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
 
 /**
  * Course Library Sync Queue Entry
@@ -132,6 +133,10 @@ export class GolfTripDB extends Dexie {
 
   // Trip Sync Queue (v9)
   tripSyncQueue!: Table<SyncQueueItem>;
+
+  // Finances (v10)
+  duesLineItems!: Table<DuesLineItem>;
+  paymentRecords!: Table<PaymentRecord>;
 
   constructor() {
     super('GolfTripDB');
@@ -250,6 +255,12 @@ export class GolfTripDB extends Dexie {
     // Schema version 9 - Trip Sync Queue persistence
     this.version(9).stores({
       tripSyncQueue: 'id, tripId, status, retryCount, createdAt, [tripId+status]',
+    });
+
+    // Schema version 10 - Finances: Dues & Payments
+    this.version(10).stores({
+      duesLineItems: 'id, tripId, playerId, category, status, [tripId+playerId], [tripId+status], [tripId+category]',
+      paymentRecords: 'id, tripId, fromPlayerId, createdAt, [tripId+fromPlayerId]',
     });
   }
 }

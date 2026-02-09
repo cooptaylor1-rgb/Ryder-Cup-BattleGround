@@ -51,6 +51,7 @@ interface UIState {
   isCaptainMode: boolean;
   captainPinHash: string | null;
   enableCaptainMode: (pin: string) => Promise<void>;
+  enableCaptainModeForCreator: () => void;
   disableCaptainMode: () => void;
   resetCaptainPin: () => void;
 
@@ -164,6 +165,11 @@ export const useUIStore = create<UIState>()(
         });
 
         get().showToast('success', 'Captain Mode enabled');
+      },
+
+      enableCaptainModeForCreator: () => {
+        set({ isCaptainMode: true });
+        get().showToast('success', 'Captain Mode enabled for trip creator');
       },
 
       disableCaptainMode: () => {

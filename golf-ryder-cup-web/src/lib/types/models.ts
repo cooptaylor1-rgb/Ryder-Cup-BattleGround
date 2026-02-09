@@ -208,6 +208,9 @@ export interface Player {
   paypalUsername?: string;
   zelleEmail?: string;
   zellePhone?: string;
+  /** RSVP status for the trip */
+  rsvpStatus?: 'confirmed' | 'tentative' | 'declined' | 'pending';
+  rsvpAt?: ISODateString;
   joinedAt?: ISODateString;
   createdAt?: ISODateString;
   updatedAt?: ISODateString;
@@ -285,6 +288,8 @@ export interface Match {
   matchOrder: number;
   status: MatchStatus;
   startTime?: ISODateString;
+  /** Captain-set tee time (actual time from the pro shop) */
+  teeTime?: ISODateString;
   currentHole: number;
 
   // Player IDs for each team

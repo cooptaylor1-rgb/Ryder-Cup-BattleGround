@@ -44,7 +44,7 @@ describe('BottomNav Component', () => {
       expect(screen.getByText('Today')).toBeInTheDocument();
       expect(screen.getByText('Score')).toBeInTheDocument();
       expect(screen.getByText('Standings')).toBeInTheDocument();
-      expect(screen.getByText('Journal')).toBeInTheDocument();
+      expect(screen.getByText('Schedule')).toBeInTheDocument();
       expect(screen.getByText('More')).toBeInTheDocument();
     });
 
@@ -67,10 +67,10 @@ describe('BottomNav Component', () => {
       expect(mockPush).toHaveBeenCalledWith('/score');
     });
 
-    it('navigates to journal when Journal is clicked', () => {
+    it('navigates to schedule when Schedule is clicked', () => {
       render(<BottomNav />);
-      fireEvent.click(screen.getByText('Journal'));
-      expect(mockPush).toHaveBeenCalledWith('/social');
+      fireEvent.click(screen.getByText('Schedule'));
+      expect(mockPush).toHaveBeenCalledWith('/schedule');
     });
 
     it('navigates to standings when Standings is clicked', () => {
@@ -95,12 +95,12 @@ describe('BottomNav Component', () => {
       expect(todayButton).toHaveAttribute('aria-current', 'page');
     });
 
-    it('marks Journal as active on social paths', () => {
-      mockPathname.mockReturnValue('/social');
+    it('marks Schedule as active on schedule paths', () => {
+      mockPathname.mockReturnValue('/schedule');
       render(<BottomNav />);
 
-      const journalButton = screen.getByText('Journal').closest('button');
-      expect(journalButton).toHaveAttribute('aria-current', 'page');
+      const scheduleButton = screen.getByText('Schedule').closest('button');
+      expect(scheduleButton).toHaveAttribute('aria-current', 'page');
     });
 
     it('marks Score as active on score sub-paths', () => {
@@ -130,8 +130,8 @@ describe('BottomNav Component', () => {
       expect(screen.getByText('3')).toBeInTheDocument();
     });
 
-    it('displays badge count for journal', () => {
-      const badges: NavBadges = { journal: 5 };
+    it('displays badge count for schedule', () => {
+      const badges: NavBadges = { schedule: 5 };
       render(<BottomNav badges={badges} />);
 
       expect(screen.getByText('5')).toBeInTheDocument();

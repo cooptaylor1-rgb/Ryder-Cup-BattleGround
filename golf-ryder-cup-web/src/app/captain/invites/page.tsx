@@ -1,12 +1,13 @@
 'use client';
 
 // Note: this route is client-only; we intentionally avoid auto-redirects to show explicit empty states.
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { BottomNav, PageHeader } from '@/components/layout';
-import { InvitationManager } from '@/components/captain';
-import { QrCode, Home, MoreHorizontal } from 'lucide-react';
+import { InvitationManager, QRCodeCard } from '@/components/captain';
+import { QrCode, Home, MoreHorizontal, Share2 } from 'lucide-react';
 
 /**
  * INVITATIONS PAGE
@@ -20,6 +21,32 @@ export default function InvitesPage() {
   const { isCaptainMode, showToast } = useUIStore();
 
   // Note: avoid auto-redirects so we can render explicit empty states.
+
+  // Share via native Share API with clipboard fallback
+  const handleShare = useCallback(async (shareCode: string, tripName: string) => {
+    const shareUrl = `${window.location.origin}/join?code=${shareCode}`;
+    const shareData = {
+      title: `Join ${tripName}`,
+      text: `Join our golf trip! Use code: ${shareCode}`,
+      url: shareUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or share failed -- fall back to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+          showToast('success', 'Invite copied to clipboard');
+        }
+      }
+    } else {
+      // Desktop fallback: copy to clipboard
+      await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+      showToast('success', 'Invite copied to clipboard');
+    }
+  }, [showToast]);
 
   if (!currentTrip) {
     return (
@@ -75,7 +102,7 @@ export default function InvitesPage() {
 
   // Generate a share code from trip id
   const shareCode = currentTrip.id.substring(0, 8).toUpperCase();
-  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/join/${shareCode}`;
+  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/join?code=${shareCode}`;
 
   const tripInfo = {
     tripId: currentTrip.id,
@@ -89,7 +116,7 @@ export default function InvitesPage() {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain" style={{ background: 'var(--canvas)' }}>
-            <PageHeader
+      <PageHeader
         title="Invitations"
         subtitle="Manage trip invites"
         icon={<QrCode size={16} style={{ color: 'var(--color-accent)' }} />}
@@ -97,6 +124,43 @@ export default function InvitesPage() {
       />
 
       <main className="container-editorial">
+        {/* QR Code Section */}
+        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
+          <QRCodeCard
+            shareUrl={shareUrl}
+            shareCode={shareCode}
+            tripName={currentTrip.name}
+          />
+
+          {/* Share Invite Button */}
+          <button
+            onClick={() => handleShare(shareCode, currentTrip.name)}
+            className="press-scale"
+            style={{
+              width: '100%',
+              marginTop: 'var(--space-4)',
+              padding: 'var(--space-3) var(--space-5)',
+              borderRadius: 'var(--radius-lg)',
+              border: '2px solid var(--masters)',
+              background: 'var(--masters)',
+              color: 'white',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              fontSize: 'var(--text-base)',
+            }}
+          >
+            <Share2 size={18} />
+            Share Invite
+          </button>
+        </section>
+
+        <hr className="divider-subtle" />
+
+        {/* Invitation Manager */}
         <section className="section">
           <div className="card" style={{ padding: 'var(--space-5)' }}>
             <InvitationManager
@@ -110,7 +174,7 @@ export default function InvitesPage() {
         </section>
       </main>
 
-            <BottomNav />
+      <BottomNav />
     </div>
   );
 }

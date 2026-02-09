@@ -21,6 +21,8 @@ import {
   Flag,
   Check,
   Sparkles,
+  Search,
+  Navigation,
 } from 'lucide-react';
 
 interface QuickStartWizardProps {
@@ -34,13 +36,14 @@ interface TripData {
   location: string;
   startDate: string;
   endDate: string;
+  courseName: string;
   teamAName: string;
   teamBName: string;
 }
 
-type Step = 'basics' | 'dates' | 'teams' | 'confirm';
+type Step = 'basics' | 'dates' | 'course' | 'teams' | 'confirm';
 
-const steps: Step[] = ['basics', 'dates', 'teams', 'confirm'];
+const steps: Step[] = ['basics', 'dates', 'course', 'teams', 'confirm'];
 
 export function QuickStartWizard({
   onComplete,
@@ -54,6 +57,7 @@ export function QuickStartWizard({
     location: '',
     startDate: '',
     endDate: '',
+    courseName: '',
     teamAName: 'USA',
     teamBName: 'Europe',
   });
@@ -92,6 +96,8 @@ export function QuickStartWizard({
         return tripData.name.trim().length > 0;
       case 'dates':
         return tripData.startDate.length > 0 && tripData.endDate.length > 0;
+      case 'course':
+        return true; // Course is optional — can skip
       case 'teams':
         return tripData.teamAName.trim().length > 0 && tripData.teamBName.trim().length > 0;
       case 'confirm':
@@ -187,6 +193,9 @@ export function QuickStartWizard({
         )}
         {currentStep === 'dates' && (
           <StepDates tripData={tripData} updateField={updateField} />
+        )}
+        {currentStep === 'course' && (
+          <StepCourse tripData={tripData} updateField={updateField} />
         )}
         {currentStep === 'teams' && (
           <StepTeams tripData={tripData} updateField={updateField} />
@@ -321,7 +330,7 @@ function StepBasics({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 1 of 4
+          Step 1 of 5
         </p>
         <h1
           style={{
@@ -425,7 +434,7 @@ function StepDates({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 2 of 4
+          Step 2 of 5
         </p>
         <h1
           style={{
@@ -521,7 +530,7 @@ function StepTeams({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 3 of 4
+          Step 4 of 5
         </p>
         <h1
           style={{
@@ -620,7 +629,102 @@ function StepTeams({ tripData, updateField }: StepProps) {
   );
 }
 
-/* ── Step 4: Confirm ── */
+/* ── Step 3: Course (Optional) ── */
+
+function StepCourse({ tripData, updateField }: StepProps) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
+        >
+          <Navigation className="w-8 h-8" style={{ color: 'var(--masters)' }} />
+        </div>
+        <p
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
+        >
+          Step 3 of 5
+        </p>
+        <h1
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
+        >
+          Where Are You Playing?
+        </h1>
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
+          Add your primary course now, or skip and add courses later.
+        </p>
+      </div>
+
+      {/* Course name input */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+        <div>
+          <label style={labelStyle}>Course Name</label>
+          <div style={{ position: 'relative' }}>
+            <Search
+              className="w-5 h-5"
+              style={{
+                position: 'absolute',
+                left: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--ink-tertiary)',
+                pointerEvents: 'none',
+              }}
+            />
+            <input
+              type="text"
+              value={tripData.courseName}
+              onChange={(e) => updateField('courseName', e.target.value)}
+              placeholder="e.g., Pebble Beach Golf Links"
+              style={{ ...inputStyle, paddingLeft: 'calc(var(--space-3) + 28px)' }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--masters)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--rule)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Skip hint */}
+        <p
+          style={{
+            fontSize: '0.8rem',
+            color: 'var(--ink-tertiary)',
+            textAlign: 'center',
+            fontStyle: 'italic',
+          }}
+        >
+          This is optional — you can add or change courses anytime from the Captain tools.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Step 5: Confirm ── */
 
 function StepConfirm({ tripData }: { tripData: TripData }) {
   const formatDate = (dateStr: string) => {
@@ -726,6 +830,18 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
               {formatDate(tripData.startDate)} – {formatDate(tripData.endDate)}
             </span>
           </div>
+
+          {tripData.courseName && (
+            <>
+              <div style={{ height: '1px', background: 'var(--rule)' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--ink-secondary)' }}>Course</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>
+                  {tripData.courseName}
+                </span>
+              </div>
+            </>
+          )}
 
           <div style={{ height: '1px', background: 'var(--rule)' }} />
 

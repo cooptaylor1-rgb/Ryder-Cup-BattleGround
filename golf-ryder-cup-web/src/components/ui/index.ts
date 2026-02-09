@@ -293,3 +293,6 @@ export { KeyboardShortcutsProvider } from './KeyboardShortcutsProvider';
 
 // Session Management
 export { SessionTimeoutWarning } from './SessionTimeoutWarning';
+
+// Format Explainer
+export { FormatExplainer } from './FormatExplainer';

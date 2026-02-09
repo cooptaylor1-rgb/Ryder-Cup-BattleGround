@@ -13,20 +13,20 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
-import { Target, Trophy, Home, Settings, Shield, BookOpen } from 'lucide-react';
+import { Target, Trophy, Home, Settings, Shield, CalendarDays } from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  badgeKey?: 'today' | 'score' | 'standings' | 'journal' | 'more';
+  badgeKey?: 'today' | 'score' | 'standings' | 'schedule' | 'more';
 }
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Today', icon: Home, badgeKey: 'today' },
   { href: '/score', label: 'Score', icon: Target, badgeKey: 'score' },
   { href: '/standings', label: 'Standings', icon: Trophy, badgeKey: 'standings' },
-  { href: '/social', label: 'Journal', icon: BookOpen, badgeKey: 'journal' },
+  { href: '/schedule', label: 'Schedule', icon: CalendarDays, badgeKey: 'schedule' },
   { href: '/more', label: 'More', icon: Settings, badgeKey: 'more' },
 ];
 
@@ -34,7 +34,7 @@ export interface NavBadges {
   today?: number;
   score?: number;
   standings?: number;
-  journal?: number;
+  schedule?: number;
   more?: number;
 }
 
