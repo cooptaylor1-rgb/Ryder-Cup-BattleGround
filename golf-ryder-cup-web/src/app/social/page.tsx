@@ -178,10 +178,9 @@ export default function SocialPage() {
         rightSlot={
           <Link
             href="/social/photos"
-            className="btn-premium"
-            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)' }}
+            style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-md)', color: 'var(--ink-secondary)', display: 'flex' }}
           >
-            <Camera size={20} />
+            <Camera size={20} strokeWidth={1.25} />
           </Link>
         }
       />
@@ -281,10 +280,11 @@ export default function SocialPage() {
             style={{
               flex: 1,
               padding: 'var(--space-2) var(--space-4)',
-              borderRadius: 'var(--radius-full)',
+              borderRadius: 'var(--radius-md)',
               background: 'var(--canvas)',
               border: '1px solid var(--rule)',
               outline: 'none',
+              fontFamily: 'var(--font-sans)',
             }}
           />
           <button
@@ -292,12 +292,12 @@ export default function SocialPage() {
             disabled={!message.trim()}
             style={{
               padding: 'var(--space-2)',
-              borderRadius: 'var(--radius-full)',
+              borderRadius: 'var(--radius-md)',
               background: message.trim() ? 'var(--masters)' : 'var(--rule)',
               color: message.trim() ? 'white' : 'var(--ink-tertiary)',
               border: 'none',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.15s ease',
             }}
           >
             <Send size={20} />
@@ -324,13 +324,14 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
     alignItems: 'center',
     gap: 'var(--space-2)',
     padding: 'var(--space-2) var(--space-4)',
-    borderRadius: 'var(--radius-full)',
+    borderRadius: 'var(--radius-md)',
     fontSize: 'var(--text-sm)',
-    fontWeight: 500,
-    transition: 'all 0.2s ease',
-    background: active ? 'var(--masters)' : 'var(--canvas-raised)',
-    color: active ? 'white' : 'var(--ink)',
-    border: active ? 'none' : '1px solid var(--rule)',
+    fontFamily: 'var(--font-sans)',
+    fontWeight: active ? 600 : 400,
+    transition: 'all 0.15s ease',
+    background: 'transparent',
+    color: active ? 'var(--masters)' : 'var(--ink-secondary)',
+    border: active ? '1px solid var(--masters)' : '1px solid var(--rule)',
     cursor: 'pointer',
     textDecoration: 'none',
   };
@@ -399,8 +400,13 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
 
   return (
     <div
-      className="card"
-      style={{ padding: 'var(--space-4)' }}
+      style={{
+        padding: 'var(--space-4)',
+        border: '1px solid var(--rule)',
+        borderRadius: 'var(--radius-md)',
+        background: 'var(--canvas-raised)',
+        transition: 'border-color 0.15s ease',
+      }}
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
@@ -413,17 +419,18 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
-            fontWeight: 700,
-            background: 'linear-gradient(135deg, var(--team-usa), var(--team-europe))',
+            fontWeight: 600,
+            fontFamily: 'var(--font-serif)',
+            background: 'var(--masters)',
           }}
         >
           {initials}
         </div>
         <div style={{ flex: 1 }}>
-          <p className="type-body-sm" style={{ fontWeight: 500 }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'var(--text-base)', color: 'var(--ink)' }}>
             {displayName}
           </p>
-          <p className="type-caption">{timeAgo}</p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--ink-tertiary)' }}>{timeAgo}</p>
         </div>
         {post.postType !== 'message' && (
           <span
@@ -488,10 +495,11 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
                 alignItems: 'center',
                 gap: 'var(--space-1)',
                 padding: '2px var(--space-2)',
-                borderRadius: 'var(--radius-full)',
+                borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 500,
-                background: hasReacted ? 'var(--masters)' : 'var(--canvas-raised)',
+                fontFamily: 'var(--font-sans)',
+                background: hasReacted ? 'var(--masters)' : 'transparent',
                 color: hasReacted ? 'white' : 'var(--ink-secondary)',
                 border: hasReacted ? '1px solid var(--masters)' : '1px solid var(--rule)',
                 cursor: 'pointer',
@@ -515,8 +523,8 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
               justifyContent: 'center',
               width: '28px',
               height: '28px',
-              borderRadius: 'var(--radius-full)',
-              background: showReactionPicker ? 'var(--masters)' : 'var(--canvas-raised)',
+              borderRadius: 'var(--radius-md)',
+              background: showReactionPicker ? 'var(--masters)' : 'transparent',
               color: showReactionPicker ? 'white' : 'var(--ink-tertiary)',
               border: '1px solid var(--rule)',
               cursor: 'pointer',
@@ -538,10 +546,9 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
                 display: 'flex',
                 gap: 'var(--space-1)',
                 padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-lg)',
+                borderRadius: 'var(--radius-md)',
                 background: 'var(--canvas)',
                 border: '1px solid var(--rule)',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
                 zIndex: 10,
               }}
             >

@@ -209,10 +209,10 @@ describe('BottomNav Component', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
 
-      // All 5 buttons are nav buttons
+      // All 5 buttons are nav buttons — editorial nav uses smaller, refined targets
       buttons.forEach((button) => {
-        expect(button).toHaveClass('min-w-[56px]');
-        expect(button).toHaveClass('min-h-[56px]');
+        expect(button).toHaveClass('min-w-[52px]');
+        expect(button).toHaveClass('min-h-[48px]');
       });
     });
 

@@ -167,7 +167,7 @@ export default function MorePage() {
               id: 'captain',
               label: 'Captain Dashboard',
               description: 'Lineups, settings & admin',
-              icon: <Shield size={20} />,
+              icon: <Shield size={20} strokeWidth={1.25} />,
               href: '/captain',
               badge: 'Active',
               badgeColor: 'var(--success)',
@@ -178,21 +178,21 @@ export default function MorePage() {
         id: 'finances',
         label: 'Finances',
         description: 'Expenses & settling up',
-        icon: <DollarSign size={20} />,
+        icon: <DollarSign size={20} strokeWidth={1.25} />,
         href: '/finances',
       },
       {
         id: 'schedule',
         label: 'Schedule',
         description: 'Sessions & tee times',
-        icon: <CalendarDays size={20} />,
+        icon: <CalendarDays size={20} strokeWidth={1.25} />,
         href: '/schedule',
       },
       {
         id: 'courses',
         label: 'Courses',
         description: 'View & add courses',
-        icon: <MapPin size={20} />,
+        icon: <MapPin size={20} strokeWidth={1.25} />,
         href: '/courses',
       },
     ],
@@ -206,28 +206,28 @@ export default function MorePage() {
         id: 'banter',
         label: 'Banter / Journal',
         description: 'Trip talk & memories',
-        icon: <MessageSquare size={20} />,
+        icon: <MessageSquare size={20} strokeWidth={1.25} />,
         href: '/social',
       },
       {
         id: 'trip-stats',
         label: 'Trip Stats',
         description: 'Beverages, mishaps & more',
-        icon: <BarChart3 size={20} />,
+        icon: <BarChart3 size={20} strokeWidth={1.25} />,
         href: '/trip-stats',
       },
       {
         id: 'awards',
         label: 'Awards',
         description: 'Badges & milestones',
-        icon: <Award size={20} />,
+        icon: <Award size={20} strokeWidth={1.25} />,
         href: '/trip-stats/awards',
       },
       {
         id: 'bets',
         label: 'Bets & Side Games',
         description: 'Fun wagers & pools',
-        icon: <Coins size={20} />,
+        icon: <Coins size={20} strokeWidth={1.25} />,
         href: '/bets',
       },
     ],
@@ -241,28 +241,28 @@ export default function MorePage() {
         id: 'appearance',
         label: 'Appearance',
         description: 'Theme & display',
-        icon: <Palette size={20} />,
+        icon: <Palette size={20} strokeWidth={1.25} />,
         href: '/settings/appearance',
       },
       {
         id: 'notifications',
         label: 'Notifications',
         description: 'Alerts & reminders',
-        icon: <Bell size={20} />,
+        icon: <Bell size={20} strokeWidth={1.25} />,
         href: '/settings/notifications',
       },
       {
         id: 'scoring',
         label: 'Scoring Preferences',
         description: 'Rules & behavior',
-        icon: <Target size={20} />,
+        icon: <Target size={20} strokeWidth={1.25} />,
         href: '/settings/scoring',
       },
       {
         id: 'backup',
         label: 'Backup & Export',
         description: 'Save your data',
-        icon: <HardDrive size={20} />,
+        icon: <HardDrive size={20} strokeWidth={1.25} />,
         href: '/settings/backup',
       },
     ],
@@ -276,14 +276,14 @@ export default function MorePage() {
         id: 'profile',
         label: 'My Profile',
         description: 'View & edit your info',
-        icon: <User size={20} />,
+        icon: <User size={20} strokeWidth={1.25} />,
         href: '/profile',
       },
       {
         id: 'about',
         label: 'About',
         description: 'Version 1.1.0',
-        icon: <Info size={20} />,
+        icon: <Info size={20} strokeWidth={1.25} />,
         // No href -- rendered inline with version info below
       },
     ],
@@ -300,14 +300,14 @@ export default function MorePage() {
               id: 'demo',
               label: 'Load Demo Data',
               description: 'Try with sample trip',
-              icon: <Database size={20} />,
+              icon: <Database size={20} strokeWidth={1.25} />,
               action: handleSeedData,
             },
             {
               id: 'clear-dev',
               label: 'Clear All Data',
               description: 'Start fresh',
-              icon: <Trash2 size={20} />,
+              icon: <Trash2 size={20} strokeWidth={1.25} />,
               action: () => setShowClearConfirm(true),
               destructive: true,
             },
@@ -325,7 +325,7 @@ export default function MorePage() {
             id: 'admin-panel',
             label: 'Admin Panel',
             description: 'Delete trips & manage data',
-            icon: <Shield size={20} />,
+            icon: <Shield size={20} strokeWidth={1.25} />,
             href: '/admin',
             badge: 'Admin',
             badgeColor: '#dc2626',
@@ -334,7 +334,7 @@ export default function MorePage() {
             id: 'clear-admin',
             label: 'Clear All Data',
             description: 'Start fresh',
-            icon: <Trash2 size={20} />,
+            icon: <Trash2 size={20} strokeWidth={1.25} />,
             action: () => setShowClearConfirm(true),
             destructive: true,
           },
@@ -535,11 +535,11 @@ export default function MorePage() {
             className="mb-[var(--space-6)]"
           >
             {sectionIndex > 0 && <hr className="divider-subtle mb-[var(--space-5)]" />}
-            <h2 className="type-overline font-[var(--font-sans)] mb-[var(--space-3)]">
+            <h2 className="type-overline mb-[var(--space-3)]" style={{ fontFamily: 'var(--font-sans)', letterSpacing: '0.1em' }}>
               {section.title}
             </h2>
 
-            <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden">
+            <div>
               {section.items.map((item, index) => (
                 <MenuItemRow
                   key={item.id}
@@ -562,7 +562,7 @@ export default function MorePage() {
         >
           <div className="flex items-center gap-[var(--space-4)] mb-[var(--space-4)]">
             <div
-              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-white font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)]"
+              className="w-[52px] h-[52px] rounded-[var(--radius-md)] flex items-center justify-center text-white font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em]"
               style={{ background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)' }}
             >
               RC
@@ -754,8 +754,8 @@ function MenuItemRow({
       <div
         className={`w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${
           item.destructive
-            ? 'bg-[var(--error-subtle)] text-[var(--error)]'
-            : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
+            ? 'text-[var(--error)]'
+            : 'text-[var(--ink-secondary)]'
         }`}
       >
         {item.icon}
@@ -792,8 +792,8 @@ function MenuItemRow({
     </>
   );
 
-  const itemClassName = `flex items-center gap-[var(--space-3)] py-[var(--space-4)] px-[var(--space-5)] w-full text-left no-underline text-inherit bg-transparent border-0 cursor-pointer transition-colors duration-150 ${
-    !isLast ? 'border-b border-b-[var(--rule-faint)]' : ''
+  const itemClassName = `flex items-center gap-[var(--space-3)] py-[var(--space-4)] px-[var(--space-2)] w-full text-left no-underline text-inherit bg-transparent border-0 cursor-pointer transition-colors duration-150 ${
+    !isLast ? 'border-b border-b-[var(--rule)]' : ''
   }`;
 
   if (item.href) {
@@ -849,7 +849,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-[var(--canvas-raised)] rounded-[var(--radius-xl)] p-[var(--space-6)] w-full max-w-[360px] shadow-[0_20px_40px_rgba(0,0,0,0.25)] border border-[var(--rule)]"
+        className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] p-[var(--space-6)] w-full max-w-[360px] border border-[var(--rule)]"
       >
         {children}
       </motion.div>

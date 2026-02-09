@@ -284,19 +284,33 @@ export default function ScorePage() {
                                 Sessions
                             </h2>
                             <div
-                                className="flex gap-3 overflow-x-auto pb-2"
-                                style={{ margin: '0 calc(-1 * var(--space-5))', padding: '0 var(--space-5)' }}
+                                className="flex gap-1 overflow-x-auto pb-2"
+                                style={{ margin: '0 calc(-1 * var(--space-5))', padding: '0 var(--space-5)', borderBottom: '1px solid var(--rule)' }}
                             >
-                                {sessions.map(session => (
-                                    <button
-                                        key={session.id}
-                                        onClick={() => setSelectedSessionId(session.id)}
-                                        className={session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-                                        style={{ whiteSpace: 'nowrap', fontFamily: 'var(--font-sans)' }}
-                                    >
-                                        Session {session.sessionNumber}
-                                    </button>
-                                ))}
+                                {sessions.map(session => {
+                                    const isActive = session.id === activeSession?.id;
+                                    return (
+                                        <button
+                                            key={session.id}
+                                            onClick={() => setSelectedSessionId(session.id)}
+                                            style={{
+                                                whiteSpace: 'nowrap',
+                                                fontFamily: 'var(--font-sans)',
+                                                fontSize: 'var(--text-sm)',
+                                                fontWeight: isActive ? 600 : 400,
+                                                color: isActive ? 'var(--masters)' : 'var(--ink-secondary)',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                borderBottom: isActive ? '2px solid var(--masters)' : '2px solid transparent',
+                                                padding: 'var(--space-2) var(--space-4)',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.15s ease',
+                                            }}
+                                        >
+                                            Session {session.sessionNumber}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </section>
                     </>
@@ -361,7 +375,7 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em',
-                        borderRadius: 'var(--radius-full)',
+                        borderRadius: 'var(--radius-md)',
                         whiteSpace: 'nowrap',
                     }}
                 >

@@ -1,11 +1,9 @@
 /**
- * Bottom Navigation — Fried Egg Editorial
+ * Bottom Navigation — Augusta Bulletin Editorial
  *
- * Clean, warm, understated. The navigation should
- * feel like a quiet anchor, not a busy dashboard.
- *
- * Design: Warm cream surface, subtle active indicator,
- * characterful typography via Plus Jakarta Sans.
+ * Clean, minimal, country club aesthetic.
+ * Thin line icons, uppercase micro labels,
+ * subtle active underline — not a busy dashboard.
  */
 
 'use client';
@@ -73,7 +71,7 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
         display: 'flex',
         alignItems: 'stretch',
         justifyContent: 'space-around',
-        height: '72px',
+        height: '64px',
         paddingLeft: 'var(--space-1)',
         paddingRight: 'var(--space-1)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -89,16 +87,9 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
           <button
             key={item.href}
             onClick={() => handleNavClick(item)}
-            className={cn(
-              'relative flex flex-col items-center justify-center',
-              'flex-1 min-w-[56px] min-h-[56px] py-1.5',
-              'transition-all duration-150',
-              'focus-visible:outline-none',
-              'active:scale-95 active:opacity-80',
-              'rounded-xl'
-            )}
+            className="relative flex flex-col items-center justify-center flex-1 min-w-[52px] min-h-[48px]"
             style={{
-              color: active ? 'var(--masters)' : 'var(--ink-tertiary)',
+              color: active ? 'var(--ink)' : 'var(--ink-tertiary)',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
@@ -106,48 +97,31 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
             }}
             aria-current={active ? 'page' : undefined}
           >
-            {/* Active indicator — refined gold bar */}
-            {active && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '24px',
-                  height: '2px',
-                  borderRadius: 'var(--radius-full)',
-                  background: 'var(--masters)',
-                }}
-                aria-hidden="true"
-              />
-            )}
-
-            {/* Icon */}
+            {/* Icon — thin stroke, minimal */}
             <div className="relative">
               <Icon
-                className={cn('w-[22px] h-[22px]', active && 'scale-110')}
-                strokeWidth={active ? 2 : 1.5}
+                className="w-[20px] h-[20px]"
+                strokeWidth={active ? 1.75 : 1.25}
               />
 
-              {/* Badge */}
+              {/* Badge — small, muted */}
               {badgeCount !== undefined && badgeCount > 0 && (
                 <span
                   style={{
                     position: 'absolute',
-                    top: '-6px',
-                    right: '-8px',
-                    minWidth: '16px',
-                    height: '16px',
-                    padding: '0 4px',
+                    top: '-5px',
+                    right: '-7px',
+                    minWidth: '14px',
+                    height: '14px',
+                    padding: '0 3px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: 'var(--radius-full)',
-                    background: 'var(--error)',
-                    color: 'white',
-                    fontSize: '10px',
-                    fontWeight: 700,
+                    background: 'var(--maroon)',
+                    color: '#F5F0E8',
+                    fontSize: '9px',
+                    fontWeight: 600,
                     lineHeight: 1,
                   }}
                   aria-label={`${badgeCount} notifications`}
@@ -166,18 +140,36 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
               )}
             </div>
 
-            {/* Label */}
+            {/* Label — micro uppercase */}
             <span
               style={{
-                fontSize: '10px',
-                marginTop: '2px',
-                fontWeight: active ? 700 : 500,
+                fontSize: '9px',
+                marginTop: '3px',
+                fontWeight: active ? 600 : 400,
                 fontFamily: 'var(--font-sans)',
-                letterSpacing: '0.02em',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
               }}
             >
               {item.label}
             </span>
+
+            {/* Active underline — subtle */}
+            {active && (
+              <span
+                style={{
+                  position: 'absolute',
+                  bottom: '6px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '14px',
+                  height: '1.5px',
+                  background: 'var(--ink)',
+                  borderRadius: 'var(--radius-full)',
+                }}
+                aria-hidden="true"
+              />
+            )}
           </button>
         );
       })}

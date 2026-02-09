@@ -1,16 +1,16 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Golf Ryder Cup App - Tailwind Configuration v3.0
+ * Golf Ryder Cup App - Tailwind Configuration v4.0
  *
- * THE FRIED EGG GOLF INSPIRED DESIGN SYSTEM
+ * AUGUSTA BULLETIN — EDITORIAL GOLF AESTHETIC
  *
  * Design Philosophy:
- * - Editorial warmth over dashboard utility
- * - Warm cream surfaces, characterful typography
- * - Restrained color palette (3 brand + 2 team + 3 semantic)
- * - Generous whitespace, content that breathes
- * - Swiss precision with approachable personality
+ * - Country club bulletin board meets editorial print
+ * - Muted earthy tones, serif authority, vintage scorecard
+ * - Thin borders over heavy shadows
+ * - Quiet confidence, not flashy
+ * - Generous whitespace, restrained color
  */
 const config: Config = {
     content: [
@@ -201,38 +201,38 @@ const config: Config = {
             },
 
             // ============================================
-            // BORDER RADIUS — Refined, not bubbly
+            // BORDER RADIUS — Understated, not bubbly
             // ============================================
             borderRadius: {
-                xs: '4px',
-                sm: '6px',
-                md: '8px',
-                lg: '12px',
-                xl: '16px',
-                '2xl': '20px',
-                '3xl': '24px',
+                xs: '2px',
+                sm: '3px',
+                md: '5px',
+                lg: '8px',
+                xl: '10px',
+                '2xl': '12px',
+                '3xl': '14px',
                 full: '9999px',
-                xxl: '24px',
+                xxl: '14px',
             },
 
             // ============================================
-            // SHADOWS — Warm, subtle, three levels
+            // SHADOWS — Barely there. Borders do the work.
             // ============================================
             boxShadow: {
                 'card-sm': 'var(--shadow-sm)',
-                'card': 'var(--shadow-md)',
+                'card': 'var(--shadow-sm)',
                 'card-md': 'var(--shadow-md)',
                 'card-lg': 'var(--shadow-lg)',
                 'card-xl': 'var(--shadow-lg)',
-                'card-default': 'var(--shadow-md)',
+                'card-default': 'var(--shadow-sm)',
                 'card-hover': 'var(--shadow-md)',
-                'card-elevated': 'var(--shadow-lg)',
-                'elevated': 'var(--shadow-lg)',
+                'card-elevated': 'var(--shadow-md)',
+                'elevated': 'var(--shadow-md)',
                 'glow-gold': 'var(--shadow-glow-gold)',
                 'glow-green': 'var(--shadow-glow-masters)',
-                'glow-subtle': '0 0 12px rgba(201, 162, 39, 0.1)',
-                'inner-gold': 'inset 0 1px 0 rgba(201, 162, 39, 0.08)',
-                'inner-light': 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                'glow-subtle': '0 0 8px rgba(166, 139, 91, 0.08)',
+                'inner-gold': 'inset 0 1px 0 rgba(166, 139, 91, 0.06)',
+                'inner-light': 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
             },
 
             // ============================================

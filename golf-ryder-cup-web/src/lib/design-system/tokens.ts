@@ -12,12 +12,12 @@
 export const colors = {
     // Brand
     brand: {
-        primary: '#004225',      // Augusta green
-        primaryLight: '#2E7D32',
-        primaryDark: '#00331A',
-        accent: '#FFD54F',       // Gold
-        accentDark: '#B8860B',
-        accentLight: '#FFE082',
+        primary: '#2D4A3E',      // Deep forest green
+        primaryLight: '#3A5C4E',
+        primaryDark: '#1F3329',
+        accent: '#A68B5B',       // Warm tan/khaki
+        accentDark: '#8B7349',
+        accentLight: '#BFA776',
     },
 
     // Surface - Layered dark mode surfaces (not pure black)
@@ -48,17 +48,17 @@ export const colors = {
         link: '#64B5F6',
     },
 
-    // Teams
+    // Teams — muted, dignified
     team: {
         usa: {
-            primary: '#1565C0',
-            light: '#42A5F5',
-            dark: '#0D47A1',
+            primary: '#2B3E5C',
+            light: '#5A6B82',
+            dark: '#1F2D42',
         },
         europe: {
-            primary: '#C62828',
-            light: '#EF5350',
-            dark: '#B71C1C',
+            primary: '#6B3A3A',
+            light: '#8A6060',
+            dark: '#522D2D',
         },
     },
 

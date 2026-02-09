@@ -37,7 +37,7 @@ export function PageHeader({
               }}
               aria-label="Back"
             >
-              <ChevronLeft size={22} strokeWidth={1.75} />
+              <ChevronLeft size={20} strokeWidth={1.25} />
             </button>
           )}
 
@@ -46,14 +46,13 @@ export function PageHeader({
               <div
                 className={iconContainerClassName}
                 style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--masters)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
                   flexShrink: 0,
                   ...iconContainerStyle,
                 }}
@@ -63,11 +62,19 @@ export function PageHeader({
             )}
 
             <div className="min-w-0">
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: 500,
+                  color: 'var(--ink)',
+                  letterSpacing: '-0.01em',
+                }}
+              >
                 {title}
               </span>
               {subtitle && (
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
+                <p className="type-caption truncate" style={{ marginTop: '1px' }}>
                   {subtitle}
                 </p>
               )}

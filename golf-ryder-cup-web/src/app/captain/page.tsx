@@ -213,11 +213,11 @@ export default function CaptainPage() {
         <PageHeader title="Captain Command" subtitle="Enable captain mode to continue" />
         <main className="container-editorial py-12">
           <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)' }}>
-              <Shield size={32} className="text-white" />
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)', borderRadius: 'var(--radius-lg)' }}>
+              <Shield size={32} strokeWidth={1.25} className="text-white" />
             </div>
-            <h2 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>Captain Mode</h2>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1.25rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 'var(--space-2)' }}>Captain Mode</h2>
             <p className="type-body-sm" style={{ color: 'var(--ink-secondary)', marginBottom: 'var(--space-6)' }}>
               Enter your captain PIN to manage lineups, scores, and settings.
             </p>
@@ -239,10 +239,27 @@ export default function CaptainPage() {
             <button
               onClick={handleEnableCaptain}
               disabled={captainPin.length < 4}
-              className="btn-premium press-scale w-full mt-6"
-              style={{ maxWidth: '200px', margin: '0 auto', marginTop: 'var(--space-4)' }}
+              className="press-scale w-full"
+              style={{
+                maxWidth: '200px',
+                margin: '0 auto',
+                marginTop: 'var(--space-4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+                padding: 'var(--space-3) var(--space-4)',
+                borderRadius: 'var(--radius-md)',
+                background: captainPin.length >= 4 ? 'var(--maroon)' : 'var(--rule)',
+                color: captainPin.length >= 4 ? 'white' : 'var(--ink-tertiary)',
+                border: 'none',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 600,
+                fontSize: 'var(--text-sm)',
+                cursor: captainPin.length >= 4 ? 'pointer' : 'not-allowed',
+              }}
             >
-              <Shield size={16} /> Enable Captain Mode
+              <Shield size={16} strokeWidth={1.25} /> Enable Captain Mode
             </button>
           </div>
         </main>
@@ -381,7 +398,7 @@ export default function CaptainPage() {
 
         {/* Captain Tools Index -- Editorial list layout */}
         <section className="pb-[var(--space-6)]">
-          <h2 className="type-overline text-[var(--maroon)] mb-[var(--space-5)] font-[family-name:var(--font-sans)]">
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1.125rem', fontWeight: 400, color: 'var(--maroon)', marginBottom: 'var(--space-5)' }}>
             Captain Tools
           </h2>
 
@@ -422,7 +439,7 @@ export default function CaptainPage() {
           <div className="mt-[var(--space-4)]">
             <button
               onClick={() => setShowAllActions(!showAllActions)}
-              className="w-full py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-center gap-[var(--space-2)] font-[family-name:var(--font-sans)] text-[length:var(--text-sm)] font-medium text-[color:var(--maroon)] bg-transparent border border-[var(--rule)] rounded-[var(--radius-md)] cursor-pointer transition-[background] duration-150"
+              className="w-full py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-center gap-[var(--space-2)] font-[family-name:var(--font-sans)] text-[length:var(--text-sm)] font-medium text-[color:var(--maroon)] bg-transparent border border-[var(--maroon-subtle)] rounded-[var(--radius-md)] cursor-pointer transition-[background] duration-150"
             >
               <span>{showAllActions ? 'Show Less' : 'More Tools'}</span>
               <ChevronDown
@@ -477,7 +494,7 @@ export default function CaptainPage() {
         {activeSessions.length > 0 && (
           <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
             <div className="flex items-center justify-between mb-[var(--space-4)]">
-              <h2 className="type-overline text-[var(--masters)] font-[family-name:var(--font-sans)]">
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1rem', fontWeight: 400, color: 'var(--masters)' }}>
                 Live Sessions
               </h2>
               <span className="live-badge">
@@ -509,7 +526,7 @@ export default function CaptainPage() {
         {/* Upcoming Sessions */}
         <section className="pt-[var(--space-4)] pb-[var(--space-6)]">
           <div className="flex items-center justify-between mb-[var(--space-4)]">
-            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1rem', fontWeight: 400, color: 'var(--maroon)' }}>
               Upcoming Sessions
             </h2>
             <Link
@@ -557,7 +574,7 @@ export default function CaptainPage() {
                 size={32}
                 className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-3)]"
               />
-              <p className="type-title-sm mb-[var(--space-2)] font-[family-name:var(--font-sans)]">
+              <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1.125rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 'var(--space-2)' }}>
                 No Sessions Yet
               </p>
               <p className="type-caption mb-[var(--space-4)] font-[family-name:var(--font-sans)]">
@@ -565,9 +582,19 @@ export default function CaptainPage() {
               </p>
               <Link
                 href="/lineup/new"
-                className="btn btn-primary inline-flex items-center gap-[var(--space-2)] bg-[var(--maroon)]"
+                className="inline-flex items-center gap-[var(--space-2)]"
+                style={{
+                  padding: 'var(--space-2) var(--space-4)',
+                  border: '1px solid var(--maroon)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--maroon)',
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 600,
+                  fontSize: 'var(--text-sm)',
+                  textDecoration: 'none',
+                }}
               >
-                <Plus size={16} />
+                <Plus size={16} strokeWidth={1.25} />
                 Create Session
               </Link>
             </div>
@@ -578,7 +605,7 @@ export default function CaptainPage() {
         <hr className="divider-subtle" />
         <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
           <div className="flex items-center justify-between mb-[var(--space-4)]">
-            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1rem', fontWeight: 400, color: 'var(--maroon)' }}>
               Team Overview
             </h2>
             <Link
@@ -638,7 +665,16 @@ export default function CaptainPage() {
                 </div>
                 <Link
                   href="/captain/draft"
-                  className="btn btn-sm bg-[var(--maroon)] text-white font-[family-name:var(--font-sans)]"
+                  style={{
+                    padding: 'var(--space-1) var(--space-3)',
+                    border: '1px solid var(--maroon)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--maroon)',
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 600,
+                    fontSize: 'var(--text-sm)',
+                    textDecoration: 'none',
+                  }}
                 >
                   Assign
                 </Link>
@@ -652,7 +688,7 @@ export default function CaptainPage() {
           <>
             <hr className="divider-subtle" />
             <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
-              <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)] font-[family-name:var(--font-sans)]">
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1rem', fontWeight: 400, color: 'var(--ink-secondary)', marginBottom: 'var(--space-4)' }}>
                 Completed Sessions
               </h2>
               <div className="flex flex-col gap-[var(--space-3)]">

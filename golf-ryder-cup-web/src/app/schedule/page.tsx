@@ -353,37 +353,43 @@ export default function SchedulePage() {
         rightSlot={
           currentUserPlayer ? (
             <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              className="flex items-center gap-2 px-3 py-1.5"
               style={{
-                background: 'var(--surface-card)',
+                background: 'var(--canvas-raised)',
                 border: '1px solid var(--rule)',
-                boxShadow: 'var(--shadow-sm)',
+                borderRadius: 'var(--radius-md)',
               }}
             >
-              <User size={14} style={{ color: 'var(--masters)' }} />
-              <span className="text-xs font-medium">{currentUserPlayer.firstName}</span>
+              <User size={14} strokeWidth={1.25} style={{ color: 'var(--masters)' }} />
+              <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{currentUserPlayer.firstName}</span>
             </div>
           ) : null
         }
       />
 
-      {/* Tab Selector */}
-      <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">
-        <div className="flex gap-2">
+      {/* Tab Selector -- Editorial underline tabs */}
+      <div className="container-editorial" role="tablist" aria-label="Schedule views" style={{ borderBottom: '1px solid var(--rule)' }}>
+        <div className="flex">
           <button
             onClick={() => setSelectedTab('my')}
             role="tab"
             aria-selected={selectedTab === 'my'}
             aria-controls="schedule-content"
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'my' ? 'text-white' : ''
-            }`}
+            className="flex-1 flex items-center justify-center gap-2"
             style={{
-              background: selectedTab === 'my' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'my' ? 'none' : '1px solid var(--rule)',
+              padding: 'var(--space-3) var(--space-4)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: selectedTab === 'my' ? 600 : 400,
+              color: selectedTab === 'my' ? 'var(--masters)' : 'var(--ink-secondary)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: selectedTab === 'my' ? '2px solid var(--masters)' : '2px solid transparent',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
-            <User size={18} />
+            <User size={16} strokeWidth={1.25} />
             Your Matches
           </button>
           <button
@@ -391,15 +397,21 @@ export default function SchedulePage() {
             role="tab"
             aria-selected={selectedTab === 'all'}
             aria-controls="schedule-content"
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'all' ? 'text-white' : ''
-            }`}
+            className="flex-1 flex items-center justify-center gap-2"
             style={{
-              background: selectedTab === 'all' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'all' ? 'none' : '1px solid var(--rule)',
+              padding: 'var(--space-3) var(--space-4)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: selectedTab === 'all' ? 600 : 400,
+              color: selectedTab === 'all' ? 'var(--masters)' : 'var(--ink-secondary)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: selectedTab === 'all' ? '2px solid var(--masters)' : '2px solid transparent',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
-            <Calendar size={18} />
+            <Calendar size={16} strokeWidth={1.25} />
             Full Schedule
           </button>
         </div>
@@ -417,10 +429,11 @@ export default function SchedulePage() {
         {/* No Profile Warning */}
         {!loadError && selectedTab === 'my' && !currentUserPlayer && (
           <div
-            className="p-4 rounded-xl mb-6 flex items-start gap-3"
+            className="p-4 mb-6 flex items-start gap-3"
             style={{
-              background: 'rgba(161, 98, 7, 0.1)',
-              border: '1px solid rgba(161, 98, 7, 0.3)',
+              background: 'var(--gold-subtle)',
+              border: '1px solid var(--gold)',
+              borderRadius: 'var(--radius-md)',
             }}
           >
             <AlertCircle
@@ -465,17 +478,17 @@ export default function SchedulePage() {
         {/* Schedule Days */}
         {!loadError && displaySchedule.map((day) => (
             <div key={day.date} className="mb-8">
-              {/* Day Header */}
+              {/* Day Header -- Editorial draw-sheet style */}
               <div className="flex items-center gap-3 mb-4">
                 <div
-                  className="w-12 h-12 rounded-xl flex flex-col items-center justify-center"
-                  style={{ background: 'var(--masters)', color: 'white' }}
+                  className="w-12 h-12 flex flex-col items-center justify-center"
+                  style={{ background: 'var(--masters)', color: 'white', borderRadius: 'var(--radius-md)' }}
                 >
-                  <span className="text-xs font-medium opacity-80">Day</span>
-                  <span className="text-lg font-bold leading-none">{day.dayNumber}</span>
+                  <span style={{ fontSize: '0.625rem', fontFamily: 'var(--font-sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.8 }}>Day</span>
+                  <span style={{ fontSize: '1.125rem', fontFamily: 'var(--font-serif)', fontWeight: 400, lineHeight: 1 }}>{day.dayNumber}</span>
                 </div>
                 <div>
-                  <p className="font-semibold">{day.dayName}</p>
+                  <p style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1rem', color: 'var(--ink)' }}>{day.dayName}</p>
                   <p className="type-caption">
                     {new Date(day.date).toLocaleDateString('en-US', {
                       month: 'long',
@@ -560,33 +573,39 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
     <button
       onClick={onPress}
       disabled={!onPress}
-      className={`w-full text-left p-4 rounded-xl transition-all ${onPress ? 'press-scale' : ''}`}
+      className={`w-full text-left p-4 transition-all ${onPress ? 'press-scale' : ''}`}
       style={{
         background: isSession
-          ? 'var(--masters-subtle, rgba(0, 103, 68, 0.1))'
+          ? 'var(--masters-subtle)'
           : isUserMatch
-            ? 'rgba(212, 175, 55, 0.1)'
-            : 'var(--surface)',
+            ? 'var(--gold-subtle)'
+            : 'var(--canvas-raised)',
         border: isSession
           ? '1px solid var(--masters-glow)'
           : isUserMatch
-            ? '1px solid rgba(212, 175, 55, 0.3)'
+            ? '1px solid var(--gold)'
             : '1px solid var(--rule)',
+        borderRadius: 'var(--radius-md)',
       }}
     >
       <div className="flex items-start gap-3">
-        {/* Time Column */}
+        {/* Time Column -- serif for tee times */}
         <div className="w-16 shrink-0">
           {entry.time && (
-            <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--ink)' }}>
               {entry.time}
             </div>
           )}
           {/* Countdown badge for upcoming user matches (P1) */}
           {countdown && !countdown.isPast && isUserMatch && entryIsToday && (
             <div
-              className="flex items-center gap-1 mt-1 text-xs font-medium px-1.5 py-0.5 rounded"
+              className="flex items-center gap-1 mt-1"
               style={{
+                fontSize: '0.75rem',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-sm)',
                 background: `${getCountdownColor(countdown.urgency)}15`,
                 color: getCountdownColor(countdown.urgency),
               }}
@@ -598,9 +617,9 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
           {isSession && !countdown && (
             <div className="flex items-center gap-1 mt-1">
               {entry.time?.includes('AM') ? (
-                <Sunrise size={12} style={{ color: 'var(--masters)' }} />
+                <Sunrise size={12} strokeWidth={1.25} style={{ color: 'var(--masters)' }} />
               ) : (
-                <Sunset size={12} style={{ color: 'var(--team-europe)' }} />
+                <Sunset size={12} strokeWidth={1.25} style={{ color: 'var(--team-europe)' }} />
               )}
             </div>
           )}
@@ -609,18 +628,29 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            {isSession && <Flag size={14} style={{ color: 'var(--masters)' }} />}
-            {isUserMatch && <User size={14} style={{ color: '#D4AF37' }} />}
+            {isSession && <Flag size={14} strokeWidth={1.25} style={{ color: 'var(--masters)' }} />}
+            {isUserMatch && <User size={14} strokeWidth={1.25} style={{ color: 'var(--gold)' }} />}
             <span
-              className={`font-medium ${isSession ? '' : 'text-sm'}`}
-              style={{ color: isSession ? 'var(--masters)' : 'var(--ink)' }}
+              style={{
+                fontFamily: isSession ? 'var(--font-serif)' : 'var(--font-sans)',
+                fontStyle: isSession ? 'italic' : 'normal',
+                fontWeight: 500,
+                fontSize: isSession ? '1rem' : 'var(--text-sm)',
+                color: isSession ? 'var(--masters)' : 'var(--ink)',
+              }}
             >
               {entry.title}
             </span>
             {entry.status && (
               <span
-                className="text-[10px] px-2 py-0.5 rounded-full font-medium uppercase"
                 style={{
+                  fontSize: '0.625rem',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
                   background: `${statusColors[entry.status]}20`,
                   color: statusColors[entry.status],
                 }}
@@ -630,7 +660,7 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
             )}
           </div>
           {entry.subtitle && (
-            <p className="text-sm mt-1 truncate" style={{ color: 'var(--ink-secondary)' }}>
+            <p className="mt-1 truncate" style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)', color: 'var(--ink-secondary)' }}>
               {entry.subtitle}
             </p>
           )}
@@ -638,7 +668,7 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
 
         {/* Arrow for tappable items */}
         {onPress && (
-          <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
+          <ChevronRight size={18} strokeWidth={1.25} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
         )}
       </div>
     </button>

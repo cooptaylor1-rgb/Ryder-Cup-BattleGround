@@ -184,8 +184,8 @@ export function QuickStartWizard({
               <div
                 style={{
                   width: index <= currentStepIndex ? '32px' : '20px',
-                  height: '3px',
-                  borderRadius: '2px',
+                  height: '2px',
+                  borderRadius: '1px',
                   background: index <= currentStepIndex ? 'var(--masters)' : 'var(--rule)',
                   transition: 'all 300ms ease',
                 }}
@@ -254,8 +254,8 @@ export function QuickStartWizard({
             className="press-scale"
             style={{
               padding: 'var(--space-3) var(--space-4)',
-              borderRadius: 'var(--radius-lg)',
-              background: 'var(--canvas-raised)',
+              borderRadius: 'var(--radius-md)',
+              background: 'transparent',
               border: '1px solid var(--rule)',
               color: 'var(--ink-secondary)',
               cursor: 'pointer',
@@ -270,13 +270,14 @@ export function QuickStartWizard({
         <button
           onClick={handleNext}
           disabled={!canProceed()}
-          className="btn-premium press-scale"
+          className="press-scale"
           style={{
             flex: 1,
             padding: 'var(--space-3) var(--space-4)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             fontWeight: 600,
             fontSize: '0.95rem',
+            fontFamily: 'var(--font-sans)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -287,7 +288,6 @@ export function QuickStartWizard({
             cursor: canProceed() ? 'pointer' : 'not-allowed',
             opacity: canProceed() ? 1 : 0.6,
             transition: 'all 200ms ease',
-            boxShadow: canProceed() ? '0 4px 14px rgba(0, 77, 51, 0.25)' : 'none',
           }}
         >
           {isLastStep ? (
@@ -322,11 +322,11 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 'var(--radius-md)',
   fontSize: '1rem',
   fontFamily: 'var(--font-sans)',
-  background: 'var(--canvas-raised)',
+  background: 'var(--canvas)',
   border: '1px solid var(--rule)',
   color: 'var(--ink)',
   outline: 'none',
-  transition: 'border-color 200ms ease, box-shadow 200ms ease',
+  transition: 'border-color 200ms ease',
 };
 
 const labelStyle: React.CSSProperties = {
@@ -365,11 +365,11 @@ function StepBasics({
             width: '64px',
             height: '64px',
             margin: '0 auto var(--space-5)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0, 77, 51, 0.08)',
+            background: 'var(--masters-glow)',
           }}
         >
           <Flag className="w-8 h-8" style={{ color: 'var(--masters)' }} />
@@ -410,11 +410,9 @@ function StepBasics({
             style={inputStyle}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--masters)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--rule)';
-              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -479,8 +477,8 @@ function StepBasics({
           <div
             style={{
               padding: 'var(--space-4)',
-              borderRadius: 'var(--radius-lg)',
-              background: 'rgba(0, 77, 51, 0.04)',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--masters-subtle)',
               border: '1px solid var(--masters)',
             }}
           >
@@ -593,8 +591,8 @@ function StepBasics({
               gap: 'var(--space-2)',
               width: '100%',
               padding: 'var(--space-3)',
-              borderRadius: 'var(--radius-lg)',
-              background: 'var(--canvas-raised)',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--canvas)',
               border: '1px dashed var(--rule)',
               color: 'var(--ink-secondary)',
               cursor: 'pointer',
@@ -627,11 +625,11 @@ function StepDates({ tripData, updateField }: StepProps) {
             width: '64px',
             height: '64px',
             margin: '0 auto var(--space-5)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0, 77, 51, 0.08)',
+            background: 'var(--masters-glow)',
           }}
         >
           <Calendar className="w-8 h-8" style={{ color: 'var(--masters)' }} />
@@ -672,11 +670,9 @@ function StepDates({ tripData, updateField }: StepProps) {
             style={inputStyle}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--masters)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--rule)';
-              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -691,11 +687,9 @@ function StepDates({ tripData, updateField }: StepProps) {
             style={inputStyle}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--masters)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--rule)';
-              e.currentTarget.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -723,11 +717,11 @@ function StepTeams({ tripData, updateField }: StepProps) {
             width: '64px',
             height: '64px',
             margin: '0 auto var(--space-5)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0, 77, 51, 0.08)',
+            background: 'var(--masters-glow)',
           }}
         >
           <Users className="w-8 h-8" style={{ color: 'var(--masters)' }} />
@@ -802,10 +796,10 @@ function StepTeams({ tripData, updateField }: StepProps) {
               borderWidth: '2px',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(185, 28, 28, 0.1)';
+              e.currentTarget.style.borderColor = 'var(--team-usa)';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.borderColor = 'var(--team-usa)';
             }}
           />
         </div>
@@ -823,10 +817,10 @@ function StepTeams({ tripData, updateField }: StepProps) {
               borderWidth: '2px',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(29, 78, 216, 0.1)';
+              e.currentTarget.style.borderColor = 'var(--team-europe)';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.borderColor = 'var(--team-europe)';
             }}
           />
         </div>
@@ -847,11 +841,11 @@ function StepCourse({ tripData, updateField }: StepProps) {
             width: '64px',
             height: '64px',
             margin: '0 auto var(--space-5)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0, 77, 51, 0.08)',
+            background: 'var(--masters-glow)',
           }}
         >
           <Navigation className="w-8 h-8" style={{ color: 'var(--masters)' }} />
@@ -951,11 +945,11 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
             width: '64px',
             height: '64px',
             margin: '0 auto var(--space-5)',
-            borderRadius: 'var(--radius-lg)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0, 77, 51, 0.08)',
+            background: 'var(--masters-glow)',
           }}
         >
           <Check className="w-8 h-8" style={{ color: 'var(--masters)' }} />
@@ -987,7 +981,7 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
       {/* Summary Card */}
       <div
         style={{
-          borderRadius: 'var(--radius-lg)',
+          borderRadius: 'var(--radius-md)',
           border: '1px solid var(--rule)',
           overflow: 'hidden',
         }}
