@@ -664,3 +664,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Complete Profile: standardized the “Skip” affordance to the shared `btn-ghost` style.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a95a0bb`)
+
+### 00:15 EST — Phase 1 (batch 121)
+- Settings (`/settings`): standardized the premium wrapper to use `bg-[var(--canvas)]` instead of inline `style={{ background: ... }}`.
+- Settings → Notifications (`/settings/notifications`): standardized the premium wrapper to use `bg-[var(--canvas)]` (removes inline background style).
+- Notifications: migrated most surface panels to the shared `card` + `btn-primary` styles to match the rest of the premium UI.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d4a1412`)

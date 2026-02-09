@@ -24,13 +24,13 @@ interface FormatExplainerProps {
 export function FormatExplainer({ format, compact = false, className }: FormatExplainerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const config = FORMAT_CONFIGS[format as MatchFormat];
-  if (!config) return null;
-
   const handleToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen((prev) => !prev);
   }, []);
+
+  const config = FORMAT_CONFIGS[format as MatchFormat];
+  if (!config) return null;
 
   const playersLabel =
     typeof config.playersPerTeam === 'number'
