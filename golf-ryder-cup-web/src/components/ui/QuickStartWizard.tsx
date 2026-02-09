@@ -21,7 +21,14 @@ import {
   Flag,
   Check,
   Sparkles,
+  Search,
+  Navigation,
+  Layers,
+  Trophy,
 } from 'lucide-react';
+import type { TripTemplate, TemplateConfig } from '@/lib/types/templates';
+import { calculateTemplateTotalMatches, calculateTemplateDays } from '@/lib/types/templates';
+import { TemplatePicker } from '@/components/ui/TemplatePicker';
 
 interface QuickStartWizardProps {
   onComplete: (tripData: TripData) => void;
@@ -34,13 +41,16 @@ interface TripData {
   location: string;
   startDate: string;
   endDate: string;
+  courseName: string;
   teamAName: string;
   teamBName: string;
+  /** Template config if a template was selected */
+  templateConfig?: TemplateConfig;
 }
 
-type Step = 'basics' | 'dates' | 'teams' | 'confirm';
+type Step = 'basics' | 'dates' | 'course' | 'teams' | 'confirm';
 
-const steps: Step[] = ['basics', 'dates', 'teams', 'confirm'];
+const steps: Step[] = ['basics', 'dates', 'course', 'teams', 'confirm'];
 
 export function QuickStartWizard({
   onComplete,
@@ -49,14 +59,36 @@ export function QuickStartWizard({
 }: QuickStartWizardProps) {
   const [currentStep, setCurrentStep] = useState<Step>('basics');
   const [isExiting, setIsExiting] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<TripTemplate | null>(null);
   const [tripData, setTripData] = useState<TripData>({
     name: '',
     location: '',
     startDate: '',
     endDate: '',
+    courseName: '',
     teamAName: 'USA',
     teamBName: 'Europe',
   });
+
+  /** Called when a template is picked from the TemplatePicker */
+  const handleTemplateSelect = useCallback((template: TripTemplate) => {
+    setSelectedTemplate(template);
+    setTripData((prev) => ({
+      ...prev,
+      teamAName: template.config.teamAName,
+      teamBName: template.config.teamBName,
+      templateConfig: template.config,
+    }));
+  }, []);
+
+  /** Clear the selected template */
+  const handleTemplateClear = useCallback(() => {
+    setSelectedTemplate(null);
+    setTripData((prev) => ({
+      ...prev,
+      templateConfig: undefined,
+    }));
+  }, []);
 
   const currentStepIndex = steps.indexOf(currentStep);
   const isFirstStep = currentStepIndex === 0;
@@ -92,6 +124,8 @@ export function QuickStartWizard({
         return tripData.name.trim().length > 0;
       case 'dates':
         return tripData.startDate.length > 0 && tripData.endDate.length > 0;
+      case 'course':
+        return true; // Course is optional — can skip
       case 'teams':
         return tripData.teamAName.trim().length > 0 && tripData.teamBName.trim().length > 0;
       case 'confirm':
@@ -183,10 +217,19 @@ export function QuickStartWizard({
         }}
       >
         {currentStep === 'basics' && (
-          <StepBasics tripData={tripData} updateField={updateField} />
+          <StepBasics
+            tripData={tripData}
+            updateField={updateField}
+            selectedTemplate={selectedTemplate}
+            onTemplateSelect={handleTemplateSelect}
+            onTemplateClear={handleTemplateClear}
+          />
         )}
         {currentStep === 'dates' && (
           <StepDates tripData={tripData} updateField={updateField} />
+        )}
+        {currentStep === 'course' && (
+          <StepCourse tripData={tripData} updateField={updateField} />
         )}
         {currentStep === 'teams' && (
           <StepTeams tripData={tripData} updateField={updateField} />
@@ -298,7 +341,21 @@ const labelStyle: React.CSSProperties = {
 
 /* ── Step 1: Basics ── */
 
-function StepBasics({ tripData, updateField }: StepProps) {
+interface StepBasicsProps extends StepProps {
+  selectedTemplate: TripTemplate | null;
+  onTemplateSelect: (template: TripTemplate) => void;
+  onTemplateClear: () => void;
+}
+
+function StepBasics({
+  tripData,
+  updateField,
+  selectedTemplate,
+  onTemplateSelect,
+  onTemplateClear,
+}: StepBasicsProps) {
+  const [showPicker, setShowPicker] = useState(false);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
       {/* Hero */}
@@ -321,7 +378,7 @@ function StepBasics({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 1 of 4
+          Step 1 of 5
         </p>
         <h1
           style={{
@@ -394,6 +451,164 @@ function StepBasics({ tripData, updateField }: StepProps) {
           </div>
         </div>
       </div>
+
+      {/* Start from Template section */}
+      <div>
+        <div
+          style={{
+            height: '1px',
+            background: 'var(--rule)',
+            marginBottom: 'var(--space-5)',
+          }}
+        />
+        <p
+          style={{
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--ink-secondary)',
+            marginBottom: 'var(--space-3)',
+          }}
+        >
+          Start from Template
+        </p>
+
+        {selectedTemplate ? (
+          /* Selected template summary card */
+          <div
+            style={{
+              padding: 'var(--space-4)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'rgba(0, 77, 51, 0.04)',
+              border: '1px solid var(--masters)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--space-2)',
+              }}
+            >
+              <h4
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontStyle: 'italic',
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
+                }}
+              >
+                {selectedTemplate.name}
+              </h4>
+              <button
+                type="button"
+                onClick={onTemplateClear}
+                style={{
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'transparent',
+                  border: '1px solid var(--rule)',
+                  color: 'var(--ink-secondary)',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                Change
+              </button>
+            </div>
+            {selectedTemplate.description && (
+              <p
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--ink-secondary)',
+                  marginBottom: 'var(--space-2)',
+                  lineHeight: 1.4,
+                }}
+              >
+                {selectedTemplate.description}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Layers className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {selectedTemplate.config.sessions.length} sessions
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Trophy className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {calculateTemplateTotalMatches(selectedTemplate.config)} matches
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-secondary)',
+                }}
+              >
+                <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--ink-tertiary)' }} />
+                {calculateTemplateDays(selectedTemplate.config)} day{calculateTemplateDays(selectedTemplate.config) !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        ) : showPicker ? (
+          /* Expanded template picker */
+          <TemplatePicker
+            onSelect={(template) => {
+              onTemplateSelect(template);
+              setShowPicker(false);
+            }}
+            onCustom={() => setShowPicker(false)}
+            selectedId={undefined}
+          />
+        ) : (
+          /* Collapsed: show a button to open the picker */
+          <button
+            type="button"
+            onClick={() => setShowPicker(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              width: '100%',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              background: 'var(--canvas-raised)',
+              border: '1px dashed var(--rule)',
+              color: 'var(--ink-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              fontFamily: 'var(--font-sans)',
+              transition: 'border-color 200ms ease',
+            }}
+          >
+            <Layers className="w-4 h-4" />
+            Choose a Tournament Format
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -425,7 +640,7 @@ function StepDates({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 2 of 4
+          Step 2 of 5
         </p>
         <h1
           style={{
@@ -521,7 +736,7 @@ function StepTeams({ tripData, updateField }: StepProps) {
           className="type-overline"
           style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
         >
-          Step 3 of 4
+          Step 4 of 5
         </p>
         <h1
           style={{
@@ -620,7 +835,102 @@ function StepTeams({ tripData, updateField }: StepProps) {
   );
 }
 
-/* ── Step 4: Confirm ── */
+/* ── Step 3: Course (Optional) ── */
+
+function StepCourse({ tripData, updateField }: StepProps) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+      {/* Hero */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            margin: '0 auto var(--space-5)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 77, 51, 0.08)',
+          }}
+        >
+          <Navigation className="w-8 h-8" style={{ color: 'var(--masters)' }} />
+        </div>
+        <p
+          className="type-overline"
+          style={{ letterSpacing: '0.15em', color: 'var(--masters)', marginBottom: 'var(--space-2)' }}
+        >
+          Step 3 of 5
+        </p>
+        <h1
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            lineHeight: 1.2,
+            marginBottom: 'var(--space-2)',
+          }}
+        >
+          Where Are You Playing?
+        </h1>
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '280px', margin: '0 auto' }}>
+          Add your primary course now, or skip and add courses later.
+        </p>
+      </div>
+
+      {/* Course name input */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+        <div>
+          <label style={labelStyle}>Course Name</label>
+          <div style={{ position: 'relative' }}>
+            <Search
+              className="w-5 h-5"
+              style={{
+                position: 'absolute',
+                left: 'var(--space-3)',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--ink-tertiary)',
+                pointerEvents: 'none',
+              }}
+            />
+            <input
+              type="text"
+              value={tripData.courseName}
+              onChange={(e) => updateField('courseName', e.target.value)}
+              placeholder="e.g., Pebble Beach Golf Links"
+              style={{ ...inputStyle, paddingLeft: 'calc(var(--space-3) + 28px)' }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--masters)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 77, 51, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--rule)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Skip hint */}
+        <p
+          style={{
+            fontSize: '0.8rem',
+            color: 'var(--ink-tertiary)',
+            textAlign: 'center',
+            fontStyle: 'italic',
+          }}
+        >
+          This is optional — you can add or change courses anytime from the Captain tools.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Step 5: Confirm ── */
 
 function StepConfirm({ tripData }: { tripData: TripData }) {
   const formatDate = (dateStr: string) => {
@@ -726,6 +1036,18 @@ function StepConfirm({ tripData }: { tripData: TripData }) {
               {formatDate(tripData.startDate)} – {formatDate(tripData.endDate)}
             </span>
           </div>
+
+          {tripData.courseName && (
+            <>
+              <div style={{ height: '1px', background: 'var(--rule)' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--ink-secondary)' }}>Course</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>
+                  {tripData.courseName}
+                </span>
+              </div>
+            </>
+          )}
 
           <div style={{ height: '1px', background: 'var(--rule)' }} />
 

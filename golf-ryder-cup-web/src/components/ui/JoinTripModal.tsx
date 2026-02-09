@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { syncService } from '@/lib/supabase';
 import { useTripStore } from '@/lib/stores/tripStore';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,19 @@ interface JoinTripModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (tripId: string) => void;
+  /** Pre-fill the share code input (e.g. from a deep link) */
+  initialCode?: string;
 }
 
-export function JoinTripModal({ isOpen, onClose, onSuccess }: JoinTripModalProps) {
-  const [shareCode, setShareCode] = useState('');
+export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinTripModalProps) {
+  const [shareCode, setShareCode] = useState(initialCode || '');
+
+  // Sync initialCode prop changes into local state
+  useEffect(() => {
+    if (initialCode) {
+      setShareCode(initialCode.toUpperCase());
+    }
+  }, [initialCode]);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

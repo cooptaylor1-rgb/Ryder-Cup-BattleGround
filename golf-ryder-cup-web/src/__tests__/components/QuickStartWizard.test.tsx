@@ -65,7 +65,7 @@ describe('QuickStartWizard', () => {
       expect(screen.getByText('Continue')).toBeInTheDocument();
     });
 
-    it('step 4 (confirm) shows Create Trip button', () => {
+    it('step 4 (course) shows Continue button after advancing', () => {
       renderWizard();
 
       // Step 1: fill name
@@ -83,6 +83,33 @@ describe('QuickStartWizard', () => {
       fireEvent.click(screen.getByText('Continue'));
 
       // Step 3: team names are pre-filled (USA/Europe), advance
+      fireEvent.click(screen.getByText('Continue'));
+
+      // Step 4: course (optional), should show Continue
+      expect(screen.getByText('Continue')).toBeInTheDocument();
+    });
+
+    it('step 5 (confirm) shows Create Trip button', () => {
+      renderWizard();
+
+      // Step 1: fill name
+      fireEvent.change(screen.getByPlaceholderText(/Annual Buddies Cup/), {
+        target: { value: 'Test Trip' },
+      });
+      fireEvent.click(screen.getByText('Continue'));
+
+      // Step 2: fill dates
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+      const dateInputs = screen.getAllByDisplayValue('');
+      fireEvent.change(dateInputs[0], { target: { value: today } });
+      fireEvent.change(dateInputs[1], { target: { value: tomorrow } });
+      fireEvent.click(screen.getByText('Continue'));
+
+      // Step 3: team names are pre-filled (USA/Europe), advance
+      fireEvent.click(screen.getByText('Continue'));
+
+      // Step 4: course (optional), advance
       fireEvent.click(screen.getByText('Continue'));
 
       expect(screen.getByText('Create Trip')).toBeInTheDocument();

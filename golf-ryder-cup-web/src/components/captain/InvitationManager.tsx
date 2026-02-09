@@ -29,11 +29,11 @@ import {
   MoreHorizontal,
   RefreshCw,
   Trash2,
-  QrCode,
   Users,
   Send,
   ExternalLink,
 } from 'lucide-react';
+import { QRCode } from '@/components/ui/QRCode';
 
 // ============================================
 // TYPES
@@ -112,15 +112,26 @@ export function InvitationManager({
   }, [tripInfo.shareUrl, onCopyLink]);
 
   const handleNativeShare = useCallback(async () => {
+    const shareData = {
+      title: `Join ${tripInfo.tripName}`,
+      text: `Join our golf trip! Use code: ${tripInfo.shareCode}`,
+      url: tripInfo.shareUrl,
+    };
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: `Join ${tripInfo.tripName}`,
-          text: `${tripInfo.captainName} has invited you to join their golf trip!`,
-          url: tripInfo.shareUrl,
-        });
-      } catch {
-        // User cancelled or share failed
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or share failed -- fall back to clipboard
+        if ((err as Error).name !== 'AbortError') {
+          try {
+            await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+            setCopiedLink(true);
+            setTimeout(() => setCopiedLink(false), 2000);
+          } catch {
+            // Clipboard also failed
+          }
+        }
       }
     } else {
       handleCopyLink();
@@ -674,9 +685,7 @@ interface QRCodeCardProps {
   className?: string;
 }
 
-export function QRCodeCard({ shareUrl: _shareUrl, shareCode, tripName, className }: QRCodeCardProps) {
-  // Note: In production, you'd use a QR code library like qrcode.react
-  // This is a placeholder representation
+export function QRCodeCard({ shareUrl, shareCode, tripName, className }: QRCodeCardProps) {
   return (
     <div
       className={cn('p-6 rounded-2xl text-center', className)}
@@ -685,15 +694,7 @@ export function QRCodeCard({ shareUrl: _shareUrl, shareCode, tripName, className
         border: '1px solid var(--rule)',
       }}
     >
-      <div
-        className="w-48 h-48 mx-auto mb-4 rounded-xl flex items-center justify-center"
-        style={{ background: 'white', border: '1px solid var(--rule)' }}
-      >
-        <QrCode
-          className="w-32 h-32"
-          style={{ color: 'var(--ink)' }}
-        />
-      </div>
+      <QRCode value={shareUrl} size={192} className="mx-auto mb-4" />
       <p
         className="font-semibold"
         style={{ color: 'var(--ink)' }}

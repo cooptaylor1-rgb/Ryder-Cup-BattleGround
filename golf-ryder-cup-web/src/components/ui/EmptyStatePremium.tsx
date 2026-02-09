@@ -288,18 +288,33 @@ export function NoTournamentsEmpty({
                 { text: 'See live leaderboards' },
                 { text: 'Crown trip champions' },
             ]}
-            action={{
-                label: 'Create Your First Trip',
-                onClick: onCreateTrip,
-                icon: <Plus className="w-5 h-5" />,
-            }}
-            secondaryAction={onJoinTrip ? {
-                label: 'Join a Trip',
-                onClick: onJoinTrip,
-            } : undefined}
-            hint="Got an invite code? Tap 'Join a Trip'"
+            hint="Got an invite code? Tap 'Join Trip'"
             variant="large"
-        />
+        >
+            <div style={{ display: 'flex', gap: 'var(--space-3)', width: '100%', marginTop: 'var(--space-6)' }}>
+                <button onClick={onCreateTrip} className="btn-premium press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+                    <Plus size={18} /> New Trip
+                </button>
+                {onJoinTrip && (
+                    <button onClick={onJoinTrip} className="press-scale" style={{
+                        flex: 1,
+                        padding: 'var(--space-3) var(--space-5)',
+                        borderRadius: 'var(--radius-lg)',
+                        border: '2px solid var(--masters)',
+                        background: 'transparent',
+                        color: 'var(--masters)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 'var(--space-2)',
+                    }}>
+                        <Users size={18} /> Join Trip
+                    </button>
+                )}
+            </div>
+        </EmptyStatePremium>
     );
 }
 

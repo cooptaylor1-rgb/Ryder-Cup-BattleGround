@@ -28,6 +28,7 @@ import {
   type SyncStatus,
 } from '../services/tripSyncService';
 import { createLogger } from '../utils/logger';
+import { useUIStore } from './uiStore';
 
 const logger = createLogger('TripStore');
 
@@ -229,6 +230,13 @@ export const useTripStore = create<TripState>()(
           sessions: [],
           syncStatus: 'pending',
         });
+
+        // After creating the trip, auto-enable captain mode for the creator
+        const uiStore = useUIStore.getState();
+        if (!uiStore.isCaptainMode) {
+          // Set captain mode without requiring PIN for trip creator
+          uiStore.enableCaptainModeForCreator();
+        }
 
         return trip;
       },

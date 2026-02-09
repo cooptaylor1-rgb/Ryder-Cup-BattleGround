@@ -18,7 +18,7 @@ import {
   Tv,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   NoTournamentsEmpty,
   WhatsNew,
@@ -49,7 +49,18 @@ export default function HomePage() {
   const { isCaptainMode } = useUIStore();
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [showJoinTrip, setShowJoinTrip] = useState(false);
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>();
   const [, setShowWhatsNew] = useState(false);
+
+  // Check for a pending join code from /join deep link
+  useEffect(() => {
+    const code = sessionStorage.getItem('pendingJoinCode');
+    if (code) {
+      sessionStorage.removeItem('pendingJoinCode');
+      setPendingJoinCode(code);
+      setShowJoinTrip(true);
+    }
+  }, []);
 
   const {
     trips,
@@ -174,11 +185,16 @@ export default function HomePage() {
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <JoinTripModal
         isOpen={showJoinTrip}
-        onClose={() => setShowJoinTrip(false)}
+        onClose={() => {
+          setShowJoinTrip(false);
+          setPendingJoinCode(undefined);
+        }}
         onSuccess={() => {
           setShowJoinTrip(false);
+          setPendingJoinCode(undefined);
           router.push('/');
         }}
+        initialCode={pendingJoinCode}
       />
       <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
 

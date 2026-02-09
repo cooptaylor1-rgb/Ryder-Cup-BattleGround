@@ -30,6 +30,7 @@ import {
   Phone,
   Sliders,
   DollarSign,
+  Printer,
 } from 'lucide-react';
 
 /**
@@ -154,15 +155,34 @@ const QUICK_ACTIONS: QuickAction[] = [
     href: '/captain/contacts',
     color: 'var(--maroon-light)',
   },
+  {
+    id: 'pairings',
+    label: 'Print Pairings',
+    description: 'Printable match sheet',
+    icon: Printer,
+    href: '/captain/pairings',
+    color: 'var(--maroon-light)',
+  },
 ];
 
 export default function CaptainPage() {
   const router = useRouter();
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore();
-  const { isCaptainMode } = useUIStore();
+  const { isCaptainMode, enableCaptainMode } = useUIStore();
+  const [captainPin, setCaptainPin] = useState('');
 
   // P0-7: State for expandable quick actions grid - default to showing all
   const [showAllActions, setShowAllActions] = useState(true);
+
+  const handleEnableCaptain = async () => {
+    try {
+      await enableCaptainMode(captainPin);
+      setCaptainPin('');
+    } catch {
+      // Show error via toast
+      useUIStore.getState().showToast('error', 'Incorrect PIN');
+    }
+  };
 
   // Note: avoid auto-redirects so we can render explicit empty states.
 
@@ -190,22 +210,41 @@ export default function CaptainPage() {
   if (!isCaptainMode) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader title="Captain Command" subtitle="Enable captain mode to continue" />
         <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access the Captain Command Center."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
+          <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+                 style={{ background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)' }}>
+              <Shield size={32} className="text-white" />
+            </div>
+            <h2 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>Captain Mode</h2>
+            <p className="type-body-sm" style={{ color: 'var(--ink-secondary)', marginBottom: 'var(--space-6)' }}>
+              Enter your captain PIN to manage lineups, scores, and settings.
+            </p>
+
+            {/* Inline PIN entry */}
+            <div style={{ maxWidth: '200px', margin: '0 auto' }}>
+              <input
+                type="password"
+                inputMode="numeric"
+                maxLength={4}
+                value={captainPin}
+                onChange={(e) => setCaptainPin(e.target.value.replace(/\D/g, ''))}
+                placeholder="4-digit PIN"
+                className="input text-center text-2xl tracking-[0.5em]"
+                style={{ letterSpacing: '0.5em', fontFamily: 'var(--font-sans)' }}
+              />
+            </div>
+
+            <button
+              onClick={handleEnableCaptain}
+              disabled={captainPin.length < 4}
+              className="btn-premium press-scale w-full mt-6"
+              style={{ maxWidth: '200px', margin: '0 auto', marginTop: 'var(--space-4)' }}
+            >
+              <Shield size={16} /> Enable Captain Mode
+            </button>
+          </div>
         </main>
         <BottomNav />
       </div>
