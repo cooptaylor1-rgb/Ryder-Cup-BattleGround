@@ -3,6 +3,12 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-09
+
+### 17:15 EST — Phase 1 — Captain Draft: PageHeader on access-gated states
+- Captain Draft (`/captain/draft`): added the shared `PageHeader` to the **No active trip** and **Captain mode required** screens so access-gated states retain consistent premium navigation.
+- Commit + push ✅ (`7c2ea89`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
