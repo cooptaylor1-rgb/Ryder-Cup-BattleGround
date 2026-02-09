@@ -105,3 +105,6 @@ All times America/New_York.
 - 15:20 — Shipped batch: Home (`/`) migrated from bespoke header + hand-rolled loading skeleton to the shared `PageHeader` and `PageLoadingSkeleton`, and now uses the standard premium wrapper (`texture-grain`, `min-h-screen`) for consistent navigation + loading. (commit 5720717)
 - 16:40 — Shipped batch: Players + Standings no-active-trip premium empty states now include the shared `PageHeader` (Back + icon + subtitle) so those states match the standard Phase 1 navigation pattern. (commit 6b37c01)
 - 17:55 — Shipped batch: Phase 1 (batch 109) — Fixed 30+ remaining invalid Tailwind CSS-var syntax across PremiumComponents, QuickPlayerSwap, CourseSetupConfirmation, MatchCardGenerator. Removed 22 unused imports/variables (lint warnings 72→50). Removed 13 unused Augusta-themed legacy colors from Tailwind config. Migrated `magnolia`→`canvas` and `azalea`→`error` across all components/stories/tests, then removed both legacy aliases. Fixed anonymous default export in PremiumComponents. (commit ba72d57)
+
+## 2026-02-09
+- 20:55 — Shipped batch: Admin (`/admin`), Captain Manage (`/captain/manage`), and Captain Side Bets (`/captain/bets`) migrated off bespoke `header-premium` markup onto the shared `PageHeader` for consistent premium navigation (including the Admin Mode Required gate state). (commit 67b5fc4)

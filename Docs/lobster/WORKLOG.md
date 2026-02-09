@@ -618,3 +618,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Players (`/players`) + Standings (`/standings`): when there is **no active trip**, the premium empty state now includes the shared `PageHeader` (Back + icon + subtitle) so the screen matches the standard Phase 1 navigation pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6b37c01`)
+
+## 2026-02-09
+
+### 20:55 EST — Phase 1 (batch 115)
+- Admin (`/admin`): replaced bespoke `header-premium` markup with the shared `PageHeader` for consistent premium navigation.
+- Admin: the “Admin Mode Required” gate now uses the standard premium wrapper + `PageHeader` so the screen isn’t a visual outlier.
+- Captain Manage (`/captain/manage`) + Captain Side Bets (`/captain/bets`): migrated bespoke `header-premium` markup to the shared `PageHeader`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`67b5fc4`)
