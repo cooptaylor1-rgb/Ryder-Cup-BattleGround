@@ -729,3 +729,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized wrappers to use `bg-[var(--canvas)]` so theming can’t silently drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3526c94`)
+
+### 05:35 EST — Phase 1 (batch 132)
+- Route error boundaries (`src/app/**/error.tsx`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
+- Standardized recovery screen wrappers to use `bg-[var(--canvas)]` so theme tokens are applied consistently.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e4c589b`)

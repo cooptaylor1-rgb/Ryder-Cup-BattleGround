@@ -91,3 +91,9 @@
 - Standardized wrappers to use `bg-[var(--canvas)]` so theming can’t silently drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3526c94`)
+
+## 05:35 EST — Phase 1 (batch 132)
+- Error boundaries (`src/app/**/error.tsx`): removed remaining inline `style={{ background: 'var(--canvas)' }}` wrappers.
+- Standardized to token-driven Tailwind (`bg-[var(--canvas)]`) so recovery screens can’t silently drift off-theme.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e4c589b`)
