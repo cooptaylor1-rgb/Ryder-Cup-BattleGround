@@ -78,3 +78,9 @@
 - Login (`/login`): standardized the premium wrapper to use `bg-[var(--canvas)]` + Tailwind `flex flex-col` instead of inline layout/background styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`20daf27`)
+
+## 03:40 EST — Phase 1 (batch 128)
+- Home Setup Guide: shifted the captain checklist card off inline gradients/border colors and onto Tailwind arbitrary values, keeping the premium styling token-driven without bespoke CSS.
+- Setup steps: replaced inline badge/row styling with utility classes via the shared `cn` helper so success and default states honor theme tokens (including hover states).
+- Notification permission banner: moved its icon background + CTA buttons onto tokenized utility classes (`btn-primary`/`btn-ghost`) instead of inline styles so the prompt matches the premium button system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

@@ -707,3 +707,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Stats (`/stats`), Join (`/join`), and Not Found (`/_not-found`): standardized the premium wrapper backgrounds to use `bg-[var(--canvas)]` instead of inline `style={{ background: 'var(--canvas)' }}`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ca9de1f`)
+
+### 03:40 EST — Phase 1 (batch 128)
+- Home Setup Guide: replaced inline gradient, border, and text color styles with Tailwind arbitrary-value tokens + the shared `cn` helper so the captain checklist honors theme variables without bespoke CSS.
+- Setup steps: migrated the state-specific badge/row styling to utility classes (no more inline `style={{ ... }}`), keeping success states green while aligning hover/press behavior with other premium lists.
+- Notification permission banner: swapped inline background/button styling for `btn-primary`/`btn-ghost` + tokenized backgrounds so the prompt fits the premium button system.

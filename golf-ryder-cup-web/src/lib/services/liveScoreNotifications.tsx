@@ -319,10 +319,7 @@ export function NotificationPermissionBanner() {
     return (
         <div className="bg-card border border-border rounded-xl p-4 mb-4">
             <div className="flex items-start gap-3">
-                <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: 'var(--masters-subtle)' }}
-                >
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[var(--masters-subtle)]">
                     🔔
                 </div>
                 <div className="flex-1">
@@ -331,17 +328,10 @@ export function NotificationPermissionBanner() {
                         Get notified when scores change, matches finish, or your team takes the lead.
                     </p>
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleEnable}
-                            className="px-4 py-2 rounded-lg text-sm font-medium text-white"
-                            style={{ background: 'var(--masters)' }}
-                        >
+                        <button onClick={handleEnable} className="btn-primary press-scale px-4 text-sm">
                             Enable Notifications
                         </button>
-                        <button
-                            onClick={() => setDismissed(true)}
-                            className="px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted transition-colors"
-                        >
+                        <button onClick={() => setDismissed(true)} className="btn-ghost press-scale px-4 text-sm">
                             Not Now
                         </button>
                     </div>
