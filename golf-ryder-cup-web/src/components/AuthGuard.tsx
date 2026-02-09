@@ -76,29 +76,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     if (!isPublicRoute) {
       return (
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--canvas, #f8fafc)',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <div
-              style={{
-                width: '48px',
-                height: '48px',
-                margin: '0 auto 16px',
-                border: '3px solid var(--rule, #e2e8f0)',
-                borderTopColor: 'var(--masters, #1a472a)',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }}
-            />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            <p style={{ color: 'var(--ink-secondary, #64748b)', fontSize: '14px' }}>Loading...</p>
+        <div className="min-h-screen flex items-center justify-center bg-[var(--canvas)]">
+          <div className="text-center">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full border-[3px] border-[var(--rule)] border-t-[var(--masters)] animate-spin" />
+            <p className="text-sm text-[var(--ink-secondary)]">Loading...</p>
           </div>
         </div>
       );
