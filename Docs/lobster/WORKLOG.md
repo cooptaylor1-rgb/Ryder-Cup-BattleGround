@@ -33,7 +33,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 14:55 EST — Phase 1 (batch 149)
 - Lineup (`/lineup/new`, `/lineup/[sessionId]`), Trip Awards (`/trip/[tripId]/awards`), and Settings → Backup (`/settings/backup`): removed inline `style={{ background: 'var(--canvas)' }}` wrappers and standardized to `bg-[var(--canvas)]` for consistent premium theming.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`1b54a2b`)
 
 ## 2026-02-04
 
