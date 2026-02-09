@@ -200,3 +200,9 @@
 - Affected surfaces: Pace Spacing, Go Time Countdown (alert schedule), Emergency Contacts, Cart Assignment Manager, Course Setup Confirmation, Quick Player Swap modal wrapper, Keyboard Shortcuts Help.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`b8353ca`)
+
+## 17:10 EST — Phase 1 (batch 152)
+- Error boundary UI (`src/components/ui/ErrorBoundary.tsx`): removed inline style props in `ErrorFallback`, `MiniErrorFallback`, and `ErrorCard` by switching to token-driven Tailwind arbitrary values (e.g. `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink)]`).
+- ErrorBoundary: replaced `window.location.href = '/'` with `window.location.assign('/')` for a slightly safer navigation call.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8d128ce`)

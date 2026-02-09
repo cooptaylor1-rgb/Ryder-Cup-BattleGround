@@ -6,6 +6,7 @@ All times America/New_York.
 - 11:22 — Shipped batch: Join deep-link (`/join?code=...`) now uses the shared `PageLoadingSkeleton` instead of a bespoke spinner, keeping loading states consistent with the premium design system. (commit a43f657)
 - 12:50 — Shipped batch: section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain) now use `PageLoadingSkeleton` in their `Suspense` fallbacks instead of the older `PageSkeleton`, matching the premium wrapper + BottomNav loading experience. (commit 17977f0)
 - 16:30 — Shipped batch: tokenized Captain UI surfaces by removing remaining inline `var(--canvas)` / `var(--ink*)` style props in key Captain widgets (Pace Spacing, Go Time Countdown alert schedule, Emergency Contacts, Cart Assignment Manager, Course Setup Confirmation, Quick Player Swap modal wrapper, Keyboard Shortcuts Help). (commit b8353ca)
+- 17:10 — Shipped batch: ErrorBoundary UI components (ErrorFallback, MiniErrorFallback, ErrorCard) now use token-driven Tailwind classes instead of inline style props (bg/border/text), keeping premium theming consistent. Also switched Go Home to use window.location.assign(). (commit 8d128ce)
 
 ## 2026-02-04
 - 18:00 — Started NOW batch: Phase 1 sweep (blank-screen `return null`), PageHeader unification, token audit (RGB vars), Score page perf (holeResults index).
