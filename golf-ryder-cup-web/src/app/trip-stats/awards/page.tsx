@@ -235,7 +235,7 @@ export default function TripAwardsPage() {
         <PageHeader
           title="Trip Awards"
           subtitle="No active trip"
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -262,7 +262,7 @@ export default function TripAwardsPage() {
       <PageHeader
         title="Trip Awards"
         subtitle={currentTrip.name}
-        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 

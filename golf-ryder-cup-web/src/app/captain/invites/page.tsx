@@ -113,13 +113,13 @@ export default function InvitesPage() {
       <PageHeader
         title="Invitations"
         subtitle="Manage trip invites"
-        icon={<QrCode size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<QrCode size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
       <main className="container-editorial">
         {/* QR Code Section */}
-        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-4)' }}>
+        <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
           <QRCodeCard
             shareUrl={shareUrl}
             shareCode={shareCode}
@@ -129,23 +129,7 @@ export default function InvitesPage() {
           {/* Share Invite Button */}
           <button
             onClick={() => handleShare(shareCode, currentTrip.name)}
-            className="press-scale"
-            style={{
-              width: '100%',
-              marginTop: 'var(--space-4)',
-              padding: 'var(--space-3) var(--space-5)',
-              borderRadius: 'var(--radius-lg)',
-              border: '2px solid var(--masters)',
-              background: 'var(--masters)',
-              color: 'white',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'var(--space-2)',
-              fontSize: 'var(--text-base)',
-            }}
+            className="press-scale flex w-full items-center justify-center gap-[var(--space-2)] mt-[var(--space-4)] rounded-[var(--radius-lg)] border-2 border-[var(--masters)] bg-[var(--masters)] px-[var(--space-5)] py-[var(--space-3)] text-[length:var(--text-base)] font-semibold text-white"
           >
             <Share2 size={18} />
             Share Invite
@@ -156,7 +140,7 @@ export default function InvitesPage() {
 
         {/* Invitation Manager */}
         <section className="section">
-          <div className="card" style={{ padding: 'var(--space-5)' }}>
+          <div className="card p-[var(--space-5)]">
             <InvitationManager
               tripInfo={tripInfo}
               invitations={[]}

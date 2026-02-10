@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 06:58 EST — Phase 1 — Trip Awards + Captain Invites: remove inline token styles
+- Trip Awards (`/trip-stats/awards`): PageHeader icon now uses token-driven Tailwind (`text-[var(--color-accent)]`) instead of inline `style`.
+- Captain → Invitations (`/captain/invites`): removed remaining inline token style blocks (PageHeader icon, section padding, Share Invite button, card padding) in favor of token-driven Tailwind classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
+
 ## 05:40 EST — Docs — Lobster worklog chronological sort
 - Lobster worklog (`Docs/lobster/WORKLOG.md`): sorted the 2026-02-10 section into chronological order for easier scanning.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
