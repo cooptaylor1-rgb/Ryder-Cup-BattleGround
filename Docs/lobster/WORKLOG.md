@@ -369,7 +369,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `ThemeToggle`: implemented the `dropdown` variant and added a safe fallback render so an unexpected variant can’t silently render nothing.
 - Migrated the button/segmented variants off the old `surface-*` palette onto token-driven Tailwind classes (`var(--surface-*)`, `var(--ink-*)`) for premium consistency.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`be62d68`)
+- Commit + push ✅ (`ca23556`)
 
 ### 14:35 EST — Phase 1 — Web worklog: chronological resort
 - Web worklog (`golf-ryder-cup-web/WORKLOG.md`): re-sorted 2026-02-05 and 2026-02-06 entries into chronological order.
