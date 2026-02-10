@@ -1,5 +1,10 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 05:40 EST — Docs — Lobster worklog chronological sort
+- Lobster worklog (`Docs/lobster/WORKLOG.md`): sorted the 2026-02-10 section into chronological order for easier scanning.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7216ae0`)
+
 ## 05:25 EST — Phase 1 (batch 166)
 - Route error boundaries: removed remaining inline `style={{ ... }}` usage across key error pages (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats).
 - Scoring match error (`/score/[matchId]/error.tsx`): migrated the offline-saved banner + dev error details panel to token-driven Tailwind classes.
