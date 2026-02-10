@@ -3,7 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
-- 06:58 — Shipped batch: Trip Awards (`/trip-stats/awards`) + Captain Invitations (`/captain/invites`) removed remaining inline token style props (PageHeader icon colors, section padding, Share Invite button + card padding) in favor of token-driven Tailwind classes. (commit TBD)
+- 06:58 — Shipped batch: Trip Awards (`/trip-stats/awards`) + Captain Invitations (`/captain/invites`) removed remaining inline token style props (PageHeader icon colors, section padding, Share Invite button + card padding) in favor of token-driven Tailwind classes. (commit e85490e)
 - 06:40 — Shipped batch: Score (`/score`) removed inline `style={{...}}` token/layout usage (spacing, typography tokens, MatchRow layout) in favor of token-driven Tailwind classes; MatchRow now uses `cn()` for conditional padding/border + token classes for the “Your Match” badge and score styling. (commit 04fea66)
 - 05:25 — Shipped batch: standardized key route error boundaries (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats + scoring match error) by removing inline `style={{...}}` token usage and replacing with token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, etc.). (commit 5a000ff)
 - 04:45 — Shipped batch: Captain Command (`/captain`) removed remaining inline token/layout `style={{...}}` usage (Captain Mode gate UI + readiness/tool list styling), and `PageHeader` now uses token-driven Tailwind classes for the back button, icon container, and typography spacing (still supports `iconContainerStyle` when needed). (commit 9d221a4)

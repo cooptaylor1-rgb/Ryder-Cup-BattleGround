@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip Awards (`/trip-stats/awards`): swapped PageHeader icon color from inline `style` to token-driven Tailwind (`text-[var(--color-accent)]`).
 - Captain → Invitations (`/captain/invites`): replaced remaining inline token style blocks (PageHeader icon, section padding, Share Invite button, card padding) with token-driven Tailwind classes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`e85490e`)
 
 ### 06:40 EST — Phase 1 — Score list: token-driven styles (remove inline var() styles)
 - Score (`/score`): removed remaining inline `style={{...}}` usage for spacing/typography tokens and most MatchRow layout styling, replacing with token-driven Tailwind classes.
