@@ -540,9 +540,9 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
         'w-full text-left p-4 rounded-xl transition-all border',
         onPress && 'press-scale',
         isSession
-          ? 'bg-[color:rgba(0,103,68,0.1)] border-[var(--masters-glow)]'
+          ? 'bg-[color:var(--masters)]/10 border-[var(--masters-glow)]'
           : isUserMatch
-            ? 'bg-[color:rgba(212,175,55,0.1)] border-[color:rgba(212,175,55,0.3)]'
+            ? 'bg-[color:var(--gold)]/10 border-[color:var(--gold)]/30'
             : 'bg-[var(--surface)] border-[var(--rule)]'
       )}
     >
@@ -582,7 +582,7 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             {isSession && <Flag size={14} className="text-[var(--masters)]" />}
-            {isUserMatch && <User size={14} className="text-[#D4AF37]" />}
+            {isUserMatch && <User size={14} className="text-[var(--gold-light)]" />}
             <span
               className={cn(
                 'font-medium',

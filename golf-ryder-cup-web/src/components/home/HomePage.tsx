@@ -499,54 +499,49 @@ export default function HomePage() {
           </div>
 
           {pastTrips.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div className="flex flex-col gap-[var(--space-3)]">
               {pastTrips.map((trip) => (
                 <button
                   key={trip.id}
                   onClick={() => handleSelectTrip(trip.id)}
-                  className="card-editorial card-interactive"
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-4)',
-                    border: '1px solid var(--rule)',
-                    cursor: 'pointer',
-                    padding: 'var(--space-5)',
-                  }}
+                  className="card-editorial card-interactive w-full text-left flex items-center gap-[var(--space-4)] border border-[var(--rule)] p-[var(--space-5)]"
                 >
                   {/* Tournament Icon */}
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: 'var(--radius-lg)',
-                    background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <Trophy size={22} style={{ color: 'var(--gold)' }} />
+                  <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shrink-0">
+                    <Trophy size={22} className="text-[var(--gold)]" />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p className="type-title-sm" style={{ fontWeight: 600 }}>
-                      {trip.name}
-                    </p>
-                    <div className="type-caption" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginTop: 'var(--space-1)' }}>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="type-title-sm font-semibold">{trip.name}</p>
+
+                    <div className="type-caption flex items-center gap-[var(--space-3)] mt-[var(--space-1)]">
                       {trip.location && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          <MapPin size={12} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trip.location}</span>
+                        <span className="flex items-center gap-[var(--space-1)] min-w-0">
+                          <MapPin
+                            size={12}
+                            strokeWidth={1.5}
+                            className="text-[var(--ink-tertiary)] shrink-0"
+                          />
+                          <span className="truncate">{trip.location}</span>
                         </span>
                       )}
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
-                        <Calendar size={12} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
+
+                      <span className="flex items-center gap-[var(--space-1)]">
+                        <Calendar
+                          size={12}
+                          strokeWidth={1.5}
+                          className="text-[var(--ink-tertiary)]"
+                        />
                         {formatDate(trip.startDate, 'short')}
                       </span>
                     </div>
                   </div>
-                  <ChevronRight size={18} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
+
+                  <ChevronRight
+                    size={18}
+                    strokeWidth={1.5}
+                    className="text-[var(--ink-tertiary)] shrink-0"
+                  />
                 </button>
               ))}
             </div>
