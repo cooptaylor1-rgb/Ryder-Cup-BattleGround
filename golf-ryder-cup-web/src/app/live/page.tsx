@@ -43,7 +43,7 @@ export default function LivePage() {
       return db.matches
         .where('sessionId')
         .equals(activeSession.id)
-        .sortBy('matchNumber');
+        .sortBy('matchOrder');
     },
     [activeSession?.id],
     []

@@ -1126,3 +1126,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Uses `cn()` for stateful styling (on/off background, error border), keeping the component consistent with the Phase 1 premium theming system.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6052b5a`)
+
+### 14:55 EST — Phase 1 (batch 160)
+- Live (`/live`): fixed match sorting to use the real `Match.matchOrder` field (was `matchNumber`, which is not part of the model and could cause unstable ordering).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`776a681`)
