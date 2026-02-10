@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 09:10 EST — Phase 1 — Home past trips + Schedule cards: token-driven styles
+- Home (`HomePage`): removed large inline `style={{...}}` blocks from the Past Trips list (layout, borders, gradients, icon/text colors), replacing with token-driven Tailwind classes and `truncate` for overflow.
+- Schedule (`ScheduleEntryCard`): replaced remaining hard-coded rgba/hex accents with token-driven Tailwind classes (`var(--masters)` + `var(--gold)`), keeping the dynamic countdown badge inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`08951fc`)
+
 ### 08:45 EST — Phase 1 — Schedule: token-driven Tailwind styles
 - Schedule (`/schedule`): removed remaining inline token styles (PageHeader icon, user badge icon, tab selector buttons, and “Profile not linked” warning card) in favor of token-driven Tailwind classes + `cn()`.
 - `ScheduleEntryCard`: migrated session/user-match card backgrounds + borders and status pill styling to token-driven Tailwind classes; kept only the truly-dynamic countdown badge colors inline.
