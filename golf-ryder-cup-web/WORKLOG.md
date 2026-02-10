@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 04:45 — Shipped batch: Captain Command (`/captain`) removed remaining inline token/layout `style={{...}}` usage (Captain Mode gate UI + readiness/tool list styling), and `PageHeader` now uses token-driven Tailwind classes for the back button, icon container, and typography spacing (still supports `iconContainerStyle` when needed). (commit 9d221a4)
 - 04:05 — Shipped batch: Settings → Notifications (`/settings/notifications`) removed inline `style={{ ... }}` usage (including switch/toggle styling) in favor of token-driven Tailwind classes + `cn()` conditional classes, keeping behavior unchanged. (commit 3211d1b)
 - 03:30 — Shipped batch: route error boundaries (`/captain`, `/courses`, `/lineup`) standardized to the premium wrapper (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`), added `BottomNav`, and replaced inline token styles with token-driven Tailwind classes for consistent recovery screens. (commit 383823c)
 - 02:00 — Shipped batch: Home components (ActiveTournamentHero + MomentumSection) removed inline token/layout `style={{...}}` usage in favor of token-driven Tailwind arbitrary-value classes (spacing + team colors) for consistent premium theming. (commit a9fa425)

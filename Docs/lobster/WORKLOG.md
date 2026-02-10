@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 04:45 EST — Phase 1 — Captain Command + PageHeader: remove inline styles
+- Captain Command (`/captain`): removed remaining inline `style={{...}}` usage for the Captain Mode PIN gate and refined readiness/tools list styling with token-driven Tailwind classes + `cn()`.
+- `PageHeader`: removed inline style objects for back button + typography spacing; added Tailwind-based defaults and support for `iconContainerClassName` for themed headers.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9d221a4`)
+
 ### 04:05 EST — Phase 1 — Settings / Notifications: remove inline styles
 - Notifications settings (`/settings/notifications`): removed inline `style={{ ... }}` usage in favor of token-driven Tailwind classes.
 - Refactored toggles + cards to use `cn()` with conditional classes (no DOM style props), keeping behavior unchanged.
