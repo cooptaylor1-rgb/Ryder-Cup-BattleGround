@@ -4,7 +4,7 @@
 - Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`) and replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
 - Small consistency/polish pass; no behavior change.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ⏳
+- Commit + push ✅ (`ed13109`)
 
 ## 00:40 EST — Phase 1 (batch 160)
 - Login (`/login`): replaced the “New here?” divider’s inline token styles with token-driven Tailwind classes (`bg-[var(--rule)]`, `text-[var(--ink-tertiary)]`).
