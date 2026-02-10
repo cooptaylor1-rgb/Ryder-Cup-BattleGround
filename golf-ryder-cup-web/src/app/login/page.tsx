@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/stores';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from 'lucide-react';
 import { BottomNav } from '@/components/layout';
 import { PageLoadingSkeleton } from '@/components/ui';
+import { cn } from '@/lib/utils';
 
 /**
  * LOGIN PAGE — Fried Egg Editorial
@@ -43,12 +44,11 @@ function LoginPageContent() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !pin) return;
+
     setIsSubmitting(true);
-    const success = await login(email, pin);
+    await login(email, pin);
     setIsSubmitting(false);
-    if (success) {
-      // useEffect handles redirect
-    }
+    // Redirect handled by useEffect.
   };
 
   const handleCreateAccount = () => {
@@ -59,83 +59,41 @@ function LoginPageContent() {
 
   const canSubmit = email && pin.length === 4 && !isSubmitting && !isLoading;
 
+  const inputBaseClasses =
+    'w-full rounded-[var(--radius-md)] border bg-[var(--canvas-raised)] px-4 py-3 text-[length:var(--text-base)] text-[var(--ink)] outline-none transition-[border-color,box-shadow] placeholder:text-[var(--ink-tertiary)] focus:border-[var(--masters)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--masters)_16%,transparent)]';
+
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       {/* Editorial Header */}
-      <header
-        className="container-editorial"
-        style={{ paddingTop: 'max(3rem, env(safe-area-inset-top, 0px))' }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
-          {/* Overline */}
-          <p
-            className="type-overline"
-            style={{
-              color: 'var(--ink-tertiary)',
-              letterSpacing: '0.15em',
-              marginBottom: 'var(--space-3)',
-            }}
-          >
+      <header className="container-editorial pt-[max(3rem,env(safe-area-inset-top,0px))]">
+        <div className="text-center mb-[var(--space-10)]">
+          <p className="type-overline text-[var(--ink-tertiary)] tracking-[0.15em] mb-[var(--space-3)]">
             RYDER CUP BATTLEGROUND
           </p>
 
-          {/* Display heading */}
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(2rem, 8vw, 3rem)',
-              fontWeight: 400,
-              fontStyle: 'italic',
-              color: 'var(--ink)',
-              lineHeight: 1.1,
-              marginBottom: 'var(--space-3)',
-            }}
-          >
+          <h1 className="font-serif italic font-normal text-[clamp(2rem,8vw,3rem)] leading-[1.1] text-[var(--ink)] mb-[var(--space-3)]">
             Welcome Back
           </h1>
 
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-base)',
-              color: 'var(--ink-secondary)',
-            }}
-          >
+          <p className="font-sans text-[length:var(--text-base)] text-[var(--ink-secondary)]">
             Sign in to your trip
           </p>
         </div>
       </header>
 
       {/* Form */}
-      <main className="container-editorial" style={{ flex: 1 }}>
-        <form onSubmit={handleLogin} style={{ maxWidth: '400px', margin: '0 auto' }}>
+      <main className="container-editorial flex-1">
+        <form onSubmit={handleLogin} className="max-w-sm mx-auto">
           {/* Email */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
+          <div className="mb-[var(--space-6)]">
             <label
               htmlFor="email"
-              style={{
-                display: 'block',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                color: 'var(--ink-secondary)',
-                marginBottom: 'var(--space-2)',
-                letterSpacing: '0.02em',
-              }}
+              className="block font-sans text-[length:var(--text-sm)] font-medium text-[var(--ink-secondary)] mb-[var(--space-2)] tracking-[0.02em]"
             >
               Email
             </label>
-            <div style={{ position: 'relative' }}>
-              <Mail
-                className="w-5 h-5"
-                style={{
-                  position: 'absolute',
-                  left: '14px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--ink-tertiary)',
-                }}
-              />
+            <div className="relative">
+              <Mail className="absolute left-[14px] top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--ink-tertiary)]" />
               <input
                 id="email"
                 type="email"
@@ -143,57 +101,22 @@ function LoginPageContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
-                style={{
-                  width: '100%',
-                  padding: '14px 16px 14px 44px',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-base)',
-                  color: 'var(--ink)',
-                  background: 'var(--canvas-raised)',
-                  border: `1px solid ${error ? 'var(--error)' : 'var(--rule)'}`,
-                  borderRadius: 'var(--radius-md)',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--masters)';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,104,71,0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = error ? 'var(--error)' : 'var(--rule)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                aria-invalid={Boolean(error)}
+                className={cn(inputBaseClasses, 'pl-11', error && 'border-[var(--error)]')}
               />
             </div>
           </div>
 
           {/* PIN */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
+          <div className="mb-[var(--space-6)]">
             <label
               htmlFor="pin"
-              style={{
-                display: 'block',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                color: 'var(--ink-secondary)',
-                marginBottom: 'var(--space-2)',
-                letterSpacing: '0.02em',
-              }}
+              className="block font-sans text-[length:var(--text-sm)] font-medium text-[var(--ink-secondary)] mb-[var(--space-2)] tracking-[0.02em]"
             >
               4-Digit PIN
             </label>
-            <div style={{ position: 'relative' }}>
-              <Lock
-                className="w-5 h-5"
-                style={{
-                  position: 'absolute',
-                  left: '14px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--ink-tertiary)',
-                }}
-              />
+            <div className="relative">
+              <Lock className="absolute left-[14px] top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--ink-tertiary)]" />
               <input
                 id="pin"
                 type={showPin ? 'text' : 'password'}
@@ -203,69 +126,28 @@ function LoginPageContent() {
                 inputMode="numeric"
                 maxLength={4}
                 autoComplete="current-password"
-                style={{
-                  width: '100%',
-                  padding: '14px 48px 14px 44px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 'var(--text-lg)',
-                  letterSpacing: '0.3em',
-                  textAlign: 'center',
-                  color: 'var(--ink)',
-                  background: 'var(--canvas-raised)',
-                  border: `1px solid ${error ? 'var(--error)' : 'var(--rule)'}`,
-                  borderRadius: 'var(--radius-md)',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--masters)';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,104,71,0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = error ? 'var(--error)' : 'var(--rule)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                aria-invalid={Boolean(error)}
+                className={cn(
+                  inputBaseClasses,
+                  'pl-11 pr-12 font-mono text-[length:var(--text-lg)] tracking-[0.3em] text-center',
+                  error && 'border-[var(--error)]'
+                )}
               />
               <button
                 type="button"
-                onClick={() => setShowPin(!showPin)}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  padding: '4px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--ink-tertiary)',
-                }}
+                onClick={() => setShowPin((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--ink-tertiary)] transition-opacity hover:opacity-80"
+                aria-label={showPin ? 'Hide PIN' : 'Show PIN'}
               >
-                {showPin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPin ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
           </div>
 
           {/* Error */}
           {error && (
-            <div
-              style={{
-                padding: 'var(--space-3) var(--space-4)',
-                background: 'rgba(166, 61, 64, 0.08)',
-                border: '1px solid rgba(166, 61, 64, 0.2)',
-                borderRadius: 'var(--radius-md)',
-                marginBottom: 'var(--space-6)',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--error)',
-                }}
-              >
-                {error}
-              </p>
+            <div className="rounded-[var(--radius-md)] border border-[color:rgba(166,61,64,0.2)] bg-[color:rgba(166,61,64,0.08)] px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
+              <p className="font-sans text-[length:var(--text-sm)] text-[var(--error)]">{error}</p>
             </div>
           )}
 
@@ -273,50 +155,29 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="btn-premium press-scale"
-            style={{
-              width: '100%',
-              padding: '16px 24px',
-              background: canSubmit ? 'var(--masters)' : 'var(--rule)',
-              color: canSubmit ? 'white' : 'var(--ink-tertiary)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-base)',
-              fontWeight: 600,
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'var(--space-2)',
-              transition: 'all 0.2s ease',
-            }}
+            className={cn(
+              'btn-premium press-scale w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity] border border-transparent',
+              canSubmit
+                ? 'bg-[var(--masters)] text-white'
+                : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed opacity-90'
+            )}
           >
             {isSubmitting || isLoading ? (
               <>
-                <span
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: 'white',
-                    borderRadius: '50%',
-                    animation: 'spin 0.6s linear infinite',
-                  }}
-                />
+                <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                 Signing In...
               </>
             ) : (
               <>
                 Sign In
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="mx-auto my-[var(--space-8)] flex max-w-[400px] items-center gap-[var(--space-4)]">
+        <div className="mx-auto my-[var(--space-8)] flex max-w-sm items-center gap-[var(--space-4)]">
           <div className="h-px flex-1 bg-[var(--rule)]" />
           <span className="font-sans text-sm text-[var(--ink-tertiary)]">New here?</span>
           <div className="h-px flex-1 bg-[var(--rule)]" />
@@ -325,42 +186,14 @@ function LoginPageContent() {
         {/* Create Account */}
         <button
           onClick={handleCreateAccount}
-          className="press-scale"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--space-2)',
-            width: '100%',
-            maxWidth: '400px',
-            margin: '0 auto',
-            padding: '14px 24px',
-            background: 'transparent',
-            color: 'var(--ink)',
-            border: '1px solid var(--rule)',
-            borderRadius: 'var(--radius-md)',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-base)',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
+          className="press-scale w-full max-w-sm mx-auto flex items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-[var(--rule)] bg-transparent px-6 py-3.5 font-sans text-[length:var(--text-base)] font-medium text-[var(--ink)] transition-[background-color] hover:bg-[var(--surface)]"
         >
-          <UserPlus className="w-5 h-5" />
+          <UserPlus className="h-5 w-5" />
           Create Your Profile
         </button>
 
         {/* Footer note */}
-        <p
-          style={{
-            textAlign: 'center',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-xs)',
-            color: 'var(--ink-tertiary)',
-            marginTop: 'var(--space-8)',
-            lineHeight: 1.5,
-          }}
-        >
+        <p className="text-center font-sans text-[length:var(--text-xs)] text-[var(--ink-tertiary)] mt-[var(--space-8)] leading-relaxed">
           Your data stays on your device.
           <br />
           No account required to browse trips.
