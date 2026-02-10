@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 13:10 — Shipped batch: Login (`/login`) removed large inline `style={{...}}` blocks and focus handlers in favor of token-driven Tailwind classes + `cn()` (safe-area top padding, header typography, form controls, error banner, buttons). Keeps the premium wrapper + BottomNav consistent with the rest of Phase 1. (commit dfa2864)
 - 11:15 — Shipped batch: `PathToVictoryCard` removed most inline `style={{...}}` usage (gradients, borders, icon colors) in favor of Tailwind/arbitrary-value classes, keeping only dynamic progress `width` inline styles and using CSS variables + `color-mix()` for team-colored row backgrounds. (commit f49c30f)
 - 10:05 — Shipped batch: app root layout `Suspense` fallback (`src/app/layout.tsx`) replaced inline style props + bespoke `@keyframes spin` with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`) for consistent premium theming. (commit f64ff02)
 - 07:35 — Shipped batch: Offline Queue panel + Header migrated remaining inline token `style={{...}}` usage (surface/border/text) to token-driven Tailwind classes; replaced inline rgba badge/action backgrounds with Tailwind opacity utilities (e.g. `bg-red-500/10`). (commit 0653314)

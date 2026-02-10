@@ -164,6 +164,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6ec6a8f`)
 
+### 13:10 EST — Phase 1 — Login: remove inline styles
+- Login (`/login`): removed large inline `style={{...}}` blocks + manual focus handlers in favor of token-driven Tailwind classes + `cn()` (safe-area header padding, editorial typography, inputs, error banner, actions, footer note).
+- Keeps the premium wrapper + BottomNav consistent with the rest of Phase 1 routes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dfa2864`)
+
 ### 22:21 EST — Phase 1 — PressTracker: token-driven styles
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
