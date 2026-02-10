@@ -13,7 +13,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, ShieldCheck, X, KeyRound, AlertCircle } from 'lucide-react';
+import { AlertCircle, KeyRound, Shield, ShieldCheck, X } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 
 interface CaptainToggleProps {
@@ -32,12 +34,13 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
   const handleToggle = () => {
     if (isCaptainMode) {
       disableCaptainMode();
-    } else {
-      // Show PIN modal to enable
-      setShowPinModal(true);
-      setPin('');
-      setError('');
+      return;
     }
+
+    // Show PIN modal to enable
+    setShowPinModal(true);
+    setPin('');
+    setError('');
   };
 
   const handleEnableCaptain = async () => {
@@ -63,14 +66,14 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
   };
 
   const handleResetPin = () => {
-    if (resetCaptainPin) {
-      resetCaptainPin();
-    }
+    resetCaptainPin?.();
+
     setShowResetConfirm(false);
     setShowPinModal(false);
     setPin('');
     setError('');
     setAttempts(0);
+
     // Reopen modal to set new PIN
     setTimeout(() => setShowPinModal(true), 100);
   };
@@ -79,96 +82,63 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
     <>
       <button
         onClick={handleToggle}
-        className={`press-scale ${className || ''}`}
-        style={{
-          padding: 'var(--space-2)',
-          borderRadius: 'var(--radius-md)',
-          background: isCaptainMode ? 'rgba(var(--masters-rgb), 0.15)' : 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        className={cn(
+          'press-scale p-[var(--space-2)] rounded-[var(--radius-md)] transition-all duration-200 flex items-center justify-center',
+          isCaptainMode ? 'bg-[rgba(var(--masters-rgb),0.15)]' : 'bg-transparent',
+          className,
+        )}
         aria-label={isCaptainMode ? 'Disable captain mode' : 'Enable captain mode'}
         title={isCaptainMode ? 'Captain Mode ON' : 'Enable Captain Mode'}
       >
         {isCaptainMode ? (
-          <ShieldCheck size={20} style={{ color: 'var(--masters)' }} strokeWidth={2} />
+          <ShieldCheck
+            size={20}
+            strokeWidth={2}
+            className="text-[var(--masters)]"
+          />
         ) : (
-          <Shield size={20} style={{ color: 'var(--ink-tertiary)' }} strokeWidth={1.5} />
+          <Shield
+            size={20}
+            strokeWidth={1.5}
+            className="text-[var(--ink-tertiary)]"
+          />
         )}
       </button>
 
       {/* PIN Modal */}
       {showPinModal && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 'var(--space-4)',
-            background: 'rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(4px)',
-          }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-[var(--space-4)] bg-black/50 backdrop-blur-[4px]"
           onClick={() => setShowPinModal(false)}
         >
           <div
-            style={{
-              background: 'var(--canvas)',
-              borderRadius: 'var(--radius-xl)',
-              padding: 'var(--space-6)',
-              width: '100%',
-              maxWidth: '320px',
-              boxShadow: 'var(--shadow-xl)',
-            }}
+            className="w-full max-w-[320px] rounded-[var(--radius-xl)] bg-[var(--canvas)] p-[var(--space-6)] shadow-[var(--shadow-xl)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-4)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <Shield size={20} style={{ color: 'var(--masters)' }} />
-                <h3 className="type-title" style={{ margin: 0 }}>
-                  Captain Mode
-                </h3>
+            <div className="mb-[var(--space-4)] flex items-center justify-between">
+              <div className="flex items-center gap-[var(--space-2)]">
+                <Shield size={20} className="text-[var(--masters)]" />
+                <h3 className="type-title m-0">Captain Mode</h3>
               </div>
               <button
                 onClick={() => setShowPinModal(false)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 'var(--space-1)',
-                  color: 'var(--ink-tertiary)',
-                }}
+                className="press-scale rounded-[var(--radius-md)] p-[var(--space-1)] text-[var(--ink-tertiary)]"
+                aria-label="Close"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Description */}
-            <p
-              className="type-caption"
-              style={{ marginBottom: 'var(--space-4)', color: 'var(--ink-secondary)' }}
-            >
+            <p className="type-caption mb-[var(--space-4)] text-[var(--ink-secondary)]">
               {captainPinHash
                 ? 'Enter your captain PIN to unlock advanced controls.'
                 : "Set a 4-digit PIN to enable captain mode. You'll need this PIN to re-enable captain mode later."}
             </p>
 
             {/* PIN Input */}
-            <div style={{ marginBottom: 'var(--space-4)' }}>
+            <div className="mb-[var(--space-4)]">
               <input
                 type="password"
                 inputMode="numeric"
@@ -182,17 +152,10 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
                 }}
                 placeholder="Enter PIN"
                 autoFocus
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-3) var(--space-4)',
-                  fontSize: 'var(--text-xl)',
-                  textAlign: 'center',
-                  letterSpacing: '0.5em',
-                  border: error ? '2px solid var(--error)' : '1px solid var(--rule)',
-                  borderRadius: 'var(--radius-lg)',
-                  background: 'var(--canvas-raised)',
-                  outline: 'none',
-                }}
+                className={cn(
+                  'w-full rounded-[var(--radius-lg)] bg-[var(--canvas-raised)] px-[var(--space-4)] py-[var(--space-3)] text-[var(--text-xl)] text-center tracking-[0.5em] outline-none',
+                  error ? 'border-2 border-[var(--error)]' : 'border border-[var(--rule)]',
+                )}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleEnableCaptain();
@@ -200,13 +163,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
                 }}
               />
               {error && (
-                <p
-                  style={{
-                    color: 'var(--error)',
-                    fontSize: 'var(--text-sm)',
-                    marginTop: 'var(--space-2)',
-                  }}
-                >
+                <p className="mt-[var(--space-2)] text-[var(--error)] text-[var(--text-sm)]">
                   {error}
                 </p>
               )}
@@ -216,52 +173,22 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
             {captainPinHash && (
               <button
                 onClick={() => setShowResetConfirm(true)}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-2)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--masters)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 500,
-                  marginBottom: 'var(--space-3)',
-                }}
+                className="btn-ghost mb-[var(--space-3)] w-full text-sm text-[var(--masters)]"
               >
-                <KeyRound
-                  size={14}
-                  style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }}
-                />
+                <KeyRound size={14} className="mr-1 inline align-middle" />
                 Forgot PIN?
               </button>
             )}
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-              <button
-                onClick={() => setShowPinModal(false)}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: 'var(--canvas-sunken)',
-                  border: '1px solid var(--rule)',
-                  borderRadius: 'var(--radius-lg)',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                }}
-              >
+            <div className="flex gap-[var(--space-3)]">
+              <button onClick={() => setShowPinModal(false)} className="btn-secondary flex-1">
                 Cancel
               </button>
               <button
                 onClick={handleEnableCaptain}
                 disabled={pin.length < 4 || attempts >= 3}
-                className="btn-premium"
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  opacity: pin.length < 4 || attempts >= 3 ? 0.5 : 1,
-                  cursor: pin.length < 4 || attempts >= 3 ? 'not-allowed' : 'pointer',
-                }}
+                className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {captainPinHash ? 'Unlock' : 'Enable'}
               </button>
@@ -273,83 +200,26 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       {/* Reset PIN Confirmation Modal */}
       {showResetConfirm && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 101,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 'var(--space-4)',
-            background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(4px)',
-          }}
+          className="fixed inset-0 z-[101] flex items-center justify-center p-[var(--space-4)] bg-black/60 backdrop-blur-[4px]"
           onClick={() => setShowResetConfirm(false)}
         >
           <div
-            style={{
-              background: 'var(--canvas)',
-              borderRadius: 'var(--radius-xl)',
-              padding: 'var(--space-6)',
-              width: '100%',
-              maxWidth: '300px',
-              boxShadow: 'var(--shadow-xl)',
-              textAlign: 'center',
-            }}
+            className="w-full max-w-[300px] rounded-[var(--radius-xl)] bg-[var(--canvas)] p-[var(--space-6)] text-center shadow-[var(--shadow-xl)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'rgba(239, 68, 68, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto var(--space-4)',
-              }}
-            >
-              <AlertCircle size={28} style={{ color: 'var(--error)' }} />
+            <div className="mx-auto mb-[var(--space-4)] flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10">
+              <AlertCircle size={28} className="text-[var(--error)]" />
             </div>
-            <h3 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>
-              Reset Captain PIN?
-            </h3>
-            <p
-              className="type-caption"
-              style={{ color: 'var(--ink-secondary)', marginBottom: 'var(--space-4)' }}
-            >
+            <h3 className="type-title mb-[var(--space-2)]">Reset Captain PIN?</h3>
+            <p className="type-caption mb-[var(--space-4)] text-[var(--ink-secondary)]">
               This will clear your current PIN. You&apos;ll need to set a new one to access captain
               features.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-              <button
-                onClick={() => setShowResetConfirm(false)}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: 'var(--canvas-sunken)',
-                  border: '1px solid var(--rule)',
-                  borderRadius: 'var(--radius-lg)',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                }}
-              >
+            <div className="flex gap-[var(--space-3)]">
+              <button onClick={() => setShowResetConfirm(false)} className="btn-secondary flex-1">
                 Cancel
               </button>
-              <button
-                onClick={handleResetPin}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-3)',
-                  background: 'var(--error)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 'var(--radius-lg)',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                }}
-              >
+              <button onClick={handleResetPin} className="btn-danger flex-1">
                 Reset PIN
               </button>
             </div>
