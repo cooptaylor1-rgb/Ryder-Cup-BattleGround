@@ -33,7 +33,6 @@ import {
     Crown,
     Zap,
 } from 'lucide-react';
-// cn import removed - unused
 import { useHaptic } from '@/lib/hooks';
 
 // ============================================
@@ -137,15 +136,14 @@ function HeroSection({ trip }: { trip: TripData }) {
                     transition={{ delay: 0.3, type: 'spring' }}
                     className="mb-4"
                 >
-                    <Trophy className="w-16 h-16 mx-auto" style={{ color: 'var(--masters)' }} />
+                    <Trophy className="w-16 h-16 mx-auto text-[var(--masters)]" />
                 </motion.div>
 
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="text-4xl font-bold mb-2"
-                    style={{ color: 'var(--ink)' }}
+                    className="text-4xl font-bold mb-2 text-[var(--ink)]"
                 >
                     {trip.name}
                 </motion.h1>
@@ -154,8 +152,7 @@ function HeroSection({ trip }: { trip: TripData }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="flex items-center justify-center gap-4 text-sm"
-                    style={{ color: 'var(--ink-tertiary)' }}
+                    className="flex items-center justify-center gap-4 text-sm text-[var(--ink-tertiary)]"
                 >
                     <span className="flex items-center gap-1">
                         <MapPin size={14} />
@@ -163,7 +160,12 @@ function HeroSection({ trip }: { trip: TripData }) {
                     </span>
                     <span className="flex items-center gap-1">
                         <Calendar size={14} />
-                        {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(trip.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} -{' '}
+                        {new Date(trip.endDate).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                        })}
                     </span>
                 </motion.div>
 
@@ -174,24 +176,18 @@ function HeroSection({ trip }: { trip: TripData }) {
                     className="flex items-center justify-center gap-6 mt-6"
                 >
                     <div className="text-center">
-                        <span className="block text-2xl font-bold" style={{ color: 'var(--ink)' }}>
-                            {trip.playerCount}
-                        </span>
-                        <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Players</span>
+                        <span className="block text-2xl font-bold text-[var(--ink)]">{trip.playerCount}</span>
+                        <span className="text-xs text-[var(--ink-tertiary)]">Players</span>
                     </div>
-                    <div className="w-px h-8" style={{ background: 'var(--rule)' }} />
+                    <div className="w-px h-8 bg-[var(--rule)]" />
                     <div className="text-center">
-                        <span className="block text-2xl font-bold" style={{ color: 'var(--ink)' }}>
-                            {trip.matchCount}
-                        </span>
-                        <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Matches</span>
+                        <span className="block text-2xl font-bold text-[var(--ink)]">{trip.matchCount}</span>
+                        <span className="text-xs text-[var(--ink-tertiary)]">Matches</span>
                     </div>
-                    <div className="w-px h-8" style={{ background: 'var(--rule)' }} />
+                    <div className="w-px h-8 bg-[var(--rule)]" />
                     <div className="text-center">
-                        <span className="block text-2xl font-bold" style={{ color: 'var(--ink)' }}>
-                            {trip.stats.totalHoles}
-                        </span>
-                        <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Holes</span>
+                        <span className="block text-2xl font-bold text-[var(--ink)]">{trip.stats.totalHoles}</span>
+                        <span className="text-xs text-[var(--ink-tertiary)]">Holes</span>
                     </div>
                 </motion.div>
             </div>
@@ -217,9 +213,7 @@ function TeamBattleSection({ stats }: { stats: TripStats }) {
             transition={{ duration: 0.6 }}
             className="px-6 py-8"
         >
-            <h2 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ink)' }}>
-                The Battle
-            </h2>
+            <h2 className="text-xl font-bold text-center mb-6 text-[var(--ink)]">The Battle</h2>
 
             <div className="max-w-md mx-auto">
                 {/* Score Display */}
@@ -235,7 +229,7 @@ function TeamBattleSection({ stats }: { stats: TripStats }) {
 
                     <div className="flex-1 mx-4 relative">
                         {/* Progress Bar */}
-                        <div className="h-4 rounded-full overflow-hidden" style={{ background: 'var(--rule)' }}>
+                        <div className="h-4 rounded-full overflow-hidden bg-[var(--rule)]">
                             <motion.div
                                 initial={{ width: '50%' }}
                                 animate={isInView ? { width: `${usaPercent}%` } : {}}
@@ -316,12 +310,8 @@ function StatCard({ icon: Icon, label, value, sublabel, color, delay }: StatCard
             style={{ background: `${color}10` }}
         >
             <Icon className="w-6 h-6 mx-auto mb-2" style={{ color }} />
-            <div className="text-2xl font-bold" style={{ color: 'var(--ink)' }}>
-                {value}
-            </div>
-            <div className="text-xs" style={{ color: 'var(--ink-secondary)' }}>
-                {label}
-            </div>
+            <div className="text-2xl font-bold text-[var(--ink)]">{value}</div>
+            <div className="text-xs text-[var(--ink-secondary)]">{label}</div>
             {sublabel && (
                 <div className="text-xs mt-1" style={{ color }}>
                     {sublabel}
@@ -334,32 +324,12 @@ function StatCard({ icon: Icon, label, value, sublabel, color, delay }: StatCard
 function StatsGridSection({ stats }: { stats: TripStats }) {
     return (
         <section className="px-6 py-8">
-            <h2 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ink)' }}>
-                By the Numbers
-            </h2>
+            <h2 className="text-xl font-bold text-center mb-6 text-[var(--ink)]">By the Numbers</h2>
 
             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
-                <StatCard
-                    icon={Star}
-                    label="Birdies"
-                    value={stats.birdies}
-                    color="#22C55E"
-                    delay={0}
-                />
-                <StatCard
-                    icon={Target}
-                    label="Pars"
-                    value={stats.pars}
-                    color="#3B82F6"
-                    delay={0.1}
-                />
-                <StatCard
-                    icon={TrendingUp}
-                    label="Bogeys"
-                    value={stats.bogeys}
-                    color="#F59E0B"
-                    delay={0.2}
-                />
+                <StatCard icon={Star} label="Birdies" value={stats.birdies} color="#22C55E" delay={0} />
+                <StatCard icon={Target} label="Pars" value={stats.pars} color="#3B82F6" delay={0.1} />
+                <StatCard icon={TrendingUp} label="Bogeys" value={stats.bogeys} color="#F59E0B" delay={0.2} />
                 <StatCard
                     icon={TrendingDown}
                     label="Double+"
@@ -395,8 +365,7 @@ function RecordCard({ icon: Icon, title, player, stat, color, delay }: RecordCar
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay, duration: 0.5 }}
-            className="flex items-center gap-4 p-4 rounded-xl"
-            style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+            className="card flex items-center gap-4 p-4"
         >
             <div
                 className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
@@ -405,12 +374,8 @@ function RecordCard({ icon: Icon, title, player, stat, color, delay }: RecordCar
                 <Icon className="w-6 h-6" style={{ color }} />
             </div>
             <div className="flex-1 min-w-0">
-                <div className="text-xs uppercase tracking-wider" style={{ color: 'var(--ink-tertiary)' }}>
-                    {title}
-                </div>
-                <div className="font-semibold truncate" style={{ color: 'var(--ink)' }}>
-                    {player}
-                </div>
+                <div className="text-xs uppercase tracking-wider text-[var(--ink-tertiary)]">{title}</div>
+                <div className="font-semibold truncate text-[var(--ink)]">{player}</div>
             </div>
             <div
                 className="px-3 py-1 rounded-lg font-bold text-sm shrink-0"
@@ -425,9 +390,7 @@ function RecordCard({ icon: Icon, title, player, stat, color, delay }: RecordCar
 function RecordsSection({ stats }: { stats: TripStats }) {
     return (
         <section className="px-6 py-8">
-            <h2 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ink)' }}>
-                Trip Records
-            </h2>
+            <h2 className="text-xl font-bold text-center mb-6 text-[var(--ink)]">Trip Records</h2>
 
             <div className="space-y-3 max-w-md mx-auto">
                 <RecordCard
@@ -483,9 +446,7 @@ function HighlightsSection({ highlights }: { highlights: TripHighlight[] }) {
 
     return (
         <section className="py-8">
-            <h2 className="text-xl font-bold text-center mb-6 px-6" style={{ color: 'var(--ink)' }}>
-                Top Moments
-            </h2>
+            <h2 className="text-xl font-bold text-center mb-6 px-6 text-[var(--ink)]">Top Moments</h2>
 
             <div className="relative">
                 <AnimatePresence mode="wait">
@@ -497,13 +458,7 @@ function HighlightsSection({ highlights }: { highlights: TripHighlight[] }) {
                         transition={{ duration: 0.3 }}
                         className="px-6"
                     >
-                        <div
-                            className="rounded-2xl overflow-hidden"
-                            style={{
-                                background: 'var(--surface)',
-                                border: '1px solid var(--rule)',
-                            }}
-                        >
+                        <div className="rounded-2xl overflow-hidden bg-[var(--surface)] border border-[var(--rule)]">
                             {/* Image placeholder */}
                             {highlight.imageUrl ? (
                                 <div
@@ -511,22 +466,15 @@ function HighlightsSection({ highlights }: { highlights: TripHighlight[] }) {
                                     style={{ backgroundImage: `url(${highlight.imageUrl})` }}
                                 />
                             ) : (
-                                <div
-                                    className="h-48 flex items-center justify-center"
-                                    style={{ background: 'var(--masters)20' }}
-                                >
-                                    <Flame className="w-12 h-12" style={{ color: 'var(--masters)' }} />
+                                <div className="h-48 flex items-center justify-center bg-[color:var(--masters)]/20">
+                                    <Flame className="w-12 h-12 text-[var(--masters)]" />
                                 </div>
                             )}
 
                             {/* Content */}
                             <div className="p-4">
-                                <h3 className="font-bold text-lg mb-1" style={{ color: 'var(--ink)' }}>
-                                    {highlight.title}
-                                </h3>
-                                <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-                                    {highlight.description}
-                                </p>
+                                <h3 className="font-bold text-lg mb-1 text-[var(--ink)]">{highlight.title}</h3>
+                                <p className="text-sm text-[var(--ink-secondary)]">{highlight.description}</p>
                             </div>
                         </div>
                     </motion.div>
@@ -537,17 +485,15 @@ function HighlightsSection({ highlights }: { highlights: TripHighlight[] }) {
                     <>
                         <button
                             onClick={prev}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
-                            style={{ background: 'var(--surface)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-[var(--surface)] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                         >
-                            <ChevronLeft size={20} style={{ color: 'var(--ink)' }} />
+                            <ChevronLeft size={20} className="text-[var(--ink)]" />
                         </button>
                         <button
                             onClick={next}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
-                            style={{ background: 'var(--surface)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-[var(--surface)] shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
                         >
-                            <ChevronRight size={20} style={{ color: 'var(--ink)' }} />
+                            <ChevronRight size={20} className="text-[var(--ink)]" />
                         </button>
                     </>
                 )}
@@ -594,9 +540,7 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
         >
             <div
                 className="rounded-2xl p-6 text-center overflow-hidden relative"
-                style={{
-                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                }}
+                style={{ background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' }}
             >
                 {/* Shine effect */}
                 <motion.div
@@ -609,31 +553,19 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
                 />
 
                 <Crown className="w-12 h-12 mx-auto mb-3 text-white" />
-                <span className="text-white/80 text-sm uppercase tracking-wider font-semibold">
-                    Trip MVP
-                </span>
+                <span className="text-white/80 text-sm uppercase tracking-wider font-semibold">Trip MVP</span>
 
                 {/* Avatar */}
                 <div className="w-20 h-20 rounded-full mx-auto my-4 bg-white flex items-center justify-center text-3xl overflow-hidden relative">
                     {mvp.avatarUrl ? (
-                        <Image
-                            src={mvp.avatarUrl}
-                            alt={mvp.name}
-                            fill
-                            className="object-cover"
-                            sizes="80px"
-                        />
+                        <Image src={mvp.avatarUrl} alt={mvp.name} fill className="object-cover" sizes="80px" />
                     ) : (
                         '👑'
                     )}
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-1">
-                    {mvp.name}
-                </h3>
-                <p className="text-white/80">
-                    {mvp.points} total points
-                </p>
+                <h3 className="text-2xl font-bold text-white mb-1">{mvp.name}</h3>
+                <p className="text-white/80">{mvp.points} total points</p>
             </div>
         </motion.section>
     );
@@ -655,8 +587,7 @@ function ShareFooter({ onShare, onExport }: { onShare?: () => void; onExport?: (
                         haptic.press();
                         onShare?.();
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-white"
-                    style={{ background: 'var(--masters)' }}
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-white bg-[var(--masters)]"
                 >
                     <Share2 size={18} />
                     Share Recap
@@ -668,10 +599,9 @@ function ShareFooter({ onShare, onExport }: { onShare?: () => void; onExport?: (
                         haptic.tap();
                         onExport?.();
                     }}
-                    className="w-14 h-14 rounded-xl flex items-center justify-center"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+                    className="w-14 h-14 rounded-xl flex items-center justify-center bg-[var(--surface)] border border-[var(--rule)]"
                 >
-                    <Download size={20} style={{ color: 'var(--ink)' }} />
+                    <Download size={20} className="text-[var(--ink)]" />
                 </motion.button>
             </div>
         </section>
@@ -684,10 +614,7 @@ function ShareFooter({ onShare, onExport }: { onShare?: () => void; onExport?: (
 
 export function TripMemories({ trip, onShare, onExport }: TripMemoriesProps) {
     return (
-        <div
-            className="min-h-screen"
-            style={{ background: 'var(--surface-secondary, #F9FAFB)' }}
-        >
+        <div className="min-h-screen bg-[var(--surface-secondary)]">
             <HeroSection trip={trip} />
             <TeamBattleSection stats={trip.stats} />
             <StatsGridSection stats={trip.stats} />
