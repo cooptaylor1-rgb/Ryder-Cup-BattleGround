@@ -2,14 +2,12 @@
 
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-
 import { DraftBoard } from '@/components/captain';
 import { BottomNav, PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { draftLogger } from '@/lib/utils/logger';
-import { Home, MoreHorizontal, Shield, Shuffle, Users } from 'lucide-react';
+import { Home, MoreHorizontal, Shuffle } from 'lucide-react';
 
 /**
  * TEAM DRAFT PAGE
@@ -142,51 +140,51 @@ export default function DraftPage() {
       <main className="container-editorial">
         <section className="section">
           {unassignedPlayers.length === 0 ? (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-              <Users size={48} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-4)' }} />
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                All Players Assigned
-              </h2>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
-                All {players.length} players have been assigned to teams.
-              </p>
-              <Link href="/captain" className="btn btn-primary">
-                Back to Captain
-              </Link>
+            <div className="py-12">
+              <EmptyStatePremium
+                illustration="golfers"
+                title="All players assigned"
+                description={`All ${players.length} player${players.length === 1 ? '' : 's'} have already been assigned to teams.`}
+                action={{
+                  label: 'Back to Captain',
+                  onClick: () => router.push('/captain'),
+                }}
+                variant="large"
+              />
             </div>
           ) : players.length < 2 ? (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-              <Users size={48} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-4)' }} />
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                Need More Players
-              </h2>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
-                Add at least 2 players to start the draft.
-              </p>
-              <Link href="/players" className="btn btn-primary">
-                Add Players
-              </Link>
+            <div className="py-12">
+              <EmptyStatePremium
+                illustration="golfers"
+                title="Add a few more players"
+                description="You need at least 2 players to run a draft."
+                action={{
+                  label: 'Manage Players',
+                  onClick: () => router.push('/players'),
+                }}
+                secondaryAction={{
+                  label: 'Back to Captain',
+                  onClick: () => router.push('/captain'),
+                }}
+                variant="large"
+              />
             </div>
           ) : teams.length < 2 ? (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-              <Shield size={48} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-4)' }} />
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                Teams Not Set Up
-              </h2>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
-                Teams need to be configured before drafting.
-              </p>
-              <Link href="/captain" className="btn btn-primary">
-                Back to Captain
-              </Link>
+            <div className="py-12">
+              <EmptyStatePremium
+                illustration="trophy"
+                title="Teams aren’t set up yet"
+                description="Create or configure both teams before drafting players."
+                action={{
+                  label: 'Back to Captain',
+                  onClick: () => router.push('/captain'),
+                }}
+                variant="large"
+              />
             </div>
           ) : (
-            <div className="card" style={{ padding: 'var(--space-5)' }}>
-              <DraftBoard
-                players={unassignedPlayers}
-                teams={teams}
-                onDraftComplete={handleDraftComplete}
-              />
+            <div className="card p-[var(--space-5)]">
+              <DraftBoard players={unassignedPlayers} teams={teams} onDraftComplete={handleDraftComplete} />
             </div>
           )}
         </section>
