@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `useDaySummary` (Day Summary share card): ensure `isLoading` is always cleared via `finally`, and clear `summary` when there is no active trip, no sessions for the day, or summary generation fails.
 - Prevents stale summary content from persisting across refreshes/date changes, and avoids a stuck loading spinner on “no sessions today” paths.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`de0e8ac`)
 
 ### 02:00 EST — Phase 1 — Home hero + Momentum: token-driven Tailwind styles
 - Home components (`ActiveTournamentHero`, `MomentumSection`): removed inline `style={{...}}` usage (spacing + team colors) in favor of token-driven Tailwind arbitrary-value classes.

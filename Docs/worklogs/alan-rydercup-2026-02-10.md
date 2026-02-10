@@ -5,7 +5,7 @@
 - Day Summary: clear `summary` when there is no active trip, there are no sessions for the selected day, or summary generation errors.
 - Prevents stale summary content persisting across refreshes/date changes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`de0e8ac`)
 
 ## 01:40 EST — Phase 1 (batch 162)
 - Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted `next build` runs don’t block pushes.
