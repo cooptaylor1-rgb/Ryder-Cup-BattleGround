@@ -472,8 +472,7 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
             <div className="p-4 flex gap-2">
                 <button
                     onClick={handleShare}
-                    className="flex-1 py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2"
-                    style={{ background: 'var(--masters)' }}
+                    className="flex-1 py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2 bg-[var(--masters)] hover:bg-[color:var(--masters)]/90 transition-colors"
                 >
                     <Share2 size={18} />
                     Share
@@ -544,7 +543,7 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
                     <div className="p-4">
                         {!currentTrip ? (
                             <div className="text-center py-12 text-muted-foreground">
-                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
+                                <p className="font-medium text-[var(--ink)]">
                                     No active trip
                                 </p>
                                 <p className="text-sm mt-2">
