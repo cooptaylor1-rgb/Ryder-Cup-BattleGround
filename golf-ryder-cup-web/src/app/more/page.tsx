@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTripStore, useUIStore, useAuthStore } from '@/lib/stores';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
+import { cn } from '@/lib/utils';
 import { createLogger } from '@/lib/utils/logger';
 import {
   ChevronRight,
@@ -372,11 +373,7 @@ export default function MorePage() {
               className="flex items-center gap-[var(--space-4)] no-underline text-inherit"
             >
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-[var(--font-sans)] font-bold text-base"
-                style={{
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                }}
+                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-[var(--font-sans)] font-bold text-base bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
               >
                 {currentUser.firstName?.[0] || '?'}
                 {currentUser.lastName?.[0] || '?'}
@@ -417,8 +414,7 @@ export default function MorePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-white"
-            style={{ background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)' }}
+            className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-white bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -465,14 +461,12 @@ export default function MorePage() {
           }`}
         >
           <div
-            className={`w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${
-              isCaptainMode ? 'text-white' : 'text-[var(--ink-secondary)]'
-            }`}
-            style={{
-              background: isCaptainMode
-                ? 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)'
-                : 'var(--canvas-sunken)',
-            }}
+            className={cn(
+              'w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
+              isCaptainMode
+                ? 'text-white bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
+                : 'text-[var(--ink-secondary)] bg-[var(--canvas-sunken)]'
+            )}
           >
             {isCaptainMode ? <Unlock size={22} /> : <Lock size={22} />}
           </div>
@@ -562,8 +556,7 @@ export default function MorePage() {
         >
           <div className="flex items-center gap-[var(--space-4)] mb-[var(--space-4)]">
             <div
-              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-white font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)]"
-              style={{ background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)' }}
+              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-white font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
             >
               RC
             </div>
@@ -776,8 +769,8 @@ function MenuItemRow({
       </div>
       {item.badge && (
         <span
-          className="py-[3px] px-2 rounded-[6px] text-white font-[var(--font-sans)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em]"
-          style={{ background: item.badgeColor || 'var(--masters)' }}
+          className="py-[3px] px-2 rounded-[6px] text-white font-[var(--font-sans)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em] bg-[var(--badge-bg)]"
+          style={{ '--badge-bg': item.badgeColor || 'var(--masters)' } as React.CSSProperties}
         >
           {item.badge}
         </span>
@@ -823,8 +816,8 @@ function MenuItemRow({
 function Toggle({ enabled, color }: { enabled: boolean; color?: string }) {
   return (
     <div
-      className="w-12 h-7 rounded-[14px] relative transition-colors duration-200 shrink-0"
-      style={{ background: enabled ? color || 'var(--masters)' : 'var(--rule)' }}
+      className="w-12 h-7 rounded-[14px] relative transition-colors duration-200 shrink-0 bg-[var(--toggle-bg)]"
+      style={{ '--toggle-bg': enabled ? color || 'var(--masters)' : 'var(--rule)' } as React.CSSProperties}
     >
       <motion.div
         animate={{ x: enabled ? 22 : 2 }}
