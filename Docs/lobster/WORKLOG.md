@@ -16,17 +16,29 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3576cc1`)
 
+### 01:35 EST — Phase 1 — Players page: token-driven styles
+- Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
+- Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`fcd4966`)
+
 ### 01:25 EST — Phase 1 — Trip Stats: token-driven icon styles
 - Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`).
 - Trip Stats: replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ed13109`)
 
-### 01:35 EST — Phase 1 — Players page: token-driven styles
-- Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
-- Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
+### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
+- Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
+- Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
+- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link, and the “No scheduled events” padding wrapper.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`fcd4966`)
+- Commit + push ✅ (`c0582e7`)
+
+### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
+- Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a240a67`)
 
 ### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
 - QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
@@ -43,18 +55,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`69b71b4`)
-
-### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
-- Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
-- Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
-- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link, and the “No scheduled events” padding wrapper.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`c0582e7`)
-
-### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
-- Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a240a67`)
 
 ## 2026-02-09
 
