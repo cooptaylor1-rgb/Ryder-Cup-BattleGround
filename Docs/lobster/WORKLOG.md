@@ -33,6 +33,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6054133`)
 
+### 20:05 EST — Docs: clarify prior push statuses
+- Lobster worklog: updated earlier entries that were marked "push pending" to reflect that they have now been pushed to `main`.
+- Commit + push ✅ (`ee2d910`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
