@@ -80,6 +80,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5a000ff`)
 
+### 06:20 EST — Phase 1 — Bets: token-driven layout cleanup (batch)
+- Bets (`/bets`): removed several remaining inline `style={{...}}` blocks for the header action button, main container padding, pot summary hero card, tabs, list spacing, and Quick Add section.
+- Swapped PageHeader icon color props from inline styles to token-driven Tailwind classes (`text-[var(--color-accent)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`32408a8`)
+
 ### 22:21 EST — Phase 1 — PressTracker: token-driven styles
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
