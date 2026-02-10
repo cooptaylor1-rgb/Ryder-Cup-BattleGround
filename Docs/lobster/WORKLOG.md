@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 02:00 EST — Phase 1 — Home hero + Momentum: token-driven Tailwind styles
+- Home components (`ActiveTournamentHero`, `MomentumSection`): removed inline `style={{...}}` usage (spacing + team colors) in favor of token-driven Tailwind arbitrary-value classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a9fa425`)
+
 ### 01:40 EST — Phase 1 — Pre-push build lock + Tailwind placeholder warnings
 - Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted builds don’t block future pushes.
 - Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.

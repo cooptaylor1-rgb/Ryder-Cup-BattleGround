@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 02:00 — Shipped batch: Home components (ActiveTournamentHero + MomentumSection) removed inline token/layout `style={{...}}` usage in favor of token-driven Tailwind arbitrary-value classes (spacing + team colors) for consistent premium theming. (commit a9fa425)
 - 01:35 — Shipped batch: Players (`/players`) removed inline token/layout `style={{...}}` usage in favor of token-driven Tailwind classes (header actions, modals, bulk-add grid, PlayerRow buttons), keeping the premium theme consistent. (commit fcd4966)
 - 23:45 — Shipped batch: QuickScoreFABv2 replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for more consistent premium theming. (commit d8266a7)
 - 23:20 — Shipped batch: Stats hub (`/stats`) and Captain Match Card generator removed inline `var(--token)` style props in favor of token-driven Tailwind classes for consistent premium theming. (commit 3aabb9f)
