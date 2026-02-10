@@ -44,7 +44,7 @@
 - Commit + push ✅ (`4956327`)
 
 ## 22:21 EST — Phase 1 (batch 157)
-- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`).
+- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Keeps press UI aligned with the Phase 1 premium theming system and reduces risk of silent inline-style drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`69b71b4`)

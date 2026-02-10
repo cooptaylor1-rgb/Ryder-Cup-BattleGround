@@ -3,4 +3,9 @@
 # Pre-push hook: run the full quality gate before pushing to remote.
 # This avoids slow feedback loops while keeping main branch safe.
 
+# Next/Turbopack sometimes leaves a stale .next/lock behind if a previous build
+# was interrupted, which can cause subsequent `next build` runs to fail.
+# Clear the lock proactively (safe: it is recreated by Next when needed).
+rm -f golf-ryder-cup-web/.next/lock
+
 pnpm -C golf-ryder-cup-web check:prepush
