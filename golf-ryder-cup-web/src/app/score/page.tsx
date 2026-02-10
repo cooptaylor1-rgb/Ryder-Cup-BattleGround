@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useScoringStore, useAuthStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { createLogger } from '@/lib/utils/logger';
-import { formatPlayerName } from '@/lib/utils';
+import { cn, formatPlayerName } from '@/lib/utils';
 import { ChevronRight, Target } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import type { MatchState } from '@/lib/types/computed';
@@ -208,16 +208,17 @@ export default function ScorePage() {
             <main className="container-editorial">
                 {/* Session Header */}
                 {activeSession && (
-                    <section style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
-                        <p className="type-overline" style={{ color: 'var(--masters)', marginBottom: 'var(--space-3)' }}>
+                    <section className="pt-[var(--space-8)] pb-[var(--space-6)]">
+                        <p className="type-overline mb-[var(--space-3)] text-[var(--masters)]">
                             Session {activeSession.sessionNumber}
                         </p>
-                        <h1 className="type-display capitalize">
-                            {activeSession.sessionType}
-                        </h1>
-                        <p className="type-caption" style={{ marginTop: 'var(--space-2)', color: 'var(--ink-secondary)' }}>
-                            {activeSession.status === 'inProgress' ? 'In Progress' :
-                                activeSession.status === 'completed' ? 'Complete' : 'Scheduled'}
+                        <h1 className="type-display capitalize">{activeSession.sessionType}</h1>
+                        <p className="type-caption mt-[var(--space-2)] text-[var(--ink-secondary)]">
+                            {activeSession.status === 'inProgress'
+                                ? 'In Progress'
+                                : activeSession.status === 'completed'
+                                  ? 'Complete'
+                                  : 'Scheduled'}
                         </p>
                     </section>
                 )}
@@ -225,24 +226,22 @@ export default function ScorePage() {
                 <hr className="divider" />
 
                 {/* Matches - BUG-011 FIX: Wrap with ErrorBoundary for graceful error handling */}
-                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-8)' }}>
-                    <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)', color: 'var(--ink-secondary)' }}>
-                        Matches
-                    </h2>
+                <section className="pt-[var(--space-6)] pb-[var(--space-8)]">
+                    <h2 className="type-overline mb-[var(--space-6)] text-[var(--ink-secondary)]">Matches</h2>
 
                     <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
                         {isLoading ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-8) 0' }}>
+                            <div className="flex flex-col gap-[var(--space-4)] py-[var(--space-8)]">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="card-editorial" style={{ padding: 'var(--space-5)' }}>
-                                        <div className="skeleton" style={{ width: '40%', height: '12px', marginBottom: '12px' }} />
-                                        <div className="skeleton" style={{ width: '70%', height: '16px', marginBottom: '8px' }} />
-                                        <div className="skeleton" style={{ width: '60%', height: '16px' }} />
+                                    <div key={i} className="card-editorial p-[var(--space-5)]">
+                                        <div className="skeleton mb-3 h-3 w-[40%]" />
+                                        <div className="skeleton mb-2 h-4 w-[70%]" />
+                                        <div className="skeleton h-4 w-[60%]" />
                                     </div>
                                 ))}
                             </div>
                         ) : matchStates.length > 0 ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                            <div className="flex flex-col gap-[var(--space-4)]">
                                 {matchStates.map((matchState, index) => {
                                     // Check if current user is in this match (P0-3)
                                     const isUserMatch = currentUserPlayer && (
@@ -273,20 +272,17 @@ export default function ScorePage() {
                 {sessions.length > 1 && (
                     <>
                         <hr className="divider" />
-                        <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-                            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)', color: 'var(--ink-secondary)' }}>
-                                Sessions
-                            </h2>
-                            <div
-                                className="flex gap-3 overflow-x-auto pb-2"
-                                style={{ margin: '0 calc(-1 * var(--space-5))', padding: '0 var(--space-5)' }}
-                            >
+                        <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
+                            <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)]">Sessions</h2>
+                            <div className="flex gap-3 overflow-x-auto pb-2 -mx-[var(--space-5)] px-[var(--space-5)]">
                                 {sessions.map(session => (
                                     <button
                                         key={session.id}
                                         onClick={() => setSelectedSessionId(session.id)}
-                                        className={session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-                                        style={{ whiteSpace: 'nowrap', fontFamily: 'var(--font-sans)' }}
+                                        className={cn(
+                                            session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm',
+                                            'whitespace-nowrap font-sans'
+                                        )}
                                     >
                                         Session {session.sessionNumber}
                                     </button>
@@ -330,117 +326,66 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
     return (
         <button
             onClick={onClick}
-            className="card-editorial card-interactive w-full text-left"
-            style={{
-                padding: isActive ? 'var(--space-6)' : 'var(--space-5)',
-                position: 'relative',
-                borderColor: isUserMatch ? 'var(--masters)' : undefined,
-                borderWidth: isUserMatch ? '2px' : undefined,
-                transition: 'box-shadow 0.15s ease',
-            }}
+            className={cn(
+                'card-editorial card-interactive relative w-full text-left transition-shadow',
+                isActive ? 'p-[var(--space-6)]' : 'p-[var(--space-5)]',
+                isUserMatch && 'border-2 border-[var(--masters)]'
+            )}
         >
             {/* Your Match Badge (P0-3) */}
             {isUserMatch && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '-10px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        padding: '3px 12px',
-                        background: 'var(--masters)',
-                        color: 'white',
-                        fontSize: '10px',
-                        fontFamily: 'var(--font-sans)',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        borderRadius: 'var(--radius-full)',
-                        whiteSpace: 'nowrap',
-                    }}
-                >
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--masters)] px-3 py-[3px] text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-white">
                     Your Match
                 </div>
             )}
 
             {/* Card header: match number + status */}
-            <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+            <div className="mb-[var(--space-4)] flex items-center justify-between">
                 <span
-                    className="type-overline"
-                    style={{ color: isUserMatch ? 'var(--masters)' : 'var(--ink-tertiary)' }}
+                    className={cn(
+                        'type-overline',
+                        isUserMatch ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
+                    )}
                 >
                     Match {matchNumber}
                 </span>
-                {status === 'inProgress' && (
-                    <span
-                        className="type-overline"
-                        style={{ color: 'var(--masters)' }}
-                    >
-                        Live
-                    </span>
-                )}
-                {status === 'completed' && (
-                    <span
-                        className="type-overline"
-                        style={{ color: 'var(--ink-tertiary)' }}
-                    >
-                        Final
-                    </span>
-                )}
+                {status === 'inProgress' && <span className="type-overline text-[var(--masters)]">Live</span>}
+                {status === 'completed' && <span className="type-overline text-[var(--ink-tertiary)]">Final</span>}
             </div>
 
             {/* Players + Score row */}
             <div className="flex items-center gap-4">
                 {/* Players */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2" style={{ marginBottom: 'var(--space-2)' }}>
+                <div className="min-w-0 flex-1">
+                    <div className="mb-[var(--space-2)] flex items-center gap-2">
                         <span className="team-dot team-dot-usa" />
                         <span
-                            className="truncate"
-                            style={{
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: 'var(--text-base)',
-                                fontWeight: currentScore > 0 ? 700 : 500,
-                                color: 'var(--ink)',
-                            }}
+                            className={cn(
+                                'truncate font-sans text-base text-[var(--ink)]',
+                                currentScore > 0 ? 'font-bold' : 'font-medium'
+                            )}
                         >
                             {formatPlayers(teamAPlayers)}
                         </span>
                         {currentScore > 0 && (
-                            <span style={{
-                                fontSize: '10px',
-                                fontFamily: 'var(--font-sans)',
-                                fontWeight: 700,
-                                color: 'var(--team-usa)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                            }}>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-[var(--team-usa)]">
                                 UP
                             </span>
                         )}
                     </div>
+
                     <div className="flex items-center gap-2">
                         <span className="team-dot team-dot-europe" />
                         <span
-                            className="truncate"
-                            style={{
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: 'var(--text-base)',
-                                fontWeight: currentScore < 0 ? 700 : 500,
-                                color: 'var(--ink)',
-                            }}
+                            className={cn(
+                                'truncate font-sans text-base text-[var(--ink)]',
+                                currentScore < 0 ? 'font-bold' : 'font-medium'
+                            )}
                         >
                             {formatPlayers(teamBPlayers)}
                         </span>
                         {currentScore < 0 && (
-                            <span style={{
-                                fontSize: '10px',
-                                fontFamily: 'var(--font-sans)',
-                                fontWeight: 700,
-                                color: 'var(--team-europe)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                            }}>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-[var(--team-europe)]">
                                 UP
                             </span>
                         )}
@@ -448,49 +393,29 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                 </div>
 
                 {/* Score — monumental for active matches, serif for all */}
-                <div className="text-right" style={{ minWidth: '70px' }}>
+                <div className="min-w-[70px] text-right">
                     <span
-                        className={isActive ? 'score-monumental' : ''}
-                        style={{
-                            fontFamily: 'var(--font-serif)',
-                            fontSize: isActive ? undefined : 'var(--text-2xl)',
-                            fontWeight: 400,
-                            lineHeight: 1,
-                            letterSpacing: '-0.02em',
-                            color: currentScore > 0 ? 'var(--team-usa)' :
-                                currentScore < 0 ? 'var(--team-europe)' : 'var(--ink-tertiary)',
-                            display: 'block',
-                        }}
+                        className={cn(
+                            'block font-serif font-normal leading-none tracking-[-0.02em]',
+                            isActive ? 'score-monumental' : 'text-2xl',
+                            currentScore > 0
+                                ? 'text-[var(--team-usa)]'
+                                : currentScore < 0
+                                  ? 'text-[var(--team-europe)]'
+                                  : 'text-[var(--ink-tertiary)]'
+                        )}
                     >
                         {displayScore}
                     </span>
                     {holesPlayed > 0 && status !== 'completed' && (
-                        <p style={{
-                            marginTop: '4px',
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 500,
-                            color: 'var(--ink-tertiary)',
-                        }}>
-                            thru {holesPlayed}
-                        </p>
+                        <p className="mt-1 text-sm font-medium text-[var(--ink-tertiary)]">thru {holesPlayed}</p>
                     )}
                     {status === 'scheduled' && holesPlayed === 0 && (
-                        <p style={{
-                            fontFamily: 'var(--font-sans)',
-                            fontSize: 'var(--text-sm)',
-                            color: 'var(--ink-tertiary)',
-                        }}>
-                            Not started
-                        </p>
+                        <p className="text-sm text-[var(--ink-tertiary)]">Not started</p>
                     )}
                 </div>
 
-                <ChevronRight
-                    size={18}
-                    strokeWidth={1.5}
-                    style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }}
-                />
+                <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-[var(--ink-tertiary)]" />
             </div>
         </button>
     );
