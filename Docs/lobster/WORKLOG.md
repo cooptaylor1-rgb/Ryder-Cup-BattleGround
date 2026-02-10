@@ -1130,4 +1130,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 14:55 EST — Phase 1 (batch 160)
 - Live (`/live`): fixed match sorting to use the real `Match.matchOrder` field (was `matchNumber`, which is not part of the model and could cause unstable ordering).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`776a681`)
+- Commit + push ✅ (`3f9adcd`)
