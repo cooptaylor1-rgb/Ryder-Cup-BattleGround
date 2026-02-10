@@ -75,7 +75,10 @@ export function useDaySummary(date?: string) {
     const teamB = teams.find(t => t.color === 'europe');
 
     const generateSummary = useCallback(async () => {
-        if (!currentTrip) return null;
+        if (!currentTrip) {
+            setSummary(null);
+            return null;
+        }
 
         setIsLoading(true);
 
@@ -89,7 +92,7 @@ export function useDaySummary(date?: string) {
             });
 
             if (daySessions.length === 0) {
-                setIsLoading(false);
+                setSummary(null);
                 return null;
             }
 
@@ -250,12 +253,13 @@ export function useDaySummary(date?: string) {
             };
 
             setSummary(daySummary);
-            setIsLoading(false);
             return daySummary;
         } catch (error) {
             logger.error('Failed to generate summary:', error);
-            setIsLoading(false);
+            setSummary(null);
             return null;
+        } finally {
+            setIsLoading(false);
         }
     }, [currentTrip, date, sessions, players, teams, teamA, teamB]);
 

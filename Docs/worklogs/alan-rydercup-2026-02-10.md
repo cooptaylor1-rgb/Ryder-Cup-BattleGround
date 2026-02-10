@@ -1,5 +1,12 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 02:55 EST — Phase 1 (batch 163)
+- Day Summary share card (`useDaySummary`): ensure `isLoading` always clears via `finally` (no stuck loading state).
+- Day Summary: clear `summary` when there is no active trip, there are no sessions for the selected day, or summary generation errors.
+- Prevents stale summary content persisting across refreshes/date changes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
+
 ## 01:40 EST — Phase 1 (batch 162)
 - Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted `next build` runs don’t block pushes.
 - Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.
