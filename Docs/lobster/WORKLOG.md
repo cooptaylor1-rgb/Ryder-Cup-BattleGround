@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
+- `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
+- Dynamic team accents now use token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) for premium consistency.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`71bbfaf`)
+
 ### 16:55 EST — Phase 1 — Captain carts + contacts: remove inline styles
 - Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): removed remaining inline `style={{...}}` usage for the `PageHeader` icon container + card padding, switching to token-driven Tailwind classes (`iconContainerClassName`, `p-[var(--space-5)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
+- `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
+- Kept dynamic team accent colors as token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) so the card stays aligned with the premium design system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`71bbfaf`)
+
 ## 13:40 EST — Phase 1 — Captain toggle: token-driven styles
 - `CaptainToggle`: removed inline `style={{...}}` usage and migrated the toggle + both modals to token-driven Tailwind classes.
 - Standardized the modal actions to shared button variants (`btn-primary`, `btn-secondary`, `btn-danger`, `btn-ghost`) and used `cn()` for stateful styling (on/off background, error border).
