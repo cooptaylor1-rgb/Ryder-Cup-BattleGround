@@ -170,6 +170,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`dfa2864`)
 
+### 15:10 EST — Phase 1 — More page: token-driven gradients + toggle backgrounds
+- More (`/more`): replaced hard-coded inline `linear-gradient(...)` background styles with token-driven Tailwind arbitrary-value classes.
+- Captain Mode toggle: removed conditional inline background styles by using `cn()` + token-driven Tailwind classes.
+- Menu badges + toggle track: replaced inline `background` style values with CSS custom properties (`--badge-bg`, `--toggle-bg`) + Tailwind `bg-[var(...)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c2cdc0f`)
+
 ### 22:21 EST — Phase 1 — PressTracker: token-driven styles
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
