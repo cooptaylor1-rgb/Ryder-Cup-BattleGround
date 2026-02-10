@@ -1114,3 +1114,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Keeps the route’s loading state consistent with Phase 1 premium patterns (no plain blank/text-only interim).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`aee41bd`)
+
+### 13:40 EST — Phase 1 (batch 159)
+- Captain toggle UI (`CaptainToggle`): removed inline `style={{...}}` usage and migrated the toggle + modals to token-driven Tailwind classes and shared button variants (`btn-primary`, `btn-secondary`, `btn-danger`, `btn-ghost`).
+- Uses `cn()` for stateful styling (on/off background, error border), keeping the component consistent with the Phase 1 premium theming system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6052b5a`)

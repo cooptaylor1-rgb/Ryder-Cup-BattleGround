@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 13:40 EST — Phase 1 — Captain toggle: token-driven styles
+- `CaptainToggle`: removed inline `style={{...}}` usage and migrated the toggle + both modals to token-driven Tailwind classes.
+- Standardized the modal actions to shared button variants (`btn-primary`, `btn-secondary`, `btn-danger`, `btn-ghost`) and used `cn()` for stateful styling (on/off background, error border).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6052b5a`)
+
 ## 11:15 EST — Phase 1 — Path to Victory: remove inline styles
 - `PathToVictoryCard`: replaced most inline `style={{...}}` usage (gradients, borders, icon colors) with Tailwind/arbitrary-value classes.
 - Quick summary rows now use a CSS variable + `color-mix()` to derive the translucent background from the team color, keeping the border + icon color tokenized without runtime Tailwind class generation.
