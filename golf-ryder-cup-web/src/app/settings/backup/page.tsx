@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
+import { cn } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { BottomNav, PageHeader } from '@/components/layout';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
@@ -279,7 +280,7 @@ export default function BackupRestorePage() {
                 <PageHeader
                     title="Backup & Restore"
                     subtitle="Trip data management"
-                    icon={<HardDrive size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<HardDrive size={16} className="text-[var(--color-accent)]" />}
                     onBack={() => router.push('/settings')}
                 />
 
@@ -297,24 +298,17 @@ export default function BackupRestorePage() {
             <PageHeader
                 title="Backup & Restore"
                 subtitle="Export and import trip data"
-                icon={<HardDrive size={16} style={{ color: 'var(--color-accent)' }} />}
+                icon={<HardDrive size={16} className="text-[var(--color-accent)]" />}
                 onBack={() => router.push('/settings')}
             />
 
             <main className="container-editorial pb-8">
                 <div className="space-y-6">
                     {/* Export */}
-                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                    <section className="card p-[var(--space-5)]">
                         <div className="flex items-start gap-3">
-                            <div
-                                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                                style={{
-                                    background:
-                                        'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                                    boxShadow: 'var(--shadow-glow-green)',
-                                }}
-                            >
-                                <Download className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
+                            <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] shadow-[var(--shadow-glow-green)]">
+                                <Download className="w-5 h-5 text-[var(--color-accent)]" />
                             </div>
                             <div className="min-w-0">
                                 <p className="type-title-sm">Export trip</p>
@@ -324,19 +318,12 @@ export default function BackupRestorePage() {
 
                         {exportSuccess ? (
                             <div
-                                className="mt-4 px-4 py-3 rounded-xl flex items-center gap-2"
-                                style={{
-                                    background: 'rgba(16,185,129,0.12)',
-                                    border: '1px solid rgba(16,185,129,0.35)',
-                                    color: 'var(--ink)',
-                                }}
+                                className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-4 py-3 text-[var(--ink)]"
                                 role="status"
                                 aria-live="polite"
                             >
-                                <CheckCircle className="w-5 h-5" style={{ color: 'rgba(16,185,129,1)' }} />
-                                <span className="text-sm" style={{ color: 'var(--ink)' }}>
-                                    {exportSuccess}
-                                </span>
+                                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                <span className="text-sm text-[var(--ink)]">{exportSuccess}</span>
                             </div>
                         ) : null}
 
@@ -367,16 +354,10 @@ export default function BackupRestorePage() {
                     </section>
 
                     {/* Import */}
-                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                    <section className="card p-[var(--space-5)]">
                         <div className="flex items-start gap-3">
-                            <div
-                                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                                style={{
-                                    background: 'rgba(100,181,246,0.14)',
-                                    border: '1px solid rgba(100,181,246,0.25)',
-                                }}
-                            >
-                                <Upload className="w-5 h-5" style={{ color: 'rgba(100,181,246,1)' }} />
+                            <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border border-blue-400/25 bg-blue-400/15">
+                                <Upload className="w-5 h-5 text-blue-400" />
                             </div>
                             <div className="min-w-0">
                                 <p className="type-title-sm">Import trip</p>
@@ -396,22 +377,12 @@ export default function BackupRestorePage() {
                         <div className="mt-5">
                             {importPreview ? (
                                 importPreview.valid ? (
-                                    <div
-                                        className="p-4 rounded-xl"
-                                        style={{
-                                            background: 'rgba(16,185,129,0.10)',
-                                            border: '1px solid rgba(16,185,129,0.25)',
-                                        }}
-                                    >
+                                    <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4">
                                         <div className="flex items-start gap-3">
-                                            <FileJson className="w-5 h-5 mt-0.5" style={{ color: 'rgba(16,185,129,1)' }} />
+                                            <FileJson className="w-5 h-5 mt-0.5 text-emerald-500" />
                                             <div className="min-w-0">
-                                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
-                                                    {importPreview.tripName}
-                                                </p>
-                                                <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
-                                                    Ready to import
-                                                </p>
+                                                <p className="font-medium text-[var(--ink)]">{importPreview.tripName}</p>
+                                                <p className="text-sm text-[var(--ink-tertiary)]">Ready to import</p>
                                             </div>
                                         </div>
 
@@ -425,15 +396,10 @@ export default function BackupRestorePage() {
                                             ).map((item) => (
                                                 <div
                                                     key={item.label}
-                                                    className="rounded-lg px-2 py-2"
-                                                    style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
+                                                    className="rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-2 py-2"
                                                 >
-                                                    <p className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
-                                                        {item.value}
-                                                    </p>
-                                                    <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                                                        {item.label}
-                                                    </p>
+                                                    <p className="text-lg font-semibold text-[var(--ink)]">{item.value}</p>
+                                                    <p className="text-xs text-[var(--ink-tertiary)]">{item.label}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -442,8 +408,7 @@ export default function BackupRestorePage() {
                                             <button
                                                 onClick={handleConfirmImport}
                                                 disabled={isImporting}
-                                                className="flex-1 btn-primary"
-                                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}
+                                                className="flex-1 btn-primary inline-flex items-center justify-center gap-2"
                                             >
                                                 {isImporting ? (
                                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -458,30 +423,21 @@ export default function BackupRestorePage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div
-                                        className="p-4 rounded-xl"
-                                        style={{
-                                            background: 'rgba(239,68,68,0.10)',
-                                            border: '1px solid rgba(239,68,68,0.25)',
-                                        }}
-                                    >
+                                    <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4">
                                         <div className="flex items-start gap-3">
-                                            <XCircle className="w-5 h-5 mt-0.5" style={{ color: 'rgba(239,68,68,1)' }} />
+                                            <XCircle className="w-5 h-5 mt-0.5 text-red-500" />
                                             <div className="min-w-0">
-                                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
-                                                    Invalid file
-                                                </p>
+                                                <p className="font-medium text-[var(--ink)]">Invalid file</p>
                                                 <ul className="mt-2 space-y-1">
                                                     {importPreview.errors.map((errorText, i) => (
-                                                        <li key={i} className="text-sm" style={{ color: 'rgba(239,68,68,1)' }}>
+                                                        <li key={i} className="text-sm text-red-500">
                                                             • {errorText}
                                                         </li>
                                                     ))}
                                                 </ul>
                                                 <button
                                                     onClick={handleCancelImport}
-                                                    className="mt-3 text-sm underline"
-                                                    style={{ color: 'var(--ink-tertiary)' }}
+                                                    className="mt-3 text-sm underline text-[var(--ink-tertiary)]"
                                                 >
                                                     Try another file
                                                 </button>
@@ -491,29 +447,25 @@ export default function BackupRestorePage() {
                                 )
                             ) : importResult ? (
                                 <div
-                                    className="p-4 rounded-xl"
-                                    style={{
-                                        background: importResult.success
-                                            ? 'rgba(16,185,129,0.10)'
-                                            : 'rgba(239,68,68,0.10)',
-                                        border: importResult.success
-                                            ? '1px solid rgba(16,185,129,0.25)'
-                                            : '1px solid rgba(239,68,68,0.25)',
-                                    }}
+                                    className={cn(
+                                        'rounded-xl border p-4',
+                                        importResult.success
+                                            ? 'border-emerald-500/25 bg-emerald-500/10'
+                                            : 'border-red-500/25 bg-red-500/10'
+                                    )}
                                 >
                                     <div className="flex items-start gap-3">
                                         {importResult.success ? (
-                                            <CheckCircle className="w-5 h-5" style={{ color: 'rgba(16,185,129,1)' }} />
+                                            <CheckCircle className="w-5 h-5 text-emerald-500" />
                                         ) : (
-                                            <XCircle className="w-5 h-5" style={{ color: 'rgba(239,68,68,1)' }} />
+                                            <XCircle className="w-5 h-5 text-red-500" />
                                         )}
                                         <div>
-                                            <p style={{ color: 'var(--ink)' }}>{importResult.message}</p>
+                                            <p className="text-[var(--ink)]">{importResult.message}</p>
                                             {importResult.tripId ? (
                                                 <button
                                                     onClick={() => router.push(`/trip/${importResult.tripId}/settings`)}
-                                                    className="mt-2 text-sm inline-flex items-center gap-1"
-                                                    style={{ color: 'var(--masters)' }}
+                                                    className="mt-2 text-sm inline-flex items-center gap-1 text-[var(--masters)]"
                                                 >
                                                     <ExternalLink className="w-3 h-3" />
                                                     Open trip
@@ -525,22 +477,12 @@ export default function BackupRestorePage() {
                             ) : (
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="w-full rounded-xl"
-                                    style={{
-                                        padding: 'var(--space-6)',
-                                        border: '2px dashed var(--rule)',
-                                        background: 'var(--surface)',
-                                        transition: 'border-color 150ms ease, background 150ms ease',
-                                    }}
+                                    className="w-full rounded-xl border-2 border-dashed border-[var(--rule)] bg-[var(--surface)] p-[var(--space-6)] transition-colors"
                                 >
                                     <div className="text-center">
-                                        <Upload className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--ink-tertiary)' }} />
-                                        <p className="font-medium" style={{ color: 'var(--ink)' }}>
-                                            Select a JSON file
-                                        </p>
-                                        <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
-                                            Backup files only
-                                        </p>
+                                        <Upload className="w-10 h-10 mx-auto mb-3 text-[var(--ink-tertiary)]" />
+                                        <p className="font-medium text-[var(--ink)]">Select a JSON file</p>
+                                        <p className="text-sm text-[var(--ink-tertiary)]">Backup files only</p>
                                     </div>
                                 </button>
                             )}
@@ -548,14 +490,12 @@ export default function BackupRestorePage() {
                     </section>
 
                     {/* Info */}
-                    <section className="card" style={{ padding: 'var(--space-5)' }}>
+                    <section className="card p-[var(--space-5)]">
                         <div className="flex items-start gap-3">
-                            <HardDrive className="w-5 h-5 mt-0.5" style={{ color: 'var(--ink-tertiary)' }} />
-                            <div className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-                                <p className="font-medium" style={{ color: 'var(--ink)' }}>
-                                    About backups
-                                </p>
-                                <ul className="mt-2 space-y-1" style={{ color: 'var(--ink-tertiary)' }}>
+                            <HardDrive className="w-5 h-5 mt-0.5 text-[var(--ink-tertiary)]" />
+                            <div className="text-sm text-[var(--ink-secondary)]">
+                                <p className="font-medium text-[var(--ink)]">About backups</p>
+                                <ul className="mt-2 space-y-1 text-[var(--ink-tertiary)]">
                                     <li>• Exports include players, teams, sessions, matches, and scores</li>
                                     <li>• Imported trips create new copies with fresh IDs</li>
                                     <li>• Store backups securely — they contain your tournament data</li>
@@ -600,20 +540,18 @@ function TripCard({
 
     return (
         <div
-            className="rounded-xl border transition-colors cursor-pointer"
-            style={{
-                padding: 'var(--space-4)',
-                borderColor: isSelected ? 'var(--masters)' : 'var(--rule)',
-                background: isSelected ? 'var(--masters-subtle, rgba(0,103,71,0.10))' : 'var(--surface)',
-            }}
+            className={cn(
+                'cursor-pointer rounded-xl border p-[var(--space-4)] transition-colors',
+                isSelected
+                    ? 'border-[var(--masters)] bg-[var(--masters-subtle,rgba(0,103,71,0.10))]'
+                    : 'border-[var(--rule)] bg-[var(--surface)]'
+            )}
             onClick={onSelect}
         >
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate" style={{ color: 'var(--ink)' }}>
-                        {trip.name}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                    <p className="font-medium truncate text-[var(--ink)]">{trip.name}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--ink-tertiary)]">
                         <span className="inline-flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {formatDate(trip.startDate)}
@@ -636,8 +574,7 @@ function TripCard({
                                 e.stopPropagation();
                                 onShare();
                             }}
-                            className="btn-secondary"
-                            style={{ padding: 'var(--space-2)' }}
+                            className="btn-secondary p-[var(--space-2)]"
                             title="Copy summary"
                         >
                             <Copy className="w-4 h-4" />
@@ -648,8 +585,7 @@ function TripCard({
                                 onExport();
                             }}
                             disabled={isExporting}
-                            className="btn-primary"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                            className="btn-primary inline-flex items-center gap-2"
                         >
                             {isExporting ? (
                                 <RefreshCw className="w-4 h-4 animate-spin" />
