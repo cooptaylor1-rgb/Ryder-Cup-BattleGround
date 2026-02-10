@@ -34,7 +34,7 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
       <PageHeader
         title="Login"
         subtitle="Something went wrong"
-        icon={<KeyRound size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<KeyRound size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
@@ -42,25 +42,12 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
         <ErrorEmpty message="We couldn't complete login right now." onRetry={reset} />
 
         {process.env.NODE_ENV === 'development' ? (
-          <details
-            className="mt-6 rounded-xl overflow-hidden"
-            style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
-          >
-            <summary
-              className="px-4 py-3 cursor-pointer text-sm font-medium"
-              style={{ color: 'var(--ink-secondary)' }}
-            >
+          <details className="mt-6 rounded-xl overflow-hidden bg-[var(--surface)] border border-[var(--rule)]">
+            <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-[var(--ink-secondary)]">
               Error Details
             </summary>
             <div className="px-4 pb-4">
-              <pre
-                className="text-xs overflow-auto p-3 rounded"
-                style={{
-                  background: 'var(--canvas)',
-                  color: 'var(--ink-tertiary)',
-                  maxHeight: '200px',
-                }}
-              >
+              <pre className="text-xs overflow-auto p-3 rounded bg-[var(--canvas)] text-[var(--ink-tertiary)] max-h-[200px]">
                 {error.message}
               </pre>
             </div>
@@ -68,11 +55,7 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
         ) : null}
 
         <div className="mt-6 flex justify-center">
-          <Link
-            href="/"
-            className="px-4 py-2 rounded-xl font-medium"
-            style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
-          >
+          <Link href="/" className="btn-secondary">
             Back to Home
           </Link>
         </div>
