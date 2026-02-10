@@ -22,45 +22,33 @@ export function MomentumSection({
 }: MomentumSectionProps) {
     return (
         <section className="section-sm">
-            <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>
-                Momentum
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
-                <MomentumCard
-                    team="USA"
-                    streak={teamAStreak}
-                    trend={teamATrend}
-                    color="var(--team-usa)"
-                />
-                <MomentumCard
-                    team="EUR"
-                    streak={teamBStreak}
-                    trend={teamBTrend}
-                    color="var(--team-europe)"
-                />
+            <h2 className="type-overline mb-[var(--space-4)]">Momentum</h2>
+            <div className="grid grid-cols-2 gap-[var(--space-3)]">
+                <MomentumCard team="USA" streak={teamAStreak} trend={teamATrend} />
+                <MomentumCard team="EUR" streak={teamBStreak} trend={teamBTrend} />
             </div>
         </section>
     );
 }
 
 interface MomentumCardProps {
-    team: string;
+    team: 'USA' | 'EUR';
     streak: number;
     trend: 'up' | 'down' | 'neutral';
-    color: string;
 }
 
-function MomentumCard({ team, streak, trend, color }: MomentumCardProps) {
+function MomentumCard({ team, streak, trend }: MomentumCardProps) {
+    const teamColorClass =
+        team === 'USA' ? 'text-[var(--team-usa)]' : 'text-[var(--team-europe)]';
+
     return (
-        <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
-                <span className="type-overline" style={{ color }}>{team}</span>
-                {trend === 'up' && <Flame size={16} style={{ color: 'var(--error)' }} />}
+        <div className="card p-[var(--space-4)]">
+            <div className="flex items-center justify-between mb-[var(--space-2)]">
+                <span className={`type-overline ${teamColorClass}`}>{team}</span>
+                {trend === 'up' && <Flame size={16} className="text-[var(--error)]" />}
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
-                <span className="score-large" style={{ color }}>
-                    {streak}
-                </span>
+            <div className="flex items-baseline gap-[var(--space-2)]">
+                <span className={`score-large ${teamColorClass}`}>{streak}</span>
                 <span className="type-caption">
                     {streak === 1 ? 'win streak' : streak > 1 ? 'win streak' : 'no streak'}
                 </span>
