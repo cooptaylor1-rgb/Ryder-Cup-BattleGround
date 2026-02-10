@@ -24,14 +24,14 @@ export default function StatsPage() {
       <PageHeader
         title="Stats"
         subtitle={currentTrip?.name ? currentTrip.name : 'No active trip'}
-        icon={<BarChart3 size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<BarChart3 size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
       <main className="container-editorial">
         <section className="section">
           <h1 className="type-display">Stats</h1>
-          <p className="type-caption" style={{ marginTop: 'var(--space-2)' }}>
+          <p className="type-caption mt-[var(--space-2)]">
             Player awards, trip tallies, and leaderboard context.
           </p>
         </section>
@@ -53,18 +53,11 @@ export default function StatsPage() {
           </section>
         ) : (
           <section className="section-sm">
-            <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(1, 1fr)' }}>
-              <Link
-                href="/trip-stats"
-                className="card press-scale"
-                style={{ padding: 'var(--space-5)', textDecoration: 'none' }}
-              >
+            <div className="grid gap-3">
+              <Link href="/trip-stats" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(var(--masters-rgb), 0.12)', color: 'var(--masters)' }}
-                    >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(var(--masters-rgb),0.12)] text-[var(--masters)]">
                       <BarChart3 size={18} />
                     </div>
                     <div>
@@ -75,17 +68,10 @@ export default function StatsPage() {
                 </div>
               </Link>
 
-              <Link
-                href="/achievements"
-                className="card press-scale"
-                style={{ padding: 'var(--space-5)', textDecoration: 'none' }}
-              >
+              <Link href="/achievements" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(212, 175, 55, 0.12)', color: 'var(--warning)' }}
-                    >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(212,175,55,0.12)] text-[var(--warning)]">
                       <Award size={18} />
                     </div>
                     <div>
@@ -96,17 +82,10 @@ export default function StatsPage() {
                 </div>
               </Link>
 
-              <Link
-                href="/schedule"
-                className="card press-scale"
-                style={{ padding: 'var(--space-5)', textDecoration: 'none' }}
-              >
+              <Link href="/schedule" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}
-                    >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(59,130,246,0.12)] text-[#3b82f6]">
                       <CalendarDays size={18} />
                     </div>
                     <div>
