@@ -255,7 +255,7 @@ export function QuickScoreModal({ isOpen, onClose, matchId }: QuickScoreModalPro
                             </button>
 
                             <div className="text-center min-w-20">
-                                <div className="text-5xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>
+                                <div className="text-5xl font-bold font-[var(--font-display)]">
                                     {currentHole}
                                 </div>
                                 <div className="text-sm text-muted-foreground font-medium mt-1">Hole</div>

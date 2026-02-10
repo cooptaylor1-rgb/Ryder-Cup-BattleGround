@@ -17,8 +17,7 @@ interface SkeletonProps {
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
-      className={cn('animate-pulse-slow rounded', className)}
-      style={{ background: 'var(--surface-elevated)' }}
+      className={cn('animate-pulse-slow rounded bg-[var(--surface-elevated)]', className)}
     />
   );
 }
@@ -29,10 +28,7 @@ export function SkeletonText({ lines = 1, className }: { lines?: number; classNa
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
-          className={cn(
-            'h-4',
-            i === lines - 1 && lines > 1 ? 'w-2/3' : 'w-full'
-          )}
+          className={cn('h-4', i === lines - 1 && lines > 1 ? 'w-2/3' : 'w-full')}
         />
       ))}
     </div>
@@ -42,11 +38,10 @@ export function SkeletonText({ lines = 1, className }: { lines?: number; classNa
 export function MatchCardSkeleton() {
   return (
     <div
-      className="p-4 rounded-lg space-y-3"
-      style={{
-        background: 'var(--surface-card)',
-        border: '1px solid var(--border-subtle)'
-      }}
+      className={cn(
+        'p-4 rounded-lg space-y-3',
+        'bg-[var(--surface-card)] border border-[color:var(--border-subtle)]'
+      )}
     >
       {/* Header */}
       <div className="flex justify-between">
@@ -57,10 +52,7 @@ export function MatchCardSkeleton() {
       {/* Teams */}
       <div className="flex items-stretch gap-3">
         {/* Team A */}
-        <div
-          className="flex-1 p-3 rounded-lg"
-          style={{ background: 'var(--surface-raised)' }}
-        >
+        <div className="flex-1 p-3 rounded-lg bg-[var(--surface-raised)]">
           <Skeleton className="h-3 w-10 mb-2" />
           <Skeleton className="h-4 w-24 mb-1" />
           <Skeleton className="h-4 w-20" />
@@ -73,10 +65,7 @@ export function MatchCardSkeleton() {
         </div>
 
         {/* Team B */}
-        <div
-          className="flex-1 p-3 rounded-lg"
-          style={{ background: 'var(--surface-raised)' }}
-        >
+        <div className="flex-1 p-3 rounded-lg bg-[var(--surface-raised)]">
           <Skeleton className="h-3 w-10 mb-2" />
           <Skeleton className="h-4 w-24 mb-1" />
           <Skeleton className="h-4 w-20" />
@@ -89,17 +78,13 @@ export function MatchCardSkeleton() {
 export function StandingsCardSkeleton() {
   return (
     <div
-      className="rounded-lg overflow-hidden"
-      style={{
-        background: 'var(--surface-card)',
-        border: '1px solid var(--border-subtle)'
-      }}
+      className={cn(
+        'rounded-lg overflow-hidden',
+        'bg-[var(--surface-card)] border border-[color:var(--border-subtle)]'
+      )}
     >
       {/* Header */}
-      <div
-        className="p-4"
-        style={{ background: 'var(--surface-raised)' }}
-      >
+      <div className="p-4 bg-[var(--surface-raised)]">
         <Skeleton className="h-5 w-40" />
         <Skeleton className="h-4 w-32 mt-2" />
       </div>
@@ -130,11 +115,10 @@ export function StandingsCardSkeleton() {
 export function PlayerListSkeleton({ count = 5 }: { count?: number }) {
   return (
     <div
-      className="rounded-lg divide-y divide-border-subtle"
-      style={{
-        background: 'var(--surface-card)',
-        border: '1px solid var(--border-subtle)'
-      }}
+      className={cn(
+        'rounded-lg divide-y divide-border-subtle',
+        'bg-[var(--surface-card)] border border-[color:var(--border-subtle)]'
+      )}
     >
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="p-4 flex items-center gap-3">
@@ -153,11 +137,7 @@ export function PlayerListSkeleton({ count = 5 }: { count?: number }) {
 export function SessionCardSkeleton() {
   return (
     <div
-      className="p-4 rounded-lg"
-      style={{
-        background: 'var(--surface-card)',
-        border: '1px solid var(--border-subtle)'
-      }}
+      className={cn('p-4 rounded-lg', 'bg-[var(--surface-card)] border border-[color:var(--border-subtle)]')}
     >
       <div className="flex items-center gap-3">
         <Skeleton className="w-10 h-10 rounded-lg" />
@@ -174,13 +154,9 @@ export function SessionCardSkeleton() {
 // Live Match Card Skeleton (for jumbotron view)
 export function LiveMatchCardSkeleton() {
   return (
-    <div
-      className="rounded-2xl overflow-hidden bg-card border border-border"
-    >
+    <div className="rounded-2xl overflow-hidden bg-card border border-border">
       {/* Header */}
-      <div
-        className="px-4 py-2 flex items-center justify-between bg-muted/50"
-      >
+      <div className="px-4 py-2 flex items-center justify-between bg-muted/50">
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-5 w-20 rounded-full" />
       </div>
@@ -217,11 +193,7 @@ export function LiveMatchCardSkeleton() {
 export function AchievementCardSkeleton() {
   return (
     <div
-      className="p-4 rounded-xl relative"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
+      className={cn('p-4 rounded-xl relative', 'bg-[var(--surface)] border border-[var(--rule)]')}
     >
       <Skeleton className="absolute top-2 right-2 h-4 w-12 rounded-full" />
       <Skeleton className="w-12 h-12 rounded-xl mb-3" />
@@ -234,13 +206,7 @@ export function AchievementCardSkeleton() {
 // Side Bet Card Skeleton
 export function BetCardSkeleton() {
   return (
-    <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
-    >
+    <div className={cn('p-4 rounded-xl', 'bg-[var(--surface)] border border-[var(--rule)]')}>
       <div className="flex items-start gap-3">
         <Skeleton className="w-10 h-10 rounded-lg" />
         <div className="flex-1">
@@ -259,13 +225,7 @@ export function BetCardSkeleton() {
 // Comment/Social Card Skeleton
 export function CommentCardSkeleton() {
   return (
-    <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
-    >
+    <div className={cn('p-4 rounded-xl', 'bg-[var(--surface)] border border-[var(--rule)]')}>
       <div className="flex items-center gap-3 mb-3">
         <Skeleton className="w-10 h-10 rounded-full" />
         <div className="flex-1">
@@ -297,13 +257,7 @@ export function PhotoGridSkeleton({ count = 6 }: { count?: number }) {
 // Weather Widget Skeleton
 export function WeatherWidgetSkeleton() {
   return (
-    <div
-      className="p-4 rounded-xl"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
-    >
+    <div className={cn('p-4 rounded-xl', 'bg-[var(--surface)] border border-[var(--rule)]')}>
       <div className="flex items-center gap-3">
         <Skeleton className="w-12 h-12 rounded-full" />
         <div className="flex-1">
@@ -355,20 +309,12 @@ export function PageSkeleton({
   return (
     <div className="min-h-screen bg-[var(--canvas)]">
       {showHeader && (
-        <div
-          className="h-14 px-4 flex items-center gap-3"
-          style={{
-            background: 'var(--surface)',
-            borderBottom: '1px solid var(--rule)',
-          }}
-        >
+        <div className="h-14 px-4 flex items-center gap-3 bg-[var(--surface)] border-b border-[var(--rule)]">
           <Skeleton className="w-8 h-8 rounded-lg" />
           <Skeleton className="h-5 w-32" />
         </div>
       )}
-      <div className="p-4">
-        {children || <DashboardSkeleton />}
-      </div>
+      <div className="p-4">{children || <DashboardSkeleton />}</div>
     </div>
   );
 }

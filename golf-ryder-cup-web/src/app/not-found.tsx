@@ -23,8 +23,7 @@ export default function NotFound() {
 
             {/* 404 Display */}
             <div
-                className="text-7xl font-bold mb-4 text-[var(--masters)]"
-                style={{ fontFamily: 'var(--font-display)' }}
+                className="text-7xl font-bold mb-4 text-[var(--masters)] font-[var(--font-display)]"
             >
                 404
             </div>

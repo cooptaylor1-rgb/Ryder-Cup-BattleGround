@@ -152,10 +152,9 @@ export function ErrorFallback({
       {/* Title */}
       <h2
         className={cn(
-          'font-semibold mb-2',
+          'font-semibold mb-2 text-[var(--ink)]',
           isCompact ? 'text-base' : 'text-lg',
         )}
-        style={{ color: 'var(--ink, #F5F1E8)' }}
       >
         Something went wrong
       </h2>
@@ -163,10 +162,9 @@ export function ErrorFallback({
       {/* Description */}
       <p
         className={cn(
-          'max-w-sm mb-6',
+          'max-w-sm mb-6 text-[var(--ink-secondary)]',
           isCompact ? 'text-xs' : 'text-sm',
         )}
-        style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
       >
         {error?.message || 'An unexpected error occurred. Please try again.'}
       </p>
