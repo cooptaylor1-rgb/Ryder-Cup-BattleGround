@@ -123,17 +123,14 @@ export default function ContactsPage() {
       <PageHeader
         title="Contacts"
         subtitle="Emergency & venue info"
-        icon={<Phone size={16} style={{ color: 'white' }} />}
-        iconContainerStyle={{
-          background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
-          boxShadow: '0 0 16px rgba(100, 116, 139, 0.3)',
-        }}
+        icon={<Phone size={16} className="text-white" />}
+        iconContainerClassName="bg-gradient-to-br from-slate-500 to-slate-600 shadow-[0_0_16px_rgba(100,116,139,0.3)]"
         onBack={() => router.back()}
       />
 
       <main className="container-editorial">
         <section className="section">
-          <div className="card" style={{ padding: 'var(--space-5)' }}>
+          <div className="card p-[var(--space-5)]">
             <EmergencyContacts
               players={contactPlayers}
               venueContacts={venueContacts}

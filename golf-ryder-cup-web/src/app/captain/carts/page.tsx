@@ -95,23 +95,18 @@ export default function CartsPage() {
       <PageHeader
         title="Cart Assignments"
         subtitle="Assign golf carts"
-        icon={<Car size={16} style={{ color: 'white' }} />}
-        iconContainerStyle={{
-          background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-          boxShadow: '0 0 16px rgba(6, 182, 212, 0.3)',
-        }}
+        icon={<Car size={16} className="text-white" />}
+        iconContainerClassName="bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-[0_0_16px_rgba(6,182,212,0.3)]"
         onBack={() => router.back()}
       />
 
       <main className="container-editorial">
         <section className="section">
           {cartPlayers.length === 0 ? (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-              <Car size={48} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-4)' }} />
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                No Players Added
-              </h2>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
+            <div className="card text-center p-[var(--space-8)]">
+              <Car size={48} className="mx-auto mb-[var(--space-4)] text-[var(--ink-tertiary)]" />
+              <h2 className="type-title-sm mb-[var(--space-2)]">No Players Added</h2>
+              <p className="type-caption mb-[var(--space-4)]">
                 Add players to the trip first before assigning carts.
               </p>
               <Link href="/players" className="btn btn-primary">
@@ -119,7 +114,7 @@ export default function CartsPage() {
               </Link>
             </div>
           ) : (
-            <div className="card" style={{ padding: 'var(--space-5)' }}>
+            <div className="card p-[var(--space-5)]">
               <CartAssignmentManager
                 players={cartPlayers}
                 teamAName={teamA?.name || 'USA'}
