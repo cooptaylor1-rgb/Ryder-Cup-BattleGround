@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 01:35 EST — Phase 1 — Players page: token-driven styles
+- Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
+- Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`fcd4966`)
+
 ### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
 - QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
