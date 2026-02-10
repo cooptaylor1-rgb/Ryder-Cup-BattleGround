@@ -912,3 +912,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Not Found + Quick Score: replaced `style={{ fontFamily: 'var(--font-display)' }}` with `font-[var(--font-display)]` for consistent token-driven styling.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`bb41c7f`)
+
+### 21:35 EST — Phase 1 (batch 156)
+- Captain `SessionWeatherPanel`: treat `latitude=0` / `longitude=0` as valid coordinates by checking for `null`/`undefined` instead of falsy values.
+- Prevents false “Location not available” errors for legit 0-valued coordinates (correctness; no UI change otherwise).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4956327`)
