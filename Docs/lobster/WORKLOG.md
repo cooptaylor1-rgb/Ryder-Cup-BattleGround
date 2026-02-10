@@ -20,7 +20,15 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - No behavior change; improves consistency and reduces the chance of silent style drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit ✅ (`aef056e`)
-- Push: pending (network to GitHub blocked/timed out on ports 22 and 443 in this environment)
+- Push: pending (network to GitHub blocked/timed out on port 22 in this environment)
+
+### 18:55 EST — Phase 1 — AuthGuard + Stableford: remove inline token styles (batch)
+- AuthGuard: replaced bespoke inline-style loading spinner with Tailwind token classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`).
+- Stableford scorecard: migrated the main wrappers and buttons off inline `style={{ ...var(--token) }}` usage onto token-driven Tailwind classes and `cn()` for stateful styling.
+- Kept the one dynamic points color as an inline `style` (computed from Stableford points).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit ✅ (`1c23771`)
+- Push: pending (network to GitHub blocked/timed out on port 22 in this environment)
 
 ## 2026-02-04
 
@@ -872,3 +880,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized wrappers to use `bg-[var(--canvas)]` so the premium theme stays token-driven and can’t silently drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`f2a5fa8`)
+
+### 19:20 EST — Phase 1 (batch 152)
+- Route error boundaries (Settings `/settings`, Scoring `/score`, Spectator `/spectator`): replaced inline token styles (`style={{ color/background: 'var(--...)' }}`) with Tailwind token/arbitrary-value classes (e.g. `text-[var(--ink-secondary)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`).
+- No behavior change; keeps premium theming token-driven and consistent across recovery screens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
