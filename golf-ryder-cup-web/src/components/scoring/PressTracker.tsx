@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-  Zap,
-  Plus,
-  ChevronDown,
-  ChevronUp,
-  AlertCircle,
-} from 'lucide-react';
+import { Zap, Plus, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 
 /**
  * PRESS TRACKER COMPONENT
@@ -65,10 +59,11 @@ export function PressTracker({
 
   // Calculate if teams can press
   const teamACanPress = mainMatchScore < -1; // Team A is down 2+
-  const teamBCanPress = mainMatchScore > 1;  // Team B is down 2+
+  const teamBCanPress = mainMatchScore > 1; // Team B is down 2+
 
   // Calculate active presses
-  const activePresses = presses.filter(p => p.status === 'active');
+  const activePresses = presses.filter((p) => p.status === 'active');
+
   // Calculate total exposure
   const totalPresses = presses.length;
   const totalValue = totalPresses * betAmount;
@@ -78,30 +73,32 @@ export function PressTracker({
   }
 
   return (
-    <div className={cn('rounded-xl overflow-hidden', className)} style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}>
+    <div
+      className={cn(
+        'rounded-xl overflow-hidden bg-[var(--surface)] border border-[var(--rule)]',
+        className
+      )}
+    >
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between"
-        style={{ background: totalPresses > 0 ? 'rgba(0, 103, 71, 0.1)' : undefined }}
+        className={cn(
+          'w-full px-4 py-3 flex items-center justify-between',
+          totalPresses > 0 && 'bg-[rgba(0,103,71,0.1)]'
+        )}
       >
         <div className="flex items-center gap-2">
-          <Zap size={18} style={{ color: 'var(--masters)' }} />
-          <span className="font-medium" style={{ color: 'var(--ink)' }}>
-            Press Bets
-          </span>
+          <Zap size={18} className="text-[var(--masters)]" />
+          <span className="font-medium text-[var(--ink)]">Press Bets</span>
           {activePresses.length > 0 && (
-            <span
-              className="px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: 'var(--masters)', color: 'white' }}
-            >
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--masters)] text-white">
               {activePresses.length} Active
             </span>
           )}
         </div>
         <div className="flex items-center gap-3">
           {betAmount > 0 && (
-            <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+            <span className="text-sm text-[var(--ink-secondary)]">
               ${totalValue} at stake
             </span>
           )}
@@ -118,7 +115,7 @@ export function PressTracker({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-4 space-y-4 border-t" style={{ borderColor: 'var(--rule)' }}>
+            <div className="p-4 space-y-4 border-t border-[var(--rule)]">
               {/* Press Buttons */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Team A Press Button */}
@@ -128,13 +125,9 @@ export function PressTracker({
                   className={cn(
                     'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
                     teamACanPress && holesRemaining > 1
-                      ? 'press-scale'
-                      : 'opacity-40 cursor-not-allowed'
+                      ? 'press-scale bg-[var(--team-usa)] text-white'
+                      : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
                   )}
-                  style={{
-                    background: teamACanPress ? 'var(--team-usa)' : 'var(--canvas-sunken)',
-                    color: teamACanPress ? 'white' : 'var(--ink-tertiary)',
-                  }}
                 >
                   <Plus size={16} />
                   {teamAName} Press
@@ -147,13 +140,9 @@ export function PressTracker({
                   className={cn(
                     'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
                     teamBCanPress && holesRemaining > 1
-                      ? 'press-scale'
-                      : 'opacity-40 cursor-not-allowed'
+                      ? 'press-scale bg-[var(--team-europe)] text-white'
+                      : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
                   )}
-                  style={{
-                    background: teamBCanPress ? 'var(--team-europe)' : 'var(--canvas-sunken)',
-                    color: teamBCanPress ? 'white' : 'var(--ink-tertiary)',
-                  }}
                 >
                   <Plus size={16} />
                   {teamBName} Press
@@ -162,19 +151,13 @@ export function PressTracker({
 
               {/* Press Status Hint */}
               {!teamACanPress && !teamBCanPress && holesRemaining > 1 && (
-                <div
-                  className="text-center py-2 text-sm"
-                  style={{ color: 'var(--ink-tertiary)' }}
-                >
+                <div className="text-center py-2 text-sm text-[var(--ink-tertiary)]">
                   Press available when down 2+ holes
                 </div>
               )}
 
               {holesRemaining <= 1 && (
-                <div
-                  className="flex items-center justify-center gap-2 py-2 text-sm"
-                  style={{ color: 'var(--warning)' }}
-                >
+                <div className="flex items-center justify-center gap-2 py-2 text-sm text-[var(--warning)]">
                   <AlertCircle size={14} />
                   No new presses on final hole
                 </div>
@@ -183,7 +166,7 @@ export function PressTracker({
               {/* Active Presses */}
               {activePresses.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ink-tertiary)' }}>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[var(--ink-tertiary)]">
                     Active Presses
                   </p>
                   {activePresses.map((press, idx) => (
@@ -202,17 +185,11 @@ export function PressTracker({
 
               {/* Auto-Press Status */}
               {autoPress && (
-                <div
-                  className="flex items-center justify-between py-2 px-3 rounded-lg text-sm"
-                  style={{ background: 'var(--canvas-sunken)' }}
-                >
-                  <span style={{ color: 'var(--ink-secondary)' }}>
+                <div className="flex items-center justify-between py-2 px-3 rounded-lg text-sm bg-[var(--canvas-sunken)]">
+                  <span className="text-[var(--ink-secondary)]">
                     Auto-press at {autoPressThreshold} down
                   </span>
-                  <span
-                    className="px-2 py-0.5 rounded text-xs font-medium"
-                    style={{ background: 'var(--masters)', color: 'white' }}
-                  >
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--masters)] text-white">
                     ON
                   </span>
                 </div>
@@ -252,68 +229,58 @@ function PressCard({
 
   const holesPlayed = currentHole - press.startHole;
 
-  const getScoreDisplay = () => {
+  const scoreDisplay = (() => {
     if (isAllSquare) return 'AS';
     const absScore = Math.abs(press.score);
     return `${absScore} UP`;
-  };
+  })();
 
-  const getLeader = () => {
+  const leader = (() => {
     if (isAllSquare) return null;
     return isTeamALeading ? teamAName : teamBName;
-  };
+  })();
 
   return (
     <div
-      className="p-3 rounded-lg flex items-center justify-between"
-      style={{
-        background: isTeamALeading
-          ? 'rgba(179, 39, 57, 0.1)'
+      className={cn(
+        'p-3 rounded-lg flex items-center justify-between border',
+        isTeamALeading
+          ? 'bg-[rgba(179,39,57,0.1)] border-[rgba(179,39,57,0.3)]'
           : isTeamBLeading
-            ? 'rgba(0, 39, 118, 0.1)'
-            : 'var(--canvas-sunken)',
-        border: `1px solid ${isTeamALeading
-          ? 'rgba(179, 39, 57, 0.3)'
-          : isTeamBLeading
-            ? 'rgba(0, 39, 118, 0.3)'
-            : 'var(--rule)'
-          }`,
-      }}
+            ? 'bg-[rgba(0,39,118,0.1)] border-[rgba(0,39,118,0.3)]'
+            : 'bg-[var(--canvas-sunken)] border-[var(--rule)]'
+      )}
     >
       <div className="flex items-center gap-3">
-        <span
-          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
-          style={{ background: 'var(--surface)', color: 'var(--ink-secondary)' }}
-        >
+        <span className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold bg-[var(--surface)] text-[var(--ink-secondary)]">
           P{pressNumber}
         </span>
         <div>
-          <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>
+          <p className="text-sm font-medium text-[var(--ink)]">
             Started hole {press.startHole}
           </p>
-          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-            By {press.pressedBy === 'teamA' ? teamAName : teamBName} • {holesPlayed} holes played
+          <p className="text-xs text-[var(--ink-tertiary)]">
+            By {press.pressedBy === 'teamA' ? teamAName : teamBName} • {holesPlayed}{' '}
+            holes played
           </p>
         </div>
       </div>
 
       <div className="text-right">
         <p
-          className="font-bold"
-          style={{
-            color: isTeamALeading
-              ? 'var(--team-usa)'
+          className={cn(
+            'font-bold',
+            isTeamALeading
+              ? 'text-[var(--team-usa)]'
               : isTeamBLeading
-                ? 'var(--team-europe)'
-                : 'var(--ink-secondary)',
-          }}
+                ? 'text-[var(--team-europe)]'
+                : 'text-[var(--ink-secondary)]'
+          )}
         >
-          {getScoreDisplay()}
+          {scoreDisplay}
         </p>
-        {getLeader() && (
-          <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-            {getLeader()}
-          </p>
+        {leader && (
+          <p className="text-xs text-[var(--ink-tertiary)]">{leader}</p>
         )}
       </div>
     </div>
