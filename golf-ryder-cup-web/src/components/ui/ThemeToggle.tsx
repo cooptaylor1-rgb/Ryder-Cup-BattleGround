@@ -51,9 +51,17 @@ export function ThemeToggle({ variant = 'segmented', className }: ThemeTogglePro
     applyTheme(newTheme);
   };
 
-  // Don't render until mounted to avoid hydration mismatch
+  // Avoid hydration mismatch: render a non-interactive placeholder until mounted.
+  // This prevents layout shift where the toggle would otherwise disappear.
   if (!mounted) {
-    return null;
+    const placeholderClass =
+      variant === 'button'
+        ? 'h-10 w-10 rounded-lg bg-[var(--surface-secondary)]'
+        : variant === 'dropdown'
+          ? 'h-10 w-[140px] rounded-lg bg-[var(--surface-secondary)]'
+          : 'h-10 w-[210px] rounded-lg bg-[var(--surface-secondary)]';
+
+    return <div aria-hidden className={cn(placeholderClass, className)} />;
   }
 
   if (variant === 'button') {
