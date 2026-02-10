@@ -911,4 +911,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - ErrorBoundary: removed inline token text colors and standardized to `text-[var(--ink)]` / `text-[var(--ink-secondary)]`.
 - Not Found + Quick Score: replaced `style={{ fontFamily: 'var(--font-display)' }}` with `font-[var(--font-display)]` for consistent token-driven styling.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`bb41c7f`)
