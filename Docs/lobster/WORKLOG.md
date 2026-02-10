@@ -885,4 +885,4 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Route error boundaries (Settings `/settings`, Scoring `/score`, Spectator `/spectator`): replaced inline token styles (`style={{ color/background: 'var(--...)' }}`) with Tailwind token/arbitrary-value classes (e.g. `text-[var(--ink-secondary)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`).
 - No behavior change; keeps premium theming token-driven and consistent across recovery screens.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`5743a9b`)
