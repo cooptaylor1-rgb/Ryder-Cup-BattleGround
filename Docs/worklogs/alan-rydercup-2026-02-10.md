@@ -1,5 +1,12 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 00:40 EST — Phase 1 (batch 160)
+- Login (`/login`): replaced the “New here?” divider’s inline token styles with token-driven Tailwind classes (`bg-[var(--rule)]`, `text-[var(--ink-tertiary)]`).
+- Create Profile (`/profile/create`): replaced the header bottom rule’s inline token styles with `h-px bg-[var(--rule)]`.
+- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link color, and the “No scheduled events” padding wrapper.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c0582e7`)
+
 ## 00:07 EST — Phase 1 (batch 159)
 - Social (`/social`): added the shared `PageHeader` to the **No trip selected** empty state so it matches the premium navigation pattern and never feels like a headerless dead end.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
+- Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
+- Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
+- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link, and the “No scheduled events” padding wrapper.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c0582e7`)
+
 ### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
 - Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
