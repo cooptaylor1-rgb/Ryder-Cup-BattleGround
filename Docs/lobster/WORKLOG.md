@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 04:05 EST — Phase 1 — Settings / Notifications: remove inline styles
+- Notifications settings (`/settings/notifications`): removed inline `style={{ ... }}` usage in favor of token-driven Tailwind classes.
+- Refactored toggles + cards to use `cn()` with conditional classes (no DOM style props), keeping behavior unchanged.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3211d1b`)
+
 ### 03:30 EST — Phase 1 — Route error boundaries: premium wrapper + BottomNav
 - Captain, Courses, Lineup (`src/app/{captain,courses,lineup}/error.tsx`): standardized wrappers to `pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`, added `BottomNav`, and removed remaining inline token styles in favor of token-driven Tailwind classes.
 - Keeps recovery screens consistent with the rest of the premium shell and avoids dead-end navigation.

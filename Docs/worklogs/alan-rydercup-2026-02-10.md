@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 04:05 EST — Phase 1 (batch 164)
+- Settings → Notifications (`/settings/notifications`): removed inline `style={{ ... }}` usage throughout (toast, cards, toggles, icon wrappers) in favor of token-driven Tailwind classes.
+- Toggle switches now use `cn()` conditional classes instead of inline `background`/`transform` style props.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3211d1b`)
+
 ## 02:55 EST — Phase 1 (batch 163)
 - Day Summary share card (`useDaySummary`): ensure `isLoading` always clears via `finally` (no stuck loading state).
 - Day Summary: clear `summary` when there is no active trip, there are no sessions for the selected day, or summary generation errors.
