@@ -3,6 +3,13 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-10
+
+### 22:21 EST — Phase 1 — PressTracker: token-driven styles
+- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`69b71b4`)
+
 ## 2026-02-09
 
 ### 17:15 EST — Phase 1 — Captain Draft: PageHeader on access-gated states
