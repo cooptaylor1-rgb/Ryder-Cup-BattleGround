@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven Tailwind styles
+- Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
+- Profile loading skeleton (`/profile` loading state): replaced inline flex + card token styles with Tailwind token classes (`bg-[var(--canvas-raised)]`, `border-[var(--rule)]`, `p-[var(--space-5)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7810571`)
+
 ### 10:05 EST — Phase 1 — App layout Suspense fallback: token-driven Tailwind styles
 - App root layout (`src/app/layout.tsx`): replaced inline style + custom `@keyframes spin` in the top-level `Suspense` fallback with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

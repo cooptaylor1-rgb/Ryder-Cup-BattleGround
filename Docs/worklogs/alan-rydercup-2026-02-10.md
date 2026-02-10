@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven styles
+- Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
+- Profile loading skeleton (`/profile` loading state): replaced inline flex + card token styles with Tailwind token classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7810571`)
+
 ## 09:45 EST — Phase 1 — PWA update toast + Predictions: token-driven styles
 - `PWAUpdateToast`: replaced the fixed toast’s large inline `style={{...}}` blocks (positioning, spacing tokens, icon/message styles, action row styling) with Tailwind classes + token-driven arbitrary values.
 - `MatchPredictions`: removed remaining inline token styles for team dots and lucide icon colors (use Tailwind `bg-[var(--team-*)]` + `text-[var(--team-*)]`).
