@@ -18,6 +18,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`f49c30f` + `f7bbd94`)
 
+### 11:50 EST — Phase 1 — Courses page: token-driven Tailwind styles
+- Courses (`/courses`): removed remaining inline `style={{...}}` usage for token-driven colors/gradients (PageHeader icons, scan-scorecard CTA, icon/text accents) in favor of Tailwind arbitrary-value classes.
+- Tee set pills: consolidated dynamic tee colors by setting a single `--tee-color` CSS variable inline, then using Tailwind to apply both text + translucent background (no more multi-prop inline styles).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2ee4a37`)
+
 ### 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven Tailwind styles
 - Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
 - Profile loading skeleton (`/profile` loading state): replaced inline flex + card token styles with Tailwind token classes (`bg-[var(--canvas-raised)]`, `border-[var(--rule)]`, `p-[var(--space-5)]`).
