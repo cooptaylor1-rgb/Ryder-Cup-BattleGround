@@ -255,7 +255,7 @@ function CreateProfilePageContent() {
           </h1>
         </div>
         {/* Thin bottom rule */}
-        <div style={{ height: '1px', background: 'var(--rule)' }} />
+        <div className="h-px bg-[var(--rule)]" />
       </header>
 
       {/* ---- MAIN CONTENT ---- */}

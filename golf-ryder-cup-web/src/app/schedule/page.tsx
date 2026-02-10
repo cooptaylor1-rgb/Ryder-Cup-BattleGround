@@ -420,8 +420,7 @@ export default function SchedulePage() {
               </p>
               <Link
                 href="/profile/create"
-                className="inline-flex items-center gap-1 mt-2 text-sm font-medium"
-                style={{ color: 'var(--masters)' }}
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[var(--masters)]"
               >
                 Create Profile
                 <ChevronRight size={16} />
@@ -451,10 +450,7 @@ export default function SchedulePage() {
             <div key={day.date} className="mb-8">
               {/* Day Header */}
               <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex flex-col items-center justify-center"
-                  style={{ background: 'var(--masters)', color: 'white' }}
-                >
+                <div className="flex h-12 w-12 flex-col items-center justify-center rounded-xl bg-[var(--masters)] text-white">
                   <span className="text-xs font-medium opacity-80">Day</span>
                   <span className="text-lg font-bold leading-none">{day.dayNumber}</span>
                 </div>
@@ -471,7 +467,7 @@ export default function SchedulePage() {
 
               {/* Entries */}
               {day.entries.length === 0 ? (
-                <div style={{ padding: 'var(--space-4) 0' }}>
+                <div className="py-[var(--space-4)]">
                   <EmptyStatePremium
                     illustration="calendar"
                     title="No scheduled events"

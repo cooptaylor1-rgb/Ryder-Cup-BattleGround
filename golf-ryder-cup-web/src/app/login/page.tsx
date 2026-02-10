@@ -316,26 +316,10 @@ function LoginPageContent() {
         </form>
 
         {/* Divider */}
-        <div
-          style={{
-            maxWidth: '400px',
-            margin: 'var(--space-8) auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-4)',
-          }}
-        >
-          <div style={{ flex: 1, height: '1px', background: 'var(--rule)' }} />
-          <span
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--ink-tertiary)',
-            }}
-          >
-            New here?
-          </span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--rule)' }} />
+        <div className="mx-auto my-[var(--space-8)] flex max-w-[400px] items-center gap-[var(--space-4)]">
+          <div className="h-px flex-1 bg-[var(--rule)]" />
+          <span className="font-sans text-sm text-[var(--ink-tertiary)]">New here?</span>
+          <div className="h-px flex-1 bg-[var(--rule)]" />
         </div>
 
         {/* Create Account */}
