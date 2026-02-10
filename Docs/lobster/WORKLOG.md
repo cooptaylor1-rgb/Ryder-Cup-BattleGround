@@ -5,6 +5,15 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 05:25 EST — Phase 1 — Route error boundaries: token-driven Tailwind styles
+- Error boundaries: removed remaining inline `style={{ ... }}` usage (token colors/backgrounds/borders) across key route error pages:
+  - App-level `src/app/error.tsx`
+  - Feature routes: Achievements, Bets, Live, Social, Trip, Profile, Trip Stats
+  - Match scoring error (`/score/[matchId]/error.tsx`) including the offline-saved banner
+- Converted to token-driven Tailwind arbitrary-value classes like `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`<TBD>`)
+
 ### 05:05 EST — Phase 1 — Achievements: token-driven styles (no inline layout)
 - Achievements (`/achievements`): removed most inline `style={{ ... }}` layout and token usage in favor of token-driven Tailwind classes.
 - Progress overview card, category filter, and grid now use standard Tailwind layout utilities; progress bars keep only the dynamic `width` inline style.

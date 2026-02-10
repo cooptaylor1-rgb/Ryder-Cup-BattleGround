@@ -1,5 +1,12 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 05:25 EST — Phase 1 (batch 166)
+- Route error boundaries: removed remaining inline `style={{ ... }}` usage across key error pages (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats).
+- Scoring match error (`/score/[matchId]/error.tsx`): migrated the offline-saved banner + dev error details panel to token-driven Tailwind classes.
+- No behavior change; keeps error recovery UI consistent with the premium token system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`<TBD>`)
+
 ## 05:05 EST — Phase 1 (batch 165)
 - Achievements (`/achievements`): removed most inline `style={{ ... }}` layout + token usage in favor of token-driven Tailwind classes.
 - Progress overview, category filter, and grid now use standard Tailwind utilities; progress bars keep only the dynamic `width` inline style.
