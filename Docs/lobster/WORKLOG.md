@@ -30,6 +30,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Commit ✅ (`1c23771`)
 - Push: pending (network to GitHub blocked/timed out on port 22 in this environment)
 
+### 19:50 EST — Phase 1 — Settings: remove inline layout styles
+- Settings (`/settings`): removed most inline layout styles (padding, flex, spacing, typography) in favor of token-driven Tailwind classes (`p-[var(--space-4)]`, `gap-[var(--space-3)]`, `text-[var(--masters)]`, etc.) for consistency.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6054133`)
+
 ## 2026-02-04
 
 ### 09:30 EST — Phase 1 (batch 1)
