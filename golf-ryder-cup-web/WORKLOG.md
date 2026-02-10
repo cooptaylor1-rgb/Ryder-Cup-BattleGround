@@ -3,7 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
-- 10:05 — Shipped batch: app root layout `Suspense` fallback (`src/app/layout.tsx`) replaced inline style props + bespoke `@keyframes spin` with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`) for consistent premium theming. (commit TBD)
+- 10:05 — Shipped batch: app root layout `Suspense` fallback (`src/app/layout.tsx`) replaced inline style props + bespoke `@keyframes spin` with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`) for consistent premium theming. (commit f64ff02)
 - 07:35 — Shipped batch: Offline Queue panel + Header migrated remaining inline token `style={{...}}` usage (surface/border/text) to token-driven Tailwind classes; replaced inline rgba badge/action backgrounds with Tailwind opacity utilities (e.g. `bg-red-500/10`). (commit 0653314)
 - 06:58 — Shipped batch: Trip Awards (`/trip-stats/awards`) + Captain Invitations (`/captain/invites`) removed remaining inline token style props (PageHeader icon colors, section padding, Share Invite button + card padding) in favor of token-driven Tailwind classes. (commit e85490e)
 - 06:40 — Shipped batch: Score (`/score`) removed inline `style={{...}}` token/layout usage (spacing, typography tokens, MatchRow layout) in favor of token-driven Tailwind classes; MatchRow now uses `cn()` for conditional padding/border + token classes for the “Your Match” badge and score styling. (commit 04fea66)

@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 10:05 EST — Phase 1 — App layout Suspense fallback: token-driven Tailwind styles
 - App root layout (`src/app/layout.tsx`): replaced inline style + custom `@keyframes spin` in the top-level `Suspense` fallback with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`f64ff02`)
 
 ### 09:45 EST — Phase 1 — PWA update toast + Predictions: token-driven styles
 - `PWAUpdateToast`: replaced large inline `style={{...}}` blocks (fixed positioning, spacing tokens, icon/message styles, actions row) with Tailwind classes + token-driven arbitrary values.
