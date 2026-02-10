@@ -4,8 +4,12 @@
 - `ThemeToggle`: replaced the `!mounted → return null` hydration gate with a non-interactive placeholder sized to the selected variant.
 - Prevents small layout shifts where the theme control would briefly disappear during client hydration.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit ✅ (`563893a`)
-- Push: pending (network connection to GitHub failed from this environment)
+- Commit + push ✅ (`563893a`)
+
+## 18:25 EST — Docs — Log ThemeToggle hydration batch (push recovered)
+- Worklogs: recorded the ThemeToggle hydration placeholder batch.
+- Note: pushing from this environment also runs `pre-push` checks (`typecheck` + `test` + `build`) and they all passed ✅.
+- Commit + push ✅ (`80d64eb`)
 
 ## 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
 - `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
