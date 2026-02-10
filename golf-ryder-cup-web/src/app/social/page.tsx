@@ -141,6 +141,13 @@ export default function SocialPage() {
   if (!currentTrip) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Trash Talk"
+          subtitle="No trip selected"
+          icon={<MessageCircle size={16} className="text-[var(--color-accent)]" />}
+          onBack={() => router.back()}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
