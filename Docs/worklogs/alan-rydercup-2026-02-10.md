@@ -30,3 +30,9 @@
 - Keeps press UI aligned with the Phase 1 premium theming system and reduces risk of silent inline-style drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`69b71b4`)
+
+## 23:20 EST — Phase 1 (batch 158)
+- Stats hub (`/stats`): removed inline style props (icon color, margins, grid/padding, token backgrounds) in favor of token-driven Tailwind classes.
+- Captain `MatchCardGenerator`: replaced inline `var(--token)` text/background/border styles with token-driven Tailwind arbitrary-value classes for consistent theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3aabb9f`)

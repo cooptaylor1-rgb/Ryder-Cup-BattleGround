@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`69b71b4`)
 
+### 23:20 EST — Phase 1 — Stats hub + Match Card generator: token-driven styles
+- Stats hub (`/stats`): removed inline style props (icon color, margins, grid/padding, token backgrounds) in favor of Tailwind token/arbitrary-value classes.
+- Captain `MatchCardGenerator`: replaced inline `var(--token)` text/background/border styles with token-driven Tailwind classes for consistent theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3aabb9f`)
+
 ## 2026-02-09
 
 ### 17:15 EST — Phase 1 — Captain Draft: PageHeader on access-gated states
