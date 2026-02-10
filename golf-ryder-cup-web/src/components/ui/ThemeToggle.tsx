@@ -62,8 +62,8 @@ export function ThemeToggle({ variant = 'segmented', className }: ThemeTogglePro
         onClick={() => handleThemeChange(theme === 'dark' ? 'light' : 'dark')}
         className={cn(
           'p-2 rounded-lg transition-colors',
-          'bg-surface-100 dark:bg-surface-800',
-          'hover:bg-surface-200 dark:hover:bg-surface-700',
+          'bg-[var(--surface-secondary)]',
+          'hover:bg-[var(--surface-tertiary)]',
           className
         )}
         aria-label="Toggle theme"
@@ -73,10 +73,32 @@ export function ThemeToggle({ variant = 'segmented', className }: ThemeTogglePro
     );
   }
 
+  if (variant === 'dropdown') {
+    return (
+      <label className={cn('inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)]', className)}>
+        <span className="sr-only">Theme</span>
+        <select
+          value={theme}
+          onChange={(e) => handleThemeChange(e.target.value as Theme)}
+          className={cn(
+            'h-10 rounded-lg border border-[var(--rule)] bg-[var(--surface)] px-3 text-sm',
+            'text-[var(--ink-primary)] shadow-sm',
+            'focus:outline-none focus:ring-2 focus:ring-[var(--masters)] focus:ring-offset-2 focus:ring-offset-[var(--canvas)]'
+          )}
+          aria-label="Theme"
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="system">System</option>
+        </select>
+      </label>
+    );
+  }
+
   if (variant === 'segmented') {
     return (
       <div
-        className={cn('inline-flex rounded-lg bg-surface-100 dark:bg-surface-800 p-1', className)}
+        className={cn('inline-flex rounded-lg bg-[var(--surface-secondary)] p-1', className)}
       >
         {[
           { value: 'light' as Theme, icon: Sun, label: 'Light' },
@@ -91,8 +113,8 @@ export function ThemeToggle({ variant = 'segmented', className }: ThemeTogglePro
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
                 theme === option.value
-                  ? 'bg-surface-card text-foreground shadow-sm'
-                  : 'text-surface-500 hover:text-foreground'
+                  ? 'bg-[var(--surface)] text-[var(--ink-primary)] shadow-sm'
+                  : 'text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)]'
               )}
               aria-label={option.label}
             >
@@ -105,7 +127,34 @@ export function ThemeToggle({ variant = 'segmented', className }: ThemeTogglePro
     );
   }
 
-  return null;
+  // Fallback for unknown variant
+  return (
+    <div className={cn('inline-flex rounded-lg bg-[var(--surface-secondary)] p-1', className)}>
+      {[
+        { value: 'light' as Theme, icon: Sun, label: 'Light' },
+        { value: 'dark' as Theme, icon: Moon, label: 'Dark' },
+        { value: 'system' as Theme, icon: Monitor, label: 'System' },
+      ].map((option) => {
+        const Icon = option.icon;
+        return (
+          <button
+            key={option.value}
+            onClick={() => handleThemeChange(option.value)}
+            className={cn(
+              'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
+              theme === option.value
+                ? 'bg-[var(--surface)] text-[var(--ink-primary)] shadow-sm'
+                : 'text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)]'
+            )}
+            aria-label={option.label}
+          >
+            <Icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 /**
