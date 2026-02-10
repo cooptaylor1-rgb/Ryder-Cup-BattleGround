@@ -16,7 +16,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Quick summary rows now use a CSS variable + `color-mix()` for translucent team-colored backgrounds, avoiding runtime Tailwind class generation while keeping the UI token-driven.
 - Kept only the truly-dynamic progress bar `width` inline styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push (pending) (`f49c30f`)
+- Commit + push ✅ (`f49c30f` + `f7bbd94`)
 
 ### 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven Tailwind styles
 - Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.

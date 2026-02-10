@@ -5,7 +5,7 @@
 - Quick summary rows now use a CSS variable + `color-mix()` to derive the translucent background from the team color, keeping the border + icon color tokenized without runtime Tailwind class generation.
 - Kept only the truly-dynamic progress bar `width` inline styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push (pending) (`f49c30f`)
+- Commit + push ✅ (`f49c30f` + `f7bbd94`)
 
 ## 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven styles
 - Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
