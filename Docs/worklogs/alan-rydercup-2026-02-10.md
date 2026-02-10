@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 01:40 EST — Phase 1 (batch 162)
+- Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted `next build` runs don’t block pushes.
+- Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3576cc1`)
+
 ## 01:25 EST — Phase 1 (batch 161)
 - Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`) and replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
 - Small consistency/polish pass; no behavior change.

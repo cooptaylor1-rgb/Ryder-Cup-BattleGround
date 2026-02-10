@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 01:40 EST — Phase 1 — Pre-push build lock + Tailwind placeholder warnings
+- Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted builds don’t block future pushes.
+- Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3576cc1`)
+
 ### 01:25 EST — Phase 1 — Trip Stats: token-driven icon styles
 - Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`).
 - Trip Stats: replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
