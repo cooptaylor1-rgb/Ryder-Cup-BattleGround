@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 16:05 EST — Settings / Backup: refresh after import (no hard reload)
+- Backup & Restore (`/settings/backup`): replaced `window.location.reload()` after a successful import with an in-app `loadTrips()` refresh and auto-select the imported trip.
+- Keeps the import confirmation UI responsive and avoids a full-page refresh.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8cdc993`)
+
 ### 15:40 EST — Phase 1 — Captain Draft: standardize empty states
 - Captain Draft (`/captain/draft`): replaced bespoke inline-styled “card” empty states (all assigned / need more players / teams not set up) with the shared `EmptyStatePremium` for consistent premium navigation + visuals.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
