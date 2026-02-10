@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 08:10 EST — Phase 1 — Captain Settings + Messages: token-driven Tailwind styles
+- Captain Settings (`/captain/settings`): removed remaining inline token/layout style props in the header save action, section headers, labels, team-name fields, and Captain Tools rows (replaced with token-driven Tailwind arbitrary-value classes).
+- Captain Messages (`/captain/messages`): removed inline layout styles in the PageHeader action + composer/empty cards; moved icon colors to Tailwind classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3cd94fd`)
+
 ## 07:35 EST — Phase 1 — Offline Queue + Header: token-driven Tailwind styles
 - Offline Queue panel (`OfflineQueuePanel`): removed inline token `style={{...}}` usage (card/surface colors, borders, text) in favor of token-driven Tailwind arbitrary-value classes.
 - Offline Queue: replaced inline rgba badge/button backgrounds with Tailwind opacity utilities (e.g. `bg-red-500/10`, `bg-green-500/10`).

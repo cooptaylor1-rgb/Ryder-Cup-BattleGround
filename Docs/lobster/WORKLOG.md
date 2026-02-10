@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 08:10 EST — Phase 1 — Captain Settings + Messages: token-driven Tailwind styles
+- Captain Settings (`/captain/settings`): removed remaining inline token/layout styles in the header save action, section headers, labels, team-name fields, and Captain Tools rows (use token-driven Tailwind classes like `text-[var(--team-usa)]`, `mb-[var(--space-4)]`, `rotate-180`).
+- Captain Messages (`/captain/messages`): removed inline layout styles in the PageHeader action and the composer/empty cards; moved icon colors to Tailwind (`text-white`, `text-[var(--ink-tertiary)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3cd94fd`)
+
 ### 07:35 EST — Phase 1 — Offline Queue + Header: token-driven Tailwind styles
 - Offline Queue panel (`OfflineQueuePanel`): removed inline token `style={{...}}` usage for surfaces/borders/text, replacing with token-driven Tailwind arbitrary-value classes.
 - Offline Queue badge/actions: replaced inline rgba styles with Tailwind opacity utilities (e.g. `bg-red-500/10`).
