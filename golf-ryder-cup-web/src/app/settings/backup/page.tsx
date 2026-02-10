@@ -240,8 +240,11 @@ export default function BackupRestorePage() {
                     tripId: result.tripId,
                 });
 
-                // Reload to refresh trips list
-                window.location.reload();
+                // Refresh trips list (avoid a full page reload so we can keep the UI responsive)
+                await loadTrips();
+                if (result.tripId) {
+                    setSelectedTripId(result.tripId);
+                }
             } else {
                 setImportResult({
                     success: false,
