@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 17:55 EST — Phase 1 — ThemeToggle: placeholder during hydration
+- `ThemeToggle`: replaced the `!mounted → return null` hydration gate with a non-interactive placeholder sized to the selected variant.
+- Prevents layout shift where the theme control would briefly disappear during client hydration.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit ✅ (`563893a`)
+- Push: pending (network connection to GitHub failed from this environment)
+
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
 - `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
 - Dynamic team accents now use token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) for premium consistency.

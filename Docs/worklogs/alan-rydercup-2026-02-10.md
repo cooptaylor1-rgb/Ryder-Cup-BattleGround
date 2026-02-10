@@ -1,5 +1,12 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 17:55 EST — Phase 1 — ThemeToggle: placeholder during hydration
+- `ThemeToggle`: replaced the `!mounted → return null` hydration gate with a non-interactive placeholder sized to the selected variant.
+- Prevents small layout shifts where the theme control would briefly disappear during client hydration.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit ✅ (`563893a`)
+- Push: pending (network connection to GitHub failed from this environment)
+
 ## 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
 - `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
 - Kept dynamic team accent colors as token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) so the card stays aligned with the premium design system.
