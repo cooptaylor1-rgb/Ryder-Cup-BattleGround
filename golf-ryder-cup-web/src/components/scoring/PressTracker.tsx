@@ -67,10 +67,7 @@ export function PressTracker({
   // Calculate total exposure
   const totalPresses = presses.length;
   const totalValue = totalPresses * betAmount;
-
-  if (betAmount === 0 && presses.length === 0) {
-    return null; // Don't show if no bets configured
-  }
+  const showSetupState = betAmount <= 0 && presses.length === 0;
 
   return (
     <div
@@ -97,10 +94,17 @@ export function PressTracker({
           )}
         </div>
         <div className="flex items-center gap-3">
-          {betAmount > 0 && (
-            <span className="text-sm text-[var(--ink-secondary)]">
-              ${totalValue} at stake
+          {showSetupState ? (
+            <span className="flex items-center gap-1 text-xs font-medium text-[var(--warning)]">
+              <AlertCircle size={14} />
+              Set bet amount
             </span>
+          ) : (
+            betAmount > 0 && (
+              <span className="text-sm text-[var(--ink-secondary)]">
+                ${totalValue} at stake
+              </span>
+            )
           )}
           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </div>
@@ -115,84 +119,107 @@ export function PressTracker({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-4 space-y-4 border-t border-[var(--rule)]">
-              {/* Press Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Team A Press Button */}
-                <button
-                  onClick={() => onPress('teamA')}
-                  disabled={!teamACanPress || holesRemaining <= 1}
-                  className={cn(
-                    'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
-                    teamACanPress && holesRemaining > 1
-                      ? 'press-scale bg-[var(--team-usa)] text-white'
-                      : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
+            <div
+              className={cn(
+                'p-4 border-t border-[var(--rule)]',
+                !showSetupState && 'space-y-4'
+              )}
+            >
+              {showSetupState ? (
+                <div className="flex items-start gap-3 rounded-xl border border-[var(--rule)] bg-[var(--canvas-sunken)] p-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--canvas)] text-[var(--warning)]">
+                    <AlertCircle size={18} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-[var(--ink)]">
+                      Press bets not configured yet
+                    </p>
+                    <p className="text-xs text-[var(--ink-secondary)]">
+                      Set a default press amount in match settings to enable quick tracking during the round.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Press Buttons */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Team A Press Button */}
+                    <button
+                      onClick={() => onPress('teamA')}
+                      disabled={!teamACanPress || holesRemaining <= 1}
+                      className={cn(
+                        'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
+                        teamACanPress && holesRemaining > 1
+                          ? 'press-scale bg-[var(--team-usa)] text-white'
+                          : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
+                      )}
+                    >
+                      <Plus size={16} />
+                      {teamAName} Press
+                    </button>
+
+                    {/* Team B Press Button */}
+                    <button
+                      onClick={() => onPress('teamB')}
+                      disabled={!teamBCanPress || holesRemaining <= 1}
+                      className={cn(
+                        'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
+                        teamBCanPress && holesRemaining > 1
+                          ? 'press-scale bg-[var(--team-europe)] text-white'
+                          : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
+                      )}
+                    >
+                      <Plus size={16} />
+                      {teamBName} Press
+                    </button>
+                  </div>
+
+                  {/* Press Status Hint */}
+                  {!teamACanPress && !teamBCanPress && holesRemaining > 1 && (
+                    <div className="text-center py-2 text-sm text-[var(--ink-tertiary)]">
+                      Press available when down 2+ holes
+                    </div>
                   )}
-                >
-                  <Plus size={16} />
-                  {teamAName} Press
-                </button>
 
-                {/* Team B Press Button */}
-                <button
-                  onClick={() => onPress('teamB')}
-                  disabled={!teamBCanPress || holesRemaining <= 1}
-                  className={cn(
-                    'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
-                    teamBCanPress && holesRemaining > 1
-                      ? 'press-scale bg-[var(--team-europe)] text-white'
-                      : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
+                  {holesRemaining <= 1 && (
+                    <div className="flex items-center justify-center gap-2 py-2 text-sm text-[var(--warning)]">
+                      <AlertCircle size={14} />
+                      No new presses on final hole
+                    </div>
                   )}
-                >
-                  <Plus size={16} />
-                  {teamBName} Press
-                </button>
-              </div>
 
-              {/* Press Status Hint */}
-              {!teamACanPress && !teamBCanPress && holesRemaining > 1 && (
-                <div className="text-center py-2 text-sm text-[var(--ink-tertiary)]">
-                  Press available when down 2+ holes
-                </div>
-              )}
+                  {/* Active Presses */}
+                  {activePresses.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium uppercase tracking-wider text-[var(--ink-tertiary)]">
+                        Active Presses
+                      </p>
+                      {activePresses.map((press, idx) => (
+                        <PressCard
+                          key={press.id}
+                          press={press}
+                          pressNumber={idx + 1}
+                          teamAName={teamAName}
+                          teamBName={teamBName}
+                          betAmount={betAmount}
+                          currentHole={currentHole}
+                        />
+                      ))}
+                    </div>
+                  )}
 
-              {holesRemaining <= 1 && (
-                <div className="flex items-center justify-center gap-2 py-2 text-sm text-[var(--warning)]">
-                  <AlertCircle size={14} />
-                  No new presses on final hole
-                </div>
-              )}
-
-              {/* Active Presses */}
-              {activePresses.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-medium uppercase tracking-wider text-[var(--ink-tertiary)]">
-                    Active Presses
-                  </p>
-                  {activePresses.map((press, idx) => (
-                    <PressCard
-                      key={press.id}
-                      press={press}
-                      pressNumber={idx + 1}
-                      teamAName={teamAName}
-                      teamBName={teamBName}
-                      betAmount={betAmount}
-                      currentHole={currentHole}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Auto-Press Status */}
-              {autoPress && (
-                <div className="flex items-center justify-between py-2 px-3 rounded-lg text-sm bg-[var(--canvas-sunken)]">
-                  <span className="text-[var(--ink-secondary)]">
-                    Auto-press at {autoPressThreshold} down
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--masters)] text-white">
-                    ON
-                  </span>
-                </div>
+                  {/* Auto-Press Status */}
+                  {autoPress && (
+                    <div className="flex items-center justify-between py-2 px-3 rounded-lg text-sm bg-[var(--canvas-sunken)]">
+                      <span className="text-[var(--ink-secondary)]">
+                        Auto-press at {autoPressThreshold} down
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--masters)] text-white">
+                        ON
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </motion.div>

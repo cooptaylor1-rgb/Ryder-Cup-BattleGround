@@ -11,6 +11,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`563893a`)
 
+### 18:58 EST — Phase 1 — Press tracker setup state
+- Press tracking (scoring advanced tools): instead of rendering nothing when the default bet is unset, show a premium empty-state card explaining how to enable presses.
+- Keeps the advanced tools accordion layout stable and guides captains to configure press tracking rather than presenting a blank region.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 18:25 EST — Docs — Log ThemeToggle hydration batch (push recovered)
 - Worklogs: recorded the ThemeToggle hydration placeholder batch.
 - Note: pushing from this environment also runs `pre-push` checks (`typecheck` + `test` + `build`) and they all passed ✅.

@@ -6,6 +6,11 @@
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`563893a`)
 
+## 18:58 EST — Phase 1 — Press tracker setup state
+- Scoring advanced tools: when the default press bet is unset, render a premium guidance card instead of returning `null` so captains understand how to enable press tracking.
+- Keeps the advanced tools accordion layout stable and avoids a confusing blank region while still holding the press UI behind a configuration gate.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ## 18:25 EST — Docs — Log ThemeToggle hydration batch (push recovered)
 - Worklogs: recorded the ThemeToggle hydration placeholder batch.
 - Note: pushing from this environment also runs `pre-push` checks (`typecheck` + `test` + `build`) and they all passed ✅.
