@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 07:35 — Shipped batch: Offline Queue panel + Header migrated remaining inline token `style={{...}}` usage (surface/border/text) to token-driven Tailwind classes; replaced inline rgba badge/action backgrounds with Tailwind opacity utilities (e.g. `bg-red-500/10`). (commit 0653314)
 - 06:58 — Shipped batch: Trip Awards (`/trip-stats/awards`) + Captain Invitations (`/captain/invites`) removed remaining inline token style props (PageHeader icon colors, section padding, Share Invite button + card padding) in favor of token-driven Tailwind classes. (commit e85490e)
 - 06:40 — Shipped batch: Score (`/score`) removed inline `style={{...}}` token/layout usage (spacing, typography tokens, MatchRow layout) in favor of token-driven Tailwind classes; MatchRow now uses `cn()` for conditional padding/border + token classes for the “Your Match” badge and score styling. (commit 04fea66)
 - 05:25 — Shipped batch: standardized key route error boundaries (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats + scoring match error) by removing inline `style={{...}}` token usage and replacing with token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, etc.). (commit 5a000ff)
