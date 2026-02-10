@@ -19,16 +19,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Scorecard Upload modal (`ScorecardUpload`): replaced common inline `style={{ ...var(--token) }}` usages with token-driven Tailwind classes for the overlay, modal surface, header, and idle/processing/error/success text panels.
 - No behavior change; improves consistency and reduces the chance of silent style drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit ✅ (`aef056e`)
-- Push: pending (network to GitHub blocked/timed out on port 22 in this environment)
+- Commit + push ✅ (`aef056e`)
 
 ### 18:55 EST — Phase 1 — AuthGuard + Stableford: remove inline token styles (batch)
 - AuthGuard: replaced bespoke inline-style loading spinner with Tailwind token classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`).
 - Stableford scorecard: migrated the main wrappers and buttons off inline `style={{ ...var(--token) }}` usage onto token-driven Tailwind classes and `cn()` for stateful styling.
 - Kept the one dynamic points color as an inline `style` (computed from Stableford points).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit ✅ (`1c23771`)
-- Push: pending (network to GitHub blocked/timed out on port 22 in this environment)
+- Commit + push ✅ (`1c23771`)
 
 ### 19:50 EST — Phase 1 — Settings: remove inline layout styles
 - Settings (`/settings`): removed most inline layout styles (padding, flex, spacing, typography) in favor of token-driven Tailwind classes (`p-[var(--space-4)]`, `gap-[var(--space-3)]`, `text-[var(--masters)]`, etc.) for consistency.
