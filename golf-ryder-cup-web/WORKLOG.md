@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 16:55 — Shipped batch: Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`) removed remaining inline `style={{...}}` usage in favor of token-driven Tailwind classes (PageHeader icon container + card padding), keeping premium theming consistent. (commit ef424ed)
 - 15:40 — Shipped batch: Captain Draft (`/captain/draft`) replaced bespoke inline-styled “card” empty states with the standard `EmptyStatePremium` (All players assigned / Need more players / Teams not set up), keeping premium navigation and visuals consistent. (commit dedc638)
 - 15:10 — Shipped batch: More (`/more`) removed hard-coded inline `linear-gradient(...)` backgrounds and toggle styling in favor of token-driven Tailwind arbitrary-value classes + `cn()`; dynamic badge/toggle track colors now use CSS vars (`--badge-bg`, `--toggle-bg`) with Tailwind `bg-[var(...)]`. (commit c2cdc0f)
 - 14:10 — Shipped batch: `ThemeToggle` implemented the `dropdown` variant and added a fallback render so unexpected variants can’t silently render nothing; also migrated button/segmented variants to token-driven Tailwind classes (`var(--surface-*)`, `var(--ink-*)`) for premium consistency. (commit ca23556)

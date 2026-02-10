@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 16:55 EST — Phase 1 — Captain carts + contacts: remove inline styles
+- Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): removed remaining inline `style={{...}}` usage for the `PageHeader` icon container + card padding, switching to token-driven Tailwind classes (`iconContainerClassName`, `p-[var(--space-5)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ef424ed`)
+
 ### 16:26 EST — Phase 1 — Weather banner: token-driven classes
 - WeatherBanner (captain delay banner): replaced inline `style` props with token-driven Tailwind classes using shared tone styles so status states inherit the premium theming.
 - Swapped bespoke action buttons + inputs to `cn()`-powered classnames with accessible focus/hover states (no DOM custom attributes leaking to the page).
