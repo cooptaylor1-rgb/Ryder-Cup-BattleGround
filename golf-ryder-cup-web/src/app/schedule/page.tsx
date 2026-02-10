@@ -7,7 +7,7 @@ import { useTripStore, useAuthStore } from '@/lib/stores';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { db } from '@/lib/db';
 import { tripLogger } from '@/lib/utils/logger';
-import { getCountdown, getCountdownColor, isToday } from '@/lib/utils';
+import { cn, getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import {
   CalendarDays,
   ChevronRight,
@@ -273,7 +273,7 @@ export default function SchedulePage() {
         <PageHeader
           title="Schedule"
           subtitle="Sign in required"
-          icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -305,7 +305,7 @@ export default function SchedulePage() {
         <PageHeader
           title="Schedule"
           subtitle="No active trip"
-          icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -339,12 +339,12 @@ export default function SchedulePage() {
       <PageHeader
         title="Schedule"
         subtitle={currentTrip.name}
-        icon={<CalendarDays size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
           currentUserPlayer ? (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface-card)] border border-[var(--rule)] shadow-sm">
-              <User size={14} style={{ color: 'var(--masters)' }} />
+              <User size={14} className="text-[var(--masters)]" />
               <span className="text-xs font-medium">{currentUserPlayer.firstName}</span>
             </div>
           ) : null
@@ -359,13 +359,12 @@ export default function SchedulePage() {
             role="tab"
             aria-selected={selectedTab === 'my'}
             aria-controls="schedule-content"
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'my' ? 'text-white' : ''
-            }`}
-            style={{
-              background: selectedTab === 'my' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'my' ? 'none' : '1px solid var(--rule)',
-            }}
+            className={cn(
+              'flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2',
+              selectedTab === 'my'
+                ? 'bg-[var(--masters)] text-white'
+                : 'bg-[var(--surface)] border border-[var(--rule)]'
+            )}
           >
             <User size={18} />
             Your Matches
@@ -375,13 +374,12 @@ export default function SchedulePage() {
             role="tab"
             aria-selected={selectedTab === 'all'}
             aria-controls="schedule-content"
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-              selectedTab === 'all' ? 'text-white' : ''
-            }`}
-            style={{
-              background: selectedTab === 'all' ? 'var(--masters)' : 'var(--surface)',
-              border: selectedTab === 'all' ? 'none' : '1px solid var(--rule)',
-            }}
+            className={cn(
+              'flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2',
+              selectedTab === 'all'
+                ? 'bg-[var(--masters)] text-white'
+                : 'bg-[var(--surface)] border border-[var(--rule)]'
+            )}
           >
             <Calendar size={18} />
             Full Schedule
@@ -400,21 +398,10 @@ export default function SchedulePage() {
 
         {/* No Profile Warning */}
         {!loadError && selectedTab === 'my' && !currentUserPlayer && (
-          <div
-            className="p-4 rounded-xl mb-6 flex items-start gap-3"
-            style={{
-              background: 'rgba(161, 98, 7, 0.1)',
-              border: '1px solid rgba(161, 98, 7, 0.3)',
-            }}
-          >
-            <AlertCircle
-              size={20}
-              style={{ color: 'var(--warning)', flexShrink: 0, marginTop: 2 }}
-            />
+          <div className="p-4 rounded-xl mb-6 flex items-start gap-3 bg-[color:rgba(161,98,7,0.1)] border border-[color:rgba(161,98,7,0.3)]">
+            <AlertCircle size={20} className="text-[var(--warning)] shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium" style={{ color: 'var(--warning)' }}>
-                Profile not linked
-              </p>
+              <p className="font-medium text-[var(--warning)]">Profile not linked</p>
               <p className="type-caption mt-1">
                 Create a profile or sign in to see your personal tee times.
               </p>
@@ -530,35 +517,40 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
   // Check if this is today's entry
   const entryIsToday = isToday(entry.date);
 
-  const statusColors = {
-    upcoming: 'var(--ink-tertiary)',
-    inProgress: 'var(--warning)',
-    completed: 'var(--success)',
-  };
+  const statusClasses = {
+    upcoming: {
+      text: 'text-[var(--ink-tertiary)]',
+      bg: 'bg-[color:var(--ink-tertiary)]/20',
+    },
+    inProgress: {
+      text: 'text-[var(--warning)]',
+      bg: 'bg-[color:var(--warning)]/20',
+    },
+    completed: {
+      text: 'text-[var(--success)]',
+      bg: 'bg-[color:var(--success)]/20',
+    },
+  } as const;
 
   return (
     <button
       onClick={onPress}
       disabled={!onPress}
-      className={`w-full text-left p-4 rounded-xl transition-all ${onPress ? 'press-scale' : ''}`}
-      style={{
-        background: isSession
-          ? 'var(--masters-subtle, rgba(0, 103, 68, 0.1))'
+      className={cn(
+        'w-full text-left p-4 rounded-xl transition-all border',
+        onPress && 'press-scale',
+        isSession
+          ? 'bg-[color:rgba(0,103,68,0.1)] border-[var(--masters-glow)]'
           : isUserMatch
-            ? 'rgba(212, 175, 55, 0.1)'
-            : 'var(--surface)',
-        border: isSession
-          ? '1px solid var(--masters-glow)'
-          : isUserMatch
-            ? '1px solid rgba(212, 175, 55, 0.3)'
-            : '1px solid var(--rule)',
-      }}
+            ? 'bg-[color:rgba(212,175,55,0.1)] border-[color:rgba(212,175,55,0.3)]'
+            : 'bg-[var(--surface)] border-[var(--rule)]'
+      )}
     >
       <div className="flex items-start gap-3">
         {/* Time Column */}
         <div className="w-16 shrink-0">
           {entry.time && (
-            <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+            <div className="text-sm font-semibold text-[var(--ink)]">
               {entry.time}
             </div>
           )}
@@ -578,9 +570,9 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
           {isSession && !countdown && (
             <div className="flex items-center gap-1 mt-1">
               {entry.time?.includes('AM') ? (
-                <Sunrise size={12} style={{ color: 'var(--masters)' }} />
+                <Sunrise size={12} className="text-[var(--masters)]" />
               ) : (
-                <Sunset size={12} style={{ color: 'var(--team-europe)' }} />
+                <Sunset size={12} className="text-[var(--team-europe)]" />
               )}
             </div>
           )}
@@ -589,28 +581,31 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            {isSession && <Flag size={14} style={{ color: 'var(--masters)' }} />}
-            {isUserMatch && <User size={14} style={{ color: '#D4AF37' }} />}
+            {isSession && <Flag size={14} className="text-[var(--masters)]" />}
+            {isUserMatch && <User size={14} className="text-[#D4AF37]" />}
             <span
-              className={`font-medium ${isSession ? '' : 'text-sm'}`}
-              style={{ color: isSession ? 'var(--masters)' : 'var(--ink)' }}
+              className={cn(
+                'font-medium',
+                !isSession && 'text-sm',
+                isSession ? 'text-[var(--masters)]' : 'text-[var(--ink)]'
+              )}
             >
               {entry.title}
             </span>
             {entry.status && (
               <span
-                className="text-[10px] px-2 py-0.5 rounded-full font-medium uppercase"
-                style={{
-                  background: `${statusColors[entry.status]}20`,
-                  color: statusColors[entry.status],
-                }}
+                className={cn(
+                  'text-[10px] px-2 py-0.5 rounded-full font-medium uppercase',
+                  statusClasses[entry.status].bg,
+                  statusClasses[entry.status].text
+                )}
               >
                 {entry.status === 'inProgress' ? 'Live' : entry.status}
               </span>
             )}
           </div>
           {entry.subtitle && (
-            <p className="text-sm mt-1 truncate" style={{ color: 'var(--ink-secondary)' }}>
+            <p className="text-sm mt-1 truncate text-[var(--ink-secondary)]">
               {entry.subtitle}
             </p>
           )}
@@ -618,7 +613,7 @@ function ScheduleEntryCard({ entry, onPress }: ScheduleEntryCardProps) {
 
         {/* Arrow for tappable items */}
         {onPress && (
-          <ChevronRight size={18} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
+          <ChevronRight size={18} className="text-[var(--ink-tertiary)] shrink-0" />
         )}
       </div>
     </button>
