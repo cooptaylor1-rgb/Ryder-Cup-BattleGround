@@ -231,53 +231,33 @@ export default function AchievementsPage() {
       <PageHeader
         title="Achievements"
         subtitle={`${unlockedCount} of ${totalCount} unlocked`}
-        icon={<Award size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Award size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
       <main className="container-editorial py-4">
         {/* Progress Overview */}
-        <div
-          className="card text-center"
-          style={{
-            background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
-            color: 'white',
-            padding: 'var(--space-6)',
-            marginBottom: 'var(--space-6)',
-          }}
-        >
-          <Award size={48} style={{ margin: '0 auto var(--space-3)', opacity: 0.9 }} />
-          <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>
+        <div className="card text-center text-white p-[var(--space-6)] mb-[var(--space-6)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)]">
+          <div className="flex justify-center mb-[var(--space-3)] opacity-90">
+            <Award size={48} className="text-white" />
+          </div>
+
+          <h2 className="score-large mb-[var(--space-1)]">
             {Math.round((unlockedCount / totalCount) * 100)}%
           </h2>
-          <p className="type-body" style={{ opacity: 0.8 }}>
-            Trip Progress
-          </p>
+          <p className="type-body opacity-80">Trip Progress</p>
 
           {/* Progress Bar */}
-          <div
-            style={{
-              marginTop: 'var(--space-4)',
-              height: '8px',
-              borderRadius: 'var(--radius-full)',
-              background: 'rgba(255,255,255,0.2)',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="mt-[var(--space-4)] h-2 rounded-full bg-white/20 overflow-hidden">
             <div
-              style={{
-                height: '100%',
-                borderRadius: 'var(--radius-full)',
-                background: 'white',
-                transition: 'width 0.5s ease',
-                width: `${(unlockedCount / totalCount) * 100}%`,
-              }}
+              className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
+              style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
             />
           </div>
         </div>
 
         {/* Category Filter */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+        <div className="flex gap-[var(--space-2)] mb-[var(--space-6)]">
           <CategoryButton
             label="All"
             count={totalCount}
@@ -299,7 +279,7 @@ export default function AchievementsPage() {
         </div>
 
         {/* Achievements Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
+        <div className="grid grid-cols-2 gap-[var(--space-3)]">
           {filteredAchievements.map((achievement) => (
             <AchievementCard key={achievement.id} achievement={achievement} />
           ))}
@@ -322,8 +302,7 @@ function CategoryButton({ label, count, active, onClick }: CategoryButtonProps) 
   return (
     <button
       onClick={onClick}
-      className={active ? 'btn btn-primary' : 'btn btn-secondary'}
-      style={{ flex: 1 }}
+      className={`${active ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
     >
       {label} ({count})
     </button>
@@ -339,42 +318,24 @@ function AchievementCard({ achievement }: AchievementCardProps) {
 
   return (
     <div
-      className="card"
+      className={`card relative border p-[var(--space-4)] ${achievement.unlocked ? '' : 'opacity-60'}`}
       style={{
-        position: 'relative',
-        padding: 'var(--space-4)',
-        opacity: achievement.unlocked ? 1 : 0.6,
         background: achievement.unlocked
           ? `linear-gradient(135deg, ${colors.bg}20 0%, ${colors.bg}10 100%)`
           : 'var(--canvas-raised)',
-        border: `1px solid ${achievement.unlocked ? colors.bg : 'var(--rule)'}`,
+        borderColor: achievement.unlocked ? colors.bg : 'var(--rule)',
       }}
     >
       <span
-        className="type-micro"
-        style={{
-          position: 'absolute',
-          top: 'var(--space-2)',
-          right: 'var(--space-2)',
-          padding: 'var(--space-1) var(--space-2)',
-          borderRadius: 'var(--radius-full)',
-          background: `${colors.bg}30`,
-          color: colors.text,
-          textTransform: 'capitalize',
-        }}
+        className="type-micro absolute top-[var(--space-2)] right-[var(--space-2)] px-[var(--space-2)] py-[var(--space-1)] rounded-full capitalize"
+        style={{ background: `${colors.bg}30`, color: colors.text }}
       >
         {achievement.rarity}
       </span>
 
       <div
+        className="h-12 w-12 rounded-[var(--radius-lg)] flex items-center justify-center mb-[var(--space-3)]"
         style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: 'var(--radius-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 'var(--space-3)',
           background: achievement.unlocked ? colors.bg : 'var(--rule)',
           color: achievement.unlocked ? 'white' : 'var(--ink-tertiary)',
         }}
@@ -382,56 +343,28 @@ function AchievementCard({ achievement }: AchievementCardProps) {
         {achievement.unlocked ? achievement.icon : <Lock size={24} />}
       </div>
 
-      <h3 className="type-body-sm" style={{ fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+      <h3 className="type-body-sm font-semibold mb-[var(--space-1)]">
         {achievement.name}
       </h3>
       <p className="type-caption">{achievement.description}</p>
 
       {achievement.unlocked ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-1)',
-            marginTop: 'var(--space-3)',
-            color: 'var(--success)',
-          }}
-        >
+        <div className="flex items-center gap-[var(--space-1)] mt-[var(--space-3)] text-[var(--success)]">
           <Check size={14} />
-          <span className="type-micro" style={{ fontWeight: 500 }}>
-            Unlocked
-          </span>
+          <span className="type-micro font-medium">Unlocked</span>
         </div>
       ) : achievement.progress !== undefined && achievement.maxProgress ? (
-        <div style={{ marginTop: 'var(--space-3)' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 'var(--space-1)',
-            }}
-          >
-            <span className="type-micro" style={{ opacity: 0.7 }}>
-              Progress
-            </span>
-            <span className="type-micro" style={{ fontWeight: 500 }}>
+        <div className="mt-[var(--space-3)]">
+          <div className="flex items-center justify-between mb-[var(--space-1)]">
+            <span className="type-micro opacity-70">Progress</span>
+            <span className="type-micro font-medium">
               {achievement.progress}/{achievement.maxProgress}
             </span>
           </div>
-          <div
-            style={{
-              height: '6px',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--rule)',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="h-1.5 rounded-full bg-[var(--rule)] overflow-hidden">
             <div
+              className="h-full rounded-full transition-[width] duration-300 ease-out"
               style={{
-                height: '100%',
-                borderRadius: 'var(--radius-full)',
-                transition: 'width 0.3s ease',
                 width: `${(achievement.progress / achievement.maxProgress) * 100}%`,
                 background: colors.bg,
               }}
