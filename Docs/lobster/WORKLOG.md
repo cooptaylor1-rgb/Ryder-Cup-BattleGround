@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 08:45 EST — Phase 1 — Schedule: token-driven Tailwind styles
+- Schedule (`/schedule`): removed remaining inline token styles (PageHeader icon, user badge icon, tab selector buttons, and “Profile not linked” warning card) in favor of token-driven Tailwind classes + `cn()`.
+- `ScheduleEntryCard`: migrated session/user-match card backgrounds + borders and status pill styling to token-driven Tailwind classes; kept only the truly-dynamic countdown badge colors inline.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`840a8e9`)
+
 ### 08:10 EST — Phase 1 — Captain Settings + Messages: token-driven Tailwind styles
 - Captain Settings (`/captain/settings`): removed remaining inline token/layout styles in the header save action, section headers, labels, team-name fields, and Captain Tools rows (use token-driven Tailwind classes like `text-[var(--team-usa)]`, `mb-[var(--space-4)]`, `rotate-180`).
 - Captain Messages (`/captain/messages`): removed inline layout styles in the PageHeader action and the composer/empty cards; moved icon colors to Tailwind (`text-white`, `text-[var(--ink-tertiary)]`).
