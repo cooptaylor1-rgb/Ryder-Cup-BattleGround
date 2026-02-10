@@ -88,7 +88,7 @@ export default function BetsPage() {
         <PageHeader
           title="Bets"
           subtitle="No active trip"
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -258,18 +258,12 @@ export default function BetsPage() {
       <PageHeader
         title="Side Bets"
         subtitle={`${activeBets.length} active`}
-        icon={<DollarSign size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<DollarSign size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
           <button
             onClick={openCreateModal}
-            className="btn-premium p-2 rounded-lg"
-            style={{
-              color: 'var(--color-accent)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="press-scale p-2 rounded-lg text-[var(--color-accent)] bg-transparent border-0 cursor-pointer"
             aria-label="Create bet"
           >
             <Plus size={22} />
@@ -277,42 +271,32 @@ export default function BetsPage() {
         }
       />
 
-      <main className="container-editorial" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
+      <main className="container-editorial py-[var(--space-4)]">
         {/* Pot Summary */}
-        <div
-          className="card text-center"
-          style={{
-            background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
-            color: 'white',
-            padding: 'var(--space-6)',
-            marginBottom: 'var(--space-6)',
-          }}
-        >
-          <DollarSign size={32} style={{ margin: '0 auto var(--space-2)', opacity: 0.9 }} />
-          <h2 className="score-large" style={{ marginBottom: 'var(--space-1)' }}>${totalPot}</h2>
-          <p className="type-body" style={{ opacity: 0.8 }}>Total in Play</p>
+        <div className="card text-center bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)] text-white p-[var(--space-6)] mb-[var(--space-6)]">
+          <DollarSign size={32} className="mx-auto mb-[var(--space-2)] opacity-90" />
+          <h2 className="score-large mb-[var(--space-1)]">${totalPot}</h2>
+          <p className="type-body opacity-80">Total in Play</p>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+        <div className="flex gap-[var(--space-2)] mb-[var(--space-6)]">
           <button
             onClick={() => setSelectedTab('active')}
-            className={selectedTab === 'active' ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ flex: 1 }}
+            className={`${selectedTab === 'active' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
           >
             Active ({activeBets.length})
           </button>
           <button
             onClick={() => setSelectedTab('completed')}
-            className={selectedTab === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ flex: 1 }}
+            className={`${selectedTab === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
           >
             Completed ({completedBets.length})
           </button>
         </div>
 
         {/* Bets List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        <div className="flex flex-col gap-[var(--space-3)]">
           {(selectedTab === 'active' ? activeBets : completedBets).map((bet) => (
             <BetCard
               key={bet.id}
@@ -331,9 +315,9 @@ export default function BetsPage() {
         {/* Quick Add Section */}
         {selectedTab === 'active' && (
           <>
-            <hr className="divider-lg" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-6)' }} />
-            <h3 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Quick Add</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)' }}>
+            <hr className="divider-lg my-[var(--space-6)]" />
+            <h3 className="type-overline mb-[var(--space-4)]">Quick Add</h3>
+            <div className="grid grid-cols-2 gap-[var(--space-3)]">
               <QuickAddButton
                 icon={<Zap size={20} />}
                 label="Skins Game"
@@ -372,10 +356,7 @@ export default function BetsPage() {
             className="absolute inset-0 bg-black/50"
             onClick={() => setShowCreateModal(false)}
           />
-          <div
-            className="relative w-full max-w-lg bg-background rounded-t-3xl p-6"
-            style={{ maxHeight: '90vh', overflowY: 'auto' }}
-          >
+          <div className="relative w-full max-w-lg bg-background rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="type-title">Create Side Bet</h2>
