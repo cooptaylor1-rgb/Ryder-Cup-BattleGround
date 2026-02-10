@@ -16,7 +16,7 @@ import {
   type FairnessScore,
 } from '@/components/captain';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { EmptyStatePremium } from '@/components/ui';
+import { EmptyStatePremium, InlineLoadingSkeleton } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import {
   Users,
@@ -404,8 +404,11 @@ export default function SessionPage() {
             </h2>
 
             {isLoading ? (
-              <div className="text-center py-8">
-                <p className="type-meta">Loading matches...</p>
+              <div className="card" style={{ padding: 'var(--space-6)' }}>
+                <p className="type-meta" style={{ marginBottom: 'var(--space-4)' }}>
+                  Loading matches…
+                </p>
+                <InlineLoadingSkeleton lines={4} />
               </div>
             ) : matches.length === 0 ? (
               <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
