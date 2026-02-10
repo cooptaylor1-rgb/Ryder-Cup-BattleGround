@@ -164,31 +164,13 @@ export default function RootLayout({
               >
                 <Suspense
                   fallback={
-                    <div
-                      style={{
-                        minHeight: '100vh',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--canvas, #f8fafc)',
-                      }}
-                    >
-                      <div style={{ textAlign: 'center' }}>
+                    <div className="min-h-screen flex items-center justify-center bg-[var(--canvas,#f8fafc)]">
+                      <div className="text-center">
                         <div
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            margin: '0 auto 16px',
-                            border: '3px solid var(--rule, #e2e8f0)',
-                            borderTopColor: 'var(--masters, #1a472a)',
-                            borderRadius: '50%',
-                            animation: 'spin 1s linear infinite',
-                          }}
+                          className="w-12 h-12 mx-auto mb-4 border-[3px] border-[var(--rule,#e2e8f0)] border-t-[var(--masters,#1a472a)] rounded-full animate-spin"
+                          aria-hidden
                         />
-                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                        <p style={{ color: 'var(--ink-secondary, #64748b)', fontSize: '14px' }}>
-                          Loading...
-                        </p>
+                        <p className="text-sm text-[var(--ink-secondary,#64748b)]">Loading...</p>
                       </div>
                     </div>
                   }
