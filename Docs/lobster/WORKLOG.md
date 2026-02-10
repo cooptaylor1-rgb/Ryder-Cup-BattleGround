@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 15:40 EST — Phase 1 — Captain Draft: standardize empty states
 - Captain Draft (`/captain/draft`): replaced bespoke inline-styled “card” empty states (all assigned / need more players / teams not set up) with the shared `EmptyStatePremium` for consistent premium navigation + visuals.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`dedc638`)
 
 ### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
 - Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
