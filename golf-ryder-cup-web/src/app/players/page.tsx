@@ -258,7 +258,7 @@ export default function PlayersPage() {
         <PageHeader
           title="Players"
           subtitle="No active trip"
-          icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<Users size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -287,29 +287,14 @@ export default function PlayersPage() {
       <PageHeader
         title="Players"
         subtitle={`${players.length} player${players.length === 1 ? '' : 's'}`}
-        icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Users size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
           isCaptainMode ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowBulkAdd(true)}
-                className="btn-secondary press-scale"
-                style={{
-                  padding: 'var(--space-2) var(--space-3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  background:
-                    'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0, 103, 71, 0.3)',
-                }}
+                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-white shadow-[0_2px_8px_rgba(0,103,71,0.3)]"
                 title="Add multiple players at once"
               >
                 <UsersRound size={16} />
@@ -317,19 +302,7 @@ export default function PlayersPage() {
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="press-scale"
-                style={{
-                  padding: 'var(--space-2) var(--space-3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  background: 'var(--surface-card)',
-                  border: '1px solid var(--rule)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}
+                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface-card)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-medium"
               >
                 <UserPlus size={16} />
                 Add One
@@ -342,10 +315,7 @@ export default function PlayersPage() {
       <main className="container-editorial pb-[var(--space-8)]">
         {/* Team A */}
         <section className="section">
-          <h2
-            className="type-overline"
-            style={{ color: 'var(--team-usa)', marginBottom: 'var(--space-3)' }}
-          >
+          <h2 className="type-overline mb-[var(--space-3)] text-[var(--team-usa)]">
             {teamA?.name || 'USA'} ({teamAPlayers.length})
           </h2>
           {teamAPlayers.length > 0 ? (
@@ -370,10 +340,7 @@ export default function PlayersPage() {
 
         {/* Team B */}
         <section className="section">
-          <h2
-            className="type-overline"
-            style={{ color: 'var(--team-europe)', marginBottom: 'var(--space-3)' }}
-          >
+          <h2 className="type-overline mb-[var(--space-3)] text-[var(--team-europe)]">
             {teamB?.name || 'Europe'} ({teamBPlayers.length})
           </h2>
           {teamBPlayers.length > 0 ? (
@@ -399,7 +366,7 @@ export default function PlayersPage() {
           <>
             <hr className="divider" />
             <section className="section">
-              <h2 className="type-overline" style={{ marginBottom: 'var(--space-3)' }}>
+              <h2 className="type-overline mb-[var(--space-3)]">
                 Unassigned ({unassignedPlayers.length})
               </h2>
               <div>
@@ -429,35 +396,21 @@ export default function PlayersPage() {
       {showAddModal && (
         <div className="modal-backdrop" onClick={resetForm}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-4)',
-              }}
-            >
+            <div className="flex items-center justify-between mb-[var(--space-4)]">
               <h2 className="type-headline">{editingPlayer ? 'Edit Player' : 'Add Player'}</h2>
               <button
                 onClick={resetForm}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                className="cursor-pointer border-0 bg-transparent p-0"
                 aria-label="Close"
               >
-                <X size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                <X size={20} className="text-[var(--ink-tertiary)]" />
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <div
-                style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}
-              >
+            <div className="flex flex-col gap-[var(--space-4)]">
+              <div className="grid grid-cols-2 gap-[var(--space-3)]">
                 <div>
-                  <label
-                    className="type-meta"
-                    style={{ display: 'block', marginBottom: 'var(--space-1)' }}
-                  >
-                    First Name *
-                  </label>
+                  <label className="type-meta block mb-[var(--space-1)]">First Name *</label>
                   <input
                     type="text"
                     className="input"
@@ -469,12 +422,7 @@ export default function PlayersPage() {
                   />
                 </div>
                 <div>
-                  <label
-                    className="type-meta"
-                    style={{ display: 'block', marginBottom: 'var(--space-1)' }}
-                  >
-                    Last Name *
-                  </label>
+                  <label className="type-meta block mb-[var(--space-1)]">Last Name *</label>
                   <input
                     type="text"
                     className="input"
@@ -486,12 +434,7 @@ export default function PlayersPage() {
               </div>
 
               <div>
-                <label
-                  className="type-meta"
-                  style={{ display: 'block', marginBottom: 'var(--space-1)' }}
-                >
-                  Handicap Index
-                </label>
+                <label className="type-meta block mb-[var(--space-1)]">Handicap Index</label>
                 <input
                   type="number"
                   min="-10"
@@ -507,12 +450,7 @@ export default function PlayersPage() {
               </div>
 
               <div>
-                <label
-                  className="type-meta"
-                  style={{ display: 'block', marginBottom: 'var(--space-1)' }}
-                >
-                  Team
-                </label>
+                <label className="type-meta block mb-[var(--space-1)]">Team</label>
                 <select
                   value={formData.teamId}
                   onChange={(e) => setFormData((prev) => ({ ...prev, teamId: e.target.value }))}
@@ -525,19 +463,17 @@ export default function PlayersPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-6)' }}>
+            <div className="mt-[var(--space-6)] flex gap-[var(--space-3)]">
               <button
                 onClick={resetForm}
-                className="btn btn-secondary"
-                style={{ flex: 1 }}
+                className="btn btn-secondary flex-1"
                 disabled={isSaving}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="btn btn-primary"
-                style={{ flex: 1 }}
+                className="btn btn-primary flex-1"
                 disabled={isSaving}
               >
                 {isSaving ? 'Saving...' : editingPlayer ? 'Save' : 'Add'}
@@ -551,26 +487,22 @@ export default function PlayersPage() {
       {playerToDelete && (
         <div className="modal-backdrop" onClick={() => setPlayerToDelete(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="type-headline" style={{ marginBottom: 'var(--space-3)' }}>
-              Delete Player?
-            </h2>
-            <p className="type-body" style={{ marginBottom: 'var(--space-4)' }}>
+            <h2 className="type-headline mb-[var(--space-3)]">Delete Player?</h2>
+            <p className="type-body mb-[var(--space-4)]">
               Are you sure you want to delete {playerToDelete.firstName} {playerToDelete.lastName}?
               This will also remove them from any matches.
             </p>
-            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <div className="flex gap-[var(--space-3)]">
               <button
                 onClick={() => setPlayerToDelete(null)}
-                className="btn btn-secondary"
-                style={{ flex: 1 }}
+                className="btn btn-secondary flex-1"
                 disabled={isDeleting}
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="btn btn-danger"
-                style={{ flex: 1 }}
+                className="btn btn-danger flex-1"
                 disabled={isDeleting}
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
@@ -584,116 +516,66 @@ export default function PlayersPage() {
       {showBulkAdd && (
         <div className="modal-backdrop" onClick={() => setShowBulkAdd(false)}>
           <div
-            className="modal"
+            className="modal flex max-h-[85vh] w-[95vw] max-w-[600px] flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              maxWidth: '600px',
-              width: '95vw',
-              maxHeight: '85vh',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 'var(--space-4)',
-                flexShrink: 0,
-              }}
-            >
+            <div className="mb-[var(--space-4)] flex shrink-0 items-center justify-between">
               <div>
                 <h2 className="type-headline">Add Multiple Players</h2>
-                <p className="type-meta" style={{ marginTop: 'var(--space-1)' }}>
-                  Fill in names to add players quickly
-                </p>
+                <p className="type-meta mt-[var(--space-1)]">Fill in names to add players quickly</p>
               </div>
               <button
                 onClick={() => setShowBulkAdd(false)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 'var(--space-2)',
-                }}
+                className="cursor-pointer border-0 bg-transparent p-[var(--space-2)]"
               >
-                <X size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                <X size={20} className="text-[var(--ink-tertiary)]" />
               </button>
             </div>
 
             {/* Column headers */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 80px 100px 32px',
-                gap: 'var(--space-2)',
-                marginBottom: 'var(--space-2)',
-                paddingRight: '8px',
-                flexShrink: 0,
-              }}
-            >
-              <span className="type-meta" style={{ fontWeight: 600 }}>
-                First Name *
-              </span>
-              <span className="type-meta" style={{ fontWeight: 600 }}>
-                Last Name *
-              </span>
-              <span className="type-meta" style={{ fontWeight: 600 }}>
-                HCP
-              </span>
-              <span className="type-meta" style={{ fontWeight: 600 }}>
-                Team
-              </span>
-              <span></span>
+            <div className="mb-[var(--space-2)] grid shrink-0 gap-[var(--space-2)] pr-2 [grid-template-columns:1fr_1fr_80px_100px_32px]">
+              <span className="type-meta font-semibold">First Name *</span>
+              <span className="type-meta font-semibold">Last Name *</span>
+              <span className="type-meta font-semibold">HCP</span>
+              <span className="type-meta font-semibold">Team</span>
+              <span />
             </div>
 
             {/* Scrollable rows container */}
-            <div style={{ flex: 1, overflowY: 'auto', marginBottom: 'var(--space-4)' }}>
+            <div className="mb-[var(--space-4)] flex-1 overflow-y-auto">
               {bulkRows.map((row, _index) => (
                 <div
                   key={row.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 80px 100px 32px',
-                    gap: 'var(--space-2)',
-                    marginBottom: 'var(--space-2)',
-                    alignItems: 'center',
-                  }}
+                  className="mb-[var(--space-2)] grid items-center gap-[var(--space-2)] [grid-template-columns:1fr_1fr_80px_100px_32px]"
                 >
                   <input
                     type="text"
-                    className="input"
+                    className="input px-[var(--space-2)] text-[14px]"
                     value={row.firstName}
                     onChange={(e) => updateBulkRow(row.id, 'firstName', e.target.value)}
                     placeholder="John"
-                    style={{ padding: 'var(--space-2)', fontSize: '14px' }}
                   />
                   <input
                     type="text"
-                    className="input"
+                    className="input px-[var(--space-2)] text-[14px]"
                     value={row.lastName}
                     onChange={(e) => updateBulkRow(row.id, 'lastName', e.target.value)}
                     placeholder="Smith"
-                    style={{ padding: 'var(--space-2)', fontSize: '14px' }}
                   />
                   <input
                     type="number"
                     min="-10"
                     max="54"
                     step="0.1"
-                    className="input"
+                    className="input px-[var(--space-2)] text-[14px]"
                     value={row.handicapIndex}
                     onChange={(e) => updateBulkRow(row.id, 'handicapIndex', e.target.value)}
                     placeholder="12"
-                    style={{ padding: 'var(--space-2)', fontSize: '14px' }}
                   />
                   <select
                     value={row.teamId}
                     onChange={(e) => updateBulkRow(row.id, 'teamId', e.target.value)}
-                    className="input"
-                    style={{ padding: 'var(--space-2)', fontSize: '14px' }}
+                    className="input px-[var(--space-2)] text-[14px]"
                   >
                     <option value="">—</option>
                     {teamA && <option value={teamA.id}>{teamA.name?.slice(0, 6) || 'USA'}</option>}
@@ -702,13 +584,9 @@ export default function PlayersPage() {
                   <button
                     onClick={() => removeBulkRow(row.id)}
                     disabled={bulkRows.length <= 1}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: bulkRows.length <= 1 ? 'not-allowed' : 'pointer',
-                      padding: 'var(--space-1)',
-                      opacity: bulkRows.length <= 1 ? 0.3 : 0.6,
-                    }}
+                    className={`border-0 bg-transparent p-[var(--space-1)] ${
+                      bulkRows.length <= 1 ? 'cursor-not-allowed opacity-30' : 'cursor-pointer opacity-60'
+                    }`}
                     title="Remove row"
                   >
                     <X size={16} />
@@ -720,51 +598,32 @@ export default function PlayersPage() {
             {/* Add row button */}
             <button
               onClick={addBulkRow}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-2)',
-                padding: 'var(--space-2)',
-                border: '1px dashed var(--border)',
-                borderRadius: 'var(--radius-md)',
-                background: 'transparent',
-                cursor: 'pointer',
-                marginBottom: 'var(--space-4)',
-                width: '100%',
-                flexShrink: 0,
-              }}
+              className="mb-[var(--space-4)] flex w-full shrink-0 cursor-pointer items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-dashed border-[var(--border)] bg-transparent p-[var(--space-2)]"
             >
-              <Plus size={16} style={{ color: 'var(--ink-tertiary)' }} />
+              <Plus size={16} className="text-[var(--ink-tertiary)]" />
               <span className="type-meta">Add another row</span>
             </button>
 
             {/* Footer */}
-            <div style={{ display: 'flex', gap: 'var(--space-3)', flexShrink: 0 }}>
+            <div className="flex shrink-0 gap-[var(--space-3)]">
               <button
                 onClick={() => setShowBulkAdd(false)}
-                className="btn btn-secondary"
-                style={{ flex: 1 }}
+                className="btn btn-secondary flex-1"
               >
                 Cancel
               </button>
               <button
                 onClick={handleBulkSave}
-                className="btn btn-primary"
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 'var(--space-2)',
-                }}
+                className="btn btn-primary flex-1"
                 disabled={validBulkCount === 0}
               >
-                <Check size={16} />
-                Add{' '}
-                {validBulkCount > 0
-                  ? `${validBulkCount} Player${validBulkCount > 1 ? 's' : ''}`
-                  : 'Players'}
+                <span className="inline-flex items-center justify-center gap-[var(--space-2)]">
+                  <Check size={16} />
+                  Add{' '}
+                  {validBulkCount > 0
+                    ? `${validBulkCount} Player${validBulkCount > 1 ? 's' : ''}`
+                    : 'Players'}
+                </span>
               </button>
             </div>
           </div>
@@ -802,26 +661,17 @@ function PlayerRow({
     <div className="match-row">
       {/* Avatar */}
       <div
-        style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: 'var(--radius-full)',
-          background: bgColor,
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '13px',
-          fontWeight: 600,
-          opacity: teamColor ? 1 : 0.5,
-        }}
+        className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold text-white ${
+          teamColor ? 'opacity-100' : 'opacity-50'
+        }`}
+        style={{ background: bgColor }}
       >
         {initials}
       </div>
 
       {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontWeight: 500 }}>{formatPlayerName(player.firstName, player.lastName)}</p>
+      <div className="min-w-0 flex-1">
+        <p className="font-medium">{formatPlayerName(player.firstName, player.lastName)}</p>
         {player.handicapIndex !== undefined && (
           <p className="type-meta">HCP: {player.handicapIndex.toFixed(1)}</p>
         )}
@@ -829,29 +679,17 @@ function PlayerRow({
 
       {/* Actions */}
       {canEdit && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+        <div className="flex items-center gap-[var(--space-1)]">
           <button
             onClick={onEdit}
-            style={{
-              padding: 'var(--space-2)',
-              color: 'var(--ink-secondary)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="cursor-pointer border-0 bg-transparent p-[var(--space-2)] text-[var(--ink-secondary)]"
             aria-label="Edit player"
           >
             <Edit2 size={16} />
           </button>
           <button
             onClick={onDelete}
-            style={{
-              padding: 'var(--space-2)',
-              color: 'var(--error)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="cursor-pointer border-0 bg-transparent p-[var(--space-2)] text-[var(--error)]"
             aria-label="Delete player"
           >
             <Trash2 size={16} />
