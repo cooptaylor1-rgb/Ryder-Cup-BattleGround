@@ -11,6 +11,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`1172afb`)
 
+### 11:15 EST — Phase 1 — Path to Victory: remove inline styles
+- `PathToVictoryCard`: replaced most inline `style={{...}}` usage (gradients, borders, icon colors) with Tailwind/arbitrary-value classes.
+- Quick summary rows now use a CSS variable + `color-mix()` for translucent team-colored backgrounds, avoiding runtime Tailwind class generation while keeping the UI token-driven.
+- Kept only the truly-dynamic progress bar `width` inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push (pending) (`f49c30f`)
+
 ### 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven Tailwind styles
 - Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
 - Profile loading skeleton (`/profile` loading state): replaced inline flex + card token styles with Tailwind token classes (`bg-[var(--canvas-raised)]`, `border-[var(--rule)]`, `p-[var(--space-5)]`).

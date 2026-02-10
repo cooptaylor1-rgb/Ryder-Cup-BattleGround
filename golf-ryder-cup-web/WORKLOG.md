@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 11:15 — Shipped batch: `PathToVictoryCard` removed most inline `style={{...}}` usage (gradients, borders, icon colors) in favor of Tailwind/arbitrary-value classes, keeping only dynamic progress `width` inline styles and using CSS variables + `color-mix()` for team-colored row backgrounds. (commit f49c30f)
 - 10:05 — Shipped batch: app root layout `Suspense` fallback (`src/app/layout.tsx`) replaced inline style props + bespoke `@keyframes spin` with Tailwind/token-driven classes (`bg-[var(--canvas)]`, `border-[var(--rule)]`, `border-t-[var(--masters)]`, `animate-spin`) for consistent premium theming. (commit f64ff02)
 - 07:35 — Shipped batch: Offline Queue panel + Header migrated remaining inline token `style={{...}}` usage (surface/border/text) to token-driven Tailwind classes; replaced inline rgba badge/action backgrounds with Tailwind opacity utilities (e.g. `bg-red-500/10`). (commit 0653314)
 - 06:58 — Shipped batch: Trip Awards (`/trip-stats/awards`) + Captain Invitations (`/captain/invites`) removed remaining inline token style props (PageHeader icon colors, section padding, Share Invite button + card padding) in favor of token-driven Tailwind classes. (commit e85490e)
