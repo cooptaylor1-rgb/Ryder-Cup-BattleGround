@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 11:00 EST — Phase 1 — Match scoring: token-driven team colors (no inline style)
+- Match scoring (`/score/[matchId]`): removed remaining inline `style={{...}}` usages for team colors and winner styling (header hero, score display, quick-score buttons, match-complete summary), switching to token-driven Tailwind arbitrary-value classes.
+- Team color constants (`TEAM_COLORS`): now use CSS tokens (`var(--team-usa)`, `var(--team-europe)`) so styling stays consistent with the design system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1172afb`)
+
 ### 10:30 EST — Phase 1 — Backup & Restore + Profile skeleton: token-driven Tailwind styles
 - Settings → Backup & Restore (`/settings/backup`): removed remaining inline `style={{...}}` usage across the page (cards, banners, file picker, TripCard) in favor of token-driven Tailwind classes and `cn()`.
 - Profile loading skeleton (`/profile` loading state): replaced inline flex + card token styles with Tailwind token classes (`bg-[var(--canvas-raised)]`, `border-[var(--rule)]`, `p-[var(--space-5)]`).
