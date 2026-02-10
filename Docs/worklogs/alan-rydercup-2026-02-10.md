@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 01:25 EST — Phase 1 (batch 161)
+- Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`) and replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
+- Small consistency/polish pass; no behavior change.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ⏳
+
 ## 00:40 EST — Phase 1 (batch 160)
 - Login (`/login`): replaced the “New here?” divider’s inline token styles with token-driven Tailwind classes (`bg-[var(--rule)]`, `text-[var(--ink-tertiary)]`).
 - Create Profile (`/profile/create`): replaced the header bottom rule’s inline token styles with `h-px bg-[var(--rule)]`.

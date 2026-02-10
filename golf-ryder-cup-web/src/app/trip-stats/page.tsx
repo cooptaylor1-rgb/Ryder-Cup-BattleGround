@@ -407,7 +407,7 @@ export default function TripStatsPage() {
         <PageHeader
           title="Trip Stats"
           subtitle="Fun tracking beyond scores"
-          icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.back()}
         />
 
@@ -443,7 +443,7 @@ export default function TripStatsPage() {
       <PageHeader
         title="Trip Stats"
         subtitle={currentTrip.name}
-        icon={<Trophy size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />
 
@@ -515,8 +515,8 @@ export default function TripStatsPage() {
             href="/trip-stats/awards"
             className="card rounded-xl p-4 flex items-center gap-4 hover:bg-[var(--surface)] transition-colors"
           >
-            <div className="w-12 h-12 rounded-full bg-masters/10 flex items-center justify-center">
-              <Trophy size={24} className="text-masters" />
+            <div className="w-12 h-12 rounded-full bg-[color-mix(in_srgb,var(--masters)_10%,transparent)] flex items-center justify-center">
+              <Trophy size={24} className="text-[var(--masters)]" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-[var(--ink)]">Trip Awards</h3>

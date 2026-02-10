@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 01:25 EST — Phase 1 — Trip Stats: token-driven icon styles
+- Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`).
+- Trip Stats: replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ⏳
+
 ### 01:35 EST — Phase 1 — Players page: token-driven styles
 - Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
 - Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
