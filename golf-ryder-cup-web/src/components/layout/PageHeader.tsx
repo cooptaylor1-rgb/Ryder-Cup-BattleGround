@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function PageHeader({
   title,
@@ -24,53 +25,32 @@ export function PageHeader({
     <header className="header-premium">
       <div className="container-editorial flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          {onBack && (
+          {onBack ? (
             <button
               onClick={onBack}
-              className="p-2 -ml-2 press-scale"
-              style={{
-                color: 'var(--ink-secondary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                borderRadius: 'var(--radius-md)',
-              }}
+              className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-0 cursor-pointer rounded-[var(--radius-md)]"
               aria-label="Back"
             >
               <ChevronLeft size={22} strokeWidth={1.75} />
             </button>
-          )}
+          ) : null}
 
           <div className="flex items-center gap-3 min-w-0">
-            {icon && (
+            {icon ? (
               <div
-                className={iconContainerClassName}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--shadow-glow-green)',
-                  flexShrink: 0,
-                  ...iconContainerStyle,
-                }}
+                className={cn(
+                  'w-8 h-8 rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shadow-[var(--shadow-glow-green)] shrink-0',
+                  iconContainerClassName
+                )}
+                style={iconContainerStyle}
               >
                 {icon}
               </div>
-            )}
+            ) : null}
 
             <div className="min-w-0">
-              <span className="type-overline" style={{ letterSpacing: '0.1em' }}>
-                {title}
-              </span>
-              {subtitle && (
-                <p className="type-caption truncate" style={{ marginTop: '2px' }}>
-                  {subtitle}
-                </p>
-              )}
+              <span className="type-overline tracking-[0.1em]">{title}</span>
+              {subtitle ? <p className="type-caption truncate mt-[2px]">{subtitle}</p> : null}
             </div>
           </div>
         </div>

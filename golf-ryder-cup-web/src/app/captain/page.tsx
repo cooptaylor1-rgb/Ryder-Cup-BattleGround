@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { cn } from '@/lib/utils';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { BottomNav, PageHeader } from '@/components/layout';
 import {
@@ -211,18 +212,17 @@ export default function CaptainPage() {
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader title="Captain Command" subtitle="Enable captain mode to continue" />
         <main className="container-editorial py-12">
-          <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)' }}>
+          <div className="card p-[var(--space-6)] text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]">
               <Shield size={32} className="text-white" />
             </div>
-            <h2 className="type-title" style={{ marginBottom: 'var(--space-2)' }}>Captain Mode</h2>
-            <p className="type-body-sm" style={{ color: 'var(--ink-secondary)', marginBottom: 'var(--space-6)' }}>
+            <h2 className="type-title mb-[var(--space-2)]">Captain Mode</h2>
+            <p className="type-body-sm text-[var(--ink-secondary)] mb-[var(--space-6)]">
               Enter your captain PIN to manage lineups, scores, and settings.
             </p>
 
             {/* Inline PIN entry */}
-            <div style={{ maxWidth: '200px', margin: '0 auto' }}>
+            <div className="max-w-[200px] mx-auto">
               <input
                 type="password"
                 inputMode="numeric"
@@ -230,16 +230,14 @@ export default function CaptainPage() {
                 value={captainPin}
                 onChange={(e) => setCaptainPin(e.target.value.replace(/\D/g, ''))}
                 placeholder="4-digit PIN"
-                className="input text-center text-2xl tracking-[0.5em]"
-                style={{ letterSpacing: '0.5em', fontFamily: 'var(--font-sans)' }}
+                className="input text-center text-2xl tracking-[0.5em] font-sans"
               />
             </div>
 
             <button
               onClick={handleEnableCaptain}
               disabled={captainPin.length < 4}
-              className="btn-premium press-scale w-full mt-6"
-              style={{ maxWidth: '200px', margin: '0 auto', marginTop: 'var(--space-4)' }}
+              className="btn-premium press-scale w-full mt-6 max-w-[200px] mx-auto"
             >
               <Shield size={16} /> Enable Captain Mode
             </button>
@@ -293,10 +291,7 @@ export default function CaptainPage() {
         title="Captain Command"
         subtitle={currentTrip.name}
         icon={<Shield size={16} className="text-white" />}
-        iconContainerStyle={{
-          background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)',
-          boxShadow: '0 0 0 3px rgba(114, 47, 55, 0.12)',
-        }}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
         onBack={() => router.back()}
         rightSlot={
           <Link
@@ -312,13 +307,12 @@ export default function CaptainPage() {
         {/* Trip Readiness */}
         <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
           <div
-            className="card-captain"
-            style={{
-              background:
-                readinessPercent === 100
-                  ? 'linear-gradient(135deg, rgba(0, 103, 71, 0.06) 0%, rgba(0, 103, 71, 0.02) 100%)'
-                  : 'var(--canvas-raised)',
-            }}
+            className={cn(
+              'card-captain',
+              readinessPercent === 100
+                ? 'bg-[linear-gradient(135deg,rgba(0,103,71,0.06)_0%,rgba(0,103,71,0.02)_100%)]'
+                : 'bg-[var(--canvas-raised)]'
+            )}
           >
             <div className="flex items-center justify-between mb-[var(--space-4)]">
               <div className="flex items-center gap-[var(--space-3)]">
@@ -349,11 +343,11 @@ export default function CaptainPage() {
             {/* Progress bar */}
             <div className="w-full h-[6px] rounded-[3px] overflow-hidden bg-[var(--rule)]">
               <div
-                className="h-full rounded-[3px] transition-[width] duration-500 ease-in-out"
-                style={{
-                  width: `${readinessPercent}%`,
-                  background: readinessPercent === 100 ? 'var(--masters)' : 'var(--maroon)',
-                }}
+                className={cn(
+                  'h-full rounded-[3px] transition-[width] duration-500 ease-in-out',
+                  readinessPercent === 100 ? 'bg-[var(--masters)]' : 'bg-[var(--maroon)]'
+                )}
+                style={{ width: `${readinessPercent}%` }}
               />
             </div>
 
@@ -390,12 +384,10 @@ export default function CaptainPage() {
               <Link
                 key={action.id}
                 href={action.href}
-                className="flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150"
-                style={
-                  index < priorityActions.length - 1
-                    ? { borderBottom: '1px solid var(--rule-faint)' }
-                    : undefined
-                }
+                className={cn(
+                  'flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150',
+                  index < priorityActions.length - 1 && 'border-b border-[var(--rule-faint)]'
+                )}
               >
                 <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon)] flex items-center justify-center shrink-0">
                   <action.icon size={18} strokeWidth={1.75} />
@@ -426,10 +418,10 @@ export default function CaptainPage() {
               <span>{showAllActions ? 'Show Less' : 'More Tools'}</span>
               <ChevronDown
                 size={16}
-                className="transition-transform duration-200"
-                style={{
-                  transform: showAllActions ? 'rotate(180deg)' : 'rotate(0deg)',
-                }}
+                className={cn(
+                  'transition-transform duration-200',
+                  showAllActions ? 'rotate-180' : 'rotate-0'
+                )}
               />
             </button>
 
@@ -440,12 +432,10 @@ export default function CaptainPage() {
                   <Link
                     key={action.id}
                     href={action.href}
-                    className="flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150"
-                    style={
-                      index < secondaryActions.length - 1
-                        ? { borderBottom: '1px solid var(--rule-faint)' }
-                        : undefined
-                    }
+                    className={cn(
+                      'flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150',
+                      index < secondaryActions.length - 1 && 'border-b border-[var(--rule-faint)]'
+                    )}
                   >
                     <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon-light)] flex items-center justify-center shrink-0">
                       <action.icon size={18} strokeWidth={1.75} />
