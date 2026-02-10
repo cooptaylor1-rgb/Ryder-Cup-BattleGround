@@ -76,8 +76,9 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
     let lat = latitude;
     let lng = longitude;
 
-    // If no explicit coordinates, try to derive from course location
-    if (!lat || !lng) {
+    // If no explicit coordinates, try to derive from course location.
+    // Note: latitude/longitude may legitimately be 0, so we check for null/undefined.
+    if (lat == null || lng == null) {
       if (course?.location) {
         const coords = getCoordinatesFromLocation(course.location);
         if (coords) {
@@ -87,7 +88,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
       }
     }
 
-    if (!lat || !lng) {
+    if (lat == null || lng == null) {
       setError('Location not available - add course location to enable weather');
       setLoading(false);
       return;
