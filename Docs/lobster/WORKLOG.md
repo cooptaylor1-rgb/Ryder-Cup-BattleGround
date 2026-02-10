@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 06:40 EST — Phase 1 — Score list: token-driven styles (remove inline var() styles)
+- Score (`/score`): removed remaining inline `style={{...}}` usage for spacing/typography tokens and most MatchRow layout styling, replacing with token-driven Tailwind classes.
+- MatchRow: now uses `cn()` for conditional padding/borders, and uses Tailwind token classes for the “Your Match” badge, overlines, player rows, and score styling.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`04fea66`)
+
 ### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
 - Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
