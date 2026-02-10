@@ -4,7 +4,11 @@ All times America/New_York.
 
 ## 2026-02-10
 - 23:45 — Shipped batch: QuickScoreFABv2 replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for more consistent premium theming. (commit d8266a7)
+- 23:20 — Shipped batch: Stats hub (`/stats`) and Captain Match Card generator removed inline `var(--token)` style props in favor of token-driven Tailwind classes for consistent premium theming. (commit 3aabb9f)
+- 22:21 — Shipped batch: scoring PressTracker removed inline token style props and now uses token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`). (commit 69b71b4)
 - 20:15 — Shipped batch: Trip Memories recap component now uses token-driven Tailwind classes for `var(--ink/surface/rule/masters)` styling instead of inline style props, keeping premium theming consistent and avoiding silent style drift. (commit 8d94e0d)
+- 00:40 — Shipped batch: small route token-style cleanup (Login + Create Profile + Schedule) to reduce inline `var(--token)` style usage. (commit c0582e7)
+- 00:07 — Shipped batch: Social (`/social`) no-trip screen now includes shared `PageHeader` so access-gated states keep consistent premium navigation. (commit a240a67)
 
 ## 2026-02-09
 - 11:22 — Shipped batch: Join deep-link (`/join?code=...`) now uses the shared `PageLoadingSkeleton` instead of a bespoke spinner, keeping loading states consistent with the premium design system. (commit a43f657)

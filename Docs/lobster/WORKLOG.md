@@ -5,6 +5,22 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
+- QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d8266a7`)
+
+### 23:20 EST — Phase 1 — Stats hub + Match Card generator: token-driven styles
+- Stats hub (`/stats`): removed inline style props (icon color, margins, grid/padding, token backgrounds) in favor of Tailwind token/arbitrary-value classes.
+- Captain `MatchCardGenerator`: replaced inline `var(--token)` text/background/border styles with token-driven Tailwind classes for consistent theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3aabb9f`)
+
+### 22:21 EST — Phase 1 — PressTracker: token-driven styles
+- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`69b71b4`)
+
 ### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
 - Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
 - Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
@@ -16,22 +32,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a240a67`)
-
-### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
-- QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d8266a7`)
-
-### 22:21 EST — Phase 1 — PressTracker: token-driven styles
-- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`69b71b4`)
-
-### 23:20 EST — Phase 1 — Stats hub + Match Card generator: token-driven styles
-- Stats hub (`/stats`): removed inline style props (icon color, margins, grid/padding, token backgrounds) in favor of Tailwind token/arbitrary-value classes.
-- Captain `MatchCardGenerator`: replaced inline `var(--token)` text/background/border styles with token-driven Tailwind classes for consistent theming.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`3aabb9f`)
 
 ## 2026-02-09
 
