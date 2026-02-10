@@ -1102,3 +1102,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - “Back to Home” now uses the shared `btn-secondary` style for consistency.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c0b0d54`)
+
+### 12:45 EST — Phase 1 (batch 158)
+- Session Lineup (`/lineup/[sessionId]`): replaced the plain “Loading matches...” text with the shared `InlineLoadingSkeleton` inside an editorial card.
+- Keeps the route’s loading state consistent with Phase 1 premium patterns (no plain blank/text-only interim).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`aee41bd`)
