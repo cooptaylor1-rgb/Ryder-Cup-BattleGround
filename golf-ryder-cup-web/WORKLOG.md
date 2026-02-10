@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
+- 23:45 — Shipped batch: QuickScoreFABv2 replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (`bg-[var(--...)]`, `text-[var(--...)]`, `shadow-[...]`, `bg-white/20`) for more consistent premium theming. (commit TBD)
 - 20:15 — Shipped batch: Trip Memories recap component now uses token-driven Tailwind classes for `var(--ink/surface/rule/masters)` styling instead of inline style props, keeping premium theming consistent and avoiding silent style drift. (commit 8d94e0d)
 
 ## 2026-02-09

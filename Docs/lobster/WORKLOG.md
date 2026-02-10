@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
+- QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (`bg-[var(--...)]`, `text-[var(--...)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (TBD)
+
 ### 22:21 EST — Phase 1 — PressTracker: token-driven styles
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (`bg-[var(--...)]`, `text-[var(--...)]`, `border-[var(--...)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

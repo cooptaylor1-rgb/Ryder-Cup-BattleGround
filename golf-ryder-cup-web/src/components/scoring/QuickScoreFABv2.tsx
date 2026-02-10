@@ -210,15 +210,11 @@ export function QuickScoreFABv2({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="absolute bottom-16 right-0 w-72 rounded-2xl shadow-2xl overflow-hidden"
-            style={{ background: 'var(--surface)' }}
+            className="absolute bottom-16 right-0 w-72 rounded-2xl shadow-2xl overflow-hidden bg-[var(--surface)]"
             aria-label="Quick score actions"
           >
             {/* Header */}
-            <div
-              className="px-4 py-3 flex items-center justify-between"
-              style={{ background: 'var(--masters)' }}
-            >
+            <div className="px-4 py-3 flex items-center justify-between bg-[var(--masters)]">
               <div className="text-white">
                 <p className="text-xs opacity-80">Hole {activeMatchData.currentHole}</p>
                 <p className="font-semibold">{activeMatchData.displayScore}</p>
@@ -249,7 +245,7 @@ export function QuickScoreFABv2({
                   >
                     <Mic className={`w-8 h-8 ${isListening ? 'text-white' : 'text-gray-600'}`} />
                   </motion.div>
-                  <p className="text-sm text-center" style={{ color: 'var(--ink-secondary)' }}>
+                  <p className="text-sm text-center text-[var(--ink-secondary)]">
                     {isListening
                       ? 'Listening... Say "USA wins" or "Europe wins"'
                       : 'Tap mic to start voice scoring'}
@@ -283,9 +279,7 @@ export function QuickScoreFABv2({
                     <p className="font-semibold" style={{ color: teamAColor }}>
                       {activeMatchData.teamAName} Wins
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                      Tap to score
-                    </p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">Tap to score</p>
                   </div>
                 </button>
 
@@ -299,12 +293,8 @@ export function QuickScoreFABv2({
                     <Minus className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-semibold" style={{ color: 'var(--ink-primary)' }}>
-                      Hole Halved
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                      All square this hole
-                    </p>
+                    <p className="font-semibold text-[var(--ink-primary)]">Hole Halved</p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">All square this hole</p>
                   </div>
                 </button>
 
@@ -325,9 +315,7 @@ export function QuickScoreFABv2({
                     <p className="font-semibold" style={{ color: teamBColor }}>
                       {activeMatchData.teamBName} Wins
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                      Tap to score
-                    </p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">Tap to score</p>
                   </div>
                 </button>
 
@@ -341,19 +329,16 @@ export function QuickScoreFABv2({
                   aria-label="Open full scorecard"
                 >
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4" style={{ color: 'var(--masters)' }} />
-                    <span className="text-sm font-medium" style={{ color: 'var(--ink-primary)' }}>
-                      Open Full Scorecard
-                    </span>
+                    <Target className="w-4 h-4 text-[var(--masters)]" />
+                    <span className="text-sm font-medium text-[var(--ink-primary)]">Open Full Scorecard</span>
                   </div>
-                  <ChevronRight className="w-4 h-4" style={{ color: 'var(--ink-tertiary)' }} />
+                  <ChevronRight className="w-4 h-4 text-[var(--ink-tertiary)]" />
                 </button>
 
                 {/* Voice Mode Toggle */}
                 <button
                   onClick={() => setIsVoiceMode(true)}
-                  className="w-full flex items-center justify-center gap-2 p-2 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                  style={{ color: 'var(--ink-secondary)' }}
+                  className="w-full flex items-center justify-center gap-2 p-2 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-[var(--ink-secondary)]"
                   aria-pressed={isVoiceMode}
                   aria-label="Use voice scoring"
                 >
@@ -373,17 +358,14 @@ export function QuickScoreFABv2({
         onTapCancel={handlePressEnd}
         whileTap={{ scale: 0.95 }}
         className={`
-          relative flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg
-          transition-all duration-200
-          ${isExpanded ? 'rounded-full w-12 h-12 p-0 justify-center' : ''}
+          relative flex items-center gap-3 px-4 py-3 rounded-2xl
+          transition-all duration-200 text-white
+          ${
+            isExpanded
+              ? 'rounded-full w-12 h-12 p-0 justify-center bg-[var(--ink-secondary)] shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
+              : 'bg-[var(--masters)] shadow-[0_4px_20px_rgba(0,103,71,0.4)]'
+          }
         `}
-        style={{
-          background: isExpanded ? 'var(--ink-secondary)' : 'var(--masters)',
-          color: 'white',
-          boxShadow: isExpanded
-            ? '0 4px 12px rgba(0, 0, 0, 0.2)'
-            : '0 4px 20px rgba(0, 103, 71, 0.4)',
-        }}
         aria-label={isExpanded ? 'Close quick score' : 'Open quick score'}
         aria-expanded={isExpanded}
         aria-controls={menuId}
@@ -394,14 +376,8 @@ export function QuickScoreFABv2({
           <>
             {/* Pulse indicator */}
             <div className="relative">
-              <span
-                className="absolute inset-0 rounded-full animate-ping opacity-75"
-                style={{ background: 'rgba(255, 255, 255, 0.4)' }}
-              />
-              <div
-                className="relative w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(255, 255, 255, 0.2)' }}
-              >
+              <span className="absolute inset-0 rounded-full animate-ping opacity-75 bg-white/40" />
+              <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/20">
                 <Target className="w-5 h-5" />
               </div>
             </div>
@@ -410,10 +386,7 @@ export function QuickScoreFABv2({
             <div className="text-left">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold">{activeMatchData.displayScore}</span>
-                <span
-                  className="text-xs px-1.5 py-0.5 rounded"
-                  style={{ background: 'rgba(255, 255, 255, 0.2)' }}
-                >
+                <span className="text-xs px-1.5 py-0.5 rounded bg-white/20">
                   LIVE
                 </span>
               </div>
