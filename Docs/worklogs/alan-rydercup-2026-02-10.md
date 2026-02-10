@@ -1,5 +1,10 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 00:07 EST — Phase 1 (batch 159)
+- Social (`/social`): added the shared `PageHeader` to the **No trip selected** empty state so it matches the premium navigation pattern and never feels like a headerless dead end.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a240a67`)
+
 ## 20:15 EST — Phase 1 (batch 153)
 - Trip Memories (Social recap component): replaced many inline token style props (`style={{ color/background/border: 'var(--...)' }}`) with token-driven Tailwind arbitrary-value classes (e.g. `text-[var(--ink)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`).
 - Keeps the recap UI aligned with the Phase 1 premium theming system and reduces chances of silent style drift.
