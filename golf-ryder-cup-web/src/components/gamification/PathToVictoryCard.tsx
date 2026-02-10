@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react';
 import { Trophy, TrendingUp, Target, AlertCircle, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { TeamStandings } from '@/lib/types/computed';
 import {
   calculatePathToVictory,
@@ -63,17 +64,9 @@ export function PathToVictoryCard({
   if (pathData.isDecided && !expanded) {
     const winner = pathData.teamA.hasClinched ? pathData.teamA : pathData.teamB;
     return (
-      <div
-        className="rounded-2xl p-6 text-center border-2"
-        style={{
-          background: `linear-gradient(135deg, ${COLORS.gold}20, ${COLORS.gold}10)`,
-          borderColor: COLORS.gold,
-        }}
-      >
-        <Trophy size={40} style={{ color: COLORS.gold, margin: '0 auto', marginBottom: '12px' }} />
-        <h3 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">
-          {winner.name} Wins!
-        </h3>
+      <div className="rounded-2xl border-2 border-[#FFD54F] bg-[linear-gradient(135deg,#FFD54F33,#FFD54F1a)] p-6 text-center">
+        <Trophy size={40} className="mx-auto mb-3 text-[#FFD54F]" />
+        <h3 className="mb-2 text-2xl font-bold text-surface-900 dark:text-white">{winner.name} Wins!</h3>
         <p className="text-base text-surface-500">
           Final: {pathData.teamA.currentPoints} - {pathData.teamB.currentPoints}
         </p>
@@ -85,18 +78,10 @@ export function PathToVictoryCard({
     <div className="bg-surface-card rounded-2xl overflow-hidden border border-surface-200 dark:border-surface-700">
       {/* Dramatic Moment Banner */}
       {dramaticMoment && (
-        <div
-          className="px-4 py-3 flex items-center gap-3"
-          style={{
-            background: `linear-gradient(90deg, ${COLORS.gold}30, ${COLORS.gold}10)`,
-            borderBottom: `1px solid ${COLORS.gold}40`,
-          }}
-        >
-          <Zap size={20} style={{ color: COLORS.gold }} />
+        <div className="flex items-center gap-3 border-b border-b-[#FFD54F66] bg-[linear-gradient(90deg,#FFD54F4d,#FFD54F1a)] px-4 py-3">
+          <Zap size={20} className="text-[#FFD54F]" />
           <div>
-            <div className="text-xs font-semibold" style={{ color: COLORS.gold }}>
-              {dramaticMoment.headline}
-            </div>
+            <div className="text-xs font-semibold text-[#FFD54F]">{dramaticMoment.headline}</div>
             <div className="text-xs text-surface-500">{dramaticMoment.subtext}</div>
           </div>
         </div>
@@ -106,7 +91,7 @@ export function PathToVictoryCard({
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Target size={20} style={{ color: COLORS.green }} />
+            <Target size={20} className="text-[#004225]" />
             <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
               Path to Victory
             </h3>
@@ -173,38 +158,22 @@ function CupProgressBar({ pathData }: { pathData: PathToVictory }) {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <div className="text-xl font-bold" style={{ color: COLORS.usa }}>
-          {teamA.currentPoints}
-        </div>
+        <div className="text-xl font-bold text-[#1565C0]">{teamA.currentPoints}</div>
         <div className="text-xs text-surface-500">{pointsToWin} to win</div>
-        <div className="text-xl font-bold" style={{ color: COLORS.europe }}>
-          {teamB.currentPoints}
-        </div>
+        <div className="text-xl font-bold text-[#C62828]">{teamB.currentPoints}</div>
       </div>
       <div className="flex h-3 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden relative">
         <div
-          className="transition-[width] duration-300 ease-out"
-          style={{
-            width: `${teamAPercent}%`,
-            background: `linear-gradient(90deg, ${COLORS.usa}, ${COLORS.usa}CC)`,
-          }}
+          className="bg-[linear-gradient(90deg,#1565C0,#1565C0cc)] transition-[width] duration-300 ease-out"
+          style={{ width: `${teamAPercent}%` }}
         />
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center z-10"
-          style={{
-            background: COLORS.gold,
-            boxShadow: `0 0 8px ${COLORS.gold}40`,
-          }}
-        >
-          <Trophy size={12} style={{ color: '#000' }} />
+        <div className="absolute left-1/2 top-1/2 z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFD54F] shadow-[0_0_8px_#FFD54F66]">
+          <Trophy size={12} className="text-black" />
         </div>
         <div className="flex-1" />
         <div
-          className="transition-[width] duration-300 ease-out"
-          style={{
-            width: `${teamBPercent}%`,
-            background: `linear-gradient(90deg, ${COLORS.europe}CC, ${COLORS.europe})`,
-          }}
+          className="bg-[linear-gradient(90deg,#C62828cc,#C62828)] transition-[width] duration-300 ease-out"
+          style={{ width: `${teamBPercent}%` }}
         />
       </div>
     </div>
@@ -224,19 +193,19 @@ function QuickSummaryRow({
 }) {
   return (
     <div
-      className="flex items-center gap-3 p-3 rounded-lg"
-      style={{
-        background: `${color}10`,
-        borderLeft: `3px solid ${color}`,
-        opacity: isEliminated ? 0.5 : 1,
-      }}
+      style={{ '--ptv-color': color } as React.CSSProperties}
+      className={cn(
+        'flex items-center gap-3 rounded-lg border-l-[3px] border-l-[var(--ptv-color)] p-3',
+        'bg-[color-mix(in_srgb,var(--ptv-color)_10%,transparent)]',
+        isEliminated && 'opacity-50'
+      )}
     >
       {hasClinched ? (
-        <Trophy size={16} style={{ color: COLORS.gold }} />
+        <Trophy size={16} className="text-[#FFD54F]" />
       ) : (
-        <TrendingUp size={16} style={{ color }} />
+        <TrendingUp size={16} className="text-[var(--ptv-color)]" />
       )}
-      <span className="text-sm text-surface-900 dark:text-white flex-1">{summary}</span>
+      <span className="flex-1 text-sm text-surface-900 dark:text-white">{summary}</span>
     </div>
   );
 }
@@ -244,18 +213,16 @@ function QuickSummaryRow({
 function TeamScenarios({ team, color }: { team: PathToVictory['teamA']; color: string }) {
   return (
     <div>
-      <div className="text-sm font-semibold mb-3" style={{ color }}>
+      <div
+        style={{ '--ptv-team-color': color } as React.CSSProperties}
+        className="mb-3 text-sm font-semibold text-[var(--ptv-team-color)]"
+      >
         {team.name}
       </div>
       {team.hasClinched ? (
-        <div
-          className="flex items-center gap-2 p-3 rounded-lg"
-          style={{ background: `${COLORS.gold}20` }}
-        >
-          <Trophy size={16} style={{ color: COLORS.gold }} />
-          <span className="text-sm" style={{ color: COLORS.gold }}>
-            Cup clinched!
-          </span>
+        <div className="flex items-center gap-2 rounded-lg bg-[#FFD54F]/20 p-3">
+          <Trophy size={16} className="text-[#FFD54F]" />
+          <span className="text-sm text-[#FFD54F]">Cup clinched!</span>
         </div>
       ) : team.isEliminated ? (
         <div className="p-3 bg-surface-100 dark:bg-surface-800 rounded-lg text-sm text-surface-500">
@@ -273,21 +240,19 @@ function TeamScenarios({ team, color }: { team: PathToVictory['teamA']; color: s
 }
 
 function ScenarioRow({ scenario }: { scenario: VictoryScenario }) {
-  const probabilityColors = {
-    high: COLORS.success,
-    medium: COLORS.warning,
-    low: '#FF9800',
-    unlikely: COLORS.error,
-  };
+  const dotClassName =
+    scenario.probability === 'high'
+      ? 'bg-[#4CAF50]'
+      : scenario.probability === 'medium'
+        ? 'bg-[#FF9800]'
+        : scenario.probability === 'low'
+          ? 'bg-[#FF9800]'
+          : 'bg-[#EF5350]';
+
   return (
-    <div className="flex items-center gap-3 p-2 bg-surface-100 dark:bg-surface-800 rounded">
-      <div
-        className="w-2 h-2 rounded-full"
-        style={{ background: probabilityColors[scenario.probability] }}
-      />
-      <span className="text-xs text-surface-900 dark:text-white flex-1">
-        {scenario.description}
-      </span>
+    <div className="flex items-center gap-3 rounded bg-surface-100 p-2 dark:bg-surface-800">
+      <div className={cn('h-2 w-2 rounded-full', dotClassName)} />
+      <span className="flex-1 text-xs text-surface-900 dark:text-white">{scenario.description}</span>
     </div>
   );
 }
@@ -304,7 +269,7 @@ export function PathToVictoryInline({
   if (pathData.isDecided) {
     const winner = pathData.teamA.hasClinched ? pathData.teamA : pathData.teamB;
     return (
-      <div className="flex items-center gap-2 text-sm" style={{ color: COLORS.gold }}>
+      <div className="flex items-center gap-2 text-sm text-[#FFD54F]">
         <Trophy size={14} />
         {winner.name} wins the cup
       </div>
