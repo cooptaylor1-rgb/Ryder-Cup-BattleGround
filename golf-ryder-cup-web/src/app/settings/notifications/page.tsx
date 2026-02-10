@@ -23,6 +23,7 @@ import {
 } from '@/lib/services/notificationService';
 import { useTripStore } from '@/lib/stores';
 import { BottomNav, PageHeader } from '@/components/layout';
+import { cn } from '@/lib/utils';
 
 export default function NotificationSettingsPage() {
   const router = useRouter();
@@ -110,15 +111,14 @@ export default function NotificationSettingsPage() {
       <PageHeader
         title="Notifications"
         subtitle={currentTrip?.name ? currentTrip.name : 'Preferences'}
-        icon={<Bell size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Bell size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.push('/settings')}
       />
 
       <main className="container-editorial py-6 space-y-6 pb-8">
         {savedMessage ? (
           <div
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-white text-sm font-medium flex items-center gap-2 shadow-lg"
-            style={{ background: 'var(--masters)' }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[var(--masters)] text-white text-sm font-medium flex items-center gap-2 shadow-lg"
             role="status"
             aria-live="polite"
           >
@@ -131,26 +131,26 @@ export default function NotificationSettingsPage() {
         {!isNotificationsSupported ? (
           <InfoCard
             icon={AlertCircle}
-            iconColor="var(--warning)"
+            iconClassName="text-[var(--warning)]"
             title="Not supported"
+            titleClassName="text-[var(--warning)]"
             description="Notifications are not supported in this browser. Try using Chrome, Safari, or Firefox."
           />
         ) : permissionStatus === 'denied' ? (
           <InfoCard
             icon={BellOff}
-            iconColor="var(--error)"
+            iconClassName="text-[var(--error)]"
             title="Notifications blocked"
+            titleClassName="text-[var(--error)]"
             description="Notifications are blocked for this site. Please enable them in your browser settings."
           />
         ) : permissionStatus === 'granted' && preferences.enabled ? (
-          <div className="card p-4" style={{ borderColor: 'rgba(34,197,94,0.35)' }}>
+          <div className="card p-4 border border-emerald-500/35">
             <div className="flex items-start gap-3">
-              <Bell className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'rgb(34,197,94)' }} />
+              <Bell className="w-5 h-5 shrink-0 mt-0.5 text-emerald-500" />
               <div className="flex-1">
-                <h3 className="font-semibold" style={{ color: 'rgb(34,197,94)' }}>
-                  Notifications enabled
-                </h3>
-                <p className="text-sm mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                <h3 className="font-semibold text-emerald-500">Notifications enabled</h3>
+                <p className="text-sm mt-1 text-[var(--ink-tertiary)]">
                   {pendingCount > 0
                     ? `${pendingCount} reminder${pendingCount !== 1 ? 's' : ''} scheduled`
                     : "You'll receive alerts based on your preferences below."}
@@ -158,8 +158,7 @@ export default function NotificationSettingsPage() {
               </div>
               <button
                 onClick={() => handleToggle('enabled')}
-                className="text-sm"
-                style={{ color: 'var(--ink-tertiary)' }}
+                className="text-sm text-[var(--ink-tertiary)]"
               >
                 Disable
               </button>
@@ -168,12 +167,10 @@ export default function NotificationSettingsPage() {
         ) : (
           <div className="card p-4">
             <div className="flex items-start gap-3">
-              <Bell className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--ink-tertiary)' }} />
+              <Bell className="w-5 h-5 shrink-0 mt-0.5 text-[var(--ink-tertiary)]" />
               <div className="flex-1">
-                <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>
-                  Enable notifications
-                </h3>
-                <p className="text-sm mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+                <h3 className="font-semibold text-[var(--ink)]">Enable notifications</h3>
+                <p className="text-sm mt-1 text-[var(--ink-tertiary)]">
                   Get tee time reminders, score updates, and more.
                 </p>
               </div>
@@ -191,27 +188,19 @@ export default function NotificationSettingsPage() {
         {/* Notification Types */}
         {preferences.enabled && permissionStatus === 'granted' ? (
           <section>
-            <h2
-              className="text-sm font-semibold uppercase tracking-wide mb-3"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
+            <h2 className="text-sm font-semibold uppercase tracking-wide mb-3 text-[var(--ink-tertiary)]">
               Notification types
             </h2>
             <div className="space-y-2">
               <div className="card p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ background: 'rgba(34,197,94,0.12)' }}
-                    >
-                      <Clock className="w-5 h-5" style={{ color: 'rgb(34,197,94)' }} />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10">
+                      <Clock className="w-5 h-5 text-emerald-500" />
                     </div>
                     <div>
-                      <h3 className="font-medium" style={{ color: 'var(--ink)' }}>
-                        Tee time reminders
-                      </h3>
-                      <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+                      <h3 className="font-medium text-[var(--ink)]">Tee time reminders</h3>
+                      <p className="text-sm text-[var(--ink-tertiary)]">
                         Get notified before your tee time
                       </p>
                     </div>
@@ -223,10 +212,8 @@ export default function NotificationSettingsPage() {
                 </div>
 
                 {preferences.teeTimeReminders ? (
-                  <div className="mt-4" style={{ paddingLeft: '52px' }}>
-                    <p className="text-sm mb-2" style={{ color: 'var(--ink-tertiary)' }}>
-                      Remind me:
-                    </p>
+                  <div className="mt-4 pl-[52px]">
+                    <p className="text-sm mb-2 text-[var(--ink-tertiary)]">Remind me:</p>
                     <div className="flex flex-wrap gap-2">
                       {[60, 45, 30, 15, 10].map((minutes) => {
                         const active = preferences.teeTimeLeadMinutes.includes(minutes);
@@ -236,16 +223,12 @@ export default function NotificationSettingsPage() {
                             onClick={() =>
                               handleLeadTimeChange(minutes, !preferences.teeTimeLeadMinutes.includes(minutes))
                             }
-                            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                            style={
+                            className={cn(
+                              'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
                               active
-                                ? { background: 'var(--masters)', color: 'white' }
-                                : {
-                                    background: 'var(--surface-card)',
-                                    border: '1px solid var(--rule)',
-                                    color: 'var(--ink-tertiary)',
-                                  }
-                            }
+                                ? 'bg-[var(--masters)] text-white'
+                                : 'bg-[var(--surface-card)] border border-[var(--rule)] text-[var(--ink-tertiary)]'
+                            )}
                           >
                             {minutes} min
                           </button>
@@ -258,7 +241,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={Zap}
-                iconColor="#f59e0b"
+                iconWrapClassName="bg-[#f59e0b]/10"
+                iconClassName="text-[#f59e0b]"
                 title="Score updates"
                 description="When another player posts a score"
                 checked={preferences.scoreUpdates}
@@ -267,7 +251,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={Trophy}
-                iconColor="#eab308"
+                iconWrapClassName="bg-[#eab308]/10"
+                iconClassName="text-[#eab308]"
                 title="Match complete"
                 description="When a match finishes"
                 checked={preferences.matchComplete}
@@ -276,7 +261,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={ClipboardList}
-                iconColor="#8b5cf6"
+                iconWrapClassName="bg-[#8b5cf6]/10"
+                iconClassName="text-[#8b5cf6]"
                 title="Lineup published"
                 description="When new pairings are announced"
                 checked={preferences.lineupPublished}
@@ -298,15 +284,16 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
       role="switch"
       aria-checked={checked}
       onClick={onChange}
-      className="relative w-12 h-7 rounded-full transition-colors"
-      style={{
-        background: checked ? 'var(--masters)' : 'var(--surface-card)',
-        border: '1px solid var(--rule)',
-      }}
+      className={cn(
+        'relative w-12 h-7 rounded-full transition-colors border border-[var(--rule)]',
+        checked ? 'bg-[var(--masters)]' : 'bg-[var(--surface-card)]'
+      )}
     >
       <span
-        className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform"
-        style={{ transform: checked ? 'translateX(20px)' : 'translateX(0px)' }}
+        className={cn(
+          'absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform',
+          checked ? 'translate-x-5' : 'translate-x-0'
+        )}
       />
     </button>
   );
@@ -314,14 +301,16 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () =>
 
 function SettingToggle({
   icon: Icon,
-  iconColor,
+  iconWrapClassName,
+  iconClassName,
   title,
   description,
   checked,
   onChange,
 }: {
-  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-  iconColor: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconWrapClassName: string;
+  iconClassName: string;
   title: string;
   description: string;
   checked: boolean;
@@ -331,19 +320,12 @@ function SettingToggle({
     <div className="card p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: `${iconColor}15` }}
-          >
-            <Icon className="w-5 h-5" style={{ color: iconColor }} />
+          <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', iconWrapClassName)}>
+            <Icon className={cn('w-5 h-5', iconClassName)} />
           </div>
           <div>
-            <h3 className="font-medium" style={{ color: 'var(--ink)' }}>
-              {title}
-            </h3>
-            <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
-              {description}
-            </p>
+            <h3 className="font-medium text-[var(--ink)]">{title}</h3>
+            <p className="text-sm text-[var(--ink-tertiary)]">{description}</p>
           </div>
         </div>
         <ToggleSwitch checked={checked} onChange={onChange} />
@@ -354,26 +336,24 @@ function SettingToggle({
 
 function InfoCard({
   icon: Icon,
-  iconColor,
+  iconClassName,
   title,
+  titleClassName,
   description,
 }: {
-  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-  iconColor: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconClassName: string;
   title: string;
+  titleClassName: string;
   description: string;
 }) {
   return (
     <div className="card p-4">
       <div className="flex items-start gap-3">
-        <Icon className="w-5 h-5 shrink-0 mt-0.5" style={{ color: iconColor }} />
+        <Icon className={cn('w-5 h-5 shrink-0 mt-0.5', iconClassName)} />
         <div>
-          <h3 className="font-semibold" style={{ color: iconColor }}>
-            {title}
-          </h3>
-          <p className="text-sm mt-1" style={{ color: 'var(--ink-tertiary)' }}>
-            {description}
-          </p>
+          <h3 className={cn('font-semibold', titleClassName)}>{title}</h3>
+          <p className="text-sm mt-1 text-[var(--ink-tertiary)]">{description}</p>
         </div>
       </div>
     </div>
