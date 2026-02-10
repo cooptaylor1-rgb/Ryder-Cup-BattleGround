@@ -255,17 +255,14 @@ export function MatchPredictionCard({
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     <div className="flex items-center gap-3">
-                        <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ background: 'var(--team-usa)' }}
-                        />
+                        <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
                         <div className="text-left">
                             <div className="font-medium">{teamAName}</div>
                             <div className="text-xs text-muted-foreground">{teamAPlayers}</div>
                         </div>
                     </div>
                     {userPrediction?.predictedWinner === 'teamA' && (
-                        <Target size={18} style={{ color: 'var(--team-usa)' }} />
+                        <Target size={18} className="text-[var(--team-usa)]" />
                     )}
                 </button>
 
@@ -291,17 +288,14 @@ export function MatchPredictionCard({
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     <div className="flex items-center gap-3">
-                        <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ background: 'var(--team-europe)' }}
-                        />
+                        <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
                         <div className="text-left">
                             <div className="font-medium">{teamBName}</div>
                             <div className="text-xs text-muted-foreground">{teamBPlayers}</div>
                         </div>
                     </div>
                     {userPrediction?.predictedWinner === 'teamB' && (
-                        <Target size={18} style={{ color: 'var(--team-europe)' }} />
+                        <Target size={18} className="text-[var(--team-europe)]" />
                     )}
                 </button>
             </div>
@@ -434,11 +428,8 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                         {/* Header */}
                         <div className="px-4 pb-4 flex items-center justify-between border-b border-border">
                             <div className="flex items-center gap-3">
-                                <div
-                                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                                    style={{ background: 'var(--masters-subtle)' }}
-                                >
-                                    <Target size={20} style={{ color: 'var(--masters)' }} />
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--masters-subtle)]">
+                                    <Target size={20} className="text-[var(--masters)]" />
                                 </div>
                                 <div>
                                     <h2 className="font-semibold">Predictions</h2>

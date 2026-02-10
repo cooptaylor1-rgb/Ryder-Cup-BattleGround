@@ -57,71 +57,28 @@ export function PWAUpdateToast() {
 
   return (
     <div
-      className="pwa-update-toast"
+      className="pwa-update-toast fixed left-1/2 bottom-[calc(env(safe-area-inset-bottom,_0px)_+_80px)] z-[9999] animate-[slideUpFade_0.3s_ease-out]"
       role="alert"
       aria-live="polite"
-      style={{
-        position: 'fixed',
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)', // Above bottom nav
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 9999,
-        animation: 'slideUpFade 0.3s ease-out',
-      }}
     >
-      <div
-        className="card-glass"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-          padding: 'var(--space-3) var(--space-4)',
-          borderRadius: 'var(--radius-full)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          maxWidth: '360px',
-          border: '1px solid var(--masters)',
-        }}
-      >
+      <div className="card-glass flex items-center gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-full)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] max-w-[360px] border border-[var(--masters)]">
         {/* Icon */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'rgba(0, 103, 71, 0.15)',
-            color: 'var(--masters)',
-            flexShrink: 0,
-          }}
-        >
+        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[rgba(0,103,71,0.15)] text-[var(--masters)] shrink-0">
           <Sparkles size={18} />
         </div>
 
         {/* Message */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 'var(--text-sm)',
-              fontWeight: 600,
-              color: 'var(--ink-primary)',
-            }}
-          >
+        <div className="flex-1 min-w-0">
+          <div className="text-[var(--text-sm)] font-semibold text-[var(--ink-primary)]">
             Update Available
           </div>
-          <div
-            style={{
-              fontSize: 'var(--text-xs)',
-              color: 'var(--ink-secondary)',
-            }}
-          >
+          <div className="text-[var(--text-xs)] text-[var(--ink-secondary)]">
             New features and improvements ready
           </div>
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+        <div className="flex gap-[var(--space-2)] shrink-0">
           <Button
             variant="primary"
             size="sm"
@@ -130,42 +87,21 @@ export function PWAUpdateToast() {
               e.preventDefault();
               handleUpdate();
             }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-1)',
-              padding: 'var(--space-2) var(--space-3)',
-              minHeight: '44px',
-              WebkitTapHighlightColor: 'transparent',
-              touchAction: 'manipulation',
-            }}
+            className="flex items-center gap-[var(--space-1)] px-[var(--space-3)] py-[var(--space-2)] min-h-[44px] [webkit-tap-highlight-color:transparent] touch-manipulation"
           >
             <RefreshCw size={14} />
             Update
           </Button>
 
           <button
+            type="button"
             onClick={handleDismiss}
             onTouchEnd={(e) => {
               e.preventDefault();
               handleDismiss();
             }}
             aria-label="Dismiss update notification"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              border: 'none',
-              background: 'var(--surface-secondary)',
-              color: 'var(--ink-tertiary)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              WebkitTapHighlightColor: 'transparent',
-              touchAction: 'manipulation',
-            }}
+            className="flex items-center justify-center w-11 h-11 rounded-full border-0 bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] cursor-pointer transition-all duration-200 ease-out hover:bg-[var(--surface)] [webkit-tap-highlight-color:transparent] touch-manipulation"
           >
             <X size={16} />
           </button>
