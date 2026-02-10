@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 16:26 EST — Phase 1 — Weather banner: token-driven classes
+- WeatherBanner (captain delay banner): replaced inline `style` props with token-driven Tailwind classes using shared tone styles so status states inherit the premium theming.
+- Swapped bespoke action buttons + inputs to `cn()`-powered classnames with accessible focus/hover states (no DOM custom attributes leaking to the page).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c8ac5cc`)
+
 ### 16:05 EST — Settings / Backup: refresh after import (no hard reload)
 - Backup & Restore (`/settings/backup`): replaced `window.location.reload()` after a successful import with an in-app `loadTrips()` refresh and auto-select the imported trip.
 - Keeps the import confirmation UI responsive and avoids a full-page refresh.
