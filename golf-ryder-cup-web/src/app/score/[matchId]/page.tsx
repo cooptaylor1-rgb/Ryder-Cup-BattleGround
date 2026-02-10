@@ -20,7 +20,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
-import { formatPlayerName } from '@/lib/utils';
+import { cn, formatPlayerName } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { addAuditLogEntry } from '@/lib/db';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
@@ -1045,12 +1045,7 @@ export default function EnhancedMatchScoringPage() {
           <div className="flex items-center justify-center gap-8">
             {/* Team A */}
             <div className="flex-1 text-right">
-              <p
-                className="type-overline"
-                style={{ color: teamAColor }}
-              >
-                {teamAName}
-              </p>
+              <p className="type-overline text-[color:var(--team-usa)]">{teamAName}</p>
               <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                 {matchState.teamAHolesWon} holes
               </p>
@@ -1065,15 +1060,14 @@ export default function EnhancedMatchScoringPage() {
               className="text-center"
             >
               <p
-                className="score-monumental"
-                style={{
-                  color:
-                    matchState.currentScore > 0
-                      ? teamAColor
-                      : matchState.currentScore < 0
-                        ? teamBColor
-                        : 'var(--ink-tertiary)',
-                }}
+                className={cn(
+                  'score-monumental',
+                  matchState.currentScore > 0
+                    ? 'text-[color:var(--team-usa)]'
+                    : matchState.currentScore < 0
+                      ? 'text-[color:var(--team-europe)]'
+                      : 'text-ink-tertiary'
+                )}
               >
                 {matchState.displayScore}
               </p>
@@ -1090,12 +1084,7 @@ export default function EnhancedMatchScoringPage() {
 
             {/* Team B */}
             <div className="flex-1 text-left">
-              <p
-                className="type-overline"
-                style={{ color: teamBColor }}
-              >
-                {teamBName}
-              </p>
+              <p className="type-overline text-[color:var(--team-europe)]">{teamBName}</p>
               <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
                 {matchState.teamBHolesWon} holes
               </p>
@@ -1173,11 +1162,7 @@ export default function EnhancedMatchScoringPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => handleQuickScoreTap('teamA')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[rgba(0,71,171,0.08)]"
-                  style={{
-                    borderColor: teamAColor,
-                    color: teamAColor,
-                  }}
+                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[color:var(--team-usa-glow)] border-[color:var(--team-usa)] text-[color:var(--team-usa)]"
                   aria-label={`Quick score ${teamAName}`}
                 >
                   <p className="text-sm font-semibold uppercase tracking-wide">{teamAName}</p>
@@ -1187,11 +1172,7 @@ export default function EnhancedMatchScoringPage() {
                 </button>
                 <button
                   onClick={() => handleQuickScoreTap('teamB')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[rgba(139,0,0,0.08)]"
-                  style={{
-                    borderColor: teamBColor,
-                    color: teamBColor,
-                  }}
+                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[color:var(--team-europe-glow)] border-[color:var(--team-europe)] text-[color:var(--team-europe)]"
                   aria-label={`Quick score ${teamBName}`}
                 >
                   <p className="text-sm font-semibold uppercase tracking-wide">{teamBName}</p>
@@ -1350,12 +1331,11 @@ export default function EnhancedMatchScoringPage() {
                     <button
                       onClick={() => handleScore('teamA')}
                       disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition ${
+                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition bg-[color:var(--team-usa)] ${
                         isSaving ? 'opacity-50' : 'opacity-100'
                       } ${
                         currentHoleResult?.winner === 'teamA' ? 'border-gold' : 'border-transparent'
                       }`}
-                      style={{ background: teamAColor }}
                       aria-pressed={currentHoleResult?.winner === 'teamA'}
                       aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
                     >
@@ -1381,12 +1361,11 @@ export default function EnhancedMatchScoringPage() {
                     <button
                       onClick={() => handleScore('teamB')}
                       disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition ${
+                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition bg-[color:var(--team-europe)] ${
                         isSaving ? 'opacity-50' : 'opacity-100'
                       } ${
                         currentHoleResult?.winner === 'teamB' ? 'border-gold' : 'border-transparent'
                       }`}
-                      style={{ background: teamBColor }}
                       aria-pressed={currentHoleResult?.winner === 'teamB'}
                       aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
                     >
@@ -1589,15 +1568,14 @@ export default function EnhancedMatchScoringPage() {
             >
               {/* Trophy Icon — clean, no glow */}
               <div
-                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-[var(--space-6)]"
-                style={{
-                  background:
-                    matchState.winningTeam === 'teamA'
-                      ? teamAColor
-                      : matchState.winningTeam === 'teamB'
-                        ? teamBColor
-                        : 'var(--ink-tertiary)',
-                }}
+                className={cn(
+                  'w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-[var(--space-6)]',
+                  matchState.winningTeam === 'teamA'
+                    ? 'bg-[color:var(--team-usa)]'
+                    : matchState.winningTeam === 'teamB'
+                      ? 'bg-[color:var(--team-europe)]'
+                      : 'bg-[color:var(--ink-tertiary)]'
+                )}
               >
                 <Trophy className="w-10 h-10 text-white" />
               </div>
@@ -1611,15 +1589,14 @@ export default function EnhancedMatchScoringPage() {
 
               {/* Final Score — monumental serif */}
               <p
-                className="score-monumental mb-[var(--space-8)]"
-                style={{
-                  color:
-                    matchState.winningTeam === 'teamA'
-                      ? teamAColor
-                      : matchState.winningTeam === 'teamB'
-                        ? teamBColor
-                        : 'var(--ink-secondary)',
-                }}
+                className={cn(
+                  'score-monumental mb-[var(--space-8)]',
+                  matchState.winningTeam === 'teamA'
+                    ? 'text-[color:var(--team-usa)]'
+                    : matchState.winningTeam === 'teamB'
+                      ? 'text-[color:var(--team-europe)]'
+                      : 'text-ink-secondary'
+                )}
               >
                 {matchState.displayScore}
               </p>
@@ -1628,7 +1605,7 @@ export default function EnhancedMatchScoringPage() {
               <div className="card-editorial mx-auto max-w-sm mb-[var(--space-6)]">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="font-serif text-[length:var(--text-2xl)]" style={{ color: teamAColor }}>
+                    <p className="font-serif text-[length:var(--text-2xl)] text-[color:var(--team-usa)]">
                       {matchState.teamAHolesWon}
                     </p>
                     <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
@@ -1644,7 +1621,7 @@ export default function EnhancedMatchScoringPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="font-serif text-[length:var(--text-2xl)]" style={{ color: teamBColor }}>
+                    <p className="font-serif text-[length:var(--text-2xl)] text-[color:var(--team-europe)]">
                       {matchState.teamBHolesWon}
                     </p>
                     <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">

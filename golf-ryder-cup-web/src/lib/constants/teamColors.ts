@@ -13,12 +13,12 @@
  * Default team colors used throughout the app
  */
 export const TEAM_COLORS = {
-    /** Team A (typically USA) - Cobalt Blue */
-    teamA: '#0047AB',
-    /** Team B (typically Europe) - Dark Red */
-    teamB: '#8B0000',
+    /** Team A (typically USA) */
+    teamA: 'var(--team-usa)',
+    /** Team B (typically Europe) */
+    teamB: 'var(--team-europe)',
     /** Neutral/halved color */
-    neutral: '#6B7280',
+    neutral: 'var(--ink-tertiary)',
 } as const;
 
 /**
