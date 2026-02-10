@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 09:45 EST — Phase 1 — PWA update toast + Predictions: token-driven styles
+- `PWAUpdateToast`: replaced the fixed toast’s large inline `style={{...}}` blocks (positioning, spacing tokens, icon/message styles, action row styling) with Tailwind classes + token-driven arbitrary values.
+- `MatchPredictions`: removed remaining inline token styles for team dots and lucide icon colors (use Tailwind `bg-[var(--team-*)]` + `text-[var(--team-*)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`737e26d`)
+
 ## 09:10 EST — Phase 1 — Home past trips + Schedule cards: token-driven styles
 - Home (`HomePage`): removed large inline `style={{...}}` blocks from the Past Trips list (layout, borders, gradients, icon/text colors), replacing with token-driven Tailwind classes and `truncate` for overflow.
 - Schedule (`ScheduleEntryCard`): replaced remaining hard-coded rgba/hex accents with token-driven Tailwind classes (`var(--masters)` + `var(--gold)`), keeping the dynamic countdown badge inline styles.

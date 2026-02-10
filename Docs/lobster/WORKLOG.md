@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 09:45 EST — Phase 1 — PWA update toast + Predictions: token-driven styles
+- `PWAUpdateToast`: replaced large inline `style={{...}}` blocks (fixed positioning, spacing tokens, icon/message styles, actions row) with Tailwind classes + token-driven arbitrary values.
+- `MatchPredictions`: removed remaining inline token styles for team dots and lucide icon colors in favor of Tailwind token classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`737e26d`)
+
 ### 09:10 EST — Phase 1 — Home past trips + Schedule cards: token-driven styles
 - Home (`HomePage`): removed large inline `style={{...}}` blocks from the Past Trips list (layout, borders, gradients, icon/text colors), replacing with token-driven Tailwind classes and `truncate` for overflow.
 - Schedule (`ScheduleEntryCard`): replaced remaining hard-coded rgba/hex accents with token-driven Tailwind classes (`var(--masters)` + `var(--gold)`), keeping the dynamic countdown badge inline styles.
