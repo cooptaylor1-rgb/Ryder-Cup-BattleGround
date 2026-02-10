@@ -5,7 +5,7 @@
 - Scoring match error (`/score/[matchId]/error.tsx`): migrated the offline-saved banner + dev error details panel to token-driven Tailwind classes.
 - No behavior change; keeps error recovery UI consistent with the premium token system.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`<TBD>`)
+- Commit + push ✅ (`5a000ff`)
 
 ## 05:05 EST — Phase 1 (batch 165)
 - Achievements (`/achievements`): removed most inline `style={{ ... }}` layout + token usage in favor of token-driven Tailwind classes.

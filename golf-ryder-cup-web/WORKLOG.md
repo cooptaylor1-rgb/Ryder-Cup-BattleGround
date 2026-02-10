@@ -3,7 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-10
-- 05:25 — Shipped batch: standardized key route error boundaries (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats + scoring match error) by removing inline `style={{...}}` token usage and replacing with token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, etc.). (commit <TBD>)
+- 05:25 — Shipped batch: standardized key route error boundaries (app-level + Achievements/Bets/Live/Social/Trip/Profile/Trip Stats + scoring match error) by removing inline `style={{...}}` token usage and replacing with token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, etc.). (commit 5a000ff)
 - 04:45 — Shipped batch: Captain Command (`/captain`) removed remaining inline token/layout `style={{...}}` usage (Captain Mode gate UI + readiness/tool list styling), and `PageHeader` now uses token-driven Tailwind classes for the back button, icon container, and typography spacing (still supports `iconContainerStyle` when needed). (commit 9d221a4)
 - 04:05 — Shipped batch: Settings → Notifications (`/settings/notifications`) removed inline `style={{ ... }}` usage (including switch/toggle styling) in favor of token-driven Tailwind classes + `cn()` conditional classes, keeping behavior unchanged. (commit 3211d1b)
 - 03:30 — Shipped batch: route error boundaries (`/captain`, `/courses`, `/lineup`) standardized to the premium wrapper (`pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`), added `BottomNav`, and replaced inline token styles with token-driven Tailwind classes for consistent recovery screens. (commit 383823c)

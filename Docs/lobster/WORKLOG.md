@@ -12,7 +12,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
   - Match scoring error (`/score/[matchId]/error.tsx`) including the offline-saved banner
 - Converted to token-driven Tailwind arbitrary-value classes like `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`<TBD>`)
+- Commit + push ✅ (`5a000ff`)
 
 ### 05:05 EST — Phase 1 — Achievements: token-driven styles (no inline layout)
 - Achievements (`/achievements`): removed most inline `style={{ ... }}` layout and token usage in favor of token-driven Tailwind classes.
