@@ -5,6 +5,72 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
+- Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a240a67`)
+
+### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
+- Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
+- Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
+- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link, and the “No scheduled events” padding wrapper.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c0582e7`)
+
+### 01:25 EST — Phase 1 — Trip Stats: token-driven icon styles
+- Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`).
+- Trip Stats: replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ed13109`)
+
+### 01:35 EST — Phase 1 — Players page: token-driven styles
+- Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
+- Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`fcd4966`)
+
+### 01:40 EST — Phase 1 — Pre-push build lock + Tailwind placeholder warnings
+- Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted builds don’t block future pushes.
+- Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3576cc1`)
+
+### 02:00 EST — Phase 1 — Home hero + Momentum: token-driven Tailwind styles
+- Home components (`ActiveTournamentHero`, `MomentumSection`): removed inline `style={{...}}` usage (spacing + team colors) in favor of token-driven Tailwind arbitrary-value classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a9fa425`)
+
+### 02:55 EST — Phase 1 — Day Summary: prevent stale summaries + stuck loading
+- `useDaySummary` (Day Summary share card): ensure `isLoading` is always cleared via `finally`, and clear `summary` when there is no active trip, no sessions for the day, or summary generation fails.
+- Prevents stale summary content from persisting across refreshes/date changes, and avoids a stuck loading spinner on “no sessions today” paths.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`de0e8ac`)
+
+### 03:30 EST — Phase 1 — Route error boundaries: premium wrapper + BottomNav
+- Captain, Courses, Lineup (`src/app/{captain,courses,lineup}/error.tsx`): standardized wrappers to `pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`, added `BottomNav`, and removed remaining inline token styles in favor of token-driven Tailwind classes.
+- Keeps recovery screens consistent with the rest of the premium shell and avoids dead-end navigation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`383823c`)
+
+### 04:05 EST — Phase 1 — Settings / Notifications: remove inline styles
+- Notifications settings (`/settings/notifications`): removed inline `style={{ ... }}` usage in favor of token-driven Tailwind classes.
+- Refactored toggles + cards to use `cn()` with conditional classes (no DOM style props), keeping behavior unchanged.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3211d1b`)
+
+### 04:45 EST — Phase 1 — Captain Command + PageHeader: remove inline styles
+- Captain Command (`/captain`): removed remaining inline `style={{...}}` usage for the Captain Mode PIN gate and refined readiness/tools list styling with token-driven Tailwind classes + `cn()`.
+- `PageHeader`: removed inline style objects for back button + typography spacing; added Tailwind-based defaults and support for `iconContainerClassName` for themed headers.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9d221a4`)
+
+### 05:05 EST — Phase 1 — Achievements: token-driven styles (no inline layout)
+- Achievements (`/achievements`): removed most inline `style={{ ... }}` layout and token usage in favor of token-driven Tailwind classes.
+- Progress overview card, category filter, and grid now use standard Tailwind layout utilities; progress bars keep only the dynamic `width` inline style.
+- Achievement cards now use Tailwind for structure/spacing, keeping only dynamic rarity colors via inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5ce5112`)
+
 ### 05:25 EST — Phase 1 — Route error boundaries: token-driven Tailwind styles
 - Error boundaries: removed remaining inline `style={{ ... }}` usage (token colors/backgrounds/borders) across key route error pages:
   - App-level `src/app/error.tsx`
@@ -14,76 +80,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5a000ff`)
 
-### 05:05 EST — Phase 1 — Achievements: token-driven styles (no inline layout)
-- Achievements (`/achievements`): removed most inline `style={{ ... }}` layout and token usage in favor of token-driven Tailwind classes.
-- Progress overview card, category filter, and grid now use standard Tailwind layout utilities; progress bars keep only the dynamic `width` inline style.
-- Achievement cards now use Tailwind for structure/spacing, keeping only dynamic rarity colors via inline styles.
+### 22:21 EST — Phase 1 — PressTracker: token-driven styles
+- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5ce5112`)
-
-### 04:45 EST — Phase 1 — Captain Command + PageHeader: remove inline styles
-- Captain Command (`/captain`): removed remaining inline `style={{...}}` usage for the Captain Mode PIN gate and refined readiness/tools list styling with token-driven Tailwind classes + `cn()`.
-- `PageHeader`: removed inline style objects for back button + typography spacing; added Tailwind-based defaults and support for `iconContainerClassName` for themed headers.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`9d221a4`)
-
-### 04:05 EST — Phase 1 — Settings / Notifications: remove inline styles
-- Notifications settings (`/settings/notifications`): removed inline `style={{ ... }}` usage in favor of token-driven Tailwind classes.
-- Refactored toggles + cards to use `cn()` with conditional classes (no DOM style props), keeping behavior unchanged.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`3211d1b`)
-
-### 03:30 EST — Phase 1 — Route error boundaries: premium wrapper + BottomNav
-- Captain, Courses, Lineup (`src/app/{captain,courses,lineup}/error.tsx`): standardized wrappers to `pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`, added `BottomNav`, and removed remaining inline token styles in favor of token-driven Tailwind classes.
-- Keeps recovery screens consistent with the rest of the premium shell and avoids dead-end navigation.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`383823c`)
-
-### 02:55 EST — Phase 1 — Day Summary: prevent stale summaries + stuck loading
-- `useDaySummary` (Day Summary share card): ensure `isLoading` is always cleared via `finally`, and clear `summary` when there is no active trip, no sessions for the day, or summary generation fails.
-- Prevents stale summary content from persisting across refreshes/date changes, and avoids a stuck loading spinner on “no sessions today” paths.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`de0e8ac`)
-
-### 02:00 EST — Phase 1 — Home hero + Momentum: token-driven Tailwind styles
-- Home components (`ActiveTournamentHero`, `MomentumSection`): removed inline `style={{...}}` usage (spacing + team colors) in favor of token-driven Tailwind arbitrary-value classes.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a9fa425`)
-
-### 01:40 EST — Phase 1 — Pre-push build lock + Tailwind placeholder warnings
-- Husky `pre-push`: proactively remove stale `golf-ryder-cup-web/.next/lock` so interrupted builds don’t block future pushes.
-- Worklogs: replaced example Tailwind token placeholders like `text-[var(--...)]` with real token names to avoid Turbopack CSS optimizer warnings.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`3576cc1`)
-
-### 01:35 EST — Phase 1 — Players page: token-driven styles
-- Players (`/players`): replaced inline token/layout style props throughout the page (header actions, modal layouts, bulk-add grid, section headers, and PlayerRow actions) with token-driven Tailwind classes.
-- Kept the one truly-dynamic avatar background color as an inline `style` (computed from team color).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`fcd4966`)
-
-### 01:25 EST — Phase 1 — Trip Stats: token-driven icon styles
-- Trip Stats (`/trip-stats`): removed remaining inline token styles in `PageHeader` icons (use `text-[var(--color-accent)]`).
-- Trip Stats: replaced `bg-masters/10` + `text-masters` with token-driven Tailwind arbitrary-value classes.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`ed13109`)
-
-### 00:40 EST — Phase 1 — Small route token-style cleanup (Login + Create Profile + Schedule)
-- Login (`/login`): replaced the “New here?” divider inline styles with token-driven Tailwind classes.
-- Create Profile (`/profile/create`): replaced the header bottom rule inline styles with `h-px bg-[var(--rule)]`.
-- Schedule (`/schedule`): removed inline token styles from the Day badge, the Create Profile link, and the “No scheduled events” padding wrapper.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`c0582e7`)
-
-### 00:07 EST — Phase 1 — Social: add PageHeader on no-trip state
-- Social (`/social`): added the shared `PageHeader` to the **No trip selected** screen so the access-gated empty state keeps consistent premium navigation (no more headerless screen).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a240a67`)
-
-### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
-- QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d8266a7`)
+- Commit + push ✅ (`69b71b4`)
 
 ### 23:20 EST — Phase 1 — Stats hub + Match Card generator: token-driven styles
 - Stats hub (`/stats`): removed inline style props (icon color, margins, grid/padding, token backgrounds) in favor of Tailwind token/arbitrary-value classes.
@@ -91,10 +91,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3aabb9f`)
 
-### 22:21 EST — Phase 1 — PressTracker: token-driven styles
-- Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
+### 23:45 EST — Phase 1 — QuickScoreFABv2: token-driven styles
+- QuickScoreFABv2: replaced inline token styles (`var(--surface/masters/ink-*)` + rgba badges/shadows) with token-driven Tailwind classes (e.g. `bg-[var(--masters)]`, `text-[var(--ink-secondary)]`, `shadow-[...]`, `bg-white/20`) for consistent premium theming.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`69b71b4`)
+- Commit + push ✅ (`d8266a7`)
 
 ## 2026-02-09
 
