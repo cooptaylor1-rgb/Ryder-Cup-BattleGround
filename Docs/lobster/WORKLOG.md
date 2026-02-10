@@ -9,6 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Captain, Courses, Lineup (`src/app/{captain,courses,lineup}/error.tsx`): standardized wrappers to `pb-nav page-premium-enter texture-grain bg-[var(--canvas)]`, added `BottomNav`, and removed remaining inline token styles in favor of token-driven Tailwind classes.
 - Keeps recovery screens consistent with the rest of the premium shell and avoids dead-end navigation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`383823c`)
 
 ### 02:55 EST — Phase 1 — Day Summary: prevent stale summaries + stuck loading
 - `useDaySummary` (Day Summary share card): ensure `isLoading` is always cleared via `finally`, and clear `summary` when there is no active trip, no sessions for the day, or summary generation fails.
