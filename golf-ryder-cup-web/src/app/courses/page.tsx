@@ -77,16 +77,12 @@ function CourseCard({
                         {teeSets.map((tee) => (
                             <span
                                 key={tee.id}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
                                 style={{
-                                    backgroundColor: `${tee.color || '#888'}20`,
-                                    color: tee.color || '#888',
-                                }}
+                                    '--tee-color': tee.color || '#888',
+                                } as React.CSSProperties}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[color-mix(in_srgb,var(--tee-color),transparent_88%)] text-[var(--tee-color)]"
                             >
-                                <span
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: tee.color || '#888' }}
-                                />
+                                <span className="w-2 h-2 rounded-full bg-[var(--tee-color)]" />
                                 {tee.name} • {tee.rating}/{tee.slope}
                             </span>
                         ))}
@@ -259,7 +255,7 @@ export default function CourseLibraryPage() {
                 <PageHeader
                     title="Search Courses"
                     subtitle="Course database"
-                    icon={<Globe size={16} style={{ color: 'var(--color-accent)' }} />}
+                    icon={<Globe size={16} className="text-[var(--color-accent)]" />}
                     onBack={() => setShowDatabaseSearch(false)}
                 />
                 <main className="max-w-4xl mx-auto">
@@ -278,7 +274,7 @@ export default function CourseLibraryPage() {
             <PageHeader
                 title="Course Library"
                 subtitle="Reusable course profiles"
-                icon={<Flag size={16} style={{ color: 'var(--color-accent)' }} />}
+                icon={<Flag size={16} className="text-[var(--color-accent)]" />}
                 onBack={() => router.back()}
             />
 
@@ -315,30 +311,18 @@ export default function CourseLibraryPage() {
                 {/* Featured: Scan Scorecard with AI */}
                 <button
                     onClick={() => setShowScorecardUpload(true)}
-                    className="w-full p-4 rounded-xl border-2 border-dashed transition-all hover:border-[var(--masters)] hover:bg-[var(--masters-soft)]"
-                    style={{
-                        borderColor: 'var(--masters)',
-                        background: 'linear-gradient(135deg, var(--masters-soft) 0%, transparent 100%)',
-                    }}
+                    className="w-full p-4 rounded-xl border-2 border-dashed transition-all border-[var(--masters)] bg-[linear-gradient(135deg,var(--masters-soft)_0%,transparent_100%)] hover:border-[var(--masters)] hover:bg-[var(--masters-soft)]"
                 >
                     <div className="flex items-center justify-center gap-3">
-                        <div
-                            className="flex items-center justify-center shrink-0"
-                            style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: 'var(--radius-lg)',
-                                background: 'var(--masters)',
-                            }}
-                        >
-                            <Camera size={24} style={{ color: 'var(--color-accent)' }} />
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--masters)]">
+                            <Camera size={24} className="text-[var(--color-accent)]" />
                         </div>
                         <div className="text-left">
                             <div className="flex items-center gap-2">
                                 <span className="type-title-sm">Scan Scorecard</span>
-                                <Sparkles size={14} style={{ color: 'var(--masters)' }} />
+                                <Sparkles size={14} className="text-[var(--masters)]" />
                             </div>
-                            <p className="type-caption" style={{ color: 'var(--ink-secondary)' }}>
+                            <p className="type-caption text-[var(--ink-secondary)]">
                                 Upload a photo or PDF to auto-fill hole data
                             </p>
                         </div>
