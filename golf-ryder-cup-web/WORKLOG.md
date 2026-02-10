@@ -2,6 +2,9 @@
 
 All times America/New_York.
 
+## 2026-02-10
+- 20:15 — Shipped batch: Trip Memories recap component now uses token-driven Tailwind classes for `var(--ink/surface/rule/masters)` styling instead of inline style props, keeping premium theming consistent and avoiding silent style drift. (commit 8d94e0d)
+
 ## 2026-02-09
 - 11:22 — Shipped batch: Join deep-link (`/join?code=...`) now uses the shared `PageLoadingSkeleton` instead of a bespoke spinner, keeping loading states consistent with the premium design system. (commit a43f657)
 - 12:50 — Shipped batch: section layouts (Stats, Awards, Spectator, Lineup, Standings, Scoring, Captain) now use `PageLoadingSkeleton` in their `Suspense` fallbacks instead of the older `PageSkeleton`, matching the premium wrapper + BottomNav loading experience. (commit 17977f0)
