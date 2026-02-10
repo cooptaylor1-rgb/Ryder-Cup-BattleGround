@@ -93,17 +93,11 @@ export default function MessagesPage() {
         title="Messages"
         subtitle="Send announcements"
         onBack={() => router.back()}
-        icon={<MessageSquare size={16} style={{ color: 'white' }} />}
+        icon={<MessageSquare size={16} className="text-white" />}
         rightSlot={
           <button
             onClick={() => setShowComposer(true)}
-            className="btn-premium"
-            style={{
-              padding: 'var(--space-2) var(--space-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-            }}
+            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)]"
           >
             <Send size={16} />
             New
@@ -114,7 +108,7 @@ export default function MessagesPage() {
       <main className="container-editorial">
         <section className="section">
           {showComposer ? (
-            <div className="card" style={{ padding: 'var(--space-5)' }}>
+            <div className="card p-[var(--space-5)]">
               <AnnouncementComposer
                 onSend={handleSendAnnouncement}
                 onCancel={() => setShowComposer(false)}
@@ -130,12 +124,12 @@ export default function MessagesPage() {
               }}
             />
           ) : (
-            <div className="card text-center" style={{ padding: 'var(--space-8)' }}>
-              <MessageSquare size={48} style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-4)' }} />
-              <h2 className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
+            <div className="card text-center p-[var(--space-8)]">
+              <MessageSquare size={48} className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-4)]" />
+              <h2 className="type-title-sm mb-[var(--space-2)]">
                 No Messages Yet
               </h2>
-              <p className="type-caption" style={{ marginBottom: 'var(--space-4)' }}>
+              <p className="type-caption mb-[var(--space-4)]">
                 Send announcements to keep everyone informed.
               </p>
               <button onClick={() => setShowComposer(true)} className="btn btn-primary">

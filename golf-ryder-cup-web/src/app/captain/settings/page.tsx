@@ -161,20 +161,12 @@ export default function CaptainSettingsPage() {
         title="Trip Settings"
         subtitle="Configure trip details"
         onBack={() => router.back()}
-        icon={<Settings size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Settings size={16} className="text-[var(--color-accent)]" />}
         rightSlot={
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="btn-premium"
-            style={{
-              padding: 'var(--space-2) var(--space-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              opacity: isSaving ? 0.6 : 1,
-              cursor: isSaving ? 'not-allowed' : 'pointer',
-            }}
+            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Save size={16} />
             {isSaving ? 'Saving...' : 'Save'}
@@ -185,12 +177,12 @@ export default function CaptainSettingsPage() {
       <main className="container-editorial">
         {/* Trip Details */}
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Trip Details</h2>
+          <h2 className="type-overline mb-[var(--space-4)]">Trip Details</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                <Edit3 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              <label className="type-meta block mb-[var(--space-2)]">
+                <Edit3 size={14} className="inline mr-1.5 align-middle" />
                 Trip Name
               </label>
               <input
@@ -203,8 +195,8 @@ export default function CaptainSettingsPage() {
             </div>
 
             <div>
-              <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                <MapPin size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              <label className="type-meta block mb-[var(--space-2)]">
+                <MapPin size={14} className="inline mr-1.5 align-middle" />
                 Location
               </label>
               <input
@@ -218,8 +210,8 @@ export default function CaptainSettingsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                  <Calendar size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <label className="type-meta block mb-[var(--space-2)]">
+                  <Calendar size={14} className="inline mr-1.5 align-middle" />
                   Start Date
                 </label>
                 <input
@@ -230,8 +222,8 @@ export default function CaptainSettingsPage() {
                 />
               </div>
               <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                  <Calendar size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                <label className="type-meta block mb-[var(--space-2)]">
+                  <Calendar size={14} className="inline mr-1.5 align-middle" />
                   End Date
                 </label>
                 <input
@@ -249,40 +241,38 @@ export default function CaptainSettingsPage() {
 
         {/* Team Names */}
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Team Names</h2>
+          <h2 className="type-overline mb-[var(--space-4)]">Team Names</h2>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                  <Palette size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--team-usa)' }} />
+                <label className="type-meta block mb-[var(--space-2)]">
+                  <Palette size={14} className="inline mr-1.5 align-middle text-[var(--team-usa)]" />
                   Team A
                 </label>
                 <input
                   type="text"
                   value={teamAName}
                   onChange={(e) => setTeamAName(e.target.value)}
-                  className="input"
+                  className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
                   placeholder="e.g., Team USA"
-                  style={{ borderColor: 'var(--team-usa)' }}
                 />
               </div>
               <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                  <Palette size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--team-europe)' }} />
+                <label className="type-meta block mb-[var(--space-2)]">
+                  <Palette size={14} className="inline mr-1.5 align-middle text-[var(--team-europe)]" />
                   Team B
                 </label>
                 <input
                   type="text"
                   value={teamBName}
                   onChange={(e) => setTeamBName(e.target.value)}
-                  className="input"
+                  className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
                   placeholder="e.g., Team Europe"
-                  style={{ borderColor: 'var(--team-europe)' }}
                 />
               </div>
             </div>
-            <p className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+            <p className="type-micro text-[var(--ink-tertiary)]">
               Customize your team names. Changes will appear throughout the app.
             </p>
           </div>
@@ -292,43 +282,43 @@ export default function CaptainSettingsPage() {
 
         {/* Captain Tools */}
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Captain Tools</h2>
+          <h2 className="type-overline mb-[var(--space-4)]">Captain Tools</h2>
 
           <div className="space-y-3">
             <Link href="/captain/checklist" className="match-row">
-              <Shield size={18} style={{ color: 'var(--masters)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Pre-Flight Checklist</p>
+              <Shield size={18} className="text-[var(--masters)]" />
+              <div className="flex-1">
+                <p className="font-medium">Pre-Flight Checklist</p>
                 <p className="type-meta">Review trip readiness</p>
               </div>
-              <ChevronLeft size={18} style={{ color: 'var(--ink-tertiary)', transform: 'rotate(180deg)' }} />
+              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
             </Link>
 
             <Link href="/captain/availability" className="match-row">
-              <Users size={18} style={{ color: 'var(--masters)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Player Attendance</p>
+              <Users size={18} className="text-[var(--masters)]" />
+              <div className="flex-1">
+                <p className="font-medium">Player Attendance</p>
                 <p className="type-meta">Track arrivals</p>
               </div>
-              <ChevronLeft size={18} style={{ color: 'var(--ink-tertiary)', transform: 'rotate(180deg)' }} />
+              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
             </Link>
 
             <Link href="/captain/messages" className="match-row">
-              <Bell size={18} style={{ color: 'var(--ink-tertiary)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Announcements</p>
+              <Bell size={18} className="text-[var(--ink-tertiary)]" />
+              <div className="flex-1">
+                <p className="font-medium">Announcements</p>
                 <p className="type-meta">Send messages to players</p>
               </div>
-              <ChevronLeft size={18} style={{ color: 'var(--ink-tertiary)', transform: 'rotate(180deg)' }} />
+              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
             </Link>
 
-            <div className="match-row" style={{ opacity: 0.6 }}>
-              <Lock size={18} style={{ color: 'var(--ink-tertiary)' }} />
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 500 }}>Lock Trip</p>
+            <div className="match-row opacity-60">
+              <Lock size={18} className="text-[var(--ink-tertiary)]" />
+              <div className="flex-1">
+                <p className="font-medium">Lock Trip</p>
                 <p className="type-meta">Prevent further changes</p>
               </div>
-              <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>Coming Soon</span>
+              <span className="type-micro text-[var(--ink-tertiary)]">Coming Soon</span>
             </div>
           </div>
         </section>
