@@ -918,3 +918,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Prevents false “Location not available” errors for legit 0-valued coordinates (correctness; no UI change otherwise).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`4956327`)
+
+### 21:55 EST — Phase 1 (batch 157)
+- Route error boundaries (Login `/login`, Schedule `/schedule`, Standings `/standings`, Matchups `/matchups`, Players `/players`): removed remaining inline token style props in the dev-only error details panel and the “Back to Home” CTA.
+- Icons now use token classes (`text-[var(--color-accent)]`), and the error details panel uses tokenized surfaces (`bg-[var(--surface)]`, `bg-[var(--canvas)]`, `border-[var(--rule)]`).
+- “Back to Home” now uses the shared `btn-secondary` style for consistency.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c0b0d54`)
