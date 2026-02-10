@@ -65,11 +65,7 @@ export function Header({
 
   return (
     <header
-      className="sticky top-0 z-40 h-14 px-4 flex items-center gap-3"
-      style={{
-        background: 'var(--surface, #1A1814)',
-        borderBottom: '1px solid var(--rule, rgba(58, 53, 48, 0.5))',
-      }}
+      className="sticky top-0 z-40 h-14 px-4 flex items-center gap-3 bg-[var(--surface)] border-b border-[var(--rule)]"
     >
       {/* Left side - Back button or Menu */}
       <div className="flex items-center min-w-[40px]">
@@ -95,17 +91,11 @@ export function Header({
 
       {/* Center - Title */}
       <div className="flex-1 min-w-0 text-center lg:text-left">
-        <h1
-          className="text-base font-semibold truncate"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
-        >
+        <h1 className="text-base font-semibold truncate text-[var(--ink)]">
           {displayTitle}
         </h1>
         {subtitle && (
-          <p
-            className="text-xs truncate"
-            style={{ color: 'var(--ink-tertiary, #807868)' }}
-          >
+          <p className="text-xs truncate text-[var(--ink-tertiary)]">
             {subtitle}
           </p>
         )}
@@ -115,13 +105,7 @@ export function Header({
       <div className="flex items-center gap-2 min-w-[40px] justify-end">
         {/* Offline indicator */}
         {!isOnline && (
-          <div
-            className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium"
-            style={{
-              background: 'rgba(196, 152, 61, 0.1)',
-              color: 'var(--warning, #C4983D)',
-            }}
-          >
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-[rgba(196,152,61,0.1)] text-[var(--warning)]">
             <WifiOff className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Offline</span>
           </div>
