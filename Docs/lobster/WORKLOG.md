@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 05:05 EST — Phase 1 — Achievements: token-driven styles (no inline layout)
+- Achievements (`/achievements`): removed most inline `style={{ ... }}` layout and token usage in favor of token-driven Tailwind classes.
+- Progress overview card, category filter, and grid now use standard Tailwind layout utilities; progress bars keep only the dynamic `width` inline style.
+- Achievement cards now use Tailwind for structure/spacing, keeping only dynamic rarity colors via inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5ce5112`)
+
 ### 04:45 EST — Phase 1 — Captain Command + PageHeader: remove inline styles
 - Captain Command (`/captain`): removed remaining inline `style={{...}}` usage for the Captain Mode PIN gate and refined readiness/tools list styling with token-driven Tailwind classes + `cn()`.
 - `PageHeader`: removed inline style objects for back button + typography spacing; added Tailwind-based defaults and support for `iconContainerClassName` for themed headers.

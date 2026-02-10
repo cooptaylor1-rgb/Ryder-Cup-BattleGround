@@ -1,5 +1,12 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-10
 
+## 05:05 EST — Phase 1 (batch 165)
+- Achievements (`/achievements`): removed most inline `style={{ ... }}` layout + token usage in favor of token-driven Tailwind classes.
+- Progress overview, category filter, and grid now use standard Tailwind utilities; progress bars keep only the dynamic `width` inline style.
+- Achievement cards now use Tailwind for structure/spacing and keep only dynamic rarity color styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5ce5112`)
+
 ## 04:05 EST — Phase 1 (batch 164)
 - Settings → Notifications (`/settings/notifications`): removed inline `style={{ ... }}` usage throughout (toast, cards, toggles, icon wrappers) in favor of token-driven Tailwind classes.
 - Toggle switches now use `cn()` conditional classes instead of inline `background`/`transform` style props.
