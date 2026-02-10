@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import {
   CloudRain,
   CloudLightning,
@@ -22,7 +22,9 @@ import {
   ChevronDown,
   Pause,
   Play,
+  CloudSnow,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 
 // ============================================
@@ -30,6 +32,15 @@ import { useUIStore } from '@/lib/stores';
 // ============================================
 
 export type DelayStatus = 'none' | 'weather-delay' | 'lightning-hold' | 'suspended' | 'resumed';
+
+type DelayTone = 'success' | 'warning' | 'danger';
+
+type ToneStyles = {
+  container: string;
+  iconContainer: string;
+  label: string;
+  duration: string;
+};
 
 interface WeatherBannerProps {
   /** Current delay status */
@@ -57,75 +68,92 @@ interface WeatherBannerProps {
 }
 
 // ============================================
-// ICON MAP
-// ============================================
-
-function WeatherIcon({ icon, size = 18 }: { icon?: string; size?: number }) {
-  const props = { size, strokeWidth: 1.5 };
-  switch (icon) {
-    case 'sun':
-      return <Sun {...props} />;
-    case 'cloud-sun':
-      return <CloudSun {...props} />;
-    case 'cloud':
-      return <Cloud {...props} />;
-    case 'cloud-rain':
-    case 'cloud-drizzle':
-    case 'cloud-rain-wind':
-      return <CloudRain {...props} />;
-    case 'cloud-lightning':
-      return <CloudLightning {...props} />;
-    case 'wind':
-      return <Wind {...props} />;
-    default:
-      return <CloudSun {...props} />;
-  }
-}
-
-// ============================================
 // DELAY CONFIG
 // ============================================
 
-const DELAY_CONFIGS: Record<
-  DelayStatus,
-  { label: string; bgColor: string; textColor: string; borderColor: string; icon: React.ReactNode }
-> = {
+const TONE_STYLES: Record<DelayTone, ToneStyles> = {
+  success: {
+    container:
+      'border border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-400/25 dark:bg-emerald-400/10',
+    iconContainer: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
+    label: 'text-emerald-600 dark:text-emerald-300',
+    duration: 'text-emerald-600/80 dark:text-emerald-300/80',
+  },
+  warning: {
+    container:
+      'border border-amber-500/30 bg-amber-500/10 dark:border-amber-400/25 dark:bg-amber-400/10',
+    iconContainer: 'bg-amber-500/15 text-amber-600 dark:text-amber-300',
+    label: 'text-amber-600 dark:text-amber-300',
+    duration: 'text-amber-600/80 dark:text-amber-200/80',
+  },
+  danger: {
+    container:
+      'border border-red-500/30 bg-red-500/10 dark:border-red-400/25 dark:bg-red-400/10',
+    iconContainer: 'bg-red-500/15 text-red-600 dark:text-red-300',
+    label: 'text-red-600 dark:text-red-300',
+    duration: 'text-red-600/80 dark:text-red-200/80',
+  },
+};
+
+const DELAY_CONFIGS: Record<DelayStatus, { label: string; tone: DelayTone; icon: ReactNode }> = {
   none: {
     label: 'Clear',
-    bgColor: 'rgba(0, 103, 71, 0.06)',
-    textColor: 'var(--masters)',
-    borderColor: 'rgba(0, 103, 71, 0.15)',
-    icon: <CheckCircle size={16} />,
+    tone: 'success',
+    icon: <CheckCircle className="h-4 w-4" />,
   },
   'weather-delay': {
     label: 'Weather Delay',
-    bgColor: 'rgba(161, 98, 7, 0.1)',
-    textColor: 'var(--warning)',
-    borderColor: 'rgba(161, 98, 7, 0.3)',
-    icon: <CloudRain size={16} />,
+    tone: 'warning',
+    icon: <CloudRain className="h-4 w-4" />,
   },
   'lightning-hold': {
     label: 'Lightning Hold',
-    bgColor: 'rgba(220, 38, 38, 0.1)',
-    textColor: 'var(--error)',
-    borderColor: 'rgba(220, 38, 38, 0.3)',
-    icon: <CloudLightning size={16} />,
+    tone: 'danger',
+    icon: <CloudLightning className="h-4 w-4" />,
   },
   suspended: {
     label: 'Play Suspended',
-    bgColor: 'rgba(220, 38, 38, 0.1)',
-    textColor: 'var(--error)',
-    borderColor: 'rgba(220, 38, 38, 0.3)',
-    icon: <Pause size={16} />,
+    tone: 'danger',
+    icon: <Pause className="h-4 w-4" />,
   },
   resumed: {
     label: 'Play Resumed',
-    bgColor: 'rgba(0, 103, 71, 0.08)',
-    textColor: 'var(--success)',
-    borderColor: 'rgba(0, 103, 71, 0.2)',
-    icon: <Play size={16} />,
+    tone: 'success',
+    icon: <Play className="h-4 w-4" />,
   },
 };
+
+// ============================================
+// ICON MAP
+// ============================================
+
+function WeatherIcon({ icon }: { icon?: string }) {
+  const normalized = icon?.toLowerCase() ?? '';
+  const commonProps = { strokeWidth: 1.5 } as const;
+
+  if (normalized.includes('snow')) {
+    return <CloudSnow {...commonProps} className="h-8 w-8 text-sky-300" />;
+  }
+
+  switch (normalized) {
+    case 'sun':
+      return <Sun {...commonProps} className="h-8 w-8 text-amber-400" />;
+    case 'cloud-sun':
+      return <CloudSun {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
+    case 'cloud':
+      return <Cloud {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
+    case 'cloud-rain':
+    case 'cloud-drizzle':
+    case 'cloud-rain-wind':
+      return <CloudRain {...commonProps} className="h-8 w-8 text-sky-500" />;
+    case 'cloud-lightning':
+      return <CloudLightning {...commonProps} className="h-8 w-8 text-amber-600" />;
+    case 'wind':
+      return <Wind {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
+    default:
+      return <CloudSun {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
+  }
+}
 
 // ============================================
 // MAIN COMPONENT
@@ -150,18 +178,18 @@ export function WeatherBanner({
 
   const canControl = showCaptainControls && isCaptainMode;
   const config = DELAY_CONFIGS[delayStatus];
+  const toneStyle = TONE_STYLES[config.tone];
   const isActive = delayStatus !== 'none' && delayStatus !== 'resumed';
 
   const handleSetDelay = useCallback(
     (status: DelayStatus) => {
-      onDelayChange?.(status, noteInput || undefined);
+      onDelayChange?.(status, noteInput.trim() || undefined);
       setNoteInput('');
       setShowControls(false);
     },
-    [onDelayChange, noteInput]
+    [noteInput, onDelayChange]
   );
 
-  // Calculate delay duration
   const delayDuration = delayStartedAt
     ? Math.round((Date.now() - new Date(delayStartedAt).getTime()) / 60000)
     : 0;
@@ -173,115 +201,65 @@ export function WeatherBanner({
 
   return (
     <div
-      style={{
-        background: isActive ? config.bgColor : 'var(--canvas-raised)',
-        border: `1px solid ${isActive ? config.borderColor : 'var(--rule)'}`,
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-3) var(--space-4)',
-        position: 'relative',
-      }}
+      className={cn(
+        'relative rounded-[var(--radius-xl)] px-[var(--space-4)] py-[var(--space-3)] transition-colors',
+        isActive ? toneStyle.container : 'border border-[var(--rule)] bg-[var(--canvas-raised)]'
+      )}
     >
       {/* Main row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        {/* Weather icon */}
+      <div className="flex items-center gap-[var(--space-3)]">
         <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 'var(--radius-lg)',
-            background: isActive ? `${config.textColor}15` : 'rgba(0, 103, 71, 0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: isActive ? config.textColor : 'var(--ink-secondary)',
-            flexShrink: 0,
-          }}
+          className={cn(
+            'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--ink-secondary)]',
+            isActive
+              ? toneStyle.iconContainer
+              : 'bg-[var(--masters)]/10 text-[var(--ink-secondary)] dark:bg-[var(--masters)]/15'
+          )}
         >
           {isActive ? config.icon : <WeatherIcon icon={weatherIcon} />}
         </div>
 
         {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="min-w-0 flex-1">
           {isActive ? (
             <>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 700,
-                    color: config.textColor,
-                  }}
-                >
+              <div className="flex items-center gap-[var(--space-2)]">
+                <span className={cn('font-sans text-sm font-semibold', toneStyle.label)}>
                   {config.label}
                 </span>
                 {delayDuration > 0 && (
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      color: config.textColor,
-                      opacity: 0.7,
-                      fontWeight: 500,
-                    }}
-                  >
+                  <span className={cn('text-[11px] font-medium', toneStyle.duration)}>
                     {delayDuration}m
                   </span>
                 )}
               </div>
               {delayNote && (
-                <p
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--ink-secondary)',
-                    marginTop: '2px',
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {delayNote}
-                </p>
+                <p className="mt-1 text-xs leading-tight text-[var(--ink-secondary)]">{delayNote}</p>
               )}
             </>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-[var(--space-3)]">
               {condition && (
-                <span
-                  style={{
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 500,
-                    color: 'var(--ink)',
-                    fontFamily: 'var(--font-sans)',
-                  }}
-                >
+                <span className="font-sans text-sm font-medium text-[var(--ink-primary)]">
                   {condition}
                 </span>
               )}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  fontSize: '12px',
-                  color: 'var(--ink-secondary)',
-                }}
-              >
+              <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--ink-secondary)]">
                 {temperature !== undefined && <span>{temperature}°F</span>}
                 {windSpeed !== undefined && windSpeed > 0 && (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                    <Wind size={10} /> {windSpeed}mph
+                  <span className="flex items-center gap-1">
+                    <Wind className="h-3 w-3" />
+                    {windSpeed}mph
                   </span>
                 )}
                 {precipChance !== undefined && precipChance > 20 && (
                   <span
-                    style={{
-                      color: precipChance > 60 ? 'var(--warning)' : 'var(--ink-secondary)',
-                      fontWeight: precipChance > 60 ? 600 : 400,
-                    }}
+                    className={cn(
+                      'font-medium',
+                      precipChance > 60
+                        ? 'text-amber-600 dark:text-amber-300'
+                        : 'text-[var(--ink-secondary)]'
+                    )}
                   >
                     {precipChance}% rain
                   </span>
@@ -292,43 +270,27 @@ export function WeatherBanner({
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+        <div className="flex items-center gap-1.5">
           {canControl && (
             <button
-              onClick={() => setShowControls(!showControls)}
-              style={{
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                color: 'var(--ink-tertiary)',
-                display: 'flex',
-                alignItems: 'center',
-              }}
+              type="button"
+              onClick={() => setShowControls((prev) => !prev)}
+              className="flex items-center rounded-md p-1 text-[var(--ink-tertiary)] transition-colors hover:text-[var(--ink-secondary)]"
               aria-label="Weather delay controls"
             >
               <ChevronDown
-                size={16}
-                style={{
-                  transform: showControls ? 'rotate(180deg)' : 'none',
-                  transition: 'transform 150ms',
-                }}
+                className={cn('h-4 w-4 transition-transform', showControls && 'rotate-180')}
               />
             </button>
           )}
           {onDismiss && !isActive && (
             <button
+              type="button"
               onClick={onDismiss}
-              style={{
-                border: 'none',
-                background: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                color: 'var(--ink-tertiary)',
-              }}
+              className="flex items-center rounded-md p-1 text-[var(--ink-tertiary)] transition-colors hover:text-[var(--ink-secondary)]"
               aria-label="Dismiss weather banner"
             >
-              <X size={14} />
+              <X className="h-3.5 w-3.5" />
             </button>
           )}
         </div>
@@ -336,75 +298,45 @@ export function WeatherBanner({
 
       {/* Captain controls panel */}
       {showControls && canControl && (
-        <div
-          style={{
-            marginTop: 'var(--space-3)',
-            paddingTop: 'var(--space-3)',
-            borderTop: '1px solid var(--rule)',
-          }}
-        >
-          {/* Note input */}
-          <input
-            type="text"
-            value={noteInput}
-            onChange={(e) => setNoteInput(e.target.value)}
-            placeholder="Optional note (e.g., 'Lightning in area')"
-            style={{
-              width: '100%',
-              padding: 'var(--space-2) var(--space-3)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--rule)',
-              background: 'var(--canvas)',
-              color: 'var(--ink)',
-              fontSize: '13px',
-              fontFamily: 'var(--font-sans)',
-              marginBottom: 'var(--space-3)',
-              outline: 'none',
-            }}
-          />
+        <div className="mt-[var(--space-3)] border-t border-[var(--rule)] pt-[var(--space-3)]">
+          <label className="block">
+            <span className="sr-only">Delay note</span>
+            <input
+              type="text"
+              value={noteInput}
+              onChange={(event) => setNoteInput(event.target.value)}
+              placeholder="Optional note (e.g., 'Lightning in area')"
+              className="w-full rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)] text-[13px] font-sans text-[var(--ink)] placeholder:text-[var(--ink-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35"
+            />
+          </label>
 
-          {/* Delay buttons */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          <div className="mt-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
             {isActive ? (
               <button
+                type="button"
                 onClick={() => handleSetDelay('resumed')}
-                style={{
-                  flex: 1,
-                  padding: 'var(--space-2) var(--space-3)',
-                  borderRadius: 'var(--radius-md)',
-                  border: 'none',
-                  background: 'var(--masters)',
-                  color: 'white',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  fontFamily: 'var(--font-sans)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 'var(--space-1)',
-                }}
+                className="flex flex-1 items-center justify-center gap-1 rounded-[var(--radius-md)] bg-[var(--masters)] px-[var(--space-3)] py-[var(--space-2)] font-sans text-xs font-semibold text-white transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35"
               >
-                <Play size={14} /> Resume Play
+                <Play className="h-3.5 w-3.5" /> Resume Play
               </button>
             ) : (
               <>
                 <DelayButton
                   label="Weather Delay"
-                  icon={<CloudRain size={12} />}
-                  color="var(--warning)"
+                  icon={<CloudRain className="h-3.5 w-3.5" />}
+                  variant="warning"
                   onClick={() => handleSetDelay('weather-delay')}
                 />
                 <DelayButton
                   label="Lightning"
-                  icon={<CloudLightning size={12} />}
-                  color="var(--error)"
+                  icon={<CloudLightning className="h-3.5 w-3.5" />}
+                  variant="danger"
                   onClick={() => handleSetDelay('lightning-hold')}
                 />
                 <DelayButton
                   label="Suspend"
-                  icon={<AlertTriangle size={12} />}
-                  color="var(--error)"
+                  icon={<AlertTriangle className="h-3.5 w-3.5" />}
+                  variant="danger"
                   onClick={() => handleSetDelay('suspended')}
                 />
               </>
@@ -416,37 +348,30 @@ export function WeatherBanner({
   );
 }
 
-function DelayButton({
-  label,
-  icon,
-  color,
-  onClick,
-}: {
+interface DelayButtonProps {
   label: string;
-  icon: React.ReactNode;
-  color: string;
+  icon: ReactNode;
+  variant: 'warning' | 'danger';
   onClick: () => void;
-}) {
+}
+
+function DelayButton({ label, icon, variant, onClick }: DelayButtonProps) {
+  const variantClasses =
+    variant === 'warning'
+      ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
+      : 'border-red-500/30 bg-red-500/10 text-red-600 hover:bg-red-500/15 dark:border-red-400/30 dark:bg-red-400/10 dark:text-red-300';
+
   return (
     <button
+      type="button"
       onClick={onClick}
-      style={{
-        padding: 'var(--space-2) var(--space-3)',
-        borderRadius: 'var(--radius-md)',
-        border: `1px solid ${color}40`,
-        background: `${color}10`,
-        color,
-        fontSize: '12px',
-        fontWeight: 600,
-        fontFamily: 'var(--font-sans)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        whiteSpace: 'nowrap',
-      }}
+      className={cn(
+        'flex items-center gap-1 whitespace-nowrap rounded-[var(--radius-md)] border px-[var(--space-3)] py-[var(--space-2)] font-sans text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35',
+        variantClasses
+      )}
     >
-      {icon} {label}
+      {icon}
+      {label}
     </button>
   );
 }
