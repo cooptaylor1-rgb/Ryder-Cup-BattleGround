@@ -5,6 +5,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 07:45 EST — Docs — Re-sort Lobster WORKLOG by date
+- Moved the 21:05–23:45 entries that were accidentally logged under **2026-02-11** back under **2026-02-10**.
+- Keeps the worklog chronological and avoids “future” timestamps.
+
 ### 07:25 EST — Captain Toolkit — Guard Smart Pairings when no sessions
 - Captain Toolkit: in the Smart Pairings section, render a clear “No sessions created yet” empty-state card instead of passing an undefined session into `SmartPairingSuggestions`.
 - Prevents potential runtime errors/silent gaps when captains open Pairings before creating sessions.
@@ -98,23 +102,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a73ed23`)
 
-### 21:05 EST — Phase 1 — Course UI: replace undefined success/warning subtle tokens
-- Course Scorecard OCR (`ScorecardScanner`) and Hole Data Editor validation banner: removed reliance on undefined CSS vars (`--success-subtle`, `--warning-soft`).
-- Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) and removed a few inline icon/text style props.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`d05d52b`)
+## 2026-02-10
 
-### 21:45 EST — Phase 2 — Live Scores: token-driven team accents
-- Live Scores (`/live`): migrated the `PageHeader` icon accent off inline `style` onto token-driven Tailwind (`text-[var(--color-accent)]`).
-- Live match cards: team dots and “winning team” highlight/score accents now use team CSS tokens via Tailwind (`bg-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/15`, `text-[var(--team-usa)]`, etc.).
+### 23:45 EST — Phase 1 — SyncStatusIndicator: token-driven premium styles
+- `SyncStatusIndicator` (full variant): migrated remaining `bg-card` / `surface-*` utility classes to the premium CSS tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`).
+- Offline “many pending changes” warning now uses `var(--warning)` tokens instead of hard-coded amber palette.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`7ce1119`)
-
-### 22:10 EST — Phase 1 — Finances progress bar + New Trip header icon: token-driven Tailwind styles
-- Finances (`/finances`): replaced the progress bar’s inline `background` style with token-driven Tailwind classes (`bg-[var(--success)]` or `bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)]`), keeping only the dynamic `width` inline.
-- New Trip (`/trip/new`): replaced the `PageHeader` icon inline color style with Tailwind token class (`text-[var(--color-accent)]`).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`abe1197`)
+- Commit + push ✅ (`278b41f`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
 
 ### 23:15 EST — Phase 1 — Live + Courses + Standings: premium token sweep
 - Live Scores (`/live`): migrated `LiveMatchCard` off shadcn-style tokens (`bg-card`, `border-border`, `bg-muted`, `text-muted-foreground`, `text-foreground`) onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`) and standardized status pill colors using `var(--error)` / `var(--success)`.
@@ -123,13 +117,23 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6e1fc4c`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
 
-### 23:45 EST — Phase 1 — SyncStatusIndicator: token-driven premium styles
-- `SyncStatusIndicator` (full variant): migrated remaining `bg-card` / `surface-*` utility classes to the premium CSS tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`).
-- Offline “many pending changes” warning now uses `var(--warning)` tokens instead of hard-coded amber palette.
+### 22:10 EST — Phase 1 — Finances progress bar + New Trip header icon: token-driven Tailwind styles
+- Finances (`/finances`): replaced the progress bar’s inline `background` style with token-driven Tailwind classes (`bg-[var(--success)]` or `bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)]`), keeping only the dynamic `width` inline.
+- New Trip (`/trip/new`): replaced the `PageHeader` icon inline color style with Tailwind token class (`text-[var(--color-accent)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`278b41f`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
+- Commit + push ✅ (`abe1197`)
 
-## 2026-02-10
+### 21:45 EST — Phase 2 — Live Scores: token-driven team accents
+- Live Scores (`/live`): migrated the `PageHeader` icon accent off inline `style` onto token-driven Tailwind (`text-[var(--color-accent)]`).
+- Live match cards: team dots and “winning team” highlight/score accents now use team CSS tokens via Tailwind (`bg-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/15`, `text-[var(--team-usa)]`, etc.).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7ce1119`)
+
+### 21:05 EST — Phase 1 — Course UI: replace undefined success/warning subtle tokens
+- Course Scorecard OCR (`ScorecardScanner`) and Hole Data Editor validation banner: removed reliance on undefined CSS vars (`--success-subtle`, `--warning-soft`).
+- Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) and removed a few inline icon/text style props.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d05d52b`)
 
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
 - `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
