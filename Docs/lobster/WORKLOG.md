@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 11:30 EST — Phase 1 — SettingsPanel: import/clear without hard reload
+- SettingsPanel data management actions now avoid `window.location.reload()` after **Import data** and **Clear all data**.
+- After a successful import/clear, we reset in-memory trip state (`useTripStore.getState().clearTrip()`) and use Next router navigation (`router.push('/')` + `router.refresh()`) so the UI updates without a hard reload.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`28c1ad5`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 10:55 EST — Phase 1 — Captain Availability + Lineup toggle: remove undefined `bg-surface`
 - Captain Availability (`/captain/availability`): session selector buttons now use premium surface + rule tokens instead of the undefined `bg-surface` utility.
 - Lineup session (`/lineup/[sessionId]`): view-mode toggle buttons now use premium surface + rule tokens instead of `bg-surface`, and rely on `disabled:*` Tailwind classes instead of inline opacity.
