@@ -66,8 +66,8 @@ export function PathToVictoryCard({
     return (
       <div className="rounded-2xl border-2 border-[#FFD54F] bg-[linear-gradient(135deg,#FFD54F33,#FFD54F1a)] p-6 text-center">
         <Trophy size={40} className="mx-auto mb-3 text-[#FFD54F]" />
-        <h3 className="mb-2 text-2xl font-bold text-surface-900 dark:text-white">{winner.name} Wins!</h3>
-        <p className="text-base text-surface-500">
+        <h3 className="mb-2 text-2xl font-bold text-[var(--ink)]">{winner.name} Wins!</h3>
+        <p className="text-base text-[var(--ink-secondary)]">
           Final: {pathData.teamA.currentPoints} - {pathData.teamB.currentPoints}
         </p>
       </div>
@@ -75,14 +75,14 @@ export function PathToVictoryCard({
   }
 
   return (
-    <div className="bg-surface-card rounded-2xl overflow-hidden border border-surface-200 dark:border-surface-700">
+    <div className="rounded-2xl overflow-hidden border border-[color:var(--rule)]/30 bg-[var(--surface)]">
       {/* Dramatic Moment Banner */}
       {dramaticMoment && (
         <div className="flex items-center gap-3 border-b border-b-[#FFD54F66] bg-[linear-gradient(90deg,#FFD54F4d,#FFD54F1a)] px-4 py-3">
           <Zap size={20} className="text-[#FFD54F]" />
           <div>
             <div className="text-xs font-semibold text-[#FFD54F]">{dramaticMoment.headline}</div>
-            <div className="text-xs text-surface-500">{dramaticMoment.subtext}</div>
+            <div className="text-xs text-[var(--ink-secondary)]">{dramaticMoment.subtext}</div>
           </div>
         </div>
       )}
@@ -92,11 +92,11 @@ export function PathToVictoryCard({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Target size={20} className="text-[#004225]" />
-            <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-[var(--ink)]">
               Path to Victory
             </h3>
           </div>
-          <div className="text-xs text-surface-500">
+          <div className="text-xs text-[var(--ink-secondary)]">
             {pathData.remainingMatches} matches remaining
           </div>
         </div>
@@ -126,21 +126,21 @@ export function PathToVictoryCard({
         <>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="w-full py-3 bg-surface-50 dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 flex items-center justify-center gap-2 text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 cursor-pointer text-xs transition-colors"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 border-t border-[color:var(--rule)]/30 bg-[var(--surface)] py-3 text-xs text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)]"
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             {expanded ? 'Hide scenarios' : 'View detailed scenarios'}
           </button>
 
           {expanded && (
-            <div className="p-4 border-t border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800">
+            <div className="border-t border-[color:var(--rule)]/30 bg-[var(--canvas-sunken)] p-4">
               <div className="grid grid-cols-2 gap-4">
                 <TeamScenarios team={pathData.teamA} color={COLORS.usa} />
                 <TeamScenarios team={pathData.teamB} color={COLORS.europe} />
               </div>
-              <div className="mt-4 p-3 bg-surface-card rounded-lg flex items-center gap-3">
-                <AlertCircle size={16} className="text-surface-400" />
-                <span className="text-xs text-surface-500">{pathData.tieBreaker}</span>
+              <div className="mt-4 flex items-center gap-3 rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface-raised)] p-3">
+                <AlertCircle size={16} className="text-[var(--ink-tertiary)]" />
+                <span className="text-xs text-[var(--ink-secondary)]">{pathData.tieBreaker}</span>
               </div>
             </div>
           )}
@@ -159,10 +159,10 @@ function CupProgressBar({ pathData }: { pathData: PathToVictory }) {
     <div>
       <div className="flex justify-between mb-2">
         <div className="text-xl font-bold text-[#1565C0]">{teamA.currentPoints}</div>
-        <div className="text-xs text-surface-500">{pointsToWin} to win</div>
+        <div className="text-xs text-[var(--ink-secondary)]">{pointsToWin} to win</div>
         <div className="text-xl font-bold text-[#C62828]">{teamB.currentPoints}</div>
       </div>
-      <div className="flex h-3 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden relative">
+      <div className="relative flex h-3 overflow-hidden rounded-full bg-[color:var(--rule)]/25">
         <div
           className="bg-[linear-gradient(90deg,#1565C0,#1565C0cc)] transition-[width] duration-300 ease-out"
           style={{ width: `${teamAPercent}%` }}
@@ -205,7 +205,7 @@ function QuickSummaryRow({
       ) : (
         <TrendingUp size={16} className="text-[var(--ptv-color)]" />
       )}
-      <span className="flex-1 text-sm text-surface-900 dark:text-white">{summary}</span>
+      <span className="flex-1 text-sm text-[var(--ink)]">{summary}</span>
     </div>
   );
 }
@@ -225,7 +225,7 @@ function TeamScenarios({ team, color }: { team: PathToVictory['teamA']; color: s
           <span className="text-sm text-[#FFD54F]">Cup clinched!</span>
         </div>
       ) : team.isEliminated ? (
-        <div className="p-3 bg-surface-100 dark:bg-surface-800 rounded-lg text-sm text-surface-500">
+        <div className="rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface)] p-3 text-sm text-[var(--ink-secondary)]">
           Eliminated from contention
         </div>
       ) : (
@@ -250,9 +250,9 @@ function ScenarioRow({ scenario }: { scenario: VictoryScenario }) {
           : 'bg-[#EF5350]';
 
   return (
-    <div className="flex items-center gap-3 rounded bg-surface-100 p-2 dark:bg-surface-800">
+    <div className="flex items-center gap-3 rounded border border-[color:var(--rule)]/20 bg-[var(--surface)] p-2">
       <div className={cn('h-2 w-2 rounded-full', dotClassName)} />
-      <span className="flex-1 text-xs text-surface-900 dark:text-white">{scenario.description}</span>
+      <span className="flex-1 text-xs text-[var(--ink)]">{scenario.description}</span>
     </div>
   );
 }
@@ -277,7 +277,7 @@ export function PathToVictoryInline({
   }
 
   return (
-    <div className="flex flex-col gap-1 text-xs text-surface-500">
+    <div className="flex flex-col gap-1 text-xs text-[var(--ink-secondary)]">
       <div>{teamASummary}</div>
       <div>{teamBSummary}</div>
     </div>
