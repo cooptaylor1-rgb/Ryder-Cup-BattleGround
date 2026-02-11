@@ -8,6 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 16:15 EST — Docs — Worklog chronological hygiene (midday re-sort)
 - `Docs/lobster/WORKLOG.md`: re-sorted the 09:15–15:55 entries to be reverse-chronological (latest-first), fixing a lingering 13:xx ordering issue.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7aab69a`)
 
 ### 15:55 EST — Phase 1 — Trip recap: highlights empty state
 - Trip recap `HighlightsSection`: when a trip has no saved highlights, render the shared `EmptyStatePremium` instead of returning `null`, so the Top Moments section stays visible with clear guidance.
@@ -31,6 +32,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - QuickScoreFABv2 + FloatingMyMatch: replaced remaining `border-[var(--border)]` usage with premium `border-[var(--rule)]`.
 - Players bulk-add dropzone: replaced dashed `border-[var(--border)]` with premium `border-[color:var(--rule)]/40`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a445d56`)
 
 ### 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
 - `src/app/global-error.tsx`: updated copy block + dev-only details panel to use premium token-driven ink/surface/rule classes so the global error page renders correctly in dark mode.
@@ -49,6 +51,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `SideBets`: migrated remaining legacy `bg-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--ink-*)`, `var(--rule)`) across category headers, bet rows, and the add form so the component matches the premium shell.
 - Replaced the bespoke inline empty state with the shared `NoBetsEmpty` so editable views surface the standard CTA and read-only views stay consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dd16081`)
 
 ### 13:25 EST — Phase 1 — FloatingMyMatch: show “Find my match” affordance when unresolved
 - `FloatingMyMatch`: no longer silently disappears when the app can’t resolve a current match yet.
@@ -59,7 +62,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 13:20 EST — Docs — Worklog chronological hygiene
 - `Docs/lobster/WORKLOG.md`: fixed a minor timestamp ordering issue in the 2026-02-11 section (08:50 entry now correctly precedes 08:25).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (this commit)
+- Commit + push ✅ (`00b6d76`)
 
 ### 13:10 EST — Phase 2 — Button/IconButton + PhotoGallery: premium token sweep
 - `Button` + `IconButton`: replaced legacy `surface-*` + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`) and updated focus ring offset to `ring-offset-[color:var(--canvas)]`.
@@ -85,13 +88,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `MomentumMeter`: migrated legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` classes to the premium design tokens (`var(--surface)`, `var(--rule)`, `var(--ink-*)`).
 - Keeps the momentum UI consistent with the rest of the premium shell and reduces theme drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (this commit)
+- Commit + push ✅ (`81489d3`)
 
 ### 11:50 EST — Phase 1 — QuickScoreFABv2: show “Start scoring” affordance when no active match
 - QuickScoreFABv2 no longer disappears entirely when there’s no in-progress match.
 - Instead, it renders a small premium “Start scoring” button that navigates to `/schedule`, so users always have an obvious scoring entry-point.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (this commit)
+- Commit + push ✅ (`e1be826`)
 
 ### 11:30 EST — Phase 1 — SettingsPanel: import/clear without hard reload
 - SettingsPanel data management actions now avoid `window.location.reload()` after **Import data** and **Clear all data**.
