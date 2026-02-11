@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 05:35 EST — Phase 1 — Photo capture + skeleton: premium token sweep
+- Photo capture context panel + actions (`PhotoCapture`): migrated off shadcn `bg-card` / `border-border` and hard-coded gray palette onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--success)`) with proper focus/hover states.
+- `LiveMatchCardSkeleton`: migrated wrapper + header off shadcn tokens (`bg-card`, `border-border`, `bg-muted`) onto premium tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d78e294`)
+
 ### 05:10 EST — Phase 1 — Social Day Summary: premium token sweep
 - Social Day Summary share card + modal (`DaySummaryCard`): migrated off shadcn `bg-card` / `border-border` / `bg-muted` / `bg-background` and `text-muted-foreground` onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping share UI consistent with the premium shell.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 05:35 EST — Phase 1 — Photo capture + skeleton: premium token sweep
+- Photo capture context panel + actions (`PhotoCapture`): migrated off shadcn `bg-card` / `border-border` and hard-coded gray palette onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--success)`) with proper focus/hover states.
+- `LiveMatchCardSkeleton`: migrated wrapper + header off shadcn tokens (`bg-card`, `border-border`, `bg-muted`) onto premium tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d78e294`)
+
 ## 03:55 EST — Phase 1 — Switch app shell to QuickScoreFABv2 (remove legacy modal)
 - App root layout now renders `QuickScoreFABv2` (enhanced premium quick-score control).
 - Removed legacy `QuickScoreFAB` + `QuickScoreModal` (and the modal unit test) to avoid duplicate/unused scoring entrypoints.
