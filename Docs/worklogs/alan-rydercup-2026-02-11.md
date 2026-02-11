@@ -4,7 +4,7 @@
 - `Courses` (`/courses`): replaced remaining legacy `bg-surface-card` / `border-surface-border` / `text-text-*` utilities with premium token-driven Tailwind and the shared `.card` surface.
 - Updated course cards, search input, and quick action tiles to use `var(--surface-*)`, `var(--rule)`, and `var(--ink-*)` tokens so the page matches the premium shell.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`88f6b14`) (push pending)
+- Commit + push ✅ (`88f6b14`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
 
 ## 17:10 EST — Phase 2 — CourseDetails: premium `.card` surfaces
 - `CourseDetails`: migrated the map wrapper, tee list, course stats, and “missing data” placeholders off legacy `bg-surface-card`/`border-surface-*` utilities and onto the shared premium `.card` surface.
