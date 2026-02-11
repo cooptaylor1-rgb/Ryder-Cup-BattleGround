@@ -79,19 +79,19 @@ export function WeatherWidget({
 
     if (isLoading) {
         return (
-            <div className={cn('p-4 rounded-xl bg-surface-card flex items-center justify-center', className)}>
-                <Loader2 className="w-6 h-6 animate-spin text-surface-400" />
+            <div className={cn('p-4 rounded-xl bg-[var(--surface)] flex items-center justify-center', className)}>
+                <Loader2 className="w-6 h-6 animate-spin text-[var(--ink-tertiary)]" />
             </div>
         );
     }
 
     if (error || !weather) {
         return (
-            <div className={cn('p-4 rounded-xl bg-surface-card', className)}>
-                <div className="flex items-center gap-2 text-surface-500">
+            <div className={cn('p-4 rounded-xl bg-[var(--surface)]', className)}>
+                <div className="flex items-center gap-2 text-[var(--ink-tertiary)]">
                     <AlertCircle className="w-5 h-5" />
                     <span className="text-sm">{error || 'Weather unavailable'}</span>
-                    <button onClick={loadWeather} className="ml-auto p-1 rounded hover:bg-surface-100 dark:hover:bg-surface-800" aria-label="Refresh weather">
+                    <button onClick={loadWeather} className="ml-auto p-1 rounded hover:bg-[var(--surface-secondary)]" aria-label="Refresh weather">
                         <RefreshCw className="w-4 h-4" />
                     </button>
                 </div>
@@ -108,8 +108,8 @@ export function WeatherWidget({
                 <button
                     onClick={() => setShowForecast(!showForecast)}
                     className={cn(
-                        'flex items-center gap-3 p-3 rounded-xl bg-surface-card',
-                        'hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors',
+                        'flex items-center gap-3 p-3 rounded-xl bg-[var(--surface)]',
+                        'hover:bg-[var(--surface-secondary)] transition-colors',
                         'w-full text-left'
                     )}
                 >
@@ -117,9 +117,9 @@ export function WeatherWidget({
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-bold">{current.temperature}°</span>
-                            <span className="text-sm text-surface-500">{current.condition.description}</span>
+                            <span className="text-sm text-[var(--ink-tertiary)]">{current.condition.description}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-surface-500">
+                        <div className="flex items-center gap-3 text-sm text-[var(--ink-tertiary)]">
                             <span className="flex items-center gap-1">
                                 <Wind className="w-3 h-3" />
                                 {current.windSpeed} mph
@@ -127,14 +127,14 @@ export function WeatherWidget({
                             <span>{getWindDirection(current.windDirection)}</span>
                         </div>
                     </div>
-                    <ChevronRight className={cn('w-5 h-5 text-surface-400 transition-transform', showForecast && 'rotate-90')} />
+                    <ChevronRight className={cn('w-5 h-5 text-[var(--ink-tertiary)] transition-transform', showForecast && 'rotate-90')} />
                 </button>
 
                 {/* Expanded forecast panel */}
                 {showForecast && (
-                    <div className="space-y-3 p-3 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+                    <div className="space-y-3 p-3 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
                         {/* Golf Conditions */}
-                        <div className="flex items-center justify-between pb-2 border-b border-surface-200 dark:border-surface-700">
+                        <div className="flex items-center justify-between pb-2 border-b border-[color:var(--rule)]/30">
                             <span className="text-sm font-medium">Golf Conditions</span>
                             <GolfConditionBadge overall={golfConditions.overall} showLabel />
                         </div>
@@ -142,26 +142,26 @@ export function WeatherWidget({
                         {/* Additional stats */}
                         <div className="grid grid-cols-3 gap-3 text-center">
                             <div>
-                                <div className="text-xs text-surface-500">Feels Like</div>
+                                <div className="text-xs text-[var(--ink-tertiary)]">Feels Like</div>
                                 <div className="font-medium">{current.feelsLike}°</div>
                             </div>
                             <div>
-                                <div className="text-xs text-surface-500">Humidity</div>
+                                <div className="text-xs text-[var(--ink-tertiary)]">Humidity</div>
                                 <div className="font-medium">{current.humidity}%</div>
                             </div>
                             <div>
-                                <div className="text-xs text-surface-500">UV Index</div>
+                                <div className="text-xs text-[var(--ink-tertiary)]">UV Index</div>
                                 <div className="font-medium">{current.uvIndex}</div>
                             </div>
                         </div>
 
                         {/* Hourly mini forecast */}
                         <div>
-                            <div className="text-xs text-surface-500 mb-2">Next Hours</div>
+                            <div className="text-xs text-[var(--ink-tertiary)] mb-2">Next Hours</div>
                             <div className="flex gap-3 overflow-x-auto pb-1">
                                 {weather.hourly.slice(0, 12).map((hour, i) => (
                                     <div key={i} className="flex flex-col items-center gap-1 min-w-[45px]">
-                                        <span className="text-xs text-surface-500">
+                                        <span className="text-xs text-[var(--ink-tertiary)]">
                                             {i === 0 ? 'Now' : format(hour.time, 'ha')}
                                         </span>
                                         <WeatherIcon
@@ -180,10 +180,10 @@ export function WeatherWidget({
 
                         {/* Recommendations */}
                         {golfConditions.recommendations.length > 0 && (
-                            <div className="pt-2 border-t border-surface-200 dark:border-surface-700">
-                                <div className="text-xs text-surface-500 mb-1">Tips</div>
+                            <div className="pt-2 border-t border-[color:var(--rule)]/30">
+                                <div className="text-xs text-[var(--ink-tertiary)] mb-1">Tips</div>
                                 {golfConditions.recommendations.slice(0, 2).map((rec, i) => (
-                                    <div key={i} className="flex items-start gap-1 text-xs text-surface-600 dark:text-surface-400">
+                                    <div key={i} className="flex items-start gap-1 text-xs text-[var(--ink-secondary)]">
                                         <span className="text-masters-primary">•</span>
                                         <span>{rec}</span>
                                     </div>
@@ -262,7 +262,7 @@ export function WeatherWidget({
             </div>
 
             {/* Golf Conditions Card */}
-            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+            <div className="p-4 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
                 <div className="flex items-center justify-between mb-3">
                     <span className="font-medium">Golf Conditions</span>
                     <GolfConditionBadge overall={golfConditions.overall} showLabel />
@@ -279,7 +279,7 @@ export function WeatherWidget({
                 {golfConditions.recommendations.length > 0 && (
                     <div className="space-y-2">
                         {golfConditions.recommendations.map((rec, i) => (
-                            <div key={i} className="flex items-start gap-2 text-sm text-surface-600 dark:text-surface-400">
+                            <div key={i} className="flex items-start gap-2 text-sm text-[var(--ink-secondary)]">
                                 <span className="text-masters-primary">•</span>
                                 <span>{rec}</span>
                             </div>
@@ -289,12 +289,12 @@ export function WeatherWidget({
             </div>
 
             {/* Hourly Forecast */}
-            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+            <div className="p-4 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
                 <div className="font-medium mb-3">Hourly Forecast</div>
                 <div className="flex gap-4 overflow-x-auto pb-2">
                     {weather.hourly.slice(0, 12).map((hour, i) => (
                         <div key={i} className="flex flex-col items-center gap-1 min-w-[50px]">
-                            <span className="text-xs text-surface-500">
+                            <span className="text-xs text-[var(--ink-tertiary)]">
                                 {i === 0 ? 'Now' : format(hour.time, 'ha')}
                             </span>
                             <WeatherIcon
@@ -312,16 +312,16 @@ export function WeatherWidget({
             </div>
 
             {/* Daily Forecast */}
-            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+            <div className="p-4 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
                 <div className="font-medium mb-3">7-Day Forecast</div>
                 <div className="space-y-3">
                     {weather.daily.map((day, i) => (
                         <div key={i} className="flex items-center gap-4">
-                            <span className="w-12 text-sm text-surface-500">
+                            <span className="w-12 text-sm text-[var(--ink-tertiary)]">
                                 {i === 0 ? 'Today' : format(day.date, 'EEE')}
                             </span>
                             <WeatherIcon condition={day.condition.icon} size="sm" isDay />
-                            <span className="flex-1 text-sm text-surface-500 truncate">
+                            <span className="flex-1 text-sm text-[var(--ink-tertiary)] truncate">
                                 {day.condition.description}
                             </span>
                             {day.precipitationProbability > 20 && (
@@ -329,7 +329,7 @@ export function WeatherWidget({
                             )}
                             <div className="text-right">
                                 <span className="font-medium">{day.temperatureMax}°</span>
-                                <span className="text-surface-400 ml-1">{day.temperatureMin}°</span>
+                                <span className="text-[var(--ink-tertiary)] ml-1">{day.temperatureMin}°</span>
                             </div>
                         </div>
                     ))}
@@ -338,15 +338,15 @@ export function WeatherWidget({
 
             {/* Sun times */}
             <div className="flex gap-4">
-                <div className="flex-1 p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
-                    <div className="flex items-center gap-2 text-surface-500 mb-1">
+                <div className="flex-1 p-4 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
+                    <div className="flex items-center gap-2 text-[var(--ink-tertiary)] mb-1">
                         <Sunrise className="w-4 h-4" />
                         <span className="text-sm">Sunrise</span>
                     </div>
                     <div className="font-medium">{formatTime(weather.daily[0].sunrise)}</div>
                 </div>
-                <div className="flex-1 p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
-                    <div className="flex items-center gap-2 text-surface-500 mb-1">
+                <div className="flex-1 p-4 rounded-xl bg-[var(--surface)] border border-[color:var(--rule)]/30">
+                    <div className="flex items-center gap-2 text-[var(--ink-tertiary)] mb-1">
                         <Sunset className="w-4 h-4" />
                         <span className="text-sm">Sunset</span>
                     </div>
@@ -443,8 +443,8 @@ function FactorBar({ label, value }: FactorBarProps) {
 
     return (
         <div className="flex items-center gap-3">
-            <span className="w-24 text-sm text-surface-500">{label}</span>
-            <div className="flex-1 h-2 bg-surface-100 dark:bg-surface-800 rounded-full overflow-hidden">
+            <span className="w-24 text-sm text-[var(--ink-tertiary)]">{label}</span>
+            <div className="flex-1 h-2 bg-[color:var(--ink-tertiary)]/15 rounded-full overflow-hidden">
                 <div
                     className={cn('h-full rounded-full transition-all', getColor())}
                     style={{ width: `${value}%` }}

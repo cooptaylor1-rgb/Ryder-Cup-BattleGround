@@ -347,7 +347,7 @@ export function PhotoStrip({ photos, onViewAll, className }: PhotoStripProps) {
             {displayPhotos.map((photo) => (
                 <div
                     key={photo.id}
-                    className="w-10 h-10 rounded overflow-hidden bg-surface-100 dark:bg-surface-800 relative"
+                    className="w-10 h-10 rounded overflow-hidden bg-[var(--surface-secondary)] relative"
                 >
                     <Image
                         src={photo.thumbnailUrl || photo.url}
@@ -361,7 +361,7 @@ export function PhotoStrip({ photos, onViewAll, className }: PhotoStripProps) {
             {remainingCount > 0 && (
                 <button
                     onClick={onViewAll}
-                    className="w-10 h-10 rounded bg-surface-100 dark:bg-surface-800 flex items-center justify-center text-xs text-surface-500"
+                    className="w-10 h-10 rounded bg-[var(--surface-secondary)] flex items-center justify-center text-xs text-[var(--ink-tertiary)]"
                 >
                     +{remainingCount}
                 </button>
