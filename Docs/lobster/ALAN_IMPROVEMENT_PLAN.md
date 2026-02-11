@@ -41,6 +41,12 @@ git push origin main
 
 Purpose: eliminate blank-screen / `return null` UI states on user-facing routes.
 
+Status: ✅ As of 2026-02-06 (see Lobster WORKLOG), the route-level sweep is functionally complete for `src/app/**/page.tsx`:
+- no top-level `return null;` in route pages (excluding `api/`)
+- no `Suspense fallback={null}` in route pages
+
+Keep the searches below around anyway; they’re the fastest way to verify we didn’t regress.
+
 Primary route checklist (keep a running checklist in the worklog):
 - `golf-ryder-cup-web/src/app/schedule/page.tsx`
 - `golf-ryder-cup-web/src/app/score/[matchId]/page.tsx`
@@ -74,6 +80,21 @@ Pattern:
 - `undefined` (loading) → `PageLoadingSkeleton`
 - `[]` / no rows (empty) → `EmptyStatePremium`
 - hard errors → `ErrorEmpty` (from `EmptyStatePremium.tsx`)
+
+## After Phase 1: component-level “silent gap” sweep (optional)
+
+Once routes are no longer blank, the next biggest UX paper-cuts are *silent gaps inside otherwise-rendering pages*.
+These usually look like `return null` in a widget that is expected to show something (even an empty state).
+
+Generate a candidate list:
+
+```bash
+rg "^\\s*return null;\\s*$" golf-ryder-cup-web/src/components -n
+```
+
+Triage guidance:
+- **OK to keep `return null`:** tiny status indicators or providers that intentionally disappear (e.g., Offline badge, feature-gated banners).
+- **Prefer explicit UI:** cards/sections inside a page where a `null` return looks like a bug (replace with a compact `EmptyStatePremium` or placeholder skeleton).
 
 ## Phase boundaries
 

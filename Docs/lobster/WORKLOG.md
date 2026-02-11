@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 00:10 EST — Docs — Phase 1 route sweep status + next optional component-level sweep
+- `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`: documented that Phase 1’s route-level blank-screen sweep is functionally complete (as of 2026-02-06), and added a follow-on optional sweep for component-level `return null` “silent gaps”.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`92d1bd2`)
+
 ### 21:05 EST — Phase 1 — Course UI: replace undefined success/warning subtle tokens
 - Course Scorecard OCR (`ScorecardScanner`) and Hole Data Editor validation banner: removed reliance on undefined CSS vars (`--success-subtle`, `--warning-soft`).
 - Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) and removed a few inline icon/text style props.
