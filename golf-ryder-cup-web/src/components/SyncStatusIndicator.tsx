@@ -212,14 +212,19 @@ export function SyncStatusIndicator({
 
   // Full variant - detailed view with queue
   return (
-    <div className={cn('rounded-xl border bg-card overflow-hidden', className)}>
+    <div
+      className={cn(
+        'rounded-2xl overflow-hidden border border-[var(--rule)] bg-[var(--surface)]',
+        className
+      )}
+    >
       {/* Header */}
       <button
         onClick={() => pendingCount > 0 && setShowQueue(!showQueue)}
         className={cn(
           'w-full flex items-center justify-between p-3',
           'transition-colors',
-          pendingCount > 0 && 'hover:bg-surface-50 cursor-pointer',
+          pendingCount > 0 && 'hover:bg-[var(--surface-secondary)] cursor-pointer',
           pulseAnimation && 'haptic-success'
         )}
       >
@@ -241,13 +246,13 @@ export function SyncStatusIndicator({
           </div>
 
           <div className="text-left">
-            <p className="text-sm font-medium text-surface-900">
+            <p className="text-sm font-medium text-[var(--ink-primary)]">
               {status === 'offline' && "You're offline"}
               {status === 'syncing' && 'Syncing changes...'}
               {status === 'pending' && `${pendingCount} changes to sync`}
               {status === 'synced' && 'All changes saved'}
             </p>
-            <p className="text-xs text-surface-500">
+            <p className="text-xs text-[var(--ink-tertiary)]">
               {status === 'offline' && 'Changes saved locally'}
               {status === 'syncing' && 'Please wait...'}
               {status === 'pending' && 'Will sync when online'}
@@ -260,7 +265,10 @@ export function SyncStatusIndicator({
         {pendingCount > 0 && (
           <ChevronDown
             size={16}
-            className={cn('text-surface-400 transition-transform', showQueue && 'rotate-180')}
+            className={cn(
+              'text-[var(--ink-tertiary)] transition-transform',
+              showQueue && 'rotate-180'
+            )}
           />
         )}
       </button>
@@ -274,14 +282,14 @@ export function SyncStatusIndicator({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-surface-200 px-3 py-2 bg-surface-50">
-              <p className="text-xs font-medium text-surface-500 mb-2">Pending changes</p>
+            <div className="border-t border-[var(--rule)] px-3 py-2 bg-[var(--surface-secondary)]">
+              <p className="text-xs font-medium text-[var(--ink-tertiary)] mb-2">Pending changes</p>
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {queueItems.slice(0, 5).map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-xs">
                     <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    <span className="flex-1 truncate text-surface-700">{item.description}</span>
-                    <span className="text-surface-400">
+                    <span className="flex-1 truncate text-[var(--ink-secondary)]">{item.description}</span>
+                    <span className="text-[var(--ink-tertiary)]">
                       {new Date(item.timestamp).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -290,7 +298,7 @@ export function SyncStatusIndicator({
                   </div>
                 ))}
                 {queueItems.length > 5 && (
-                  <p className="text-xs text-surface-400 text-center pt-1">
+                  <p className="text-xs text-[var(--ink-tertiary)] text-center pt-1">
                     +{queueItems.length - 5} more
                   </p>
                 )}
@@ -302,9 +310,9 @@ export function SyncStatusIndicator({
 
       {/* Error state (for future use) */}
       {status === 'offline' && pendingCount > 5 && (
-        <div className="border-t border-surface-200 px-3 py-2 bg-amber-50 flex items-start gap-2">
-          <AlertCircle size={14} className="text-amber-600 mt-0.5 shrink-0" />
-          <p className="text-xs text-amber-700">
+        <div className="border-t border-[var(--rule)] px-3 py-2 bg-[color:var(--warning)]/10 flex items-start gap-2">
+          <AlertCircle size={14} className="text-[var(--warning)] mt-0.5 shrink-0" />
+          <p className="text-xs text-[var(--warning)]">
             You have many pending changes. Connect to sync and prevent data conflicts.
           </p>
         </div>
@@ -339,7 +347,9 @@ export function LastSyncedTimestamp({ className = '' }: { className?: string }) 
     );
   }
 
-  return <span className={cn('text-xs text-surface-400', className)}>Synced {formattedTime}</span>;
+  return (
+    <span className={cn('text-xs text-[var(--ink-tertiary)]', className)}>Synced {formattedTime}</span>
+  );
 }
 
 export default SyncStatusIndicator;
