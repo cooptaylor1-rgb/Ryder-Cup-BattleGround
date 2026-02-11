@@ -89,8 +89,19 @@ export function HandicapStrokeIndicator({
   }, [teamAStrokes, teamBStrokes, holeHandicaps]);
 
   // No strokes to show (equal handicaps)
+  // Prefer explicit UI over a silent gap, since this widget often sits in a fixed scoring header.
   if (teamAStrokes === 0 && teamBStrokes === 0) {
-    return null;
+    return (
+      <div
+        className={cn(
+          'flex items-center justify-center gap-2 p-3 rounded-xl border border-[var(--rule)] bg-[var(--canvas-sunken)] text-xs text-[var(--ink-tertiary)]',
+          className
+        )}
+      >
+        <Info className="w-4 h-4" aria-hidden />
+        <span>No handicap strokes</span>
+      </div>
+    );
   }
 
   // Get hole handicap ranking
