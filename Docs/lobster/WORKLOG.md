@@ -221,6 +221,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c2cdc0f`)
 
+### 19:50 EST — Phase 2 — Captain dashboard LiveMatchMonitor: token-driven Tailwind styles
+- `LiveMatchMonitor` (captain dashboard): removed most inline `style={{ ... }}` token usage (surface/border/ink colors, progress bar, alert banners) in favor of token-driven Tailwind classes.
+- Kept truly-dynamic colors (team accents + status colors) inline where required.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`80d1ab8`)
+
 ### 22:21 EST — Phase 1 — PressTracker: token-driven styles
 - Scoring `PressTracker`: replaced inline token styles (`style={{ background/color/border... }}`) with token-driven Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `text-[var(--ink-secondary)]`, `border-[var(--rule)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

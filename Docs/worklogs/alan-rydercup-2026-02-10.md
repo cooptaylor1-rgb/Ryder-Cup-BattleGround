@@ -11,6 +11,12 @@
 - Keeps the advanced tools accordion layout stable and avoids a confusing blank region while still holding the press UI behind a configuration gate.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+## 19:50 EST — Phase 2 — Captain dashboard LiveMatchMonitor: token-driven Tailwind styles
+- `LiveMatchMonitor` (captain dashboard): removed most inline `style={{ ... }}` token usage (surface/border/ink colors, progress bar, alert banners) in favor of token-driven Tailwind classes.
+- Kept truly-dynamic colors (team accents + status colors) inline where required.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`80d1ab8`)
+
 ## 18:25 EST — Docs — Log ThemeToggle hydration batch (push recovered)
 - Worklogs: recorded the ThemeToggle hydration placeholder batch.
 - Note: pushing from this environment also runs `pre-push` checks (`typecheck` + `test` + `build`) and they all passed ✅.
