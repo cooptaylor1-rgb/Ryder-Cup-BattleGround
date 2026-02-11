@@ -17,6 +17,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`7ce1119`)
 
+### 22:10 EST — Phase 1 — Finances progress bar + New Trip header icon: token-driven Tailwind styles
+- Finances (`/finances`): replaced the progress bar’s inline `background` style with token-driven Tailwind classes (`bg-[var(--success)]` or `bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)]`), keeping only the dynamic `width` inline.
+- New Trip (`/trip/new`): replaced the `PageHeader` icon inline color style with Tailwind token class (`text-[var(--color-accent)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`abe1197`)
+
 ## 2026-02-10
 
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
