@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Bets (`/bets` + `/bets/[betId]`): migrated remaining bottom-sheet/confirm modal surfaces off shadcn `bg-background` / `bg-muted` and onto premium surfaces (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`) with consistent hover states (`hover:bg-[var(--surface)]`).
 - Trip settings (`/trip/[tripId]/settings`): replaced remaining `border-border` section dividers with premium `border-[var(--rule)]`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`f157b5f`)
+- Commit + push ✅ (`0db49c2`)
 
 ### 06:20 EST — Phase 1 — Home skeleton + Continue Scoring banner: premium token sweep
 - `HomeLoadingSkeleton`: migrated the pulse blocks off shadcn `bg-muted/50` to premium token-driven Tailwind (`bg-[color:var(--ink-tertiary)]/10`) and removed remaining inline layout/token styles in favor of classnames.
