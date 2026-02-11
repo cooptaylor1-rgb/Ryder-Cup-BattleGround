@@ -34,6 +34,11 @@ const config: Config = {
                     deep: 'var(--masters-deep)',
                     subtle: 'var(--masters-subtle)',
                 },
+
+                // Legacy/compat aliases (used throughout the codebase)
+                // Keep these until we finish migrating all Tailwind classnames.
+                'masters-primary': 'var(--masters)',
+                'masters-primary-dark': 'var(--masters-deep)',
                 gold: {
                     DEFAULT: 'var(--gold)',
                     light: 'var(--gold-light)',
