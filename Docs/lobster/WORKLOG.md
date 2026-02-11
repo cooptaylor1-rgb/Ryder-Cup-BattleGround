@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 09:40 EST — Captain Toolkit: premium tokens + EmptyStatePremium for no sessions
+- Captain Toolkit: migrated UI surfaces/inks/rules off the hard-coded gray/blue palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping accent colors via `var(--color-accent)`.
+- Tee Times / Smart Pairings / Weather sections: when there are no sessions, now render `EmptyStatePremium` (“No sessions created yet”) instead of bespoke placeholder blocks.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5eeee4a`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 09:15 EST — Phase 1 — OfflineIndicator: token-driven banner gradients
 - Offline banner: replaced inline `style={{ background, paddingTop }}` with Tailwind classes.
 - Uses `pt-[env(safe-area-inset-top)]` for iOS safe-area spacing and gradient utilities for offline/syncing/online states (`var(--masters)` → `var(--masters-deep)` for the “back online” banner).
