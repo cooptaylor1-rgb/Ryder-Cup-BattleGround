@@ -327,7 +327,40 @@ export function NassauEnhancedCard({
   }
 
   // No game
-  if (!game) return null;
+  if (!game) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🏆</span>
+              <div>
+                <h2 className="text-xl font-bold text-white">Nassau</h2>
+                <p className="text-emerald-100 text-sm">Game unavailable</p>
+              </div>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/10"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-4 text-center">
+            <p className="text-sm font-medium text-gray-900 dark:text-white">We couldn’t load this Nassau game.</p>
+            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+              Try reopening the game, or start a new one.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate payouts for display
   const payouts = showPayouts ? calculateNassauPayouts(game, players) : null;
