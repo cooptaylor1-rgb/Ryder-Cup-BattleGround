@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 16:55 EST — Phase 2 — Bets: replace shadcn `--muted` token
+- Bets list + bet detail: replaced remaining `var(--muted)` surfaces with the premium token `var(--surface-secondary)` so “disabled/empty” pills and the Nassau team-selection disabled state render consistently across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`42e3634`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 16:15 EST — Docs — Worklog chronological hygiene (midday re-sort)
 - `Docs/lobster/WORKLOG.md`: re-sorted the 09:15–15:55 entries to be reverse-chronological (latest-first), fixing a lingering 13:xx ordering issue.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
