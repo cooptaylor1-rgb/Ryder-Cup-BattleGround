@@ -188,7 +188,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                                     'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
                                     preferences.scoringHand === hand
                                         ? 'bg-masters-primary text-white'
-                                        : 'bg-surface-100 dark:bg-surface-800'
+                                        : 'bg-[var(--surface)] text-[var(--ink-secondary)] border border-[var(--rule)]'
                                 )}
                             >
                                 {hand.charAt(0).toUpperCase() + hand.slice(1)}
@@ -250,8 +250,8 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                             </>
                         ) : (
                             <>
-                                <CloudOff className="w-4 h-4 text-surface-400" />
-                                <span className="text-sm text-surface-400">Offline only</span>
+                                <CloudOff className="w-4 h-4 text-[var(--ink-tertiary)]" />
+                                <span className="text-sm text-[var(--ink-tertiary)]">Offline only</span>
                             </>
                         )}
                     </div>
@@ -271,7 +271,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
 
                 {storageUsage && (
                     <SettingsRow label="Storage used" description={`${storageUsage.used} of ${storageUsage.total}`}>
-                        <HardDrive className="w-5 h-5 text-surface-400" />
+                        <HardDrive className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     </SettingsRow>
                 )}
             </SettingsSection>
@@ -280,26 +280,26 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
             <SettingsSection title="Data Management" icon={<HardDrive className="w-5 h-5" />}>
                 <button
                     onClick={handleExportData}
-                    className="w-full flex items-center gap-3 p-4 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                    className="w-full flex items-center gap-3 p-4 rounded-lg bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)] transition-colors"
                 >
                     <Download className="w-5 h-5 text-masters-primary" />
                     <div className="flex-1 text-left">
                         <div className="font-medium">Export data</div>
-                        <div className="text-sm text-surface-500">Download a backup of all your data</div>
+                        <div className="text-sm text-[var(--ink-tertiary)]">Download a backup of all your data</div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-surface-400" />
+                    <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
                 </button>
 
                 <button
                     onClick={handleImportData}
-                    className="w-full flex items-center gap-3 p-4 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                    className="w-full flex items-center gap-3 p-4 rounded-lg bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)] transition-colors"
                 >
                     <Upload className="w-5 h-5 text-masters-primary" />
                     <div className="flex-1 text-left">
                         <div className="font-medium">Import data</div>
-                        <div className="text-sm text-surface-500">Restore from a backup file</div>
+                        <div className="text-sm text-[var(--ink-tertiary)]">Restore from a backup file</div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-surface-400" />
+                    <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
                 </button>
 
                 <button
@@ -318,10 +318,10 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
             {/* About */}
             <SettingsSection title="About" icon={<Info className="w-5 h-5" />}>
                 <SettingsRow label="Version" description="Golf Ryder Cup App">
-                    <span className="text-sm text-surface-500">1.0.0</span>
+                    <span className="text-sm text-[var(--ink-tertiary)]">1.0.0</span>
                 </SettingsRow>
                 <SettingsRow label="Platform" description="Progressive Web App">
-                    <Smartphone className="w-5 h-5 text-surface-400" />
+                    <Smartphone className="w-5 h-5 text-[var(--ink-tertiary)]" />
                 </SettingsRow>
             </SettingsSection>
         </div>
@@ -358,10 +358,12 @@ interface SettingsRowProps {
 
 function SettingsRow({ label, description, children }: SettingsRowProps) {
     return (
-        <div className="flex items-center justify-between p-4 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700">
+        <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--surface)] border border-[var(--rule)]">
             <div>
                 <div className="font-medium">{label}</div>
-                {description && <div className="text-sm text-surface-500">{description}</div>}
+                {description && (
+                    <div className="text-sm text-[var(--ink-tertiary)]">{description}</div>
+                )}
             </div>
             {children}
         </div>
@@ -381,7 +383,7 @@ function Toggle({ checked, onChange }: ToggleProps) {
             onClick={() => onChange(!checked)}
             className={cn(
                 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                checked ? 'bg-masters-primary' : 'bg-surface-300 dark:bg-surface-600'
+                checked ? 'bg-masters-primary' : 'bg-[color:var(--ink-tertiary)]/25'
             )}
         >
             <span
