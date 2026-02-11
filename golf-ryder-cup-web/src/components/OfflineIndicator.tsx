@@ -261,7 +261,7 @@ export function OfflineIndicator() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border"
+            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--rule)]"
           >
             <Wifi size={14} className="text-green-500" />
             <span className="text-xs font-medium">Online</span>

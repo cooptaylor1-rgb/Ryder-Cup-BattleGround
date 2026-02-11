@@ -317,14 +317,14 @@ export function NotificationPermissionBanner() {
     }
 
     return (
-        <div className="bg-card border border-border rounded-xl p-4 mb-4">
+        <div className="bg-[var(--surface)] border border-[var(--rule)] rounded-2xl p-4 mb-4">
             <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[var(--masters-subtle)]">
                     🔔
                 </div>
                 <div className="flex-1">
                     <h3 className="font-semibold mb-1">Stay Updated</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className="text-sm text-[var(--ink-tertiary)] mb-3">
                         Get notified when scores change, matches finish, or your team takes the lead.
                     </p>
                     <div className="flex gap-2">
