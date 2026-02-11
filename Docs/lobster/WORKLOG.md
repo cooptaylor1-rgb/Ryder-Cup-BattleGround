@@ -1291,7 +1291,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Live play `MatchStatusHeader`: removed inline `style={{ ... }}` usage and migrated to Tailwind classes (including token-driven team colors like `bg-[var(--team-usa)]` / `bg-[var(--team-europe)]`).
 - No behavior change; keeps premium theming class-driven and reduces chances of silent style drift.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`9282e2f`)
 
 ### 19:30 EST — Phase 1 — Games: explicit fallback when game missing
 - NassauEnhancedCard + HammerGameCard: replaced `if (!game) return null;` with a small in-component fallback card (“Game unavailable”) so the UI can’t silently render nothing if a game record can’t be loaded.
