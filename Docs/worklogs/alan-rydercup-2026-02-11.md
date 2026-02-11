@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 03:25 EST — Phase 1 — Remove unused legacy sync status components
+- Removed the unused legacy sync UI module at `src/components/sync/*` (deprecated in favor of the newer premium sync/offline indicators).
+- Avoids confusion from two similarly-named `SyncStatusIndicator` implementations and reduces dead code.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9ff91bf`)
+
 ## 21:05 EST — Phase 1 — Course UI: replace undefined success/warning subtle tokens
 - Course Scorecard OCR (`ScorecardScanner`) and Hole Data Editor validation banner: removed reliance on undefined CSS vars (`--success-subtle`, `--warning-soft`).
 - Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) and removed a few inline icon/text style props.

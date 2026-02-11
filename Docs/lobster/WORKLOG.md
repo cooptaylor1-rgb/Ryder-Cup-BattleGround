@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 03:25 EST — Phase 1 — Remove unused legacy sync status components
+- Removed the unused legacy sync UI module at `src/components/sync/*` (deprecated in favor of the newer premium sync/offline indicators).
+- Reduces dead code + confusion from two similarly-named `SyncStatusIndicator` implementations.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9ff91bf`)
+
 ### 02:48 EST — Phase 1 — PWA banners: remove unused InstallPrompt stub
 - `PWABanners`: removed the unused `InstallPrompt` export that always returned `null` (the real install UI lives in `components/InstallPrompt.tsx`).
 - Avoids confusing name collisions and ensures future imports don’t silently render nothing.
