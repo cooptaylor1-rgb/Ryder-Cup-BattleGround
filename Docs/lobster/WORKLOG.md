@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 13:10 EST — Phase 2 — Button/IconButton + PhotoGallery: premium token sweep
+- `Button` + `IconButton`: replaced legacy `surface-*` + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`) and updated focus ring offset to `ring-offset-[color:var(--canvas)]`.
+- `PhotoGallery`: migrated legacy `bg-surface-*` / `text-surface-*` empty-state + upload progress styles to premium tokens (surface/rule/ink).
+- `getWinnerStyles`: removed legacy `surface-*` classes for halved/none winner states in favor of token-driven neutral pill styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f32eb7d`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 12:55 EST — Phase 2 — SettingsPanel: premium token sweep (remove legacy surface palette)
 - `SettingsPanel`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
 - Updates include the scoring-hand selector buttons, settings rows, storage/sync icons, and the Export/Import data cards.
