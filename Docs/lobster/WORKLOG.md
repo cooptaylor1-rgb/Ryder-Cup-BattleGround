@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 05:55 EST — Phase 1 — Predictions + Cart Tracker: premium token sweep
+- `MatchPredictions`: migrated prediction cards + bottom-sheet modal off shadcn tokens (`bg-background`, `bg-card`, `bg-muted`, `border-border`, `text-muted-foreground`) onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping the Masters + team accents.
+- `CartTracker`: migrated the bottom sheet + controls off shadcn tokens onto premium tokens and standardized the selected state to use premium `var(--warning)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f25f1de`) (note: pre-push `typecheck` + `test` + `build` passed; Next build reported an existing CSS optimization warning for a `bg-[var(...)]` class)
+
 ### 05:35 EST — Phase 1 — Photo capture + skeleton: premium token sweep
 - Photo capture context panel + actions (`PhotoCapture`): migrated off shadcn `bg-card` / `border-border` and hard-coded gray palette onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--success)`) with proper focus/hover states.
 - `LiveMatchCardSkeleton`: migrated wrapper + header off shadcn tokens (`bg-card`, `border-border`, `bg-muted`) onto premium tokens.
