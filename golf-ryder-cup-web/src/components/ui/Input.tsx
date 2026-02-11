@@ -44,7 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     <label
                         htmlFor={inputId}
                         className={cn(
-                            'block text-base font-medium text-text-primary mb-2',
+                            'block text-base font-medium text-[var(--ink-primary)] mb-2',
                             disabled && 'opacity-50',
                         )}
                     >
@@ -56,7 +56,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 <div className="relative">
                     {/* Left icon */}
                     {leftIcon && (
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)] pointer-events-none">
                             <span className="[&>svg]:h-4 [&>svg]:w-4">{leftIcon}</span>
                         </div>
                     )}
@@ -69,8 +69,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             // Base styles
                             'block w-full rounded-xl',
-                            'bg-surface-elevated border-2 border-surface-border',
-                            'text-base text-text-primary placeholder:text-text-tertiary',
+                            'bg-[var(--surface-raised)] border-2 border-[var(--rule)]',
+                            'text-base text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]',
                             'transition-all duration-150',
 
                             // Sizing - iPhone optimized minimum 44px height
@@ -80,16 +80,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                             // Focus state - Masters gold accent, high contrast
                             'focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold',
+                            'focus:ring-offset-2 focus:ring-offset-[color:var(--canvas)]',
                             'focus:shadow-md',
 
                             // Error state - high contrast for visibility
                             error && [
-                                'border-error focus:ring-error focus:border-error',
-                                'bg-error/5',
+                                'border-[var(--error)] focus:ring-[var(--error)] focus:border-[var(--error)]',
+                                'bg-[color:var(--error)]/8',
                             ],
 
                             // Disabled state
-                            disabled && 'opacity-50 cursor-not-allowed bg-surface-muted',
+                            disabled && 'opacity-50 cursor-not-allowed bg-[var(--surface-secondary)]',
 
                             className
                         )}
@@ -102,7 +103,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                     {/* Right icon */}
                     {rightIcon && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)] pointer-events-none">
                             <span className="[&>svg]:h-4 [&>svg]:w-4">{rightIcon}</span>
                         </div>
                     )}
@@ -114,7 +115,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         id={error ? `${inputId}-error` : `${inputId}-hint`}
                         className={cn(
                             'mt-1.5 text-xs',
-                            error ? 'text-error' : 'text-text-tertiary',
+                            error ? 'text-[var(--error)]' : 'text-[var(--ink-tertiary)]',
                         )}
                     >
                         {error || hint}

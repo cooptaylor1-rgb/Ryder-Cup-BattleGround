@@ -50,39 +50,39 @@ function AwardCard({
   return (
     <div
       className={`
-        card-surface rounded-xl overflow-hidden
-        ${def.isPositive ? 'ring-1 ring-masters/20' : 'ring-1 ring-surface-border/30'}
+        card rounded-xl overflow-hidden p-0
+        ${def.isPositive ? 'ring-1 ring-[color:var(--masters)]/20' : 'ring-1 ring-[color:var(--rule)]/30'}
       `}
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-surface-highlight transition-colors"
+        className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-3xl">{def.emoji}</span>
           <div className="text-left">
-            <div className="font-semibold text-text-primary">{def.label}</div>
-            <div className="text-sm text-text-tertiary">{def.description}</div>
+            <div className="font-semibold text-[var(--ink-primary)]">{def.label}</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">{def.description}</div>
           </div>
         </div>
         {winnerPlayer ? (
           <div className="text-right">
             <div className="font-bold text-masters">{winnerPlayer.firstName}</div>
-            <div className="text-xs text-text-tertiary">Winner</div>
+            <div className="text-xs text-[var(--ink-tertiary)]">Winner</div>
           </div>
         ) : suggestedPlayer ? (
           <div className="text-right">
-            <div className="text-sm text-text-secondary">{suggestedPlayer.firstName}</div>
-            <div className="text-xs text-text-tertiary">Suggested</div>
+            <div className="text-sm text-[var(--ink-secondary)]">{suggestedPlayer.firstName}</div>
+            <div className="text-xs text-[var(--ink-tertiary)]">Suggested</div>
           </div>
         ) : (
-          <div className="text-sm text-text-tertiary">Tap to vote</div>
+          <div className="text-sm text-[var(--ink-tertiary)]">Tap to vote</div>
         )}
       </button>
 
       {expanded && (
-        <div className="border-t border-surface-border p-4">
-          <p className="text-sm text-text-secondary mb-3">Select a winner:</p>
+        <div className="border-t border-[var(--rule)] p-4">
+          <p className="text-sm text-[var(--ink-secondary)] mb-3">Select a winner:</p>
           <div className="flex flex-wrap gap-2">
             {players.map((player) => {
               const isWinner = currentWinner?.winnerId === player.id;
@@ -99,7 +99,7 @@ function AwardCard({
                         ? 'bg-masters text-white shadow-md'
                         : isSuggested
                           ? 'bg-masters/20 text-masters border border-masters/30'
-                          : 'bg-surface-elevated text-text-primary hover:bg-surface-highlight'
+                          : 'bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
                     }
                   `}
                 >
@@ -136,10 +136,10 @@ function WinnerShowcase({
 
   if (rows.length === 0) {
     return (
-      <div className="card-elevated rounded-xl p-6 mb-6 text-center">
+      <div className="card card-elevated rounded-xl p-6 mb-6 text-center">
         <div className="text-4xl mb-3">🏆</div>
         <h2 className="type-h3 mb-1">No award winners yet</h2>
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-[var(--ink-secondary)]">
           Tap an award below to vote and we’ll showcase winners here.
         </p>
       </div>
@@ -147,7 +147,7 @@ function WinnerShowcase({
   }
 
   return (
-    <div className="card-elevated rounded-xl p-6 mb-6">
+    <div className="card card-elevated rounded-xl p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
         <Trophy size={20} className="text-masters" />
         <h2 className="type-h3">Award Winners</h2>
@@ -157,8 +157,8 @@ function WinnerShowcase({
           <div key={award.id} className="flex items-center gap-3">
             <span className="text-2xl">{def.emoji}</span>
             <div>
-              <div className="text-xs text-text-tertiary">{def.label}</div>
-              <div className="font-semibold text-text-primary">{winner!.firstName}</div>
+              <div className="text-xs text-[var(--ink-tertiary)]">{def.label}</div>
+              <div className="font-semibold text-[var(--ink-primary)]">{winner!.firstName}</div>
             </div>
           </div>
         ))}
@@ -270,11 +270,11 @@ export default function TripAwardsPage() {
         <section className="section-sm space-y-6">
           <WinnerShowcase awards={awards} players={players} />
 
-          <div className="card-surface rounded-xl p-4 flex items-start gap-3">
+          <div className="card rounded-xl p-4 flex items-start gap-3">
             <Sparkles size={20} className="text-masters shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm text-text-primary font-medium">Vote for trip superlatives!</p>
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-sm text-[var(--ink-primary)] font-medium">Vote for trip superlatives!</p>
+              <p className="text-xs text-[var(--ink-secondary)] mt-1">
                 Some awards have auto-suggestions based on trip stats. Tap any award to select a
                 winner.
               </p>
@@ -282,7 +282,7 @@ export default function TripAwardsPage() {
           </div>
 
           <section>
-            <h2 className="type-overline text-text-secondary mb-3">🌟 Positive Vibes</h2>
+            <h2 className="type-overline text-[var(--ink-secondary)] mb-3">🌟 Positive Vibes</h2>
             <div className="space-y-3">
               {positiveAwards.map((awardType) => (
                 <AwardCard
@@ -298,7 +298,7 @@ export default function TripAwardsPage() {
           </section>
 
           <section>
-            <h2 className="type-overline text-text-secondary mb-3">😂 Dubious Honors</h2>
+            <h2 className="type-overline text-[var(--ink-secondary)] mb-3">😂 Dubious Honors</h2>
             <div className="space-y-3">
               {funnyAwards.map((awardType) => (
                 <AwardCard
