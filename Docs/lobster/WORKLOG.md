@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 15:55 EST — Phase 1 — Trip recap: highlights empty state
+- Trip recap `HighlightsSection`: when a trip has no saved highlights, render the shared `EmptyStatePremium` instead of returning `null`, so the Top Moments section stays visible with clear guidance.
+- Keeps the social recap free of silent gaps and aligned with the premium empty-state pattern.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`acdd239`)
+
 ### 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
 - Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` in favor of a stable token-driven class (`bg-[var(--masters-subtle)]`) to avoid CSS optimizer warnings.
 - `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
