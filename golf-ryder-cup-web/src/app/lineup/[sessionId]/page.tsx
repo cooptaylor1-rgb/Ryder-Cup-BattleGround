@@ -364,7 +364,10 @@ export default function SessionPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode('matches')}
-                className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${viewMode === 'matches' ? 'bg-masters text-white' : 'bg-surface border border-rule'}`}
+                className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${viewMode === 'matches'
+                  ? 'bg-masters text-white'
+                  : 'bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)] hover:border-[color:var(--rule)]/60'
+                  }`}
               >
                 <Eye size={16} />
                 View Matches
@@ -372,8 +375,10 @@ export default function SessionPage() {
               <button
                 onClick={() => setViewMode('edit')}
                 disabled={!canEdit}
-                className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${viewMode === 'edit' ? 'bg-masters text-white' : 'bg-surface border border-rule'}`}
-                style={{ opacity: canEdit ? 1 : 0.5 }}
+                className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${viewMode === 'edit'
+                  ? 'bg-masters text-white'
+                  : 'bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)] hover:border-[color:var(--rule)]/60'
+                  }`}
               >
                 <Edit3 size={16} />
                 Edit Lineup
