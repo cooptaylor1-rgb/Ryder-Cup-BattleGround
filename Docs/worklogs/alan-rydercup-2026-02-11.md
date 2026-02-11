@@ -1,5 +1,10 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 17:10 EST — Phase 2 — CourseDetails: premium `.card` surfaces
+- `CourseDetails`: migrated the map wrapper, tee list, course stats, and “missing data” placeholders off legacy `bg-surface-card`/`border-surface-*` utilities and onto the shared premium `.card` surface.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`190e2fc`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
 - Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` and replaced it with `bg-[var(--masters-subtle)]` to avoid CSS optimizer warnings.
 - `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
