@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 03:55 EST — Phase 1 — Switch app shell to QuickScoreFABv2 (remove legacy modal)
+- App root layout now renders `QuickScoreFABv2` (enhanced premium quick-score control).
+- Removed legacy `QuickScoreFAB` + `QuickScoreModal` (and the modal unit test) to avoid duplicate/unused scoring entrypoints.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7324079`)
+
 ## 03:25 EST — Phase 1 — Remove unused legacy sync status components
 - Removed the unused legacy sync UI module at `src/components/sync/*` (deprecated in favor of the newer premium sync/offline indicators).
 - Avoids confusion from two similarly-named `SyncStatusIndicator` implementations and reduces dead code.
