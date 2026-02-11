@@ -168,7 +168,12 @@ export function ConnectionStatusBadge({ className }: { className?: string }) {
         );
     }
 
-    return null;
+    return (
+        <span className={cn('flex items-center gap-1 text-xs text-surface-500', className)}>
+            <CloudOff className="w-3 h-3" />
+            Local
+        </span>
+    );
 }
 
 /**

@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 01:50 EST — Phase 1 — ConnectionStatusBadge: avoid silent gap when sync is local-only
+- `ConnectionStatusBadge`: when Supabase sync is not configured, render an explicit "Local" badge (with `CloudOff` icon) instead of returning `null`.
+- Keeps header UI stable and makes it clear that the app is running offline/local-only even while online.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 01:30 EST — Phase 1 — HandicapStrokeIndicator: avoid silent gap when no strokes
 - `HandicapStrokeIndicator`: when both teams have 0 strokes, render an explicit compact “No handicap strokes” row (with `Info` icon) instead of `return null`.
 - Prevents a confusing empty region in scoring headers where the strokes widget is expected.
