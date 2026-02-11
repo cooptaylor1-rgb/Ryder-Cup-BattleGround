@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 14:50 EST — Phase 2 — Remove remaining shadcn `--border`/`--card` CSS vars
+- Offline Queue panel: replaced `bg-[var(--card)]`, `border-[var(--border)]`, and `text-[var(--ink)]` with premium tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-primary)]`).
+- QuickScoreFABv2 + FloatingMyMatch: replaced remaining `border-[var(--border)]` usage with premium `border-[var(--rule)]`.
+- Players bulk-add dropzone: replaced dashed `border-[var(--border)]` with premium `border-[color:var(--rule)]/40`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
 - `src/app/global-error.tsx`: updated copy block + dev-only details panel to use premium token-driven ink/surface/rule classes so the global error page renders correctly in dark mode.
 - Added `dark:from-surface-900 dark:to-surface-950` to the page gradient background.

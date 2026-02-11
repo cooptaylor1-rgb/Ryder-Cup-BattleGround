@@ -177,11 +177,11 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
                     animate={{ y: 0 }}
                     exit={{ y: '100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    className="absolute bottom-0 left-0 right-0 max-h-[80vh] rounded-t-2xl overflow-hidden bg-[var(--card)]"
+                    className="absolute bottom-0 left-0 right-0 max-h-[80vh] rounded-t-2xl overflow-hidden bg-[var(--surface-raised)]"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="sticky top-0 z-10 px-4 py-3 border-b border-[var(--border)] bg-[var(--card)] flex items-center justify-between">
+                    <div className="sticky top-0 z-10 px-4 py-3 border-b border-[var(--rule)] bg-[var(--surface-raised)] flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div
                                 className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -195,7 +195,7 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
                                 )}
                             </div>
                             <div>
-                                <h2 className="font-semibold text-[var(--ink)]">Sync Queue</h2>
+                                <h2 className="font-semibold text-[var(--ink-primary)]">Sync Queue</h2>
                                 <p className="text-xs text-[var(--ink-secondary)]">
                                     {isOnline ? 'Online' : 'Offline'} • {stats?.total || 0} pending
                                 </p>
@@ -211,7 +211,7 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
 
                     {/* Stats Bar */}
                     {stats && stats.total > 0 && (
-                        <div className="px-4 py-2 flex items-center gap-4 border-b border-[var(--border)]">
+                        <div className="px-4 py-2 flex items-center gap-4 border-b border-[var(--rule)]">
                             <div className="flex items-center gap-1.5">
                                 <Clock size={14} className="text-yellow-500" />
                                 <span className="text-xs text-[var(--ink-secondary)]">
@@ -251,13 +251,13 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
                                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-green-500/10">
                                     <Check size={32} className="text-green-500" />
                                 </div>
-                                <p className="font-medium text-[var(--ink)]">All synced!</p>
+                                <p className="font-medium text-[var(--ink-primary)]">All synced!</p>
                                 <p className="text-sm text-center mt-1 text-[var(--ink-secondary)]">
                                     No pending changes to sync
                                 </p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-[var(--border)]">
+                            <div className="divide-y divide-[var(--rule)]">
                                 {items.map((item) => (
                                     <div
                                         key={`${item.type}-${item.id}`}
@@ -268,20 +268,20 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
 
                                         {/* Info */}
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium truncate text-[var(--ink)]">
+                                            <p className="text-sm font-medium truncate text-[var(--ink-primary)]">
                                                 {item.description}
                                             </p>
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <span className={`text-xs ${getStatusColor(item.status)}`}>
                                                     {item.status}
                                                 </span>
-                                                <span className="text-xs text-[var(--ink-muted)]">•</span>
+                                                <span className="text-xs text-[var(--ink-tertiary)]">•</span>
                                                 <span className="text-xs text-[var(--ink-secondary)]">
                                                     {formatTimestamp(item.timestamp)}
                                                 </span>
                                                 {item.retryCount > 0 && (
                                                     <>
-                                                        <span className="text-xs text-[var(--ink-muted)]">
+                                                        <span className="text-xs text-[var(--ink-tertiary)]">
                                                             •
                                                         </span>
                                                         <span className="text-xs text-orange-500">
@@ -354,7 +354,7 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
 
                     {/* Footer Actions */}
                     {items.length > 0 && (
-                        <div className="sticky bottom-0 px-4 py-3 border-t border-[var(--border)] bg-[var(--card)] flex items-center justify-between gap-2">
+                        <div className="sticky bottom-0 px-4 py-3 border-t border-[var(--rule)] bg-[var(--surface-raised)] flex items-center justify-between gap-2">
                             {confirmDiscardAll ? (
                                 <div className="flex items-center gap-2 w-full">
                                     <span className="text-sm flex-1 text-[var(--ink-secondary)]">
@@ -373,7 +373,7 @@ export function OfflineQueuePanel({ isOpen, onClose }: OfflineQueuePanelProps) {
                                     </button>
                                     <button
                                         onClick={() => setConfirmDiscardAll(false)}
-                                        className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--surface)] text-[var(--ink)]"
+                                        className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--surface)] text-[var(--ink-primary)]"
                                     >
                                         Cancel
                                     </button>

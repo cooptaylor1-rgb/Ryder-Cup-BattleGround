@@ -208,7 +208,7 @@ export function QuickScoreFABv2({
           }}
           className={
             'flex items-center gap-2 rounded-full shadow-xl px-4 py-3 ' +
-            'bg-[var(--surface)] border border-[var(--border)] '
+            'bg-[var(--surface)] border border-[var(--rule)] '
           }
           aria-label="Start scoring"
         >

@@ -598,7 +598,7 @@ export default function PlayersPage() {
             {/* Add row button */}
             <button
               onClick={addBulkRow}
-              className="mb-[var(--space-4)] flex w-full shrink-0 cursor-pointer items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-dashed border-[var(--border)] bg-transparent p-[var(--space-2)]"
+              className="mb-[var(--space-4)] flex w-full shrink-0 cursor-pointer items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-dashed border-[color:var(--rule)]/40 bg-transparent p-[var(--space-2)]"
             >
               <Plus size={16} className="text-[var(--ink-tertiary)]" />
               <span className="type-meta">Add another row</span>

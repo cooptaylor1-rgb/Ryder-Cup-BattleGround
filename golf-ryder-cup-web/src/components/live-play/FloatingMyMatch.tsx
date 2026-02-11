@@ -243,7 +243,7 @@ export function FloatingMyMatch({
                     'fixed right-4 z-50',
                     'lg:right-6',
                     'flex items-center gap-2 rounded-full shadow-lg',
-                    'px-4 py-3 bg-[var(--surface)] border border-[var(--border)]'
+                    'px-4 py-3 bg-[var(--surface)] border border-[var(--rule)]'
                 )}
                 style={{ bottom: `${bottomOffset}px` }}
                 aria-label="Find my match"
