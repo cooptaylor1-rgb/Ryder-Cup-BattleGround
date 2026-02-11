@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 08:25 — Shipped batch: `ScorecardScanner` (Course OCR) migrated remaining shadcn utility tokens (`bg-background`, `bg-muted`, `border-border`, `text-muted-foreground`, `bg-card`) onto premium design tokens (`bg-[var(--canvas)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`). Updated `ScanScorecardButton` to match premium surfaces. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted an existing CSS optimization warning). (commit ba1b6b7)
 - 07:45 — Docs: re-sorted the Lobster worklog to keep entries under the correct dates (moved mis-logged 21:05–23:45 entries back under 2026-02-10). (commit dd4ecd7)
 - 07:25 — Shipped batch: Captain Toolkit Pairings section now renders a clear “No sessions created yet” empty-state when there are no sessions, instead of passing an undefined session into `SmartPairingSuggestions` (avoids potential runtime errors / silent gaps). (commit 3c0c782)
 - 06:20 — Shipped batch: `HomeLoadingSkeleton` + `ContinueScoringBanner` removed remaining shadcn utility tokens (`bg-muted`, `text-muted-foreground`) and inline `var(--token)` styles in favor of premium token-driven Tailwind classes (`bg-[color:var(--ink-tertiary)]/10`, `bg-[var(--masters)]`, `border-[var(--masters)]`, `text-[var(--ink-tertiary)]`, etc.). (commit 3afa1e0)

@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 08:25 EST — Phase 1 — ScorecardScanner: premium token sweep
+- Course scorecard OCR (`ScorecardScanner`): migrated remaining shadcn tokens (`bg-background`, `bg-muted`, `border-border`, `text-muted-foreground`, `bg-card`) to premium token-driven Tailwind (`bg-[var(--canvas)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`).
+- Updated `ScanScorecardButton` to match premium surfaces (surface + rule + raised hover).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ba1b6b7`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 07:45 EST — Docs — Re-sort Lobster WORKLOG by date
 - Moved the 21:05–23:45 entries that were accidentally logged under **2026-02-11** back under **2026-02-10**.
 - Keeps the worklog chronological and avoids “future” timestamps.
