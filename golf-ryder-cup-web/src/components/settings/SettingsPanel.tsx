@@ -7,9 +7,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/utils/logger';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { useTripStore } from '@/lib/stores';
 import { syncService, useSyncStatus, isSupabaseConfigured } from '@/lib/supabase';
 import {
     Palette,
@@ -53,6 +55,7 @@ const DEFAULT_PREFERENCES: Preferences = {
 };
 
 export function SettingsPanel({ className }: SettingsPanelProps) {
+    const router = useRouter();
     const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFERENCES);
     const [storageUsage, setStorageUsage] = useState<{ used: string; total: string } | null>(null);
     const syncStatus = useSyncStatus();
@@ -120,7 +123,11 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                 const { importData } = await import('@/lib/db');
                 await importData(data);
                 alert('Data imported successfully!');
-                window.location.reload();
+
+                // Refresh in-app state without forcing a hard reload.
+                useTripStore.getState().clearTrip();
+                router.push('/');
+                router.refresh();
             } catch (error) {
                 logger.error('Import failed:', error);
                 alert('Failed to import data. Make sure the file is a valid backup.');
@@ -142,7 +149,11 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
             await clearAllData();
             localStorage.clear();
             alert('All data cleared');
-            window.location.reload();
+
+            // Reset in-memory stores and return to Home.
+            useTripStore.getState().clearTrip();
+            router.push('/');
+            router.refresh();
         } catch (error) {
             logger.error('Clear failed:', error);
             alert('Failed to clear data');
