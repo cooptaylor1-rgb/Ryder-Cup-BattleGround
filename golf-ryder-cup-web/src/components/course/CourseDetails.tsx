@@ -131,7 +131,7 @@ export function CourseDetails({
                 <div className="space-y-4">
                     {/* Map */}
                     {hasLocation && (
-                        <div className="rounded-xl overflow-hidden border border-surface-200 dark:border-surface-700">
+                        <div className="card overflow-hidden">
                             <iframe
                                 src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${course.location.latitude},${course.location.longitude}&zoom=15&maptype=satellite`}
                                 width="100%"
@@ -146,7 +146,7 @@ export function CourseDetails({
                     )}
 
                     {/* Tee Selection */}
-                    <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
+                    <div className="card p-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-medium">Available Tees</h3>
                             {tees.length > 4 && (
@@ -182,19 +182,19 @@ export function CourseDetails({
                     {/* Course Stats */}
                     {tees.length > 0 && (
                         <div className="grid grid-cols-3 gap-4">
-                            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 text-center">
+                            <div className="card p-4 text-center">
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].par_total}
                                 </div>
                                 <div className="text-sm text-surface-500">Par</div>
                             </div>
-                            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 text-center">
+                            <div className="card p-4 text-center">
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].total_yards?.toLocaleString()}
                                 </div>
                                 <div className="text-sm text-surface-500">Yards</div>
                             </div>
-                            <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 text-center">
+                            <div className="card p-4 text-center">
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].slope_rating}
                                 </div>
@@ -220,7 +220,7 @@ export function CourseDetails({
             )}
 
             {activeTab === 'weather' && !hasLocation && (
-                <div className="p-8 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 text-center">
+                <div className="card p-8 text-center">
                     <MapPin className="w-10 h-10 mx-auto mb-3 text-surface-400" />
                     <p className="text-surface-500">Location data not available for weather</p>
                 </div>
@@ -297,7 +297,7 @@ function ScorecardView({ tees }: ScorecardViewProps) {
 
     if (!selectedTee || !selectedTee.holes) {
         return (
-            <div className="p-8 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 text-center">
+            <div className="card p-8 text-center">
                 <Target className="w-10 h-10 mx-auto mb-3 text-surface-400" />
                 <p className="text-surface-500">Hole-by-hole data not available</p>
             </div>
