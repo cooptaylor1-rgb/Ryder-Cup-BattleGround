@@ -30,6 +30,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`6e1fc4c`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
 
+### 23:45 EST — Phase 1 — SyncStatusIndicator: token-driven premium styles
+- `SyncStatusIndicator` (full variant): migrated remaining `bg-card` / `surface-*` utility classes to the premium CSS tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`).
+- Offline “many pending changes” warning now uses `var(--warning)` tokens instead of hard-coded amber palette.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`278b41f`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
+
 ## 2026-02-10
 
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
