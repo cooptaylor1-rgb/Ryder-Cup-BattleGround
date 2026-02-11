@@ -356,13 +356,13 @@ export default function BetsPage() {
             className="absolute inset-0 bg-black/50"
             onClick={() => setShowCreateModal(false)}
           />
-          <div className="relative w-full max-w-lg bg-background rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full max-w-lg rounded-t-3xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="type-title">Create Side Bet</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 rounded-full hover:bg-muted"
+                className="p-2 rounded-full hover:bg-[var(--surface)]"
                 style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
               >
                 <X size={24} />

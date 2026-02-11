@@ -253,7 +253,7 @@ export default function BetDetailPage() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowEditModal(true)}
-                            className="p-2 rounded-lg hover:bg-muted transition-colors bg-transparent border-none cursor-pointer"
+                            className="p-2 rounded-lg hover:bg-[var(--surface)] transition-colors bg-transparent border-none cursor-pointer"
                             aria-label="Edit"
                         >
                             <Edit2 size={20} className="text-[var(--ink-secondary)]" />
@@ -654,12 +654,12 @@ export default function BetDetailPage() {
                         className="absolute inset-0 bg-black/50"
                         onClick={() => setShowRecordWinner(false)}
                     />
-                    <div className="relative w-full max-w-lg bg-background rounded-t-3xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
+                    <div className="relative w-full max-w-lg rounded-t-3xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="type-title">Hole {selectedHole} Winner</h2>
                             <button
                                 onClick={() => setShowRecordWinner(false)}
-                                className="p-2 rounded-full hover:bg-muted bg-transparent border-none cursor-pointer"
+                                className="p-2 rounded-full hover:bg-[var(--surface)] bg-transparent border-none cursor-pointer"
                             >
                                 <X size={24} />
                             </button>
@@ -704,7 +704,7 @@ export default function BetDetailPage() {
                         className="absolute inset-0 bg-black/50"
                         onClick={() => setShowDeleteConfirm(false)}
                     />
-                    <div className="relative bg-background rounded-2xl p-6 max-w-sm w-full">
+                    <div className="relative rounded-2xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 max-w-sm w-full">
                         <h2 className="type-title mb-2">Delete Bet?</h2>
                         <p className="type-body mb-6 text-[var(--ink-secondary)]">
                             This action cannot be undone.

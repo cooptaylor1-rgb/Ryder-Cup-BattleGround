@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 06:55 EST — Phase 1 — Bets modals + Trip settings: premium token surfaces
+- Bets (`/bets` + `/bets/[betId]`): migrated remaining bottom-sheet/confirm modal surfaces off shadcn `bg-background` / `bg-muted` and onto premium surfaces (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`) with consistent hover states (`hover:bg-[var(--surface)]`).
+- Trip settings (`/trip/[tripId]/settings`): replaced remaining `border-border` section dividers with premium `border-[var(--rule)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f157b5f`)
+
 ## 05:55 EST — Phase 1 — Predictions + Cart Tracker: premium token sweep
 - `MatchPredictions`: migrated cards + bottom-sheet modal off shadcn tokens (`bg-background`, `bg-card`, `bg-muted`, `border-border`, `text-muted-foreground`) onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping the Masters + team accents.
 - `CartTracker`: migrated the bottom sheet, controls, and recent list off shadcn tokens onto premium tokens; standardized “selected” state to use the premium `var(--warning)` accent.

@@ -263,7 +263,7 @@ export default function TripSettingsPage() {
         <div className="content-area space-y-6">
           {/* Backup & Export Section */}
           <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-border">
+            <div className="p-4 border-b border-[var(--rule)]">
               <h2 className="type-h3">Backup & Export</h2>
               <p className="text-sm text-text-secondary mt-1">Save your trip data or share with others.</p>
             </div>
@@ -341,7 +341,7 @@ export default function TripSettingsPage() {
 
           {/* Danger Zone */}
           <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-border">
+            <div className="p-4 border-b border-[var(--rule)]">
               <h2 className="type-h3 text-red-200">Danger Zone</h2>
               <p className="text-sm text-text-secondary mt-1">Destructive actions can’t be undone.</p>
             </div>
