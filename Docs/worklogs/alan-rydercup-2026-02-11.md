@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
+- `src/app/global-error.tsx`: updated the global error page to use premium token-driven ink/surface/rule classes so it renders correctly in dark mode (removed hard-coded `text-surface-*` utilities).
+- Added `dark:from-surface-900 dark:to-surface-950` to the background gradient.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`aab0a8b`)
+
 ## 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
 - `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) so theme borders remain consistent and token-driven.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

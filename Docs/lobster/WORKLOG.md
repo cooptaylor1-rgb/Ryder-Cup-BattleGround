@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
+- `src/app/global-error.tsx`: updated copy block + dev-only details panel to use premium token-driven ink/surface/rule classes so the global error page renders correctly in dark mode.
+- Added `dark:from-surface-900 dark:to-surface-950` to the page gradient background.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`aab0a8b`)
+
 ### 14:10 EST — Phase 2 — WeatherWidget + PhotoStrip: premium token sweep
 - `WeatherWidget`: migrated remaining legacy `bg-surface-card` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) across loading/error/compact + forecast cards.
 - `FactorBar`: updated the track color to a subtle token-driven neutral (`bg-[color:var(--ink-tertiary)]/15`) so the conditions bars render consistently across themes.
