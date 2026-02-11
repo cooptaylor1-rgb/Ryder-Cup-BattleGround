@@ -159,7 +159,7 @@ export default function LivePage() {
       <PageHeader
         title="Live Scores"
         subtitle={currentTrip.name}
-        icon={<Tv size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Tv size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
         rightSlot={
           <div className="flex items-center gap-2">
@@ -325,43 +325,31 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
       <div className="p-4">
         {/* Team A */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg mb-2 transition-all ${isTeamAWinning ? 'bg-blue-500/20' : ''
-            }`}
+          className={`flex items-center justify-between py-3 px-4 rounded-lg mb-2 transition-all ${isTeamAWinning ? 'bg-[color:var(--team-usa)]/15' : ''}`}
         >
           <div className="flex items-center gap-3">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: 'var(--team-usa)' }}
-            />
+            <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
             <span className={`font-medium ${isTeamAWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
               {formatPlayerNames(teamAPlayers)}
             </span>
           </div>
           {isTeamAWinning && (
-            <span className="text-lg font-bold text-blue-400">
-              {getScoreDisplay()}
-            </span>
+            <span className="text-lg font-bold text-[var(--team-usa)]">{getScoreDisplay()}</span>
           )}
         </div>
 
         {/* Team B */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg transition-all ${isTeamBWinning ? 'bg-yellow-500/20' : ''
-            }`}
+          className={`flex items-center justify-between py-3 px-4 rounded-lg transition-all ${isTeamBWinning ? 'bg-[color:var(--team-europe)]/15' : ''}`}
         >
           <div className="flex items-center gap-3">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: 'var(--team-europe)' }}
-            />
+            <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
             <span className={`font-medium ${isTeamBWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
               {formatPlayerNames(teamBPlayers)}
             </span>
           </div>
           {isTeamBWinning && (
-            <span className="text-lg font-bold text-yellow-400">
-              {getScoreDisplay()}
-            </span>
+            <span className="text-lg font-bold text-[var(--team-europe)]">{getScoreDisplay()}</span>
           )}
         </div>
 
