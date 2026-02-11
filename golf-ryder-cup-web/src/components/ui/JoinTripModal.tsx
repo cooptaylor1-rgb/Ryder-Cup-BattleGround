@@ -70,16 +70,16 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-surface-card rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="bg-[var(--surface-raised)] rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-[color:var(--rule)]/40">
         {/* Header */}
-        <div className="p-6 border-b border-surface-200 dark:border-surface-700">
+        <div className="p-6 border-b border-[color:var(--rule)]/40">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full bg-masters-primary/10">
               <Users className="w-6 h-6 text-masters-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold">Join a Trip</h2>
-              <p className="text-sm text-surface-500">Enter the share code to join</p>
+              <h2 className="text-xl font-semibold text-[var(--ink)]">Join a Trip</h2>
+              <p className="text-sm text-[var(--ink-secondary)]">Enter the share code to join</p>
             </div>
           </div>
         </div>
@@ -92,12 +92,12 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                 <CheckCircle className="w-8 h-8 text-success" />
               </div>
               <h3 className="text-lg font-medium text-success mb-2">Successfully Joined!</h3>
-              <p className="text-surface-500">Loading trip data...</p>
+              <p className="text-[var(--ink-secondary)]">Loading trip data...</p>
             </div>
           ) : (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-2">
+                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
                   Share Code
                 </label>
                 <input
@@ -107,9 +107,10 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                   placeholder="Enter 6-character code"
                   className={cn(
                     'w-full px-4 py-3 text-center text-2xl font-mono tracking-widest',
-                    'rounded-lg border bg-surface-50 dark:bg-surface-800',
-                    'focus:outline-none focus:ring-2 focus:ring-masters-primary',
-                    error ? 'border-error text-error' : 'border-surface-200 dark:border-surface-700'
+                    'rounded-lg border bg-[var(--surface)]',
+                    'text-[var(--ink)] placeholder:text-[var(--ink-tertiary)]',
+                    'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-[color:var(--canvas)]',
+                    error ? 'border-error text-error' : 'border-[color:var(--rule)]/40'
                   )}
                   maxLength={6}
                   autoFocus
@@ -122,9 +123,9 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                 )}
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-surface-50 dark:bg-surface-800 mb-6">
-                <Share2 className="w-5 h-5 text-surface-400" />
-                <div className="text-sm text-surface-500">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-[color:var(--surface)]/60 mb-6 border border-[color:var(--rule)]/20">
+                <Share2 className="w-5 h-5 text-[var(--ink-tertiary)]" />
+                <div className="text-sm text-[var(--ink-secondary)]">
                   Ask the trip captain for the share code, or find it in the trip settings.
                 </div>
               </div>
@@ -134,10 +135,10 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
 
         {/* Footer */}
         {!success && (
-          <div className="flex gap-3 p-6 border-t border-surface-200 dark:border-surface-700">
+          <div className="flex gap-3 p-6 border-t border-[color:var(--rule)]/40">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-lg border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 font-medium hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg border border-[color:var(--rule)]/40 text-[var(--ink-secondary)] font-medium hover:bg-[color:var(--surface)]/60 transition-colors"
             >
               Cancel
             </button>
@@ -206,22 +207,24 @@ export function ShareTripCard({ shareCode, className }: ShareTripProps) {
     >
       <div className="flex items-center gap-3 mb-3">
         <Share2 className="w-5 h-5 text-masters-primary" />
-        <span className="font-medium">Share This Trip</span>
+        <span className="font-medium text-[var(--ink)]">Share This Trip</span>
       </div>
-      <p className="text-sm text-surface-500 mb-4">
+      <p className="text-sm text-[var(--ink-secondary)] mb-4">
         Share this code with others so they can join and see live scores.
       </p>
       <button
         onClick={handleCopy}
         className={cn(
           'w-full py-3 px-4 rounded-lg',
-          'bg-surface-card border border-surface-200 dark:border-surface-700',
-          'hover:bg-surface-50 dark:hover:bg-surface-800',
+          'bg-[var(--surface-raised)] border border-[color:var(--rule)]/40',
+          'hover:bg-[color:var(--surface)]/60',
           'transition-colors',
           'flex items-center justify-center gap-3'
         )}
       >
-        <span className="text-2xl font-mono tracking-[0.5em] font-bold">{shareCode}</span>
+        <span className="text-2xl font-mono tracking-[0.5em] font-bold text-[var(--ink)]">
+          {shareCode}
+        </span>
         <span className="text-sm text-masters-primary">{copied ? 'Copied!' : 'Copy'}</span>
       </button>
     </div>
