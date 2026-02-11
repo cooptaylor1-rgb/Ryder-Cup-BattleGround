@@ -423,12 +423,13 @@ function SummaryCard({
         {/* Progress Bar */}
         <div className="w-full h-3 rounded-[var(--radius-full)] bg-[var(--surface-elevated)] overflow-hidden mb-[var(--space-3)]">
           <div
-            className="h-full rounded-[var(--radius-full)] transition-all duration-500 ease-out"
+            className={`h-full rounded-[var(--radius-full)] transition-all duration-500 ease-out ${
+              summary.isFullySettled
+                ? 'bg-[var(--success)]'
+                : 'bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)]'
+            }`}
             style={{
               width: `${progressPct}%`,
-              background: summary.isFullySettled
-                ? 'var(--success)'
-                : 'linear-gradient(90deg, var(--masters) 0%, var(--masters-deep) 100%)',
             }}
           />
         </div>

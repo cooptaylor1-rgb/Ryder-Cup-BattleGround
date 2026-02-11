@@ -110,7 +110,7 @@ export default function NewTripPage() {
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title={headerTitle}
-        icon={<Plus size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Plus size={16} className="text-[var(--color-accent)]" />}
         onBack={handleBack}
       />
 
