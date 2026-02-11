@@ -1182,3 +1182,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Live (`/live`): fixed match sorting to use the real `Match.matchOrder` field (was `matchNumber`, which is not part of the model and could cause unstable ordering).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`3f9adcd`)
+
+## 2026-02-11
+
+### 19:30 EST — Phase 1 — Games: explicit fallback when game missing
+- NassauEnhancedCard + HammerGameCard: replaced `if (!game) return null;` with a small in-component fallback card (“Game unavailable”) so the UI can’t silently render nothing if a game record can’t be loaded.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c3ee33c`)
