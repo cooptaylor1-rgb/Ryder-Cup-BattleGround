@@ -60,39 +60,15 @@ function SettingRow({
   action: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-4)',
-        padding: 'var(--space-4)',
-        borderTop: '1px solid var(--rule)',
-      }}
-    >
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 'var(--radius-md)',
-          background: 'rgba(0,0,0,0.04)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--ink-secondary)',
-          flexShrink: 0,
-        }}
-      >
+    <div className="flex items-center gap-[var(--space-4)] p-[var(--space-4)] border-t border-[var(--rule)]">
+      <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-200 flex items-center justify-center text-[var(--ink-secondary)] shrink-0">
         {icon}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="type-body-sm" style={{ fontWeight: 650 }}>
-          {title}
-        </p>
-        <p className="type-caption" style={{ marginTop: 2 }}>
-          {description}
-        </p>
+      <div className="flex-1 min-w-0">
+        <p className="type-body-sm font-[650]">{title}</p>
+        <p className="type-caption mt-[2px]">{description}</p>
       </div>
-      <div style={{ flexShrink: 0 }}>{action}</div>
+      <div className="shrink-0">{action}</div>
     </div>
   );
 }
@@ -107,52 +83,30 @@ export default function ScoringSettingsPage() {
         title="Scoring"
         subtitle="Rules & preferences"
         onBack={() => router.push('/settings')}
-        icon={<Target size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Target size={16} className="text-[var(--color-accent)]" />}
         rightSlot={
           <button
             type="button"
             onClick={() => {
               resetScoringPreferences();
             }}
-            className="press-scale"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              padding: '8px 10px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--rule)',
-              background: 'var(--surface)',
-              color: 'var(--ink)',
-            }}
+            className={cn(
+              'press-scale inline-flex items-center gap-[var(--space-2)] px-[10px] py-[8px] rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)]'
+            )}
           >
-            <RotateCcw size={16} style={{ color: 'var(--ink-secondary)' }} />
-            <span className="type-caption" style={{ fontWeight: 650 }}>
-              Reset
-            </span>
+            <RotateCcw size={16} className="text-[var(--ink-secondary)]" />
+            <span className="type-caption font-[650]">Reset</span>
           </button>
         }
       />
 
       <main className="container-editorial">
         <section className="section">
-          <div className="card" style={{ overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--space-5)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 'var(--radius-md)',
-                    background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: 'var(--shadow-glow-green)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Hand size={18} style={{ color: 'var(--color-accent)' }} />
+          <div className="card overflow-hidden">
+            <div className="p-[var(--space-5)]">
+              <div className="flex items-center gap-[var(--space-3)]">
+                <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shadow-[var(--shadow-glow-green)] shrink-0">
+                  <Hand size={18} className="text-[var(--color-accent)]" />
                 </div>
                 <div>
                   <p className="type-title-sm">One-Handed Mode</p>
@@ -173,53 +127,39 @@ export default function ScoringSettingsPage() {
               }
             />
 
-            <div style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--rule)' }}>
-              <p className="type-body-sm" style={{ fontWeight: 650, marginBottom: 10 }}>
-                Preferred Hand
-              </p>
-              <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <div className="p-[var(--space-4)] border-t border-[var(--rule)]">
+              <p className="type-body-sm font-[650] mb-[10px]">Preferred Hand</p>
+              <div className="flex gap-[var(--space-3)]">
                 {(['left', 'right'] as const).map((hand) => (
                   <button
                     key={hand}
                     type="button"
                     onClick={() => updateScoringPreference('preferredHand', hand)}
                     className={cn(
-                      'press-scale',
+                      'press-scale flex-1 px-3 py-[10px] inline-flex justify-center items-center',
                       scoringPreferences.preferredHand === hand ? 'btn-premium' : 'btn-ghost'
                     )}
-                    style={{
-                      flex: 1,
-                      padding: '10px 12px',
-                      display: 'inline-flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
                   >
-                    <span className="type-body-sm" style={{ fontWeight: 650 }}>
-                      {hand === 'left' ? 'Left' : 'Right'}
-                    </span>
+                    <span className="type-body-sm font-[650]">{hand === 'left' ? 'Left' : 'Right'}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--rule)' }}>
-              <p className="type-body-sm" style={{ fontWeight: 650, marginBottom: 10 }}>
-                Button Size
-              </p>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            <div className="p-[var(--space-4)] border-t border-[var(--rule)]">
+              <p className="type-body-sm font-[650] mb-[10px]">Button Size</p>
+              <div className="flex gap-[var(--space-2)]">
                 {(['normal', 'large', 'extra-large'] as const).map((size) => (
                   <button
                     key={size}
                     type="button"
                     onClick={() => updateScoringPreference('buttonScale', size)}
                     className={cn(
-                      'press-scale',
+                      'press-scale flex-1 px-[10px] py-[10px]',
                       scoringPreferences.buttonScale === size ? 'btn-premium' : 'btn-ghost'
                     )}
-                    style={{ flex: 1, padding: '10px 10px' }}
                   >
-                    <span className="type-body-sm" style={{ fontWeight: 650 }}>
+                    <span className="type-body-sm font-[650]">
                       {size === 'normal' ? 'Normal' : size === 'large' ? 'Large' : 'X-Large'}
                     </span>
                   </button>
@@ -230,8 +170,8 @@ export default function ScoringSettingsPage() {
         </section>
 
         <section className="section">
-          <div className="card" style={{ overflow: 'hidden' }}>
-            <div style={{ padding: 'var(--space-5)' }}>
+          <div className="card overflow-hidden">
+            <div className="p-[var(--space-5)]">
               <p className="type-title-sm">Behavior</p>
               <p className="type-caption">Feedback and assistive scoring options.</p>
             </div>
@@ -260,35 +200,30 @@ export default function ScoringSettingsPage() {
               }
             />
 
-            <div style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--rule)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <Gauge size={18} style={{ color: 'var(--ink-secondary)' }} />
-                <p className="type-body-sm" style={{ fontWeight: 650 }}>
-                  Haptic Intensity
-                </p>
+            <div className="p-[var(--space-4)] border-t border-[var(--rule)]">
+              <div className="flex items-center gap-[var(--space-2)]">
+                <Gauge size={18} className="text-[var(--ink-secondary)]" />
+                <p className="type-body-sm font-[650]">Haptic Intensity</p>
               </div>
 
-              <div className="mt-3" style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <div className="mt-3 flex gap-[var(--space-2)]">
                 {(['low', 'medium', 'high'] as const).map((level) => (
                   <button
                     key={level}
                     type="button"
                     onClick={() => updateScoringPreference('hapticIntensity', level)}
                     className={cn(
-                      'press-scale',
+                      'press-scale flex-1 px-[10px] py-[10px]',
                       scoringPreferences.hapticIntensity === level ? 'btn-premium' : 'btn-ghost'
                     )}
-                    style={{ flex: 1, padding: '10px 10px' }}
                   >
-                    <span className="type-body-sm" style={{ fontWeight: 650 }}>
+                    <span className="type-body-sm font-[650]">
                       {level === 'low' ? 'Low' : level === 'medium' ? 'Medium' : 'High'}
                     </span>
                   </button>
                 ))}
               </div>
-              <p className="type-caption" style={{ marginTop: 8 }}>
-                Adjust vibration strength for score feedback.
-              </p>
+              <p className="type-caption mt-2">Adjust vibration strength for score feedback.</p>
             </div>
 
             <SettingRow
@@ -388,23 +323,12 @@ export default function ScoringSettingsPage() {
             />
 
             {scoringPreferences.oneHandedMode && (
-              <div style={{ padding: 'var(--space-4)', borderTop: '1px solid var(--rule)' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 'var(--space-3)',
-                    padding: 'var(--space-4)',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid rgba(245, 158, 11, 0.25)',
-                    background: 'rgba(245, 158, 11, 0.08)',
-                  }}
-                >
-                  <AlertCircle size={18} style={{ color: '#f59e0b', flexShrink: 0, marginTop: 2 }} />
+              <div className="p-[var(--space-4)] border-t border-[var(--rule)]">
+                <div className="flex gap-[var(--space-3)] p-[var(--space-4)] rounded-[var(--radius-lg)] border border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.08)]">
+                  <AlertCircle size={18} className="text-[#f59e0b] shrink-0 mt-[2px]" />
                   <div>
-                    <p className="type-body-sm" style={{ fontWeight: 650, color: '#f59e0b' }}>
-                      Tip
-                    </p>
-                    <p className="type-caption" style={{ marginTop: 2 }}>
+                    <p className="type-body-sm font-[650] text-[#f59e0b]">Tip</p>
+                    <p className="type-caption mt-[2px]">
                       One-handed mode works best when your preferred hand is set correctly.
                     </p>
                   </div>
