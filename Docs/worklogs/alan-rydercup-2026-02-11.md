@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 17:35 EST — Phase 2 — Courses page: premium token sweep
+- `Courses` (`/courses`): replaced remaining legacy `bg-surface-card` / `border-surface-border` / `text-text-*` utilities with premium token-driven Tailwind and the shared `.card` surface.
+- Updated course cards, search input, and quick action tiles to use `var(--surface-*)`, `var(--rule)`, and `var(--ink-*)` tokens so the page matches the premium shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b44039d`) (push pending)
+
 ## 17:10 EST — Phase 2 — CourseDetails: premium `.card` surfaces
 - `CourseDetails`: migrated the map wrapper, tee list, course stats, and “missing data” placeholders off legacy `bg-surface-card`/`border-surface-*` utilities and onto the shared premium `.card` surface.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

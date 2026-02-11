@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 17:35 EST — Phase 2 — Courses page: premium token sweep
+- `Courses` (`/courses`): replaced remaining legacy `bg-surface-card` / `border-surface-border` / `text-text-*` utilities with premium token-driven Tailwind and the shared `.card` surface.
+- Course cards now use consistent premium surfaces and ink tokens; search input + quick action tiles match the rest of the premium shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b44039d`) (push pending)
+
 ### 17:10 EST — Phase 2 — CourseDetails: replace legacy `bg-surface-card` blocks with premium `.card`
 - `CourseDetails`: migrated the map wrapper, tee list, course stats, and “missing data” placeholder cards off legacy `bg-surface-card`/`border-surface-*` utilities and onto the shared premium `.card` surface.
 - Keeps the course details UI consistent with the premium shell and reduces theme drift.
