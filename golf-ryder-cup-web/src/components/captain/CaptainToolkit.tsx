@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { Trip, Team, Player, RyderCupSession, Match, Course } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { PreFlightChecklist } from './PreFlightChecklist';
 import { BulkImportModal } from './BulkImportModal';
 import { TeeTimeGenerator } from './TeeTimeGenerator';
@@ -147,9 +149,9 @@ export function CaptainToolkit({
   const getStatusIcon = (status?: 'ready' | 'needs-attention' | 'complete') => {
     switch (status) {
       case 'complete':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-[var(--success)]" />;
       case 'needs-attention':
-        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+        return <AlertTriangle className="w-4 h-4 text-[var(--warning)]" />;
       default:
         return null;
     }
@@ -183,10 +185,12 @@ export function CaptainToolkit({
       case 'teetimes':
         if (!currentSession) {
           return (
-            <div className="text-center py-8 text-gray-500">
-              <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No sessions created yet</p>
-            </div>
+            <EmptyStatePremium
+              illustration="calendar"
+              title="No sessions created yet"
+              description="Add a session first, then you can generate tee times."
+              variant="compact"
+            />
           );
         }
         return (
@@ -205,10 +209,12 @@ export function CaptainToolkit({
       case 'pairings':
         if (!currentSession) {
           return (
-            <div className="text-center py-8 text-gray-500">
-              <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No sessions created yet</p>
-            </div>
+            <EmptyStatePremium
+              illustration="calendar"
+              title="No sessions created yet"
+              description="Create a session to unlock smart pairing suggestions."
+              variant="compact"
+            />
           );
         }
         return (
@@ -237,21 +243,22 @@ export function CaptainToolkit({
       case 'weather':
         if (!currentSession) {
           return (
-            <div className="text-center py-8 text-gray-500">
-              <Cloud className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No sessions created yet</p>
-            </div>
+            <EmptyStatePremium
+              illustration="calendar"
+              title="No sessions created yet"
+              description="Add a session to see the weather forecast for each day."
+              variant="compact"
+            />
           );
         }
         return (
           <div className="space-y-4">
-            {sessions.map(session => {
+            {sessions.map((session) => {
               // Find course from matches in this session
-              const sessionMatches = matches.filter(m => m.sessionId === session.id);
-              const matchWithCourse = sessionMatches.find(m => m.courseId);
-              const course = matchWithCourse
-                ? courses.find(c => c.id === matchWithCourse.courseId)
-                : courses[0];
+              const sessionMatches = matches.filter((m) => m.sessionId === session.id);
+              const matchWithCourse = sessionMatches.find((m) => m.courseId);
+              const course = matchWithCourse ? courses.find((c) => c.id === matchWithCourse.courseId) : courses[0];
+
               return (
                 <SessionWeatherPanel
                   key={session.id}
@@ -273,20 +280,16 @@ export function CaptainToolkit({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Settings className="w-6 h-6 text-blue-500" />
+          <Settings className="w-6 h-6 text-[var(--color-accent)]" />
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Captain&apos;s Toolkit
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Everything you need to run your trip
-            </p>
+            <h2 className="text-xl font-bold text-[var(--ink-primary)]">Captain&apos;s Toolkit</h2>
+            <p className="text-sm text-[var(--ink-tertiary)]">Everything you need to run your trip</p>
           </div>
         </div>
         {activeSection && (
           <button
             onClick={() => setActiveSection(null)}
-            className="text-sm text-blue-500 hover:text-blue-600"
+            className="text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]"
           >
             ← Back to Tools
           </button>
@@ -295,9 +298,7 @@ export function CaptainToolkit({
 
       {/* Active Section Content */}
       {activeSection ? (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border dark:border-gray-700 p-6">
-          {renderActiveSection()}
-        </div>
+        <div className="card p-6">{renderActiveSection()}</div>
       ) : (
         /* Tool Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -311,28 +312,31 @@ export function CaptainToolkit({
                   setActiveSection(item.id);
                 }
               }}
-              className="p-4 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 transition-all text-left flex items-center gap-4 group"
+              className={cn(
+                'p-4 rounded-xl border border-[var(--rule)] bg-[var(--surface)] transition-all text-left flex items-center gap-4 group',
+                'hover:bg-[var(--surface-raised)] hover:border-[color:var(--masters)]/50'
+              )}
             >
-              <div className={`p-3 rounded-lg ${item.status === 'needs-attention'
-                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600'
-                : item.status === 'complete'
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600'
-                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
-                }`}>
+              <div
+                className={cn(
+                  'p-3 rounded-lg',
+                  item.status === 'needs-attention'
+                    ? 'bg-[color:var(--warning)]/10 text-[var(--warning)]'
+                    : item.status === 'complete'
+                      ? 'bg-[color:var(--success)]/10 text-[var(--success)]'
+                      : 'bg-[color:var(--color-accent)]/12 text-[var(--color-accent)]'
+                )}
+              >
                 {item.icon}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {item.name}
-                  </h3>
+                  <h3 className="font-semibold text-[var(--ink-primary)]">{item.name}</h3>
                   {getStatusIcon(item.status)}
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {item.description}
-                </p>
+                <p className="text-sm text-[var(--ink-tertiary)]">{item.description}</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" />
+              <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)] group-hover:text-[var(--color-accent)] transition-colors" />
             </button>
           ))}
         </div>
