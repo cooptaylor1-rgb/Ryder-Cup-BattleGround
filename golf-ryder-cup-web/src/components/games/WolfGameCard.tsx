@@ -78,7 +78,7 @@ export function WolfGameCard({
 
   return (
     <div className={cn(
-      'card-surface rounded-xl overflow-hidden',
+      'card overflow-hidden',
       className
     )}>
       {/* Header */}
@@ -100,7 +100,7 @@ export function WolfGameCard({
 
           <div className={cn(
             'px-2 py-1 rounded-full type-caption',
-            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-tertiary)] text-[var(--ink-tertiary)]'
+            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
           )}>
             {game.status === 'setup' ? 'Setup' : game.status === 'active' ? `Hole ${currentHole}` : 'Complete'}
           </div>
@@ -109,7 +109,7 @@ export function WolfGameCard({
 
       {/* Current Wolf */}
       {game.status !== 'completed' && (
-        <div className="p-4 border-t border-[var(--surface-tertiary)]">
+        <div className="p-4 border-t border-[var(--rule)]">
           <div className="flex items-center gap-2 mb-3">
             <span className="type-caption text-[var(--ink-tertiary)]">Current Wolf:</span>
             <span className="type-body font-semibold text-amber-600">
@@ -129,7 +129,7 @@ export function WolfGameCard({
                     'p-3 rounded-lg border-2 transition-all text-center',
                     selectedPartner === playerId
                       ? 'border-[var(--accent)] bg-[var(--accent)]/10'
-                      : 'border-[var(--surface-tertiary)] hover:border-[var(--ink-tertiary)]'
+                      : 'border-[var(--rule)] hover:border-[var(--ink-tertiary)]'
                   )}
                 >
                   <span className="type-caption font-medium">
@@ -150,7 +150,7 @@ export function WolfGameCard({
                   'flex-1 p-3 rounded-lg border-2 transition-all',
                   selectedPartner === null && !isPig
                     ? 'border-amber-600 bg-amber-600/10'
-                    : 'border-[var(--surface-tertiary)] hover:border-amber-600/50'
+                    : 'border-[var(--rule)] hover:border-amber-600/50'
                 )}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -169,7 +169,7 @@ export function WolfGameCard({
                     'flex-1 p-3 rounded-lg border-2 transition-all',
                     isPig
                       ? 'border-red-500 bg-red-500/10'
-                      : 'border-[var(--surface-tertiary)] hover:border-red-500/50'
+                      : 'border-[var(--rule)] hover:border-red-500/50'
                   )}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -193,7 +193,7 @@ export function WolfGameCard({
       )}
 
       {/* Standings */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)]">
+      <div className="p-4 border-t border-[var(--rule)]">
         <h4 className="type-caption text-[var(--ink-tertiary)] mb-3">Standings</h4>
         <div className="space-y-2">
           {payouts.map((payout, index) => (
@@ -227,7 +227,7 @@ export function WolfGameCard({
 
       {/* History */}
       {game.holeResults.length > 0 && (
-        <div className="border-t border-[var(--surface-tertiary)]">
+        <div className="border-t border-[var(--rule)]">
           <button
             onClick={() => setShowHistory(!showHistory)}
             className="w-full p-3 flex items-center justify-center gap-2 text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)] transition-colors"
@@ -262,7 +262,7 @@ export function WolfGameCard({
       )}
 
       {/* Rules Info */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)] bg-[var(--surface-secondary)]/50">
+      <div className="p-4 border-t border-[var(--rule)] bg-[var(--surface-secondary)]/50">
         <div className="flex items-start gap-2">
           <Info size={14} className="text-[var(--ink-tertiary)] shrink-0 mt-0.5" />
           <p className="type-caption text-[var(--ink-tertiary)]">

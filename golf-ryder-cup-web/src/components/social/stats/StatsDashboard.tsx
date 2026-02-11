@@ -223,7 +223,7 @@ export function StatsDashboard({
 
       {/* Empty state */}
       {playerStats.length === 0 && (
-        <div className="card-surface rounded-xl p-8 text-center">
+        <div className="card p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--surface-secondary)] flex items-center justify-center">
             <BarChart3 size={32} className="text-[var(--ink-tertiary)]" />
           </div>
@@ -246,7 +246,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, subtext, icon }: StatCardProps) {
   return (
-    <div className="card-surface rounded-xl p-4">
+    <div className="card p-4">
       <div className="flex items-center gap-2 mb-2 text-[var(--ink-tertiary)]">
         {icon}
         <span className="type-caption">{label}</span>
@@ -291,7 +291,7 @@ function AwardCard({ award }: AwardCardProps) {
   };
 
   return (
-    <div className="card-surface rounded-xl p-4 flex items-center gap-3">
+    <div className="card p-4 flex items-center gap-3">
       <div className="text-2xl">
         {awardIcons[award.type] || '🏅'}
       </div>

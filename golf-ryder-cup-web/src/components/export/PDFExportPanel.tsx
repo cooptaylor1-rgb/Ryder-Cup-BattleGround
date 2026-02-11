@@ -164,9 +164,9 @@ export function PDFExportPanel({
   };
 
   return (
-    <div className={cn('card-surface rounded-xl overflow-hidden', className)}>
+    <div className={cn('card overflow-hidden', className)}>
       {/* Header */}
-      <div className="p-4 border-b border-[var(--surface-tertiary)]">
+      <div className="p-4 border-b border-[var(--rule)]">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-[var(--accent)]/10 text-[var(--accent)]">
             <FileText size={20} />
@@ -203,7 +203,7 @@ export function PDFExportPanel({
                 'w-full flex items-center gap-3 p-3 rounded-lg transition-all',
                 isSelected
                   ? 'bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]'
-                  : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)]',
+                  : 'bg-[var(--surface-secondary)] hover:bg-[color:var(--surface-secondary)]/70',
                 isDisabled && 'opacity-50 cursor-not-allowed'
               )}
             >
@@ -211,7 +211,7 @@ export function PDFExportPanel({
                 'p-2 rounded-lg',
                 isSelected
                   ? 'bg-[var(--accent)] text-white'
-                  : 'bg-[var(--surface-tertiary)] text-[var(--ink-tertiary)]'
+                  : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
               )}>
                 <Icon size={18} />
               </div>
@@ -256,7 +256,7 @@ export function PDFExportPanel({
       )}
 
       {/* Export Button */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)]">
+      <div className="p-4 border-t border-[var(--rule)]">
         <button
           onClick={handleExport}
           disabled={!canExport() || isExporting}
@@ -264,7 +264,7 @@ export function PDFExportPanel({
             'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all',
             canExport() && !isExporting
               ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
-              : 'bg-[var(--surface-tertiary)] text-[var(--ink-tertiary)] cursor-not-allowed'
+              : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] cursor-not-allowed'
           )}
         >
           {isExporting ? (

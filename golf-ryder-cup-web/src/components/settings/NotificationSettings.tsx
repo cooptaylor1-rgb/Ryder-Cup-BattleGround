@@ -164,10 +164,10 @@ export function NotificationSettings({
 
   if (isLoading) {
     return (
-      <div className={cn('card-surface rounded-xl p-6', className)}>
+      <div className={cn('card p-6', className)}>
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-[var(--surface-tertiary)] rounded w-1/3" />
-          <div className="h-20 bg-[var(--surface-tertiary)] rounded" />
+          <div className="h-6 bg-[color:var(--ink-tertiary)]/10 rounded w-1/3" />
+          <div className="h-20 bg-[color:var(--ink-tertiary)]/10 rounded" />
         </div>
       </div>
     );
@@ -175,7 +175,7 @@ export function NotificationSettings({
 
   if (!isSupported) {
     return (
-      <div className={cn('card-surface rounded-xl p-6', className)}>
+      <div className={cn('card p-6', className)}>
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
             <BellOff size={24} className="text-[var(--ink-tertiary)]" />
@@ -196,7 +196,7 @@ export function NotificationSettings({
 
   if (permission === 'denied') {
     return (
-      <div className={cn('card-surface rounded-xl p-6', className)}>
+      <div className={cn('card p-6', className)}>
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-xl bg-red-500/10">
             <AlertCircle size={24} className="text-red-500" />
@@ -221,9 +221,9 @@ export function NotificationSettings({
   }
 
   return (
-    <div className={cn('card-surface rounded-xl overflow-hidden', className)}>
+    <div className={cn('card overflow-hidden', className)}>
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-[var(--surface-tertiary)]">
+      <div className="p-4 flex items-center justify-between border-b border-[var(--rule)]">
         <div className="flex items-center gap-3">
           <div className={cn(
             'p-2 rounded-lg',
@@ -249,7 +249,7 @@ export function NotificationSettings({
           className={cn(
             'px-4 py-2 rounded-lg font-medium transition-colors',
             subscription
-              ? 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
+              ? 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[color:var(--ink-tertiary)]/10'
               : 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
           )}
         >
@@ -295,7 +295,7 @@ export function NotificationSettings({
 
                 <div className={cn(
                   'w-10 h-6 rounded-full p-1 transition-colors',
-                  isEnabled ? 'bg-[var(--accent)]' : 'bg-[var(--surface-tertiary)]'
+                  isEnabled ? 'bg-[var(--accent)]' : 'bg-[color:var(--ink-tertiary)]/25'
                 )}>
                   <div className={cn(
                     'w-4 h-4 rounded-full bg-white transition-transform',
@@ -310,7 +310,7 @@ export function NotificationSettings({
 
       {/* Test Notification */}
       {subscription && (
-        <div className="p-4 border-t border-[var(--surface-tertiary)]">
+        <div className="p-4 border-t border-[var(--rule)]">
           <button
             onClick={() => {
               if ('Notification' in window && Notification.permission === 'granted') {

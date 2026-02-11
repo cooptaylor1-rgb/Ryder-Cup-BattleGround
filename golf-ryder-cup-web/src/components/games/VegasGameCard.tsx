@@ -73,7 +73,7 @@ export function VegasGameCard({
 
   return (
     <div className={cn(
-      'card-surface rounded-xl overflow-hidden',
+      'card overflow-hidden',
       className
     )}>
       {/* Header */}
@@ -95,7 +95,7 @@ export function VegasGameCard({
 
           <div className={cn(
             'px-2 py-1 rounded-full type-caption',
-            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-tertiary)] text-[var(--ink-tertiary)]'
+            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
           )}>
             {game.status === 'setup' ? 'Setup' : game.status === 'active' ? `Hole ${currentHole}` : 'Complete'}
           </div>
@@ -103,7 +103,7 @@ export function VegasGameCard({
       </div>
 
       {/* Running Score */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)]">
+      <div className="p-4 border-t border-[var(--rule)]">
         <div className="flex items-center justify-between">
           <div className="text-center flex-1">
             <p className="type-caption text-[var(--ink-tertiary)] mb-1">Team 1</p>
@@ -134,7 +134,7 @@ export function VegasGameCard({
 
       {/* Score Entry */}
       {game.status !== 'completed' && (
-        <div className="p-4 border-t border-[var(--surface-tertiary)]">
+        <div className="p-4 border-t border-[var(--rule)]">
           <p className="type-caption text-[var(--ink-tertiary)] mb-3">Enter hole {currentHole} scores:</p>
 
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -196,7 +196,7 @@ export function VegasGameCard({
       )}
 
       {/* Payout Summary */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)]">
+      <div className="p-4 border-t border-[var(--rule)]">
         <div className="flex items-center justify-between">
           <span className="type-body">Settlement</span>
           <div className="flex items-center gap-2">
@@ -217,7 +217,7 @@ export function VegasGameCard({
 
       {/* History */}
       {game.holeResults.length > 0 && (
-        <div className="border-t border-[var(--surface-tertiary)]">
+        <div className="border-t border-[var(--rule)]">
           <button
             onClick={() => setShowHistory(!showHistory)}
             className="w-full p-3 flex items-center justify-center gap-2 text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)] transition-colors"
@@ -240,7 +240,7 @@ export function VegasGameCard({
                 </thead>
                 <tbody>
                   {game.holeResults.map(result => (
-                    <tr key={result.holeNumber} className="border-t border-[var(--surface-tertiary)]">
+                    <tr key={result.holeNumber} className="border-t border-[var(--rule)]">
                       <td className="p-1">{result.holeNumber}</td>
                       <td className={cn(
                         'text-center p-1',
@@ -276,7 +276,7 @@ export function VegasGameCard({
       )}
 
       {/* Rules Info */}
-      <div className="p-4 border-t border-[var(--surface-tertiary)] bg-[var(--surface-secondary)]/50">
+      <div className="p-4 border-t border-[var(--rule)] bg-[var(--surface-secondary)]/50">
         <div className="flex items-start gap-2">
           <Info size={14} className="text-[var(--ink-tertiary)] shrink-0 mt-0.5" />
           <p className="type-caption text-[var(--ink-tertiary)]">
