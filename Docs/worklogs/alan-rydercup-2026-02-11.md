@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 18:00 EST — Phase 2 — Trip Awards + shared Input: premium token sweep
+- `Trip Awards` (`/trip-stats/awards`): replaced remaining legacy `card-surface`/`surface-*` + `text-text-*` utilities with premium `.card` + `var(--ink-*)`/`var(--rule)` tokens.
+- Shared `Input` component: migrated label/ink, surfaces, borders, placeholders, disabled, and error states onto premium tokens; added `ring-offset-[color:var(--canvas)]` so focus styles render cleanly across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`539cb08`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 17:35 EST — Phase 2 — Courses page: premium token sweep
 - `Courses` (`/courses`): replaced remaining legacy `bg-surface-card` / `border-surface-border` / `text-text-*` utilities with premium token-driven Tailwind and the shared `.card` surface.
 - Updated course cards, search input, and quick action tiles to use `var(--surface-*)`, `var(--rule)`, and `var(--ink-*)` tokens so the page matches the premium shell.

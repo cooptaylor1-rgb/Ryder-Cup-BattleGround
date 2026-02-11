@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 18:00 EST — Phase 2 — Trip Awards + shared Input: premium token sweep
+- Trip Awards (`/trip-stats/awards`): replaced remaining legacy `card-surface`/`surface-*` + `text-text-*` utilities with premium `.card` + `var(--ink-*)`/`var(--rule)` tokens.
+- Shared `Input` component: migrated label/ink, surfaces, borders, placeholders, disabled, and error states onto premium tokens; added `ring-offset-[color:var(--canvas)]` so focus styles render cleanly across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`539cb08`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 17:35 EST — Phase 2 — Courses page: premium token sweep
 - `Courses` (`/courses`): replaced remaining legacy `bg-surface-card` / `border-surface-border` / `text-text-*` utilities with premium token-driven Tailwind and the shared `.card` surface.
 - Course cards now use consistent premium surfaces and ink tokens; search input + quick action tiles match the rest of the premium shell.
