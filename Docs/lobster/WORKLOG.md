@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 07:25 EST — Captain Toolkit — Guard Smart Pairings when no sessions
+- Captain Toolkit: in the Smart Pairings section, render a clear “No sessions created yet” empty-state card instead of passing an undefined session into `SmartPairingSuggestions`.
+- Prevents potential runtime errors/silent gaps when captains open Pairings before creating sessions.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3c0c782`)
+
 ### 06:55 EST — Phase 1 — Bets modals + Trip settings: premium token surfaces
 - Bets (`/bets` + `/bets/[betId]`): migrated remaining bottom-sheet/confirm modal surfaces off shadcn `bg-background` / `bg-muted` and onto premium surfaces (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`) with consistent hover states (`hover:bg-[var(--surface)]`).
 - Trip settings (`/trip/[tripId]/settings`): replaced remaining `border-border` section dividers with premium `border-[var(--rule)]`.

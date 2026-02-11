@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 07:25 — Shipped batch: Captain Toolkit Pairings section now renders a clear “No sessions created yet” empty-state when there are no sessions, instead of passing an undefined session into `SmartPairingSuggestions` (avoids potential runtime errors / silent gaps). (commit 3c0c782)
 - 06:20 — Shipped batch: `HomeLoadingSkeleton` + `ContinueScoringBanner` removed remaining shadcn utility tokens (`bg-muted`, `text-muted-foreground`) and inline `var(--token)` styles in favor of premium token-driven Tailwind classes (`bg-[color:var(--ink-tertiary)]/10`, `bg-[var(--masters)]`, `border-[var(--masters)]`, `text-[var(--ink-tertiary)]`, etc.). (commit 3afa1e0)
 - 05:55 — Shipped batch: `MatchPredictions` + `CartTracker` migrated their cards/bottom-sheets off shadcn `bg-background` / `bg-card` / `bg-muted` / `border-border` / `text-muted-foreground` onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), and Cart Tracker’s selected state now uses the premium `var(--warning)` accent. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted an existing CSS optimization warning for a `bg-[var(...)]` class). (commit f25f1de)
 - 05:10 — Shipped batch: Social Day Summary card + modal migrated off shadcn `bg-card` / `border-border` / `bg-muted` / `bg-background` and `text-muted-foreground` onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`) so the share UI matches the premium shell. (commit 274194e)
