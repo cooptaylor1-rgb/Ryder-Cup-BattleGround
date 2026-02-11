@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 01:05 EST — Phase 1 — Tailwind: restore legacy `masters-primary*` color aliases
+- Tailwind config: added legacy color aliases (`masters-primary`, `masters-primary-dark`) mapping to `var(--masters)` / `var(--masters-deep)` so existing classnames like `bg-masters-primary`, `text-masters-primary`, `hover:bg-masters-primary-dark`, `focus:ring-masters-primary` resolve correctly.
+- This prevents silent styling failures after the palette refactor without needing to touch every component immediately.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9c5c94b`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
+
 ### 00:35 EST — Phase 1 — HandicapStrokeIndicator: token-driven premium styles
 - `HandicapStrokeIndicator`: replaced inline `style={{...}}` (premium tokens + team colors) with token-driven Tailwind arbitrary-value classes (`bg-[var(--canvas-sunken)]`, `border-[var(--rule)]`, `text-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/15`, etc.).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
