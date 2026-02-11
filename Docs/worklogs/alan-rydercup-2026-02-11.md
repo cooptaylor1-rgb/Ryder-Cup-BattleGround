@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
+- Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` and replaced it with `bg-[var(--masters-subtle)]` to avoid CSS optimizer warnings.
+- `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`40f0fe4`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
 - `src/app/global-error.tsx`: updated the global error page to use premium token-driven ink/surface/rule classes so it renders correctly in dark mode (removed hard-coded `text-surface-*` utilities).
 - Added `dark:from-surface-900 dark:to-surface-950` to the background gradient.

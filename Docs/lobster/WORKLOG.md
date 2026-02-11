@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
+- Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` in favor of a stable token-driven class (`bg-[var(--masters-subtle)]`) to avoid CSS optimizer warnings.
+- `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`40f0fe4`)
+
 ### 15:16 EST — Phase 2 — JoinTripModal: premium token sweep
 - `JoinTripModal`: migrated modal surfaces/ink/rules off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`).
 - Input now uses the standard premium focus ring + ring offset (`ring-gold` + `ring-offset-[color:var(--canvas)]`).
