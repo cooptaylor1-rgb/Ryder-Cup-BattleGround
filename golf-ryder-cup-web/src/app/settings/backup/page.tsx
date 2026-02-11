@@ -546,7 +546,7 @@ function TripCard({
             className={cn(
                 'cursor-pointer rounded-xl border p-[var(--space-4)] transition-colors',
                 isSelected
-                    ? 'border-[var(--masters)] bg-[var(--masters-subtle,rgba(0,103,71,0.10))]'
+                    ? 'border-[var(--masters)] bg-[var(--masters-subtle)]'
                     : 'border-[var(--rule)] bg-[var(--surface)]'
             )}
             onClick={onSelect}

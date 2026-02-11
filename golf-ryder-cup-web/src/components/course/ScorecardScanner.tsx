@@ -313,11 +313,8 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             exit={{ opacity: 0 }}
                             className="h-full flex flex-col items-center justify-center p-6 gap-6"
                         >
-                            <div
-                                className="w-20 h-20 rounded-2xl flex items-center justify-center"
-                                style={{ background: 'var(--masters-subtle)' }}
-                            >
-                                <Sparkles size={40} style={{ color: 'var(--masters)' }} />
+                            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-[var(--masters-subtle)]">
+                                <Sparkles size={40} className="text-[var(--masters)]" />
                             </div>
 
                             <div className="text-center">
@@ -539,15 +536,8 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             exit={{ opacity: 0 }}
                             className="h-full flex flex-col items-center justify-center p-6 gap-4"
                         >
-                            <div
-                                className="w-20 h-20 rounded-2xl flex items-center justify-center"
-                                style={{ background: 'var(--masters-subtle)' }}
-                            >
-                                <Loader2
-                                    size={40}
-                                    className="animate-spin"
-                                    style={{ color: 'var(--masters)' }}
-                                />
+                            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-[var(--masters-subtle)]">
+                                <Loader2 size={40} className="animate-spin text-[var(--masters)]" />
                             </div>
 
                             <div className="text-center">
