@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 02:25 EST — Phase 1 — PointsCalculator: token-driven premium styles
+- Captain dashboard `PointsCalculator`: removed inline `style={{...}}` usage for premium CSS tokens (surface/ink/masters/positive) in favor of token-driven Tailwind arbitrary-value classes.
+- Keeps premium theming consistent and reduces silent style drift; dynamic team colors remain inline where required.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7d8200c`)
+
 ### 01:50 EST — Phase 1 — ConnectionStatusBadge: avoid silent gap when sync is local-only
 - `ConnectionStatusBadge`: when Supabase sync is not configured, render an explicit "Local" badge (with `CloudOff` icon) instead of returning `null`.
 - Keeps header UI stable and makes it clear that the app is running offline/local-only even while online.
