@@ -62,58 +62,38 @@ export function ContinueScoringBanner({
         'w-full relative overflow-hidden rounded-xl px-4 py-3',
         'transition-all duration-200 active:scale-[0.98]',
         'group cursor-pointer text-left',
-        'border-2',
+        'border-2 border-[var(--masters)]',
+        'bg-gradient-to-br from-[color:var(--masters)]/15 to-[color:var(--masters)]/5',
         className
       )}
-      style={{
-        background:
-          'linear-gradient(135deg, rgba(0, 103, 71, 0.12) 0%, rgba(0, 103, 71, 0.05) 100%)',
-        borderColor: 'var(--masters, #006747)',
-      }}
     >
       {/* Content */}
       <div className="relative flex items-center gap-3">
         {/* Play icon */}
-        <div
-          className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--masters, #006747)' }}
-        >
+        <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--masters)]">
           <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
         </div>
 
         {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold" style={{ color: 'var(--masters, #006747)' }}>
-              Continue Scoring
-            </span>
-            <span
-              className="text-xs px-1.5 py-0.5 rounded-full font-medium"
-              style={{
-                background: 'rgba(0, 103, 71, 0.15)',
-                color: 'var(--masters, #006747)',
-              }}
-            >
+            <span className="text-sm font-semibold text-[var(--masters)]">Continue Scoring</span>
+            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-[color:var(--masters)]/15 text-[var(--masters)]">
               Hole {currentHole}
             </span>
           </div>
           {matchDescription && (
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
+            <p className="text-xs text-[var(--ink-tertiary)] truncate mt-0.5">
               {matchDescription}
               {scoreDisplay && (
-                <span className="ml-2 font-medium" style={{ color: 'var(--ink)' }}>
-                  • {scoreDisplay}
-                </span>
+                <span className="ml-2 font-medium text-[var(--ink)]">• {scoreDisplay}</span>
               )}
             </p>
           )}
         </div>
 
         {/* Arrow */}
-        <ChevronRight
-          className="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-0.5"
-          style={{ color: 'var(--masters, #006747)' }}
-        />
+        <ChevronRight className="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-0.5 text-[var(--masters)]" />
       </div>
     </button>
   );
