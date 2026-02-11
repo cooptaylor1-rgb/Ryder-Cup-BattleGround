@@ -58,7 +58,12 @@ export function MomentumMeter({
     }
 
     return (
-        <div className={cn('p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700', className)}>
+        <div
+            className={cn(
+                'p-4 rounded-xl bg-[var(--surface)] border border-[var(--rule)]',
+                className
+            )}
+        >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium flex items-center gap-2">
@@ -81,9 +86,9 @@ export function MomentumMeter({
             </div>
 
             {/* Momentum bar */}
-            <div className="relative h-8 rounded-full bg-surface-100 dark:bg-surface-800 overflow-hidden">
+            <div className="relative h-8 rounded-full bg-[color:var(--ink-tertiary)]/10 overflow-hidden">
                 {/* Center line */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-surface-300 dark:bg-surface-600 z-10" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[color:var(--rule)] z-10" />
 
                 {/* Momentum indicator */}
                 <div
@@ -119,8 +124,8 @@ export function MomentumMeter({
             </div>
 
             {/* Last 5 holes visual */}
-            <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
-                <div className="text-xs text-surface-500 mb-2">Last 5 Holes</div>
+            <div className="mt-4 pt-4 border-t border-[var(--rule)]">
+                <div className="text-xs text-[var(--ink-tertiary)] mb-2">Last 5 Holes</div>
                 <div className="flex justify-center gap-2">
                     {momentum.lastFiveResults.map((result, i) => (
                         <div
@@ -129,16 +134,16 @@ export function MomentumMeter({
                                 'w-8 h-8 rounded-full flex items-center justify-center',
                                 result === 'teamA' && 'bg-team-usa',
                                 result === 'teamB' && 'bg-team-europe',
-                                result === 'halved' && 'bg-surface-300 dark:bg-surface-600'
+                                result === 'halved' && 'bg-[color:var(--ink-tertiary)]/15'
                             )}
                         >
                             {result === 'teamA' && <TrendingUp className="w-4 h-4 text-white" />}
                             {result === 'teamB' && <TrendingDown className="w-4 h-4 text-white" />}
-                            {result === 'halved' && <Minus className="w-4 h-4 text-surface-500" />}
+                            {result === 'halved' && <Minus className="w-4 h-4 text-[var(--ink-tertiary)]" />}
                         </div>
                     ))}
                     {momentum.lastFiveResults.length === 0 && (
-                        <div className="text-sm text-surface-400">No holes played yet</div>
+                        <div className="text-sm text-[var(--ink-secondary)]">No holes played yet</div>
                     )}
                 </div>
             </div>
@@ -163,7 +168,7 @@ function CompactMomentum({
 }) {
     if (momentum.lastFiveResults.length === 0) {
         return (
-            <div className={cn('text-xs text-surface-400', className)}>
+            <div className={cn('text-xs text-[var(--ink-tertiary)]', className)}>
                 No holes yet
             </div>
         );
@@ -192,7 +197,7 @@ function CompactMomentum({
                                 'w-4 h-4 rounded-full',
                                 result === 'teamA' && 'bg-team-usa',
                                 result === 'teamB' && 'bg-team-europe',
-                                result === 'halved' && 'bg-surface-300 dark:bg-surface-600'
+                                result === 'halved' && 'bg-[color:var(--ink-tertiary)]/15'
                             )}
                         />
                     ))}

@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 12:15 EST — Phase 2 — MomentumMeter: premium token sweep (remove legacy surface palette)
+- `MomentumMeter`: migrated legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` classes to the premium design tokens (`var(--surface)`, `var(--rule)`, `var(--ink-*)`).
+- Keeps the momentum UI consistent with the rest of the premium shell and reduces theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
 ### 11:50 EST — Phase 1 — QuickScoreFABv2: show “Start scoring” affordance when no active match
 - QuickScoreFABv2 no longer disappears entirely when there’s no in-progress match.
 - Instead, it renders a small premium “Start scoring” button that navigates to `/schedule`, so users always have an obvious scoring entry-point.
