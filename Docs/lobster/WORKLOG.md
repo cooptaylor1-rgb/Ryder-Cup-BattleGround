@@ -11,6 +11,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d05d52b`)
 
+### 21:45 EST — Phase 2 — Live Scores: token-driven team accents
+- Live Scores (`/live`): migrated the `PageHeader` icon accent off inline `style` onto token-driven Tailwind (`text-[var(--color-accent)]`).
+- Live match cards: team dots and “winning team” highlight/score accents now use team CSS tokens via Tailwind (`bg-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/15`, `text-[var(--team-usa)]`, etc.).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7ce1119`)
+
 ## 2026-02-10
 
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
