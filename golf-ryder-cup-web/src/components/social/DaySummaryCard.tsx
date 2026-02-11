@@ -466,7 +466,7 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
     };
 
     return (
-        <div className="bg-card rounded-2xl overflow-hidden border border-border">
+        <div className="rounded-2xl overflow-hidden border border-[var(--rule)] bg-[var(--surface-raised)]">
             {/* Preview */}
             <div className="relative aspect-[9/16] max-h-[500px] bg-linear-to-b from-[#006644] to-[#004D33]">
                 <canvas ref={canvasRef} className="w-full h-full object-contain" />
@@ -483,15 +483,15 @@ export function DaySummaryCard({ summary, tripName }: DaySummaryCardProps) {
                 </button>
                 <button
                     onClick={handleDownload}
-                    className="py-3 px-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors"
+                    className="py-3 px-4 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[color:var(--surface)]/80 transition-colors"
                 >
                     <Download size={18} />
                 </button>
                 <button
                     onClick={handleCopyText}
-                    className="py-3 px-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors"
+                    className="py-3 px-4 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[color:var(--surface)]/80 transition-colors"
                 >
-                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+                    {copied ? <Check size={18} className="text-[var(--success)]" /> : <Copy size={18} />}
                 </button>
             </div>
         </div>
@@ -526,17 +526,17 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] md:max-h-[90vh] z-50 overflow-auto rounded-2xl bg-background"
+                    className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[400px] md:max-h-[90vh] z-50 overflow-auto rounded-2xl border border-[var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)]"
                     role="dialog"
                     aria-modal="true"
                     aria-label="Day Summary"
                 >
                     {/* Header */}
-                    <div className="sticky top-0 bg-background/95 backdrop-blur-sm p-4 flex items-center justify-between border-b border-border">
+                    <div className="sticky top-0 bg-[color:var(--surface-raised)]/95 backdrop-blur-sm p-4 flex items-center justify-between border-b border-[var(--rule)]">
                         <h2 className="font-semibold">Day Summary</h2>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full hover:bg-muted"
+                            className="p-2 rounded-full hover:bg-[var(--surface)]"
                             aria-label="Close"
                         >
                             <X size={20} />
@@ -546,8 +546,8 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
                     {/* Content */}
                     <div className="p-4">
                         {!currentTrip ? (
-                            <div className="text-center py-12 text-muted-foreground">
-                                <p className="font-medium text-[var(--ink)]">
+                            <div className="text-center py-12 text-[var(--ink-secondary)]">
+                                <p className="font-medium text-[var(--ink-primary)]">
                                     No active trip
                                 </p>
                                 <p className="text-sm mt-2">
@@ -555,13 +555,13 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
                                 </p>
                             </div>
                         ) : isLoading ? (
-                            <div className="text-center py-12 text-muted-foreground">
+                            <div className="text-center py-12 text-[var(--ink-secondary)]">
                                 Generating summary...
                             </div>
                         ) : summary ? (
                             <DaySummaryCard summary={summary} tripName={currentTrip.name} />
                         ) : (
-                            <div className="text-center py-12 text-muted-foreground">
+                            <div className="text-center py-12 text-[var(--ink-secondary)]">
                                 No matches found for this day
                             </div>
                         )}
