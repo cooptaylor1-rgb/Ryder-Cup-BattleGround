@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 00:35 EST — Phase 1 — HandicapStrokeIndicator: token-driven premium styles
+- `HandicapStrokeIndicator`: replaced inline `style={{...}}` (premium tokens + team colors) with token-driven Tailwind arbitrary-value classes (`bg-[var(--canvas-sunken)]`, `border-[var(--rule)]`, `text-[var(--team-usa)]`, `bg-[color:var(--team-usa)]/15`, etc.).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`bb8428f`)
+
 ### 00:10 EST — Docs — Phase 1 route sweep status + next optional component-level sweep
 - `Docs/lobster/ALAN_IMPROVEMENT_PLAN.md`: documented that Phase 1’s route-level blank-screen sweep is functionally complete (as of 2026-02-06), and added a follow-on optional sweep for component-level `return null` “silent gaps”.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
