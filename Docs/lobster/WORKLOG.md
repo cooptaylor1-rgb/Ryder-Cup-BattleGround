@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Updates include the scoring-hand selector buttons, settings rows, storage/sync icons, and the Export/Import data cards.
 - Toggle off-state now uses a token-driven neutral (`bg-[color:var(--ink-tertiary)]/25`) instead of the legacy surface palette.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (this commit)
+- Commit + push ✅ (`b03f336`)
 
 ### 12:30 EST — Phase 2 — PathToVictoryCard: premium token sweep (remove legacy surface palette)
 - `PathToVictoryCard`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--canvas-sunken)`, `var(--rule)`, `var(--ink-*)`).
