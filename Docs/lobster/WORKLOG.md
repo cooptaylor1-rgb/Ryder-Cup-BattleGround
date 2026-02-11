@@ -5,27 +5,27 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-10
 
+### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
+- `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
+- Dynamic team accents now use token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) for premium consistency.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`71bbfaf`)
+
 ### 17:55 EST — Phase 1 — ThemeToggle: placeholder during hydration
 - `ThemeToggle`: replaced the `!mounted → return null` hydration gate with a non-interactive placeholder sized to the selected variant.
 - Prevents layout shift where the theme control would briefly disappear during client hydration.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`563893a`)
 
-### 18:58 EST — Phase 1 — Press tracker setup state
-- Press tracking (scoring advanced tools): instead of rendering nothing when the default bet is unset, show a premium empty-state card explaining how to enable presses.
-- Keeps the advanced tools accordion layout stable and guides captains to configure press tracking rather than presenting a blank region.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-
 ### 18:25 EST — Docs — Log ThemeToggle hydration batch (push recovered)
 - Worklogs: recorded the ThemeToggle hydration placeholder batch.
 - Note: pushing from this environment also runs `pre-push` checks (`typecheck` + `test` + `build`) and they all passed ✅.
 - Commit + push ✅ (`80d64eb`)
 
-### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
-- `YourMatchCard` (Home hero): removed large inline `style={{...}}` blocks (layout, borders, gradients, typography, CTA surface) in favor of token-driven Tailwind classes + `cn()`.
-- Dynamic team accents now use token-driven Tailwind classes (`text-[var(--team-usa)]`, `text-[var(--team-europe)]`) for premium consistency.
+### 18:58 EST — Phase 1 — Press tracker setup state
+- Press tracking (scoring advanced tools): instead of rendering nothing when the default bet is unset, show a premium empty-state card explaining how to enable presses.
+- Keeps the advanced tools accordion layout stable and guides captains to configure press tracking rather than presenting a blank region.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`71bbfaf`)
 
 ### 16:55 EST — Phase 1 — Captain carts + contacts: remove inline styles
 - Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`): removed remaining inline `style={{...}}` usage for the `PageHeader` icon container + card padding, switching to token-driven Tailwind classes (`iconContainerClassName`, `p-[var(--space-5)]`).
