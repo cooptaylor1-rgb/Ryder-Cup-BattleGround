@@ -96,39 +96,29 @@ export function HandicapStrokeIndicator({
   // Get hole handicap ranking
   const holeHandicapRank = holeHandicaps[currentHole - 1] || 0;
 
+  const hasStrokesOnHole = teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0;
+
   return (
     <div className={cn('', className)}>
       {/* Current Hole Strokes */}
       <div
-        className="flex items-center justify-between p-3 rounded-xl"
-        style={{
-          background:
-            teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0
-              ? 'linear-gradient(90deg, rgba(179, 39, 57, 0.05) 0%, rgba(0, 39, 118, 0.05) 100%)'
-              : 'var(--canvas-sunken)',
-          border: '1px solid var(--rule)',
-        }}
+        className={cn(
+          'flex items-center justify-between p-3 rounded-xl border border-[var(--rule)]',
+          hasStrokesOnHole
+            ? 'bg-[linear-gradient(90deg,rgba(179,39,57,0.05)_0%,rgba(0,39,118,0.05)_100%)]'
+            : 'bg-[var(--canvas-sunken)]'
+        )}
       >
         {/* Team A Strokes */}
         <div className="flex items-center gap-2">
-          <span
-            className="text-xs font-medium"
-            style={{ color: 'var(--team-usa)', minWidth: '50px' }}
-          >
-            {teamAName}
-          </span>
+          <span className="text-xs font-medium text-[var(--team-usa)] min-w-[50px]">{teamAName}</span>
           <StrokeDots strokes={teamAStrokesOnHole} color="var(--team-usa)" />
         </div>
 
         {/* Hole Info */}
         <div className="text-center px-3">
-          <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-            Hole {currentHole}
-          </span>
-          <span
-            className="block text-[10px]"
-            style={{ color: 'var(--ink-tertiary)', opacity: 0.7 }}
-          >
+          <span className="text-xs text-[var(--ink-tertiary)]">Hole {currentHole}</span>
+          <span className="block text-[10px] text-[var(--ink-tertiary)] opacity-70">
             HCP {holeHandicapRank}
           </span>
         </div>
@@ -136,10 +126,7 @@ export function HandicapStrokeIndicator({
         {/* Team B Strokes */}
         <div className="flex items-center gap-2 justify-end">
           <StrokeDots strokes={teamBStrokesOnHole} color="var(--team-europe)" />
-          <span
-            className="text-xs font-medium text-right"
-            style={{ color: 'var(--team-europe)', minWidth: '50px' }}
-          >
+          <span className="text-xs font-medium text-right text-[var(--team-europe)] min-w-[50px]">
             {teamBName}
           </span>
         </div>
@@ -147,10 +134,7 @@ export function HandicapStrokeIndicator({
 
       {/* Stroke Summary - Shows match play differential */}
       {matchPlayDifferential > 0 && higherHandicapTeam && (
-        <div
-          className="flex items-center justify-center mt-2 px-2 text-xs"
-          style={{ color: 'var(--ink-tertiary)' }}
-        >
+        <div className="flex items-center justify-center mt-2 px-2 text-xs text-[var(--ink-tertiary)]">
           <span>
             {higherHandicapTeam === 'teamA' ? teamAName : teamBName} gets {matchPlayDifferential}{' '}
             {isTeamStrokesFormat ? 'team ' : ''}stroke{matchPlayDifferential !== 1 ? 's' : ''}
@@ -160,7 +144,7 @@ export function HandicapStrokeIndicator({
 
       {/* Format hint for one-ball formats */}
       {isTeamStrokesFormat && (teamAStrokes > 0 || teamBStrokes > 0) && (
-        <div className="flex items-center gap-1 mt-1 px-2" style={{ color: 'var(--ink-muted)' }}>
+        <div className="flex items-center gap-1 mt-1 px-2 text-[var(--ink-muted)]">
           <Info size={10} />
           <span className="text-[10px]">One ball in play — strokes apply to team</span>
         </div>
@@ -169,10 +153,7 @@ export function HandicapStrokeIndicator({
       {/* All Holes View */}
       {showAllHoles && (
         <div className="mt-4 space-y-2">
-          <p
-            className="text-xs font-medium uppercase tracking-wider"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
+          <p className="text-xs font-medium uppercase tracking-wider text-[var(--ink-tertiary)]">
             Stroke Holes
           </p>
           <div className="flex flex-wrap gap-1">
@@ -181,26 +162,20 @@ export function HandicapStrokeIndicator({
               const bStrokes = teamBStrokeAllocation[hole - 1];
               const hasStrokes = aStrokes > 0 || bStrokes > 0;
               const isCurrent = hole === currentHole;
+              const isA = aStrokes > 0;
 
               return (
                 <div
                   key={hole}
                   className={cn(
                     'w-8 h-8 rounded flex flex-col items-center justify-center text-[10px]',
-                    isCurrent && 'ring-2 ring-masters ring-offset-1'
+                    isCurrent && 'ring-2 ring-masters ring-offset-1',
+                    !hasStrokes && 'bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]',
+                    hasStrokes &&
+                      (isA
+                        ? 'bg-[color:var(--team-usa)]/15 text-[var(--team-usa)]'
+                        : 'bg-[color:var(--team-europe)]/15 text-[var(--team-europe)]')
                   )}
-                  style={{
-                    background: hasStrokes
-                      ? aStrokes > 0
-                        ? 'rgba(179, 39, 57, 0.15)'
-                        : 'rgba(0, 39, 118, 0.15)'
-                      : 'var(--canvas-sunken)',
-                    color: hasStrokes
-                      ? aStrokes > 0
-                        ? 'var(--team-usa)'
-                        : 'var(--team-europe)'
-                      : 'var(--ink-tertiary)',
-                  }}
                 >
                   <span className="font-medium">{hole}</span>
                   {hasStrokes && (
@@ -229,11 +204,7 @@ interface StrokeDotsProps {
 
 function StrokeDots({ strokes, color }: StrokeDotsProps) {
   if (strokes === 0) {
-    return (
-      <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-        —
-      </span>
-    );
+    return <span className="text-xs text-[var(--ink-tertiary)]">—</span>;
   }
 
   return (
@@ -263,19 +234,15 @@ interface StrokeBadgeProps {
 export function StrokeBadge({ strokes, team, size = 'md' }: StrokeBadgeProps) {
   if (strokes === 0) return null;
 
-  const color = team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
-
   return (
     <span
       className={cn(
-        'inline-flex items-center justify-center rounded-full font-bold',
-        size === 'sm' ? 'w-4 h-4 text-[8px]' : 'w-5 h-5 text-[10px]'
+        'inline-flex items-center justify-center rounded-full font-bold border',
+        size === 'sm' ? 'w-4 h-4 text-[8px]' : 'w-5 h-5 text-[10px]',
+        team === 'A'
+          ? 'bg-[color:var(--team-usa)]/15 text-[var(--team-usa)] border-[color:var(--team-usa)]/30'
+          : 'bg-[color:var(--team-europe)]/15 text-[var(--team-europe)] border-[color:var(--team-europe)]/30'
       )}
-      style={{
-        background: `${color}20`,
-        color,
-        border: `1px solid ${color}40`,
-      }}
     >
       {strokes > 1 ? strokes : '●'}
     </span>
