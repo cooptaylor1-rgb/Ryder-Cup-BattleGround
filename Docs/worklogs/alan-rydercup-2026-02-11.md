@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 18:55 EST — Phase 2 — WeatherBanner: render when wind/temp provided
+- `WeatherBanner`: updated the “don’t render” guard to treat `0` values as meaningful and to show the banner when *any* weather signal is present (condition, precip chance, temperature, or wind speed).
+- Prevents a silent gap when `condition` is unset but wind/temperature data exists.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`842ef4e`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 18:00 EST — Phase 2 — Trip Awards + shared Input: premium token sweep
 - `Trip Awards` (`/trip-stats/awards`): replaced remaining legacy `card-surface`/`surface-*` + `text-text-*` utilities with premium `.card` + `var(--ink-*)`/`var(--rule)` tokens.
 - Shared `Input` component: migrated label/ink, surfaces, borders, placeholders, disabled, and error states onto premium tokens; added `ring-offset-[color:var(--canvas)]` so focus styles render cleanly across themes.

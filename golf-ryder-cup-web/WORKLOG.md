@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 18:55 — Shipped batch: WeatherBanner now treats `0` as a meaningful weather value and will render whenever *any* weather signal is provided (condition, precip chance, temperature, or wind speed). Prevents the banner from silently disappearing when wind/temperature are present but `condition` is unset. (commit 842ef4e)
 - 14:50 — Shipped batch: removed remaining shadcn-style CSS var tokens (`--border`, `--card`) from the Offline Queue panel, the Quick Score FAB “Start scoring” affordance, the FloatingMyMatch fallback chip, and the Players bulk-add dropzone. All now use premium surface/rule/ink tokens (`var(--surface-raised)`, `var(--rule)`, `var(--ink-primary)`) so borders/surfaces don’t silently drift across themes. (commit a445d56)
 - 13:25 — Shipped batch: `FloatingMyMatch` no longer silently disappears when a trip exists but a match can’t be resolved yet; it now shows a small premium “Find my match” button that routes to `/schedule` (and still hides on scoring pages). Pre-push checks (`typecheck` + `test` + `build`) ran and passed. (commit 9305cf2)
 - 12:55 — Shipped batch: `SettingsPanel` migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`bg-[var(--surface)]`, `hover:bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`). Also updated the toggle off-state to use a token-driven neutral (`bg-[color:var(--ink-tertiary)]/25`) to reduce theme drift. (commit b03f336)

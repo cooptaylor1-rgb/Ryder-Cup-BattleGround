@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 18:55 EST — Phase 2 — WeatherBanner: render when wind/temp provided
+- `WeatherBanner`: updated the “don’t render” guard to treat `0` values as meaningful and to show the banner when *any* weather signal is present (condition, precip chance, temperature, or wind speed).
+- Prevents a silent gap when `condition` is unset but wind/temperature data exists.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`842ef4e`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 18:30 EST — Phase 2 — Games/Exports/Stats/Notifications: replace legacy `card-surface` + borders
 - `VegasGameCard` + `WolfGameCard`: replaced legacy `card-surface` wrapper with the shared premium `.card` surface and migrated section dividers to `border-[var(--rule)]`.
 - `PDFExportPanel`: replaced the legacy wrapper with `.card`, migrated dividers to `border-[var(--rule)]`, and standardized neutral option/disabled surfaces on premium tokens.
