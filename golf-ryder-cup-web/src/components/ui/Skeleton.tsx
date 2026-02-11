@@ -154,9 +154,9 @@ export function SessionCardSkeleton() {
 // Live Match Card Skeleton (for jumbotron view)
 export function LiveMatchCardSkeleton() {
   return (
-    <div className="rounded-2xl overflow-hidden bg-card border border-border">
+    <div className="rounded-2xl overflow-hidden bg-[var(--surface)] border border-[var(--rule)]">
       {/* Header */}
-      <div className="px-4 py-2 flex items-center justify-between bg-muted/50">
+      <div className="px-4 py-2 flex items-center justify-between bg-[color:var(--surface-tertiary)]/60">
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-5 w-20 rounded-full" />
       </div>

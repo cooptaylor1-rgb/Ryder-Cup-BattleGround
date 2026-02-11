@@ -323,10 +323,10 @@ function PhotoPreview({
       </div>
 
       {/* Context Panel */}
-      <div className="bg-card dark:bg-zinc-900 p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+      <div className="bg-[var(--surface)] p-4 space-y-4 max-h-[50vh] overflow-y-auto text-[var(--ink)]">
         {/* Moment Type */}
         <div>
-          <label className="text-xs text-gray-400 uppercase tracking-wide mb-2 block">
+          <label className="text-xs text-[var(--ink-tertiary)] uppercase tracking-wide mb-2 block">
             Moment Type
           </label>
           <div className="flex flex-wrap gap-2">
@@ -337,8 +337,8 @@ function PhotoPreview({
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
                   context.momentType === type
-                    ? 'text-white ring-2 ring-offset-2 ring-offset-gray-900'
-                    : 'text-gray-300 bg-gray-800'
+                    ? 'text-white ring-2 ring-offset-2 ring-offset-[var(--surface)]'
+                    : 'text-[var(--ink-secondary)] bg-[var(--surface-tertiary)] hover:bg-[color:var(--surface-tertiary)]/80'
                 )}
                 style={{
                   background: context.momentType === type ? color : undefined,
@@ -354,7 +354,7 @@ function PhotoPreview({
 
         {/* Hole Number */}
         <div>
-          <label className="text-xs text-gray-400 uppercase tracking-wide mb-2 block">
+          <label className="text-xs text-[var(--ink-tertiary)] uppercase tracking-wide mb-2 block">
             Hole (optional)
           </label>
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
@@ -363,8 +363,8 @@ function PhotoPreview({
               className={cn(
                 'px-3 py-1.5 rounded-lg text-sm font-medium transition-all shrink-0',
                 context.holeNumber === undefined
-                  ? 'bg-white text-black'
-                  : 'bg-gray-800 text-gray-300'
+                  ? 'bg-[var(--surface-raised)] text-[var(--ink)] ring-2 ring-[var(--masters)]'
+                  : 'bg-[var(--surface-tertiary)] text-[var(--ink-secondary)] hover:bg-[color:var(--surface-tertiary)]/80'
               )}
             >
               None
@@ -375,7 +375,9 @@ function PhotoPreview({
                 onClick={() => handleHoleChange(hole)}
                 className={cn(
                   'w-9 h-9 rounded-lg text-sm font-medium transition-all shrink-0',
-                  context.holeNumber === hole ? 'bg-white text-black' : 'bg-gray-800 text-gray-300'
+                  context.holeNumber === hole
+                    ? 'bg-[var(--surface-raised)] text-[var(--ink)] ring-2 ring-[var(--masters)]'
+                    : 'bg-[var(--surface-tertiary)] text-[var(--ink-secondary)] hover:bg-[color:var(--surface-tertiary)]/80'
                 )}
               >
                 {hole}
@@ -387,7 +389,7 @@ function PhotoPreview({
         {/* Tag Players */}
         {players.length > 0 && (
           <div>
-            <label className="text-xs text-gray-400 uppercase tracking-wide mb-2 block">
+            <label className="text-xs text-[var(--ink-tertiary)] uppercase tracking-wide mb-2 block">
               Tag Players
             </label>
             <div className="flex flex-wrap gap-2">
@@ -399,7 +401,9 @@ function PhotoPreview({
                     onClick={() => handleToggleTag(player.id)}
                     className={cn(
                       'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all',
-                      isTagged ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300'
+                      isTagged
+                        ? 'bg-[var(--masters)] text-white'
+                        : 'bg-[var(--surface-tertiary)] text-[var(--ink-secondary)] hover:bg-[color:var(--surface-tertiary)]/80'
                     )}
                   >
                     {player.avatarUrl ? (
@@ -411,7 +415,7 @@ function PhotoPreview({
                         className="w-5 h-5 rounded-full"
                       />
                     ) : (
-                      <div className="w-5 h-5 rounded-full bg-gray-600 flex items-center justify-center text-xs">
+                      <div className="w-5 h-5 rounded-full bg-[var(--surface-tertiary)] flex items-center justify-center text-xs text-[var(--ink)]">
                         {player.name.charAt(0)}
                       </div>
                     )}
@@ -425,7 +429,7 @@ function PhotoPreview({
 
         {/* Caption */}
         <div>
-          <label className="text-xs text-gray-400 uppercase tracking-wide mb-2 block">
+          <label className="text-xs text-[var(--ink-tertiary)] uppercase tracking-wide mb-2 block">
             Caption (optional)
           </label>
           <input
@@ -433,18 +437,18 @@ function PhotoPreview({
             value={context.caption || ''}
             onChange={(e) => onContextChange({ ...context, caption: e.target.value })}
             placeholder="Add a caption..."
-            className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white placeholder-gray-500 text-sm"
+            className="w-full px-4 py-3 rounded-lg bg-[var(--surface-tertiary)] text-[var(--ink)] placeholder:text-[var(--ink-tertiary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--masters)]"
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="bg-card dark:bg-zinc-900 border-t border-border p-4 pb-safe">
+      <div className="bg-[var(--surface)] border-t border-[var(--rule)] p-4 pb-safe">
         <div className="flex items-center gap-3">
           <button
             onClick={onRetake}
             disabled={isUploading}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gray-800 text-white font-medium"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--surface-tertiary)] text-[var(--ink)] font-medium hover:bg-[color:var(--surface-tertiary)]/80 transition-colors"
           >
             <RotateCcw size={18} />
             Retake
@@ -452,7 +456,7 @@ function PhotoPreview({
           <button
             onClick={onConfirm}
             disabled={isUploading}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 text-white font-semibold"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--success)] text-white font-semibold hover:bg-[color:var(--success)]/90 transition-colors"
           >
             {isUploading ? (
               <>
