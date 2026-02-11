@@ -445,7 +445,7 @@ export default function BetDetailPage() {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="p-2 rounded text-center bg-[var(--muted)]">
+                                        <div className="p-2 rounded text-center bg-[color:var(--surface-secondary)]">
                                             <span className="type-caption text-[var(--ink-tertiary)]">No result</span>
                                         </div>
                                     )}
@@ -595,7 +595,7 @@ export default function BetDetailPage() {
                                                     className={`type-body-sm font-bold size-6 rounded-full flex items-center justify-center ${
                                                         i === 0
                                                             ? 'bg-[var(--success)] text-white'
-                                                            : 'bg-[var(--muted)] text-[var(--ink-secondary)]'
+                                                            : 'bg-[color:var(--surface-secondary)] text-[var(--ink-secondary)]'
                                                     }`}
                                                 >
                                                     {i + 1}

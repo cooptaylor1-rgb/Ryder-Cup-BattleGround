@@ -539,7 +539,7 @@ export default function BetsPage() {
                         disabled={isOnOtherTeam}
                         className="px-3 py-2 rounded-lg transition-all"
                         style={{
-                          background: isSelected ? 'var(--team-usa)' : isOnOtherTeam ? 'var(--muted)' : 'var(--surface)',
+                          background: isSelected ? 'var(--team-usa)' : isOnOtherTeam ? 'var(--surface-secondary)' : 'var(--surface)',
                           color: isSelected ? 'white' : isOnOtherTeam ? 'var(--ink-tertiary)' : 'var(--ink)',
                           border: isSelected ? '2px solid var(--team-usa)' : '1px solid var(--rule)',
                           cursor: isOnOtherTeam ? 'not-allowed' : 'pointer',
@@ -574,7 +574,7 @@ export default function BetsPage() {
                         disabled={isOnOtherTeam}
                         className="px-3 py-2 rounded-lg transition-all"
                         style={{
-                          background: isSelected ? 'var(--team-europe)' : isOnOtherTeam ? 'var(--muted)' : 'var(--surface)',
+                          background: isSelected ? 'var(--team-europe)' : isOnOtherTeam ? 'var(--surface-secondary)' : 'var(--surface)',
                           color: isSelected ? 'white' : isOnOtherTeam ? 'var(--ink-tertiary)' : 'var(--ink)',
                           border: isSelected ? '2px solid var(--team-europe)' : '1px solid var(--rule)',
                           cursor: isOnOtherTeam ? 'not-allowed' : 'pointer',
