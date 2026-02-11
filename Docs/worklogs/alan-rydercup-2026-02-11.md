@@ -1,5 +1,10 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-11
 
+## 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
+- `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) so theme borders remain consistent and token-driven.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`09b0122`) (note: pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ## 06:55 EST — Phase 1 — Bets modals + Trip settings: premium token surfaces
 - Bets (`/bets` + `/bets/[betId]`): migrated remaining bottom-sheet/confirm modal surfaces off shadcn `bg-background` / `bg-muted` and onto premium surfaces (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`) with consistent hover states (`hover:bg-[var(--surface)]`).
 - Trip settings (`/trip/[tripId]/settings`): replaced remaining `border-border` section dividers with premium `border-[var(--rule)]`.

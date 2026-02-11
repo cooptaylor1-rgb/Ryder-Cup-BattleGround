@@ -11,6 +11,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ba1b6b7`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
+### 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
+- `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) to prevent silent theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`09b0122`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 07:45 EST — Docs — Re-sort Lobster WORKLOG by date
 - Moved the 21:05–23:45 entries that were accidentally logged under **2026-02-11** back under **2026-02-10**.
 - Keeps the worklog chronological and avoids “future” timestamps.

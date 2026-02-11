@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 08:50 — Shipped batch: `ScorecardScanner` (preview “Add another image” dashed dropzone) replaced the last shadcn border token (`border-muted-foreground/*`) with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) to prevent silent theme drift. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted an existing CSS optimization warning). (commit 09b0122)
 - 08:25 — Shipped batch: `ScorecardScanner` (Course OCR) migrated remaining shadcn utility tokens (`bg-background`, `bg-muted`, `border-border`, `text-muted-foreground`, `bg-card`) onto premium design tokens (`bg-[var(--canvas)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`). Updated `ScanScorecardButton` to match premium surfaces. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted an existing CSS optimization warning). (commit ba1b6b7)
 - 07:45 — Docs: re-sorted the Lobster worklog to keep entries under the correct dates (moved mis-logged 21:05–23:45 entries back under 2026-02-10). (commit dd4ecd7)
 - 07:25 — Shipped batch: Captain Toolkit Pairings section now renders a clear “No sessions created yet” empty-state when there are no sessions, instead of passing an undefined session into `SmartPairingSuggestions` (avoids potential runtime errors / silent gaps). (commit 3c0c782)
