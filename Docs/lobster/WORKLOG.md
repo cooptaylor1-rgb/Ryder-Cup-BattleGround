@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 10:55 EST — Phase 1 — Captain Availability + Lineup toggle: remove undefined `bg-surface`
+- Captain Availability (`/captain/availability`): session selector buttons now use premium surface + rule tokens instead of the undefined `bg-surface` utility.
+- Lineup session (`/lineup/[sessionId]`): view-mode toggle buttons now use premium surface + rule tokens instead of `bg-surface`, and rely on `disabled:*` Tailwind classes instead of inline opacity.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5c3be62`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 10:35 EST — Phase 1 — Replace legacy `bg-surface/*` utilities + QuickScoreFABv2 typecheck fix
 - Trip Settings (`/trip/[tripId]/settings`): replaced legacy `bg-surface/60 hover:bg-surface` buttons with premium token-driven Tailwind (`bg-[color:var(--surface)]/60`, `hover:bg-[var(--surface)]`, `border-[color:var(--rule)]/30`) and removed `PageHeader` icon inline color style.
 - Live: `QuickStandingsOverlay` pull-indicator pill now uses premium surface + rule tokens instead of `bg-surface/80`.
