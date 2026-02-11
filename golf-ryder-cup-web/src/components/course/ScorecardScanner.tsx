@@ -585,11 +585,8 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                         >
                             {/* Success header */}
                             <div className="p-4 flex items-center gap-3 border-b border-border">
-                                <div
-                                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                                    style={{ background: 'var(--success-subtle)' }}
-                                >
-                                    <Check size={20} style={{ color: 'var(--success)' }} />
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[color:var(--success)]/15">
+                                    <Check size={20} className="text-[var(--success)]" />
                                 </div>
                                 <div>
                                     <h2 className="font-semibold">Data Extracted!</h2>

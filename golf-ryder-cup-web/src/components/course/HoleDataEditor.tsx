@@ -123,13 +123,13 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
         <div className="flex items-center gap-2">
           <span className="type-meta font-medium">Hole Details</span>
           {validation.isValid ? (
-            <Check size={14} style={{ color: 'var(--success)' }} />
+            <Check size={14} className="text-[var(--success)]" />
           ) : (
-            <AlertCircle size={14} style={{ color: 'var(--warning)' }} />
+            <AlertCircle size={14} className="text-[var(--warning)]" />
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="type-micro" style={{ color: 'var(--ink-tertiary)' }}>
+          <span className="type-micro text-[var(--ink-tertiary)]">
             Par {totals.totalPar} | {totals.totalYards > 0 ? `${totals.totalYards} yds` : 'No yardage'}
           </span>
           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -141,12 +141,14 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
         <div className="mt-3 p-4 rounded-lg" style={{ background: 'var(--surface-elevated)', border: '1px solid var(--rule)' }}>
           {/* Validation Errors */}
           {!validation.isValid && (
-            <div className="mb-4 p-3 rounded-lg" style={{ background: 'var(--warning-soft)', border: '1px solid var(--warning)' }}>
+            <div className="mb-4 rounded-lg border border-[color:var(--warning)] bg-[color:var(--warning)]/10 p-3">
               <div className="flex items-start gap-2">
-                <AlertCircle size={16} style={{ color: 'var(--warning)', flexShrink: 0, marginTop: 2 }} />
+                <AlertCircle size={16} className="mt-0.5 shrink-0 text-[var(--warning)]" />
                 <div>
                   {validation.errors.map((error, i) => (
-                    <p key={i} className="type-caption" style={{ color: 'var(--warning)' }}>{error}</p>
+                    <p key={i} className="type-caption text-[var(--warning)]">
+                      {error}
+                    </p>
                   ))}
                 </div>
               </div>
