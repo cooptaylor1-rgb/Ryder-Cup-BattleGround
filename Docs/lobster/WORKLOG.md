@@ -26,6 +26,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `JoinTripModal`: migrated modal surfaces/ink/rules off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`).
 - Input now uses the standard premium focus ring + ring offset (`ring-gold` + `ring-offset-[color:var(--canvas)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5823fc9`)
 
 ### 14:50 EST — Phase 2 — Remove remaining shadcn `--border`/`--card` CSS vars
 - Offline Queue panel: replaced `bg-[var(--card)]`, `border-[var(--border)]`, and `text-[var(--ink)]` with premium tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-primary)]`).
