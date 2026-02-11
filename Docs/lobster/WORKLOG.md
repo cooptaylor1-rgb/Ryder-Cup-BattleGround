@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `HomeLoadingSkeleton`: migrated the pulse blocks off shadcn `bg-muted/50` to premium token-driven Tailwind (`bg-[color:var(--ink-tertiary)]/10`) and removed remaining inline layout/token styles in favor of classnames.
 - `ContinueScoringBanner`: removed the last `text-muted-foreground` usage and swapped inline gradient/border colors to token-driven Tailwind (`border-[var(--masters)]`, `bg-gradient-to-br from-[color:var(--masters)]/15 to-[color:var(--masters)]/5`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`3afa1e0`)
 
 ### 05:55 EST — Phase 1 — Predictions + Cart Tracker: premium token sweep
 - `MatchPredictions`: migrated prediction cards + bottom-sheet modal off shadcn tokens (`bg-background`, `bg-card`, `bg-muted`, `border-border`, `text-muted-foreground`) onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping the Masters + team accents.
