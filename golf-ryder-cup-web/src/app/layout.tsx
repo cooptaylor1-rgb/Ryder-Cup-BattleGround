@@ -11,7 +11,7 @@ import { KeyboardShortcutsProvider } from '@/components/ui/KeyboardShortcutsProv
 import { AppOnboardingProvider } from '@/components/AppOnboardingProvider';
 import { NotificationProvider } from '@/components/live-play';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { QuickScoreFAB } from '@/components/QuickScoreFAB';
+import { QuickScoreFABv2 } from '@/components/scoring';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { TripRehydrationProvider } from '@/components/TripRehydrationProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -191,7 +191,7 @@ export default function RootLayout({
                   </AuthGuard>
                 </Suspense>
               </ErrorBoundary>
-              <QuickScoreFAB />
+              <QuickScoreFABv2 />
               <OfflineIndicator />
               <CourseSyncInitializer />
               <TripSyncInitializer />
