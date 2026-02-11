@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 18:30 EST — Phase 2 — Games/Exports/Stats/Notifications: replace legacy `card-surface` + borders
+- `VegasGameCard` + `WolfGameCard`: replaced legacy `card-surface` wrapper with the shared premium `.card` surface and migrated section dividers to `border-[var(--rule)]`.
+- `PDFExportPanel`: replaced the legacy wrapper with `.card`, migrated dividers to `border-[var(--rule)]`, and standardized neutral option/disabled surfaces on premium tokens.
+- `StatsDashboard` + `NotificationSettings`: replaced remaining `card-surface` wrappers with `.card`; standardized divider rules and a neutral toggle track (`bg-[color:var(--ink-tertiary)]/25`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a099832`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 18:00 EST — Phase 2 — Trip Awards + shared Input: premium token sweep
 - Trip Awards (`/trip-stats/awards`): replaced remaining legacy `card-surface`/`surface-*` + `text-text-*` utilities with premium `.card` + `var(--ink-*)`/`var(--rule)` tokens.
 - Shared `Input` component: migrated label/ink, surfaces, borders, placeholders, disabled, and error states onto premium tokens; added `ring-offset-[color:var(--canvas)]` so focus styles render cleanly across themes.
