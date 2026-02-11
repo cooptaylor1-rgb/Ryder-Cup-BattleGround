@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 04:25 EST — Phase 1 — Replace remaining shadcn `bg-card` tokens (Offline + live notifications)
+- `OfflineIndicator`: the small “Online” reconnection pill now uses premium surface/rule tokens (`bg-[var(--surface)] border-[var(--rule)]`) instead of shadcn `bg-card border-border`.
+- Live score notifications permission banner (`liveScoreNotifications.tsx`): migrated the container + description text off shadcn tokens (`bg-card`, `border-border`, `text-muted-foreground`) onto premium tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3ecf73b`)
+
 ### 03:55 EST — Phase 1 — Switch app shell to QuickScoreFABv2 (remove legacy modal)
 - App root layout now renders `QuickScoreFABv2` (enhanced premium quick-score control).
 - Removed legacy `QuickScoreFAB` + `QuickScoreModal` (and the modal unit test) to avoid duplicate/unused scoring entrypoints.
