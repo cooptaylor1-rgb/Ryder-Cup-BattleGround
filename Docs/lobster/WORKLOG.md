@@ -5,17 +5,105 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
-### 09:15 EST — Phase 1 — OfflineIndicator: token-driven banner gradients
-- Offline banner: replaced inline `style={{ background, paddingTop }}` with Tailwind classes.
-- Uses `pt-[env(safe-area-inset-top)]` for iOS safe-area spacing and gradient utilities for offline/syncing/online states (`var(--masters)` → `var(--masters-deep)` for the “back online” banner).
+### 16:15 EST — Docs — Worklog chronological hygiene (midday re-sort)
+- `Docs/lobster/WORKLOG.md`: re-sorted the 09:15–15:55 entries to be reverse-chronological (latest-first), fixing a lingering 13:xx ordering issue.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`e1fb04b`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
-### 09:40 EST — Captain Toolkit: premium tokens + EmptyStatePremium for no sessions
-- Captain Toolkit: migrated UI surfaces/inks/rules off the hard-coded gray/blue palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping accent colors via `var(--color-accent)`.
-- Tee Times / Smart Pairings / Weather sections: when there are no sessions, now render `EmptyStatePremium` (“No sessions created yet”) instead of bespoke placeholder blocks.
+### 15:55 EST — Phase 1 — Trip recap: highlights empty state
+- Trip recap `HighlightsSection`: when a trip has no saved highlights, render the shared `EmptyStatePremium` instead of returning `null`, so the Top Moments section stays visible with clear guidance.
+- Keeps the social recap free of silent gaps and aligned with the premium empty-state pattern.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5eeee4a`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+- Commit + push ✅ (`acdd239`)
+
+### 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
+- Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` in favor of a stable token-driven class (`bg-[var(--masters-subtle)]`) to avoid CSS optimizer warnings.
+- `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`40f0fe4`)
+
+### 15:16 EST — Phase 2 — JoinTripModal: premium token sweep
+- `JoinTripModal`: migrated modal surfaces/ink/rules off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`).
+- Input now uses the standard premium focus ring + ring offset (`ring-gold` + `ring-offset-[color:var(--canvas)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+### 14:50 EST — Phase 2 — Remove remaining shadcn `--border`/`--card` CSS vars
+- Offline Queue panel: replaced `bg-[var(--card)]`, `border-[var(--border)]`, and `text-[var(--ink)]` with premium tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-primary)]`).
+- QuickScoreFABv2 + FloatingMyMatch: replaced remaining `border-[var(--border)]` usage with premium `border-[var(--rule)]`.
+- Players bulk-add dropzone: replaced dashed `border-[var(--border)]` with premium `border-[color:var(--rule)]/40`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+### 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
+- `src/app/global-error.tsx`: updated copy block + dev-only details panel to use premium token-driven ink/surface/rule classes so the global error page renders correctly in dark mode.
+- Added `dark:from-surface-900 dark:to-surface-950` to the page gradient background.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`aab0a8b`)
+
+### 14:10 EST — Phase 2 — WeatherWidget + PhotoStrip: premium token sweep
+- `WeatherWidget`: migrated remaining legacy `bg-surface-card` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) across loading/error/compact + forecast cards.
+- `FactorBar`: updated the track color to a subtle token-driven neutral (`bg-[color:var(--ink-tertiary)]/15`) so the conditions bars render consistently across themes.
+- `PhotoStrip` (in `PhotoGallery`): migrated thumbnail + “+N” pill backgrounds/text off the legacy `surface-*` palette and onto premium tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a7e25df`)
+
+### 13:36 EST — Phase 2 — SideBets: premium token sweep + empty state upgrade
+- `SideBets`: migrated remaining legacy `bg-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--ink-*)`, `var(--rule)`) across category headers, bet rows, and the add form so the component matches the premium shell.
+- Replaced the bespoke inline empty state with the shared `NoBetsEmpty` so editable views surface the standard CTA and read-only views stay consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+### 13:25 EST — Phase 1 — FloatingMyMatch: show “Find my match” affordance when unresolved
+- `FloatingMyMatch`: no longer silently disappears when the app can’t resolve a current match yet.
+- When a trip exists but no match is found (and you’re not already on a scoring page), it now shows a small premium button that routes to `/schedule`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9305cf2`) (pre-push `typecheck` + `test` + `build` passed)
+
+### 13:20 EST — Docs — Worklog chronological hygiene
+- `Docs/lobster/WORKLOG.md`: fixed a minor timestamp ordering issue in the 2026-02-11 section (08:50 entry now correctly precedes 08:25).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
+### 13:10 EST — Phase 2 — Button/IconButton + PhotoGallery: premium token sweep
+- `Button` + `IconButton`: replaced legacy `surface-*` + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`) and updated focus ring offset to `ring-offset-[color:var(--canvas)]`.
+- `PhotoGallery`: migrated legacy `bg-surface-*` / `text-surface-*` empty-state + upload progress styles to premium tokens (surface/rule/ink).
+- `getWinnerStyles`: removed legacy `surface-*` classes for halved/none winner states in favor of token-driven neutral pill styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f32eb7d`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
+### 12:55 EST — Phase 2 — SettingsPanel: premium token sweep (remove legacy surface palette)
+- `SettingsPanel`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
+- Updates include the scoring-hand selector buttons, settings rows, storage/sync icons, and the Export/Import data cards.
+- Toggle off-state now uses a token-driven neutral (`bg-[color:var(--ink-tertiary)]/25`) instead of the legacy surface palette.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b03f336`)
+
+### 12:30 EST — Phase 2 — PathToVictoryCard: premium token sweep (remove legacy surface palette)
+- `PathToVictoryCard`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--canvas-sunken)`, `var(--rule)`, `var(--ink-*)`).
+- Keeps gamification UI consistent with the premium shell and reduces theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`997cccb`)
+
+### 12:15 EST — Phase 2 — MomentumMeter: premium token sweep (remove legacy surface palette)
+- `MomentumMeter`: migrated legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` classes to the premium design tokens (`var(--surface)`, `var(--rule)`, `var(--ink-*)`).
+- Keeps the momentum UI consistent with the rest of the premium shell and reduces theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
+### 11:50 EST — Phase 1 — QuickScoreFABv2: show “Start scoring” affordance when no active match
+- QuickScoreFABv2 no longer disappears entirely when there’s no in-progress match.
+- Instead, it renders a small premium “Start scoring” button that navigates to `/schedule`, so users always have an obvious scoring entry-point.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
+### 11:30 EST — Phase 1 — SettingsPanel: import/clear without hard reload
+- SettingsPanel data management actions now avoid `window.location.reload()` after **Import data** and **Clear all data**.
+- After a successful import/clear, we reset in-memory trip state (`useTripStore.getState().clearTrip()`) and use Next router navigation (`router.push('/')` + `router.refresh()`) so the UI updates without a hard reload.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`28c1ad5`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
+### 10:55 EST — Phase 1 — Captain Availability + Lineup toggle: remove undefined `bg-surface`
+- Captain Availability (`/captain/availability`): session selector buttons now use premium surface + rule tokens instead of the undefined `bg-surface` utility.
+- Lineup session (`/lineup/[sessionId]`): view-mode toggle buttons now use premium surface + rule tokens instead of `bg-surface`, and rely on `disabled:*` Tailwind classes instead of inline opacity.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5c3be62`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
 ### 10:35 EST — Phase 1 — Replace legacy `bg-surface/*` utilities + QuickScoreFABv2 typecheck fix
 - Trip Settings (`/trip/[tripId]/settings`): replaced legacy `bg-surface/60 hover:bg-surface` buttons with premium token-driven Tailwind (`bg-[color:var(--surface)]/60`, `hover:bg-[var(--surface)]`, `border-[color:var(--rule)]/30`) and removed `PageHeader` icon inline color style.
@@ -25,104 +113,17 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c8220e7`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
-### 10:55 EST — Phase 1 — Captain Availability + Lineup toggle: remove undefined `bg-surface`
-- Captain Availability (`/captain/availability`): session selector buttons now use premium surface + rule tokens instead of the undefined `bg-surface` utility.
-- Lineup session (`/lineup/[sessionId]`): view-mode toggle buttons now use premium surface + rule tokens instead of `bg-surface`, and rely on `disabled:*` Tailwind classes instead of inline opacity.
+### 09:40 EST — Captain Toolkit: premium tokens + EmptyStatePremium for no sessions
+- Captain Toolkit: migrated UI surfaces/inks/rules off the hard-coded gray/blue palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping accent colors via `var(--color-accent)`.
+- Tee Times / Smart Pairings / Weather sections: when there are no sessions, now render `EmptyStatePremium` (“No sessions created yet”) instead of bespoke placeholder blocks.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5c3be62`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+- Commit + push ✅ (`5eeee4a`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
-### 11:30 EST — Phase 1 — SettingsPanel: import/clear without hard reload
-- SettingsPanel data management actions now avoid `window.location.reload()` after **Import data** and **Clear all data**.
-- After a successful import/clear, we reset in-memory trip state (`useTripStore.getState().clearTrip()`) and use Next router navigation (`router.push('/')` + `router.refresh()`) so the UI updates without a hard reload.
+### 09:15 EST — Phase 1 — OfflineIndicator: token-driven banner gradients
+- Offline banner: replaced inline `style={{ background, paddingTop }}` with Tailwind classes.
+- Uses `pt-[env(safe-area-inset-top)]` for iOS safe-area spacing and gradient utilities for offline/syncing/online states (`var(--masters)` → `var(--masters-deep)` for the “back online” banner).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`28c1ad5`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
-
-### 11:50 EST — Phase 1 — QuickScoreFABv2: show “Start scoring” affordance when no active match
-- QuickScoreFABv2 no longer disappears entirely when there’s no in-progress match.
-- Instead, it renders a small premium “Start scoring” button that navigates to `/schedule`, so users always have an obvious scoring entry-point.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`e1be826`)
-
-### 12:15 EST — Phase 2 — MomentumMeter: premium token sweep (remove legacy surface palette)
-- `MomentumMeter`: migrated legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` classes to the premium design tokens (`var(--surface)`, `var(--rule)`, `var(--ink-*)`).
-- Keeps the momentum UI consistent with the rest of the premium shell and reduces theme drift.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`81489d3`)
-
-### 12:30 EST — Phase 2 — PathToVictoryCard: premium token sweep (remove legacy surface palette)
-- `PathToVictoryCard`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--canvas-sunken)`, `var(--rule)`, `var(--ink-*)`).
-- Keeps gamification UI consistent with the premium shell and reduces theme drift.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`997cccb`)
-
-### 12:55 EST — Phase 2 — SettingsPanel: premium token sweep (remove legacy surface palette)
-- `SettingsPanel`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
-- Updates include the scoring-hand selector buttons, settings rows, storage/sync icons, and the Export/Import data cards.
-- Toggle off-state now uses a token-driven neutral (`bg-[color:var(--ink-tertiary)]/25`) instead of the legacy surface palette.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`b03f336`)
-
-### 13:10 EST — Phase 2 — Button/IconButton + PhotoGallery: premium token sweep
-- `Button` + `IconButton`: replaced legacy `surface-*` + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`) and updated focus ring offset to `ring-offset-[color:var(--canvas)]`.
-- `PhotoGallery`: migrated legacy `bg-surface-*` / `text-surface-*` empty-state + upload progress styles to premium tokens (surface/rule/ink).
-- `getWinnerStyles`: removed legacy `surface-*` classes for halved/none winner states in favor of token-driven neutral pill styles.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`f32eb7d`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
-
-### 13:20 EST — Docs — Worklog chronological hygiene
-- `Docs/lobster/WORKLOG.md`: fixed a minor timestamp ordering issue in the 2026-02-11 section (08:50 entry now correctly precedes 08:25).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`00b6d76`)
-
-### 13:25 EST — Phase 1 — FloatingMyMatch: show “Find my match” affordance when unresolved
-- `FloatingMyMatch`: no longer silently disappears when the app can’t resolve a current match yet.
-- When a trip exists but no match is found (and you’re not already on a scoring page), it now shows a small premium button that routes to `/schedule`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`9305cf2`) (pre-push `typecheck` + `test` + `build` passed)
-
-### 13:36 EST — Phase 2 — SideBets: premium token sweep + empty state upgrade
-- `SideBets`: migrated remaining legacy `bg-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--ink-*)`, `var(--rule)`) across category headers, bet rows, and the add form so the component matches the premium shell.
-- Replaced the bespoke inline empty state with the shared `NoBetsEmpty` so editable views surface the standard CTA and read-only views stay consistent.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`dd16081`)
-
-### 14:10 EST — Phase 2 — WeatherWidget + PhotoStrip: premium token sweep
-- `WeatherWidget`: migrated remaining legacy `bg-surface-card` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) across loading/error/compact + forecast cards.
-- `FactorBar`: updated the track color to a subtle token-driven neutral (`bg-[color:var(--ink-tertiary)]/15`) so the conditions bars render consistently across themes.
-- `PhotoStrip` (in `PhotoGallery`): migrated thumbnail + “+N” pill backgrounds/text off the legacy `surface-*` palette and onto premium tokens.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a7e25df`)
-
-### 14:30 EST — Polish — Global error: token-driven ink + dark-mode gradient
-- `src/app/global-error.tsx`: updated copy block + dev-only details panel to use premium token-driven ink/surface/rule classes so the global error page renders correctly in dark mode.
-- Added `dark:from-surface-900 dark:to-surface-950` to the page gradient background.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`aab0a8b`)
-
-### 14:50 EST — Phase 2 — Remove remaining shadcn `--border`/`--card` CSS vars
-- Offline Queue panel: replaced `bg-[var(--card)]`, `border-[var(--border)]`, and `text-[var(--ink)]` with premium tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-primary)]`).
-- QuickScoreFABv2 + FloatingMyMatch: replaced remaining `border-[var(--border)]` usage with premium `border-[var(--rule)]`.
-- Players bulk-add dropzone: replaced dashed `border-[var(--border)]` with premium `border-[color:var(--rule)]/40`.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a445d56`)
-
-### 15:16 EST — Phase 2 — JoinTripModal: premium token sweep
-- `JoinTripModal`: migrated modal surfaces/ink/rules off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface)`, `var(--rule)`, `var(--ink-*)`).
-- Input now uses the standard premium focus ring + ring offset (`ring-gold` + `ring-offset-[color:var(--canvas)]`).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`5823fc9`)
-
-### 15:35 EST — Phase 2 — Backup + ScorecardScanner: tokenize `--masters-subtle`
-- Backup & Restore (`/settings/backup`): removed the Tailwind class fallback form `bg-[var(--masters-subtle,rgba(...))]` in favor of a stable token-driven class (`bg-[var(--masters-subtle)]`) to avoid CSS optimizer warnings.
-- `ScorecardScanner`: replaced the remaining inline `style={{ background/color: 'var(--masters-subtle/masters)' }}` usage with token-driven Tailwind classes (`bg-[var(--masters-subtle)]`, `text-[var(--masters)]`).
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`40f0fe4`)
-
-### 15:55 EST — Phase 1 — Trip recap: highlights empty state
-- Trip recap `HighlightsSection`: when a trip has no saved highlights, render the shared `EmptyStatePremium` instead of returning `null`, so the Top Moments section stays visible with clear guidance.
-- Keeps the social recap free of silent gaps and aligned with the premium empty-state pattern.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`acdd239`)
+- Commit + push ✅ (`e1fb04b`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
 ### 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
 - `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) to prevent silent theme drift.
