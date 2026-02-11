@@ -7,7 +7,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ### 21:05 EST — Phase 1 — Course UI: replace undefined success/warning subtle tokens
 - Course Scorecard OCR (`ScorecardScanner`) and Hole Data Editor validation banner: removed reliance on undefined CSS vars (`--success-subtle`, `--warning-soft`).
-- Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success|warning)]`) and removed a few inline icon/text style props.
+- Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) and removed a few inline icon/text style props.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d05d52b`)
 

@@ -3,7 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
-- 21:05 — Shipped batch: Course OCR + Hole Editor UI no longer rely on undefined CSS vars (`--success-subtle`, `--warning-soft`). Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success|warning)]`) for consistent theming and to avoid silent CSS failures. (commit d05d52b)
+- 21:05 — Shipped batch: Course OCR + Hole Editor UI no longer rely on undefined CSS vars (`--success-subtle`, `--warning-soft`). Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) for consistent theming and to avoid silent CSS failures. (commit d05d52b)
 
 ## 2026-02-10
 - 16:55 — Shipped batch: Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`) removed remaining inline `style={{...}}` usage in favor of token-driven Tailwind classes (PageHeader icon container + card padding), keeping premium theming consistent. (commit ef424ed)
