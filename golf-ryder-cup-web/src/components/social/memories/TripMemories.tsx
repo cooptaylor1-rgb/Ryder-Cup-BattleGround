@@ -34,6 +34,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { useHaptic } from '@/lib/hooks';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 
 // ============================================
 // TYPES
@@ -440,7 +441,22 @@ function HighlightsSection({ highlights }: { highlights: TripHighlight[] }) {
         setCurrent((c) => (c - 1 + highlights.length) % highlights.length);
     };
 
-    if (highlights.length === 0) return null;
+    if (highlights.length === 0) {
+        return (
+            <section className="py-8">
+                <h2 className="text-xl font-bold text-center mb-6 px-6 text-[var(--ink)]">Top Moments</h2>
+                <div className="px-6">
+                    <EmptyStatePremium
+                        illustration="celebration"
+                        title="No highlights captured yet"
+                        description="Add standout shots or memorable moments and they’ll appear in your trip recap."
+                        variant="compact"
+                        className="mx-auto max-w-md"
+                    />
+                </div>
+            </section>
+        );
+    }
 
     const highlight = highlights[current];
 
