@@ -486,7 +486,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                 {capturedImages.length < 3 && (
                                     <button
                                         onClick={addAnotherImage}
-                                        className="w-full py-4 border-2 border-dashed border-muted-foreground/30 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-muted-foreground/50 transition-colors"
+                                        className="w-full py-4 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[color:var(--rule)]/70 transition-colors"
                                     >
                                         <ImageIcon size={24} className="text-[var(--ink-secondary)]" />
                                         <span className="text-sm text-[var(--ink-secondary)]">
