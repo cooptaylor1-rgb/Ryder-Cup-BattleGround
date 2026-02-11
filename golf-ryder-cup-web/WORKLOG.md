@@ -4,6 +4,7 @@ All times America/New_York.
 
 ## 2026-02-11
 - 21:05 — Shipped batch: Course OCR + Hole Editor UI no longer rely on undefined CSS vars (`--success-subtle`, `--warning-soft`). Replaced with token-driven Tailwind classes (`bg-[color:var(--success)]/15`, `bg-[color:var(--warning)]/10`, `text-[var(--success)]` / `text-[var(--warning)]`) for consistent theming and to avoid silent CSS failures. (commit d05d52b)
+- 23:15 — Shipped batch: Live Scores (`/live`) match cards removed shadcn-style `bg-card` / `border-border` / `bg-muted` / `text-muted-foreground` tokens in favor of the premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), and standardized status badges + progress bars. Also removed remaining inline token styles in Add Course (`/courses/new`) and Standings awards icon blocks (switch to token-driven Tailwind classes). Pre-push checks (`typecheck` + `test` + `build`) ran and passed. (commit 6e1fc4c)
 
 ## 2026-02-10
 - 16:55 — Shipped batch: Captain Cart Assignments (`/captain/carts`) + Contacts (`/captain/contacts`) removed remaining inline `style={{...}}` usage in favor of token-driven Tailwind classes (PageHeader icon container + card padding), keeping premium theming consistent. (commit ef424ed)

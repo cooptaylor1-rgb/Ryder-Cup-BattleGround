@@ -23,6 +23,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`abe1197`)
 
+### 23:15 EST — Phase 1 — Live + Courses + Standings: premium token sweep
+- Live Scores (`/live`): migrated `LiveMatchCard` off shadcn-style tokens (`bg-card`, `border-border`, `bg-muted`, `text-muted-foreground`, `text-foreground`) onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`) and standardized status pill colors using `var(--error)` / `var(--success)`.
+- Add Course (`/courses/new`): removed remaining inline token styles (scan scorecard CTA + icon colors) in favor of token-driven Tailwind classes.
+- Standings (`/standings`) Awards tab: removed inline gradient background in award icon blocks in favor of `bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6e1fc4c`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
+
 ## 2026-02-10
 
 ### 17:35 EST — Phase 1 — Home: YourMatchCard token-driven styles
