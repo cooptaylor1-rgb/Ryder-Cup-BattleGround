@@ -194,8 +194,15 @@ export function WeatherBanner({
     ? Math.round((Date.now() - new Date(delayStartedAt).getTime()) / 60000)
     : 0;
 
-  // Don't show banner when conditions are normal and no delay
-  if (delayStatus === 'none' && !precipChance && !condition) {
+  // Don't show banner when conditions are normal and no delay.
+  // Note: values like 0 are meaningful (e.g., 0% precip), so we check for null/undefined.
+  const hasAnyWeatherSignal =
+    condition != null ||
+    precipChance != null ||
+    temperature != null ||
+    windSpeed != null;
+
+  if (delayStatus === 'none' && !hasAnyWeatherSignal) {
     return null;
   }
 
