@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { NoBetsEmpty } from '@/components/ui';
 import {
     DollarSign,
     Target,
@@ -94,12 +95,12 @@ export function SideBets({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="font-medium flex items-center gap-2">
+                    <h3 className="font-medium flex items-center gap-2 text-[var(--ink-primary)]">
                         <DollarSign className="w-5 h-5 text-secondary-gold" />
                         Side Bets
                     </h3>
                     {totalPot > 0 && (
-                        <p className="text-sm text-surface-500">
+                        <p className="text-sm text-[var(--ink-tertiary)]">
                             ${totalPot} total pot
                         </p>
                     )}
@@ -218,18 +219,10 @@ export function SideBets({
 
             {/* Empty state */}
             {bets.length === 0 && !showAddForm && (
-                <div className="text-center py-8 bg-surface-50 dark:bg-surface-800/50 rounded-xl">
-                    <DollarSign className="w-10 h-10 mx-auto mb-3 text-surface-400" />
-                    <p className="text-surface-500">No side bets yet</p>
-                    {!readonly && (
-                        <button
-                            onClick={() => setShowAddForm(true)}
-                            className="mt-3 text-sm text-masters-primary"
-                        >
-                            Add your first bet
-                        </button>
-                    )}
-                </div>
+                <NoBetsEmpty
+                    onAddBet={!readonly ? () => setShowAddForm(true) : undefined}
+                    isActive={!readonly}
+                />
             )}
         </div>
     );
@@ -268,29 +261,29 @@ function BetCategory({
     const completedCount = bets.filter((bet) => bet.winnerPlayerId).length;
 
     return (
-        <div className="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+        <div className="rounded-xl overflow-hidden border border-[color:var(--rule)]/30">
             <button
                 onClick={onToggle}
-                className="w-full flex items-center gap-3 p-4 bg-surface-card hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                className="w-full flex items-center gap-3 p-4 text-left transition-colors bg-[var(--surface)] hover:bg-[var(--surface-secondary)]"
             >
                 <div className="text-secondary-gold">{icon}</div>
-                <div className="flex-1 text-left">
-                    <div className="font-medium">{title}</div>
-                    <div className="text-sm text-surface-500">
+                <div className="flex-1">
+                    <div className="font-medium text-[var(--ink-primary)]">{title}</div>
+                    <div className="text-sm text-[var(--ink-tertiary)]">
                         {bets.length} bet{bets.length !== 1 ? 's' : ''}
                         {totalAmount > 0 && ` · $${totalAmount}`}
                         {completedCount > 0 && ` · ${completedCount} decided`}
                     </div>
                 </div>
                 {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-surface-400" />
+                    <ChevronUp className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                 ) : (
-                    <ChevronDown className="w-5 h-5 text-surface-400" />
+                    <ChevronDown className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                 )}
             </button>
 
             {isExpanded && bets.length > 0 && (
-                <div className="border-t border-surface-200 dark:border-surface-700 divide-y divide-surface-200 dark:divide-surface-700">
+                <div className="border-t border-[color:var(--rule)]/20 divide-y divide-[color:var(--rule)]/20 bg-[var(--surface)]">
                     {bets.map((bet) => (
                         <BetItem
                             key={bet.id}
@@ -305,7 +298,7 @@ function BetCategory({
             )}
 
             {isExpanded && bets.length === 0 && (
-                <div className="p-4 text-center text-sm text-surface-500">
+                <div className="p-4 text-center text-sm text-[var(--ink-tertiary)] bg-[var(--surface)]">
                     No {title.toLowerCase()} bets added yet
                 </div>
             )}
@@ -326,7 +319,7 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
     const winner = bet.winnerPlayerId ? players.get(bet.winnerPlayerId) : null;
 
     return (
-        <div className="p-4 bg-surface-card">
+        <div className="p-4 bg-[var(--surface)]">
             <div className="flex items-center gap-3">
                 {/* Hole number if applicable */}
                 {bet.holeNumber && (
@@ -337,18 +330,18 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
 
                 {/* Bet info */}
                 <div className="flex-1">
-                    <div className="font-medium">{bet.name}</div>
+                    <div className="font-medium text-[var(--ink-primary)]">{bet.name}</div>
                     {bet.amount && (
                         <div className="text-sm text-secondary-gold">${bet.amount}</div>
                     )}
                     {bet.notes && (
-                        <div className="text-sm text-surface-500 mt-1">{bet.notes}</div>
+                        <div className="text-sm text-[var(--ink-tertiary)] mt-1">{bet.notes}</div>
                     )}
                 </div>
 
                 {/* Winner */}
                 {winner ? (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 text-success">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[color:var(--success)]/15 text-[var(--success)]">
                         <Trophy className="w-4 h-4" />
                         <span className="text-sm font-medium">
                             {winner.firstName || 'Unknown'} {winner.lastName?.charAt(0) || ''}.
@@ -357,19 +350,19 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
                 ) : !readonly ? (
                     <button
                         onClick={() => setSelectingWinner(!selectingWinner)}
-                        className="px-3 py-1.5 rounded-lg bg-surface-100 dark:bg-surface-800 text-sm hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-[color:var(--surface)]/60 text-sm text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--ink)]"
                     >
                         Set Winner
                     </button>
                 ) : (
-                    <span className="text-sm text-surface-400">Pending</span>
+                    <span className="text-sm text-[color:var(--ink-tertiary)]/70">Pending</span>
                 )}
 
                 {/* Actions */}
                 {!readonly && !winner && (
                     <button
                         onClick={() => onDelete?.(bet.id)}
-                        className="p-2 text-surface-400 hover:text-error transition-colors"
+                        className="p-2 text-[color:var(--ink-tertiary)]/70 transition-colors hover:text-[var(--error)]"
                     >
                         <Trash2 className="w-4 h-4" />
                     </button>
@@ -378,8 +371,8 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
 
             {/* Winner selector */}
             {selectingWinner && !readonly && (
-                <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700">
-                    <div className="text-sm text-surface-500 mb-2">Select winner:</div>
+                <div className="mt-3 pt-3 border-t border-[color:var(--rule)]/20">
+                    <div className="text-sm text-[var(--ink-tertiary)] mb-2">Select winner:</div>
                     <div className="flex flex-wrap gap-2">
                         {Array.from(players.values()).map((player) => (
                             <button
@@ -388,7 +381,7 @@ function BetItem({ bet, players, onUpdate, onDelete, readonly }: BetItemProps) {
                                     onUpdate?.(bet.id, { winnerPlayerId: player.id });
                                     setSelectingWinner(false);
                                 }}
-                                className="px-3 py-1.5 rounded-lg bg-surface-100 dark:bg-surface-800 text-sm hover:bg-masters-primary hover:text-white transition-colors"
+                                className="px-3 py-1.5 rounded-lg bg-[color:var(--surface)]/60 text-sm text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--ink)]"
                             >
                                 {player.firstName} {player.lastName.charAt(0)}.
                             </button>
@@ -436,10 +429,13 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
     };
 
     return (
-        <form onSubmit={handleSubmit} className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700 space-y-4">
+        <form
+            onSubmit={handleSubmit}
+            className="p-4 rounded-xl space-y-4 border border-[color:var(--rule)]/30 bg-[var(--surface)]"
+        >
             {/* Bet Type */}
             <div>
-                <label className="block text-sm font-medium mb-2">Type</label>
+                <label className="block text-sm font-medium mb-2 text-[var(--ink-secondary)]">Type</label>
                 <div className="flex flex-wrap gap-2">
                     {[
                         { type: 'closest_to_pin' as const, label: 'CTP', icon: <Target className="w-4 h-4" /> },
@@ -455,8 +451,8 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                             className={cn(
                                 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
                                 betType === option.type
-                                    ? 'bg-secondary-gold text-white'
-                                    : 'bg-surface-100 dark:bg-surface-800'
+                                    ? 'bg-secondary-gold text-white shadow-sm'
+                                    : 'bg-[color:var(--surface)]/60 text-[var(--ink-primary)] hover:bg-[var(--surface)]'
                             )}
                         >
                             {option.icon}
@@ -470,7 +466,7 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                 {/* Hole Number */}
                 {(betType === 'closest_to_pin' || betType === 'longest_drive') && (
                     <div>
-                        <label className="block text-sm font-medium mb-2">Hole #</label>
+                        <label className="block text-sm font-medium mb-2 text-[var(--ink-secondary)]">Hole #</label>
                         <input
                             type="number"
                             min="1"
@@ -478,14 +474,14 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                             value={holeNumber}
                             onChange={(e) => setHoleNumber(e.target.value)}
                             placeholder="1-18"
-                            className="w-full px-3 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                            className="w-full px-3 py-2 rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30"
                         />
                     </div>
                 )}
 
                 {/* Amount */}
                 <div>
-                    <label className="block text-sm font-medium mb-2">Amount ($)</label>
+                    <label className="block text-sm font-medium mb-2 text-[var(--ink-secondary)]">Amount ($)</label>
                     <input
                         type="number"
                         min="0"
@@ -493,7 +489,7 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="Optional"
-                        className="w-full px-3 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        className="w-full px-3 py-2 rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30"
                     />
                 </div>
             </div>
@@ -501,13 +497,13 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
             {/* Custom name */}
             {betType === 'custom' && (
                 <div>
-                    <label className="block text-sm font-medium mb-2">Name</label>
+                    <label className="block text-sm font-medium mb-2 text-[var(--ink-secondary)]">Name</label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Bet description"
-                        className="w-full px-3 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800"
+                        className="w-full px-3 py-2 rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30"
                         required
                     />
                 </div>
@@ -518,13 +514,13 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 py-2 rounded-lg border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400"
+                    className="flex-1 py-2 rounded-lg border border-[color:var(--rule)]/30 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-secondary)]"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="flex-1 py-2 rounded-lg bg-secondary-gold text-white font-medium"
+                    className="flex-1 py-2 rounded-lg bg-secondary-gold text-white font-medium transition-colors hover:bg-secondary-gold/90"
                 >
                     Add Bet
                 </button>
