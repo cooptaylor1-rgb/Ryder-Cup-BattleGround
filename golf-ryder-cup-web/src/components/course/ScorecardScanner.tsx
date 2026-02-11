@@ -284,13 +284,17 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
     }, [scanResult, onScanComplete]);
 
     return (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[var(--canvas)] flex flex-col">
             {/* Header */}
             <div
-                className="flex items-center justify-between p-4 border-b border-border"
+                className="flex items-center justify-between p-4 border-b border-[var(--rule)]"
                 style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
             >
-                <button onClick={onCancel || reset} className="p-2 rounded-full hover:bg-muted" aria-label="Cancel">
+                <button
+                    onClick={onCancel || reset}
+                    className="p-2 rounded-full hover:bg-[var(--surface-raised)]"
+                    aria-label="Cancel"
+                >
                     <X size={24} />
                 </button>
                 <h1 className="font-semibold">Scan Scorecard</h1>
@@ -320,7 +324,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                 <h2 className="text-xl font-bold mb-2">
                                     {capturedImages.length === 0 ? 'Quick Course Setup' : 'Add Back Side'}
                                 </h2>
-                                <p className="text-muted-foreground">
+                                <p className="text-[var(--ink-secondary)]">
                                     {capturedImages.length === 0
                                         ? 'Capture both sides of the scorecard for complete data (holes, yardages, ratings, and slope)'
                                         : 'Add the back of the scorecard for ratings and slope information'
@@ -350,7 +354,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="w-full py-4 rounded-xl flex items-center justify-center gap-3 font-medium bg-muted hover:bg-muted/80"
+                                    className="w-full py-4 rounded-xl flex items-center justify-center gap-3 font-medium bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)]"
                                 >
                                     <Upload size={20} />
                                     Upload Image
@@ -359,7 +363,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                 {capturedImages.length === 0 && (
                                     <button
                                         onClick={() => multiFileInputRef.current?.click()}
-                                        className="w-full py-3 rounded-xl flex items-center justify-center gap-3 text-sm bg-muted/50 hover:bg-muted/80"
+                                        className="w-full py-3 rounded-xl flex items-center justify-center gap-3 text-sm bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)]"
                                     >
                                         <ImageIcon size={18} />
                                         Upload Multiple Images
@@ -388,13 +392,13 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             {capturedImages.length > 0 && (
                                 <button
                                     onClick={() => setMode('preview')}
-                                    className="text-sm underline text-muted-foreground hover:text-foreground"
+                                    className="text-sm underline text-[var(--ink-secondary)] hover:text-[var(--ink)]"
                                 >
                                     Continue with {capturedImages.length} image{capturedImages.length > 1 ? 's' : ''}
                                 </button>
                             )}
 
-                            <p className="text-xs text-muted-foreground text-center max-w-xs">
+                            <p className="text-xs text-[var(--ink-secondary)] text-center max-w-xs">
                                 💡 Tip: Capture front (holes/yardages) and back (ratings/slope) for best results
                             </p>
                         </motion.div>
@@ -484,8 +488,8 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                         onClick={addAnotherImage}
                                         className="w-full py-4 border-2 border-dashed border-muted-foreground/30 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-muted-foreground/50 transition-colors"
                                     >
-                                        <ImageIcon size={24} className="text-muted-foreground" />
-                                        <span className="text-sm text-muted-foreground">
+                                        <ImageIcon size={24} className="text-[var(--ink-secondary)]" />
+                                        <span className="text-sm text-[var(--ink-secondary)]">
                                             Add {capturedImages.length === 1 ? 'back side' : 'another'} image
                                         </span>
                                     </button>
@@ -493,7 +497,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             </div>
 
                             {/* Actions */}
-                            <div className="p-4 border-t border-border space-y-3">
+                            <div className="p-4 border-t border-[var(--rule)] space-y-3">
                                 {error && (
                                     <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 text-red-500">
                                         <AlertCircle size={16} />
@@ -517,7 +521,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
                                 <button
                                     onClick={reset}
-                                    className="w-full py-3 rounded-xl flex items-center justify-center gap-2 bg-muted hover:bg-muted/80"
+                                    className="w-full py-3 rounded-xl flex items-center justify-center gap-2 bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)]"
                                 >
                                     <RotateCcw size={18} />
                                     Start Over
@@ -548,7 +552,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
                             <div className="text-center">
                                 <h2 className="text-lg font-semibold mb-1">Reading Scorecard...</h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-[var(--ink-secondary)]">
                                     AI is extracting hole data
                                 </p>
                             </div>
@@ -584,14 +588,14 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             className="h-full flex flex-col"
                         >
                             {/* Success header */}
-                            <div className="p-4 flex items-center gap-3 border-b border-border">
+                            <div className="p-4 flex items-center gap-3 border-b border-[var(--rule)]">
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[color:var(--success)]/15">
                                     <Check size={20} className="text-[var(--success)]" />
                                 </div>
                                 <div>
                                     <h2 className="font-semibold">Data Extracted!</h2>
                                     {scanResult.courseName && (
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-sm text-[var(--ink-secondary)]">
                                             {scanResult.courseName}
                                         </p>
                                     )}
@@ -601,21 +605,21 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             {/* Data preview */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {/* Holes summary */}
-                                <div className="bg-muted/50 rounded-xl p-4">
+                                <div className="bg-[var(--canvas-sunken)] rounded-xl p-4">
                                     <h3 className="font-medium mb-3">
                                         {scanResult.holes.length} Holes Detected
                                     </h3>
 
                                     {/* Front 9 */}
                                     <div className="mb-4">
-                                        <p className="text-xs text-muted-foreground mb-2">Front 9</p>
+                                        <p className="text-xs text-[var(--ink-secondary)] mb-2">Front 9</p>
                                         <div className="grid grid-cols-9 gap-1">
                                             {scanResult.holes.slice(0, 9).map((hole, i) => (
                                                 <div
                                                     key={i}
-                                                    className="text-center bg-card rounded p-1"
+                                                    className="text-center bg-[var(--surface)] rounded p-1"
                                                 >
-                                                    <div className="text-xs text-muted-foreground">
+                                                    <div className="text-xs text-[var(--ink-secondary)]">
                                                         {i + 1}
                                                     </div>
                                                     <div className="font-medium text-sm">
@@ -629,14 +633,14 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                     {/* Back 9 */}
                                     {scanResult.holes.length > 9 && (
                                         <div>
-                                            <p className="text-xs text-muted-foreground mb-2">Back 9</p>
+                                            <p className="text-xs text-[var(--ink-secondary)] mb-2">Back 9</p>
                                             <div className="grid grid-cols-9 gap-1">
                                                 {scanResult.holes.slice(9, 18).map((hole, i) => (
                                                     <div
                                                         key={i}
-                                                        className="text-center bg-card rounded p-1"
+                                                        className="text-center bg-[var(--surface)] rounded p-1"
                                                     >
-                                                        <div className="text-xs text-muted-foreground">
+                                                        <div className="text-xs text-[var(--ink-secondary)]">
                                                             {i + 10}
                                                         </div>
                                                         <div className="font-medium text-sm">
@@ -650,20 +654,20 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
                                     <div className="mt-3 flex gap-4 text-sm">
                                         <div>
-                                            <span className="text-muted-foreground">Total Par:</span>{' '}
+                                            <span className="text-[var(--ink-secondary)]">Total Par:</span>{' '}
                                             <span className="font-medium">
                                                 {scanResult.holes.reduce((sum, h) => sum + h.par, 0)}
                                             </span>
                                         </div>
                                         {scanResult.rating && (
                                             <div>
-                                                <span className="text-muted-foreground">Rating:</span>{' '}
+                                                <span className="text-[var(--ink-secondary)]">Rating:</span>{' '}
                                                 <span className="font-medium">{scanResult.rating}</span>
                                             </div>
                                         )}
                                         {scanResult.slope && (
                                             <div>
-                                                <span className="text-muted-foreground">Slope:</span>{' '}
+                                                <span className="text-[var(--ink-secondary)]">Slope:</span>{' '}
                                                 <span className="font-medium">{scanResult.slope}</span>
                                             </div>
                                         )}
@@ -672,7 +676,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
 
                                 {/* Tee sets */}
                                 {scanResult.teeSets && scanResult.teeSets.length > 0 && (
-                                    <div className="bg-muted/50 rounded-xl p-4">
+                                    <div className="bg-[var(--canvas-sunken)] rounded-xl p-4">
                                         <h3 className="font-medium mb-3">
                                             {scanResult.teeSets.length} Tee Sets Found
                                         </h3>
@@ -690,7 +694,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                                     />
                                                     <span className="font-medium">{tee.name}</span>
                                                     {tee.rating && (
-                                                        <span className="text-muted-foreground">
+                                                        <span className="text-[var(--ink-secondary)]">
                                                             {tee.rating}/{tee.slope}
                                                         </span>
                                                     )}
@@ -702,7 +706,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                             </div>
 
                             {/* Actions */}
-                            <div className="p-4 border-t border-border space-y-2">
+                            <div className="p-4 border-t border-[var(--rule)] space-y-2">
                                 <button
                                     onClick={confirmResult}
                                     className="w-full py-4 rounded-xl flex items-center justify-center gap-2 font-medium"
@@ -713,7 +717,7 @@ export function ScorecardScanner({ onScanComplete, onCancel }: ScorecardScannerP
                                 </button>
                                 <button
                                     onClick={reset}
-                                    className="w-full py-3 rounded-xl bg-muted hover:bg-muted/80"
+                                    className="w-full py-3 rounded-xl bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)]"
                                 >
                                     Scan Again
                                 </button>
@@ -755,7 +759,7 @@ export function ScanScorecardButton({ onScanComplete, variant = 'default' }: Sca
             {variant === 'default' ? (
                 <button
                     onClick={() => setShowScanner(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)] transition-colors"
                 >
                     <Camera size={18} />
                     <span className="font-medium">Scan Scorecard</span>
@@ -763,7 +767,7 @@ export function ScanScorecardButton({ onScanComplete, variant = 'default' }: Sca
             ) : (
                 <button
                     onClick={() => setShowScanner(true)}
-                    className="p-2 rounded-lg bg-muted hover:bg-muted/80"
+                    className="p-2 rounded-lg bg-[var(--surface)] border border-[var(--rule)] hover:bg-[var(--surface-raised)]"
                     title="Scan Scorecard"
                 >
                     <Camera size={18} />
