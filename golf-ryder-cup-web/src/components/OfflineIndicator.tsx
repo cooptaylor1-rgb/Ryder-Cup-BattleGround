@@ -134,6 +134,12 @@ export function OfflineIndicator() {
     return null;
   }
 
+  const bannerGradientClass = !isOnline
+    ? 'bg-gradient-to-br from-red-600 to-red-700'
+    : isSyncing
+      ? 'bg-gradient-to-br from-blue-600 to-blue-700'
+      : 'bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)]';
+
   return (
     <>
       {/* Offline Banner */}
@@ -143,15 +149,7 @@ export function OfflineIndicator() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-50"
-            style={{
-              background: !isOnline
-                ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'
-                : isSyncing
-                  ? 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)'
-                  : 'linear-gradient(135deg, var(--masters) 0%, #005238 100%)',
-              paddingTop: 'env(safe-area-inset-top)',
-            }}
+            className={`fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top)] ${bannerGradientClass}`}
           >
             <div className="px-4 py-2">
               {/* Main status row */}
