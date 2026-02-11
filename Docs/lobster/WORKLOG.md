@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 09:15 EST — Phase 1 — OfflineIndicator: token-driven banner gradients
+- Offline banner: replaced inline `style={{ background, paddingTop }}` with Tailwind classes.
+- Uses `pt-[env(safe-area-inset-top)]` for iOS safe-area spacing and gradient utilities for offline/syncing/online states (`var(--masters)` → `var(--masters-deep)` for the “back online” banner).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e1fb04b`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 08:25 EST — Phase 1 — ScorecardScanner: premium token sweep
 - Course scorecard OCR (`ScorecardScanner`): migrated remaining shadcn tokens (`bg-background`, `bg-muted`, `border-border`, `text-muted-foreground`, `bg-card`) to premium token-driven Tailwind (`bg-[var(--canvas)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`).
 - Updated `ScanScorecardButton` to match premium surfaces (surface + rule + raised hover).
