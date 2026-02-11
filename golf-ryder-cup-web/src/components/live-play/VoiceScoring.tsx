@@ -362,14 +362,14 @@ export function VoiceScoring({
             className={cn(
               'flex items-center justify-center',
               'w-14 h-14 rounded-full shadow-lg',
-              'bg-surface/60 text-white/70 border border-white/10'
+              'bg-[color:var(--surface)]/60 text-[var(--ink-secondary)] border border-[color:var(--rule)]/30'
             )}
             aria-disabled="true"
             disabled
           >
             <Mic className="w-6 h-6" />
           </button>
-          <p className="text-xs text-center" style={{ color: 'var(--ink-tertiary)' }}>
+          <p className="text-xs text-center text-[var(--ink-tertiary)]">
             Voice scoring not supported
           </p>
         </div>

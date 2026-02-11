@@ -192,8 +192,6 @@ export function QuickScoreFABv2({
     return null;
   }
 
-  const teamAColor = '#0047AB';
-  const teamBColor = '#8B0000';
 
   return (
     <div
@@ -240,10 +238,14 @@ export function QuickScoreFABv2({
                     transition={{ duration: 1, repeat: Infinity }}
                     className={`
                       w-20 h-20 rounded-full flex items-center justify-center mb-3
-                      ${isListening ? 'bg-red-500' : 'bg-gray-200 dark:bg-gray-700'}
+                      ${isListening ? 'bg-[var(--error)]' : 'bg-[var(--surface-secondary)]'}
                     `}
                   >
-                    <Mic className={`w-8 h-8 ${isListening ? 'text-white' : 'text-gray-600'}`} />
+                    <Mic
+                      className={`w-8 h-8 ${
+                        isListening ? 'text-white' : 'text-[var(--ink-secondary)]'
+                      }`}
+                    />
                   </motion.div>
                   <p className="text-sm text-center text-[var(--ink-secondary)]">
                     {isListening
@@ -253,7 +255,7 @@ export function QuickScoreFABv2({
                 </div>
                 <button
                   onClick={() => setIsVoiceMode(false)}
-                  className="w-full py-2 text-sm font-medium text-gray-600 hover:text-gray-800"
+                  className="w-full py-2 text-sm font-medium text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]"
                   aria-label="Switch to tap scoring"
                 >
                   Switch to tap scoring
@@ -265,18 +267,14 @@ export function QuickScoreFABv2({
                 {/* Team A Button */}
                 <button
                   onClick={() => handleQuickScore('teamA')}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: `${teamAColor}15` }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-[color:var(--team-usa)]/15 hover:bg-[color:var(--team-usa)]/20"
                   aria-label={`Score hole: ${activeMatchData.teamAName} wins`}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: teamAColor }}
-                  >
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--team-usa)]">
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-semibold" style={{ color: teamAColor }}>
+                    <p className="font-semibold text-[var(--team-usa)]">
                       {activeMatchData.teamAName} Wins
                     </p>
                     <p className="text-xs text-[var(--ink-tertiary)]">Tap to score</p>
@@ -286,10 +284,10 @@ export function QuickScoreFABv2({
                 {/* Halved Button */}
                 <button
                   onClick={() => handleQuickScore('halved')}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-gray-100 dark:bg-gray-800"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-[var(--surface-secondary)] hover:bg-[var(--surface)]"
                   aria-label="Score hole: Halved"
                 >
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-500">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[color:var(--ink-tertiary)]/40">
                     <Minus className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 text-left">
@@ -301,18 +299,14 @@ export function QuickScoreFABv2({
                 {/* Team B Button */}
                 <button
                   onClick={() => handleQuickScore('teamB')}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: `${teamBColor}15` }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-[color:var(--team-europe)]/15 hover:bg-[color:var(--team-europe)]/20"
                   aria-label={`Score hole: ${activeMatchData.teamBName} wins`}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: teamBColor }}
-                  >
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--team-europe)]">
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-semibold" style={{ color: teamBColor }}>
+                    <p className="font-semibold text-[var(--team-europe)]">
                       {activeMatchData.teamBName} Wins
                     </p>
                     <p className="text-xs text-[var(--ink-tertiary)]">Tap to score</p>

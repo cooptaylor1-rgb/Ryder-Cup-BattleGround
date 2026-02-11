@@ -157,7 +157,7 @@ export default function TripSettingsPage() {
         <div className="relative page-container">
           <PageHeader
             title="Trip Settings"
-            icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+            icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
             onBack={() => router.back()}
             rightSlot={
               <button
@@ -203,7 +203,7 @@ export default function TripSettingsPage() {
         <div className="relative page-container">
           <PageHeader
             title="Trip Settings"
-            icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+            icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
             onBack={() => router.back()}
             rightSlot={
               <button
@@ -246,7 +246,7 @@ export default function TripSettingsPage() {
         <PageHeader
           title="Trip Settings"
           subtitle={tripName ?? undefined}
-          icon={<MoreHorizontal size={16} style={{ color: 'var(--color-accent)' }} />}
+          icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
           onBack={() => router.push(`/trip/${tripId}`)}
           rightSlot={
             <button
@@ -273,7 +273,7 @@ export default function TripSettingsPage() {
               <button
                 onClick={handleExport}
                 disabled={isExporting}
-                className="w-full flex items-center gap-3 p-4 bg-surface/60 hover:bg-surface rounded-xl transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
                 <div className="w-10 h-10 rounded-full bg-blue-500/15 flex items-center justify-center">
                   <Download className="w-5 h-5 text-blue-300" />
@@ -288,7 +288,7 @@ export default function TripSettingsPage() {
               <button
                 onClick={handleImportClick}
                 disabled={isImporting}
-                className="w-full flex items-center gap-3 p-4 bg-surface/60 hover:bg-surface rounded-xl transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
                 <div className="w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center">
                   <Upload className="w-5 h-5 text-green-300" />
@@ -326,7 +326,7 @@ export default function TripSettingsPage() {
               <button
                 onClick={handleShare}
                 disabled={isSharing}
-                className="w-full flex items-center gap-3 p-4 bg-surface/60 hover:bg-surface rounded-xl transition-colors disabled:opacity-50"
+                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
                 <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center">
                   <Share2 className="w-5 h-5 text-gold" />
@@ -383,7 +383,7 @@ export default function TripSettingsPage() {
                             setShowDeleteConfirm(false);
                             setIsDeleting(false);
                           }}
-                          className="px-4 py-2 rounded-xl bg-surface/60 hover:bg-surface text-text-primary text-sm font-semibold"
+                          className="px-4 py-2 rounded-xl text-sm font-semibold bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)]"
                         >
                           Cancel
                         </button>
