@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 12:30 EST — Phase 2 — PathToVictoryCard: premium token sweep (remove legacy surface palette)
+- `PathToVictoryCard`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--canvas-sunken)`, `var(--rule)`, `var(--ink-*)`).
+- Keeps gamification UI consistent with the premium shell and reduces theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`997cccb`)
+
 ### 12:15 EST — Phase 2 — MomentumMeter: premium token sweep (remove legacy surface palette)
 - `MomentumMeter`: migrated legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` classes to the premium design tokens (`var(--surface)`, `var(--rule)`, `var(--ink-*)`).
 - Keeps the momentum UI consistent with the rest of the premium shell and reduces theme drift.
