@@ -223,9 +223,36 @@ export function FloatingMyMatch({
         setIsExpanded(!isExpanded);
     };
 
-    // Don't render if no trip, no match, or on scoring page
-    if (!currentTrip || !myMatchData || shouldHide) {
+    // Don't render if no trip, or on scoring page
+    if (!currentTrip || shouldHide) {
         return null;
+    }
+
+    // If we can't resolve a match yet, show a gentle affordance instead of disappearing.
+    if (!myMatchData) {
+        return (
+            <motion.button
+                initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 10 }}
+                onClick={() => {
+                    trigger('selection');
+                    router.push('/schedule');
+                }}
+                className={cn(
+                    'fixed right-4 z-50',
+                    'lg:right-6',
+                    'flex items-center gap-2 rounded-full shadow-lg',
+                    'px-4 py-3 bg-[var(--surface)] border border-[var(--border)]'
+                )}
+                style={{ bottom: `${bottomOffset}px` }}
+                aria-label="Find my match"
+                type="button"
+            >
+                <Target className="w-5 h-5 text-[var(--ink-secondary)]" />
+                <span className="text-sm font-medium text-[var(--ink-secondary)]">Find my match</span>
+            </motion.button>
+        );
     }
 
     const { scoreDisplay, isWinning, isLosing, currentHole, teammateNames, opponentNames } = myMatchData;
