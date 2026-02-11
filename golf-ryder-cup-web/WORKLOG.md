@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 05:10 — Shipped batch: Social Day Summary card + modal migrated off shadcn `bg-card` / `border-border` / `bg-muted` / `bg-background` and `text-muted-foreground` onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`) so the share UI matches the premium shell. (commit 274194e)
 - 04:40 — Shipped batch: `MatchStatusHeader` (live play mini-scoreboard) removed inline `style={{...}}` usage for the container, status dots, momentum pill, and CTA. Migrated to Tailwind classes (including token-driven team colors like `bg-[var(--team-usa)]` / `bg-[var(--team-europe)]`). No behavior change; keeps premium theming class-driven and reduces silent style drift. (commit 9282e2f)
 - 02:25 — Shipped batch: Captain Dashboard `PointsCalculator` removed inline `style={{...}}` usage for premium tokens (`var(--surface)`, `var(--ink*)`, `var(--masters)`, etc.) in favor of token-driven Tailwind arbitrary-value classes. Keeps premium theming consistent and avoids silent style drift while preserving dynamic team color styling where needed. (commit 7d8200c)
 - 01:05 — Shipped batch: Tailwind config restored legacy `masters-primary` / `masters-primary-dark` color aliases (mapping to `var(--masters)` / `var(--masters-deep)`) so existing classnames like `bg-masters-primary`, `text-masters-primary`, `hover:bg-masters-primary-dark`, and `focus:ring-masters-primary` resolve correctly post-palette refactor. This prevents silent styling failures without touching every component yet. (commit 9c5c94b)

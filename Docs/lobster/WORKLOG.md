@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 05:10 EST — Phase 1 — Social Day Summary: premium token sweep
+- Social Day Summary share card + modal (`DaySummaryCard`): migrated off shadcn `bg-card` / `border-border` / `bg-muted` / `bg-background` and `text-muted-foreground` onto premium design tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping share UI consistent with the premium shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`274194e`) (note: pre-push hook ran `typecheck` + `test` + `build` and all passed ✅)
+
 ### 04:25 EST — Phase 1 — Replace remaining shadcn `bg-card` tokens (Offline + live notifications)
 - `OfflineIndicator`: the small “Online” reconnection pill now uses premium surface/rule tokens (`bg-[var(--surface)] border-[var(--rule)]`) instead of shadcn `bg-card border-border`.
 - Live score notifications permission banner (`liveScoreNotifications.tsx`): migrated the container + description text off shadcn tokens (`bg-card`, `border-border`, `text-muted-foreground`) onto premium tokens.
