@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 10:35 EST — Phase 1 — Replace legacy `bg-surface/*` utilities + QuickScoreFABv2 typecheck fix
+- Trip Settings (`/trip/[tripId]/settings`): replaced legacy `bg-surface/60 hover:bg-surface` buttons with premium token-driven Tailwind (`bg-[color:var(--surface)]/60`, `hover:bg-[var(--surface)]`, `border-[color:var(--rule)]/30`) and removed `PageHeader` icon inline color style.
+- Live: `QuickStandingsOverlay` pull-indicator pill now uses premium surface + rule tokens instead of `bg-surface/80`.
+- Live: `VoiceScoring` “not supported” disabled control now uses premium surface/ink/rule tokens (no undefined `bg-surface` class; removed inline ink color style).
+- Scoring: fixed `QuickScoreFABv2` typecheck error by removing a stray `teamBColor` reference and using the team token via Tailwind.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c8220e7`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 09:40 EST — Captain Toolkit: premium tokens + EmptyStatePremium for no sessions
 - Captain Toolkit: migrated UI surfaces/inks/rules off the hard-coded gray/blue palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), keeping accent colors via `var(--color-accent)`.
 - Tee Times / Smart Pairings / Weather sections: when there are no sessions, now render `EmptyStatePremium` (“No sessions created yet”) instead of bespoke placeholder blocks.
