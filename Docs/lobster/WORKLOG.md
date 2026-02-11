@@ -12,6 +12,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`f32eb7d`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
+### 13:20 EST — Docs — Worklog chronological hygiene
+- `Docs/lobster/WORKLOG.md`: fixed a minor timestamp ordering issue in the 2026-02-11 section (08:50 entry now correctly precedes 08:25).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
 ### 12:55 EST — Phase 2 — SettingsPanel: premium token sweep (remove legacy surface palette)
 - `SettingsPanel`: migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium tokens (`var(--surface)`, `var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
 - Updates include the scoring-hand selector buttons, settings rows, storage/sync icons, and the Export/Import data cards.
@@ -69,16 +74,16 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`e1fb04b`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
+### 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
+- `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) to prevent silent theme drift.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`09b0122`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
+
 ### 08:25 EST — Phase 1 — ScorecardScanner: premium token sweep
 - Course scorecard OCR (`ScorecardScanner`): migrated remaining shadcn tokens (`bg-background`, `bg-muted`, `border-border`, `text-muted-foreground`, `bg-card`) to premium token-driven Tailwind (`bg-[var(--canvas)]`, `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`).
 - Updated `ScanScorecardButton` to match premium surfaces (surface + rule + raised hover).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ba1b6b7`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
-
-### 08:50 EST — Phase 1 — ScorecardScanner: remove remaining shadcn border token
-- `ScorecardScanner` (preview → “Add another image” dashed dropzone): replaced `border-muted-foreground/*` with premium token-driven Tailwind (`border-[color:var(--rule)]/40` + hover state) to prevent silent theme drift.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`09b0122`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
 ### 07:45 EST — Docs — Re-sort Lobster WORKLOG by date
 - Moved the 21:05–23:45 entries that were accidentally logged under **2026-02-11** back under **2026-02-10**.
