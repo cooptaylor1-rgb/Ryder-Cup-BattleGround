@@ -207,7 +207,7 @@ export function PhotoGallery({
                         )}
                     </button>
                     {isUploading && uploadProgress > 0 && (
-                        <div className="flex-1 h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
+                        <div className="flex-1 h-2 bg-[color:var(--ink-tertiary)]/15 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-masters-primary transition-all duration-300"
                                 style={{ width: `${uploadProgress}%` }}
@@ -224,7 +224,7 @@ export function PhotoGallery({
                         <button
                             key={photo.id}
                             onClick={() => openViewer(photo, index)}
-                            className="relative aspect-square rounded-lg overflow-hidden bg-surface-100 dark:bg-surface-800 group"
+                            className="relative aspect-square rounded-lg overflow-hidden bg-[var(--surface)] group"
                         >
                             <Image
                                 src={photo.thumbnailUrl || photo.url}
@@ -242,11 +242,11 @@ export function PhotoGallery({
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-12 bg-surface-50 dark:bg-surface-800/50 rounded-xl">
-                    <ImageIcon className="w-12 h-12 mx-auto mb-3 text-surface-400" />
-                    <p className="text-surface-500">No photos yet</p>
+                <div className="text-center py-12 bg-[color:var(--surface)]/60 rounded-xl border border-[color:var(--rule)]/30">
+                    <ImageIcon className="w-12 h-12 mx-auto mb-3 text-[var(--ink-tertiary)]" />
+                    <p className="text-[var(--ink-secondary)]">No photos yet</p>
                     {canUpload && (
-                        <p className="text-sm text-surface-400 mt-1">
+                        <p className="text-sm text-[var(--ink-tertiary)] mt-1">
                             Capture memories from the course!
                         </p>
                     )}

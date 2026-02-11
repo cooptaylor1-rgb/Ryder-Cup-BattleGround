@@ -25,7 +25,7 @@ describe('Button Component', () => {
         it('renders secondary variant', () => {
             render(<Button variant="secondary">Secondary</Button>);
             const button = screen.getByRole('button');
-            expect(button).toHaveClass('bg-surface-elevated');
+            expect(button).toHaveClass('bg-[var(--surface-raised)]');
         });
 
         it('renders ghost variant', () => {
@@ -43,7 +43,7 @@ describe('Button Component', () => {
         it('renders outline variant', () => {
             render(<Button variant="outline">Outline</Button>);
             const button = screen.getByRole('button');
-            expect(button).toHaveClass('border-surface-border');
+            expect(button).toHaveClass('border-[color:var(--rule)]/40');
         });
     });
 

@@ -148,9 +148,9 @@ export function getWinnerStyles(
         case 'teamB':
             return 'bg-team-europe text-white';
         case 'halved':
-            return 'bg-surface-200 text-surface-600 dark:bg-surface-700 dark:text-surface-300';
+            return 'bg-[color:var(--ink-tertiary)]/12 text-[var(--ink-secondary)]';
         default:
-            return 'bg-surface-100 text-surface-400 dark:bg-surface-800 dark:text-surface-500';
+            return 'bg-[color:var(--ink-tertiary)]/8 text-[var(--ink-tertiary)]';
     }
 }
 

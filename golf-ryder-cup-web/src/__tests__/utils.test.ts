@@ -258,14 +258,14 @@ describe('getWinnerStyles', () => {
 
     it('returns neutral styles for halved', () => {
         const result = getWinnerStyles('halved');
-        expect(result).toContain('bg-surface');
-        expect(result).toContain('text-surface');
+        expect(result).toContain('bg-[color:var(--ink-tertiary)]');
+        expect(result).toContain('text-[var(--ink-secondary)]');
     });
 
     it('returns subtle styles for no winner', () => {
         const result = getWinnerStyles('none');
-        expect(result).toContain('bg-surface');
-        expect(result).toContain('text-surface');
+        expect(result).toContain('bg-[color:var(--ink-tertiary)]');
+        expect(result).toContain('text-[var(--ink-tertiary)]');
     });
 });
 

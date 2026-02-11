@@ -50,7 +50,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
                     'hover:scale-110 active:scale-90',
                     // Standardized gold focus ring for consistency
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2',
-                    'focus-visible:ring-offset-surface-base',
+                    'focus-visible:ring-offset-[color:var(--canvas)]',
                     // Disabled states
                     'disabled:pointer-events-none disabled:opacity-50 disabled:grayscale',
                     'disabled:hover:scale-100',
@@ -63,19 +63,19 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
                     // Variant styles
                     variant === 'default' && [
-                        'bg-surface-elevated text-text-secondary',
-                        'hover:bg-surface-highlight hover:text-text-primary',
+                        'bg-[var(--surface-raised)] text-[var(--ink-secondary)]',
+                        'hover:bg-[color:var(--surface)]/60 hover:text-[var(--ink)]',
                     ],
 
                     variant === 'ghost' && [
-                        'bg-transparent text-text-secondary',
-                        'hover:bg-surface-highlight hover:text-text-primary',
+                        'bg-transparent text-[var(--ink-secondary)]',
+                        'hover:bg-[color:var(--surface)]/60 hover:text-[var(--ink)]',
                     ],
 
                     variant === 'outline' && [
-                        'bg-transparent text-text-secondary',
-                        'border border-surface-border',
-                        'hover:bg-surface-highlight hover:text-text-primary hover:border-gold/40',
+                        'bg-transparent text-[var(--ink-secondary)]',
+                        'border border-[color:var(--rule)]/40',
+                        'hover:bg-[color:var(--surface)]/60 hover:text-[var(--ink)] hover:border-gold/40',
                     ],
 
                     variant === 'danger' && [

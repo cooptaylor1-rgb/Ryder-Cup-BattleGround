@@ -57,7 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     'hover:scale-[1.02] active:scale-[0.96]',
                     // Focus ring - standardized gold for consistency
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                    'focus-visible:ring-gold focus-visible:ring-offset-surface-base',
+                    'focus-visible:ring-gold focus-visible:ring-offset-[color:var(--canvas)]',
                     // Disabled states with grayscale for better visibility
                     'disabled:pointer-events-none disabled:opacity-50 disabled:grayscale',
                     'disabled:hover:scale-100',
@@ -79,15 +79,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ],
 
                     variant === 'secondary' && [
-                        'bg-surface-elevated text-canvas',
-                        'border border-surface-border',
-                        'hover:bg-surface-highlight hover:border-gold/40',
+                        'bg-[var(--surface-raised)] text-[var(--ink)]',
+                        'border border-[color:var(--rule)]/40',
+                        'hover:bg-[var(--surface)] hover:border-gold/40',
                         'shadow-sm hover:shadow-md',
                     ],
 
                     variant === 'ghost' && [
-                        'bg-transparent text-text-secondary',
-                        'hover:bg-surface-highlight hover:text-canvas',
+                        'bg-transparent text-[var(--ink-secondary)]',
+                        'hover:bg-[color:var(--surface)]/60 hover:text-[var(--ink)]',
                     ],
 
                     variant === 'danger' && [
@@ -98,9 +98,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ],
 
                     variant === 'outline' && [
-                        'bg-transparent text-canvas',
-                        'border border-surface-border',
-                        'hover:bg-surface-highlight hover:border-gold/40',
+                        'bg-transparent text-[var(--ink)]',
+                        'border border-[color:var(--rule)]/40',
+                        'hover:bg-[color:var(--surface)]/60 hover:border-gold/40',
                     ],
 
                     // Full width
