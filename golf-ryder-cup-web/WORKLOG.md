@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-11
+- 13:25 — Shipped batch: `FloatingMyMatch` no longer silently disappears when a trip exists but a match can’t be resolved yet; it now shows a small premium “Find my match” button that routes to `/schedule` (and still hides on scoring pages). Pre-push checks (`typecheck` + `test` + `build`) ran and passed. (commit 9305cf2)
 - 12:55 — Shipped batch: `SettingsPanel` migrated remaining legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`bg-[var(--surface)]`, `hover:bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`). Also updated the toggle off-state to use a token-driven neutral (`bg-[color:var(--ink-tertiary)]/25`) to reduce theme drift. (commit b03f336)
 - 12:15 — Shipped batch: `MomentumMeter` removed legacy `bg-surface-*` / `border-surface-*` / `text-surface-*` palette classes in favor of premium design tokens (`bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`). Keeps the gamification UI consistent with the premium shell and reduces theme drift. (commit 81489d3)
 - 11:30 — Shipped batch: SettingsPanel (legacy settings component) no longer forces a hard reload after **Import data** / **Clear all data**. We now clear the in-memory trip store and use Next router navigation (`router.push('/')` + `router.refresh()`) so the UI updates without a full page refresh. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted an existing CSS optimization warning). (commit 28c1ad5)

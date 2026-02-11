@@ -12,6 +12,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`f32eb7d`) (pre-push `typecheck` + `test` + `build` passed; build emitted an existing CSS optimization warning)
 
+### 13:25 EST — Phase 1 — FloatingMyMatch: show “Find my match” affordance when unresolved
+- `FloatingMyMatch`: no longer silently disappears when the app can’t resolve a current match yet.
+- When a trip exists but no match is found (and you’re not already on a scoring page), it now shows a small premium button that routes to `/schedule`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9305cf2`) (pre-push `typecheck` + `test` + `build` passed)
+
 ### 13:20 EST — Docs — Worklog chronological hygiene
 - `Docs/lobster/WORKLOG.md`: fixed a minor timestamp ordering issue in the 2026-02-11 section (08:50 entry now correctly precedes 08:25).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
