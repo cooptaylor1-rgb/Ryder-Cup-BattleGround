@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 11:50 EST — Phase 1 — QuickScoreFABv2: show “Start scoring” affordance when no active match
+- QuickScoreFABv2 no longer disappears entirely when there’s no in-progress match.
+- Instead, it renders a small premium “Start scoring” button that navigates to `/schedule`, so users always have an obvious scoring entry-point.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (this commit)
+
 ### 11:30 EST — Phase 1 — SettingsPanel: import/clear without hard reload
 - SettingsPanel data management actions now avoid `window.location.reload()` after **Import data** and **Clear all data**.
 - After a successful import/clear, we reset in-memory trip state (`useTripStore.getState().clearTrip()`) and use Next router navigation (`router.push('/')` + `router.refresh()`) so the UI updates without a hard reload.
