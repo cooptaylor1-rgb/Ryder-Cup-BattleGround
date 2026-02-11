@@ -203,13 +203,21 @@ export function CaptainToolkit({
         );
 
       case 'pairings':
+        if (!currentSession) {
+          return (
+            <div className="text-center py-8 text-gray-500">
+              <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No sessions created yet</p>
+            </div>
+          );
+        }
         return (
           <SmartPairingSuggestions
             players={players}
             teams={teams}
             sessions={sessions}
             matches={matches}
-            currentSessionId={currentSession?.id}
+            currentSessionId={currentSession.id}
             onApplySuggestion={(suggestion) => {
               captainLogger.log('Applying suggestion:', suggestion);
               onDataUpdate();
