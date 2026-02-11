@@ -1504,6 +1504,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`9282e2f`)
 
+### 18:54 EST — Phase 1 — Scoring settings: remove inline styles
+- Settings → Scoring (`/settings/scoring`): migrated remaining inline `style={{ ... }}` usage to Tailwind/token-driven classnames (spacing, borders, icon colors, gradient header, and the one-handed-mode tip callout).
+- No behavior change; reduces style drift and keeps premium theming class-driven.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`372f7dc`)
+
 ### 19:30 EST — Phase 1 — Games: explicit fallback when game missing
 - NassauEnhancedCard + HammerGameCard: replaced `if (!game) return null;` with a small in-component fallback card (“Game unavailable”) so the UI can’t silently render nothing if a game record can’t be loaded.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
