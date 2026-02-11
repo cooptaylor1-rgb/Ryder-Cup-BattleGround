@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 14:10 EST — Phase 2 — WeatherWidget + PhotoStrip: premium token sweep
+- `WeatherWidget`: migrated remaining legacy `bg-surface-card` / `border-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) across loading/error/compact + forecast cards.
+- `FactorBar`: updated the track color to a subtle token-driven neutral (`bg-[color:var(--ink-tertiary)]/15`) so the conditions bars render consistently across themes.
+- `PhotoStrip` (in `PhotoGallery`): migrated thumbnail + “+N” pill backgrounds/text off the legacy `surface-*` palette and onto premium tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a7e25df`)
+
 ### 13:36 EST — Phase 2 — SideBets: premium token sweep + empty state upgrade
 - `SideBets`: migrated remaining legacy `bg-surface-*` / `text-surface-*` utilities to premium token-driven Tailwind (`var(--surface)`, `var(--surface-secondary)`, `var(--ink-*)`, `var(--rule)`) across category headers, bet rows, and the add form so the component matches the premium shell.
 - Replaced the bespoke inline empty state with the shared `NoBetsEmpty` so editable views surface the standard CTA and read-only views stay consistent.
