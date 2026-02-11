@@ -207,23 +207,21 @@ function MatchProjectionRow({
             animate={{ opacity: 1, x: 0 }}
             className={cn(
                 'flex items-center justify-between p-3 rounded-lg',
-                isLocked ? 'bg-gray-50 dark:bg-gray-800/50' : ''
+                isLocked ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-[var(--surface)]'
             )}
-            style={{ background: isLocked ? undefined : 'var(--surface)' }}
         >
             {/* Match Info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div
-                    className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
-                    style={{ background: 'var(--rule)', color: 'var(--ink-secondary)' }}
+                    className="w-6 h-6 rounded flex items-center justify-center bg-[var(--rule)] text-xs font-bold text-[var(--ink-secondary)]"
                 >
                     {match.matchNumber}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate" style={{ color: 'var(--ink)' }}>
+                    <div className="text-sm truncate text-[var(--ink)]">
                         {match.teamANames.join(' & ')}
                     </div>
-                    <div className="text-xs truncate" style={{ color: 'var(--ink-tertiary)' }}>
+                    <div className="text-xs truncate text-[var(--ink-tertiary)]">
                         vs {match.teamBNames.join(' & ')}
                     </div>
                 </div>
@@ -232,9 +230,7 @@ function MatchProjectionRow({
             {/* Current Status */}
             <div className="px-3 text-center">
                 {match.isCompleted ? (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ background: 'var(--positive-bg)', color: 'var(--positive)' }}
-                    >
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--positive-bg)] text-[var(--positive)]">
                         Final
                     </span>
                 ) : (
@@ -245,7 +241,7 @@ function MatchProjectionRow({
                         }}>
                             {match.currentScore > 0 ? `+${match.currentScore}` : match.currentScore}
                         </span>
-                        <span className="text-[10px] block" style={{ color: 'var(--ink-tertiary)' }}>
+                        <span className="text-[10px] block text-[var(--ink-tertiary)]">
                             {match.holesPlayed} holes
                         </span>
                     </div>
@@ -313,7 +309,7 @@ function ScenarioSummaryCard({
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <p className="text-[10px] uppercase" style={{ color: 'var(--ink-tertiary)' }}>
+                    <p className="text-[10px] uppercase text-[var(--ink-tertiary)]">
                         Current
                     </p>
                     <p className="text-2xl font-bold" style={{ color: teamColor }}>
@@ -321,7 +317,7 @@ function ScenarioSummaryCard({
                     </p>
                 </div>
                 <div>
-                    <p className="text-[10px] uppercase" style={{ color: 'var(--ink-tertiary)' }}>
+                    <p className="text-[10px] uppercase text-[var(--ink-tertiary)]">
                         Projected
                     </p>
                     <p className="text-2xl font-bold" style={{ color: teamColor }}>
@@ -332,7 +328,7 @@ function ScenarioSummaryCard({
 
             <div className="mt-3 pt-3 border-t" style={{ borderColor: `${teamColor}30` }}>
                 <div className="flex items-center justify-between text-sm">
-                    <span style={{ color: 'var(--ink-secondary)' }}>Need to win:</span>
+                    <span className="text-[var(--ink-secondary)]">Need to win:</span>
                     <span className="font-semibold" style={{ color: willReach ? 'var(--positive)' : 'var(--ink)' }}>
                         {formatDecimal(pointsNeeded)} pts
                     </span>
@@ -408,8 +404,8 @@ export function PointsCalculator({
         <div className={cn('space-y-4', className)}>
             {/* Header */}
             <div className="flex items-center gap-2">
-                <Calculator size={20} style={{ color: 'var(--masters)' }} />
-                <h2 className="text-xl font-bold" style={{ color: 'var(--ink)' }}>
+                <Calculator size={20} className="text-[var(--masters)]" />
+                <h2 className="text-xl font-bold text-[var(--ink)]">
                     Points Calculator
                 </h2>
             </div>
@@ -435,17 +431,14 @@ export function PointsCalculator({
             </div>
 
             {/* Target Indicator */}
-            <div
-                className="p-3 rounded-lg flex items-center justify-between"
-                style={{ background: 'var(--surface)' }}
-            >
+            <div className="p-3 rounded-lg flex items-center justify-between bg-[var(--surface)]">
                 <div className="flex items-center gap-2">
-                    <Target size={16} style={{ color: 'var(--ink-secondary)' }} />
-                    <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                    <Target size={16} className="text-[var(--ink-secondary)]" />
+                    <span className="text-sm text-[var(--ink-secondary)]">
                         Points to win
                     </span>
                 </div>
-                <span className="font-bold" style={{ color: 'var(--ink)' }}>
+                <span className="font-bold text-[var(--ink)]">
                     {formatDecimal(targetPoints)}
                 </span>
             </div>
@@ -472,16 +465,15 @@ export function PointsCalculator({
             {/* Match Details Toggle */}
             <button
                 onClick={toggleDetails}
-                className="w-full flex items-center justify-between p-3 rounded-lg"
-                style={{ background: 'var(--surface)' }}
+                className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--surface)]"
             >
-                <span className="text-sm font-medium" style={{ color: 'var(--ink-secondary)' }}>
+                <span className="text-sm font-medium text-[var(--ink-secondary)]">
                     {showDetails ? 'Hide' : 'Show'} Match Details
                 </span>
                 {showDetails ? (
-                    <ChevronUp size={18} style={{ color: 'var(--ink-secondary)' }} />
+                    <ChevronUp size={18} className="text-[var(--ink-secondary)]" />
                 ) : (
-                    <ChevronDown size={18} style={{ color: 'var(--ink-secondary)' }} />
+                    <ChevronDown size={18} className="text-[var(--ink-secondary)]" />
                 )}
             </button>
 
@@ -497,9 +489,7 @@ export function PointsCalculator({
                         {/* Ongoing Matches */}
                         {ongoingMatches.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-semibold uppercase mb-2 flex items-center gap-2"
-                                    style={{ color: 'var(--ink-secondary)' }}
-                                >
+                                <h3 className="text-sm font-semibold uppercase mb-2 flex items-center gap-2 text-[var(--ink-secondary)]">
                                     <Zap size={14} />
                                     In Progress ({ongoingMatches.length})
                                 </h3>
@@ -525,9 +515,7 @@ export function PointsCalculator({
                         {/* Completed Matches */}
                         {completedMatches.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-semibold uppercase mb-2 flex items-center gap-2"
-                                    style={{ color: 'var(--ink-tertiary)' }}
-                                >
+                                <h3 className="text-sm font-semibold uppercase mb-2 flex items-center gap-2 text-[var(--ink-tertiary)]">
                                     <CheckCircle2 size={14} />
                                     Completed ({completedMatches.length})
                                 </h3>
@@ -548,10 +536,7 @@ export function PointsCalculator({
                         )}
 
                         {/* Info Note */}
-                        <div
-                            className="flex items-start gap-2 p-3 rounded-lg text-xs"
-                            style={{ background: 'rgba(0, 103, 71, 0.1)', color: 'var(--masters)' }}
-                        >
+                        <div className="flex items-start gap-2 p-3 rounded-lg text-xs bg-[color:var(--masters)]/10 text-[var(--masters)]">
                             <Info size={14} className="shrink-0 mt-0.5" />
                             <span>
                                 Tap the outcome buttons to project different scenarios.
