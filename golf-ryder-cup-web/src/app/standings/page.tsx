@@ -715,12 +715,11 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
             >
               <div className="flex items-start gap-[var(--space-4)]">
                 <div
-                  className="w-12 h-12 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0"
-                  style={{
-                    background: award.winner
-                      ? 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)'
-                      : 'var(--surface-elevated)',
-                  }}
+                  className={`w-12 h-12 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0 ${
+                    award.winner
+                      ? 'bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)]'
+                      : 'bg-[var(--surface-elevated)]'
+                  }`}
                 >
                   {getAwardIcon(award.type)}
                 </div>

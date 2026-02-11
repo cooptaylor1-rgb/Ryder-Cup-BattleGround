@@ -196,7 +196,7 @@ export default function LivePage() {
         {activeSession && (
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+            <p className="type-caption">Last updated: {lastUpdate.toLocaleTimeString()}</p>
           </div>
         )}
 
@@ -223,7 +223,7 @@ export default function LivePage() {
             {isLoadingMatches ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-40 rounded-xl bg-muted/50" />
+                  <div key={i} className="h-40 rounded-xl bg-[var(--surface-elevated)] border border-[var(--rule)]" />
                 ))}
               </div>
             ) : matches && matches.length > 0 ? (
@@ -301,21 +301,19 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
   };
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden bg-card border border-border"
-    >
+    <div className="card rounded-2xl overflow-hidden border border-[var(--rule)] bg-[var(--surface-card)]">
       {/* Match Header */}
-      <div
-        className="px-4 py-2 flex items-center justify-between bg-muted/50"
-      >
-        <span className="text-sm text-muted-foreground">Match {match.matchOrder}</span>
+      <div className="px-4 py-2 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--rule)]">
+        <span className="text-sm text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
         <span
-          className={`text-xs px-2 py-1 rounded-full ${state?.status === 'inProgress'
-            ? 'bg-red-500/20 text-red-500'
-            : state?.status === 'completed'
-              ? 'bg-green-500/20 text-green-500'
-              : 'bg-muted text-muted-foreground'
-            }`}
+          className={
+            `text-xs px-2 py-1 rounded-full border ` +
+            (state?.status === 'inProgress'
+              ? 'bg-[color:var(--error)]/10 text-[var(--error)] border-[color:var(--error)]/25'
+              : state?.status === 'completed'
+                ? 'bg-[color:var(--success)]/10 text-[var(--success)] border-[color:var(--success)]/25'
+                : 'bg-[var(--surface-card)] text-[var(--ink-tertiary)] border-[var(--rule)]')
+          }
         >
           {getStatusText()}
         </span>
@@ -329,7 +327,11 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
         >
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
-            <span className={`font-medium ${isTeamAWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
+            <span
+              className={`font-medium ${
+                isTeamAWinning ? 'text-[var(--ink)]' : 'text-[var(--ink-secondary)]'
+              }`}
+            >
               {formatPlayerNames(teamAPlayers)}
             </span>
           </div>
@@ -344,7 +346,11 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
         >
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
-            <span className={`font-medium ${isTeamBWinning ? 'text-foreground' : 'text-muted-foreground'}`}>
+            <span
+              className={`font-medium ${
+                isTeamBWinning ? 'text-[var(--ink)]' : 'text-[var(--ink-secondary)]'
+              }`}
+            >
               {formatPlayerNames(teamBPlayers)}
             </span>
           </div>
@@ -356,7 +362,7 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
         {/* Halved indicator */}
         {isHalved && state && state.holesPlayed > 0 && (
           <div className="text-center mt-2">
-            <span className="text-sm text-muted-foreground">All Square</span>
+            <span className="text-sm text-[var(--ink-tertiary)]">All Square</span>
           </div>
         )}
       </div>
@@ -373,16 +379,16 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
                 <div
                   key={i}
                   className={`h-1 flex-1 rounded-full transition-all ${isCurrent
-                    ? 'bg-green-500 animate-pulse'
+                    ? 'bg-[var(--masters)] animate-pulse'
                     : isPlayed
-                      ? 'bg-foreground/40'
-                      : 'bg-muted'
+                      ? 'bg-[var(--ink-tertiary)]/40'
+                      : 'bg-[var(--surface-elevated)]'
                     }`}
                 />
               );
             })}
           </div>
-          <p className="text-xs text-center mt-2 text-muted-foreground">
+          <p className="text-xs text-center mt-2 text-[var(--ink-tertiary)]">
             Hole {state.holesPlayed + 1} of 18
           </p>
         </div>

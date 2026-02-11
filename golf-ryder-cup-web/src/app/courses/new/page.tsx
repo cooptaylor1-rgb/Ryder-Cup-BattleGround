@@ -216,19 +216,13 @@ export default function NewCoursePage() {
       <PageHeader
         title="Add Course"
         subtitle="Enter course details"
-        icon={<Flag size={16} style={{ color: 'var(--color-accent)' }} />}
+        icon={<Flag size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.push('/courses')}
         rightSlot={
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
             className="btn-premium"
-            style={{
-              padding: 'var(--space-2) var(--space-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-            }}
           >
             <Save size={16} />
             Save
@@ -241,30 +235,18 @@ export default function NewCoursePage() {
         <section className="section">
           <button
             onClick={() => setShowScorecardUpload(true)}
-            className="w-full p-4 rounded-xl border-2 border-dashed transition-all press-scale"
-            style={{
-              borderColor: 'var(--masters)',
-              background: 'linear-gradient(135deg, var(--masters-soft) 0%, transparent 100%)',
-            }}
+            className="w-full p-4 rounded-xl border-2 border-dashed border-[var(--masters)] bg-[linear-gradient(135deg,var(--masters-soft)_0%,transparent_100%)] transition-all press-scale"
           >
             <div className="flex items-center justify-center gap-3">
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: 'var(--radius-lg)',
-                  background: 'var(--masters)',
-                }}
-              >
-                <Camera size={24} style={{ color: 'var(--color-accent)' }} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--masters)]">
+                <Camera size={24} className="text-[var(--color-accent)]" />
               </div>
               <div className="text-left">
                 <div className="flex items-center gap-2">
                   <span className="type-title-sm">Scan Scorecard</span>
-                  <Sparkles size={14} style={{ color: 'var(--masters)' }} />
+                  <Sparkles size={14} className="text-[var(--masters)]" />
                 </div>
-                <p className="type-caption" style={{ color: 'var(--ink-secondary)' }}>
+                <p className="type-caption text-[var(--ink-secondary)]">
                   Upload a photo or PDF to auto-fill hole data
                 </p>
               </div>
@@ -272,20 +254,20 @@ export default function NewCoursePage() {
           </button>
         </section>
 
-        <div className="flex items-center gap-4 my-4">
-          <hr className="flex-1 border-t" style={{ borderColor: 'var(--rule)' }} />
-          <span className="type-micro" style={{ color: 'var(--ink-muted)' }}>OR ENTER MANUALLY</span>
-          <hr className="flex-1 border-t" style={{ borderColor: 'var(--rule)' }} />
+        <div className="my-4 flex items-center gap-4">
+          <hr className="flex-1 border-t border-[var(--rule)]" />
+          <span className="type-micro text-[var(--ink-muted)]">OR ENTER MANUALLY</span>
+          <hr className="flex-1 border-t border-[var(--rule)]" />
         </div>
 
         {/* Course Details */}
         <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-4)' }}>Course Details</h2>
+          <h2 className="type-overline mb-[var(--space-4)]">Course Details</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                <Flag size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              <label className="type-meta mb-[var(--space-2)] block">
+                <Flag size={14} className="mr-[6px] inline-block align-middle" />
                 Course Name *
               </label>
               <input
@@ -298,8 +280,8 @@ export default function NewCoursePage() {
             </div>
 
             <div>
-              <label className="type-meta" style={{ display: 'block', marginBottom: 'var(--space-2)' }}>
-                <MapPin size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              <label className="type-meta mb-[var(--space-2)] block">
+                <MapPin size={14} className="mr-[6px] inline-block align-middle" />
                 Location
               </label>
               <input
