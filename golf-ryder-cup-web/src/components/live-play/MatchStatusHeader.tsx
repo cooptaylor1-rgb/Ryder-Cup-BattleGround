@@ -249,12 +249,9 @@ export function MatchStatusHeader({
             className={cn(
                 'mx-4 mt-2 rounded-xl overflow-hidden',
                 'shadow-md backdrop-blur-md',
+                'bg-[#1a1814]/95 border border-[#807868]/20',
                 className,
             )}
-            style={{
-                background: 'rgba(26, 24, 20, 0.95)',
-                border: '1px solid rgba(128, 120, 104, 0.2)',
-            }}
         >
             {/* Compact header */}
             <button
@@ -266,17 +263,15 @@ export function MatchStatusHeader({
                     <div
                         className={cn(
                             'w-2 h-2 rounded-full',
-                            isComplete ? 'bg-gray-400' : 'animate-pulse',
-                        )}
-                        style={{
-                            background: isComplete
-                                ? '#6B7280'
+                            !isComplete && 'animate-pulse',
+                            isComplete
+                                ? 'bg-gray-500'
                                 : isTeamAUp
-                                    ? 'var(--team-usa, #B91C1C)'
+                                    ? 'bg-[var(--team-usa)]'
                                     : isTeamBUp
-                                        ? 'var(--team-europe, #1E40AF)'
-                                        : 'var(--masters, #006747)',
-                        }}
+                                        ? 'bg-[var(--team-europe)]'
+                                        : 'bg-[var(--masters)]',
+                        )}
                     />
 
                     {/* Score display */}
@@ -294,19 +289,12 @@ export function MatchStatusHeader({
                     {/* Momentum indicator */}
                     {streak >= 2 && (
                         <div
-                            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                            style={{
-                                background: momentum === 'teamA'
-                                    ? 'rgba(185, 28, 28, 0.2)'
-                                    : momentum === 'teamB'
-                                        ? 'rgba(30, 64, 175, 0.2)'
-                                        : 'rgba(128, 120, 104, 0.2)',
-                                color: momentum === 'teamA'
-                                    ? '#EF4444'
-                                    : momentum === 'teamB'
-                                        ? '#60A5FA'
-                                        : '#A09080',
-                            }}
+                            className={cn(
+                                'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
+                                momentum === 'teamA' && 'bg-red-500/15 text-red-400',
+                                momentum === 'teamB' && 'bg-blue-500/15 text-blue-300',
+                                momentum === 'neutral' && 'bg-white/10 text-white/60',
+                            )}
                         >
                             <Flame className="w-3 h-3" />
                             {streak} in a row
@@ -342,10 +330,7 @@ export function MatchStatusHeader({
                                 {/* Team A */}
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <div
-                                            className="w-3 h-3 rounded-full"
-                                            style={{ background: 'var(--team-usa, #B91C1C)' }}
-                                        />
+                                        <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
                                         <span className="text-xs text-white/60 uppercase tracking-wider">
                                             USA
                                         </span>
@@ -368,10 +353,7 @@ export function MatchStatusHeader({
                                         <span className="text-xs text-white/60 uppercase tracking-wider">
                                             EUR
                                         </span>
-                                        <div
-                                            className="w-3 h-3 rounded-full"
-                                            style={{ background: 'var(--team-europe, #1E40AF)' }}
-                                        />
+                                        <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
                                     </div>
                                     <p className="font-medium text-white text-xs">
                                         {teamBPlayers.map(p => `${p.firstName || '?'} ${p.lastName?.[0] || '?'}.`).join(' / ')}
@@ -388,12 +370,9 @@ export function MatchStatusHeader({
                                         'w-full flex items-center justify-center gap-2',
                                         'py-2 rounded-lg',
                                         'text-sm font-medium',
-                                        'transition-colors duration-150',
+                                        'bg-[var(--masters)] text-white hover:opacity-90',
+                                        'transition-opacity duration-150',
                                     )}
-                                    style={{
-                                        background: 'var(--masters)',
-                                        color: 'white',
-                                    }}
                                 >
                                     <Target className="w-4 h-4" />
                                     Score Hole {currentHole}
