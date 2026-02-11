@@ -202,15 +202,15 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl max-h-[80vh] overflow-hidden"
+                        className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)] rounded-t-3xl max-h-[80vh] overflow-hidden border-t border-[var(--rule)]"
                     >
                         {/* Handle */}
                         <div className="flex justify-center pt-3 pb-2">
-                            <div className="w-10 h-1 rounded-full bg-muted" />
+                            <div className="w-10 h-1 rounded-full bg-[var(--surface-tertiary)]" />
                         </div>
 
                         {/* Header */}
-                        <div className="px-4 pb-4 flex items-center justify-between border-b border-border">
+                        <div className="px-4 pb-4 flex items-center justify-between border-b border-[var(--rule)]">
                             <div className="flex items-center gap-3">
                                 <div
                                     className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -219,15 +219,15 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                                     <Beer size={20} className="text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="font-semibold">Cart Tracker</h2>
-                                    <p className="text-sm text-muted-foreground">
+                                    <h2 className="font-semibold text-[var(--ink-primary)]">Cart Tracker</h2>
+                                    <p className="text-sm text-[var(--ink-tertiary)]">
                                         {latestSighting
                                             ? `Last seen: Hole ${latestSighting.holeNumber}`
                                             : 'No recent sightings'}
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 rounded-full hover:bg-muted">
+                            <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--surface-secondary)] transition-colors" aria-label="Close cart tracker">
                                 <X size={20} />
                             </button>
                         </div>
@@ -235,7 +235,7 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                         <div className="overflow-y-auto p-4" style={{ maxHeight: 'calc(80vh - 120px)' }}>
                             {/* Report Section */}
                             <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+                                <h3 className="text-sm font-semibold text-[var(--ink-tertiary)] mb-3">
                                     SPOT THE CART
                                 </h3>
 
@@ -248,8 +248,8 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                                                 key={hole}
                                                 onClick={() => setSelectedHole(hole)}
                                                 className={`w-full aspect-square rounded-lg text-sm font-medium transition-all ${selectedHole === hole
-                                                    ? 'bg-amber-500 text-white scale-110'
-                                                    : 'bg-muted hover:bg-muted/80'
+                                                    ? 'bg-[var(--warning)] text-white scale-110'
+                                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)]'
                                                     }`}
                                             >
                                                 {hole}
@@ -271,8 +271,8 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                                                 key={type}
                                                 onClick={() => setSelectedType(type)}
                                                 className={`flex-1 py-3 rounded-xl flex flex-col items-center gap-1 transition-all ${selectedType === type
-                                                    ? 'bg-amber-500 text-white'
-                                                    : 'bg-muted hover:bg-muted/80'
+                                                    ? 'bg-[var(--warning)] text-white'
+                                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)]'
                                                     }`}
                                             >
                                                 <Icon size={20} />
@@ -289,7 +289,7 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                                         placeholder="Add a note (optional)"
                                         value={note}
                                         onChange={e => setNote(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl bg-muted border-none focus:ring-2 focus:ring-amber-500 outline-none"
+                                        className="w-full px-4 py-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--rule)] focus:ring-2 focus:ring-[var(--warning)] outline-none text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]"
                                     />
                                 </div>
 
@@ -308,14 +308,14 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                             {/* Recent Sightings */}
                             {sightings.length > 0 && (
                                 <div>
-                                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+                                    <h3 className="text-sm font-semibold text-[var(--ink-tertiary)] mb-3">
                                         RECENT SIGHTINGS
                                     </h3>
                                     <div className="space-y-2">
                                         {sightings.slice(0, 5).map(sighting => (
                                             <div
                                                 key={sighting.id}
-                                                className="flex items-center gap-3 p-3 rounded-xl bg-muted/50"
+                                                className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-secondary)]"
                                             >
                                                 <div
                                                     className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
@@ -327,11 +327,11 @@ export function CartTrackerPanel({ isOpen, onClose }: CartTrackerPanelProps) {
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-medium">Hole {sighting.holeNumber}</span>
-                                                        <span className="text-xs text-muted-foreground">
+                                                        <span className="text-xs text-[var(--ink-tertiary)]">
                                                             {formatDistanceToNow(new Date(sighting.timestamp), { addSuffix: true })}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-sm text-[var(--ink-secondary)]">
                                                         {sighting.reportedByName}
                                                         {sighting.note && ` • ${sighting.note}`}
                                                     </p>

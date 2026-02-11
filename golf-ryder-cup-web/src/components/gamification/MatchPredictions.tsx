@@ -233,9 +233,9 @@ export function MatchPredictionCard({
     const isLocked = match.status !== 'scheduled';
 
     return (
-        <div className="bg-card rounded-xl border border-border p-4">
+        <div className="bg-[var(--surface)] rounded-xl border border-[var(--rule)] p-4">
             <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-muted-foreground">Match {match.matchOrder}</span>
+                <span className="text-sm text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
                 {userPrediction && (
                     <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600">
                         <Check size={12} className="inline mr-1" />
@@ -250,15 +250,15 @@ export function MatchPredictionCard({
                     onClick={() => onPredict?.('teamA')}
                     disabled={disabled || isLocked || !!userPrediction}
                     className={`w-full py-3 px-4 rounded-xl flex items-center justify-between transition-all ${userPrediction?.predictedWinner === 'teamA'
-                        ? 'ring-2 ring-[var(--team-usa)] bg-[var(--team-usa-light)]'
-                        : 'bg-muted hover:bg-muted/80'
+                        ? 'ring-2 ring-[var(--team-usa)] bg-[color:var(--team-usa)]/10'
+                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)]'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
                         <div className="text-left">
                             <div className="font-medium">{teamAName}</div>
-                            <div className="text-xs text-muted-foreground">{teamAPlayers}</div>
+                            <div className="text-xs text-[var(--ink-tertiary)]">{teamAPlayers}</div>
                         </div>
                     </div>
                     {userPrediction?.predictedWinner === 'teamA' && (
@@ -271,8 +271,8 @@ export function MatchPredictionCard({
                     onClick={() => onPredict?.('halved')}
                     disabled={disabled || isLocked || !!userPrediction}
                     className={`w-full py-2 px-4 rounded-lg text-sm transition-all ${userPrediction?.predictedWinner === 'halved'
-                        ? 'ring-2 ring-muted-foreground bg-muted'
-                        : 'bg-muted/50 hover:bg-muted/80'
+                        ? 'ring-2 ring-[var(--ink-tertiary)] bg-[var(--surface-secondary)]'
+                        : 'bg-[var(--surface-secondary)]/70 hover:bg-[var(--surface-tertiary)]'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     Halved
@@ -283,15 +283,15 @@ export function MatchPredictionCard({
                     onClick={() => onPredict?.('teamB')}
                     disabled={disabled || isLocked || !!userPrediction}
                     className={`w-full py-3 px-4 rounded-xl flex items-center justify-between transition-all ${userPrediction?.predictedWinner === 'teamB'
-                        ? 'ring-2 ring-[var(--team-europe)] bg-[var(--team-europe-light)]'
-                        : 'bg-muted hover:bg-muted/80'
+                        ? 'ring-2 ring-[var(--team-europe)] bg-[color:var(--team-europe)]/10'
+                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)]'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
                         <div className="text-left">
                             <div className="font-medium">{teamBName}</div>
-                            <div className="text-xs text-muted-foreground">{teamBPlayers}</div>
+                            <div className="text-xs text-[var(--ink-tertiary)]">{teamBPlayers}</div>
                         </div>
                     </div>
                     {userPrediction?.predictedWinner === 'teamB' && (
@@ -301,7 +301,7 @@ export function MatchPredictionCard({
             </div>
 
             {isLocked && !userPrediction && (
-                <p className="text-xs text-muted-foreground mt-3 text-center">
+                <p className="text-xs text-[var(--ink-tertiary)] mt-3 text-center">
                     Match started - predictions locked
                 </p>
             )}
@@ -315,7 +315,7 @@ export function PredictionsLeaderboard() {
 
     if (leaderboard.length === 0) {
         return (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-[var(--ink-tertiary)]">
                 <Target size={40} className="mx-auto mb-2 opacity-50" />
                 <p>No predictions settled yet</p>
                 <p className="text-sm">Make predictions to compete!</p>
@@ -328,10 +328,10 @@ export function PredictionsLeaderboard() {
             {leaderboard.map((entry, index) => (
                 <div
                     key={entry.playerId}
-                    className={`flex items-center gap-3 p-3 rounded-xl ${index === 0 ? 'bg-yellow-500/10 border border-yellow-500/30' :
-                        index === 1 ? 'bg-gray-400/10 border border-gray-400/30' :
-                            index === 2 ? 'bg-orange-500/10 border border-orange-500/30' :
-                                'bg-muted/50'
+                    className={`flex items-center gap-3 p-3 rounded-xl border ${index === 0 ? 'bg-yellow-500/10 border-yellow-500/30' :
+                        index === 1 ? 'bg-gray-400/10 border-gray-400/30' :
+                            index === 2 ? 'bg-orange-500/10 border-orange-500/30' :
+                                'bg-[var(--surface-secondary)] border-[var(--rule)]'
                         }`}
                 >
                     {/* Rank */}
@@ -345,7 +345,7 @@ export function PredictionsLeaderboard() {
                     {/* Player Info */}
                     <div className="flex-1">
                         <div className="font-medium">{entry.playerName}</div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-[var(--ink-tertiary)]">
                             {entry.correctPredictions}/{entry.totalPredictions} correct • {entry.accuracy}%
                         </div>
                     </div>
@@ -418,27 +418,27 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl max-h-[85vh] overflow-hidden"
+                        className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface)] rounded-t-3xl max-h-[85vh] overflow-hidden border-t border-[var(--rule)]"
                     >
                         {/* Handle */}
                         <div className="flex justify-center pt-3 pb-2">
-                            <div className="w-10 h-1 rounded-full bg-muted" />
+                            <div className="w-10 h-1 rounded-full bg-[var(--surface-tertiary)]" />
                         </div>
 
                         {/* Header */}
-                        <div className="px-4 pb-4 flex items-center justify-between border-b border-border">
+                        <div className="px-4 pb-4 flex items-center justify-between border-b border-[var(--rule)]">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--masters-subtle)]">
                                     <Target size={20} className="text-[var(--masters)]" />
                                 </div>
                                 <div>
                                     <h2 className="font-semibold">Predictions</h2>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-sm text-[var(--ink-tertiary)]">
                                         Pick your winners
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 rounded-full hover:bg-muted" aria-label="Close">
+                            <button onClick={onClose} className="p-2 rounded-full hover:bg-[var(--surface-secondary)] transition-colors" aria-label="Close">
                                 <X size={20} />
                             </button>
                         </div>
@@ -449,7 +449,7 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                                 onClick={() => setSelectedTab('predict')}
                                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${selectedTab === 'predict'
                                     ? 'bg-[var(--masters)] text-white'
-                                    : 'bg-muted hover:bg-muted/80'
+                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-primary)]'
                                     }`}
                             >
                                 Make Picks
@@ -458,7 +458,7 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                                 onClick={() => setSelectedTab('leaderboard')}
                                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${selectedTab === 'leaderboard'
                                     ? 'bg-[var(--masters)] text-white'
-                                    : 'bg-muted hover:bg-muted/80'
+                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-primary)]'
                                     }`}
                             >
                                 Leaderboard
@@ -483,7 +483,7 @@ export function PredictionsModal({ isOpen, onClose }: PredictionsModalProps) {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-12 text-muted-foreground">
+                                    <div className="text-center py-12 text-[var(--ink-tertiary)]">
                                         <Sparkles size={40} className="mx-auto mb-2 opacity-50" />
                                         <p>No upcoming matches to predict</p>
                                     </div>
