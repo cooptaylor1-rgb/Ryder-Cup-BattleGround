@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 02:05 EST — Captain Settings: consistent premium header in empty states
+- `/captain/settings`: added the standard `PageHeader` to the **No active trip** and **Captain mode required** empty-state shells so the page keeps consistent navigation + title context.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5b916f5`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 01:40 EST — Phase 2 — PlayerOnboardingWizard: premium token sweep
 - `PlayerOnboardingWizard`: replaced remaining legacy `surface-*` palette utilities (bg/border/text/hover + dark variants) with premium token-driven Tailwind (`var(--canvas)`, `var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
 - Standardized disabled CTA state onto a token-neutral tint (`bg-[color:var(--ink-tertiary)]/10`) and removed remaining dark-mode palette branches.
