@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 18:40 EST — Phase 2 — SyncStatusBadge + StrokeScoreEntry: premium token alignment
+- `SyncStatusBadge`: replaced hard-coded Tailwind palettes (green/blue/red/gray) with premium tone tokens (`var(--success)`, `var(--info)`, `var(--error)`, `var(--ink-*)`) and token-driven tint backgrounds so the badge remains theme-consistent.
+- `StrokeScoreEntry`: replaced `bg-gray-*` separators and inline ink styles in the Hole info row with premium rule/ink token classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 17:30 EST — Phase 2 — SessionWeatherPanel: premium status tokens (remove hard-coded palettes)
 - `SessionWeatherPanel`: replaced hard-coded Tailwind palette utilities (red/orange/yellow/blue/green) with premium status tokens (`var(--info)`, `var(--warning)`, `var(--success)`, `var(--error)`) for icons, alert cards, recommendation badges, and error/recommendation panels.
 - Also removed dark-mode-specific palette branches in favor of token-driven tints + premium ink.

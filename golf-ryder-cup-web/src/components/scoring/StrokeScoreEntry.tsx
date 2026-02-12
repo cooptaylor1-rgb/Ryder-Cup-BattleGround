@@ -265,17 +265,13 @@ export function StrokeScoreEntry({
     <div className={cn('space-y-4', className)}>
       {/* Hole Info */}
       <div className="flex items-center justify-center gap-2">
-        <span className="text-sm font-medium">Hole {holeNumber}</span>
-        <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
-        <span className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-          Par {par}
-        </span>
+        <span className="text-sm font-medium text-[var(--ink-primary)]">Hole {holeNumber}</span>
+        <span className="w-px h-3 bg-[color:var(--rule)]/60" />
+        <span className="text-sm text-[var(--ink-secondary)]">Par {par}</span>
         {(teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
           <>
-            <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
-            <span className="text-xs font-medium" style={{ color: 'var(--masters)' }}>
-              Stroke Hole
-            </span>
+            <span className="w-px h-3 bg-[color:var(--rule)]/60" />
+            <span className="text-xs font-medium text-[var(--masters)]">Stroke Hole</span>
           </>
         )}
       </div>

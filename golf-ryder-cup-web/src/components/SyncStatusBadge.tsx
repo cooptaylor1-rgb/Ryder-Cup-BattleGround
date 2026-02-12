@@ -62,37 +62,37 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
                 return {
                     icon: <Check className="h-4 w-4" />,
                     text: 'Synced',
-                    color: 'text-green-600',
-                    bgColor: 'bg-green-100',
+                    tone: 'text-[var(--success)]',
+                    bg: 'bg-[color:var(--success)]/15',
                 };
             case 'pending':
             case 'syncing':
                 return {
                     icon: <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />,
                     text: `Syncing${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
-                    color: 'text-blue-600',
-                    bgColor: 'bg-blue-100',
+                    tone: 'text-[var(--info)]',
+                    bg: 'bg-[color:var(--info)]/15',
                 };
             case 'failed':
                 return {
                     icon: <AlertCircle className="h-4 w-4" />,
                     text: `Failed (${queueInfo.failed})`,
-                    color: 'text-red-600',
-                    bgColor: 'bg-red-100',
+                    tone: 'text-[var(--error)]',
+                    bg: 'bg-[color:var(--error)]/15',
                 };
             case 'offline':
                 return {
                     icon: <CloudOff className="h-4 w-4" />,
                     text: 'Offline',
-                    color: 'text-gray-500',
-                    bgColor: 'bg-gray-100',
+                    tone: 'text-[var(--ink-secondary)]',
+                    bg: 'bg-[color:var(--ink-tertiary)]/10',
                 };
             default:
                 return {
                     icon: <Cloud className="h-4 w-4" />,
                     text: 'Unknown',
-                    color: 'text-gray-400',
-                    bgColor: 'bg-gray-50',
+                    tone: 'text-[var(--ink-tertiary)]',
+                    bg: 'bg-[color:var(--ink-tertiary)]/10',
                 };
         }
     };
@@ -101,10 +101,10 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
 
     const content = (
         <div
-            className={`
-                inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium
-                ${config.color} ${config.bgColor} ${className}
-            `}
+            className={
+                `inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ` +
+                `${config.tone} ${config.bg} ${className}`
+            }
         >
             {config.icon}
             {showText && <span>{config.text}</span>}
