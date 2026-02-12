@@ -224,7 +224,7 @@ export function ProfilePhotoUpload({
                     <button
                         onClick={() => setShowOptions(true)}
                         className={cn(
-                            'w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-white dark:border-surface-800',
+                            'w-32 h-32 rounded-full overflow-hidden shadow-lg border-4 border-[color:var(--canvas)]',
                             'focus:outline-none focus:ring-4 focus:ring-masters/30',
                             'transition-all duration-200',
                             'relative'
@@ -270,7 +270,7 @@ export function ProfilePhotoUpload({
                     {photo ? 'Change photo' : 'Add a photo'}
                 </button>
 
-                <p className="text-xs text-surface-500 mt-1">
+                <p className="text-xs text-[var(--ink-tertiary)] mt-1">
                     Help your team recognize you on the course!
                 </p>
             </div>
@@ -289,14 +289,14 @@ export function ProfilePhotoUpload({
                             initial={{ y: 100, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 100, opacity: 0 }}
-                            className="w-full max-w-md bg-white dark:bg-surface-800 rounded-t-3xl overflow-hidden shadow-xl"
+                            className="w-full max-w-md bg-[var(--surface-raised)] rounded-t-3xl overflow-hidden shadow-xl"
                             onClick={e => e.stopPropagation()}
                         >
                             <div className="p-4">
                                 {/* Handle */}
-                                <div className="w-10 h-1 rounded-full bg-surface-300 mx-auto mb-4" />
+                                <div className="w-10 h-1 rounded-full bg-[color:var(--ink-tertiary)]/25 mx-auto mb-4" />
 
-                                <h3 className="text-lg font-semibold text-surface-900 dark:text-white text-center mb-4">
+                                <h3 className="text-lg font-semibold text-[var(--ink-primary)] text-center mb-4">
                                     Profile Photo
                                 </h3>
 
@@ -304,16 +304,16 @@ export function ProfilePhotoUpload({
                                     {/* Camera Option */}
                                     <button
                                         onClick={openCamera}
-                                        className="w-full p-4 rounded-xl bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors flex items-center gap-4"
+                                        className="w-full p-4 rounded-xl bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors flex items-center gap-4"
                                     >
                                         <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                                             <Camera className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <div className="text-left">
-                                            <div className="font-medium text-surface-900 dark:text-white">
+                                            <div className="font-medium text-[var(--ink-primary)]">
                                                 Take a selfie
                                             </div>
-                                            <div className="text-sm text-surface-500">
+                                            <div className="text-sm text-[var(--ink-tertiary)]">
                                                 Use your camera
                                             </div>
                                         </div>
@@ -322,16 +322,16 @@ export function ProfilePhotoUpload({
                                     {/* Gallery Option */}
                                     <button
                                         onClick={openGallery}
-                                        className="w-full p-4 rounded-xl bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors flex items-center gap-4"
+                                        className="w-full p-4 rounded-xl bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors flex items-center gap-4"
                                     >
                                         <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                             <ImageIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                                         </div>
                                         <div className="text-left">
-                                            <div className="font-medium text-surface-900 dark:text-white">
+                                            <div className="font-medium text-[var(--ink-primary)]">
                                                 Choose from gallery
                                             </div>
-                                            <div className="text-sm text-surface-500">
+                                            <div className="text-sm text-[var(--ink-tertiary)]">
                                                 Pick an existing photo
                                             </div>
                                         </div>
@@ -361,7 +361,7 @@ export function ProfilePhotoUpload({
                                 {/* Cancel Button */}
                                 <button
                                     onClick={() => setShowOptions(false)}
-                                    className="w-full mt-4 py-3 rounded-xl border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 font-medium"
+                                    className="w-full mt-4 py-3 rounded-xl border border-[var(--rule)] text-[var(--ink-secondary)] font-medium hover:bg-[var(--surface-secondary)]"
                                 >
                                     Cancel
                                 </button>
@@ -384,17 +384,17 @@ export function ProfilePhotoUpload({
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-surface-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-xl"
+                            className="bg-[var(--surface-raised)] rounded-2xl w-full max-w-sm overflow-hidden shadow-xl"
                         >
-                            <div className="p-4 border-b border-surface-200 dark:border-surface-700">
-                                <h3 className="font-semibold text-surface-900 dark:text-white text-center">
+                            <div className="p-4 border-b border-[var(--rule)]">
+                                <h3 className="font-semibold text-[var(--ink-primary)] text-center">
                                     Looking good! 📸
                                 </h3>
                             </div>
 
                             {/* Preview Image */}
                             <div className="p-6 flex justify-center">
-                                <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-white dark:border-surface-700 relative">
+                                <div className="w-48 h-48 rounded-full overflow-hidden shadow-xl border-4 border-[color:var(--canvas)] relative">
                                     <NextImage
                                         src={previewPhoto}
                                         alt="Preview"
@@ -406,10 +406,10 @@ export function ProfilePhotoUpload({
                             </div>
 
                             {/* Actions */}
-                            <div className="flex gap-3 p-4 border-t border-surface-200 dark:border-surface-700">
+                            <div className="flex gap-3 p-4 border-t border-[var(--rule)]">
                                 <button
                                     onClick={cancelPreview}
-                                    className="flex-1 py-3 rounded-xl border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 font-medium flex items-center justify-center gap-2"
+                                    className="flex-1 py-3 rounded-xl border border-[var(--rule)] text-[var(--ink-secondary)] font-medium flex items-center justify-center gap-2 hover:bg-[var(--surface-secondary)]"
                                 >
                                     <RotateCw className="w-4 h-4" />
                                     Retake
@@ -436,9 +436,9 @@ export function ProfilePhotoUpload({
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
                     >
-                        <div className="bg-white dark:bg-surface-800 rounded-2xl p-6 shadow-xl text-center">
+                        <div className="bg-[var(--surface-raised)] rounded-2xl p-6 shadow-xl text-center">
                             <div className="w-12 h-12 rounded-full border-4 border-masters border-t-transparent animate-spin mx-auto mb-4" />
-                            <p className="font-medium text-surface-900 dark:text-white">
+                            <p className="font-medium text-[var(--ink-primary)]">
                                 Processing photo...
                             </p>
                         </div>
