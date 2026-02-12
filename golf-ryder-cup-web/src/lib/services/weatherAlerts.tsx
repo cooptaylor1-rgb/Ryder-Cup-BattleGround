@@ -18,6 +18,7 @@ import { useUIStore } from '@/lib/stores';
 import { getWeather, type GolfWeather } from '@/lib/services/weatherService';
 import { sendNotification } from './liveScoreNotifications';
 import { createLogger } from '../utils/logger';
+import { cn } from '@/lib/utils';
 
 const logger = createLogger('WeatherAlerts');
 
@@ -260,11 +261,24 @@ interface WeatherAlertBannerProps {
 }
 
 export function WeatherAlertBanner({ alert, onDismiss }: WeatherAlertBannerProps) {
-    const severityColors = {
-        info: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400',
-        warning: 'bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400',
-        danger: 'bg-orange-500/10 border-orange-500 text-orange-700 dark:text-orange-400',
-        emergency: 'bg-red-500/20 border-red-600 text-red-700 dark:text-red-400',
+    const severityStyles: Record<WeatherAlert['severity'], { container: string; icon: string }> = {
+        info: {
+            container: 'bg-[color:var(--info)]/10 border-l-[color:var(--info)]',
+            icon: 'text-[color:var(--info)]',
+        },
+        warning: {
+            container: 'bg-[color:var(--warning)]/10 border-l-[color:var(--warning)]',
+            icon: 'text-[color:var(--warning)]',
+        },
+        // "danger" is still a warning-class event, but rendered with a slightly stronger warning tint.
+        danger: {
+            container: 'bg-[color:var(--warning)]/15 border-l-[color:var(--warning)]',
+            icon: 'text-[color:var(--warning)]',
+        },
+        emergency: {
+            container: 'bg-[color:var(--error)]/15 border-l-[color:var(--error)]',
+            icon: 'text-[color:var(--error)]',
+        },
     };
 
     const severityIcons = {
@@ -278,11 +292,14 @@ export function WeatherAlertBanner({ alert, onDismiss }: WeatherAlertBannerProps
 
     return (
         <div
-            className={`rounded-xl border-l-4 p-4 mb-3 ${severityColors[alert.severity]}`
+            className={
+                `rounded-xl border border-l-4 p-4 mb-3 text-[color:var(--ink-primary)] border-[color:var(--rule)] ${severityStyles[alert.severity].container}`
             }
         >
-            <div className="flex items-start gap-3" >
-                <span className="text-2xl" > {severityIcons[alert.type]} </span>
+            <div className="flex items-start gap-3">
+                <span className={cn('text-2xl', severityStyles[alert.severity].icon)}>
+                    {severityIcons[alert.type]}
+                </span>
                 < div className="flex-1" >
                     <div className="flex items-center justify-between" >
                         <h4 className="font-semibold" > {alert.title} </h4>

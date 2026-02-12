@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 14:55 EST — Phase 2 — iOS sheets + Weather alerts: premium token sweep
+- `IOSBottomSheet`: replaced `bg-white` and hard-coded gray handle/hover classes with premium surface/rule/ink tokens; snap indicators now use `var(--masters)` + neutral token tints.
+- `IOSActionSheet`: migrated the iOS-style translucent panels and dividers off `bg-white`/`border-gray-*` and replaced iOS-blue / destructive reds with premium `var(--info)` + `var(--error)` tokens; active/pressed states now use premium surface tints.
+- `WeatherAlertBanner`: replaced hard-coded Tailwind severity palettes (`blue/yellow/orange/red`) and dark-mode branches with premium status tokens (`var(--info)`, `var(--warning)`, `var(--error)`) + neutral ink/rule so alerts remain legible across themes.
+- Lobster checkpoint: `lint` + `typecheck` ⏳ (run pending)
+- Commit + push ⏳ (<pending>)
+
 ### 14:10 EST — Phase 2 — SyncStatusIndicator: premium token tones (remove hard-coded red/blue/amber/green)
 - `SyncStatusIndicator`: migrated minimal/compact/full variants off hard-coded Tailwind status colors (`red-500`, `blue-500`, `amber-*`, `green-*`) onto premium design tokens (`var(--warning)`, `var(--info)`, `var(--success)`, `var(--ink-tertiary)` for offline).
 - `LastSyncedTimestamp`: aligned syncing/offline text colors to the same token system.

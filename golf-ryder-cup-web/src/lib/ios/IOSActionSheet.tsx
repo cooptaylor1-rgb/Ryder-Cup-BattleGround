@@ -195,10 +195,10 @@ export function IOSActionSheet({
         style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
         {/* Main actions group */}
-        <div className="bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden mb-2 shadow-xl">
+        <div className="bg-[color:var(--surface-raised)]/95 backdrop-blur-xl rounded-2xl overflow-hidden mb-2 shadow-xl">
           {/* Header */}
           {(title || message) && (
-            <div className="px-4 py-3 text-center border-b border-gray-200/50">
+            <div className="px-4 py-3 text-center border-b border-[color:var(--rule)]/50">
               {title && (
                 <h2 className="text-sm font-semibold text-ink-secondary">
                   {title}
@@ -220,11 +220,11 @@ export function IOSActionSheet({
                 'w-full flex items-center justify-center gap-2',
                 'px-4 py-4 text-[17px] font-normal',
                 'transition-colors duration-100',
-                'active:bg-gray-100',
-                index > 0 && 'border-t border-gray-200/50',
+                'active:bg-[color:var(--surface-secondary)]',
+                index > 0 && 'border-t border-[color:var(--rule)]/50',
                 action.disabled
                   ? 'opacity-40 cursor-not-allowed text-ink-tertiary'
-                  : 'text-[#007AFF]'
+                  : 'text-[color:var(--info)]'
               )}
             >
               {action.icon && (
@@ -244,11 +244,11 @@ export function IOSActionSheet({
                 'w-full flex items-center justify-center gap-2',
                 'px-4 py-4 text-[17px] font-normal',
                 'transition-colors duration-100',
-                'active:bg-red-50',
-                'border-t border-gray-200/50',
+                'active:bg-[color:var(--error)]/10',
+                'border-t border-[color:var(--rule)]/50',
                 action.disabled
-                  ? 'opacity-40 cursor-not-allowed text-red-300'
-                  : 'text-red-500'
+                  ? 'opacity-40 cursor-not-allowed text-[color:var(--error)]/50'
+                  : 'text-[color:var(--error)]'
               )}
             >
               {action.icon && (
@@ -264,10 +264,10 @@ export function IOSActionSheet({
           onClick={handleCancel}
           className={cn(
             'w-full py-4 rounded-2xl',
-            'bg-white/95 backdrop-blur-xl shadow-xl',
-            'text-[17px] font-semibold text-[#007AFF]',
+            'bg-[color:var(--surface-raised)]/95 backdrop-blur-xl shadow-xl',
+            'text-[17px] font-semibold text-[color:var(--info)]',
             'transition-colors duration-100',
-            'active:bg-gray-100'
+            'active:bg-[color:var(--surface-secondary)]'
           )}
         >
           {cancelLabel}

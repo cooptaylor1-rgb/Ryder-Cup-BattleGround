@@ -365,7 +365,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
           aria-labelledby={title ? 'sheet-title' : undefined}
           className={cn(
             'fixed left-0 right-0 bottom-0 z-9999',
-            'bg-white rounded-t-[20px] shadow-2xl',
+            'bg-[color:var(--surface-raised)] rounded-t-[20px] shadow-2xl',
             'flex flex-col overflow-hidden',
             !isDragging && 'transition-all duration-300 ease-out',
             isAnimating && !isOpen && 'translate-y-full',
@@ -387,7 +387,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
             {/* Drag handle */}
             {showHandle && (
               <div className="flex justify-center mb-2">
-                <div className="w-10 h-1 rounded-full bg-gray-300" />
+                <div className="w-10 h-1 rounded-full bg-[color:var(--rule)]" />
               </div>
             )}
 
@@ -406,7 +406,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
                     onClick={close}
                     className={cn(
                       'p-2 -mr-2 rounded-full',
-                      'hover:bg-gray-100 active:bg-gray-200',
+                      'hover:bg-[color:var(--surface-secondary)] active:bg-[color:var(--surface-tertiary)]',
                       'transition-colors'
                     )}
                     aria-label="Close"
@@ -433,8 +433,8 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
                   className={cn(
                     'w-2 h-2 rounded-full transition-colors',
                     currentSnap === snap
-                      ? 'bg-masters'
-                      : 'bg-gray-300 hover:bg-gray-400'
+                      ? 'bg-[color:var(--masters)]'
+                      : 'bg-[color:var(--rule)] hover:bg-[color:var(--ink-tertiary)]/30'
                   )}
                   aria-label={`Snap to ${snap}`}
                 />
