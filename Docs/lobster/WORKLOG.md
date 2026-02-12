@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 16:20 EST — Phase 2 — iOS ContextMenu + iOS install prompt: token sweep
+- `IOSContextMenu`: replaced `bg-white/*` + `border-white/*` + `bg-gray-200` separator with premium surface/rule tokens so the blur menu is consistent across themes.
+- `IOSInstallPrompt`: removed hard-coded hex palette and migrated instruction body surfaces + inks onto premium tokens (`var(--surface-secondary)`, `var(--ink-*)`, `var(--masters)`, `var(--info)`), keeping the iOS sheet style while matching the premium design system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`209407d`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimizer warnings)
+
 ### 15:25 EST — Phase 2 — HammerGameCard: premium token sweep
 - `HammerGameCard`: migrated the Hammer game setup + gameplay UI off legacy `bg-white`/`dark:bg-gray-*` and hard-coded Tailwind palettes (amber/orange/green/red/blue) onto premium surface/ink/rule + status tokens.
 - Team selection + payouts now use Ryder Cup team tokens (`bg-team-usa`, `bg-team-europe`, `text-team-*`) and success/error/info tokens for actions.
