@@ -150,12 +150,9 @@ export function Modal({
       className={cn(
         'fixed inset-0 z-50',
         'flex items-center justify-center p-4',
+        'bg-black/75 backdrop-blur-sm',
         isExiting ? 'animate-fade-out' : 'animate-fade-in'
       )}
-      style={{
-        background: 'rgba(0, 0, 0, 0.75)',
-        backdropFilter: 'blur(4px)',
-      }}
       onClick={handleOverlayClick}
       role="presentation"
     >
@@ -167,34 +164,22 @@ export function Modal({
         aria-describedby={description ? 'modal-description' : undefined}
         className={cn(
           'relative w-full rounded-xl',
+          'border border-[var(--rule)] bg-[var(--surface-raised)] shadow-[var(--shadow-card-lg)]',
           sizeClasses[size],
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
         )}
-        style={{
-          background: 'var(--surface-card)',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-card-lg)',
-        }}
       >
         {/* Header */}
         {(title || showCloseButton) && (
           <div className="flex items-start justify-between gap-4 p-5 pb-3">
             <div className="flex-1 min-w-0">
               {title && (
-                <h2
-                  id="modal-title"
-                  className="text-xl font-bold"
-                  style={{ color: 'var(--text-primary)' }}
-                >
+                <h2 id="modal-title" className="text-xl font-bold text-[var(--ink-primary)]">
                   {title}
                 </h2>
               )}
               {description && (
-                <p
-                  id="modal-description"
-                  className="text-base mt-2"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
+                <p id="modal-description" className="text-base mt-2 text-[var(--ink-secondary)]">
                   {description}
                 </p>
               )}
@@ -282,22 +267,14 @@ export function ConfirmDialog({
       closeOnEscape={!isLoading}
     >
       <div className="space-y-4">
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          {description}
-        </p>
+        <p className="text-sm text-[var(--ink-secondary)]">{description}</p>
 
         {/* Type-to-confirm input */}
         {confirmText && (
           <div className="space-y-2">
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-sm text-[var(--ink-secondary)]">
               Type{' '}
-              <code
-                className="px-1.5 py-0.5 rounded font-mono text-xs"
-                style={{
-                  background: 'var(--surface-elevated)',
-                  color: 'var(--error)',
-                }}
-              >
+              <code className="px-1.5 py-0.5 rounded font-mono text-xs bg-[var(--surface)] text-[var(--error)]">
                 {confirmText}
               </code>{' '}
               to confirm:
@@ -309,13 +286,9 @@ export function ConfirmDialog({
               placeholder={confirmText}
               className={cn(
                 'w-full px-3 py-2 rounded-lg text-sm',
+                'bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink-primary)]',
                 'focus:outline-none transition-colors'
               )}
-              style={{
-                background: 'var(--surface-elevated)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-primary)',
-              }}
               autoComplete="off"
               autoFocus
             />
@@ -324,12 +297,7 @@ export function ConfirmDialog({
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
-          <Button
-            variant="secondary"
-            onClick={handleClose}
-            disabled={isLoading}
-            fullWidth
-          >
+          <Button variant="secondary" onClick={handleClose} disabled={isLoading} fullWidth>
             {cancelLabel}
           </Button>
           <Button

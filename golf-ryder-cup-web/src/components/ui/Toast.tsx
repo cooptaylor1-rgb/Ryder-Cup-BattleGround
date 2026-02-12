@@ -73,9 +73,7 @@ function ToastProgress({
   }, [isPaused, duration, onComplete, progress]);
 
   return (
-    <div
-      className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-black/15 dark:bg-white/15"
-    >
+    <div className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-black/15 dark:bg-white/15">
       <div
         className="h-full"
         style={{
@@ -108,72 +106,48 @@ function ToastItem({ type, message, onDismiss, duration = 4000 }: ToastItemProps
 
   const Icon = icons[type];
 
-  // Design system colors - subtle, not loud
-  const styles = {
-    success: {
-      background: 'var(--surface-card)',
-      border: '1px solid var(--success)',
-      iconColor: 'var(--success)',
-      progressColor: 'var(--success)',
-    },
-    error: {
-      background: 'var(--surface-card)',
-      border: '1px solid var(--error)',
-      iconColor: 'var(--error)',
-      progressColor: 'var(--error)',
-    },
-    info: {
-      background: 'var(--surface-card)',
-      border: '1px solid var(--masters-gold)',
-      iconColor: 'var(--masters-gold)',
-      progressColor: 'var(--masters-gold)',
-    },
-    warning: {
-      background: 'var(--surface-card)',
-      border: '1px solid var(--warning)',
-      iconColor: 'var(--warning)',
-      progressColor: 'var(--warning)',
-    },
+  const toneClasses = {
+    success: 'border-[color:var(--success)] text-[var(--success)]',
+    error: 'border-[color:var(--error)] text-[var(--error)]',
+    info: 'border-[color:var(--gold)] text-[var(--gold)]',
+    warning: 'border-[color:var(--warning)] text-[var(--warning)]',
   };
 
-  const style = styles[type];
+  const progressColors = {
+    success: 'var(--success)',
+    error: 'var(--error)',
+    info: 'var(--gold)',
+    warning: 'var(--warning)',
+  };
 
   return (
     <div
       className={cn(
         'relative flex items-center gap-3 px-4 py-4 pb-5 rounded-xl',
         'w-full',
+        'border bg-[var(--surface-raised)] text-[var(--ink-primary)] shadow-[var(--shadow-card-lg)]',
         'transition-transform duration-150',
         isPaused && 'scale-[1.02]',
-        isExiting ? 'toast-exit' : 'toast-enter'
+        isExiting ? 'toast-exit' : 'toast-enter',
+        toneClasses[type]
       )}
-      style={{
-        background: style.background,
-        border: style.border,
-        boxShadow: 'var(--shadow-card-lg), 0 8px 32px rgba(0, 0, 0, 0.12)',
-        color: 'var(--text-primary)',
-      }}
       role="alert"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <Icon
-        className="w-6 h-6 shrink-0"
-        style={{ color: style.iconColor }}
-        strokeWidth={2}
-      />
-      <p className="flex-1 text-base font-semibold">{message}</p>
+      <Icon className="w-6 h-6 shrink-0" strokeWidth={2} />
+      <p className="flex-1 text-base font-semibold text-[var(--ink-primary)]">{message}</p>
       <button
         onClick={handleDismiss}
         className={cn(
           'p-2.5 -mr-1 rounded-full',
           'transition-transform duration-150 ease-out',
           'hover:scale-110 active:scale-90',
-          'hover:bg-surface-highlight',
+          'hover:bg-[color:var(--surface)]/80',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
           'min-w-[44px] min-h-[44px] flex items-center justify-center'
         )}
-        style={{ color: 'var(--text-tertiary)' }}
+        style={{ color: 'var(--ink-tertiary)' }}
         aria-label="Dismiss notification"
       >
         <X className="w-5 h-5" />
@@ -182,7 +156,7 @@ function ToastItem({ type, message, onDismiss, duration = 4000 }: ToastItemProps
       <ToastProgress
         duration={duration}
         isPaused={isPaused}
-        color={style.progressColor}
+        color={progressColors[type]}
         onComplete={handleDismiss}
       />
     </div>
@@ -196,12 +170,11 @@ export function ToastContainer() {
 
   return (
     <div
-      className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 lg:bottom-8 px-4 w-full max-w-md"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 lg:bottom-8 px-4 w-full max-w-md pb-[env(safe-area-inset-bottom,0px)]"
       aria-live="polite"
       aria-label="Notifications"
     >
-      {toasts.map(toast => (
+      {toasts.map((toast) => (
         <ToastItem
           key={toast.id}
           type={toast.type}
