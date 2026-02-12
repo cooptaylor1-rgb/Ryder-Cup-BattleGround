@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 22:55 EST — Phase 2 — TrashTalkFeed + Lineup new: premium tokens for legacy surface palette
+- `TrashTalkFeed`: migrated the remaining legacy `surface-*` palette utilities (borders/surfaces/text) to premium tokens (`var(--rule)`, `var(--surface-secondary)`, `var(--surface-raised)`, `var(--ink-*)`) so the match banter UI stays consistent across themes.
+- `/lineup/new`: replaced `hover:bg-surface-100` with `hover:bg-[var(--surface-secondary)]` to avoid reliance on the legacy palette.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4393797`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 22:40 EST — Phase 2 — ScoreCelebration/Toast: token-driven colors + team-color mix
 - `ScoreCelebration` (hole-lost subtle feedback): replaced inline `teamColor + '40'` alpha concatenation with a token-safe `color-mix()` background and a single `--team-color` CSS variable.
 - `ScoreToast`: replaced hard-coded hex colors for info/warning with premium tokens (`var(--info)`, `var(--warning)`) and switched success to `var(--success)`.
