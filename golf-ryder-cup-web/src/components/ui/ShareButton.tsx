@@ -263,29 +263,42 @@ export function ShareButton(props: ShareButtonProps) {
                     />
 
                     {/* Menu */}
-                    <div className="absolute right-0 top-full mt-2 z-50 w-48 py-2 rounded-xl bg-surface-800 border border-surface-700 shadow-xl">
+                    <div
+                        className={
+                            'absolute right-0 top-full mt-2 z-50 w-48 py-2 rounded-xl shadow-xl ' +
+                            'bg-[var(--surface-raised)] border border-[var(--rule)] '
+                        }
+                    >
                         <button
                             onClick={handleDownload}
                             disabled={isSharing}
-                            className="w-full px-4 py-2.5 flex items-center gap-3 text-left text-sm hover:bg-surface-700 transition-colors disabled:opacity-50"
+                            className={
+                                'w-full px-4 py-2.5 flex items-center gap-3 text-left text-sm ' +
+                                'text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)] transition-colors ' +
+                                'disabled:opacity-50'
+                            }
                         >
-                            <Download className="w-4 h-4 text-surface-400" />
+                            <Download className="w-4 h-4 text-[var(--ink-tertiary)]" />
                             <span>Download Image</span>
                         </button>
 
                         <button
                             onClick={handleCopy}
                             disabled={isSharing}
-                            className="w-full px-4 py-2.5 flex items-center gap-3 text-left text-sm hover:bg-surface-700 transition-colors disabled:opacity-50"
+                            className={
+                                'w-full px-4 py-2.5 flex items-center gap-3 text-left text-sm ' +
+                                'text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)] transition-colors ' +
+                                'disabled:opacity-50'
+                            }
                         >
                             {copied ? (
                                 <>
-                                    <Check className="w-4 h-4 text-green-500" />
-                                    <span className="text-green-500">Copied!</span>
+                                    <Check className="w-4 h-4 text-[var(--success)]" />
+                                    <span className="text-[var(--success)]">Copied!</span>
                                 </>
                             ) : (
                                 <>
-                                    <Copy className="w-4 h-4 text-surface-400" />
+                                    <Copy className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                     <span>Copy to Clipboard</span>
                                 </>
                             )}
