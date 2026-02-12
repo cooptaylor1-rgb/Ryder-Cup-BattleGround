@@ -30,11 +30,11 @@ export default function GlobalError({
     return (
         <html>
             <body>
-                <div className="min-h-screen pb-nav page-premium-enter texture-grain flex items-center justify-center bg-linear-to-b from-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-950 px-4">
+                <div className="min-h-screen pb-nav page-premium-enter texture-grain flex items-center justify-center bg-linear-to-b from-[var(--canvas)] to-[var(--surface-secondary)] px-4">
                     <div className="max-w-md w-full text-center">
                         {/* Error Icon */}
-                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                            <AlertTriangle className="w-10 h-10 text-red-600" />
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[color:var(--error)]/12 flex items-center justify-center">
+                            <AlertTriangle className="w-10 h-10 text-[var(--error)]" />
                         </div>
 
                         {/* Error Message */}
@@ -49,7 +49,7 @@ export default function GlobalError({
                         {/* Error Details (development only) */}
                         {process.env.NODE_ENV === 'development' && (
                             <div className="mb-6 p-4 rounded-lg text-left border border-[var(--rule)] bg-[var(--surface)]">
-                                <p className="text-sm font-mono text-red-700 dark:text-red-300 break-all">
+                                <p className="text-sm font-mono text-[var(--error)] break-all">
                                     {error.message}
                                 </p>
                                 {error.digest && (

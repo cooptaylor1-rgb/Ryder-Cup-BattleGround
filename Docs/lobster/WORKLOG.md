@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 04:12 EST — Phase 2 — Global error page: replace legacy surface gradient + hard-coded reds
+- `/global-error`: replaced the legacy `from-surface-*` gradient utilities with premium token-driven surfaces (`from-[var(--canvas)]` → `to-[var(--surface-secondary)]`).
+- Standardized the error icon + dev-only stack text off hard-coded reds and onto the shared `var(--error)` token.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 03:55 EST — Phase 2 — Trip setup PointSystem + TeamColorPicker: premium token sweep
 - `PointSystem` (trip setup): migrated legacy `surface-*` palette utilities (text, borders, hover states, steppers) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
 - `TeamColorPicker` (trip setup): migrated remaining legacy `surface-*` palette utilities (pills, tab container, borders, preview header/divider) onto premium design tokens.
