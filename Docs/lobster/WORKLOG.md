@@ -11,6 +11,8 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `CourseDetails`: removed remaining legacy `surface-*` palette usage across tabs, tee cards, and scorecard tables; standardized neutrals onto premium surface/rule/ink tokens.
 - `ProfileCompletionReward`: migrated remaining legacy `surface-*` palette utilities to premium token-driven text/surfaces and standardized the team card onto `.card`.
 
+## 2026-02-11
+
 ### 23:59 EST — Phase 2 — Achievements + Social share/reactions: premium token sweep
 - `Achievements`: migrated remaining legacy `surface-*` palette utilities (bg/border/text) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) and standardized cards onto the shared `.card` surface.
 - Social: `ReactionPicker` emoji hover state now uses `hover:bg-[var(--surface-raised)]` (no legacy class).
@@ -54,8 +56,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`28818ba`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
 
-
-## 2026-02-11
 
 ### 23:24 EST — Phase 2 — Core UI primitives: migrate legacy surface/ink utilities to premium tokens
 - `Badge`, `Card`, `Tabs`, `Tooltip`, `SectionHeader`, `Breadcrumb`, `LiveJumbotron`: replaced remaining legacy `surface-*` palette + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
