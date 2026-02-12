@@ -271,31 +271,31 @@ export function PlayerOnboardingWizard({
     const stepConfig = STEP_CONFIG[currentStep];
 
     return (
-        <div className={cn('min-h-screen flex flex-col bg-linear-to-b from-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-950', className)}>
+        <div className={cn('min-h-screen flex flex-col bg-linear-to-b from-[var(--canvas)] to-[var(--surface)]', className)}>
             {/* Header (hidden on welcome and complete) */}
             {currentStep !== 'welcome' && currentStep !== 'complete' && (
-                <header className="sticky top-0 z-10 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-800">
+                <header className="sticky top-0 z-10 bg-[color:var(--canvas)]/80 backdrop-blur-md border-b border-[var(--rule)]">
                     <div className="px-4 py-3 flex items-center gap-3">
                         {canGoBack && (
                             <button
                                 onClick={prevStep}
-                                className="p-2 -ml-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                                className="p-2 -ml-2 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
                             >
-                                <ChevronLeft className="w-5 h-5 text-surface-600 dark:text-surface-400" />
+                                <ChevronLeft className="w-5 h-5 text-[var(--ink-secondary)]" />
                             </button>
                         )}
                         <div className="flex-1">
-                            <h1 className="text-lg font-semibold text-surface-900 dark:text-white">
+                            <h1 className="text-lg font-semibold text-[var(--ink-primary)]">
                                 {stepConfig.label}
                             </h1>
-                            <p className="text-xs text-surface-500">
+                            <p className="text-xs text-[var(--ink-tertiary)]">
                                 Step {currentStepIndex + 1} of {activeSteps.length}
                             </p>
                         </div>
                         {stepConfig.optional && (
                             <button
                                 onClick={skipStep}
-                                className="text-sm text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200"
+                                className="text-sm text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]"
                             >
                                 Skip
                             </button>
@@ -303,7 +303,7 @@ export function PlayerOnboardingWizard({
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="h-1 bg-surface-100 dark:bg-surface-800">
+                    <div className="h-1 bg-[var(--surface-secondary)]">
                         <motion.div
                             className="h-full bg-masters"
                             initial={{ width: 0 }}
@@ -344,10 +344,10 @@ export function PlayerOnboardingWizard({
                             className="p-6 space-y-6"
                         >
                             <div className="text-center">
-                                <h2 className="text-xl font-bold text-surface-900 dark:text-white">
+                                <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                                     How would you like to set up?
                                 </h2>
-                                <p className="text-surface-500 mt-1">
+                                <p className="text-[var(--ink-tertiary)] mt-1">
                                     Choose your preferred onboarding experience
                                 </p>
                             </div>
@@ -356,42 +356,42 @@ export function PlayerOnboardingWizard({
                                 {/* Quick Mode */}
                                 <button
                                     onClick={() => handleModeSelect('quick')}
-                                    className="w-full p-5 rounded-2xl bg-white dark:bg-surface-800 border-2 border-surface-200 dark:border-surface-700 hover:border-amber-400 transition-all text-left"
+                                    className="w-full p-5 rounded-2xl bg-[var(--surface)] border-2 border-[var(--rule)] hover:border-amber-400 transition-all text-left"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                                             <Zap className="w-7 h-7 text-white" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-semibold text-surface-900 dark:text-white text-lg">
+                                            <div className="font-semibold text-[var(--ink-primary)] text-lg">
                                                 Quick Setup
                                             </div>
-                                            <div className="text-surface-500 text-sm">
+                                            <div className="text-[var(--ink-tertiary)] text-sm">
                                                 Just the essentials • 30 seconds
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-5 h-5 text-surface-400" />
+                                        <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
                                     </div>
                                 </button>
 
                                 {/* Full Mode */}
                                 <button
                                     onClick={() => handleModeSelect('full')}
-                                    className="w-full p-5 rounded-2xl bg-white dark:bg-surface-800 border-2 border-surface-200 dark:border-surface-700 hover:border-masters transition-all text-left"
+                                    className="w-full p-5 rounded-2xl bg-[var(--surface)] border-2 border-[var(--rule)] hover:border-masters transition-all text-left"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-linear-to-br from-masters to-emerald-600 flex items-center justify-center">
                                             <Sparkles className="w-7 h-7 text-white" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-semibold text-surface-900 dark:text-white text-lg">
+                                            <div className="font-semibold text-[var(--ink-primary)] text-lg">
                                                 Full Experience
                                             </div>
-                                            <div className="text-surface-500 text-sm">
+                                            <div className="text-[var(--ink-tertiary)] text-sm">
                                                 Complete profile + fun extras • 2-3 min
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-5 h-5 text-surface-400" />
+                                        <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
                                     </div>
                                 </button>
                             </div>
@@ -434,7 +434,7 @@ export function PlayerOnboardingWizard({
                                 <div className="w-16 h-16 rounded-2xl bg-masters/10 mx-auto mb-4 flex items-center justify-center">
                                     <User className="w-8 h-8 text-masters" />
                                 </div>
-                                <h2 className="text-xl font-bold text-surface-900 dark:text-white">
+                                <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                                     Let&apos;s get to know you
                                 </h2>
                             </div>
@@ -442,7 +442,7 @@ export function PlayerOnboardingWizard({
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                             First Name *
                                         </label>
                                         <input
@@ -450,11 +450,11 @@ export function PlayerOnboardingWizard({
                                             value={data.firstName}
                                             onChange={(e) => updateData('firstName', e.target.value)}
                                             placeholder="John"
-                                            className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                            className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                             Last Name *
                                         </label>
                                         <input
@@ -462,13 +462,13 @@ export function PlayerOnboardingWizard({
                                             value={data.lastName}
                                             onChange={(e) => updateData('lastName', e.target.value)}
                                             placeholder="Smith"
-                                            className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                            className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                    <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                         Nickname (optional)
                                     </label>
                                     <input
@@ -476,12 +476,12 @@ export function PlayerOnboardingWizard({
                                         value={data.nickname || ''}
                                         onChange={(e) => updateData('nickname', e.target.value)}
                                         placeholder="What your buddies call you"
-                                        className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                        className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                    <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                         Email *
                                     </label>
                                     <input
@@ -489,12 +489,12 @@ export function PlayerOnboardingWizard({
                                         value={data.email}
                                         onChange={(e) => updateData('email', e.target.value)}
                                         placeholder="john@example.com"
-                                        className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                        className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                    <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                         Phone (optional)
                                     </label>
                                     <input
@@ -502,7 +502,7 @@ export function PlayerOnboardingWizard({
                                         value={data.phone || ''}
                                         onChange={(e) => updateData('phone', e.target.value)}
                                         placeholder="(555) 123-4567"
-                                        className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                        className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                     />
                                 </div>
                             </div>
@@ -514,7 +514,7 @@ export function PlayerOnboardingWizard({
                                     'w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2',
                                     data.firstName && data.lastName && data.email
                                         ? 'bg-masters text-white'
-                                        : 'bg-surface-200 dark:bg-surface-700 text-surface-400'
+                                        : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)] cursor-not-allowed'
                                 )}
                             >
                                 Continue
@@ -541,15 +541,15 @@ export function PlayerOnboardingWizard({
                                 <div className="space-y-4">
                                     <div className="relative text-center">
                                         <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-surface-200 dark:border-surface-700" />
+                                            <div className="w-full border-t border-[var(--rule)]" />
                                         </div>
-                                        <span className="relative bg-linear-to-b from-surface-50 to-surface-100 dark:from-surface-900 dark:to-surface-950 px-4 text-sm text-surface-500">
+                                        <span className="relative bg-linear-to-b from-[var(--canvas)] to-[var(--surface)] px-4 text-sm text-[var(--ink-tertiary)]">
                                             or enter manually
                                         </span>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                             Handicap Index *
                                         </label>
                                         <input
@@ -558,7 +558,7 @@ export function PlayerOnboardingWizard({
                                             value={data.handicapIndex ?? ''}
                                             onChange={(e) => updateData('handicapIndex', e.target.value ? parseFloat(e.target.value) : null)}
                                             placeholder="12.5"
-                                            className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white"
+                                            className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                         />
                                     </div>
                                 </div>
@@ -571,7 +571,7 @@ export function PlayerOnboardingWizard({
                                     'w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2',
                                     data.handicapIndex !== null
                                         ? 'bg-masters text-white'
-                                        : 'bg-surface-200 dark:bg-surface-700 text-surface-400'
+                                        : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)] cursor-not-allowed'
                                 )}
                             >
                                 Continue
