@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 11:56 EST — Phase 2 — Course + trip setup accents: replace `augusta-green` + legacy grays with premium tokens
+- `SideBetPresets`: replaced remaining `bg-surface-*` + `augusta-green` chips and action states with premium surface/ink/rule tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--masters)`, `var(--error)`), eliminating dark-mode branches.
+- `CourseSearch`: migrated search/results UI off hard-coded `gray-*` palettes and `augusta-green` accents onto premium token-driven Tailwind; standardized inputs, cards, warnings, and error states to the shared surfaces/ink.
+- `CourseSelection` + `SessionBuilder`: replaced remaining `augusta-green` selection and hover accents with token-driven `var(--masters)` and neutral surfaces/rules.
+- `/trip/[tripId]/awards`: tab navigation now uses premium surfaces and `var(--masters)` for the active state.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`504eea6`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 11:08 EST — Phase 2 — Nassau Enhanced card: premium token sweep
 - `NassauEnhancedCard`: replaced legacy `bg-white`/`dark:*` surface palettes and `text-gray-*` ink utilities with the shared premium `.card` shell, token-driven ink/surface/team classes, and primary button/input patterns so the Nassau side game aligns with the premium shell.
 - Auto-press configuration now uses premium success + neutral tokens for the toggle, team selection chips reuse Ryder Cup team tokens, and standings/payout/press pills leverage the standard warning/success accents instead of bespoke Tailwind colors.
