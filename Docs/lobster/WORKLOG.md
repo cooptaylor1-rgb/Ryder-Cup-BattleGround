@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 07:25 EST — Phase 2 — Player onboarding TripWelcomeCard + GolfSuperlatives: premium token sweep
+- `TripWelcomeCard`: replaced legacy `surface-*` palette utilities and dark-mode branches with premium `.card` surfaces and token-driven ink/rule classes; standardized the hero wave fill to `var(--canvas)`.
+- `GolfSuperlatives`: migrated the onboarding card, progress track, input, and actions off legacy `surface-*` palette classes onto premium tokens (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`31e0408`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 06:28 EST — Phase 2 — Trip Settings + SessionTimeoutWarning: premium token sweep
 - `/trip/[tripId]/settings`: migrated remaining legacy `text-text-*` utilities onto premium ink tokens (`text-[var(--ink-primary)]` / `text-[var(--ink-secondary)]`) so the Trip Settings route is consistent with the premium shell.
 - `SessionTimeoutWarning`: removed legacy `text-surface-*` usage in message + logout button and replaced with premium ink tokens.
