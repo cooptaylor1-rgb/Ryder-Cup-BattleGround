@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 21:55 EST — Phase 2 — Modal/Toast/ConfirmDialog: premium token sweep
+- `Modal`: migrated overlay + dialog surfaces/borders/text off legacy inline `var(--surface-card)` / `--border-subtle` / `--text-*` and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
+- `Toast`: migrated toast container + item surfaces/borders/text onto premium tokens and removed legacy `hover:bg-surface-highlight` usage.
+- `ConfirmDialog` (hook-driven): replaced broken `var(--color-*)20` alpha concatenation + legacy `--text-*` usage with token-driven Tailwind tone classes (`var(--error)`, `var(--warning)`, `var(--masters)`, `var(--success)`), preserving variants.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2e38ec8`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 21:15 EST — Docs — Worklog chronological hygiene (2026-02-10)
 - `Docs/lobster/WORKLOG.md`: re-sorted the 2026-02-10 entries so the day stays reverse-chronological (latest-first) and stops drifting as new batches land.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
