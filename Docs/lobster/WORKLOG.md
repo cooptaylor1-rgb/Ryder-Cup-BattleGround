@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 10:38 EST — Phase 2 — Trip setup scoring format: premium token sweep
+- `ScoringFormatOptions`: migrated legacy `surface-*`, `augusta-green`, and `text-surface-*` utilities to premium token-driven Tailwind for cards, toggles, and Stableford configuration so the trip scoring setup matches the premium shell.
+- Format badges now use premium status tokens (`var(--masters)`, `var(--info)`, `var(--color-accent)`, `var(--warning)`) with shared ring/masters-subtle selection states, and supporting copy moved onto the shared `ink` token palette.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9ec65d9`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 10:20 EST — Phase 2 — Trip setup imports + side bets: premium token sweep
 - `PlayerRosterImport`: migrated remaining legacy `surface-*` palette utilities and `augusta-green` accents to premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`), removing theme-specific branches.
 - `SideBetPresets`: migrated header + preset pills + amount labels off legacy `surface-*` palette utilities onto premium tokens for consistent theme behavior.
