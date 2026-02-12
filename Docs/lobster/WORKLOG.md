@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 02:27 EST — Docs — Worklog chronological hygiene (2026-02-11)
+- `Docs/lobster/WORKLOG.md`: fixed a minor ordering regression where the **23:24** Phase 2 entry had drifted below **20:45**; restored reverse-chronological ordering and removed an extra blank line.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (see next commit)
+
 ### 02:05 EST — Captain Settings: consistent premium header in empty states
 - `/captain/settings`: added the standard `PageHeader` to the **No active trip** and **Captain mode required** empty-state shells so the page keeps consistent navigation + title context.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
@@ -44,6 +49,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`86e14cd`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
 
+### 23:24 EST — Phase 2 — Core UI primitives: migrate legacy surface/ink utilities to premium tokens
+- `Badge`, `Card`, `Tabs`, `Tooltip`, `SectionHeader`, `Breadcrumb`, `LiveJumbotron`: replaced remaining legacy `surface-*` palette + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
+- Storybook `.stories.tsx` examples for these primitives were updated to match the token system so docs don’t demonstrate deprecated classnames.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 22:55 EST — Phase 2 — TrashTalkFeed + Lineup new: premium tokens for legacy surface palette
 - `TrashTalkFeed`: migrated the remaining legacy `surface-*` palette utilities (borders/surfaces/text) to premium tokens (`var(--rule)`, `var(--surface-secondary)`, `var(--surface-raised)`, `var(--ink-*)`) so the match banter UI stays consistent across themes.
 - `/lineup/new`: replaced `hover:bg-surface-100` with `hover:bg-[var(--surface-secondary)]` to avoid reliance on the legacy palette.
@@ -79,12 +89,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `/settings/notifications`: added `aria-label` support to the toggle switch and set labels for tee time + type toggles so screen readers announce control purpose.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`28818ba`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
-
-
-### 23:24 EST — Phase 2 — Core UI primitives: migrate legacy surface/ink utilities to premium tokens
-- `Badge`, `Card`, `Tabs`, `Tooltip`, `SectionHeader`, `Breadcrumb`, `LiveJumbotron`: replaced remaining legacy `surface-*` palette + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
-- Storybook `.stories.tsx` examples for these primitives were updated to match the token system so docs don’t demonstrate deprecated classnames.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
 ### 20:25 EST — Phase 2 — ConnectionStatus: premium token sweep
 - `ConnectionStatus`: migrated remaining legacy `surface-*` palette usage (text/background/border utilities) to premium design tokens (`var(--ink-*)`, `var(--surface-secondary)`, `var(--rule)`), keeping warning/info/success states intact.
