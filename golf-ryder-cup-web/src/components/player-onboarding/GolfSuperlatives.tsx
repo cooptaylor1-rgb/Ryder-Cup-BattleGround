@@ -151,17 +151,17 @@ export function GolfSuperlatives({
                 >
                     <Trophy className="w-8 h-8 text-white" />
                 </motion.div>
-                <h2 className="text-xl font-bold text-surface-900 dark:text-white">
+                <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                     Golf Superlatives 🏆
                 </h2>
-                <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
+                <p className="text-sm text-[var(--ink-tertiary)] mt-1">
                     Fun questions for team bonding
                 </p>
             </div>
 
             {/* Progress */}
             <div className="relative">
-                <div className="h-2 bg-surface-100 dark:bg-surface-700 rounded-full overflow-hidden">
+                <div className="h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
                     <motion.div
                         className="h-full bg-linear-to-r from-amber-400 to-yellow-500 rounded-full"
                         initial={{ width: 0 }}
@@ -169,7 +169,7 @@ export function GolfSuperlatives({
                         transition={{ type: 'spring', damping: 20 }}
                     />
                 </div>
-                <div className="flex justify-between mt-1.5 text-xs text-surface-500">
+                <div className="flex justify-between mt-1.5 text-xs text-[var(--ink-tertiary)]">
                     <span>{currentIndex + 1} of {questions.length}</span>
                     <span className="flex items-center gap-1">
                         <Sparkles className="w-3 h-3" />
@@ -186,10 +186,10 @@ export function GolfSuperlatives({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -50 }}
                     transition={{ type: 'spring', damping: 25 }}
-                    className="bg-white dark:bg-surface-800 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-700 overflow-hidden"
+                    className="card overflow-hidden"
                 >
                     {/* Question */}
-                    <div className="p-6 text-center border-b border-surface-100 dark:border-surface-700">
+                    <div className="p-6 text-center border-b border-[var(--rule)]">
                         <motion.span
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
@@ -198,10 +198,10 @@ export function GolfSuperlatives({
                         >
                             {currentQuestion.emoji}
                         </motion.span>
-                        <h3 className="text-lg font-semibold text-surface-900 dark:text-white leading-relaxed">
+                        <h3 className="text-lg font-semibold text-[var(--ink-primary)] leading-relaxed">
                             {currentQuestion.prompt}
                         </h3>
-                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-100 dark:bg-surface-700 text-xs text-surface-500">
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[var(--surface-secondary)] text-xs text-[var(--ink-tertiary)]">
                             <Star className="w-3 h-3" />
                             {currentQuestion.category}
                         </div>
@@ -218,16 +218,17 @@ export function GolfSuperlatives({
                                 placeholder="Who comes to mind? (or describe yourself!)"
                                 className={cn(
                                     'w-full py-4 px-4 rounded-xl border text-center text-lg',
-                                    'bg-surface-50 dark:bg-surface-900',
-                                    'border-surface-200 dark:border-surface-700',
-                                    'placeholder:text-surface-400',
+                                    'bg-[var(--surface)]',
+                                    'border-[var(--rule)]',
+                                    'text-[var(--ink-primary)]',
+                                    'placeholder:text-[color:var(--ink-tertiary)]/70',
                                     'focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400',
                                     'transition-all'
                                 )}
                                 autoFocus
                             />
                         </div>
-                        <p className="text-xs text-surface-400 text-center mt-2">
+                        <p className="text-xs text-[color:var(--ink-tertiary)]/80 text-center mt-2">
                             Press Enter or tap the button below
                         </p>
                     </div>
@@ -242,8 +243,8 @@ export function GolfSuperlatives({
                     className={cn(
                         'flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                         currentIndex === 0
-                            ? 'text-surface-300 cursor-not-allowed'
-                            : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100 dark:text-surface-400 dark:hover:text-white dark:hover:bg-surface-800'
+                            ? 'text-[color:var(--ink-tertiary)]/40 cursor-not-allowed'
+                            : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
                     )}
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -253,7 +254,7 @@ export function GolfSuperlatives({
                 {onSkip && (
                     <button
                         onClick={onSkip}
-                        className="text-sm text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 transition-colors"
+                        className="text-sm text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)] transition-colors"
                     >
                         Skip these
                     </button>
@@ -268,7 +269,7 @@ export function GolfSuperlatives({
                         'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
                         currentAnswer.trim()
                             ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30'
-                            : 'bg-surface-100 dark:bg-surface-700 text-surface-400'
+                            : 'bg-[var(--surface-secondary)] text-[color:var(--ink-tertiary)]/70'
                     )}
                 >
                     {isLastQuestion ? 'Finish' : 'Next'}
@@ -281,7 +282,7 @@ export function GolfSuperlatives({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex items-center justify-center gap-2 text-xs text-surface-400"
+                className="flex items-center justify-center gap-2 text-xs text-[color:var(--ink-tertiary)]/80"
             >
                 <MessageCircle className="w-3.5 h-3.5" />
                 <span>Your answers help build team chemistry! 💚</span>
@@ -310,7 +311,7 @@ export function SuperlativesDisplay({
 
     return (
         <div className={cn('space-y-3', className)}>
-            <h4 className="font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+            <h4 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-amber-500" />
                 {playerName ? `${playerName}'s Superlatives` : 'Superlatives'}
             </h4>
