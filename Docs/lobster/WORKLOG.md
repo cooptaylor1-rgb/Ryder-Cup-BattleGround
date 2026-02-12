@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 03:55 EST — Phase 2 — Trip setup PointSystem + TeamColorPicker: premium token sweep
+- `PointSystem` (trip setup): migrated legacy `surface-*` palette utilities (text, borders, hover states, steppers) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
+- `TeamColorPicker` (trip setup): migrated remaining legacy `surface-*` palette utilities (pills, tab container, borders, preview header/divider) onto premium design tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1f03bf7`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 03:19 EST — Phase 2 — SessionBuilder: premium token sweep
 - `SessionBuilder` (trip setup): migrated remaining legacy `surface-*` palette utilities (backgrounds, borders, hover states, and text) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
