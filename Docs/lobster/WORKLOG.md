@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 13:20 EST — Phase 2 — Remove remaining legacy `augusta-green`/`masters-green` classes (PWA banners + trip setup + Storybook)
+- `PWABanners`: offline + update banners now use premium warning + Masters tokens (no hard-coded `amber-*` / `augusta-green`).
+- Trip setup: `PointSystem` + `TeamColorPicker` accents now use `var(--masters)` token-driven Tailwind.
+- Storybook: `Card.stories` + `Modal.stories` examples now use `var(--masters)` instead of `masters-green`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e06bb25`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimizer warnings)
+
 ### 13:05 EST — Phase 2 — Tokenize remaining `masters-green` classes (Course Library + scoring)
 - `/courses`: replaced remaining `bg-masters-green/*` + `text-masters-green-*` accents in the course cards + info banner with premium `var(--masters)` tokens.
 - `SwipeScorePanel`: focus ring now uses token-driven `focus:ring-[var(--masters)]` instead of a legacy Tailwind color.
