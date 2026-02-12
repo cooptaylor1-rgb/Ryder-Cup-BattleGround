@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 19:25 EST — Phase 2 — Trip creation preview: premium token sweep
+- New trip flow (`/trip/new`): migrated remaining legacy `surface-*` palette usages (e.g. `text-surface-*`, `divide-surface-*`, `border-surface-*`, `bg-augusta-green/*`) to premium token-driven Tailwind (`var(--ink-tertiary)`, `var(--rule)`, `var(--masters)`), keeping the UI consistent with the premium shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5548a02`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 18:55 EST — Phase 2 — WeatherBanner: render when wind/temp provided
 - `WeatherBanner`: updated the “don’t render” guard to treat `0` values as meaningful and to show the banner when *any* weather signal is present (condition, precip chance, temperature, or wind speed).
 - Prevents a silent gap when `condition` is unset but wind/temperature data exists.
