@@ -210,8 +210,8 @@ export function MatchResultCard({
                     onClick={handleDownload}
                     className={cn(
                         'flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg',
-                        'border border-surface-200 dark:border-surface-700',
-                        'hover:bg-surface-50 dark:hover:bg-surface-800',
+                        'border border-[var(--rule)]',
+                        'hover:bg-[var(--surface-secondary)]',
                         'transition-colors'
                     )}
                 >

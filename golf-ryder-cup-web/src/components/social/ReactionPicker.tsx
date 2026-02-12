@@ -259,7 +259,7 @@ function EmojiPicker({ onSelect }: EmojiPickerProps) {
           <button
             key={emoji}
             onClick={() => onSelect(emoji)}
-            className="text-xl p-1.5 rounded-lg transition-transform hover:scale-110 hover:bg-surface-raised active:scale-95"
+            className="text-xl p-1.5 rounded-lg transition-transform hover:scale-110 hover:bg-[var(--surface-raised)] active:scale-95"
           >
             {emoji}
           </button>

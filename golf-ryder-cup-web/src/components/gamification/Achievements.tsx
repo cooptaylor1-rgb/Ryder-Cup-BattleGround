@@ -265,7 +265,7 @@ export function Achievements({
                         ];
                     })}
                 {achievements.length > 5 && (
-                    <div className="px-2 py-1 rounded bg-surface-100 dark:bg-surface-800 text-sm text-surface-500">
+                    <div className="px-2 py-1 rounded bg-[var(--surface-secondary)] text-sm text-[var(--ink-tertiary)]">
                         +{achievements.length - 5} more
                     </div>
                 )}
@@ -282,13 +282,13 @@ export function Achievements({
                         <Trophy className="w-5 h-5 text-secondary-gold" />
                         Achievements
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         {totalEarned} of {totalAvailable} earned
                     </p>
                 </div>
                 {player && (
                     <div className="text-right">
-                        <div className="text-sm text-surface-500">Player</div>
+                        <div className="text-sm text-[var(--ink-tertiary)]">Player</div>
                         <div className="font-medium">
                             {formatPlayerName(player.firstName, player.lastName, 'short')}
                         </div>
@@ -297,7 +297,7 @@ export function Achievements({
             </div>
 
             {/* Progress bar */}
-            <div className="h-2 rounded-full bg-surface-200 dark:bg-surface-700 overflow-hidden">
+            <div className="h-2 rounded-full bg-[color:var(--ink-tertiary)]/15 overflow-hidden">
                 <div
                     className="h-full rounded-full bg-secondary-gold transition-all"
                     style={{ width: `${(totalEarned / totalAvailable) * 100}%` }}
@@ -320,7 +320,7 @@ export function Achievements({
                             'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                             activeCategory === cat.value
                                 ? 'bg-secondary-gold text-white'
-                                : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
+                                : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                         )}
                     >
                         {cat.label}
@@ -331,7 +331,7 @@ export function Achievements({
             {/* Earned achievements */}
             {earned.length > 0 && (
                 <div>
-                    <h4 className="text-sm font-medium text-surface-500 mb-3">Earned</h4>
+                    <h4 className="text-sm font-medium text-[var(--ink-tertiary)] mb-3">Earned</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {earned.map((def) => {
                             const achievement = achievements.find((a) => a.achievementType === def.type);
@@ -351,7 +351,7 @@ export function Achievements({
             {/* Locked achievements */}
             {locked.length > 0 && (
                 <div>
-                    <h4 className="text-sm font-medium text-surface-500 mb-3">Locked</h4>
+                    <h4 className="text-sm font-medium text-[var(--ink-tertiary)] mb-3">Locked</h4>
                     <div className="grid grid-cols-2 gap-3">
                         {locked.map((def) => (
                             <AchievementCard
@@ -390,8 +390,8 @@ function AchievementCard({ definition, achievement, earned }: AchievementCardPro
             className={cn(
                 'p-4 rounded-xl border transition-all',
                 earned
-                    ? 'bg-surface-card border-secondary-gold/30'
-                    : 'bg-surface-50 dark:bg-surface-800/50 border-surface-200 dark:border-surface-700 opacity-60'
+                    ? 'card border-secondary-gold/30'
+                    : 'card border-[color:var(--rule)]/60 opacity-60'
             )}
         >
             <div className="flex items-start gap-3">
@@ -401,20 +401,20 @@ function AchievementCard({ definition, achievement, earned }: AchievementCardPro
                         'w-12 h-12 rounded-xl flex items-center justify-center',
                         earned
                             ? `bg-linear-to-br ${rarityColors[definition.rarity]}`
-                            : 'bg-surface-200 dark:bg-surface-700'
+                            : 'bg-[color:var(--ink-tertiary)]/15'
                     )}
                 >
                     {earned ? (
                         <AchievementIcon icon={definition.icon} className="w-6 h-6 text-white" />
                     ) : (
-                        <Lock className="w-5 h-5 text-surface-400" />
+                        <Lock className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     )}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">{definition.name}</div>
-                    <div className="text-xs text-surface-500 mt-0.5">{definition.description}</div>
+                    <div className="text-xs text-[var(--ink-tertiary)] mt-0.5">{definition.description}</div>
                     {earned && achievement && (
                         <div className="text-xs text-secondary-gold mt-1">
                             Earned {format(new Date(achievement.earnedAt), 'MMM d, yyyy')}
@@ -474,14 +474,14 @@ export function AchievementBadge({ definition, earned, size = 'md' }: Achievemen
                 sizeClasses[size],
                 earned
                     ? `bg-linear-to-br ${rarityColors[definition.rarity]}`
-                    : 'bg-surface-200 dark:bg-surface-700'
+                    : 'bg-[color:var(--ink-tertiary)]/15'
             )}
             title={earned ? definition.name : 'Locked'}
         >
             {earned ? (
                 <AchievementIcon icon={definition.icon} className={cn(iconSizes[size], 'text-white')} />
             ) : (
-                <Lock className={cn(iconSizes[size], 'text-surface-400')} />
+                <Lock className={cn(iconSizes[size], 'text-[var(--ink-tertiary)]')} />
             )}
         </div>
     );
