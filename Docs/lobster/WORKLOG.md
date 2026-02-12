@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 08:30 EST — Phase 2 — ProfilePhotoUpload: premium token sweep
+- `ProfilePhotoUpload` (player onboarding): migrated legacy `surface-*` palette utilities (`bg-white`, `dark:bg-surface-*`, `border-surface-*`, `text-surface-*`) to premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`), keeping the photo picker modals and actions consistent across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5fbac9d`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 07:58 EST — Phase 2 — Trip setup HandicapRules: premium token sweep
 - `HandicapRules` (trip setup): migrated legacy `surface-*` palette utilities + `augusta-green` accents onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`), removing dark-mode palette branches.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
