@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 03:05 EST — Docs — Worklog hash update (Phase 2 onboarding sweep)
+- `Docs/lobster/WORKLOG.md`: updated the Phase 2 player onboarding token sweep entry to reference code commit `1965186` once the batch landed.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`da7ae31`)
+
 ### 03:03 EST — Phase 2 — Player onboarding GHIN + Side Bet: premium token sweep
 - `GHINLookup`: migrated the lookup input, success states, and history cards off legacy `surface-*` palette utilities onto premium tokens; refreshed the loading/success accents to use shared Masters/success tokens.
 - `SideBetOptIn`: replaced legacy `surface-*` toggles + info states with premium surface/ink/rule tokens and aligned the summary card and controls with the shared success tokens.
