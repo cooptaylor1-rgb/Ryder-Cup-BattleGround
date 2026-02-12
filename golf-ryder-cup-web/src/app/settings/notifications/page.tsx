@@ -208,6 +208,7 @@ export default function NotificationSettingsPage() {
                   <ToggleSwitch
                     checked={preferences.teeTimeReminders}
                     onChange={() => handleToggle('teeTimeReminders')}
+                    ariaLabel="Tee time reminders"
                   />
                 </div>
 
@@ -278,11 +279,20 @@ export default function NotificationSettingsPage() {
   );
 }
 
-function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function ToggleSwitch({
+  checked,
+  onChange,
+  ariaLabel,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  ariaLabel?: string;
+}) {
   return (
     <button
       role="switch"
       aria-checked={checked}
+      aria-label={ariaLabel}
       onClick={onChange}
       className={cn(
         'relative w-12 h-7 rounded-full transition-colors border border-[var(--rule)]',
@@ -328,7 +338,7 @@ function SettingToggle({
             <p className="text-sm text-[var(--ink-tertiary)]">{description}</p>
           </div>
         </div>
-        <ToggleSwitch checked={checked} onChange={onChange} />
+        <ToggleSwitch checked={checked} onChange={onChange} ariaLabel={title} />
       </div>
     </div>
   );
