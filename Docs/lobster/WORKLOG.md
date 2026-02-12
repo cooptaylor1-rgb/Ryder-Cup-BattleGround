@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 09:15 EST — Phase 2 — EnhancedTripWizard: premium token sweep
+- `EnhancedTripWizard` (trip setup): migrated remaining legacy `surface-*` palette utilities and `augusta-green` accents to premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
+- `Badge.stories.tsx`: removed legacy `bg-surface-base` / `text-canvas` usage in the RealWorldExamples story so Storybook examples don’t demonstrate deprecated classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9cb350d`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 08:50 EST — Phase 2 — PlayingStyleSurvey: premium token sweep
 - `PlayingStyleSurvey` (player onboarding): migrated legacy `surface-*` palette utilities (`bg-white`, `border-surface-*`, `text-surface-*`, dark variants) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`) and the shared `.card` surface.
 - Progress and navigation UI now use premium neutral tokens, reducing theme drift.
