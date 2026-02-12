@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 03:19 EST — Phase 2 — SessionBuilder: premium token sweep
+- `SessionBuilder` (trip setup): migrated remaining legacy `surface-*` palette utilities (backgrounds, borders, hover states, and text) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ff0ac2d`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 03:05 EST — Docs — Worklog hash update (Phase 2 onboarding sweep)
 - `Docs/lobster/WORKLOG.md`: updated the Phase 2 player onboarding token sweep entry to reference code commit `1965186` once the batch landed.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
