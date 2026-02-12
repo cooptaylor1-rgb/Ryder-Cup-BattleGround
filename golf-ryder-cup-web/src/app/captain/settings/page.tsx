@@ -112,6 +112,13 @@ export default function CaptainSettingsPage() {
   if (!currentTrip) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Trip Settings"
+          subtitle="Captain controls"
+          onBack={() => router.push('/more')}
+          icon={<Settings size={16} className="text-[var(--color-accent)]" />}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -121,6 +128,10 @@ export default function CaptainSettingsPage() {
               label: 'Go Home',
               onClick: () => router.push('/'),
               icon: <Home size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
             }}
             variant="large"
           />
@@ -133,6 +144,13 @@ export default function CaptainSettingsPage() {
   if (!isCaptainMode) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Trip Settings"
+          subtitle="Captain controls"
+          onBack={() => router.push('/more')}
+          icon={<Settings size={16} className="text-[var(--color-accent)]" />}
+        />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
