@@ -256,8 +256,8 @@ export function SideBetPresets({
                                                     className={cn(
                                                         'px-2 py-1 rounded text-xs font-medium transition-all',
                                                         bet.amount === amount
-                                                            ? 'bg-augusta-green text-white'
-                                                            : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200'
+                                                            ? 'bg-[var(--masters)] text-white'
+                                                            : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-secondary)]'
                                                     )}
                                                 >
                                                     {currency}{amount}
@@ -274,24 +274,24 @@ export function SideBetPresets({
                                         className={cn(
                                             'p-2 rounded-lg transition-colors',
                                             bet.isEnabled
-                                                ? 'bg-augusta-green/10 text-augusta-green'
-                                                : 'bg-surface-100 dark:bg-surface-700 text-surface-500'
+                                                ? 'bg-[color:var(--masters)]/10 text-[var(--masters)]'
+                                                : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                                         )}
                                     >
                                         <Check className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => removeBet(bet.id)}
-                                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                        className="p-2 hover:bg-[color:var(--error)]/10 rounded-lg transition-colors"
                                     >
-                                        <X className="w-4 h-4 text-red-500" />
+                                        <X className="w-4 h-4 text-[var(--error)]" />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Rules tooltip */}
                             {bet.rules && (
-                                <div className="mt-3 p-2 rounded-lg bg-surface-50 dark:bg-surface-800 text-xs text-surface-600 dark:text-surface-400">
+                                <div className="mt-3 p-2 rounded-lg bg-[var(--surface-secondary)] text-xs text-[var(--ink-secondary)]">
                                     <strong>Rules:</strong> {bet.rules}
                                 </div>
                             )}
@@ -303,7 +303,7 @@ export function SideBetPresets({
                 {sideBets.length === 0 && (
                     <button
                         onClick={() => setShowAddModal(true)}
-                        className="w-full p-8 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-xl text-surface-500 hover:border-augusta-green hover:text-augusta-green transition-colors"
+                        className="w-full p-8 border-2 border-dashed border-[var(--rule)] rounded-xl text-[var(--ink-tertiary)] hover:border-[var(--masters)] hover:text-[var(--masters)] transition-colors"
                     >
                         <DollarSign className="w-8 h-8 mx-auto mb-2" />
                         <p className="font-medium">No side bets configured</p>
@@ -314,9 +314,9 @@ export function SideBetPresets({
 
             {/* Tip */}
             {sideBets.length > 0 && (
-                <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-800 flex gap-3">
+                <div className="p-3 rounded-xl bg-[var(--surface-secondary)] flex gap-3">
                     <Lightbulb className="w-5 h-5 text-yellow-500 shrink-0" />
-                    <p className="text-sm text-surface-600 dark:text-surface-400">
+                    <p className="text-sm text-[var(--ink-secondary)]">
                         Side bets are optional and can be adjusted before each round.
                         Players can opt in or out individually.
                     </p>
@@ -337,15 +337,15 @@ export function SideBetPresets({
                             initial={{ opacity: 0, y: 100 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 100 }}
-                            className="bg-white dark:bg-surface-900 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
+                            className="bg-[var(--surface-raised)] rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
+                            <div className="p-4 border-b border-[var(--rule)] flex items-center justify-between">
                                 <h3 className="font-semibold text-lg">Add Side Bet</h3>
                                 <button
                                     onClick={() => setShowAddModal(false)}
-                                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg"
+                                    className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -355,7 +355,7 @@ export function SideBetPresets({
                             <div className="p-4 space-y-4 overflow-y-auto max-h-[60vh]">
                                 {/* Preset bets */}
                                 <div>
-                                    <p className="text-sm font-medium text-surface-500 mb-2">Popular Bets</p>
+                                    <p className="text-sm font-medium text-[var(--ink-secondary)] mb-2">Popular Bets</p>
                                     <div className="space-y-2">
                                         {PRESET_BETS.map(preset => {
                                             const isAdded = sideBets.some(b => b.type === preset.type);
@@ -367,8 +367,8 @@ export function SideBetPresets({
                                                     className={cn(
                                                         'w-full p-3 rounded-xl text-left transition-all',
                                                         isAdded
-                                                            ? 'bg-surface-100 dark:bg-surface-800 opacity-50 cursor-not-allowed'
-                                                            : 'hover:bg-surface-100 dark:hover:bg-surface-800'
+                                                            ? 'bg-[var(--surface-secondary)] opacity-50 cursor-not-allowed'
+                                                            : 'hover:bg-[var(--surface-tertiary)]'
                                                     )}
                                                 >
                                                     <div className="flex items-center gap-3">
@@ -380,12 +380,12 @@ export function SideBetPresets({
                                                         </div>
                                                         <div className="flex-1">
                                                             <p className="font-medium">{preset.name}</p>
-                                                            <p className="text-sm text-surface-500">{preset.description}</p>
+                                                            <p className="text-sm text-[var(--ink-tertiary)]">{preset.description}</p>
                                                         </div>
                                                         {isAdded ? (
-                                                            <Check className="w-5 h-5 text-augusta-green" />
+                                                            <Check className="w-5 h-5 text-[var(--masters)]" />
                                                         ) : (
-                                                            <Plus className="w-5 h-5 text-surface-400" />
+                                                            <Plus className="w-5 h-5 text-[var(--ink-tertiary)]" />
                                                         )}
                                                     </div>
                                                 </button>
@@ -395,8 +395,8 @@ export function SideBetPresets({
                                 </div>
 
                                 {/* Custom bet form */}
-                                <div className="pt-4 border-t border-surface-200 dark:border-surface-700">
-                                    <p className="text-sm font-medium text-surface-500 mb-3">Create Custom Bet</p>
+                                <div className="pt-4 border-t border-[var(--rule)]">
+                                    <p className="text-sm font-medium text-[var(--ink-secondary)] mb-3">Create Custom Bet</p>
                                     <div className="space-y-3">
                                         <input
                                             type="text"
@@ -428,8 +428,8 @@ export function SideBetPresets({
                                                     className={cn(
                                                         'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                                                         customBet.amount === amount
-                                                            ? 'bg-augusta-green text-white'
-                                                            : 'bg-surface-100 dark:bg-surface-700'
+                                                            ? 'bg-[var(--masters)] text-white'
+                                                            : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-secondary)]'
                                                     )}
                                                 >
                                                     {currency}{amount}

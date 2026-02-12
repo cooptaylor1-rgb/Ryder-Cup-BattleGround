@@ -300,14 +300,14 @@ export default function AwardsPage() {
             </section>
 
             {/* Tab Navigation */}
-            <div className="flex bg-white rounded-xl p-1 shadow-sm">
+            <div className="flex bg-[var(--surface-raised)] rounded-xl p-1 border border-[var(--rule)]">
               <button
                 onClick={() => setActiveTab('awards')}
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2',
                   activeTab === 'awards'
-                    ? 'bg-augusta-green text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-[var(--masters)] text-white'
+                    : 'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
                 )}
               >
                 <Trophy className="w-4 h-4" />
@@ -318,8 +318,8 @@ export default function AwardsPage() {
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2',
                   activeTab === 'leaderboard'
-                    ? 'bg-augusta-green text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-[var(--masters)] text-white'
+                    : 'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
                 )}
               >
                 <TrendingUp className="w-4 h-4" />

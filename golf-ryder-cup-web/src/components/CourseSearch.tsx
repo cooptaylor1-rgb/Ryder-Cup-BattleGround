@@ -160,8 +160,8 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     if (isCheckingConfig) {
         return (
             <div className="p-6 text-center">
-                <Loader2 className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin" />
-                <p className="text-sm text-gray-500">Checking course database...</p>
+                <Loader2 className="w-12 h-12 text-[var(--ink-tertiary)] mx-auto mb-4 animate-spin" />
+                <p className="text-sm text-[var(--ink-secondary)]">Checking course database...</p>
             </div>
         );
     }
@@ -169,15 +169,15 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     if (isConfigured === false) {
         return (
             <div className="p-6 text-center">
-                <Database className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Course Database Not Configured</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                    Set the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">GOLF_COURSE_API_KEY</code> environment variable to enable course search.
+                <Database className="w-12 h-12 text-[var(--ink-tertiary)] mx-auto mb-4" />
+                <h3 className="font-semibold text-[var(--ink-primary)] mb-2">Course Database Not Configured</h3>
+                <p className="text-sm text-[var(--ink-secondary)] mb-4">
+                    Set the <code className="bg-[var(--surface-secondary)] px-1 rounded">GOLF_COURSE_API_KEY</code> environment variable to enable course search.
                 </p>
                 {onClose && (
                     <button
                         onClick={onClose}
-                        className="text-sm text-augusta-green hover:underline"
+                        className="text-sm text-[var(--masters)] hover:underline"
                     >
                         Enter course manually instead
                     </button>
@@ -195,40 +195,40 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                 <div className="flex items-center justify-between mb-4">
                     <button
                         onClick={() => setSelectedCourse(null)}
-                        className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                        className="text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] flex items-center gap-1"
                     >
                         ← Back to search
                     </button>
                     {onClose && (
-                        <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600" aria-label="Close">
+                        <button onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
                             <X className="w-5 h-5" />
                         </button>
                     )}
                 </div>
 
                 <div className="mb-4">
-                    <h3 className="font-semibold text-lg text-gray-900">
+                    <h3 className="font-semibold text-lg text-[var(--ink-primary)]">
                         {selectedCourse.course_name || selectedCourse.club_name}
                     </h3>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <p className="text-sm text-[var(--ink-secondary)] flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
                         {formatCourseLocation(selectedCourse.location)}
                     </p>
                 </div>
 
                 {allTees.length === 0 ? (
-                    <div className="p-4 bg-yellow-50 rounded-lg text-yellow-800 text-sm">
+                    <div className="p-4 bg-[color:var(--warning)]/10 rounded-lg text-[var(--warning)] text-sm">
                         No tee data available for this course. You can still import basic info and add tees manually.
                         <button
                             onClick={() => handleImportCourse([])}
-                            className="mt-2 block w-full py-2 bg-yellow-100 hover:bg-yellow-200 rounded font-medium"
+                            className="mt-2 block w-full py-2 bg-[color:var(--warning)]/15 hover:bg-[color:var(--warning)]/20 rounded font-medium text-[var(--ink-primary)]"
                         >
                             Import Course (No Tees)
                         </button>
                     </div>
                 ) : (
                     <>
-                        <p className="text-sm text-gray-600 mb-3">
+                        <p className="text-sm text-[var(--ink-secondary)] mb-3">
                             Select tees to import ({allTees.length} available):
                         </p>
                         <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -242,7 +242,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                         </div>
                         <button
                             onClick={() => handleImportCourse(allTees)}
-                            className="mt-4 w-full py-3 bg-augusta-green text-white font-medium rounded-lg hover:bg-augusta-green/90"
+                            className="mt-4 w-full py-3 bg-[var(--masters)] text-white font-medium rounded-lg hover:bg-[color:var(--masters)]/90"
                         >
                             Import All Tees ({allTees.length})
                         </button>
@@ -256,9 +256,9 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     return (
         <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Search Course Database</h3>
+                <h3 className="font-semibold text-[var(--ink-primary)]">Search Course Database</h3>
                 {onClose && (
-                    <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600" aria-label="Close">
+                    <button onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
                         <X className="w-5 h-5" />
                     </button>
                 )}
@@ -272,20 +272,20 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="Search by course name or city..."
-                    className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-augusta-green/50"
+                    className="w-full px-4 py-3 pl-10 border border-[var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/40"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--ink-tertiary)]" />
                 <button
                     onClick={handleSearch}
                     disabled={isSearching || query.trim().length < 2}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-augusta-green text-white text-sm font-medium rounded-md hover:bg-augusta-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[var(--masters)] text-white text-sm font-medium rounded-md hover:bg-[color:var(--masters)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
                 </button>
             </div>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                <div className="mb-4 p-3 bg-[color:var(--error)]/10 text-[var(--error)] rounded-lg text-sm">
                     {error}
                 </div>
             )}
@@ -298,24 +298,24 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             key={course.id}
                             onClick={() => handleSelectCourse(course)}
                             disabled={isLoadingDetails}
-                            className="w-full p-3 text-left bg-white border border-gray-200 rounded-lg hover:border-augusta-green hover:bg-augusta-green/5 transition-colors disabled:opacity-50"
+                            className="w-full p-3 text-left bg-[var(--surface-raised)] border border-[var(--rule)] rounded-lg hover:border-[var(--masters)] hover:bg-[var(--surface-secondary)] transition-colors disabled:opacity-50"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="min-w-0 flex-1">
-                                    <div className="font-medium text-gray-900 truncate">
+                                    <div className="font-medium text-[var(--ink-primary)] truncate">
                                         {course.course_name || course.club_name}
                                     </div>
-                                    <div className="text-sm text-gray-500 flex items-center gap-1">
+                                    <div className="text-sm text-[var(--ink-secondary)] flex items-center gap-1">
                                         <MapPin className="w-3 h-3 shrink-0" />
                                         <span className="truncate">{formatCourseLocation(course.location)}</span>
                                     </div>
                                     {course.tees && (getAllTees(course).length > 0) && (
-                                        <div className="text-xs text-augusta-green mt-1">
+                                        <div className="text-xs text-[var(--masters)] mt-1">
                                             {getAllTees(course).length} tee{getAllTees(course).length !== 1 ? 's' : ''} available
                                         </div>
                                     )}
                                 </div>
-                                <ChevronRight className="w-5 h-5 text-gray-400 shrink-0" />
+                                <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)] shrink-0" />
                             </div>
                         </button>
                     ))}
@@ -323,15 +323,15 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
             )}
 
             {results.length === 0 && query && !isSearching && !error && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-[var(--ink-secondary)]">
                     <p>No courses found for &quot;{query}&quot;</p>
                     <p className="text-sm mt-1">Try a different search term</p>
                 </div>
             )}
 
             {!query && (
-                <div className="text-center py-8 text-gray-500">
-                    <Database className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                <div className="text-center py-8 text-[var(--ink-secondary)]">
+                    <Database className="w-10 h-10 mx-auto mb-2 opacity-50 text-[var(--ink-tertiary)]" />
                     <p className="text-sm">Search thousands of golf courses worldwide</p>
                 </div>
             )}
@@ -346,23 +346,25 @@ function TeeOption({ tee, onSelect }: { tee: GolfCourseAPITee; onSelect: () => v
         <button
             onClick={onSelect}
             className={cn(
-                "w-full p-3 text-left border rounded-lg hover:border-augusta-green transition-colors",
-                hasHoleData ? "bg-white border-gray-200" : "bg-gray-50 border-gray-100"
+                "w-full p-3 text-left border rounded-lg hover:border-[var(--masters)] transition-colors",
+                hasHoleData
+                    ? "bg-[var(--surface-raised)] border-[var(--rule)]"
+                    : "bg-[var(--surface-secondary)] border-[var(--rule)]"
             )}
         >
             <div className="flex items-center justify-between">
                 <div>
-                    <div className="font-medium text-gray-900">{tee.tee_name}</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-medium text-[var(--ink-primary)]">{tee.tee_name}</div>
+                    <div className="text-sm text-[var(--ink-secondary)]">
                         {tee.total_yards?.toLocaleString()} yards • Par {tee.par_total} • Rating {tee.course_rating}/{tee.slope_rating}
                     </div>
                     {!hasHoleData && (
-                        <div className="text-xs text-yellow-600 mt-1">
-                            ⚠️ No hole-by-hole data
+                        <div className="text-xs text-[var(--warning)] mt-1">
+                            No hole-by-hole data
                         </div>
                     )}
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
             </div>
         </button>
     );

@@ -216,7 +216,7 @@ export function CourseSelection({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-augusta-green" />
+                        <MapPin className="w-5 h-5 text-[var(--masters)]" />
                         Course Selection
                     </h3>
                     <p className="text-sm text-[var(--ink-tertiary)]">
@@ -249,8 +249,8 @@ export function CourseSelection({
                             <div className="p-4">
                                 <div className="flex items-start gap-3">
                                     {/* Day indicator */}
-                                    <div className="w-10 h-10 rounded-lg bg-augusta-green/10 flex items-center justify-center shrink-0">
-                                        <span className="font-bold text-augusta-green">D{index + 1}</span>
+                                    <div className="w-10 h-10 rounded-lg bg-[color:var(--masters)]/10 flex items-center justify-center shrink-0">
+                                        <span className="font-bold text-[var(--masters)]">D{index + 1}</span>
                                     </div>
 
                                     {/* Course info */}
@@ -353,7 +353,7 @@ export function CourseSelection({
                 {selectedCourses.length === 0 && (
                     <button
                         onClick={() => setShowSearch(true)}
-                        className="w-full p-8 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-augusta-green hover:text-augusta-green transition-colors"
+                        className="w-full p-8 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-[var(--masters)] hover:text-[var(--masters)] transition-colors"
                     >
                         <MapPin className="w-8 h-8 mx-auto mb-2" />
                         <p className="font-medium">No courses selected</p>
@@ -406,7 +406,7 @@ export function CourseSelection({
                             <div className="overflow-y-auto max-h-[60vh] p-2">
                                 {isSearching && (
                                     <div className="flex items-center justify-center p-8">
-                                        <Loader2 className="w-6 h-6 animate-spin text-augusta-green" />
+                                        <Loader2 className="w-6 h-6 animate-spin text-[var(--masters)]" />
                                     </div>
                                 )}
 
@@ -428,13 +428,13 @@ export function CourseSelection({
                                             className={cn(
                                                 'w-full p-3 rounded-xl text-left transition-colors mb-1',
                                                 isSelected
-                                                    ? 'bg-augusta-green/10 cursor-default'
+                                                    ? 'bg-[color:var(--masters)]/10 cursor-default'
                                                     : 'hover:bg-[var(--surface-secondary)]'
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
-                                                    <TreePine className="w-6 h-6 text-augusta-green" />
+                                                    <TreePine className="w-6 h-6 text-[var(--masters)]" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-medium truncate">{course.name}</p>
@@ -448,7 +448,7 @@ export function CourseSelection({
                                                     </div>
                                                 </div>
                                                 {isSelected ? (
-                                                    <Check className="w-5 h-5 text-augusta-green" />
+                                                    <Check className="w-5 h-5 text-[var(--masters)]" />
                                                 ) : (
                                                     <Plus className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                                                 )}
@@ -473,7 +473,7 @@ export function CourseSelection({
                                                     className={cn(
                                                         'w-full p-3 rounded-xl text-left transition-colors mb-1',
                                                         isSelected
-                                                            ? 'bg-augusta-green/10 cursor-default'
+                                                            ? 'bg-[color:var(--masters)]/10 cursor-default'
                                                             : 'hover:bg-[var(--surface-secondary)]'
                                                     )}
                                                 >
@@ -488,7 +488,7 @@ export function CourseSelection({
                                                             </p>
                                                         </div>
                                                         {isSelected ? (
-                                                            <Check className="w-5 h-5 text-augusta-green" />
+                                                            <Check className="w-5 h-5 text-[var(--masters)]" />
                                                         ) : (
                                                             <Plus className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                                                         )}

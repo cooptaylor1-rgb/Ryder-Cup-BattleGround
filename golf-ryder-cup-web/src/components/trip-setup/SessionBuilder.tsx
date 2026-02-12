@@ -271,7 +271,7 @@ export function SessionBuilder({
                                 <button
                                     key={preset.id}
                                     onClick={() => applyPreset(preset.id)}
-                                    className="p-3 rounded-lg bg-[var(--surface-raised)] hover:bg-augusta-green/5 border border-[var(--rule)] text-left transition-colors"
+                                    className="p-3 rounded-lg bg-[var(--surface-raised)] hover:bg-[color:var(--masters)]/5 border border-[var(--rule)] text-left transition-colors"
                                 >
                                     <p className="font-medium text-sm">{preset.name}</p>
                                     <p className="text-xs text-[var(--ink-tertiary)]">{preset.description}</p>
@@ -294,8 +294,8 @@ export function SessionBuilder({
                             className={cn(
                                 'w-9 h-9 rounded-lg text-sm font-medium transition-all',
                                 totalDays === day
-                                    ? 'bg-augusta-green text-white'
-                                    : 'bg-[var(--surface-raised)] hover:bg-augusta-green/10'
+                                    ? 'bg-[var(--masters)] text-white'
+                                    : 'bg-[var(--surface-raised)] hover:bg-[color:var(--masters)]/10'
                             )}
                         >
                             {day}
@@ -314,7 +314,7 @@ export function SessionBuilder({
                             </h4>
                             <button
                                 onClick={() => addSession(dayIndex)}
-                                className="text-sm text-augusta-green hover:text-augusta-green/80 flex items-center gap-1"
+                                className="text-sm text-[var(--masters)] hover:text-[color:var(--masters)]/80 flex items-center gap-1"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Session
@@ -364,7 +364,7 @@ export function SessionBuilder({
                         {(!sessionsByDay[dayIndex] || sessionsByDay[dayIndex].length === 0) && (
                             <button
                                 onClick={() => addSession(dayIndex)}
-                                className="w-full p-6 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-augusta-green hover:text-augusta-green transition-colors"
+                                className="w-full p-6 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-[var(--masters)] hover:text-[var(--masters)] transition-colors"
                             >
                                 <Plus className="w-6 h-6 mx-auto mb-2" />
                                 <p className="text-sm">Add first session for Day {dayIndex + 1}</p>
@@ -499,7 +499,7 @@ function SessionCard({
                                                 className={cn(
                                                     'p-2 rounded-lg border-2 transition-all',
                                                     session.timeSlot === slot
-                                                        ? 'border-augusta-green bg-augusta-green/5'
+                                                        ? 'border-[var(--masters)] bg-[color:var(--masters)]/5'
                                                         : 'border-[var(--rule)]'
                                                 )}
                                             >
@@ -532,7 +532,7 @@ function SessionCard({
                                                 className={cn(
                                                     'p-3 rounded-lg border-2 transition-all text-left',
                                                     session.sessionType === type
-                                                        ? 'border-augusta-green bg-augusta-green/5'
+                                                        ? 'border-[var(--masters)] bg-[color:var(--masters)]/5'
                                                         : 'border-[var(--rule)]'
                                                 )}
                                             >
@@ -563,7 +563,7 @@ function SessionCard({
                                         max={maxMatches}
                                         value={session.matchCount}
                                         onChange={(e) => onUpdate({ matchCount: parseInt(e.target.value) })}
-                                        className="flex-1 accent-augusta-green"
+                                        className="flex-1 accent-[var(--masters)]"
                                     />
                                     <span className="w-8 text-center font-mono text-lg">{session.matchCount}</span>
                                 </div>
@@ -583,7 +583,7 @@ function SessionCard({
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 session.pointsPerMatch === pts
-                                                    ? 'bg-augusta-green text-white'
+                                                    ? 'bg-[var(--masters)] text-white'
                                                     : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)]'
                                             )}
                                         >
