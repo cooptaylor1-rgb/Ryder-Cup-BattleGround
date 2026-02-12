@@ -1456,7 +1456,7 @@ export default function EnhancedMatchScoringPage() {
                       </div>
                     </div>
                     {/* Arrow pointing down */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 rotate-45 bg-surface-card border-r border-b border-rule" />
+                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 rotate-45 bg-[var(--surface-raised)] border-r border-b border-[var(--rule)]" />
                   </motion.div>
                 )}
               </AnimatePresence>

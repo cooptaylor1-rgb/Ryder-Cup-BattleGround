@@ -54,7 +54,7 @@ export function MatchCard({
     const getScoreColor = () => {
         if (currentScore > 0) return 'text-team-usa';
         if (currentScore < 0) return 'text-team-europe';
-        return 'text-surface-500';
+        return 'text-[var(--ink-tertiary)]';
     };
 
     return (
@@ -62,7 +62,7 @@ export function MatchCard({
             onClick={onClick}
             className={cn(
                 'card p-4 cursor-pointer',
-                'hover:bg-surface-50 dark:hover:bg-surface-750',
+                'hover:bg-[var(--surface-secondary)]',
                 'transition-colors duration-150',
                 'active:scale-[0.99]'
             )}
@@ -72,7 +72,7 @@ export function MatchCard({
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-surface-500 dark:text-surface-400">
+                <span className="text-sm font-medium text-[var(--ink-tertiary)]">
                     Match {matchNumber}
                 </span>
                 {getStatusBadge()}
@@ -93,7 +93,7 @@ export function MatchCard({
                             </p>
                         ))}
                         {teamAPlayers.length === 0 && (
-                            <p className="text-sm text-surface-400 italic">No players</p>
+                            <p className="text-sm text-[var(--ink-tertiary)] italic">No players</p>
                         )}
                     </div>
                 </div>
@@ -107,7 +107,7 @@ export function MatchCard({
                         {displayScore}
                     </span>
                     {holesPlayed > 0 && (
-                        <span className="text-xs text-surface-500">
+                        <span className="text-xs text-[var(--ink-tertiary)]">
                             thru {holesPlayed}
                         </span>
                     )}
@@ -126,7 +126,7 @@ export function MatchCard({
                             </p>
                         ))}
                         {teamBPlayers.length === 0 && (
-                            <p className="text-sm text-surface-400 italic">No players</p>
+                            <p className="text-sm text-[var(--ink-tertiary)] italic">No players</p>
                         )}
                     </div>
                 </div>
@@ -134,7 +134,7 @@ export function MatchCard({
 
             {/* Hole Strip */}
             {holesPlayed > 0 && (
-                <div className="pt-2 border-t border-surface-200 dark:border-surface-700">
+                <div className="pt-2 border-t border-[var(--rule)]">
                     <HoleStrip
                         results={matchState.holeResults.map(r => ({
                             holeNumber: r.holeNumber,
@@ -146,7 +146,7 @@ export function MatchCard({
             )}
 
             {/* Footer with navigation hint */}
-            <div className="flex items-center justify-end mt-2 text-surface-400">
+            <div className="flex items-center justify-end mt-2 text-[var(--ink-tertiary)]">
                 <span className="text-xs mr-1">Score</span>
                 <ChevronRight className="w-4 h-4" />
             </div>

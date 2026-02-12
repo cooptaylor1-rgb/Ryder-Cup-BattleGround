@@ -51,8 +51,8 @@ export function ScoreButton({
   const getColorClasses = () => {
     if (winner === 'halved') {
       return isSelected
-        ? 'bg-surface-400 text-white border-surface-500 shadow-lg'
-        : 'bg-surface-100 text-surface-700 border-surface-400 dark:bg-surface-800 dark:text-surface-200 dark:border-surface-500 hover:bg-surface-200';
+        ? 'bg-[var(--ink-secondary)] text-[var(--canvas)] border-[var(--ink-secondary)] shadow-lg'
+        : 'bg-[var(--surface)] text-[var(--ink-primary)] border-[var(--rule)] hover:bg-[var(--surface-secondary)]';
     }
 
     if (teamColor === 'usa') {
@@ -67,7 +67,7 @@ export function ScoreButton({
         : 'bg-team-europe/15 text-team-europe border-team-europe/50 hover:bg-team-europe/25 hover:border-team-europe';
     }
 
-    return 'bg-surface-100 text-surface-800 border-surface-400';
+    return 'bg-[var(--surface)] text-[var(--ink-primary)] border-[var(--rule)]';
   };
 
   return (
@@ -81,17 +81,17 @@ export function ScoreButton({
         'font-bold rounded-xl border-2',
         'transition-all duration-150',
         'active:scale-95',
-        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-augusta-green',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--masters)] focus:ring-offset-[color:var(--canvas)]',
         sizeClasses[size],
         getColorClasses(),
         disabled && 'opacity-50 cursor-not-allowed',
-        isSelected && 'ring-2 ring-offset-2 ring-augusta-green'
+        isSelected && 'ring-2 ring-offset-2 ring-[var(--masters)] ring-offset-[color:var(--canvas)]'
       )}
       aria-pressed={isSelected}
     >
       {label}
       {isSelected && (
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-augusta-green rounded-full flex items-center justify-center">
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--masters)] rounded-full flex items-center justify-center">
           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
