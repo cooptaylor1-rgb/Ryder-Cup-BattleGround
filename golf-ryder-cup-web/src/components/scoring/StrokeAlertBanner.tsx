@@ -116,18 +116,9 @@ export function StrokeAlertBanner({
             className
           )}
         >
-          <div
-            className="rounded-xl shadow-lg overflow-hidden"
-            style={{
-              background: 'var(--surface)',
-              border: '2px solid var(--masters)',
-            }}
-          >
+          <div className="rounded-xl shadow-lg overflow-hidden bg-[var(--surface)] border-2 border-[var(--masters)]">
             {/* Header */}
-            <div
-              className="px-4 py-2 flex items-center justify-between"
-              style={{ background: 'var(--masters)', color: 'white' }}
-            >
+            <div className="px-4 py-2 flex items-center justify-between bg-[var(--masters)] text-white">
               <div className="flex items-center gap-2">
                 <Award size={18} />
                 <span className="font-medium">Stroke Hole</span>
@@ -149,19 +140,15 @@ export function StrokeAlertBanner({
                   <StrokeIndicator
                     teamName={teamAName}
                     strokes={currentHoleTeamAStrokes}
-                    color="var(--team-usa)"
+                    variant="usa"
                     isLeading={currentHoleTeamAStrokes > currentHoleTeamBStrokes}
                   />
                 </div>
 
                 {/* Hole Info */}
                 <div className="text-center px-4">
-                  <p className="text-2xl font-bold" style={{ color: 'var(--ink)' }}>
-                    #{currentHole}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                    HCP {holeHcpRank}
-                  </p>
+                  <p className="text-2xl font-bold text-[var(--ink)]">#{currentHole}</p>
+                  <p className="text-xs text-[var(--ink-tertiary)]">HCP {holeHcpRank}</p>
                 </div>
 
                 {/* Team B Info */}
@@ -169,7 +156,7 @@ export function StrokeAlertBanner({
                   <StrokeIndicator
                     teamName={teamBName}
                     strokes={currentHoleTeamBStrokes}
-                    color="var(--team-europe)"
+                    variant="europe"
                     isLeading={currentHoleTeamBStrokes > currentHoleTeamAStrokes}
                     alignRight
                   />
@@ -177,23 +164,24 @@ export function StrokeAlertBanner({
               </div>
 
               {/* Explanation */}
-              <div
-                className="mt-3 pt-3 text-center"
-                style={{ borderTop: '1px solid var(--rule)' }}
-              >
-                <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+              <div className="mt-3 pt-3 text-center border-t border-[var(--rule)]">
+                <p className="text-sm text-[var(--ink-secondary)]">
                   {currentHoleTeamAStrokes > 0 && currentHoleTeamBStrokes > 0 ? (
                     <>Both teams receive {isTeamStrokesFormat ? 'team ' : ''}strokes on this hole</>
                   ) : currentHoleTeamAStrokes > 0 ? (
-                    <><strong style={{ color: 'var(--team-usa)' }}>{teamAName}</strong> receives {currentHoleTeamAStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamAStrokes > 1 ? 's' : ''}</>
+                    <>
+                      <strong className="text-[var(--team-usa)]">{teamAName}</strong> receives {currentHoleTeamAStrokes}{' '}
+                      {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamAStrokes > 1 ? 's' : ''}
+                    </>
                   ) : (
-                    <><strong style={{ color: 'var(--team-europe)' }}>{teamBName}</strong> receives {currentHoleTeamBStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamBStrokes > 1 ? 's' : ''}</>
+                    <>
+                      <strong className="text-[var(--team-europe)]">{teamBName}</strong> receives {currentHoleTeamBStrokes}{' '}
+                      {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamBStrokes > 1 ? 's' : ''}
+                    </>
                   )}
                 </p>
                 {isTeamStrokesFormat && (
-                  <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>
-                    One ball in play — stroke applies to the team
-                  </p>
+                  <p className="text-xs mt-1 text-[var(--ink-muted)]">One ball in play — stroke applies to the team</p>
                 )}
               </div>
             </div>
@@ -208,10 +196,12 @@ export function StrokeAlertBanner({
 // STROKE INDICATOR SUB-COMPONENT
 // ============================================
 
+type StrokeIndicatorVariant = 'usa' | 'europe';
+
 interface StrokeIndicatorProps {
   teamName: string;
   strokes: number;
-  color: string;
+  variant: StrokeIndicatorVariant;
   isLeading: boolean;
   alignRight?: boolean;
 }
@@ -219,54 +209,52 @@ interface StrokeIndicatorProps {
 function StrokeIndicator({
   teamName,
   strokes,
-  color,
+  variant,
   isLeading,
   alignRight,
 }: StrokeIndicatorProps) {
+  const palette =
+    variant === 'usa'
+      ? {
+          text: 'text-[var(--team-usa)]',
+          border: 'border-[var(--team-usa)]',
+          badgeBg: 'bg-[rgba(179,39,57,0.12)]',
+        }
+      : {
+          text: 'text-[var(--team-europe)]',
+          border: 'border-[var(--team-europe)]',
+          badgeBg: 'bg-[rgba(0,39,118,0.12)]',
+        };
+
   return (
     <div className={cn('flex items-center gap-2', alignRight && 'flex-row-reverse')}>
       <div className={cn('text-center', alignRight ? 'text-right' : 'text-left')}>
-        <p
-          className="text-sm font-medium"
-          style={{ color }}
-        >
-          {teamName}
-        </p>
+        <p className={cn('text-sm font-medium', palette.text)}>{teamName}</p>
+
         {strokes > 0 ? (
           <div className={cn('flex items-center gap-1 mt-1', alignRight && 'justify-end')}>
             {Array.from({ length: Math.min(strokes, 3) }, (_, i) => (
-              <CircleDot
-                key={i}
-                size={14}
-                style={{ color }}
-                fill={color}
-              />
+              <CircleDot key={i} size={14} className={palette.text} fill="currentColor" />
             ))}
             {strokes > 3 && (
-              <span
-                className="text-xs font-bold ml-0.5"
-                style={{ color }}
-              >
-                +{strokes - 3}
-              </span>
+              <span className={cn('text-xs font-bold ml-0.5', palette.text)}>+{strokes - 3}</span>
             )}
           </div>
         ) : (
-          <p className="text-xs mt-1" style={{ color: 'var(--ink-tertiary)' }}>
-            No strokes
-          </p>
+          <p className="text-xs mt-1 text-[var(--ink-tertiary)]">No strokes</p>
         )}
       </div>
 
       {/* Visual indicator for receiving strokes */}
       {strokes > 0 && isLeading && (
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: `${color}20`, border: `2px solid ${color}` }}
+          className={cn(
+            'w-8 h-8 rounded-full flex items-center justify-center border-2',
+            palette.badgeBg,
+            palette.border
+          )}
         >
-          <span className="text-sm font-bold" style={{ color }}>
-            +{strokes}
-          </span>
+          <span className={cn('text-sm font-bold', palette.text)}>+{strokes}</span>
         </div>
       )}
     </div>
@@ -363,9 +351,7 @@ export function StrokeHolesMiniMap({
 
   return (
     <div className={cn('', className)}>
-      <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--ink-tertiary)' }}>
-        Stroke Holes
-      </p>
+      <p className="text-xs font-medium uppercase tracking-wider mb-2 text-[var(--ink-tertiary)]">Stroke Holes</p>
       <div className="flex gap-1 flex-wrap">
         {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
           const aStrokes = teamAAllocation[hole - 1];
@@ -416,19 +402,13 @@ export function StrokeHolesMiniMap({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-3 text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+      <div className="flex items-center gap-4 mt-3 text-xs text-[var(--ink-tertiary)]">
         <div className="flex items-center gap-1">
-          <span
-            className="w-3 h-3 rounded"
-            style={{ background: 'rgba(179, 39, 57, 0.15)' }}
-          />
+          <span className="w-3 h-3 rounded bg-[rgba(179,39,57,0.15)]" />
           <span>{teamAName}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span
-            className="w-3 h-3 rounded"
-            style={{ background: 'rgba(0, 39, 118, 0.15)' }}
-          />
+          <span className="w-3 h-3 rounded bg-[rgba(0,39,118,0.15)]" />
           <span>{teamBName}</span>
         </div>
       </div>
