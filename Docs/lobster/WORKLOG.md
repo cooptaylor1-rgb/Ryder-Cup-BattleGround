@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 01:05 EST — Phase 2 — MatchCard + ScoreButton: premium token sweep
+- `MatchCard`: migrated remaining legacy `surface-*` palette utilities (hover/text/dividers) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-tertiary)`).
+- `ScoreButton`: replaced legacy `surface-*` palette fallbacks for the “Halved” + default button states with premium surfaces/ink/rule tokens; standardized focus/selected rings to token-driven `var(--masters)` + `ring-offset-[color:var(--canvas)]`.
+- `/score/[matchId]`: replaced a remaining `bg-surface-card` tooltip arrow block with the premium raised surface (`bg-[var(--surface-raised)]`) and premium rule border.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f8fb1b8`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 00:35 EST — Docs — WORKLOG date boundary ordering
 - `Docs/lobster/WORKLOG.md`: moved late-night Phase 2 entries (20:45–23:59) back under **2026-02-11** so the 2026-02-12 section only contains post-midnight work.
 - Minor whitespace cleanup in the moved block to keep the day reverse-chronological (latest-first).
