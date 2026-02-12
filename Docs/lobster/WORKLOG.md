@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 02:27 EST — Docs — Worklog chronological hygiene (2026-02-11)
 - `Docs/lobster/WORKLOG.md`: fixed a minor ordering regression where the **23:24** Phase 2 entry had drifted below **20:45**; restored reverse-chronological ordering and removed an extra blank line.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (see next commit)
+- Commit + push ✅ (`fc2ad5a`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
 
 ### 02:05 EST — Captain Settings: consistent premium header in empty states
 - `/captain/settings`: added the standard `PageHeader` to the **No active trip** and **Captain mode required** empty-state shells so the page keeps consistent navigation + title context.
