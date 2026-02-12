@@ -470,7 +470,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `PWABanners`: removed the unused `InstallPrompt` export that always returned `null` (the real install UI lives in `components/InstallPrompt.tsx`).
 - Avoids confusing name collisions and ensures future imports don’t silently render nothing.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`c5d78be`)
 
 ### 02:25 EST — Phase 1 — PointsCalculator: token-driven premium styles
 - Captain dashboard `PointsCalculator`: removed inline `style={{...}}` usage for premium CSS tokens (surface/ink/masters/positive) in favor of token-driven Tailwind arbitrary-value classes.
@@ -482,7 +482,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `ConnectionStatusBadge`: when Supabase sync is not configured, render an explicit "Local" badge (with `CloudOff` icon) instead of returning `null`.
 - Keeps header UI stable and makes it clear that the app is running offline/local-only even while online.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`fcefb45`)
 
 ### 01:30 EST — Phase 1 — HandicapStrokeIndicator: avoid silent gap when no strokes
 - `HandicapStrokeIndicator`: when both teams have 0 strokes, render an explicit compact “No handicap strokes” row (with `Info` icon) instead of `return null`.
