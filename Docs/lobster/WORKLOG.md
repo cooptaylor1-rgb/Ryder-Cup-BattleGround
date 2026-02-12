@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 06:03 EST — Phase 2 — TripRecap: premium token sweep (remove legacy surface palette)
+- `TripRecap` (social): migrated legacy `surface-*` palette utilities (`bg-surface-card`, `text-surface-*`, dark variants) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`) and the shared `.card` surface.
+- Match rows, player rows, tabs, and photos empty state now match the premium shell across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`44a6e73`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 05:32 EST — Phase 2 — Trip setup TeeTimePreferences: premium token sweep
 - `TeeTimePreferences` (trip setup): migrated remaining legacy `surface-*` palette utilities + `augusta-green` accents onto the premium token-driven Tailwind system (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`), removing dark-mode palette branches.
 - Standardized separators and neutral pills to `var(--rule)` and premium surfaces (`var(--surface-secondary)` / `var(--surface-raised)`) so the scheduling UI stays consistent across themes.
