@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 04:47 EST — Phase 2 — Player onboarding QuickProfileMode + TravelLodgingInfo: premium token sweep
+- `QuickProfileMode`: migrated remaining legacy `surface-*` palette utilities (text, borders, disabled states, error tint) onto premium token-driven Tailwind (`var(--ink-*)`, `var(--rule)`, `var(--error)`).
+- `TravelLodgingInfo`: replaced legacy `bg-white/dark:bg-surface-*` + `border-surface-*` + `text-surface-*` utilities with premium `.card` surfaces and token-driven ink/rule/hover classes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`92f9d00`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 04:12 EST — Phase 2 — Global error page: replace legacy surface gradient + hard-coded reds
 - `/global-error`: replaced the legacy `from-surface-*` gradient utilities with premium token-driven surfaces (`from-[var(--canvas)]` → `to-[var(--surface-secondary)]`).
 - Standardized the error icon + dev-only stack text off hard-coded reds and onto the shared `var(--error)` token.
