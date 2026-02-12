@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 16:56 EST — Phase 2 — TripArchiveCard: premium token + team palette sweep
+- `TripArchiveCard` (trip history): replaced legacy `bg-white`/`dark:bg-gray-*` shell + indigo/purple/blue/red palettes with the premium `.card` surface and token-driven inks/surfaces/rules.
+- Header now uses a Masters gradient (`var(--masters)` → `var(--masters-deep)`); all-time standings + timeline winner states use Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`, `text-team-*`).
+- Compare/selected states now use premium `var(--info)` + `var(--masters)` accents; badges use `var(--success)`/`var(--warning)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c28263d`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimizer warnings)
+
 ### 16:20 EST — Phase 2 — iOS ContextMenu + iOS install prompt: token sweep
 - `IOSContextMenu`: replaced `bg-white/*` + `border-white/*` + `bg-gray-200` separator with premium surface/rule tokens so the blur menu is consistent across themes.
 - `IOSInstallPrompt`: removed hard-coded hex palette and migrated instruction body surfaces + inks onto premium tokens (`var(--surface-secondary)`, `var(--ink-*)`, `var(--masters)`, `var(--info)`), keeping the iOS sheet style while matching the premium design system.
