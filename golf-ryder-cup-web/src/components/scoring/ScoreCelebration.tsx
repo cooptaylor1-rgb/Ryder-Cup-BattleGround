@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Minus, Flag, Sparkles, Star } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
@@ -401,10 +401,10 @@ export function ScoreCelebration({
                             transition={{ duration: 0.2 }}
                         >
                             <div
-                                className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
-                                style={{ background: teamColor + '40' }}
+                                className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg bg-[color:color-mix(in_srgb,var(--team-color)_25%,transparent)]"
+                                style={{ '--team-color': teamColor } as CSSProperties}
                             >
-                                <span className="text-2xl font-bold" style={{ color: teamColor }}>
+                                <span className="text-2xl font-bold text-[color:var(--team-color)]">
                                     {holeNumber}
                                 </span>
                             </div>
@@ -442,10 +442,10 @@ export function ScoreToast({
     }, [show, onComplete]);
 
     const colors = {
-        success: 'var(--masters)',
-        info: '#3b82f6',
-        warning: '#f59e0b',
-    };
+        success: 'var(--success)',
+        info: 'var(--info)',
+        warning: 'var(--warning)',
+    } as const;
 
     return (
         <AnimatePresence>
