@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 19:50 EST — Phase 2 — Day Summary modal: premium empty/loading states
+- `DaySummaryModal` (social share card): replaced plain text placeholders with shared premium components:
+  - `EmptyStatePremium` for **No active trip** and **No matches found** states.
+  - `LoadingEmpty` for the “Generating summary…” state.
+- Keeps modal content consistent with the premium shell and avoids sparse/unstyled interim states.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 19:25 EST — Phase 2 — Trip creation preview: premium token sweep
 - New trip flow (`/trip/new`): migrated remaining legacy `surface-*` palette usages (e.g. `text-surface-*`, `divide-surface-*`, `border-surface-*`, `bg-augusta-green/*`) to premium token-driven Tailwind (`var(--ink-tertiary)`, `var(--rule)`, `var(--masters)`), keeping the UI consistent with the premium shell.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

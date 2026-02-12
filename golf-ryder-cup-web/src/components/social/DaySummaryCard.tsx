@@ -24,6 +24,7 @@ import {
     Check,
 } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
+import { EmptyStatePremium, LoadingEmpty } from '@/components/ui';
 
 const logger = createLogger('DaySummary');
 import { useTripStore } from '@/lib/stores';
@@ -261,7 +262,7 @@ export function useDaySummary(date?: string) {
         } finally {
             setIsLoading(false);
         }
-    }, [currentTrip, date, sessions, players, teams, teamA, teamB]);
+    }, [currentTrip, date, sessions, players, teamA, teamB]);
 
     useEffect(() => {
         generateSummary();
@@ -546,24 +547,23 @@ export function DaySummaryModal({ isOpen, onClose, date }: DaySummaryModalProps)
                     {/* Content */}
                     <div className="p-4">
                         {!currentTrip ? (
-                            <div className="text-center py-12 text-[var(--ink-secondary)]">
-                                <p className="font-medium text-[var(--ink-primary)]">
-                                    No active trip
-                                </p>
-                                <p className="text-sm mt-2">
-                                    Start or select a trip to generate a day summary.
-                                </p>
-                            </div>
+                            <EmptyStatePremium
+                                illustration="trophy"
+                                title="No active trip"
+                                description="Start or select a trip to generate a day summary."
+                                variant="compact"
+                            />
                         ) : isLoading ? (
-                            <div className="text-center py-12 text-[var(--ink-secondary)]">
-                                Generating summary...
-                            </div>
+                            <LoadingEmpty message="Generating summary…" />
                         ) : summary ? (
                             <DaySummaryCard summary={summary} tripName={currentTrip.name} />
                         ) : (
-                            <div className="text-center py-12 text-[var(--ink-secondary)]">
-                                No matches found for this day
-                            </div>
+                            <EmptyStatePremium
+                                illustration="calendar"
+                                title="No matches found"
+                                description="There are no scored matches for this day yet."
+                                variant="compact"
+                            />
                         )}
                     </div>
                 </motion.div>
