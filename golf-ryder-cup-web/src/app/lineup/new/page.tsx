@@ -662,7 +662,7 @@ export default function NewLineupPage() {
               <div className="text-center">
                 <button
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors hover:bg-surface-100"
+                  className="text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors hover:bg-[var(--surface-secondary)]"
                   style={{ color: 'var(--ink-secondary)' }}
                 >
                   {showAdvanced ? 'Hide' : 'Customize'} session options
@@ -828,7 +828,7 @@ export default function NewLineupPage() {
                   <div className="text-center mt-4">
                     <button
                       onClick={() => setShowAllFormats(!showAllFormats)}
-                      className="text-sm inline-flex items-center gap-1 px-4 py-2 rounded-lg transition-colors hover:bg-surface-100"
+                      className="text-sm inline-flex items-center gap-1 px-4 py-2 rounded-lg transition-colors hover:bg-[var(--surface-secondary)]"
                       style={{ color: 'var(--masters)' }}
                     >
                       {showAllFormats
