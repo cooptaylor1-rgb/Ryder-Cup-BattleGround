@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `SideBetPresets`: migrated header + preset pills + amount labels off legacy `surface-*` palette utilities onto premium tokens for consistent theme behavior.
 - Storybook: updated `Button` + `Input` RealWorldExamples wrappers to use the shared `.card` surface and premium ink tokens (no `bg-surface-base` / `text-canvas`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`b7c8303`)
+- Commit + push ✅ (`2f3e2d3`)
 
 ### 09:15 EST — Phase 2 — EnhancedTripWizard: premium token sweep
 - `EnhancedTripWizard` (trip setup): migrated remaining legacy `surface-*` palette utilities and `augusta-green` accents to premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
