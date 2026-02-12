@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 15:25 EST — Phase 2 — HammerGameCard: premium token sweep
+- `HammerGameCard`: migrated the Hammer game setup + gameplay UI off legacy `bg-white`/`dark:bg-gray-*` and hard-coded Tailwind palettes (amber/orange/green/red/blue) onto premium surface/ink/rule + status tokens.
+- Team selection + payouts now use Ryder Cup team tokens (`bg-team-usa`, `bg-team-europe`, `text-team-*`) and success/error/info tokens for actions.
+- Header + primary actions now use `var(--masters)` for consistent premium theming.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
+
 ### 14:55 EST — Phase 2 — iOS sheets + Weather alerts: premium token sweep
 - `IOSBottomSheet`: replaced `bg-white` and hard-coded gray handle/hover classes with premium surface/rule/ink tokens; snap indicators now use `var(--masters)` + neutral token tints.
 - `IOSActionSheet`: migrated the iOS-style translucent panels and dividers off `bg-white`/`border-gray-*` and replaced iOS-blue / destructive reds with premium `var(--info)` + `var(--error)` tokens; active/pressed states now use premium surface tints.
