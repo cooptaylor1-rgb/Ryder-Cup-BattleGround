@@ -219,7 +219,7 @@ export function CourseSelection({
                         <MapPin className="w-5 h-5 text-augusta-green" />
                         Course Selection
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         {selectedCourses.length} of {maxCourses} courses selected
                     </p>
                 </div>
@@ -256,10 +256,10 @@ export function CourseSelection({
                                     {/* Course info */}
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium truncate">{course.name}</h4>
-                                        <p className="text-sm text-surface-500">
+                                        <p className="text-sm text-[var(--ink-tertiary)]">
                                             {course.city}, {course.state}
                                         </p>
-                                        <div className="flex items-center gap-4 mt-2 text-xs text-surface-500">
+                                        <div className="flex items-center gap-4 mt-2 text-xs text-[var(--ink-tertiary)]">
                                             {course.par && (
                                                 <span className="flex items-center gap-1">
                                                     <TreePine className="w-3 h-3" />
@@ -289,8 +289,8 @@ export function CourseSelection({
                                             className={cn(
                                                 'p-1.5 rounded transition-colors',
                                                 index === 0
-                                                    ? 'text-surface-300'
-                                                    : 'text-surface-500 hover:bg-surface-100'
+                                                    ? 'text-[color:var(--ink-tertiary)]/40'
+                                                    : 'text-[var(--ink-tertiary)] hover:bg-[var(--surface-secondary)]'
                                             )}
                                         >
                                             <ChevronUp className="w-4 h-4" />
@@ -301,8 +301,8 @@ export function CourseSelection({
                                             className={cn(
                                                 'p-1.5 rounded transition-colors',
                                                 index === selectedCourses.length - 1
-                                                    ? 'text-surface-300'
-                                                    : 'text-surface-500 hover:bg-surface-100'
+                                                    ? 'text-[color:var(--ink-tertiary)]/40'
+                                                    : 'text-[var(--ink-tertiary)] hover:bg-[var(--surface-secondary)]'
                                             )}
                                         >
                                             <ChevronDown className="w-4 h-4" />
@@ -319,13 +319,13 @@ export function CourseSelection({
 
                                 {/* Tee box selector */}
                                 {course.teeBoxes && course.teeBoxes.length > 0 && (
-                                    <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700">
-                                        <p className="text-xs font-medium text-surface-500 mb-2">Available Tees</p>
+                                    <div className="mt-3 pt-3 border-t border-[var(--rule)]">
+                                        <p className="text-xs font-medium text-[var(--ink-tertiary)] mb-2">Available Tees</p>
                                         <div className="flex flex-wrap gap-2">
                                             {course.teeBoxes.map(tee => (
                                                 <div
                                                     key={tee.name}
-                                                    className="px-2 py-1 rounded-lg bg-surface-100 dark:bg-surface-800 text-xs flex items-center gap-2"
+                                                    className="px-2 py-1 rounded-lg bg-[var(--surface-secondary)] text-xs flex items-center gap-2"
                                                 >
                                                     <div
                                                         className="w-3 h-3 rounded-full"
@@ -336,7 +336,7 @@ export function CourseSelection({
                                                         }}
                                                     />
                                                     <span>{tee.name}</span>
-                                                    <span className="text-surface-500">
+                                                    <span className="text-[var(--ink-tertiary)]">
                                                         {tee.yardage.toLocaleString()}
                                                     </span>
                                                 </div>
@@ -353,7 +353,7 @@ export function CourseSelection({
                 {selectedCourses.length === 0 && (
                     <button
                         onClick={() => setShowSearch(true)}
-                        className="w-full p-8 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-xl text-surface-500 hover:border-augusta-green hover:text-augusta-green transition-colors"
+                        className="w-full p-8 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-augusta-green hover:text-augusta-green transition-colors"
                     >
                         <MapPin className="w-8 h-8 mx-auto mb-2" />
                         <p className="font-medium">No courses selected</p>
@@ -376,13 +376,13 @@ export function CourseSelection({
                             initial={{ opacity: 0, y: 100 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 100 }}
-                            className="bg-white dark:bg-surface-900 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
+                            className="bg-[var(--surface-raised)] rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Search header */}
-                            <div className="p-4 border-b border-surface-200 dark:border-surface-700">
+                            <div className="p-4 border-b border-[var(--rule)]">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                                     <input
                                         type="text"
                                         value={searchQuery}
@@ -396,7 +396,7 @@ export function CourseSelection({
                                             onClick={() => setSearchQuery('')}
                                             className="absolute right-3 top-1/2 -translate-y-1/2"
                                         >
-                                            <X className="w-4 h-4 text-surface-400" />
+                                            <X className="w-4 h-4 text-[color:var(--ink-tertiary)]/70" />
                                         </button>
                                     )}
                                 </div>
@@ -411,7 +411,7 @@ export function CourseSelection({
                                 )}
 
                                 {!isSearching && searchQuery && searchResults.length === 0 && (
-                                    <div className="text-center p-8 text-surface-500">
+                                    <div className="text-center p-8 text-[var(--ink-tertiary)]">
                                         <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
                                         <p>No courses found</p>
                                         <p className="text-sm">Try a different search term</p>
@@ -429,19 +429,19 @@ export function CourseSelection({
                                                 'w-full p-3 rounded-xl text-left transition-colors mb-1',
                                                 isSelected
                                                     ? 'bg-augusta-green/10 cursor-default'
-                                                    : 'hover:bg-surface-100 dark:hover:bg-surface-800'
+                                                    : 'hover:bg-[var(--surface-secondary)]'
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
                                                     <TreePine className="w-6 h-6 text-augusta-green" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-medium truncate">{course.name}</p>
-                                                    <p className="text-sm text-surface-500">
+                                                    <p className="text-sm text-[var(--ink-tertiary)]">
                                                         {course.city}, {course.state}
                                                     </p>
-                                                    <div className="flex items-center gap-3 mt-1 text-xs text-surface-500">
+                                                    <div className="flex items-center gap-3 mt-1 text-xs text-[var(--ink-tertiary)]">
                                                         {course.par && <span>Par {course.par}</span>}
                                                         {course.rating && <span>{course.rating} rating</span>}
                                                         {course.slope && <span>{course.slope} slope</span>}
@@ -450,7 +450,7 @@ export function CourseSelection({
                                                 {isSelected ? (
                                                     <Check className="w-5 h-5 text-augusta-green" />
                                                 ) : (
-                                                    <Plus className="w-5 h-5 text-surface-400" />
+                                                    <Plus className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                                                 )}
                                             </div>
                                         </button>
@@ -460,7 +460,7 @@ export function CourseSelection({
                                 {/* Show popular courses when no search */}
                                 {!searchQuery && (
                                     <div>
-                                        <p className="text-xs font-medium text-surface-500 px-3 py-2">
+                                        <p className="text-xs font-medium text-[var(--ink-tertiary)] px-3 py-2">
                                             Popular Courses
                                         </p>
                                         {DEMO_COURSES.map(course => {
@@ -474,23 +474,23 @@ export function CourseSelection({
                                                         'w-full p-3 rounded-xl text-left transition-colors mb-1',
                                                         isSelected
                                                             ? 'bg-augusta-green/10 cursor-default'
-                                                            : 'hover:bg-surface-100 dark:hover:bg-surface-800'
+                                                            : 'hover:bg-[var(--surface-secondary)]'
                                                     )}
                                                 >
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-12 h-12 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
+                                                        <div className="w-12 h-12 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
                                                             <Star className="w-6 h-6 text-yellow-500" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-medium truncate">{course.name}</p>
-                                                            <p className="text-sm text-surface-500">
+                                                            <p className="text-sm text-[var(--ink-tertiary)]">
                                                                 {course.city}, {course.state}
                                                             </p>
                                                         </div>
                                                         {isSelected ? (
                                                             <Check className="w-5 h-5 text-augusta-green" />
                                                         ) : (
-                                                            <Plus className="w-5 h-5 text-surface-400" />
+                                                            <Plus className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
                                                         )}
                                                     </div>
                                                 </button>
@@ -501,7 +501,7 @@ export function CourseSelection({
                             </div>
 
                             {/* Footer */}
-                            <div className="p-4 border-t border-surface-200 dark:border-surface-700">
+                            <div className="p-4 border-t border-[var(--rule)]">
                                 <button
                                     onClick={() => setShowSearch(false)}
                                     className="btn-secondary w-full"

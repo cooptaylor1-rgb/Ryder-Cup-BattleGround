@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 00:20 EST — Phase 2 — Course + Trip Setup + Settings toggles: premium token sweep
+- `CourseSelection` (trip setup): migrated legacy `surface-*` palette usage (text/background/border/hover) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
+- `/settings/appearance` + `/settings/scoring`: toggle tracks now use token-driven neutrals (`bg-[color:var(--ink-tertiary)]/25`) and toggle knobs use `bg-[var(--surface-raised)]`.
+- `CourseDetails`: removed remaining legacy `surface-*` palette usage across tabs, tee cards, and scorecard tables; standardized neutrals onto premium surface/rule/ink tokens.
+- `ProfileCompletionReward`: migrated remaining legacy `surface-*` palette utilities to premium token-driven text/surfaces and standardized the team card onto `.card`.
+
 ### 23:59 EST — Phase 2 — Achievements + Social share/reactions: premium token sweep
 - `Achievements`: migrated remaining legacy `surface-*` palette utilities (bg/border/text) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) and standardized cards onto the shared `.card` surface.
 - Social: `ReactionPicker` emoji hover state now uses `hover:bg-[var(--surface-raised)]` (no legacy class).

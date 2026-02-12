@@ -14,13 +14,13 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boo
       onClick={() => onChange(!checked)}
       className={cn(
         'relative w-12 h-7 rounded-full transition-colors',
-        checked ? 'bg-masters' : 'bg-surface-200'
+        checked ? 'bg-masters' : 'bg-[color:var(--ink-tertiary)]/25'
       )}
       aria-pressed={checked}
     >
       <span
         className={cn(
-          'absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform',
+          'absolute top-1 w-5 h-5 rounded-full bg-[var(--surface-raised)] shadow transition-transform',
           checked ? 'translate-x-6' : 'translate-x-1'
         )}
       />

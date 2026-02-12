@@ -219,7 +219,7 @@ export function ProfileCompletionReward({
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.6 }}
-                            className="text-3xl font-bold text-surface-900 dark:text-white mt-8 text-center"
+                            className="text-3xl font-bold text-[var(--ink-primary)] mt-8 text-center"
                         >
                             You&apos;re All Set! 🎉
                         </motion.h1>
@@ -228,7 +228,7 @@ export function ProfileCompletionReward({
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.7 }}
-                            className="text-surface-600 dark:text-surface-400 mt-2 text-center"
+                            className="text-[var(--ink-secondary)] mt-2 text-center"
                         >
                             Welcome to {data.tripName}
                         </motion.p>
@@ -251,10 +251,10 @@ export function ProfileCompletionReward({
                             >
                                 <Check className="w-8 h-8 text-green-600" />
                             </motion.div>
-                            <h2 className="text-xl font-bold text-surface-900 dark:text-white">
+                            <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                                 Profile Complete!
                             </h2>
-                            <p className="text-surface-500 mt-1">
+                            <p className="text-[var(--ink-tertiary)] mt-1">
                                 Here&apos;s what&apos;s next for you, {data.playerName}
                             </p>
                         </div>
@@ -267,7 +267,7 @@ export function ProfileCompletionReward({
                                 transition={{ delay: 0.2 }}
                                 className="mb-6"
                             >
-                                <h3 className="text-sm font-medium text-surface-500 mb-3 flex items-center gap-2">
+                                <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-3 flex items-center gap-2">
                                     <Zap className="w-4 h-4" />
                                     Achievements Earned
                                 </h3>
@@ -280,10 +280,10 @@ export function ProfileCompletionReward({
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 transition={{ delay: 0.3 + idx * 0.1 }}
-                                                className="flex items-center gap-2 px-3 py-2 rounded-full bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 shadow-sm"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--surface-raised)] border border-[var(--rule)] shadow-sm"
                                             >
                                                 <Icon className={cn('w-4 h-4', achievement.color)} />
-                                                <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                                                <span className="text-sm font-medium text-[var(--ink-secondary)]">
                                                     {achievement.label}
                                                 </span>
                                             </motion.div>
@@ -299,7 +299,7 @@ export function ProfileCompletionReward({
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 overflow-hidden mb-4"
+                                className="card overflow-hidden mb-4"
                             >
                                 <div
                                     className="p-4 text-white"
@@ -318,7 +318,7 @@ export function ProfileCompletionReward({
 
                                 {data.teammates && data.teammates.length > 0 && (
                                     <div className="p-4">
-                                        <h4 className="text-sm font-medium text-surface-500 mb-2 flex items-center gap-2">
+                                        <h4 className="text-sm font-medium text-[var(--ink-tertiary)] mb-2 flex items-center gap-2">
                                             <Users className="w-4 h-4" />
                                             Your Teammates
                                         </h4>
@@ -326,13 +326,13 @@ export function ProfileCompletionReward({
                                             {data.teammates.slice(0, 5).map(name => (
                                                 <span
                                                     key={name}
-                                                    className="px-3 py-1 rounded-full bg-surface-100 dark:bg-surface-700 text-sm text-surface-700 dark:text-surface-300"
+                                                    className="px-3 py-1 rounded-full bg-[var(--surface-secondary)] text-sm text-[var(--ink-secondary)]"
                                                 >
                                                     {name}
                                                 </span>
                                             ))}
                                             {data.teammates.length > 5 && (
-                                                <span className="px-3 py-1 rounded-full bg-surface-100 dark:bg-surface-700 text-sm text-surface-500">
+                                                <span className="px-3 py-1 rounded-full bg-[var(--surface-secondary)] text-sm text-[var(--ink-tertiary)]">
                                                     +{data.teammates.length - 5} more
                                                 </span>
                                             )}
@@ -355,10 +355,10 @@ export function ProfileCompletionReward({
                                     First Up
                                 </h4>
                                 <div className="mt-2">
-                                    <div className="font-semibold text-surface-900 dark:text-white">
+                                    <div className="font-semibold text-[var(--ink-primary)]">
                                         {data.nextSession.name}
                                     </div>
-                                    <div className="text-sm text-surface-600 dark:text-surface-400">
+                                    <div className="text-sm text-[var(--ink-secondary)]">
                                         {new Date(data.nextSession.date).toLocaleDateString('en-US', {
                                             weekday: 'long',
                                             month: 'long',

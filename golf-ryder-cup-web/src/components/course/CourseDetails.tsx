@@ -118,7 +118,7 @@ export function CourseDetails({
                             'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                             activeTab === tab
                                 ? 'bg-masters-primary text-white'
-                                : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
+                                : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
                         )}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -172,7 +172,7 @@ export function CourseDetails({
                         </div>
 
                         {tees.length === 0 && (
-                            <div className="text-center py-8 text-surface-500">
+                            <div className="text-center py-8 text-[var(--ink-tertiary)]">
                                 <Info className="w-8 h-8 mx-auto mb-2" />
                                 <p>No tee information available</p>
                             </div>
@@ -186,19 +186,19 @@ export function CourseDetails({
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].par_total}
                                 </div>
-                                <div className="text-sm text-surface-500">Par</div>
+                                <div className="text-sm text-[var(--ink-tertiary)]">Par</div>
                             </div>
                             <div className="card p-4 text-center">
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].total_yards?.toLocaleString()}
                                 </div>
-                                <div className="text-sm text-surface-500">Yards</div>
+                                <div className="text-sm text-[var(--ink-tertiary)]">Yards</div>
                             </div>
                             <div className="card p-4 text-center">
                                 <div className="text-2xl font-bold text-masters-primary">
                                     {tees[0].slope_rating}
                                 </div>
-                                <div className="text-sm text-surface-500">Slope</div>
+                                <div className="text-sm text-[var(--ink-tertiary)]">Slope</div>
                             </div>
                         </div>
                     )}
@@ -221,8 +221,8 @@ export function CourseDetails({
 
             {activeTab === 'weather' && !hasLocation && (
                 <div className="card p-8 text-center">
-                    <MapPin className="w-10 h-10 mx-auto mb-3 text-surface-400" />
-                    <p className="text-surface-500">Location data not available for weather</p>
+                    <MapPin className="w-10 h-10 mx-auto mb-3 text-[color:var(--ink-tertiary)]/70" />
+                    <p className="text-[var(--ink-tertiary)]">Location data not available for weather</p>
                 </div>
             )}
         </div>
@@ -250,14 +250,14 @@ function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
                 'w-full flex items-center gap-4 p-4 rounded-lg transition-all',
                 isSelected
                     ? 'bg-masters-primary/10 border-2 border-masters-primary'
-                    : 'bg-surface-50 dark:bg-surface-800 border-2 border-transparent hover:border-surface-300 dark:hover:border-surface-600'
+                    : 'bg-[var(--surface-secondary)] border-2 border-transparent hover:border-[color:var(--rule)]/40'
             )}
         >
             {/* Tee color indicator */}
             <div
                 className={cn(
                     'w-8 h-8 rounded-full shrink-0',
-                    isWhite && 'border-2 border-surface-300'
+                    isWhite && 'border-2 border-[color:var(--rule)]/40'
                 )}
                 style={{ backgroundColor: color }}
             />
@@ -265,7 +265,7 @@ function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
             {/* Tee info */}
             <div className="flex-1 text-left">
                 <div className="font-medium">{tee.tee_name}</div>
-                <div className="text-sm text-surface-500">
+                <div className="text-sm text-[var(--ink-tertiary)]">
                     {tee.total_yards?.toLocaleString()} yards
                 </div>
             </div>
@@ -273,7 +273,7 @@ function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
             {/* Ratings */}
             <div className="text-right">
                 <div className="text-sm font-medium">{tee.course_rating} / {tee.slope_rating}</div>
-                <div className="text-xs text-surface-500">Rating / Slope</div>
+                <div className="text-xs text-[var(--ink-tertiary)]">Rating / Slope</div>
             </div>
 
             {/* Selected indicator */}
@@ -298,8 +298,8 @@ function ScorecardView({ tees }: ScorecardViewProps) {
     if (!selectedTee || !selectedTee.holes) {
         return (
             <div className="card p-8 text-center">
-                <Target className="w-10 h-10 mx-auto mb-3 text-surface-400" />
-                <p className="text-surface-500">Hole-by-hole data not available</p>
+                <Target className="w-10 h-10 mx-auto mb-3 text-[color:var(--ink-tertiary)]/70" />
+                <p className="text-[var(--ink-tertiary)]">Hole-by-hole data not available</p>
             </div>
         );
     }
@@ -321,7 +321,7 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                                 'flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors',
                                 selectedTee.tee_name === tee.tee_name
                                     ? 'bg-masters-primary text-white'
-                                    : 'bg-surface-100 dark:bg-surface-800'
+                                    : 'bg-[var(--surface-secondary)]'
                             )}
                         >
                             <div
@@ -338,34 +338,34 @@ function ScorecardView({ tees }: ScorecardViewProps) {
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="bg-surface-100 dark:bg-surface-800">
+                        <tr className="bg-[var(--surface-secondary)]">
                             <th className="px-3 py-2 text-left font-medium">Hole</th>
                             {[...Array(9)].map((_, i) => (
                                 <th key={i} className="px-2 py-2 text-center font-medium w-10">
                                     {i + 1}
                                 </th>
                             ))}
-                            <th className="px-2 py-2 text-center font-medium bg-surface-200 dark:bg-surface-700">Out</th>
+                            <th className="px-2 py-2 text-center font-medium bg-[var(--surface)]">Out</th>
                         </tr>
                     </thead>
                     <tbody>
                         {/* Front 9 Yardage */}
-                        <tr className="border-b border-surface-200 dark:border-surface-700">
-                            <td className="px-3 py-2 text-surface-500">Yards</td>
+                        <tr className="border-b border-[var(--rule)]">
+                            <td className="px-3 py-2 text-[var(--ink-tertiary)]">Yards</td>
                             {frontNine.map((hole, i) => (
                                 <td key={i} className="px-2 py-2 text-center">{hole.yardage}</td>
                             ))}
-                            <td className="px-2 py-2 text-center font-medium bg-surface-50 dark:bg-surface-800">
+                            <td className="px-2 py-2 text-center font-medium bg-[var(--surface-secondary)]">
                                 {frontNine.reduce((sum, h) => sum + h.yardage, 0)}
                             </td>
                         </tr>
                         {/* Front 9 Handicap */}
-                        <tr className="border-b border-surface-200 dark:border-surface-700">
-                            <td className="px-3 py-2 text-surface-500">Hdcp</td>
+                        <tr className="border-b border-[var(--rule)]">
+                            <td className="px-3 py-2 text-[var(--ink-tertiary)]">Hdcp</td>
                             {frontNine.map((hole, i) => (
-                                <td key={i} className="px-2 py-2 text-center text-surface-400">{hole.handicap}</td>
+                                <td key={i} className="px-2 py-2 text-center text-[color:var(--ink-tertiary)]/70">{hole.handicap}</td>
                             ))}
-                            <td className="px-2 py-2 text-center bg-surface-50 dark:bg-surface-800">-</td>
+                            <td className="px-2 py-2 text-center bg-[var(--surface-secondary)]">-</td>
                         </tr>
                         {/* Front 9 Par */}
                         <tr className="bg-masters-primary/5">
@@ -383,25 +383,25 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                 {/* Back 9 */}
                 <table className="w-full text-sm mt-4">
                     <thead>
-                        <tr className="bg-surface-100 dark:bg-surface-800">
+                        <tr className="bg-[var(--surface-secondary)]">
                             <th className="px-3 py-2 text-left font-medium">Hole</th>
                             {[...Array(9)].map((_, i) => (
                                 <th key={i} className="px-2 py-2 text-center font-medium w-10">
                                     {i + 10}
                                 </th>
                             ))}
-                            <th className="px-2 py-2 text-center font-medium bg-surface-200 dark:bg-surface-700">In</th>
+                            <th className="px-2 py-2 text-center font-medium bg-[var(--surface)]">In</th>
                             <th className="px-2 py-2 text-center font-medium bg-masters-primary text-white">Tot</th>
                         </tr>
                     </thead>
                     <tbody>
                         {/* Back 9 Yardage */}
-                        <tr className="border-b border-surface-200 dark:border-surface-700">
-                            <td className="px-3 py-2 text-surface-500">Yards</td>
+                        <tr className="border-b border-[var(--rule)]">
+                            <td className="px-3 py-2 text-[var(--ink-tertiary)]">Yards</td>
                             {backNine.map((hole, i) => (
                                 <td key={i} className="px-2 py-2 text-center">{hole.yardage}</td>
                             ))}
-                            <td className="px-2 py-2 text-center font-medium bg-surface-50 dark:bg-surface-800">
+                            <td className="px-2 py-2 text-center font-medium bg-[var(--surface-secondary)]">
                                 {backNine.reduce((sum, h) => sum + h.yardage, 0)}
                             </td>
                             <td className="px-2 py-2 text-center font-bold bg-masters-primary/10">
@@ -409,12 +409,12 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                             </td>
                         </tr>
                         {/* Back 9 Handicap */}
-                        <tr className="border-b border-surface-200 dark:border-surface-700">
-                            <td className="px-3 py-2 text-surface-500">Hdcp</td>
+                        <tr className="border-b border-[var(--rule)]">
+                            <td className="px-3 py-2 text-[var(--ink-tertiary)]">Hdcp</td>
                             {backNine.map((hole, i) => (
-                                <td key={i} className="px-2 py-2 text-center text-surface-400">{hole.handicap}</td>
+                                <td key={i} className="px-2 py-2 text-center text-[color:var(--ink-tertiary)]/70">{hole.handicap}</td>
                             ))}
-                            <td className="px-2 py-2 text-center bg-surface-50 dark:bg-surface-800">-</td>
+                            <td className="px-2 py-2 text-center bg-[var(--surface-secondary)]">-</td>
                             <td className="px-2 py-2 text-center bg-masters-primary/10">-</td>
                         </tr>
                         {/* Back 9 Par */}
