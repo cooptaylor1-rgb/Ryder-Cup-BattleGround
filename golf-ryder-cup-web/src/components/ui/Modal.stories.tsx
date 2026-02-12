@@ -51,7 +51,7 @@ const ModalDemo = () => {
       >
         <div className="py-4">
           <div className="text-center mb-6">
-            <div className="text-4xl font-bold text-masters-green mb-2">2 & 1</div>
+            <div className="text-4xl font-bold text-[var(--masters)] mb-2">2 & 1</div>
             <div className="text-[var(--ink-tertiary)]">USA wins the match</div>
           </div>
           <div className="flex gap-2">
@@ -221,7 +221,7 @@ const ShareDemo = () => {
       >
         <div className="py-4 space-y-4">
           <div className="p-4 bg-[var(--surface)] rounded-lg text-center">
-            <div className="text-2xl font-bold text-masters-green mb-1">USA 15½</div>
+            <div className="text-2xl font-bold text-[var(--masters)] mb-1">USA 15½</div>
             <div className="text-[var(--ink-tertiary)]">defeats</div>
             <div className="text-2xl font-bold text-error mt-1">EUR 12½</div>
           </div>

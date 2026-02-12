@@ -119,7 +119,7 @@ export function TeamColorPicker({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Palette className="w-5 h-5 text-augusta-green" />
+                        <Palette className="w-5 h-5 text-[var(--masters)]" />
                         Team Colors
                     </h3>
                     <p className="text-sm text-[var(--ink-tertiary)]">
@@ -131,7 +131,7 @@ export function TeamColorPicker({
                         onClick={() => setShowPreview(!showPreview)}
                         className={cn(
                             'btn-secondary text-sm px-3 py-1.5',
-                            showPreview && 'bg-augusta-green/10 text-augusta-green'
+                            showPreview && 'bg-[color:var(--masters)]/12 text-[var(--masters)]'
                         )}
                     >
                         <Eye className="w-4 h-4 mr-1" />
@@ -218,7 +218,7 @@ export function TeamColorPicker({
                                     className={cn(
                                         'aspect-square rounded-xl transition-all relative',
                                         isSelected
-                                            ? 'ring-2 ring-offset-2 ring-augusta-green scale-110'
+                                            ? 'ring-2 ring-offset-2 ring-[var(--masters)] scale-110'
                                             : 'hover:scale-105'
                                     )}
                                     style={{ backgroundColor: preset.primary }}

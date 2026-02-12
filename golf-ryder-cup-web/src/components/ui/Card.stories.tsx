@@ -105,7 +105,7 @@ export const MatchCard: Story = {
       <CardContent>
         <div className="flex justify-between items-center py-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-masters-green">2</div>
+            <div className="text-2xl font-bold text-[var(--masters)]">2</div>
             <div className="text-sm text-[var(--ink-tertiary)]">USA</div>
           </div>
           <div className="text-[var(--ink-tertiary)]">UP</div>
@@ -135,7 +135,7 @@ export const PlayerCard: Story = {
     <Card className="w-72" interactive>
       <CardContent>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-masters-green flex items-center justify-center text-white font-bold">
+          <div className="w-12 h-12 rounded-full bg-[var(--masters)] flex items-center justify-center text-white font-bold">
             JS
           </div>
           <div className="flex-1">
@@ -154,7 +154,7 @@ export const StatsCard: Story = {
   render: () => (
     <Card className="w-64" padding="lg">
       <div className="text-center">
-        <div className="text-4xl font-bold text-masters-green mb-1">8½</div>
+        <div className="text-4xl font-bold text-[var(--masters)] mb-1">8½</div>
         <div className="text-sm text-[var(--ink-tertiary)] uppercase tracking-wide">
           Team Points
         </div>

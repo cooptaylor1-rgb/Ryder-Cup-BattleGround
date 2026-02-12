@@ -15,7 +15,7 @@ export function PWABanners() {
         <>
             {/* Offline Banner */}
             {!isOnline && (
-                <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 px-4 py-2 text-center text-sm font-medium">
+                <div className="fixed top-0 left-0 right-0 z-50 bg-[color:var(--warning)]/15 text-[var(--ink-primary)] border-b border-[color:var(--warning)]/25 px-4 py-2 text-center text-sm font-medium">
                     <span className="inline-flex items-center gap-2">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -33,7 +33,7 @@ export function PWABanners() {
             {/* Update Available Banner */}
             {hasUpdate && !isDismissed && (
                 <div className="fixed bottom-20 left-4 right-4 z-50 sm:left-auto sm:right-4 sm:w-80">
-                    <div className="bg-augusta-green text-white rounded-lg shadow-lg p-4">
+                    <div className="bg-[var(--masters)] text-white rounded-lg shadow-lg p-4">
                         <div className="flex items-start gap-3">
                             <div className="shrink-0">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@ export function PWABanners() {
                                 <div className="mt-3 flex gap-2">
                                     <button
                                         onClick={updateApp}
-                                        className="bg-white text-augusta-green px-3 py-1.5 rounded text-sm font-medium hover:bg-white/90 transition-colors"
+                                        className="bg-[var(--surface-raised)] text-[var(--masters)] px-3 py-1.5 rounded text-sm font-medium border border-[color:var(--rule)]/25 hover:bg-[var(--surface-secondary)] transition-colors"
                                     >
                                         Update Now
                                     </button>

@@ -159,7 +159,7 @@ export function PointSystem({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Trophy className="w-5 h-5 text-augusta-green" />
+                        <Trophy className="w-5 h-5 text-[var(--masters)]" />
                         Point System
                     </h3>
                     <p className="text-sm text-[var(--ink-tertiary)]">
@@ -177,15 +177,15 @@ export function PointSystem({
                         className={cn(
                             'p-3 rounded-xl border-2 text-left transition-all',
                             activePreset === preset.id
-                                ? 'border-augusta-green bg-augusta-green/5'
-                                : 'border-[color:var(--rule)]/40 hover:border-augusta-green/50'
+                                ? 'border-[var(--masters)] bg-[color:var(--masters)]/8'
+                                : 'border-[color:var(--rule)]/40 hover:border-[color:var(--masters)]/50'
                         )}
                     >
                         <div className="flex items-start gap-2">
                             <div className={cn(
                                 'w-8 h-8 rounded-lg flex items-center justify-center',
                                 activePreset === preset.id
-                                    ? 'bg-augusta-green text-white'
+                                    ? 'bg-[var(--masters)] text-white'
                                     : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                             )}>
                                 {preset.icon}
@@ -287,7 +287,7 @@ export function PointSystem({
                                             className={cn(
                                                 'p-3 rounded-xl border-2 transition-all',
                                                 isActive
-                                                    ? 'border-augusta-green bg-augusta-green/5'
+                                                    ? 'border-[var(--masters)] bg-[color:var(--masters)]/8'
                                                     : 'border-[color:var(--rule)]/40'
                                             )}
                                         >
@@ -307,7 +307,7 @@ export function PointSystem({
                                                         >
                                                             <Minus className="w-4 h-4" />
                                                         </button>
-                                                        <span className="w-12 text-center font-bold text-augusta-green">
+                                                        <span className="w-12 text-center font-bold text-[var(--masters)]">
                                                             {override.multiplier}x
                                                         </span>
                                                         <button
@@ -429,11 +429,11 @@ export function PointSystem({
             </div>
 
             {/* Preview */}
-            <div className="p-3 rounded-xl bg-augusta-green/5 border border-augusta-green/20">
+            <div className="p-3 rounded-xl bg-[color:var(--masters)]/8 border border-[color:var(--masters)]/25">
                 <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-augusta-green mt-0.5" />
+                    <Info className="w-4 h-4 text-[var(--masters)] mt-0.5" />
                     <div className="text-sm">
-                        <p className="font-medium text-augusta-green">Point Summary</p>
+                        <p className="font-medium text-[var(--masters)]">Point Summary</p>
                         <p className="text-[var(--ink-secondary)] mt-1">
                             Example: {exampleMatches} matches at {config.matchWin} pts each = <strong>{basePoints} base points</strong>
                             {(config.cleanSweepBonus > 0 || config.comebackBonus > 0) && (
@@ -474,7 +474,7 @@ function PointStepper({ value, onChange, min, max, step, compact }: PointStepper
                 <Minus className="w-4 h-4" />
             </button>
             <span className={cn(
-                'text-center font-bold text-augusta-green',
+                'text-center font-bold text-[var(--masters)]',
                 compact ? 'w-10 text-sm' : 'w-12'
             )}>
                 {value}
