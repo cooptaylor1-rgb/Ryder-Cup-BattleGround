@@ -172,7 +172,7 @@ export function SessionTimeoutWarning({
             {/* Message */}
             <p
               id="session-warning-message"
-              className="text-sm text-center text-surface-600 dark:text-surface-400 mb-4"
+              className="text-sm text-center text-[var(--ink-secondary)] mb-4"
             >
               {isExpired
                 ? 'Your session has expired due to inactivity. Please sign in again to continue.'
@@ -208,7 +208,7 @@ export function SessionTimeoutWarning({
                       variant="ghost"
                       size="md"
                       onClick={onLogout}
-                      className="w-full text-surface-500"
+                      className="w-full text-[var(--ink-tertiary)]"
                     >
                       {logoutButtonLabel}
                     </Button>

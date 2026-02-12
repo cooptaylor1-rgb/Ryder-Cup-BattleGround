@@ -162,7 +162,7 @@ export default function TripSettingsPage() {
             rightSlot={
               <button
                 onClick={() => router.push('/')}
-                className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
                 aria-label="Go home"
               >
                 <Home className="w-4 h-4" />
@@ -208,7 +208,7 @@ export default function TripSettingsPage() {
             rightSlot={
               <button
                 onClick={() => router.push('/')}
-                className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
                 aria-label="Go home"
               >
                 <Home className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function TripSettingsPage() {
           rightSlot={
             <button
               onClick={() => router.push('/')}
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
               aria-label="Go home"
             >
               <Home className="w-4 h-4" />
@@ -265,7 +265,7 @@ export default function TripSettingsPage() {
           <section className="card-elevated overflow-hidden">
             <div className="p-4 border-b border-[var(--rule)]">
               <h2 className="type-h3">Backup & Export</h2>
-              <p className="text-sm text-text-secondary mt-1">Save your trip data or share with others.</p>
+              <p className="text-sm text-[var(--ink-secondary)] mt-1">Save your trip data or share with others.</p>
             </div>
 
             <div className="p-4 space-y-3">
@@ -279,8 +279,8 @@ export default function TripSettingsPage() {
                   <Download className="w-5 h-5 text-blue-300" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-medium text-text-primary">{isExporting ? 'Exporting…' : 'Export Trip'}</div>
-                  <div className="text-sm text-text-secondary">Download as JSON file for backup</div>
+                  <div className="font-medium text-[var(--ink-primary)]">{isExporting ? 'Exporting…' : 'Export Trip'}</div>
+                  <div className="text-sm text-[var(--ink-secondary)]">Download as JSON file for backup</div>
                 </div>
               </button>
 
@@ -294,8 +294,8 @@ export default function TripSettingsPage() {
                   <Upload className="w-5 h-5 text-green-300" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-medium text-text-primary">{isImporting ? 'Importing…' : 'Import Trip'}</div>
-                  <div className="text-sm text-text-secondary">Restore from a backup file</div>
+                  <div className="font-medium text-[var(--ink-primary)]">{isImporting ? 'Importing…' : 'Import Trip'}</div>
+                  <div className="text-sm text-[var(--ink-secondary)]">Restore from a backup file</div>
                 </div>
               </button>
               <input
@@ -332,8 +332,8 @@ export default function TripSettingsPage() {
                   <Share2 className="w-5 h-5 text-gold" />
                 </div>
                 <div className="text-left flex-1">
-                  <div className="font-medium text-text-primary">{isSharing ? 'Sharing…' : 'Share Summary'}</div>
-                  <div className="text-sm text-text-secondary">Copy a shareable summary to your clipboard</div>
+                  <div className="font-medium text-[var(--ink-primary)]">{isSharing ? 'Sharing…' : 'Share Summary'}</div>
+                  <div className="text-sm text-[var(--ink-secondary)]">Copy a shareable summary to your clipboard</div>
                 </div>
               </button>
             </div>
@@ -343,7 +343,7 @@ export default function TripSettingsPage() {
           <section className="card-elevated overflow-hidden">
             <div className="p-4 border-b border-[var(--rule)]">
               <h2 className="type-h3 text-red-200">Danger Zone</h2>
-              <p className="text-sm text-text-secondary mt-1">Destructive actions can’t be undone.</p>
+              <p className="text-sm text-[var(--ink-secondary)] mt-1">Destructive actions can’t be undone.</p>
             </div>
 
             <div className="p-4 space-y-3">
@@ -389,7 +389,7 @@ export default function TripSettingsPage() {
                         </button>
                         <button
                           onClick={() => router.push('/more')}
-                          className="ml-auto px-4 py-2 rounded-xl text-text-secondary hover:text-text-primary text-sm font-semibold inline-flex items-center gap-2"
+                          className="ml-auto px-4 py-2 rounded-xl text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] text-sm font-semibold inline-flex items-center gap-2"
                         >
                           <MoreHorizontal className="w-4 h-4" />
                           More
