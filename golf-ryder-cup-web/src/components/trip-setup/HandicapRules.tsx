@@ -119,11 +119,11 @@ export function HandicapRules({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Calculator className="w-5 h-5 text-augusta-green" />
+                    <h3 className="font-semibold text-lg flex items-center gap-2 text-[var(--ink-primary)]">
+                        <Calculator className="w-5 h-5 text-[var(--masters)]" />
                         Handicap Rules
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         Configure stroke allowances
                     </p>
                 </div>
@@ -138,17 +138,17 @@ export function HandicapRules({
                         className={cn(
                             'p-3 rounded-xl border-2 text-left transition-all',
                             activePreset === preset.id
-                                ? 'border-augusta-green bg-augusta-green/5'
-                                : 'border-surface-200 dark:border-surface-700 hover:border-augusta-green/50'
+                                ? 'border-[var(--masters)] bg-[color:var(--masters)]/10'
+                                : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                         )}
                     >
                         <div className="flex items-start justify-between">
                             <div>
                                 <p className="font-medium text-sm">{preset.name}</p>
-                                <p className="text-xs text-surface-500 mt-0.5">{preset.description}</p>
+                                <p className="text-xs text-[var(--ink-tertiary)] mt-0.5">{preset.description}</p>
                             </div>
                             {activePreset === preset.id && (
-                                <Check className="w-4 h-4 text-augusta-green shrink-0" />
+                                <Check className="w-4 h-4 text-[var(--masters)] shrink-0" />
                             )}
                         </div>
                     </button>
@@ -161,20 +161,20 @@ export function HandicapRules({
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="font-medium">Use Net Scoring</p>
-                        <p className="text-sm text-surface-500">Apply handicap strokes</p>
+                        <p className="text-sm text-[var(--ink-tertiary)]">Apply handicap strokes</p>
                     </div>
                     <button
                         onClick={() => updateSetting('useNetScoring', !settings.useNetScoring)}
                         className={cn(
                             'relative w-14 h-8 rounded-full transition-colors',
                             settings.useNetScoring
-                                ? 'bg-augusta-green'
-                                : 'bg-surface-300 dark:bg-surface-600'
+                                ? 'bg-[var(--masters)]'
+                                : 'bg-[color:var(--ink-tertiary)]/25'
                         )}
                     >
                         <motion.div
                             animate={{ x: settings.useNetScoring ? 24 : 4 }}
-                            className="absolute top-1 w-6 h-6 rounded-full bg-white shadow-sm"
+                            className="absolute top-1 w-6 h-6 rounded-full bg-[var(--surface-raised)] shadow-sm"
                         />
                     </button>
                 </div>
@@ -185,10 +185,10 @@ export function HandicapRules({
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <label className="font-medium flex items-center gap-2">
-                                    <Percent className="w-4 h-4 text-surface-500" />
+                                    <Percent className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                     Handicap Allowance
                                 </label>
-                                <span className="text-lg font-bold text-augusta-green">
+                                <span className="text-lg font-bold text-[var(--masters)]">
                                     {settings.allowancePercent}%
                                 </span>
                             </div>
@@ -199,9 +199,9 @@ export function HandicapRules({
                                 step={5}
                                 value={settings.allowancePercent}
                                 onChange={(e) => updateSetting('allowancePercent', parseInt(e.target.value))}
-                                className="w-full accent-augusta-green"
+                                className="w-full accent-[var(--masters)]"
                             />
-                            <div className="flex justify-between text-xs text-surface-500 mt-1">
+                            <div className="flex justify-between text-xs text-[var(--ink-tertiary)] mt-1">
                                 <span>50%</span>
                                 <span>75%</span>
                                 <span>100%</span>
@@ -212,10 +212,10 @@ export function HandicapRules({
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <label className="font-medium flex items-center gap-2">
-                                    <TrendingDown className="w-4 h-4 text-surface-500" />
+                                    <TrendingDown className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                     Maximum Handicap Cap
                                 </label>
-                                <span className="text-lg font-bold text-augusta-green">
+                                <span className="text-lg font-bold text-[var(--masters)]">
                                     {settings.maxHandicap}
                                 </span>
                             </div>
@@ -227,8 +227,8 @@ export function HandicapRules({
                                         className={cn(
                                             'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                             settings.maxHandicap === cap
-                                                ? 'bg-augusta-green text-white'
-                                                : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200'
+                                                ? 'bg-[var(--masters)] text-white'
+                                                : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)] text-[var(--ink-primary)]'
                                         )}
                                     >
                                         {cap}
@@ -241,32 +241,32 @@ export function HandicapRules({
 
                 {/* Example calculation */}
                 {settings.useNetScoring && (
-                    <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-800">
+                    <div className="p-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--rule)]">
                         <div className="flex items-start gap-2">
                             <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5" />
                             <div className="text-sm">
                                 <p className="font-medium">Example Calculation</p>
-                                <p className="text-surface-500 mt-1">
+                                <p className="text-[var(--ink-tertiary)] mt-1">
                                     A player with an {exampleHandicap} handicap:
                                 </p>
                                 <div className="mt-2 space-y-1">
                                     <div className="flex justify-between">
-                                        <span className="text-surface-500">Original handicap:</span>
+                                        <span className="text-[var(--ink-tertiary)]">Original handicap:</span>
                                         <span className="font-medium">{exampleHandicap}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-surface-500">After {settings.allowancePercent}% allowance:</span>
+                                        <span className="text-[var(--ink-tertiary)]">After {settings.allowancePercent}% allowance:</span>
                                         <span className="font-medium">{effectiveHandicap}</span>
                                     </div>
                                     {effectiveHandicap !== cappedHandicap && (
                                         <div className="flex justify-between">
-                                            <span className="text-surface-500">After {settings.maxHandicap} cap:</span>
+                                            <span className="text-[var(--ink-tertiary)]">After {settings.maxHandicap} cap:</span>
                                             <span className="font-medium">{cappedHandicap}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between pt-1 border-t border-surface-200 dark:border-surface-700">
+                                    <div className="flex justify-between pt-1 border-t border-[var(--rule)]">
                                         <span className="font-medium">Playing handicap:</span>
-                                        <span className="font-bold text-augusta-green">{cappedHandicap} strokes</span>
+                                        <span className="font-bold text-[var(--masters)]">{cappedHandicap} strokes</span>
                                     </div>
                                 </div>
                             </div>
@@ -280,12 +280,12 @@ export function HandicapRules({
                 <div className="card overflow-hidden">
                     <button
                         onClick={() => setShowAdvanced(!showAdvanced)}
-                        className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                        className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                     >
                         <span className="font-medium">Advanced Format Settings</span>
                         <ChevronDown
                             className={cn(
-                                'w-5 h-5 text-surface-500 transition-transform',
+'w-5 h-5 text-[var(--ink-tertiary)] transition-transform',
                                 showAdvanced && 'rotate-180'
                             )}
                         />
@@ -299,7 +299,7 @@ export function HandicapRules({
                                 exit={{ height: 0 }}
                                 className="overflow-hidden"
                             >
-                                <div className="p-4 pt-0 space-y-6 border-t border-surface-200 dark:border-surface-700">
+                                <div className="p-4 pt-0 space-y-6 border-t border-[var(--rule)]">
                                     {/* Match Play Allowance */}
                                     <div>
                                         <label className="font-medium text-sm mb-2 block">
@@ -317,12 +317,12 @@ export function HandicapRules({
                                                     className={cn(
                                                         'p-2 rounded-lg border-2 text-center transition-all',
                                                         settings.matchPlayAllowance === option.value
-                                                            ? 'border-augusta-green bg-augusta-green/5'
-                                                            : 'border-surface-200 dark:border-surface-700'
+                                                            ? 'border-[var(--masters)] bg-[color:var(--masters)]/10'
+                                                            : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                                                     )}
                                                 >
                                                     <p className="font-medium text-sm">{option.label}</p>
-                                                    <p className="text-xs text-surface-500">{option.desc}</p>
+                                                    <p className="text-xs text-[var(--ink-tertiary)]">{option.desc}</p>
                                                 </button>
                                             ))}
                                         </div>
@@ -345,17 +345,17 @@ export function HandicapRules({
                                                     className={cn(
                                                         'w-full p-3 rounded-lg border-2 text-left transition-all',
                                                         settings.foursomesMethod === option.value
-                                                            ? 'border-augusta-green bg-augusta-green/5'
-                                                            : 'border-surface-200 dark:border-surface-700'
+                                                            ? 'border-[var(--masters)] bg-[color:var(--masters)]/10'
+                                                            : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                                                     )}
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div>
                                                             <p className="font-medium text-sm">{option.label}</p>
-                                                            <p className="text-xs text-surface-500">{option.desc}</p>
+                                                            <p className="text-xs text-[var(--ink-tertiary)]">{option.desc}</p>
                                                         </div>
                                                         {settings.foursomesMethod === option.value && (
-                                                            <Check className="w-4 h-4 text-augusta-green" />
+                                                            <Check className="w-4 h-4 text-[var(--masters)]" />
                                                         )}
                                                     </div>
                                                 </button>
@@ -379,17 +379,17 @@ export function HandicapRules({
                                                     className={cn(
                                                         'p-3 rounded-lg border-2 text-left transition-all',
                                                         settings.fourballMethod === option.value
-                                                            ? 'border-augusta-green bg-augusta-green/5'
-                                                            : 'border-surface-200 dark:border-surface-700'
+                                                            ? 'border-[var(--masters)] bg-[color:var(--masters)]/10'
+                                                            : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                                                     )}
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div>
                                                             <p className="font-medium text-sm">{option.label}</p>
-                                                            <p className="text-xs text-surface-500">{option.desc}</p>
+                                                            <p className="text-xs text-[var(--ink-tertiary)]">{option.desc}</p>
                                                         </div>
                                                         {settings.fourballMethod === option.value && (
-                                                            <Check className="w-4 h-4 text-augusta-green" />
+                                                            <Check className="w-4 h-4 text-[var(--masters)]" />
                                                         )}
                                                     </div>
                                                 </button>
@@ -401,20 +401,20 @@ export function HandicapRules({
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="font-medium text-sm">Round Handicaps</p>
-                                            <p className="text-xs text-surface-500">Round to nearest whole number</p>
+                                            <p className="text-xs text-[var(--ink-tertiary)]">Round to nearest whole number</p>
                                         </div>
                                         <button
                                             onClick={() => updateSetting('roundHandicaps', !settings.roundHandicaps)}
                                             className={cn(
                                                 'relative w-12 h-7 rounded-full transition-colors',
                                                 settings.roundHandicaps
-                                                    ? 'bg-augusta-green'
-                                                    : 'bg-surface-300 dark:bg-surface-600'
+                                                    ? 'bg-[var(--masters)]'
+                                                    : 'bg-[color:var(--ink-tertiary)]/25'
                                             )}
                                         >
                                             <motion.div
                                                 animate={{ x: settings.roundHandicaps ? 22 : 4 }}
-                                                className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-sm"
+                                                className="absolute top-1 w-5 h-5 rounded-full bg-[var(--surface-raised)] shadow-sm"
                                             />
                                         </button>
                                     </div>
