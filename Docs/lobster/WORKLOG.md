@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Team selection + payouts now use Ryder Cup team tokens (`bg-team-usa`, `bg-team-europe`, `text-team-*`) and success/error/info tokens for actions.
 - Header + primary actions now use `var(--masters)` for consistent premium theming.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`e6690a1`)
 
 ### 14:55 EST — Phase 2 — iOS sheets + Weather alerts: premium token sweep
 - `IOSBottomSheet`: replaced `bg-white` and hard-coded gray handle/hover classes with premium surface/rule/ink tokens; snap indicators now use `var(--masters)` + neutral token tints.
