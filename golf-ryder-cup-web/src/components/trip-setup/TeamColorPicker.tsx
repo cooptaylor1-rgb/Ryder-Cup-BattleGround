@@ -122,7 +122,7 @@ export function TeamColorPicker({
                         <Palette className="w-5 h-5 text-augusta-green" />
                         Team Colors
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         Customize team appearance
                     </p>
                 </div>
@@ -152,7 +152,7 @@ export function TeamColorPicker({
                     <button
                         key={i}
                         onClick={() => applyPreset(preset)}
-                        className="shrink-0 px-3 py-2 rounded-full bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 transition-colors text-sm flex items-center gap-2"
+                        className="shrink-0 px-3 py-2 rounded-full bg-[var(--surface-secondary)] hover:bg-[var(--surface)] transition-colors text-sm flex items-center gap-2 text-[var(--ink-secondary)]"
                     >
                         <div className="flex -space-x-1">
                             <div
@@ -170,7 +170,7 @@ export function TeamColorPicker({
             </div>
 
             {/* Team selector tabs */}
-            <div className="flex gap-2 p-1 bg-surface-100 dark:bg-surface-800 rounded-xl">
+            <div className="flex gap-2 p-1 bg-[var(--surface-secondary)] rounded-xl">
                 {(['teamA', 'teamB'] as const).map(team => (
                     <button
                         key={team}
@@ -178,8 +178,8 @@ export function TeamColorPicker({
                         className={cn(
                             'flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2',
                             activeTeam === team
-                                ? 'bg-white dark:bg-surface-700 shadow-sm'
-                                : 'text-surface-500 hover:text-surface-700'
+                                ? 'bg-[var(--surface-raised)] shadow-sm'
+                                : 'text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)]'
                         )}
                     >
                         <div
@@ -240,7 +240,7 @@ export function TeamColorPicker({
                 </div>
 
                 {/* Current color preview */}
-                <div className="flex items-center gap-3 p-3 rounded-xl border border-surface-200 dark:border-surface-700">
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--rule)]">
                     <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
                         style={{ backgroundColor: colors[activeTeam].primary }}
@@ -249,10 +249,10 @@ export function TeamColorPicker({
                     </div>
                     <div className="flex-1">
                         <p className="font-medium">{colors[activeTeam].name || (activeTeam === 'teamA' ? 'Team A' : 'Team B')}</p>
-                        <p className="text-sm text-surface-500">{colors[activeTeam].primary}</p>
+                        <p className="text-sm text-[var(--ink-tertiary)]">{colors[activeTeam].primary}</p>
                     </div>
                     <div
-                        className="w-12 h-12 rounded-xl border border-surface-200"
+                        className="w-12 h-12 rounded-xl border border-[var(--rule)]"
                         style={{ backgroundColor: colors[activeTeam].secondary }}
                     />
                 </div>
@@ -265,8 +265,8 @@ export function TeamColorPicker({
                     animate={{ opacity: 1, y: 0 }}
                     className="card overflow-hidden"
                 >
-                    <div className="p-3 border-b border-surface-200 dark:border-surface-700">
-                        <p className="text-sm font-medium text-surface-500">Preview</p>
+                    <div className="p-3 border-b border-[var(--rule)]">
+                        <p className="text-sm font-medium text-[var(--ink-tertiary)]">Preview</p>
                     </div>
 
                     {/* Scoreboard preview */}
@@ -298,7 +298,7 @@ export function TeamColorPicker({
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px bg-surface-200 dark:bg-surface-700" />
+                            <div className="w-px bg-[var(--rule)]" />
 
                             {/* Team B */}
                             <div
@@ -329,7 +329,7 @@ export function TeamColorPicker({
 
                     {/* Match card preview */}
                     <div className="p-4 pt-0">
-                        <div className="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                        <div className="rounded-xl border border-[var(--rule)] overflow-hidden">
                             <div className="p-3 flex items-center gap-3">
                                 <div
                                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"

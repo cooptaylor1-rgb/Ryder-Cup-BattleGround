@@ -162,7 +162,7 @@ export function PointSystem({
                         <Trophy className="w-5 h-5 text-augusta-green" />
                         Point System
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         Configure how points are awarded
                     </p>
                 </div>
@@ -178,7 +178,7 @@ export function PointSystem({
                             'p-3 rounded-xl border-2 text-left transition-all',
                             activePreset === preset.id
                                 ? 'border-augusta-green bg-augusta-green/5'
-                                : 'border-surface-200 dark:border-surface-700 hover:border-augusta-green/50'
+                                : 'border-[color:var(--rule)]/40 hover:border-augusta-green/50'
                         )}
                     >
                         <div className="flex items-start gap-2">
@@ -186,13 +186,13 @@ export function PointSystem({
                                 'w-8 h-8 rounded-lg flex items-center justify-center',
                                 activePreset === preset.id
                                     ? 'bg-augusta-green text-white'
-                                    : 'bg-surface-100 dark:bg-surface-800 text-surface-600'
+                                    : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                             )}>
                                 {preset.icon}
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-sm">{preset.name}</p>
-                                <p className="text-xs text-surface-500">{preset.description}</p>
+                                <p className="text-xs text-[var(--ink-tertiary)]">{preset.description}</p>
                             </div>
                         </div>
                     </button>
@@ -201,7 +201,7 @@ export function PointSystem({
 
             {/* Main point values */}
             <div className="card p-4 space-y-4">
-                <h4 className="font-medium text-sm text-surface-600 dark:text-surface-400">
+                <h4 className="font-medium text-sm text-[var(--ink-secondary)]">
                     Base Points
                 </h4>
 
@@ -213,7 +213,7 @@ export function PointSystem({
                         </div>
                         <div>
                             <p className="font-medium">Match Win</p>
-                            <p className="text-xs text-surface-500">Points for winning a match</p>
+                            <p className="text-xs text-[var(--ink-tertiary)]">Points for winning a match</p>
                         </div>
                     </div>
                     <PointStepper
@@ -233,7 +233,7 @@ export function PointSystem({
                         </div>
                         <div>
                             <p className="font-medium">Match Halve</p>
-                            <p className="text-xs text-surface-500">Points for a tie</p>
+                            <p className="text-xs text-[var(--ink-tertiary)]">Points for a tie</p>
                         </div>
                     </div>
                     <PointStepper
@@ -250,13 +250,13 @@ export function PointSystem({
             <div className="card overflow-hidden">
                 <button
                     onClick={() => setShowMultipliers(!showMultipliers)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                    className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
                         <Star className="w-5 h-5 text-yellow-500" />
                         <div className="text-left">
                             <p className="font-medium">Session Multipliers</p>
-                            <p className="text-xs text-surface-500">
+                            <p className="text-xs text-[var(--ink-tertiary)]">
                                 {sessionOverrides.length > 0
                                     ? `${sessionOverrides.length} custom multiplier${sessionOverrides.length > 1 ? 's' : ''}`
                                     : 'Make certain sessions worth more'}
@@ -264,7 +264,7 @@ export function PointSystem({
                         </div>
                     </div>
                     <motion.div animate={{ rotate: showMultipliers ? 180 : 0 }}>
-                        <Plus className="w-5 h-5 text-surface-500" />
+                        <Plus className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     </motion.div>
                 </button>
 
@@ -276,7 +276,7 @@ export function PointSystem({
                             exit={{ height: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-4 pt-0 space-y-3 border-t border-surface-200 dark:border-surface-700">
+                            <div className="p-4 pt-0 space-y-3 border-t border-[var(--rule)]">
                                 {SESSION_TYPES.map(({ type, label, icon }) => {
                                     const override = sessionOverrides.find(o => o.sessionType === type);
                                     const isActive = !!override;
@@ -288,7 +288,7 @@ export function PointSystem({
                                                 'p-3 rounded-xl border-2 transition-all',
                                                 isActive
                                                     ? 'border-augusta-green bg-augusta-green/5'
-                                                    : 'border-surface-200 dark:border-surface-700'
+                                                    : 'border-[color:var(--rule)]/40'
                                             )}
                                         >
                                             <div className="flex items-center justify-between">
@@ -303,7 +303,7 @@ export function PointSystem({
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() => updateOverrideMultiplier(type, Math.max(1, override.multiplier - 0.25))}
-                                                            className="p-1 hover:bg-surface-100 rounded"
+                                                            className="p-1 hover:bg-[var(--surface-secondary)] rounded"
                                                         >
                                                             <Minus className="w-4 h-4" />
                                                         </button>
@@ -312,14 +312,14 @@ export function PointSystem({
                                                         </span>
                                                         <button
                                                             onClick={() => updateOverrideMultiplier(type, Math.min(3, override.multiplier + 0.25))}
-                                                            className="p-1 hover:bg-surface-100 rounded"
+                                                            className="p-1 hover:bg-[var(--surface-secondary)] rounded"
                                                         >
                                                             <Plus className="w-4 h-4" />
                                                         </button>
                                                     </div>
                                                 )}
                                                 {!isActive && (
-                                                    <span className="text-sm text-surface-500">1x (default)</span>
+                                                    <span className="text-sm text-[var(--ink-tertiary)]">1x (default)</span>
                                                 )}
                                             </div>
                                         </div>
@@ -335,19 +335,19 @@ export function PointSystem({
             <div className="card overflow-hidden">
                 <button
                     onClick={() => setShowBonuses(!showBonuses)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                    className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
                         <Sparkles className="w-5 h-5 text-purple-500" />
                         <div className="text-left">
                             <p className="font-medium">Bonus Points</p>
-                            <p className="text-xs text-surface-500">
+                            <p className="text-xs text-[var(--ink-tertiary)]">
                                 Reward sweeps, comebacks & dominations
                             </p>
                         </div>
                     </div>
                     <motion.div animate={{ rotate: showBonuses ? 180 : 0 }}>
-                        <Plus className="w-5 h-5 text-surface-500" />
+                        <Plus className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     </motion.div>
                 </button>
 
@@ -359,7 +359,7 @@ export function PointSystem({
                             exit={{ height: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-4 pt-0 space-y-4 border-t border-surface-200 dark:border-surface-700">
+                            <div className="p-4 pt-0 space-y-4 border-t border-[var(--rule)]">
                                 {/* Clean Sweep */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
@@ -368,7 +368,7 @@ export function PointSystem({
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Clean Sweep</p>
-                                            <p className="text-xs text-surface-500">Win all matches in a session</p>
+                                            <p className="text-xs text-[var(--ink-tertiary)]">Win all matches in a session</p>
                                         </div>
                                     </div>
                                     <PointStepper
@@ -389,7 +389,7 @@ export function PointSystem({
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Comeback</p>
-                                            <p className="text-xs text-surface-500">Win after being 3+ down</p>
+                                            <p className="text-xs text-[var(--ink-tertiary)]">Win after being 3+ down</p>
                                         </div>
                                     </div>
                                     <PointStepper
@@ -410,7 +410,7 @@ export function PointSystem({
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Domination</p>
-                                            <p className="text-xs text-surface-500">Win by 5+ holes</p>
+                                            <p className="text-xs text-[var(--ink-tertiary)]">Win by 5+ holes</p>
                                         </div>
                                     </div>
                                     <PointStepper
@@ -434,7 +434,7 @@ export function PointSystem({
                     <Info className="w-4 h-4 text-augusta-green mt-0.5" />
                     <div className="text-sm">
                         <p className="font-medium text-augusta-green">Point Summary</p>
-                        <p className="text-surface-600 dark:text-surface-400 mt-1">
+                        <p className="text-[var(--ink-secondary)] mt-1">
                             Example: {exampleMatches} matches at {config.matchWin} pts each = <strong>{basePoints} base points</strong>
                             {(config.cleanSweepBonus > 0 || config.comebackBonus > 0) && (
                                 <span> + up to <strong>{config.cleanSweepBonus + config.comebackBonus + config.dominationBonus}</strong> bonus</span>
@@ -467,8 +467,8 @@ function PointStepper({ value, onChange, min, max, step, compact }: PointStepper
                     'rounded-lg flex items-center justify-center transition-all',
                     compact ? 'w-7 h-7' : 'w-8 h-8',
                     value <= min
-                        ? 'bg-surface-100 text-surface-300 cursor-not-allowed'
-                        : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 active:scale-95'
+                        ? 'bg-[color:var(--ink-tertiary)]/10 text-[color:var(--ink-tertiary)]/40 cursor-not-allowed'
+                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)] active:scale-95'
                 )}
             >
                 <Minus className="w-4 h-4" />
@@ -486,8 +486,8 @@ function PointStepper({ value, onChange, min, max, step, compact }: PointStepper
                     'rounded-lg flex items-center justify-center transition-all',
                     compact ? 'w-7 h-7' : 'w-8 h-8',
                     value >= max
-                        ? 'bg-surface-100 text-surface-300 cursor-not-allowed'
-                        : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 active:scale-95'
+                        ? 'bg-[color:var(--ink-tertiary)]/10 text-[color:var(--ink-tertiary)]/40 cursor-not-allowed'
+                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)] active:scale-95'
                 )}
             >
                 <Plus className="w-4 h-4" />
