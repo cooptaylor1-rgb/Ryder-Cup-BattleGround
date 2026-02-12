@@ -184,17 +184,17 @@ export function PlayingStyleSurvey({
                 >
                     <Sparkles className="w-7 h-7 text-white" />
                 </motion.div>
-                <h2 className="text-lg font-bold text-surface-900 dark:text-white">
+                <h2 className="text-lg font-bold text-[var(--ink-primary)]">
                     Know Your Game
                 </h2>
-                <p className="text-sm text-surface-500 dark:text-surface-400">
+                <p className="text-sm text-[var(--ink-tertiary)]">
                     Quick survey for better matchups
                 </p>
             </div>
 
             {/* Progress Bar */}
             <div className="relative">
-                <div className="h-2 bg-surface-100 dark:bg-surface-700 rounded-full overflow-hidden">
+                <div className="h-2 bg-[color:var(--ink-tertiary)]/10 rounded-full overflow-hidden">
                     <motion.div
                         className="h-full bg-linear-to-r from-purple-500 to-indigo-500 rounded-full"
                         initial={{ width: 0 }}
@@ -202,7 +202,7 @@ export function PlayingStyleSurvey({
                         transition={{ type: 'spring', damping: 20 }}
                     />
                 </div>
-                <div className="flex justify-between mt-1.5 text-xs text-surface-500">
+                <div className="flex justify-between mt-1.5 text-xs text-[var(--ink-tertiary)]">
                     <span>{currentQuestion + 1} of {questions.length}</span>
                     <span>{Math.round(progress)}% complete</span>
                 </div>
@@ -216,19 +216,19 @@ export function PlayingStyleSurvey({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -50 }}
                     transition={{ type: 'spring', damping: 20 }}
-                    className="bg-white dark:bg-surface-800 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-700 overflow-hidden"
+                    className="card overflow-hidden"
                 >
                     {/* Question Header */}
-                    <div className="p-5 border-b border-surface-100 dark:border-surface-700">
+                    <div className="p-5 border-b border-[var(--rule)]">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
                                 {question.icon}
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-semibold text-surface-900 dark:text-white">
+                                <h3 className="font-semibold text-[var(--ink-primary)]">
                                     {question.question}
                                 </h3>
-                                <p className="text-sm text-surface-500">
+                                <p className="text-sm text-[var(--ink-tertiary)]">
                                     {question.subtitle}
                                 </p>
                             </div>
@@ -250,15 +250,15 @@ export function PlayingStyleSurvey({
                                     'hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/10',
                                     currentAnswer === option.value
                                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                                        : 'border-surface-200 dark:border-surface-700'
+                                        : 'border-[var(--rule)]'
                                 )}
                             >
                                 <span className="text-3xl">{option.emoji}</span>
                                 <div className="flex-1">
-                                    <div className="font-medium text-surface-900 dark:text-white">
+                                    <div className="font-medium text-[var(--ink-primary)]">
                                         {option.label}
                                     </div>
-                                    <div className="text-sm text-surface-500">
+                                    <div className="text-sm text-[var(--ink-tertiary)]">
                                         {option.description}
                                     </div>
                                 </div>
@@ -285,8 +285,8 @@ export function PlayingStyleSurvey({
                     className={cn(
                         'flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                         currentQuestion === 0
-                            ? 'text-surface-300 cursor-not-allowed'
-                            : 'text-surface-600 hover:text-surface-900 hover:bg-surface-100 dark:text-surface-400 dark:hover:text-white dark:hover:bg-surface-800'
+                            ? 'text-[var(--ink-tertiary)]/40 cursor-not-allowed'
+                            : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
                     )}
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -296,7 +296,7 @@ export function PlayingStyleSurvey({
                 {onSkip && (
                     <button
                         onClick={onSkip}
-                        className="text-sm text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 transition-colors"
+                        className="text-sm text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)] transition-colors"
                     >
                         Skip survey
                     </button>
