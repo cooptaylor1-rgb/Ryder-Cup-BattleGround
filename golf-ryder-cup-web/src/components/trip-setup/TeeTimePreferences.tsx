@@ -156,12 +156,10 @@ export function TeeTimePreferences({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-augusta-green" />
+                        <Clock className="w-5 h-5 text-[var(--masters)]" />
                         Tee Time Preferences
                     </h3>
-                    <p className="text-sm text-surface-500">
-                        Set starting times and intervals
-                    </p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Set starting times and intervals</p>
                 </div>
             </div>
 
@@ -174,8 +172,8 @@ export function TeeTimePreferences({
                         className={cn(
                             'shrink-0 px-3 py-2 rounded-full transition-colors text-sm flex items-center gap-2',
                             settings.firstTeeTime === time
-                                ? 'bg-augusta-green text-white'
-                                : 'bg-surface-100 dark:bg-surface-800 hover:bg-surface-200'
+                                ? 'bg-[color:var(--masters)] text-white'
+                                : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                         )}
                     >
                         {icon}
@@ -189,12 +187,12 @@ export function TeeTimePreferences({
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="font-medium">First Tee Time</p>
-                        <p className="text-sm text-surface-500">When the first group starts</p>
+                        <p className="text-sm text-[var(--ink-tertiary)]">When the first group starts</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => adjustTime(-30)}
-                            className="p-2 rounded-lg bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 transition-colors"
+                            className="p-2 rounded-lg bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors"
                         >
                             <ChevronDown className="w-4 h-4" />
                         </button>
@@ -206,7 +204,7 @@ export function TeeTimePreferences({
                         />
                         <button
                             onClick={() => adjustTime(30)}
-                            className="p-2 rounded-lg bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 transition-colors"
+                            className="p-2 rounded-lg bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors"
                         >
                             <ChevronUp className="w-4 h-4" />
                         </button>
@@ -219,31 +217,31 @@ export function TeeTimePreferences({
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="font-medium">Tee Interval</p>
-                        <p className="text-sm text-surface-500">Time between groups</p>
+                        <p className="text-sm text-[var(--ink-tertiary)]">Time between groups</p>
                     </div>
-                    <span className="text-lg font-bold text-augusta-green">
-                        {settings.interval} min
-                    </span>
+                    <span className="text-lg font-bold text-[var(--masters)]">{settings.interval} min</span>
                 </div>
                 <div className="flex gap-2">
-                    {INTERVAL_OPTIONS.map(option => (
+                    {INTERVAL_OPTIONS.map((option) => (
                         <button
                             key={option.value}
                             onClick={() => updateSetting('interval', option.value)}
                             className={cn(
                                 'flex-1 py-2 px-1 rounded-lg text-center transition-all',
                                 settings.interval === option.value
-                                    ? 'bg-augusta-green text-white'
-                                    : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200'
+                                    ? 'bg-[color:var(--masters)] text-white'
+                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                             )}
                         >
                             <p className="font-medium text-sm">{option.label}</p>
-                            <p className={cn(
-                                'text-xs mt-0.5',
-                                settings.interval === option.value
-                                    ? 'text-white/80'
-                                    : 'text-surface-500'
-                            )}>
+                            <p
+                                className={cn(
+                                    'text-xs mt-0.5',
+                                    settings.interval === option.value
+                                        ? 'text-white/80'
+                                        : 'text-[var(--ink-tertiary)]'
+                                )}
+                            >
                                 {option.desc}
                             </p>
                         </button>
@@ -255,32 +253,34 @@ export function TeeTimePreferences({
             <div className="card p-4 space-y-3">
                 <p className="font-medium">Start Format</p>
                 <div className="space-y-2">
-                    {FORMAT_OPTIONS.map(option => (
+                    {FORMAT_OPTIONS.map((option) => (
                         <button
                             key={option.format}
                             onClick={() => updateSetting('format', option.format)}
                             className={cn(
                                 'w-full p-3 rounded-xl border-2 text-left transition-all',
                                 settings.format === option.format
-                                    ? 'border-augusta-green bg-augusta-green/5'
-                                    : 'border-surface-200 dark:border-surface-700 hover:border-augusta-green/50'
+                                    ? 'border-[color:var(--masters)] bg-[color:var(--masters)]/10'
+                                    : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                             )}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={cn(
-                                    'w-10 h-10 rounded-xl flex items-center justify-center',
-                                    settings.format === option.format
-                                        ? 'bg-augusta-green text-white'
-                                        : 'bg-surface-100 dark:bg-surface-800 text-surface-600'
-                                )}>
+                                <div
+                                    className={cn(
+                                        'w-10 h-10 rounded-xl flex items-center justify-center',
+                                        settings.format === option.format
+                                            ? 'bg-[color:var(--masters)] text-white'
+                                            : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
+                                    )}
+                                >
                                     {option.icon}
                                 </div>
                                 <div className="flex-1">
                                     <p className="font-medium text-sm">{option.label}</p>
-                                    <p className="text-xs text-surface-500">{option.description}</p>
+                                    <p className="text-xs text-[var(--ink-tertiary)]">{option.description}</p>
                                 </div>
                                 {settings.format === option.format && (
-                                    <Check className="w-5 h-5 text-augusta-green" />
+                                    <Check className="w-5 h-5 text-[var(--masters)]" />
                                 )}
                             </div>
                         </button>
@@ -290,35 +290,33 @@ export function TeeTimePreferences({
 
             {/* Schedule preview */}
             <div className="card overflow-hidden">
-                <div className="p-3 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
+                <div className="p-3 border-b border-[var(--rule)] flex items-center justify-between">
                     <p className="font-medium text-sm">Schedule Preview</p>
-                    <span className="text-xs text-surface-500">
+                    <span className="text-xs text-[var(--ink-tertiary)]">
                         Est. finish: {schedulePreview.lastFinish}
                     </span>
                 </div>
-                <div className="divide-y divide-surface-100 dark:divide-surface-800 max-h-48 overflow-y-auto">
+                <div className="divide-y divide-[color:var(--rule)]/40 max-h-48 overflow-y-auto">
                     {schedulePreview.groups.map(({ group, teeTime, finishTime }) => (
                         <div key={group} className="p-3 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
-                                    <Users className="w-4 h-4 text-surface-500" />
+                                <div className="w-8 h-8 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
+                                    <Users className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                 </div>
                                 <div>
                                     <p className="font-medium text-sm">Group {group}</p>
-                                    <p className="text-xs text-surface-500">
+                                    <p className="text-xs text-[var(--ink-tertiary)]">
                                         {settings.format === 'split-tees' && (
                                             <span>Hole {group % 2 === 1 ? '1' : '10'} • </span>
                                         )}
-                                        {settings.format === 'shotgun' && (
-                                            <span>Hole {group} • </span>
-                                        )}
+                                        {settings.format === 'shotgun' && <span>Hole {group} • </span>}
                                         {playersPerMatch} players
                                     </p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="font-mono font-bold text-augusta-green">{teeTime}</p>
-                                <p className="text-xs text-surface-500">→ {finishTime}</p>
+                                <p className="font-mono font-bold text-[var(--masters)]">{teeTime}</p>
+                                <p className="text-xs text-[var(--ink-tertiary)]">→ {finishTime}</p>
                             </div>
                         </div>
                     ))}
@@ -328,10 +326,12 @@ export function TeeTimePreferences({
             {/* Advanced settings */}
             <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-sm text-augusta-green hover:text-augusta-green/80 flex items-center gap-1"
+                className="text-sm text-[var(--masters)] hover:text-[var(--masters)]/80 flex items-center gap-1"
             >
                 {showAdvanced ? 'Hide' : 'Show'} advanced settings
-                <ChevronDown className={cn('w-4 h-4 transition-transform', showAdvanced && 'rotate-180')} />
+                <ChevronDown
+                    className={cn('w-4 h-4 transition-transform', showAdvanced && 'rotate-180')}
+                />
             </button>
 
             <AnimatePresence>
@@ -345,22 +345,21 @@ export function TeeTimePreferences({
                         <div className="card p-4 space-y-4">
                             {/* Round time estimate */}
                             <div>
-                                <label className="text-sm font-medium mb-2 block">
-                                    Estimated Round Time
-                                </label>
+                                <label className="text-sm font-medium mb-2 block">Estimated Round Time</label>
                                 <div className="flex gap-2">
-                                    {[180, 210, 240, 270, 300].map(mins => (
+                                    {[180, 210, 240, 270, 300].map((mins) => (
                                         <button
                                             key={mins}
                                             onClick={() => updateSetting('estimatedRoundTime', mins)}
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 settings.estimatedRoundTime === mins
-                                                    ? 'bg-augusta-green text-white'
-                                                    : 'bg-surface-100 dark:bg-surface-700'
+                                                    ? 'bg-[color:var(--masters)] text-white'
+                                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                                             )}
                                         >
-                                            {Math.floor(mins / 60)}h {mins % 60 > 0 ? `${mins % 60}m` : ''}
+                                            {Math.floor(mins / 60)}h{' '}
+                                            {mins % 60 > 0 ? `${mins % 60}m` : ''}
                                         </button>
                                     ))}
                                 </div>
@@ -368,19 +367,17 @@ export function TeeTimePreferences({
 
                             {/* Session break */}
                             <div>
-                                <label className="text-sm font-medium mb-2 block">
-                                    Break Between Sessions
-                                </label>
+                                <label className="text-sm font-medium mb-2 block">Break Between Sessions</label>
                                 <div className="flex gap-2">
-                                    {[30, 45, 60, 90, 120].map(mins => (
+                                    {[30, 45, 60, 90, 120].map((mins) => (
                                         <button
                                             key={mins}
                                             onClick={() => updateSetting('breakBetweenSessions', mins)}
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 settings.breakBetweenSessions === mins
-                                                    ? 'bg-augusta-green text-white'
-                                                    : 'bg-surface-100 dark:bg-surface-700'
+                                                    ? 'bg-[color:var(--masters)] text-white'
+                                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                                             )}
                                         >
                                             {mins} min
@@ -394,11 +391,11 @@ export function TeeTimePreferences({
             </AnimatePresence>
 
             {/* Info tip */}
-            <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-800 flex gap-3">
-                <Info className="w-5 h-5 text-augusta-green shrink-0" />
-                <p className="text-sm text-surface-600 dark:text-surface-400">
-                    Tee times can be adjusted individually before each round.
-                    These are the default preferences for scheduling.
+            <div className="p-3 rounded-xl bg-[var(--surface-secondary)] flex gap-3">
+                <Info className="w-5 h-5 text-[var(--masters)] shrink-0" />
+                <p className="text-sm text-[var(--ink-secondary)]">
+                    Tee times can be adjusted individually before each round. These are the default
+                    preferences for scheduling.
                 </p>
             </div>
         </div>
