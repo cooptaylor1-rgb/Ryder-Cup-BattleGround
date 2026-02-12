@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 07:28 EST — Phase 2 — Player onboarding AvailabilityCalendar: premium token sweep
+- `AvailabilityCalendar`: migrated the calendar container, expanded session cards, and note modal off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`), keeping the semantic availability colors intact.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1790ac6`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 07:25 EST — Phase 2 — Player onboarding TripWelcomeCard + GolfSuperlatives: premium token sweep
 - `TripWelcomeCard`: replaced legacy `surface-*` palette utilities and dark-mode branches with premium `.card` surfaces and token-driven ink/rule classes; standardized the hero wave fill to `var(--canvas)`.
 - `GolfSuperlatives`: migrated the onboarding card, progress track, input, and actions off legacy `surface-*` palette classes onto premium tokens (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
