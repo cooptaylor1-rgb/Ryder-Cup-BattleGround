@@ -138,18 +138,18 @@ export function FormatSelector({
                 <div className="flex flex-col sm:flex-row gap-3">
                     {showSearch && (
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-tertiary)]" />
                             <input
                                 type="text"
                                 placeholder="Search formats..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 focus:outline-none focus:ring-2 focus:ring-masters-green"
+                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--rule)] bg-[var(--surface-raised)] focus:outline-none focus:ring-2 focus:ring-[var(--masters)]"
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)] hover:text-[var(--ink-primary)]"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -159,11 +159,11 @@ export function FormatSelector({
 
                     {showFilters && (
                         <div className="flex items-center gap-2">
-                            <Filter className="w-4 h-4 text-surface-500" />
+                            <Filter className="w-4 h-4 text-[var(--ink-tertiary)]" />
                             <select
                                 value={complexityFilter}
                                 onChange={(e) => setComplexityFilter(e.target.value as typeof complexityFilter)}
-                                className="px-3 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-sm"
+                                className="px-3 py-2 rounded-lg border border-[var(--rule)] bg-[var(--surface-raised)] text-sm"
                             >
                                 <option value="all">All Levels</option>
                                 <option value="beginner">Beginner</option>
@@ -178,7 +178,7 @@ export function FormatSelector({
             {/* Popular Formats */}
             {showPopular && !searchQuery && (
                 <div>
-                    <h4 className="text-sm font-medium text-surface-500 mb-2 flex items-center gap-2">
+                    <h4 className="text-sm font-medium text-[var(--ink-tertiary)] mb-2 flex items-center gap-2">
                         <Star className="w-4 h-4 text-yellow-500" />
                         Popular Formats
                     </h4>
@@ -190,8 +190,8 @@ export function FormatSelector({
                                 className={cn(
                                     'p-3 rounded-xl border-2 transition-all text-left',
                                     value === format.id
-                                        ? 'border-masters-green bg-masters-green/5'
-                                        : 'border-surface-200 dark:border-surface-700 hover:border-masters-green/50'
+                                        ? 'border-[var(--masters)] bg-[var(--masters-subtle)]'
+                                        : 'border-[var(--rule)] hover:border-[color:var(--masters)]/50'
                                 )}
                             >
                                 <div className="flex items-center gap-2 mb-1">
@@ -200,7 +200,7 @@ export function FormatSelector({
                                     </div>
                                     <span className="font-medium text-sm">{format.shortName}</span>
                                 </div>
-                                <p className="text-xs text-surface-500 line-clamp-1">{format.description}</p>
+                                <p className="text-xs text-[var(--ink-tertiary)] line-clamp-1">{format.description}</p>
                             </button>
                         ))}
                     </div>
@@ -209,7 +209,7 @@ export function FormatSelector({
 
             {/* Selected Format Display */}
             {selectedFormat && (
-                <div className="p-4 rounded-xl bg-masters-green/5 border border-masters-green/20">
+                <div className="p-4 rounded-xl bg-[var(--masters-subtle)] border border-[color:var(--masters)]/20">
                     <div className="flex items-start gap-3">
                         <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0', selectedFormat.color)}>
                             {getFormatIcon(selectedFormat.icon)}
@@ -217,9 +217,9 @@ export function FormatSelector({
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                                 <h3 className="font-semibold">{selectedFormat.name}</h3>
-                                <Check className="w-5 h-5 text-masters-green" />
+                                <Check className="w-5 h-5 text-[var(--masters)]" />
                             </div>
-                            <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
+                            <p className="text-sm text-[var(--ink-secondary)]">
                                 {selectedFormat.description}
                             </p>
                             <div className="flex flex-wrap gap-2 mt-2">
@@ -231,7 +231,7 @@ export function FormatSelector({
                                 )}>
                                     {selectedFormat.complexity}
                                 </span>
-                                <span className="px-2 py-0.5 rounded-full text-xs bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300">
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-[var(--surface-secondary)] text-[var(--ink-secondary)]">
                                     {typeof selectedFormat.playersPerTeam === 'number'
                                         ? `${selectedFormat.playersPerTeam} per team`
                                         : `${selectedFormat.playersPerTeam[0]}-${selectedFormat.playersPerTeam[1]} per team`}
@@ -245,22 +245,22 @@ export function FormatSelector({
             {/* Categories Accordion */}
             <div className="space-y-2">
                 {filteredCategories.map(({ category, name, formats }) => (
-                    <div key={category} className="border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
+                    <div key={category} className="border border-[var(--rule)] rounded-xl overflow-hidden">
                         <button
                             onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
-                            className="w-full flex items-center justify-between p-3 bg-surface-50 dark:bg-surface-800 hover:bg-surface-100 dark:hover:bg-surface-750 transition-colors"
+                            className="w-full flex items-center justify-between p-3 bg-[var(--surface-secondary)] hover:bg-[color:var(--surface-secondary)] transition-colors"
                         >
                             <div className="flex items-center gap-2">
                                 {getCategoryIcon(category)}
                                 <span className="font-medium">{name}</span>
-                                <span className="text-xs text-surface-500 bg-surface-200 dark:bg-surface-700 px-2 py-0.5 rounded-full">
+                                <span className="text-xs text-[var(--ink-tertiary)] bg-[color:var(--ink-tertiary)]/10 px-2 py-0.5 rounded-full">
                                     {formats.length}
                                 </span>
                             </div>
                             {expandedCategory === category ? (
-                                <ChevronDown className="w-5 h-5 text-surface-400" />
+                                <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
                             ) : (
-                                <ChevronRight className="w-5 h-5 text-surface-400" />
+                                <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
                             )}
                         </button>
 
@@ -294,9 +294,9 @@ export function FormatSelector({
             {/* No Results */}
             {filteredCategories.length === 0 && (
                 <div className="text-center py-8">
-                    <Search className="w-10 h-10 mx-auto text-surface-400 mb-3" />
-                    <p className="text-surface-500">No formats found</p>
-                    <p className="text-sm text-surface-400">Try a different search term</p>
+                    <Search className="w-10 h-10 mx-auto text-[var(--ink-tertiary)] mb-3" />
+                    <p className="text-[var(--ink-tertiary)]">No formats found</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Try a different search term</p>
                 </div>
             )}
 
@@ -334,8 +334,8 @@ function FormatCard({ format, isSelected, onSelect, onShowDetails, getIcon }: Fo
             className={cn(
                 'relative p-3 rounded-xl border-2 transition-all cursor-pointer',
                 isSelected
-                    ? 'border-masters-green bg-masters-green/5'
-                    : 'border-transparent bg-white dark:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600'
+                    ? 'border-[var(--masters)] bg-[var(--masters-subtle)]'
+                    : 'border-transparent bg-[var(--surface-raised)] hover:border-[color:var(--rule)]'
             )}
             onClick={onSelect}
         >
@@ -346,9 +346,9 @@ function FormatCard({ format, isSelected, onSelect, onShowDetails, getIcon }: Fo
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                         <h4 className="font-medium text-sm">{format.shortName}</h4>
-                        {isSelected && <Check className="w-4 h-4 text-masters-green" />}
+                        {isSelected && <Check className="w-4 h-4 text-[var(--masters)]" />}
                     </div>
-                    <p className="text-xs text-surface-500 line-clamp-2 mt-0.5">{format.description}</p>
+                    <p className="text-xs text-[var(--ink-tertiary)] line-clamp-2 mt-0.5">{format.description}</p>
                     <div className="flex items-center gap-2 mt-2">
                         <span className={cn(
                             'px-1.5 py-0.5 rounded text-[10px] font-medium',
@@ -363,9 +363,9 @@ function FormatCard({ format, isSelected, onSelect, onShowDetails, getIcon }: Fo
                                 e.stopPropagation();
                                 onShowDetails();
                             }}
-                            className="p-1 rounded hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
+                            className="p-1 rounded hover:bg-[color:var(--surface-secondary)] transition-colors"
                         >
-                            <Info className="w-3.5 h-3.5 text-surface-400" />
+                            <Info className="w-3.5 h-3.5 text-[var(--ink-tertiary)]" />
                         </button>
                     </div>
                 </div>
@@ -397,7 +397,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white dark:bg-surface-800 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-xl"
+                className="bg-[var(--surface-raised)] rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-xl"
             >
                 {/* Header */}
                 <div className={cn('p-6', format.color)}>
@@ -417,28 +417,28 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
 
                 {/* Content */}
                 <div className="p-6 space-y-6 overflow-y-auto max-h-[50vh]">
-                    <p className="text-surface-600 dark:text-surface-300">{format.description}</p>
+                    <p className="text-[var(--ink-secondary)]">{format.description}</p>
 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-700">
-                            <p className="text-xs text-surface-500 mb-1">Players per Team</p>
+                        <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
+                            <p className="text-xs text-[var(--ink-tertiary)] mb-1">Players per Team</p>
                             <p className="font-semibold">
                                 {typeof format.playersPerTeam === 'number'
                                     ? format.playersPerTeam
                                     : `${format.playersPerTeam[0]}-${format.playersPerTeam[1]}`}
                             </p>
                         </div>
-                        <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-700">
-                            <p className="text-xs text-surface-500 mb-1">Complexity</p>
+                        <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
+                            <p className="text-xs text-[var(--ink-tertiary)] mb-1">Complexity</p>
                             <p className="font-semibold capitalize">{format.complexity}</p>
                         </div>
-                        <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-700">
-                            <p className="text-xs text-surface-500 mb-1">Scoring Type</p>
+                        <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
+                            <p className="text-xs text-[var(--ink-tertiary)] mb-1">Scoring Type</p>
                             <p className="font-semibold capitalize">{format.scoringType.replace(/([A-Z])/g, ' $1')}</p>
                         </div>
-                        <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-700">
-                            <p className="text-xs text-surface-500 mb-1">Handicap Method</p>
+                        <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
+                            <p className="text-xs text-[var(--ink-tertiary)] mb-1">Handicap Method</p>
                             <p className="font-semibold capitalize">{format.handicapMethod.replace('-', ' ')}</p>
                         </div>
                     </div>
@@ -448,8 +448,8 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                         <h3 className="font-semibold mb-2">Rules</h3>
                         <ul className="space-y-2">
                             {format.rules.map((rule, index) => (
-                                <li key={index} className="flex items-start gap-2 text-sm text-surface-600 dark:text-surface-400">
-                                    <span className="w-5 h-5 rounded-full bg-masters-green/10 text-masters-green flex items-center justify-center shrink-0 text-xs font-medium">
+                                <li key={index} className="flex items-start gap-2 text-sm text-[var(--ink-secondary)]">
+                                    <span className="w-5 h-5 rounded-full bg-masters-green/10 text-[var(--masters)] flex items-center justify-center shrink-0 text-xs font-medium">
                                         {index + 1}
                                     </span>
                                     {rule}
@@ -465,7 +465,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                             {format.tags.map(tag => (
                                 <span
                                     key={tag}
-                                    className="px-2 py-1 rounded-full text-xs bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300"
+                                    className="px-2 py-1 rounded-full text-xs bg-[var(--surface-secondary)] text-[var(--ink-secondary)]"
                                 >
                                     #{tag}
                                 </span>
@@ -475,13 +475,13 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-surface-200 dark:border-surface-700">
+                <div className="p-4 border-t border-[var(--rule)]">
                     <button
                         onClick={onSelect}
                         className={cn(
                             'w-full py-3 rounded-xl font-semibold transition-all',
                             isSelected
-                                ? 'bg-surface-100 dark:bg-surface-700 text-surface-600'
+                                ? 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                                 : 'bg-masters-green text-white hover:bg-masters-green/90'
                         )}
                     >
