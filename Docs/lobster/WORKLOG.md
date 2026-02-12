@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 20:25 EST — Phase 2 — ConnectionStatus: premium token sweep
+- `ConnectionStatus`: migrated remaining legacy `surface-*` palette usage (text/background/border utilities) to premium design tokens (`var(--ink-*)`, `var(--surface-secondary)`, `var(--rule)`), keeping warning/info/success states intact.
+- `ActiveUsersIndicator` + Sync error banner: standardized neutral ink/surface tokens and removed `border-surface-card`/`bg-surface-*` usage for avatar pills.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`aa6b891`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 19:50 EST — Phase 2 — Day Summary modal: premium empty/loading states
 - `DaySummaryModal` (social share card): replaced plain text placeholders with shared premium components:
   - `EmptyStatePremium` for **No active trip** and **No matches found** states.
