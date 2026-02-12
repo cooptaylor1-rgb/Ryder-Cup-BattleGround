@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 21:15 EST — Docs — Worklog chronological hygiene (2026-02-10)
 - `Docs/lobster/WORKLOG.md`: re-sorted the 2026-02-10 entries so the day stays reverse-chronological (latest-first) and stops drifting as new batches land.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (pending)
+- Commit + push ✅ (`98fea22`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
 
 ### 20:45 EST — Phase 2 — Notifications settings: accessibility labels for toggles
 - `/settings/notifications`: added `aria-label` support to the toggle switch and set labels for tee time + type toggles so screen readers announce control purpose.
