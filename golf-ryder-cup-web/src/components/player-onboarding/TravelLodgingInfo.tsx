@@ -119,39 +119,39 @@ export function TravelLodgingInfo({
         <div className={cn('space-y-4', className)}>
             {/* Header */}
             <div>
-                <h3 className="font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                <h3 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
                     <Plane className="w-5 h-5 text-blue-500" />
                     Travel & Lodging
                 </h3>
-                <p className="text-sm text-surface-500 mt-0.5">
+                <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                     Help us coordinate logistics
                 </p>
             </div>
 
             {/* Arrival Section */}
-            <div className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+            <div className="card rounded-xl overflow-hidden">
                 <button
                     onClick={() => toggleSection('arrival')}
-                    className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
+                    className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                             <Plane className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="text-left">
-                            <div className="font-medium text-surface-900 dark:text-white">
+                            <div className="font-medium text-[var(--ink-primary)]">
                                 Arrival Details
                             </div>
-                            <div className="text-sm text-surface-500">
+                            <div className="text-sm text-[var(--ink-secondary)]">
                                 {info.arrivalMethod === 'flying' ? 'Flying in' :
                                     info.arrivalMethod === 'driving' ? 'Driving' : 'Already there'}
                             </div>
                         </div>
                     </div>
                     {expandedSection === 'arrival' ? (
-                        <ChevronUp className="w-5 h-5 text-surface-400" />
+                        <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     ) : (
-                        <ChevronDown className="w-5 h-5 text-surface-400" />
+                        <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     )}
                 </button>
 
@@ -163,7 +163,7 @@ export function TravelLodgingInfo({
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-4 pt-0 space-y-4 border-t border-surface-100 dark:border-surface-700 mt-0 pt-4">
+                            <div className="p-4 pt-0 space-y-4 border-t border-[var(--rule)] mt-0 pt-4">
                                 {/* Arrival Method */}
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
@@ -178,20 +178,20 @@ export function TravelLodgingInfo({
                                                 'p-3 rounded-xl border-2 text-center transition-all',
                                                 info.arrivalMethod === value
                                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                    : 'border-surface-200 dark:border-surface-700'
+                                                    : 'border-[var(--rule)]'
                                             )}
                                         >
                                             <Icon className={cn(
                                                 'w-5 h-5 mx-auto mb-1',
                                                 info.arrivalMethod === value
                                                     ? 'text-blue-600'
-                                                    : 'text-surface-400'
+                                                    : 'text-[var(--ink-tertiary)]'
                                             )} />
                                             <span className={cn(
                                                 'text-sm font-medium',
                                                 info.arrivalMethod === value
                                                     ? 'text-blue-700 dark:text-blue-300'
-                                                    : 'text-surface-600 dark:text-surface-400'
+                                                    : 'text-[var(--ink-secondary)]'
                                             )}>
                                                 {label}
                                             </span>
@@ -204,7 +204,7 @@ export function TravelLodgingInfo({
                                     <div className="space-y-3">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
-                                                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                     Arrival Date
                                                 </label>
                                                 <input
@@ -212,25 +212,25 @@ export function TravelLodgingInfo({
                                                     value={info.arrivalDate || ''}
                                                     onChange={(e) => updateInfo({ arrivalDate: e.target.value })}
                                                     min={tripStartDate}
-                                                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white"
+                                                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                     Arrival Time
                                                 </label>
                                                 <input
                                                     type="time"
                                                     value={info.arrivalTime || ''}
                                                     onChange={(e) => updateInfo({ arrivalTime: e.target.value })}
-                                                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white"
+                                                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
-                                                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                     Flight # (optional)
                                                 </label>
                                                 <input
@@ -238,11 +238,11 @@ export function TravelLodgingInfo({
                                                     value={info.flightNumber || ''}
                                                     onChange={(e) => updateInfo({ flightNumber: e.target.value.toUpperCase() })}
                                                     placeholder="AA1234"
-                                                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white placeholder:text-surface-400"
+                                                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                     Airport
                                                 </label>
                                                 <input
@@ -251,24 +251,24 @@ export function TravelLodgingInfo({
                                                     onChange={(e) => updateInfo({ arrivalAirport: e.target.value.toUpperCase() })}
                                                     placeholder="ATL"
                                                     maxLength={3}
-                                                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white placeholder:text-surface-400"
+                                                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]"
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Need Pickup */}
-                                        <label className="flex items-center gap-3 p-3 rounded-xl bg-surface-50 dark:bg-surface-900 cursor-pointer">
+                                        <label className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface)] cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={info.needsPickup}
                                                 onChange={(e) => updateInfo({ needsPickup: e.target.checked })}
-                                                className="w-5 h-5 rounded border-surface-300 text-blue-500 focus:ring-blue-500"
+                                                className="w-5 h-5 rounded border-[var(--rule)] text-blue-500 focus:ring-blue-500"
                                             />
                                             <div>
-                                                <div className="font-medium text-surface-900 dark:text-white">
+                                                <div className="font-medium text-[var(--ink-primary)]">
                                                     I need airport pickup
                                                 </div>
-                                                <div className="text-sm text-surface-500">
+                                                <div className="text-sm text-[var(--ink-secondary)]">
                                                     Coordinate with other arrivals
                                                 </div>
                                             </div>
@@ -280,7 +280,7 @@ export function TravelLodgingInfo({
                                 {info.arrivalMethod === 'driving' && (
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                 Arrival Date
                                             </label>
                                             <input
@@ -288,18 +288,18 @@ export function TravelLodgingInfo({
                                                 value={info.arrivalDate || ''}
                                                 onChange={(e) => updateInfo({ arrivalDate: e.target.value })}
                                                 min={tripStartDate}
-                                                className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white"
+                                                className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                                 ETA
                                             </label>
                                             <input
                                                 type="time"
                                                 value={info.arrivalTime || ''}
                                                 onChange={(e) => updateInfo({ arrivalTime: e.target.value })}
-                                                className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white"
+                                                className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                             />
                                         </div>
                                     </div>
@@ -311,28 +311,28 @@ export function TravelLodgingInfo({
             </div>
 
             {/* Lodging Section */}
-            <div className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+            <div className="card rounded-xl overflow-hidden">
                 <button
                     onClick={() => toggleSection('lodging')}
-                    className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
+                    className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                             <Home className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div className="text-left">
-                            <div className="font-medium text-surface-900 dark:text-white">
+                            <div className="font-medium text-[var(--ink-primary)]">
                                 Lodging Preferences
                             </div>
-                            <div className="text-sm text-surface-500">
+                            <div className="text-sm text-[var(--ink-secondary)]">
                                 Room & roommate preferences
                             </div>
                         </div>
                     </div>
                     {expandedSection === 'lodging' ? (
-                        <ChevronUp className="w-5 h-5 text-surface-400" />
+                        <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     ) : (
-                        <ChevronDown className="w-5 h-5 text-surface-400" />
+                        <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     )}
                 </button>
 
@@ -344,7 +344,7 @@ export function TravelLodgingInfo({
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-4 pt-0 space-y-4 border-t border-surface-100 dark:border-surface-700 mt-0 pt-4">
+                            <div className="p-4 pt-0 space-y-4 border-t border-[var(--rule)] mt-0 pt-4">
                                 {/* Room Preference */}
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
@@ -359,7 +359,7 @@ export function TravelLodgingInfo({
                                                 'p-3 rounded-xl border-2 text-center transition-all',
                                                 info.lodgingPreference === value
                                                     ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                                                    : 'border-surface-200 dark:border-surface-700'
+                                                    : 'border-[var(--rule)]'
                                             )}
                                         >
                                             <span className="text-2xl mb-1 block">{emoji}</span>
@@ -367,7 +367,7 @@ export function TravelLodgingInfo({
                                                 'text-sm font-medium',
                                                 info.lodgingPreference === value
                                                     ? 'text-purple-700 dark:text-purple-300'
-                                                    : 'text-surface-600 dark:text-surface-400'
+                                                    : 'text-[var(--ink-secondary)]'
                                             )}>
                                                 {label}
                                             </span>
@@ -378,14 +378,14 @@ export function TravelLodgingInfo({
                                 {/* Roommate Request */}
                                 {info.lodgingPreference === 'shared' && (
                                     <div>
-                                        <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">
+                                        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-1">
                                             Roommate Preference (optional)
                                         </label>
                                         {teammates.length > 0 ? (
                                             <select
                                                 value={info.roommateRequest || ''}
                                                 onChange={(e) => updateInfo({ roommateRequest: e.target.value })}
-                                                className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white"
+                                                className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)]"
                                             >
                                                 <option value="">No preference</option>
                                                 {teammates.map(name => (
@@ -398,7 +398,7 @@ export function TravelLodgingInfo({
                                                 value={info.roommateRequest || ''}
                                                 onChange={(e) => updateInfo({ roommateRequest: e.target.value })}
                                                 placeholder="Enter teammate's name"
-                                                className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white placeholder:text-surface-400"
+                                                className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]"
                                             />
                                         )}
                                     </div>
@@ -406,7 +406,7 @@ export function TravelLodgingInfo({
 
                                 {/* Sleep Schedule */}
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-2">
+                                    <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
                                         Sleep Schedule
                                     </label>
                                     <div className="grid grid-cols-3 gap-2">
@@ -422,20 +422,20 @@ export function TravelLodgingInfo({
                                                     'p-2 rounded-lg border-2 text-center transition-all text-sm',
                                                     info.sleepSchedule === value
                                                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                                                        : 'border-surface-200 dark:border-surface-700'
+                                                        : 'border-[var(--rule)]'
                                                 )}
                                             >
                                                 <Icon className={cn(
                                                     'w-4 h-4 mx-auto mb-0.5',
                                                     info.sleepSchedule === value
                                                         ? 'text-purple-600'
-                                                        : 'text-surface-400'
+                                                        : 'text-[var(--ink-tertiary)]'
                                                 )} />
                                                 <span className={cn(
                                                     'font-medium',
                                                     info.sleepSchedule === value
                                                         ? 'text-purple-700 dark:text-purple-300'
-                                                        : 'text-surface-600 dark:text-surface-400'
+                                                        : 'text-[var(--ink-secondary)]'
                                                 )}>
                                                     {label}
                                                 </span>
@@ -446,7 +446,7 @@ export function TravelLodgingInfo({
 
                                 {/* Room Preferences */}
                                 <div>
-                                    <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-2">
+                                    <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
                                         Room Preferences (optional)
                                     </label>
                                     <div className="flex flex-wrap gap-2">
@@ -458,7 +458,7 @@ export function TravelLodgingInfo({
                                                     'px-3 py-2 rounded-full border text-sm transition-all flex items-center gap-1.5',
                                                     info.roomPreferences?.includes(pref.id)
                                                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
-                                                        : 'border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400'
+                                                        : 'border-[var(--rule)] text-[var(--ink-secondary)]'
                                                 )}
                                             >
                                                 <span>{pref.emoji}</span>
@@ -475,7 +475,7 @@ export function TravelLodgingInfo({
 
             {/* Special Requests */}
             <div>
-                <label className="block text-sm font-medium text-surface-600 dark:text-surface-400 mb-2">
+                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
                     Special Requests (optional)
                 </label>
                 <textarea
@@ -483,7 +483,7 @@ export function TravelLodgingInfo({
                     onChange={(e) => updateInfo({ specialRequests: e.target.value })}
                     placeholder="Any other travel or lodging notes..."
                     rows={2}
-                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-masters/30"
+                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus:outline-none focus:ring-2 focus:ring-masters/30 ring-offset-2 ring-offset-[color:var(--canvas)]"
                 />
             </div>
         </div>

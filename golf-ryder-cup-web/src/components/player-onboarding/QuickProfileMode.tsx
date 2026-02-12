@@ -125,10 +125,10 @@ export function QuickProfileMode({
                 >
                     <Zap className="w-8 h-8 text-white" />
                 </motion.div>
-                <h2 className="text-xl font-bold text-surface-900 dark:text-white">
+                <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                     Quick Setup
                 </h2>
-                <p className="text-surface-500 dark:text-surface-400 mt-1">
+                <p className="text-[var(--ink-secondary)] mt-1">
                     Just the essentials • 30 seconds
                 </p>
             </div>
@@ -145,16 +145,16 @@ export function QuickProfileMode({
                             'w-2 h-2 rounded-full transition-colors',
                             progress >= i
                                 ? 'bg-masters'
-                                : 'bg-surface-200 dark:bg-surface-700'
+                                : 'bg-[color:var(--ink-tertiary)]/20'
                         )}
                     />
                 ))}
             </div>
 
             {/* Form Card */}
-            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-700 overflow-hidden">
+            <div className="card rounded-2xl shadow-sm overflow-hidden">
                 {/* Name Row */}
-                <div className="grid grid-cols-2 divide-x divide-surface-100 dark:divide-surface-700">
+                <div className="grid grid-cols-2 divide-x divide-[var(--rule)]">
                     <QuickInput
                         icon={<User className="w-4 h-4" />}
                         placeholder="First name"
@@ -177,7 +177,7 @@ export function QuickProfileMode({
                     />
                 </div>
 
-                <div className="border-t border-surface-100 dark:border-surface-700">
+                <div className="border-t border-[var(--rule)]">
                     <QuickInput
                         icon={<Hash className="w-4 h-4" />}
                         placeholder="Handicap (e.g., 12.5)"
@@ -194,7 +194,7 @@ export function QuickProfileMode({
                     />
                 </div>
 
-                <div className="border-t border-surface-100 dark:border-surface-700">
+                <div className="border-t border-[var(--rule)]">
                     <QuickInput
                         icon={<Mail className="w-4 h-4" />}
                         placeholder="Email address"
@@ -208,7 +208,7 @@ export function QuickProfileMode({
                     />
                 </div>
 
-                <div className="border-t border-surface-100 dark:border-surface-700">
+                <div className="border-t border-[var(--rule)]">
                     <QuickInput
                         icon={<Phone className="w-4 h-4" />}
                         placeholder="Phone (optional)"
@@ -231,7 +231,7 @@ export function QuickProfileMode({
                     'w-full py-4 px-6 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2 transition-all',
                     progress === 4
                         ? 'bg-masters text-white shadow-lg shadow-masters/30'
-                        : 'bg-surface-100 dark:bg-surface-700 text-surface-400'
+                        : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)]'
                 )}
             >
                 <Zap className="w-5 h-5" />
@@ -242,7 +242,7 @@ export function QuickProfileMode({
             {/* Switch to Full Mode */}
             <button
                 onClick={onSwitchToFull}
-                className="w-full py-3 text-center text-sm text-surface-500 dark:text-surface-400 hover:text-masters transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 text-center text-sm text-[var(--ink-secondary)] hover:text-masters transition-colors flex items-center justify-center gap-2"
             >
                 <Sparkles className="w-4 h-4" />
                 Want to add more details?
@@ -250,7 +250,7 @@ export function QuickProfileMode({
             </button>
 
             {/* Time Estimate */}
-            <div className="flex items-center justify-center gap-2 text-xs text-surface-400">
+            <div className="flex items-center justify-center gap-2 text-xs text-[var(--ink-tertiary)]">
                 <Clock className="w-3.5 h-3.5" />
                 You can complete your full profile anytime later
             </div>
@@ -293,13 +293,13 @@ function QuickInput({
         <div className={cn(
             'relative transition-colors',
             focused && 'bg-masters/5',
-            error && 'bg-red-50 dark:bg-red-900/10'
+            error && 'bg-[color:var(--error)]/10'
         )}>
             <div className="flex items-center">
                 {icon && (
                     <div className={cn(
                         'pl-4 transition-colors',
-                        focused ? 'text-masters' : 'text-surface-400'
+                        focused ? 'text-masters' : 'text-[var(--ink-tertiary)]'
                     )}>
                         {icon}
                     </div>
@@ -313,7 +313,7 @@ function QuickInput({
                     onBlur={onBlur}
                     autoFocus={autoFocus}
                     className={cn(
-                        'flex-1 py-4 px-4 bg-transparent text-surface-900 dark:text-white placeholder:text-surface-400',
+                        'flex-1 py-4 px-4 bg-transparent text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]',
                         'focus:outline-none text-base',
                         icon ? 'pl-3' : 'pl-4'
                     )}
@@ -334,7 +334,7 @@ function QuickInput({
                 </AnimatePresence>
             </div>
             {error && (
-                <div className="px-4 pb-2 text-xs text-red-500">
+                <div className="px-4 pb-2 text-xs text-[var(--error)]">
                     {error}
                 </div>
             )}
