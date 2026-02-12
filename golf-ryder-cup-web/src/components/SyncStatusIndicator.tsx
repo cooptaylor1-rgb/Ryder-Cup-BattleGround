@@ -160,16 +160,45 @@ export function SyncStatusIndicator({
     return null;
   }
 
+  const tone =
+    status === 'offline'
+      ? 'offline'
+      : status === 'syncing'
+        ? 'info'
+        : status === 'pending'
+          ? 'warning'
+          : 'success';
+
+  const toneDot: Record<typeof tone, string> = {
+    success: 'bg-[var(--success)]',
+    warning: 'bg-[var(--warning)]',
+    offline: 'bg-[var(--ink-tertiary)]',
+    info: 'bg-[var(--info)]',
+  };
+
+  const toneIconBg: Record<typeof tone, string> = {
+    success: 'bg-[color:var(--success)]/12',
+    warning: 'bg-[color:var(--warning)]/12',
+    offline: 'bg-[color:var(--ink-tertiary)]/12',
+    info: 'bg-[color:var(--info)]/12',
+  };
+
+  const tonePill: Record<typeof tone, string> = {
+    success: 'bg-[color:var(--success)]/12 text-[var(--success)] border border-[color:var(--success)]/30',
+    warning: 'bg-[color:var(--warning)]/12 text-[var(--warning)] border border-[color:var(--warning)]/30',
+    offline:
+      'bg-[color:var(--ink-tertiary)]/12 text-[var(--ink-tertiary)] border border-[color:var(--ink-tertiary)]/25',
+    info: 'bg-[color:var(--info)]/12 text-[var(--info)] border border-[color:var(--info)]/30',
+  };
+
   // Minimal variant - just a small dot indicator
   if (variant === 'minimal') {
     return (
       <div
         className={cn(
           'w-2 h-2 rounded-full transition-colors',
-          status === 'offline' && 'bg-red-500',
-          status === 'syncing' && 'bg-blue-500 animate-pulse',
-          status === 'pending' && 'bg-amber-500',
-          status === 'synced' && 'bg-green-500',
+          toneDot[tone],
+          status === 'syncing' && 'animate-pulse',
           className
         )}
         title={`${status} - ${formattedTime}`}
@@ -187,10 +216,7 @@ export function SyncStatusIndicator({
         className={cn(
           'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
           'transition-all duration-300',
-          status === 'offline' && 'bg-red-500/15 text-red-600 border border-red-500/30',
-          status === 'syncing' && 'bg-blue-500/15 text-blue-600 border border-blue-500/30',
-          status === 'pending' && 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
-          status === 'synced' && 'bg-green-500/15 text-green-600 border border-green-500/30',
+          tonePill[tone],
           pulseAnimation && 'haptic-success',
           className
         )}
@@ -200,7 +226,7 @@ export function SyncStatusIndicator({
         {status === 'pending' && <RefreshCw size={12} />}
         {status === 'synced' && <Check size={12} />}
 
-        <span>
+        <span className={status === 'offline' ? 'text-[var(--ink-secondary)]' : undefined}>
           {status === 'offline' && 'Offline'}
           {status === 'syncing' && 'Syncing...'}
           {status === 'pending' && `${pendingCount} pending`}
@@ -231,18 +257,12 @@ export function SyncStatusIndicator({
         <div className="flex items-center gap-3">
           {/* Status icon */}
           <div
-            className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center',
-              status === 'offline' && 'bg-red-500/15',
-              status === 'syncing' && 'bg-blue-500/15',
-              status === 'pending' && 'bg-amber-500/15',
-              status === 'synced' && 'bg-green-500/15'
-            )}
+            className={cn('w-8 h-8 rounded-full flex items-center justify-center', toneIconBg[tone])}
           >
-            {status === 'offline' && <CloudOff size={16} className="text-red-500" />}
-            {status === 'syncing' && <Loader2 size={16} className="text-blue-500 animate-spin" />}
-            {status === 'pending' && <RefreshCw size={16} className="text-amber-500" />}
-            {status === 'synced' && <Cloud size={16} className="text-green-500" />}
+            {status === 'offline' && <CloudOff size={16} className="text-[var(--ink-tertiary)]" />}
+            {status === 'syncing' && <Loader2 size={16} className="text-[var(--info)] animate-spin" />}
+            {status === 'pending' && <RefreshCw size={16} className="text-[var(--warning)]" />}
+            {status === 'synced' && <Cloud size={16} className="text-[var(--success)]" />}
           </div>
 
           <div className="text-left">
@@ -287,7 +307,7 @@ export function SyncStatusIndicator({
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {queueItems.slice(0, 5).map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-xs">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--warning)]" />
                     <span className="flex-1 truncate text-[var(--ink-secondary)]">{item.description}</span>
                     <span className="text-[var(--ink-tertiary)]">
                       {new Date(item.timestamp).toLocaleTimeString([], {
@@ -331,7 +351,7 @@ export function LastSyncedTimestamp({ className = '' }: { className?: string }) 
 
   if (isSyncing) {
     return (
-      <span className={cn('text-xs text-blue-500 flex items-center gap-1', className)}>
+      <span className={cn('text-xs text-[var(--info)] flex items-center gap-1', className)}>
         <Loader2 size={10} className="animate-spin" />
         Syncing...
       </span>
@@ -340,7 +360,7 @@ export function LastSyncedTimestamp({ className = '' }: { className?: string }) 
 
   if (!isOnline) {
     return (
-      <span className={cn('text-xs text-red-500 flex items-center gap-1', className)}>
+      <span className={cn('text-xs text-[var(--ink-tertiary)] flex items-center gap-1', className)}>
         <CloudOff size={10} />
         Offline
       </span>

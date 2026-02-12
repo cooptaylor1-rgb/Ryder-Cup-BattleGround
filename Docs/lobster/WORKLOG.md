@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 14:10 EST — Phase 2 — SyncStatusIndicator: premium token tones (remove hard-coded red/blue/amber/green)
+- `SyncStatusIndicator`: migrated minimal/compact/full variants off hard-coded Tailwind status colors (`red-500`, `blue-500`, `amber-*`, `green-*`) onto premium design tokens (`var(--warning)`, `var(--info)`, `var(--success)`, `var(--ink-tertiary)` for offline).
+- `LastSyncedTimestamp`: aligned syncing/offline text colors to the same token system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e4b3e87`)
+
 ### 13:45 EST — Phase 2 — Tokenize remaining Trip Settings gradient accent
 - `/trip/[tripId]/settings`: replaced the last `from-masters-green/15` gradient overlay with token-driven `from-[color:var(--masters)]/15` so the premium texture overlay stays theme-consistent.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
