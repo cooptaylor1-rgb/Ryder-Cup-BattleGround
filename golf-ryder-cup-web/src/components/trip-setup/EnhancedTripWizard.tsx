@@ -200,19 +200,19 @@ export function EnhancedTripWizard({
     return (
         <div className={cn('flex flex-col h-full', className)}>
             {/* Header with progress */}
-            <div className="px-4 py-3 border-b border-surface-200 dark:border-surface-700">
+            <div className="px-4 py-3 border-b border-[var(--rule)]">
                 {/* Step indicator */}
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-xl bg-augusta-green/10 flex items-center justify-center text-augusta-green">
+                        <div className="w-10 h-10 rounded-xl bg-[color:var(--masters)]/10 flex items-center justify-center text-[var(--masters)]">
                             {currentStepConfig.icon}
                         </div>
                         <div>
                             <h2 className="font-semibold">{currentStepConfig.label}</h2>
-                            <p className="text-xs text-surface-500">{currentStepConfig.description}</p>
+                            <p className="text-xs text-[var(--ink-tertiary)]">{currentStepConfig.description}</p>
                         </div>
                     </div>
-                    <span className="text-sm text-surface-500">
+                    <span className="text-sm text-[var(--ink-tertiary)]">
                         {currentStepIndex + 1} of {WIZARD_STEPS.length}
                     </span>
                 </div>
@@ -227,12 +227,12 @@ export function EnhancedTripWizard({
                             className={cn(
                                 'flex-1 h-1.5 rounded-full transition-all',
                                 index === currentStepIndex
-                                    ? 'bg-augusta-green'
+                                    ? 'bg-[var(--masters)]'
                                     : visitedSteps.has(step.id)
                                         ? stepCompletion[step.id]
-                                            ? 'bg-augusta-green/40'
-                                            : 'bg-amber-400'
-                                        : 'bg-surface-200 dark:bg-surface-700'
+                                            ? 'bg-[color:var(--masters)]/40'
+                                            : 'bg-[var(--warning)]'
+                                        : 'bg-[color:var(--ink-tertiary)]/25'
                             )}
                         />
                     ))}
@@ -328,7 +328,7 @@ export function EnhancedTripWizard({
             </div>
 
             {/* Footer with navigation */}
-            <div className="p-4 border-t border-surface-200 dark:border-surface-700 flex gap-3">
+            <div className="p-4 border-t border-[var(--rule)] flex gap-3">
                 {isFirstStep ? (
                     <button
                         onClick={onCancel}
@@ -465,26 +465,26 @@ function ReviewStep({ data }: { data: TripSetupData }) {
         <div className="space-y-4">
             <div className="text-center mb-6">
                 <h3 className="text-xl font-bold">{data.tripName || 'Untitled Trip'}</h3>
-                <p className="text-surface-500">{data.location || 'Location TBD'}</p>
+                <p className="text-[var(--ink-tertiary)]">{data.location || 'Location TBD'}</p>
             </div>
 
             {/* Summary cards */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="card p-4 text-center">
-                    <p className="text-3xl font-bold text-augusta-green">{data.players.length}</p>
-                    <p className="text-sm text-surface-500">Players</p>
+                    <p className="text-3xl font-bold text-[var(--masters)]">{data.players.length}</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Players</p>
                 </div>
                 <div className="card p-4 text-center">
-                    <p className="text-3xl font-bold text-augusta-green">{data.totalDays}</p>
-                    <p className="text-sm text-surface-500">Days</p>
+                    <p className="text-3xl font-bold text-[var(--masters)]">{data.totalDays}</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Days</p>
                 </div>
                 <div className="card p-4 text-center">
-                    <p className="text-3xl font-bold text-augusta-green">{data.sessions.length}</p>
-                    <p className="text-sm text-surface-500">Sessions</p>
+                    <p className="text-3xl font-bold text-[var(--masters)]">{data.sessions.length}</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Sessions</p>
                 </div>
                 <div className="card p-4 text-center">
-                    <p className="text-3xl font-bold text-augusta-green">{totalMatches}</p>
-                    <p className="text-sm text-surface-500">Matches</p>
+                    <p className="text-3xl font-bold text-[var(--masters)]">{totalMatches}</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Matches</p>
                 </div>
             </div>
 
@@ -500,9 +500,9 @@ function ReviewStep({ data }: { data: TripSetupData }) {
                     <p className="text-2xl font-bold mt-1" style={{ color: data.teamColors.teamA.primary }}>
                         {data.players.filter(p => p.team === 'A').length}
                     </p>
-                    <p className="text-xs text-surface-500">players</p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">players</p>
                 </div>
-                <div className="w-px bg-surface-200" />
+                <div className="w-px bg-[var(--rule)]" />
                 <div
                     className="flex-1 p-4 text-center"
                     style={{ backgroundColor: data.teamColors.teamB.secondary }}
@@ -513,26 +513,26 @@ function ReviewStep({ data }: { data: TripSetupData }) {
                     <p className="text-2xl font-bold mt-1" style={{ color: data.teamColors.teamB.primary }}>
                         {data.players.filter(p => p.team === 'B').length}
                     </p>
-                    <p className="text-xs text-surface-500">players</p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">players</p>
                 </div>
             </div>
 
             {/* Details list */}
-            <div className="card divide-y divide-surface-100 dark:divide-surface-800">
+            <div className="card divide-y divide-[var(--rule)]">
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">Courses</span>
+                    <span className="text-[var(--ink-tertiary)]">Courses</span>
                     <span className="font-medium">{data.courses.length} selected</span>
                 </div>
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">Total Points</span>
+                    <span className="text-[var(--ink-tertiary)]">Total Points</span>
                     <span className="font-medium">{totalPoints}</span>
                 </div>
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">Format</span>
+                    <span className="text-[var(--ink-tertiary)]">Format</span>
                     <span className="font-medium capitalize">{data.scoringSettings.defaultFormat.replace('-', ' ')}</span>
                 </div>
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">Handicap</span>
+                    <span className="text-[var(--ink-tertiary)]">Handicap</span>
                     <span className="font-medium">
                         {data.handicapSettings.useNetScoring
                             ? `${data.handicapSettings.allowancePercent}% allowance`
@@ -540,19 +540,19 @@ function ReviewStep({ data }: { data: TripSetupData }) {
                     </span>
                 </div>
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">Side Bets</span>
+                    <span className="text-[var(--ink-tertiary)]">Side Bets</span>
                     <span className="font-medium">{data.sideBets.length} configured</span>
                 </div>
                 <div className="p-3 flex justify-between">
-                    <span className="text-surface-500">First Tee</span>
+                    <span className="text-[var(--ink-tertiary)]">First Tee</span>
                     <span className="font-medium">{data.teeTimeSettings.firstTeeTime}</span>
                 </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-augusta-green/5 border border-augusta-green/20 text-center">
-                <Zap className="w-8 h-8 mx-auto text-augusta-green mb-2" />
-                <p className="font-medium text-augusta-green">Ready to create your trip!</p>
-                <p className="text-sm text-surface-500 mt-1">
+            <div className="p-4 rounded-xl bg-[color:var(--masters)]/10 border border-[color:var(--masters)]/25 text-center">
+                <Zap className="w-8 h-8 mx-auto text-[var(--masters)] mb-2" />
+                <p className="font-medium text-[var(--masters)]">Ready to create your trip!</p>
+                <p className="text-sm text-[var(--ink-tertiary)] mt-1">
                     You can always edit these settings later
                 </p>
             </div>

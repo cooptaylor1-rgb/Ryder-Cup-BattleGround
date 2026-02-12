@@ -142,18 +142,18 @@ export const PulseAnimation: Story = {
 // Real-world examples
 export const RealWorldExamples: Story = {
   render: () => (
-    <div className="flex flex-col gap-6 p-6 bg-surface-base rounded-xl">
+    <div className="flex flex-col gap-6 p-6 rounded-xl border border-[var(--rule)] bg-[var(--canvas)]">
       <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-semibold text-canvas">Player Card</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Player Card</h3>
         <div className="flex items-center gap-2">
-          <span className="text-canvas">John Smith</span>
+          <span className="text-[var(--ink-primary)]">John Smith</span>
           <Badge variant="usa">USA</Badge>
           <Badge variant="primary" icon={<Trophy size={12} />}>MVP</Badge>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-semibold text-canvas">Match Status</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Match Status</h3>
         <div className="flex items-center gap-3">
           <Badge variant="live" dot pulse>Live</Badge>
           <Badge variant="default" icon={<Clock size={12} />}>Hole 7</Badge>
@@ -162,7 +162,7 @@ export const RealWorldExamples: Story = {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h3 className="text-lg font-semibold text-canvas">Handicap Info</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Handicap Info</h3>
         <div className="flex gap-2">
           <Badge variant="info">+4.2 HCP</Badge>
           <Badge variant="warning" icon={<Zap size={12} />}>Hot Streak</Badge>
