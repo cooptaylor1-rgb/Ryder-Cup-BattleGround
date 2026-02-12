@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 01:40 EST — Phase 2 — PlayerOnboardingWizard: premium token sweep
+- `PlayerOnboardingWizard`: replaced remaining legacy `surface-*` palette utilities (bg/border/text/hover + dark variants) with premium token-driven Tailwind (`var(--canvas)`, `var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
+- Standardized disabled CTA state onto a token-neutral tint (`bg-[color:var(--ink-tertiary)]/10`) and removed remaining dark-mode palette branches.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4d1ba10`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 01:05 EST — Phase 2 — MatchCard + ScoreButton: premium token sweep
 - `MatchCard`: migrated remaining legacy `surface-*` palette utilities (hover/text/dividers) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-tertiary)`).
 - `ScoreButton`: replaced legacy `surface-*` palette fallbacks for the “Halved” + default button states with premium surfaces/ink/rule tokens; standardized focus/selected rings to token-driven `var(--masters)` + `ring-offset-[color:var(--canvas)]`.

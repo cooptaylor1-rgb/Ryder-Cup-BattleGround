@@ -17,3 +17,9 @@
 - `/settings/notifications`: added `aria-label` support to the toggle switch and set labels for tee time + type toggles so screen readers announce control purpose.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`28818ba`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
+## 01:40 EST — Phase 2 — PlayerOnboardingWizard: premium token sweep
+- `PlayerOnboardingWizard`: migrated legacy `surface-*` palette utilities (bg/border/text/hover + dark variants) to premium token-driven Tailwind (`var(--canvas)`, `var(--surface)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
+- Standardized disabled CTA styling onto a token-neutral tint (`bg-[color:var(--ink-tertiary)]/10`) and removed remaining dark-mode palette branches.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4d1ba10`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
