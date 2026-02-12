@@ -161,11 +161,11 @@ export function AvailabilityCalendar({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="font-semibold text-surface-900 dark:text-white flex items-center gap-2">
+                    <h3 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-masters" />
                         Your Availability
                     </h3>
-                    <p className="text-sm text-surface-500 mt-0.5">
+                    <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                         Mark which sessions you can play
                     </p>
                 </div>
@@ -194,7 +194,7 @@ export function AvailabilityCalendar({
             </div>
 
             {/* Calendar Days */}
-            <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+            <div className="rounded-2xl border border-[var(--rule)] overflow-hidden bg-[var(--surface-raised)]">
                 {tripDays.map((day, dayIndex) => {
                     const daySessions = getSessionsForDay(day);
                     const isExpanded = expandedDay === day.toISOString();
@@ -204,14 +204,14 @@ export function AvailabilityCalendar({
                         <div
                             key={dayKey}
                             className={cn(
-                                'border-b border-surface-100 dark:border-surface-700 last:border-b-0',
-                                isExpanded && 'bg-surface-50 dark:bg-surface-800/50'
+                                'border-b border-[color:var(--rule)]/60 last:border-b-0',
+                                isExpanded && 'bg-[var(--surface-secondary)]'
                             )}
                         >
                             {/* Day Header */}
                             <button
                                 onClick={() => setExpandedDay(isExpanded ? null : dayKey)}
-                                className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors"
+                                className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-xl bg-masters/10 flex flex-col items-center justify-center">
@@ -223,10 +223,10 @@ export function AvailabilityCalendar({
                                         </span>
                                     </div>
                                     <div>
-                                        <div className="font-medium text-surface-900 dark:text-white text-left">
+                                        <div className="font-medium text-[var(--ink-primary)] text-left">
                                             Day {dayIndex + 1}
                                         </div>
-                                        <div className="text-sm text-surface-500">
+                                        <div className="text-sm text-[var(--ink-secondary)]">
                                             {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
                                         </div>
                                     </div>
@@ -254,7 +254,7 @@ export function AvailabilityCalendar({
                                     })}
                                     <ChevronRight
                                         className={cn(
-                                            'w-5 h-5 text-surface-400 transition-transform',
+                                            'w-5 h-5 text-[var(--ink-tertiary)] transition-transform',
                                             isExpanded && 'rotate-90'
                                         )}
                                     />
@@ -277,7 +277,7 @@ export function AvailabilityCalendar({
                                                 return (
                                                     <div
                                                         key={session.id}
-                                                        className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 p-3"
+                                                        className="rounded-xl border border-[var(--rule)] bg-[var(--surface)] p-3"
                                                     >
                                                         <div className="flex items-center justify-between mb-3">
                                                             <div className="flex items-center gap-2">
@@ -290,11 +290,11 @@ export function AvailabilityCalendar({
                                                                 {session.time === 'full' && (
                                                                     <Calendar className="w-4 h-4 text-blue-500" />
                                                                 )}
-                                                                <span className="font-medium text-surface-900 dark:text-white">
+                                                                <span className="font-medium text-[var(--ink-primary)]">
                                                                     {session.name}
                                                                 </span>
                                                             </div>
-                                                            <span className="text-xs text-surface-500 px-2 py-1 bg-surface-100 dark:bg-surface-700 rounded-full">
+                                                            <span className="text-xs text-[var(--ink-tertiary)] px-2 py-1 bg-[var(--surface-secondary)] rounded-full">
                                                                 {session.format}
                                                             </span>
                                                         </div>
@@ -370,7 +370,7 @@ export function AvailabilityCalendar({
                                                                     sessionId: session.id,
                                                                     note: sessionAvailability.note || '',
                                                                 })}
-                                                                className="w-full mt-2 py-2 text-xs text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors flex items-center justify-center gap-1"
+                                                                className="w-full mt-2 py-2 text-xs text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)] transition-colors flex items-center justify-center gap-1"
                                                             >
                                                                 <AlertCircle className="w-3.5 h-3.5" />
                                                                 {sessionAvailability.note
@@ -404,14 +404,14 @@ export function AvailabilityCalendar({
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-surface-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-xl"
+                            className="bg-[var(--surface-raised)] rounded-2xl w-full max-w-sm overflow-hidden shadow-xl border border-[var(--rule)]"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="p-4 border-b border-surface-200 dark:border-surface-700">
-                                <h3 className="font-semibold text-surface-900 dark:text-white">
+                            <div className="p-4 border-b border-[var(--rule)]">
+                                <h3 className="font-semibold text-[var(--ink-primary)]">
                                     Add a Note
                                 </h3>
-                                <p className="text-sm text-surface-500">
+                                <p className="text-sm text-[var(--ink-secondary)]">
                                     Let the captain know why
                                 </p>
                             </div>
@@ -421,14 +421,14 @@ export function AvailabilityCalendar({
                                     onChange={(e) => setNoteModal({ ...noteModal, note: e.target.value })}
                                     placeholder="e.g., Flight arrives at 2pm"
                                     rows={3}
-                                    className="w-full p-3 rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-white placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-masters/30"
+                                    className="w-full p-3 rounded-xl border border-[var(--rule)] bg-[var(--surface-secondary)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30 ring-offset-2 ring-offset-[color:var(--canvas)]"
                                     autoFocus
                                 />
                             </div>
-                            <div className="flex gap-2 p-4 border-t border-surface-200 dark:border-surface-700">
+                            <div className="flex gap-2 p-4 border-t border-[var(--rule)]">
                                 <button
                                     onClick={() => setNoteModal(null)}
-                                    className="flex-1 py-2.5 rounded-lg border border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 font-medium"
+                                    className="flex-1 py-2.5 rounded-lg border border-[var(--rule)] text-[var(--ink-secondary)] font-medium hover:bg-[var(--surface-secondary)] transition-colors"
                                 >
                                     Cancel
                                 </button>
