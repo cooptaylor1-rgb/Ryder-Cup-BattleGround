@@ -231,7 +231,7 @@ export function TripRecap({
                             'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                             activeSection === section
                                 ? 'bg-masters-primary text-white'
-                                : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
+                                : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] hover:bg-[var(--surface)]'
                         )}
                     >
                         {section.charAt(0).toUpperCase() + section.slice(1)}
@@ -254,7 +254,7 @@ export function TripRecap({
                                     <div className="text-lg font-bold">
                                         {formatPlayerName(mvp.player.firstName, mvp.player.lastName, 'full')}
                                     </div>
-                                    <div className="text-sm text-surface-500">
+                                    <div className="text-sm text-[var(--ink-tertiary)]">
                                         {mvp.wins}W - {mvp.losses}L - {mvp.halves}H ({mvp.points} pts)
                                     </div>
                                 </div>
@@ -267,8 +267,8 @@ export function TripRecap({
 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
-                            <div className="flex items-center gap-2 text-surface-500 mb-2">
+                        <div className="card p-4">
+                            <div className="flex items-center gap-2 text-[var(--ink-tertiary)] mb-2">
                                 <Target className="w-4 h-4" />
                                 <span className="text-sm">Matches Played</span>
                             </div>
@@ -277,8 +277,8 @@ export function TripRecap({
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
-                            <div className="flex items-center gap-2 text-surface-500 mb-2">
+                        <div className="card p-4">
+                            <div className="flex items-center gap-2 text-[var(--ink-tertiary)] mb-2">
                                 <Flame className="w-4 h-4" />
                                 <span className="text-sm">Sessions</span>
                             </div>
@@ -288,15 +288,15 @@ export function TripRecap({
 
                     {/* Best Match */}
                     {bestMatch !== null && (
-                        <div className="p-4 rounded-xl bg-surface-card border border-surface-200 dark:border-surface-700">
-                            <div className="flex items-center gap-2 text-surface-500 mb-3">
+                        <div className="card p-4">
+                            <div className="flex items-center gap-2 text-[var(--ink-tertiary)] mb-3">
                                 <Star className="w-4 h-4" />
                                 <span className="text-sm">Most Dominant Victory</span>
                             </div>
                             <div className="text-lg font-bold">
                                 {(bestMatch as { match: Match; state: MatchState; margin: number }).state.displayScore}
                             </div>
-                            <div className="text-sm text-surface-500 mt-1">
+                            <div className="text-sm text-[var(--ink-tertiary)] mt-1">
                                 {(bestMatch as { match: Match; state: MatchState; margin: number }).match.teamAPlayerIds.map((id: string) => {
                                     const p = players.get(id);
                                     return p ? formatPlayerName(p.firstName, p.lastName, 'short') : '';
@@ -320,10 +320,10 @@ export function TripRecap({
                             key={record.player.id}
                             className={cn(
                                 'flex items-center gap-4 p-4 rounded-xl',
-                                'bg-surface-card border border-surface-200 dark:border-surface-700'
+                                'card'
                             )}
                         >
-                            <div className="text-xl font-bold text-surface-400 w-8">
+                            <div className="text-xl font-bold text-[var(--ink-tertiary)]/70 w-8">
                                 #{index + 1}
                             </div>
 
@@ -331,7 +331,7 @@ export function TripRecap({
                                 <div className="font-medium">
                                     {formatPlayerName(record.player.firstName, record.player.lastName, 'full')}
                                 </div>
-                                <div className="text-sm text-surface-500">
+                                <div className="text-sm text-[var(--ink-tertiary)]">
                                     {record.wins}W - {record.losses}L - {record.halves}H
                                 </div>
                             </div>
@@ -342,7 +342,7 @@ export function TripRecap({
 
                             <div className="text-right">
                                 <div className="text-xl font-bold">{record.points}</div>
-                                <div className="text-xs text-surface-500">points</div>
+                                <div className="text-xs text-[var(--ink-tertiary)]">points</div>
                             </div>
 
                             {index === 0 && (
@@ -358,7 +358,7 @@ export function TripRecap({
                 <div className="space-y-4">
                     {sessions.map((session) => (
                         <div key={session.id}>
-                            <h3 className="text-sm font-medium text-surface-500 mb-2">
+                            <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-2">
                                 {session.name}
                             </h3>
                             <div className="space-y-2">
@@ -372,7 +372,7 @@ export function TripRecap({
                                     .map(({ match, state }) => (
                                         <div
                                             key={match.id}
-                                            className="flex items-center gap-3 p-3 rounded-lg bg-surface-card border border-surface-200 dark:border-surface-700"
+                                            className="flex items-center gap-3 p-3 rounded-lg bg-[var(--surface)] border border-[var(--rule)]"
                                         >
                                             <div className="flex-1 text-sm">
                                                 {match.teamAPlayerIds
@@ -388,7 +388,7 @@ export function TripRecap({
                                                         ? 'text-team-usa'
                                                         : state.currentScore < 0
                                                           ? 'text-team-europe'
-                                                          : 'text-surface-500'
+                                                          : 'text-[var(--ink-tertiary)]'
                                                 )}
                                             >
                                                 {state.displayScore}
@@ -416,7 +416,7 @@ export function TripRecap({
                             {photos.map((photo) => (
                                 <div
                                     key={photo.id}
-                                    className="aspect-square rounded-lg overflow-hidden bg-surface-100 dark:bg-surface-800 relative"
+                                    className="aspect-square rounded-lg overflow-hidden bg-[var(--surface-secondary)] relative"
                                 >
                                     <Image
                                         src={photo.url}
@@ -429,9 +429,9 @@ export function TripRecap({
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12 bg-surface-50 dark:bg-surface-800/50 rounded-xl">
-                            <Camera className="w-12 h-12 mx-auto mb-3 text-surface-400" />
-                            <p className="text-surface-500">No photos from this trip</p>
+                        <div className="text-center py-12 bg-[var(--surface-secondary)] rounded-xl border border-[var(--rule)]">
+                            <Camera className="w-12 h-12 mx-auto mb-3 text-[var(--ink-tertiary)]/60" />
+                            <p className="text-[var(--ink-tertiary)]">No photos from this trip</p>
                         </div>
                     )}
                 </div>
