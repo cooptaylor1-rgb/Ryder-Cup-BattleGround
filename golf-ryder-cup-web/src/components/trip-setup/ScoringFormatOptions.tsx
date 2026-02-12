@@ -81,37 +81,37 @@ const FORMAT_OPTIONS: {
     label: string;
     description: string;
     icon: React.ReactNode;
-    color: string;
+    iconClass: string;
 }[] = [
-        {
-            format: 'match-play',
-            label: 'Match Play',
-            description: 'Hole-by-hole competition, most holes wins',
-            icon: <Target className="w-5 h-5" />,
-            color: 'bg-green-500',
-        },
-        {
-            format: 'stroke-play',
-            label: 'Stroke Play',
-            description: 'Total strokes, lowest score wins',
-            icon: <ListOrdered className="w-5 h-5" />,
-            color: 'bg-blue-500',
-        },
-        {
-            format: 'stableford',
-            label: 'Stableford',
-            description: 'Points per hole based on score',
-            icon: <Star className="w-5 h-5" />,
-            color: 'bg-purple-500',
-        },
-        {
-            format: 'modified-stableford',
-            label: 'Modified Stableford',
-            description: 'Aggressive points with penalties',
-            icon: <Medal className="w-5 h-5" />,
-            color: 'bg-orange-500',
-        },
-    ];
+    {
+        format: 'match-play',
+        label: 'Match Play',
+        description: 'Hole-by-hole competition, most holes wins',
+        icon: <Target className="w-5 h-5" />,
+        iconClass: 'bg-[var(--masters)] text-[var(--canvas)]',
+    },
+    {
+        format: 'stroke-play',
+        label: 'Stroke Play',
+        description: 'Total strokes, lowest score wins',
+        icon: <ListOrdered className="w-5 h-5" />,
+        iconClass: 'bg-[var(--info)] text-[var(--canvas)]',
+    },
+    {
+        format: 'stableford',
+        label: 'Stableford',
+        description: 'Points per hole based on score',
+        icon: <Star className="w-5 h-5" />,
+        iconClass: 'bg-[var(--color-accent)] text-[var(--masters-deep)]',
+    },
+    {
+        format: 'modified-stableford',
+        label: 'Modified Stableford',
+        description: 'Aggressive points with penalties',
+        icon: <Medal className="w-5 h-5" />,
+        iconClass: 'bg-[var(--warning)] text-[var(--masters-deep)]',
+    },
+];
 
 export function ScoringFormatOptions({
     settings,
@@ -155,10 +155,10 @@ export function ScoringFormatOptions({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Calculator className="w-5 h-5 text-augusta-green" />
+                        <Calculator className="w-5 h-5 text-[var(--masters)]" />
                         Scoring Format
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-secondary)]">
                         Choose how matches are scored
                     </p>
                 </div>
@@ -171,25 +171,25 @@ export function ScoringFormatOptions({
                         key={option.format}
                         onClick={() => updateSetting('defaultFormat', option.format)}
                         className={cn(
-                            'p-3 rounded-xl border-2 text-left transition-all',
+                            'p-3 rounded-xl border-2 text-left transition-all bg-[var(--surface-secondary)]',
                             settings.defaultFormat === option.format
-                                ? 'border-augusta-green bg-augusta-green/5'
-                                : 'border-surface-200 dark:border-surface-700 hover:border-augusta-green/50'
+                                ? 'border-[var(--masters)] bg-[var(--masters-subtle)] ring-1 ring-[color:var(--masters)]/20'
+                                : 'border-[var(--rule)] hover:border-[color:var(--masters)]/40 hover:bg-[var(--surface)]'
                         )}
                     >
                         <div className="flex items-start gap-2">
                             <div className={cn(
-                                'w-8 h-8 rounded-lg flex items-center justify-center text-white',
-                                option.color
+                                'w-8 h-8 rounded-lg flex items-center justify-center',
+                                option.iconClass
                             )}>
                                 {option.icon}
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-sm">{option.label}</p>
-                                <p className="text-xs text-surface-500 mt-0.5">{option.description}</p>
+                                <p className="text-xs text-[var(--ink-tertiary)] mt-0.5">{option.description}</p>
                             </div>
                             {settings.defaultFormat === option.format && (
-                                <Check className="w-4 h-4 text-augusta-green shrink-0" />
+                                <Check className="w-4 h-4 text-[var(--masters)] shrink-0" />
                             )}
                         </div>
                     </button>
@@ -201,7 +201,7 @@ export function ScoringFormatOptions({
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="font-medium">Allow Format Per Session</p>
-                        <p className="text-sm text-surface-500">
+                        <p className="text-sm text-[var(--ink-secondary)]">
                             Let each session use a different format
                         </p>
                     </div>
@@ -210,13 +210,13 @@ export function ScoringFormatOptions({
                         className={cn(
                             'relative w-14 h-8 rounded-full transition-colors',
                             settings.allowFormatPerSession
-                                ? 'bg-augusta-green'
-                                : 'bg-surface-300 dark:bg-surface-600'
+                                ? 'bg-[var(--masters)]'
+                                : 'bg-[color:var(--ink-tertiary)]/25'
                         )}
                     >
                         <motion.div
                             animate={{ x: settings.allowFormatPerSession ? 24 : 4 }}
-                            className="absolute top-1 w-6 h-6 rounded-full bg-white shadow-sm"
+                            className="absolute top-1 w-6 h-6 rounded-full bg-[var(--surface-raised)] shadow-sm"
                         />
                     </button>
                 </div>
@@ -234,19 +234,19 @@ export function ScoringFormatOptions({
                             key={option.value}
                             onClick={() => updateSetting('winCondition', option.value as WinCondition)}
                             className={cn(
-                                'w-full p-3 rounded-lg border-2 text-left transition-all',
+                                'w-full p-3 rounded-lg border-2 text-left transition-all bg-[var(--surface-secondary)]',
                                 settings.winCondition === option.value
-                                    ? 'border-augusta-green bg-augusta-green/5'
-                                    : 'border-surface-200 dark:border-surface-700'
+                                    ? 'border-[var(--masters)] bg-[var(--masters-subtle)] ring-1 ring-[color:var(--masters)]/20'
+                                    : 'border-[var(--rule)] hover:border-[color:var(--masters)]/40 hover:bg-[var(--surface)]'
                             )}
                         >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="font-medium text-sm">{option.label}</p>
-                                    <p className="text-xs text-surface-500">{option.desc}</p>
+                                    <p className="text-xs text-[var(--ink-tertiary)]">{option.desc}</p>
                                 </div>
                                 {settings.winCondition === option.value && (
-                                    <Check className="w-4 h-4 text-augusta-green" />
+                                    <Check className="w-4 h-4 text-[var(--masters)]" />
                                 )}
                             </div>
                         </button>
@@ -258,7 +258,7 @@ export function ScoringFormatOptions({
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        className="pt-3 border-t border-surface-200 dark:border-surface-700"
+                        className="pt-3 border-t border-[var(--rule)]"
                     >
                         <label className="text-sm font-medium mb-2 block">Points to Win</label>
                         <div className="flex gap-2">
@@ -269,8 +269,8 @@ export function ScoringFormatOptions({
                                     className={cn(
                                         'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                         settings.pointsToWin === pts
-                                            ? 'bg-augusta-green text-white'
-                                            : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200'
+                                            ? 'bg-[var(--masters)] text-[var(--canvas)]'
+                                            : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)]'
                                     )}
                                 >
                                     {pts}
@@ -286,22 +286,22 @@ export function ScoringFormatOptions({
                 <div className="card overflow-hidden">
                     <button
                         onClick={() => setShowStablefordConfig(!showStablefordConfig)}
-                        className="w-full p-4 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                        className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                     >
                         <div className="flex items-center gap-3">
-                            <Star className="w-5 h-5 text-purple-500" />
+                            <Star className="w-5 h-5 text-[var(--color-accent)]" />
                             <div className="text-left">
                                 <p className="font-medium">
                                     {settings.defaultFormat === 'stableford' ? 'Stableford' : 'Modified Stableford'} Points
                                 </p>
-                                <p className="text-xs text-surface-500">
+                                <p className="text-xs text-[var(--ink-tertiary)]">
                                     Customize points per score
                                 </p>
                             </div>
                         </div>
                         <ChevronDown
                             className={cn(
-                                'w-5 h-5 text-surface-500 transition-transform',
+                                'w-5 h-5 text-[var(--ink-secondary)] transition-transform',
                                 showStablefordConfig && 'rotate-180'
                             )}
                         />
@@ -315,7 +315,7 @@ export function ScoringFormatOptions({
                                 exit={{ height: 0 }}
                                 className="overflow-hidden"
                             >
-                                <div className="p-4 pt-0 border-t border-surface-200 dark:border-surface-700">
+                                <div className="p-4 pt-0 border-t border-[var(--rule)]">
                                     {settings.defaultFormat === 'stableford' ? (
                                         <div className="space-y-3">
                                             {[
@@ -339,8 +339,8 @@ export function ScoringFormatOptions({
                                                                 className={cn(
                                                                     'w-8 h-8 rounded-lg text-sm font-medium transition-all',
                                                                     settings.stablefordPoints[key] === pts
-                                                                        ? 'bg-purple-500 text-white'
-                                                                        : 'bg-surface-100 dark:bg-surface-700'
+                                                                        ? 'bg-[var(--masters)] text-[var(--canvas)]'
+                                                                        : 'bg-[var(--surface-secondary)]'
                                                                 )}
                                                             >
                                                                 {pts}
@@ -389,11 +389,11 @@ export function ScoringFormatOptions({
 
             {/* Format explanation */}
             {selectedFormat && (
-                <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-800 flex gap-3">
-                    <Info className="w-5 h-5 text-augusta-green shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-[var(--surface-secondary)] flex gap-3">
+                    <Info className="w-5 h-5 text-[var(--masters)] shrink-0 mt-0.5" />
                     <div className="text-sm">
-                        <p className="font-medium text-augusta-green">{selectedFormat.label}</p>
-                        <p className="text-surface-600 dark:text-surface-400 mt-1">
+                        <p className="font-medium text-[var(--masters)]">{selectedFormat.label}</p>
+                        <p className="text-[var(--ink-secondary)] mt-1">
                             {selectedFormat.format === 'match-play' && (
                                 'Each hole is a separate contest. The player/team with the lowest score wins the hole. Most holes won wins the match.'
                             )}
