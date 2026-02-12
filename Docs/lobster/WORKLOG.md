@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 07:58 EST — Phase 2 — Trip setup HandicapRules: premium token sweep
+- `HandicapRules` (trip setup): migrated legacy `surface-*` palette utilities + `augusta-green` accents onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`), removing dark-mode palette branches.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c23306e`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 07:28 EST — Phase 2 — Player onboarding AvailabilityCalendar: premium token sweep
 - `AvailabilityCalendar`: migrated the calendar container, expanded session cards, and note modal off the legacy `surface-*` palette and onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`), keeping the semantic availability colors intact.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
