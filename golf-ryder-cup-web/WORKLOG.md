@@ -2,6 +2,9 @@
 
 All times America/New_York.
 
+## 2026-02-12
+- 22:15 — Shipped batch: Social Poll UI (`PollCard`, `CreatePollModal`) and `PlayerStatsCard` migrated off legacy `card-surface` + `surface-tertiary` borders and onto the premium `.card` surface + `var(--rule)` separators. Also standardized subtle progress-bar/dashed-border neutrals using token-driven Tailwind (`bg-[color:var(--ink-tertiary)]/15`, `border-[color:var(--rule)]/40`). (commit f68a71a)
+
 ## 2026-02-11
 - 18:55 — Shipped batch: WeatherBanner now treats `0` as a meaningful weather value and will render whenever *any* weather signal is provided (condition, precip chance, temperature, or wind speed). Prevents the banner from silently disappearing when wind/temperature are present but `condition` is unset. (commit 842ef4e)
 - 14:50 — Shipped batch: removed remaining shadcn-style CSS var tokens (`--border`, `--card`) from the Offline Queue panel, the Quick Score FAB “Start scoring” affordance, the FloatingMyMatch fallback chip, and the Players bulk-add dropzone. All now use premium surface/rule/ink tokens (`var(--surface-raised)`, `var(--rule)`, `var(--ink-primary)`) so borders/surfaces don’t silently drift across themes. (commit a445d56)

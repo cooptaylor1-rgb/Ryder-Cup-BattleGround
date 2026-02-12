@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 22:15 EST — Phase 2 — Social Polls + PlayerStatsCard: premium `.card` + rule tokens
+- Social Poll UI (`PollCard`, `CreatePollModal`): replaced legacy `card-surface` wrapper with the shared premium `.card` surface.
+- Standardized section separators/dashed affordances off `border-[var(--surface-tertiary)]` and onto premium `border-[var(--rule)]` / `border-[color:var(--rule)]/40`.
+- `PlayerStatsCard`: replaced legacy `card-surface` wrapper with `.card`; migrated section separators to `border-[var(--rule)]` and standardized the closing-rate track to a token-driven neutral (`bg-[color:var(--ink-tertiary)]/15`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f68a71a`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 21:55 EST — Phase 2 — Modal/Toast/ConfirmDialog: premium token sweep
 - `Modal`: migrated overlay + dialog surfaces/borders/text off legacy inline `var(--surface-card)` / `--border-subtle` / `--text-*` and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
 - `Toast`: migrated toast container + item surfaces/borders/text onto premium tokens and removed legacy `hover:bg-surface-highlight` usage.
