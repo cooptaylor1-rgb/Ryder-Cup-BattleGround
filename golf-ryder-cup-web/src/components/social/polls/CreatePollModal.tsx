@@ -159,9 +159,9 @@ export function CreatePollModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="card-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-scale-up">
+      <div className="card rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-scale-up">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[var(--surface-tertiary)]">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--rule)]">
           <h2 className="type-h3">Create Poll</h2>
           <button
             onClick={onClose}
@@ -172,7 +172,7 @@ export function CreatePollModal({
         </div>
 
         {/* Mode Tabs */}
-        <div className="flex border-b border-[var(--surface-tertiary)]">
+        <div className="flex border-b border-[var(--rule)]">
           <button
             onClick={() => setMode('templates')}
             className={cn(
@@ -215,7 +215,7 @@ export function CreatePollModal({
                       'w-full p-4 rounded-xl text-left transition-all',
                       disabled
                         ? 'opacity-50 cursor-not-allowed bg-[var(--surface-secondary)]'
-                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] hover:scale-[1.02]'
+                        : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)] hover:scale-[1.02]'
                     )}
                   >
                     <div className="flex items-start gap-3">
@@ -298,7 +298,7 @@ export function CreatePollModal({
                   {options.length < 10 && (
                     <button
                       onClick={handleAddOption}
-                      className="w-full py-2 border-2 border-dashed border-[var(--surface-tertiary)] rounded-lg text-[var(--ink-tertiary)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors flex items-center justify-center gap-2 type-caption"
+                      className="w-full py-2 border-2 border-dashed border-[color:var(--rule)]/40 rounded-lg text-[var(--ink-tertiary)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors flex items-center justify-center gap-2 type-caption"
                     >
                       <Plus size={14} />
                       Add option
@@ -378,7 +378,7 @@ export function CreatePollModal({
 
         {/* Footer */}
         {mode === 'custom' && (
-          <div className="p-4 border-t border-[var(--surface-tertiary)]">
+          <div className="p-4 border-t border-[var(--rule)]">
             <button
               onClick={handleCreateCustom}
               disabled={!isValidCustom || isCreating}

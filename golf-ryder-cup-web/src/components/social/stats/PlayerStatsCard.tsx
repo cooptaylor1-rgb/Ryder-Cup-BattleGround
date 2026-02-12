@@ -85,10 +85,7 @@ export function PlayerStatsCard({
   ], [stats]);
 
   return (
-    <div className={cn(
-      'card-surface rounded-xl overflow-hidden',
-      className
-    )}>
+    <div className={cn('card rounded-xl overflow-hidden', className)}>
       {/* Header */}
       <div className="p-4 bg-gradient-to-r from-[var(--surface-secondary)] to-transparent">
         <div className="flex items-start gap-4">
@@ -143,7 +140,7 @@ export function PlayerStatsCard({
       </div>
 
       {/* Format Records */}
-      <div className="px-4 py-3 border-t border-[var(--surface-tertiary)] grid grid-cols-3 gap-4">
+      <div className="px-4 py-3 border-t border-[var(--rule)] grid grid-cols-3 gap-4">
         <FormatRecord
           label="Singles"
           record={stats.singlesRecord}
@@ -161,7 +158,7 @@ export function PlayerStatsCard({
       {/* Detailed Stats */}
       {showDetails && (
         <>
-          <div className="px-4 py-3 border-t border-[var(--surface-tertiary)] grid grid-cols-3 gap-3">
+          <div className="px-4 py-3 border-t border-[var(--rule)] grid grid-cols-3 gap-3">
             {statsItems.map((item, index) => (
               <div key={index} className="text-center">
                 <div className={cn(
@@ -181,7 +178,7 @@ export function PlayerStatsCard({
 
           {/* Best Partner / Worst Matchup */}
           {(stats.bestPartner || stats.worstMatchup) && (
-            <div className="px-4 py-3 border-t border-[var(--surface-tertiary)] grid grid-cols-2 gap-4">
+            <div className="px-4 py-3 border-t border-[var(--rule)] grid grid-cols-2 gap-4">
               {stats.bestPartner && (
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-lg bg-[var(--masters)]/10 text-[var(--masters)]">
@@ -213,7 +210,7 @@ export function PlayerStatsCard({
 
           {/* Closing Rate */}
           {stats.closingRate > 0 && (
-            <div className="px-4 py-3 border-t border-[var(--surface-tertiary)]">
+            <div className="px-4 py-3 border-t border-[var(--rule)]">
               <div className="flex items-center justify-between">
                 <span className="type-caption text-[var(--ink-tertiary)]">Closing Rate (when 2+ up)</span>
                 <span className={cn(
@@ -223,7 +220,7 @@ export function PlayerStatsCard({
                   {Math.round(stats.closingRate)}%
                 </span>
               </div>
-              <div className="mt-1 h-1.5 bg-[var(--surface-tertiary)] rounded-full overflow-hidden">
+              <div className="mt-1 h-1.5 bg-[color:var(--ink-tertiary)]/15 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[var(--masters)] rounded-full transition-all"
                   style={{ width: `${stats.closingRate}%` }}
