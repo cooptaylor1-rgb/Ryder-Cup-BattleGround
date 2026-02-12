@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 11:08 EST — Phase 2 — Nassau Enhanced card: premium token sweep
+- `NassauEnhancedCard`: replaced legacy `bg-white`/`dark:*` surface palettes and `text-gray-*` ink utilities with the shared premium `.card` shell, token-driven ink/surface/team classes, and primary button/input patterns so the Nassau side game aligns with the premium shell.
+- Auto-press configuration now uses premium success + neutral tokens for the toggle, team selection chips reuse Ryder Cup team tokens, and standings/payout/press pills leverage the standard warning/success accents instead of bespoke Tailwind colors.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`617b78a`)
+
 ### 10:38 EST — Phase 2 — Trip setup scoring format: premium token sweep
 - `ScoringFormatOptions`: migrated legacy `surface-*`, `augusta-green`, and `text-surface-*` utilities to premium token-driven Tailwind for cards, toggles, and Stableford configuration so the trip scoring setup matches the premium shell.
 - Format badges now use premium status tokens (`var(--masters)`, `var(--info)`, `var(--color-accent)`, `var(--warning)`) with shared ring/masters-subtle selection states, and supporting copy moved onto the shared `ink` token palette.
