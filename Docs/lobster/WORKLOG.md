@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 02:56 EST — Phase 2 — ShareButton: premium tokens in fallback menu
+- `ShareButton`: migrated the non-WebShare fallback menu off legacy `surface-*` palette utilities and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
+- Copied state now uses the premium success token (`var(--success)`) instead of hard-coded green.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`574da3b`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 02:27 EST — Docs — Worklog chronological hygiene (2026-02-11)
 - `Docs/lobster/WORKLOG.md`: fixed a minor ordering regression where the **23:24** Phase 2 entry had drifted below **20:45**; restored reverse-chronological ordering and removed an extra blank line.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
