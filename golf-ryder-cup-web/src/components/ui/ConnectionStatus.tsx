@@ -48,9 +48,9 @@ export function ConnectionStatus({ tripId: _tripId, showDetails = false, classNa
             icon: CloudOff,
             label: 'Local Only',
             description: 'Cloud sync not configured',
-            color: 'text-surface-500',
-            bgColor: 'bg-surface-100 dark:bg-surface-800',
-            borderColor: 'border-surface-300 dark:border-surface-700',
+            color: 'text-[var(--ink-secondary)]',
+            bgColor: 'bg-[color:var(--surface-secondary)]',
+            borderColor: 'border-[color:var(--rule)]/40',
         },
         syncing: {
             icon: RefreshCw,
@@ -113,10 +113,10 @@ export function ConnectionStatus({ tripId: _tripId, showDetails = false, classNa
                 </div>
                 <div className="flex-1">
                     <div className={cn('font-medium', config.color)}>{config.label}</div>
-                    <div className="text-sm text-surface-500">{config.description}</div>
+                    <div className="text-sm text-[var(--ink-tertiary)]">{config.description}</div>
                 </div>
                 {syncStatus.lastSyncAt && (
-                    <div className="text-xs text-surface-400">
+                    <div className="text-xs text-[var(--ink-tertiary)]">
                         Last sync: {formatRelativeTime(syncStatus.lastSyncAt)}
                     </div>
                 )}
@@ -169,7 +169,7 @@ export function ConnectionStatusBadge({ className }: { className?: string }) {
     }
 
     return (
-        <span className={cn('flex items-center gap-1 text-xs text-surface-500', className)}>
+        <span className={cn('flex items-center gap-1 text-xs text-[var(--ink-tertiary)]', className)}>
             <CloudOff className="w-3 h-3" />
             Local
         </span>
@@ -192,24 +192,24 @@ export function ActiveUsersIndicator({ users, className }: ActiveUsersProps) {
 
     return (
         <div className={cn('flex items-center gap-2', className)}>
-            <Users className="w-4 h-4 text-surface-400" />
+            <Users className="w-4 h-4 text-[var(--ink-tertiary)]" />
             <div className="flex -space-x-2">
                 {displayUsers.map((user) => (
                     <div
                         key={user.id}
-                        className="w-6 h-6 rounded-full bg-masters-primary text-white text-xs flex items-center justify-center border-2 border-surface-card"
+                        className="w-6 h-6 rounded-full bg-masters-primary text-white text-xs flex items-center justify-center border-2 border-[var(--surface)]"
                         title={user.name}
                     >
                         {user.name.charAt(0).toUpperCase()}
                     </div>
                 ))}
                 {remainingCount > 0 && (
-                    <div className="w-6 h-6 rounded-full bg-surface-300 dark:bg-surface-600 text-xs flex items-center justify-center border-2 border-surface-card">
+                    <div className="w-6 h-6 rounded-full bg-[color:var(--ink-tertiary)]/20 text-xs flex items-center justify-center border-2 border-[var(--surface)]">
                         +{remainingCount}
                     </div>
                 )}
             </div>
-            <span className="text-xs text-surface-500">
+            <span className="text-xs text-[var(--ink-tertiary)]">
                 {users.length} {users.length === 1 ? 'viewer' : 'viewers'}
             </span>
         </div>
@@ -231,13 +231,13 @@ export function SyncErrorBanner() {
                 <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
                 <div className="flex-1">
                     <div className="font-medium text-error">Sync Error</div>
-                    <div className="text-sm text-surface-600 dark:text-surface-400">
+                    <div className="text-sm text-[var(--ink-secondary)]">
                         {syncStatus.error}
                     </div>
                 </div>
                 <button
                     onClick={() => setDismissed(true)}
-                    className="text-surface-400 hover:text-surface-600"
+                    className="text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]"
                 >
                     &times;
                 </button>
