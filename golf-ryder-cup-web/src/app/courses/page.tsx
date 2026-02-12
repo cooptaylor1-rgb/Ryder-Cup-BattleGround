@@ -51,8 +51,8 @@ function CourseCard({
                 onClick={() => onSelect?.(course)}
             >
                 <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-masters-green/10 flex items-center justify-center shrink-0">
-                        <Flag className="w-6 h-6 text-masters-green-light" />
+                    <div className="w-12 h-12 rounded-lg bg-[color:var(--masters)]/10 flex items-center justify-center shrink-0">
+                        <Flag className="w-6 h-6 text-[var(--masters)]" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-[var(--ink-primary)] truncate">{course.name}</h3>
@@ -292,13 +292,13 @@ export default function CourseLibraryPage() {
                 </div>
 
                 {/* Info Banner */}
-                <div className="bg-masters-green/5 border border-masters-green/20 rounded-xl p-4">
+                <div className="bg-[color:var(--masters)]/5 border border-[color:var(--masters)]/20 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-masters-green/10 flex items-center justify-center shrink-0">
-                            <Copy className="w-4 h-4 text-masters-green-light" />
+                        <div className="w-8 h-8 rounded-full bg-[color:var(--masters)]/10 flex items-center justify-center shrink-0">
+                            <Copy className="w-4 h-4 text-[var(--masters)]" />
                         </div>
                         <div>
-                            <div className="font-medium text-masters-green-light">Reusable Course Profiles</div>
+                            <div className="font-medium text-[var(--masters)]">Reusable Course Profiles</div>
                             <div className="text-sm text-[var(--ink-secondary)] mt-1">
                                 Save courses to your library and quickly add them to any trip.
                                 Hole pars, handicaps, and tee sets are preserved.

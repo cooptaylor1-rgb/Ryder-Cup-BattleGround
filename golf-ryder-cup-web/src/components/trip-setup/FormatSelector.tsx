@@ -449,7 +449,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                         <ul className="space-y-2">
                             {format.rules.map((rule, index) => (
                                 <li key={index} className="flex items-start gap-2 text-sm text-[var(--ink-secondary)]">
-                                    <span className="w-5 h-5 rounded-full bg-masters-green/10 text-[var(--masters)] flex items-center justify-center shrink-0 text-xs font-medium">
+                                    <span className="w-5 h-5 rounded-full bg-[color:var(--masters)]/10 text-[var(--masters)] flex items-center justify-center shrink-0 text-xs font-medium">
                                         {index + 1}
                                     </span>
                                     {rule}
@@ -482,7 +482,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                             'w-full py-3 rounded-xl font-semibold transition-all',
                             isSelected
                                 ? 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
-                                : 'bg-masters-green text-white hover:bg-masters-green/90'
+                                : 'bg-[var(--masters)] text-white hover:bg-[color:var(--masters)]/90'
                         )}
                     >
                         {isSelected ? 'Currently Selected' : 'Select This Format'}

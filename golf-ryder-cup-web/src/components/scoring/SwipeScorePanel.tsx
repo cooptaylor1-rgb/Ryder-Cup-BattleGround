@@ -256,7 +256,7 @@ export function SwipeScorePanel({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full aspect-[4/3] max-h-[400px] rounded-3xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-masters-green ${className}`}
+      className={`relative w-full aspect-[4/3] max-h-[400px] rounded-3xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--masters)] ${className}`}
       style={{
         background: 'var(--surface)',
         touchAction: 'none',
