@@ -189,8 +189,8 @@ function ContextMenuItems({ items, onClose }: ContextMenuItemsProps) {
   return (
     <div
       className={cn(
-        'bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl',
-        'border border-white/20 overflow-hidden min-w-50',
+        'bg-[color:var(--surface-raised)]/95 backdrop-blur-xl rounded-2xl shadow-2xl',
+        'border border-[color:var(--rule)]/40 overflow-hidden min-w-50',
         'animate-in fade-in zoom-in-95 duration-150'
       )}
     >
@@ -198,7 +198,7 @@ function ContextMenuItems({ items, onClose }: ContextMenuItemsProps) {
         <React.Fragment key={item.id}>
           {/* Separator before destructive items */}
           {hasDestructive && index === destructiveStartIndex && (
-            <div className="h-px bg-gray-200 my-1" />
+            <div className="h-px bg-[color:var(--rule)]/60 my-1" />
           )}
 
           <MenuItem
@@ -412,7 +412,7 @@ export function IOSContextMenu({
               }}
             >
               <div
-                className="w-full h-full rounded-xl shadow-2xl bg-white/80 backdrop-blur"
+                className="w-full h-full rounded-xl shadow-2xl bg-[color:var(--surface-raised)]/80 backdrop-blur"
                 style={{ transform: 'scale(1.02)' }}
               />
             </div>
