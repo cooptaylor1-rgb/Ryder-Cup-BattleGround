@@ -234,7 +234,7 @@ export function SessionBuilder({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg">Session Builder</h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         {sessions.length} sessions • {totalMatches} matches • {totalPoints} points
                     </p>
                 </div>
@@ -266,15 +266,15 @@ export function SessionBuilder({
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="grid grid-cols-3 gap-2 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl">
+                        <div className="grid grid-cols-3 gap-2 p-3 bg-[var(--surface-secondary)] rounded-xl">
                             {PRESET_TEMPLATES.map(preset => (
                                 <button
                                     key={preset.id}
                                     onClick={() => applyPreset(preset.id)}
-                                    className="p-3 rounded-lg bg-white dark:bg-surface-700 hover:bg-augusta-green/5 border border-surface-200 dark:border-surface-600 text-left transition-colors"
+                                    className="p-3 rounded-lg bg-[var(--surface-raised)] hover:bg-augusta-green/5 border border-[var(--rule)] text-left transition-colors"
                                 >
                                     <p className="font-medium text-sm">{preset.name}</p>
-                                    <p className="text-xs text-surface-500">{preset.description}</p>
+                                    <p className="text-xs text-[var(--ink-tertiary)]">{preset.description}</p>
                                 </button>
                             ))}
                         </div>
@@ -283,8 +283,8 @@ export function SessionBuilder({
             </AnimatePresence>
 
             {/* Days selector */}
-            <div className="flex items-center gap-4 p-3 bg-surface-50 dark:bg-surface-800 rounded-xl">
-                <Calendar className="w-5 h-5 text-surface-500" />
+            <div className="flex items-center gap-4 p-3 bg-[var(--surface-secondary)] rounded-xl">
+                <Calendar className="w-5 h-5 text-[var(--ink-tertiary)]" />
                 <span className="text-sm font-medium">Tournament Days</span>
                 <div className="flex gap-1 ml-auto">
                     {[1, 2, 3, 4, 5].map(day => (
@@ -295,7 +295,7 @@ export function SessionBuilder({
                                 'w-9 h-9 rounded-lg text-sm font-medium transition-all',
                                 totalDays === day
                                     ? 'bg-augusta-green text-white'
-                                    : 'bg-white dark:bg-surface-700 hover:bg-augusta-green/10'
+                                    : 'bg-[var(--surface-raised)] hover:bg-augusta-green/10'
                             )}
                         >
                             {day}
@@ -309,7 +309,7 @@ export function SessionBuilder({
                 {Array.from({ length: totalDays }).map((_, dayIndex) => (
                     <div key={dayIndex} className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-surface-600 dark:text-surface-400">
+                            <h4 className="font-medium text-[var(--ink-secondary)]">
                                 Day {dayIndex + 1}
                             </h4>
                             <button
@@ -364,7 +364,7 @@ export function SessionBuilder({
                         {(!sessionsByDay[dayIndex] || sessionsByDay[dayIndex].length === 0) && (
                             <button
                                 onClick={() => addSession(dayIndex)}
-                                className="w-full p-6 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-xl text-surface-500 hover:border-augusta-green hover:text-augusta-green transition-colors"
+                                className="w-full p-6 border-2 border-dashed border-[color:var(--rule)]/40 rounded-xl text-[var(--ink-tertiary)] hover:border-augusta-green hover:text-augusta-green transition-colors"
                             >
                                 <Plus className="w-6 h-6 mx-auto mb-2" />
                                 <p className="text-sm">Add first session for Day {dayIndex + 1}</p>
@@ -377,11 +377,11 @@ export function SessionBuilder({
             {/* Empty state */}
             {sessions.length === 0 && (
                 <div className="text-center py-12">
-                    <Calendar className="w-12 h-12 mx-auto text-surface-400 mb-3" />
-                    <p className="text-surface-600 dark:text-surface-400">
+                    <Calendar className="w-12 h-12 mx-auto text-[var(--ink-tertiary)] mb-3" />
+                    <p className="text-[var(--ink-secondary)]">
                         No sessions yet
                     </p>
-                    <p className="text-sm text-surface-500 mb-4">
+                    <p className="text-sm text-[var(--ink-tertiary)] mb-4">
                         Start with a preset or build your own format
                     </p>
                     <button
@@ -425,9 +425,9 @@ function SessionCard({
             {/* Header - always visible */}
             <button
                 onClick={onToggleExpand}
-                className="w-full p-3 flex items-center gap-3 text-left hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                className="w-full p-3 flex items-center gap-3 text-left hover:bg-[var(--surface-secondary)] transition-colors"
             >
-                <div className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-surface-400 hover:text-surface-600">
+                <div className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]">
                     <GripVertical className="w-4 h-4" />
                 </div>
 
@@ -437,7 +437,7 @@ function SessionCard({
 
                 <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{session.name}</p>
-                    <div className="flex items-center gap-2 text-xs text-surface-500">
+                    <div className="flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
                         <span className="flex items-center gap-1">
                             {timeConfig.icon}
                             {timeConfig.label}
@@ -452,9 +452,9 @@ function SessionCard({
                 <div className="flex items-center gap-1">
                     <button
                         onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-                        className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                        className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
                     >
-                        <Copy className="w-4 h-4 text-surface-500" />
+                        <Copy className="w-4 h-4 text-[var(--ink-tertiary)]" />
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -474,7 +474,7 @@ function SessionCard({
                         exit={{ height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="p-4 pt-0 space-y-4 border-t border-surface-200 dark:border-surface-700">
+                        <div className="p-4 pt-0 space-y-4 border-t border-[var(--rule)]">
                             {/* Session name */}
                             <div>
                                 <label className="text-sm font-medium mb-1.5 block">Session Name</label>
@@ -500,7 +500,7 @@ function SessionCard({
                                                     'p-2 rounded-lg border-2 transition-all',
                                                     session.timeSlot === slot
                                                         ? 'border-augusta-green bg-augusta-green/5'
-                                                        : 'border-surface-200 dark:border-surface-700'
+                                                        : 'border-[var(--rule)]'
                                                 )}
                                             >
                                                 <div className="flex items-center justify-center gap-1 text-sm">
@@ -533,7 +533,7 @@ function SessionCard({
                                                     'p-3 rounded-lg border-2 transition-all text-left',
                                                     session.sessionType === type
                                                         ? 'border-augusta-green bg-augusta-green/5'
-                                                        : 'border-surface-200 dark:border-surface-700'
+                                                        : 'border-[var(--rule)]'
                                                 )}
                                             >
                                                 <div className="flex items-center gap-2">
@@ -542,7 +542,7 @@ function SessionCard({
                                                     </div>
                                                     <div>
                                                         <p className="font-medium text-sm">{config.label}</p>
-                                                        <p className="text-xs text-surface-500">{config.description}</p>
+                                                        <p className="text-xs text-[var(--ink-tertiary)]">{config.description}</p>
                                                     </div>
                                                 </div>
                                             </button>
@@ -567,7 +567,7 @@ function SessionCard({
                                     />
                                     <span className="w-8 text-center font-mono text-lg">{session.matchCount}</span>
                                 </div>
-                                <p className="text-xs text-surface-500 mt-1">
+                                <p className="text-xs text-[var(--ink-tertiary)] mt-1">
                                     Max {maxMatches} for {typeConfig.label.toLowerCase()} with {playersPerTeam} players per team
                                 </p>
                             </div>
@@ -584,7 +584,7 @@ function SessionCard({
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 session.pointsPerMatch === pts
                                                     ? 'bg-augusta-green text-white'
-                                                    : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200'
+                                                    : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)]'
                                             )}
                                         >
                                             {pts}
