@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 05:15 EST — Phase 2 — Trip setup FormatSelector + PlayerCountSelector: premium token sweep
+- `FormatSelector` + `PlayerCountSelector` (trip setup): migrated remaining legacy `surface-*` palette usage (`bg-*`, `border-*`, `text-*`, `hover:*`, dark variants) onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
+- Standardized the selection accents from legacy `masters-green`/`augusta-green` classes to `var(--masters)` + `var(--masters-subtle)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ef4d599`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 04:47 EST — Phase 2 — Player onboarding QuickProfileMode + TravelLodgingInfo: premium token sweep
 - `QuickProfileMode`: migrated remaining legacy `surface-*` palette utilities (text, borders, disabled states, error tint) onto premium token-driven Tailwind (`var(--ink-*)`, `var(--rule)`, `var(--error)`).
 - `TravelLodgingInfo`: replaced legacy `bg-white/dark:bg-surface-*` + `border-surface-*` + `text-surface-*` utilities with premium `.card` surfaces and token-driven ink/rule/hover classes.

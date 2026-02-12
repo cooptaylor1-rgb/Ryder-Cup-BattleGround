@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-12
 
+## 05:15 EST — Phase 2 — Trip setup FormatSelector + PlayerCountSelector: premium token sweep
+- `FormatSelector` + `PlayerCountSelector`: migrated remaining legacy `surface-*` palette usage and dark variants onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
+- Standardized the selection accents from legacy `masters-green`/`augusta-green` classes to `var(--masters)` + `var(--masters-subtle)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ef4d599`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 22:40 EST — Phase 2 — ScoreCelebration/Toast: token-driven colors + team-color mix
 - `ScoreCelebration` (hole-lost subtle feedback): replaced inline `teamColor + '40'` alpha concatenation with a token-safe `color-mix()` background and a single `--team-color` CSS variable.
 - `ScoreToast`: replaced hard-coded hex colors for info/warning with premium tokens (`var(--info)`, `var(--warning)`) and switched success to `var(--success)`.
