@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 13:05 EST — Phase 2 — Tokenize remaining `masters-green` classes (Course Library + scoring)
+- `/courses`: replaced remaining `bg-masters-green/*` + `text-masters-green-*` accents in the course cards + info banner with premium `var(--masters)` tokens.
+- `SwipeScorePanel`: focus ring now uses token-driven `focus:ring-[var(--masters)]` instead of a legacy Tailwind color.
+- Trip setup `FormatSelector`: replaced remaining `bg-masters-green` usage with token-driven `var(--masters)`.
+- Root `layout` skip-link: replaced `focus:bg-masters-green` with `focus:bg-[var(--masters)]` for theme-consistent accessibility styling.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`eaf436b`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimizer warnings)
+
 ### 12:31 EST — Docs — WORKLOG backfill: add missing commit hashes
 - `Docs/lobster/WORKLOG.md`: filled in missing commit hashes for two older Phase 1 entries so the historical log consistently references the exact landed changes.
   - PWABanners InstallPrompt stub removal → `c5d78be`
