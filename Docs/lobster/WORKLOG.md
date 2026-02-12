@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 10:20 EST — Phase 2 — Trip setup imports + side bets: premium token sweep
+- `PlayerRosterImport`: migrated remaining legacy `surface-*` palette utilities and `augusta-green` accents to premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`), removing theme-specific branches.
+- `SideBetPresets`: migrated header + preset pills + amount labels off legacy `surface-*` palette utilities onto premium tokens for consistent theme behavior.
+- Storybook: updated `Button` + `Input` RealWorldExamples wrappers to use the shared `.card` surface and premium ink tokens (no `bg-surface-base` / `text-canvas`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b7c8303`)
+
 ### 09:15 EST — Phase 2 — EnhancedTripWizard: premium token sweep
 - `EnhancedTripWizard` (trip setup): migrated remaining legacy `surface-*` palette utilities and `augusta-green` accents to premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
 - `Badge.stories.tsx`: removed legacy `bg-surface-base` / `text-canvas` usage in the RealWorldExamples story so Storybook examples don’t demonstrate deprecated classes.

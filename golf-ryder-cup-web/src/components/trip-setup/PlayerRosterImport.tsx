@@ -193,10 +193,10 @@ export function PlayerRosterImport({
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Users className="w-5 h-5 text-augusta-green" />
+                        <Users className="w-5 h-5 text-[var(--masters)]" />
                         Player Roster
                     </h3>
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm text-[var(--ink-tertiary)]">
                         {players.length} players • {unassigned} unassigned
                     </p>
                 </div>
@@ -226,23 +226,23 @@ export function PlayerRosterImport({
                         'p-3 rounded-xl border-2 text-center transition-all',
                         activeTab === 'teamA'
                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : 'border-surface-200 dark:border-surface-700'
+                            : 'border-[var(--rule)]'
                     )}
                 >
                     <p className="text-2xl font-bold text-blue-600">{teamACounts}</p>
-                    <p className="text-xs text-surface-500 truncate">{teamAName}</p>
+                    <p className="text-xs text-[var(--ink-tertiary)] truncate">{teamAName}</p>
                 </button>
                 <button
                     onClick={() => setActiveTab('all')}
                     className={cn(
                         'p-3 rounded-xl border-2 text-center transition-all',
                         activeTab === 'all'
-                            ? 'border-augusta-green bg-augusta-green/5'
-                            : 'border-surface-200 dark:border-surface-700'
+                            ? 'border-[var(--masters)] bg-[color:var(--masters)]/5'
+                            : 'border-[var(--rule)]'
                     )}
                 >
                     <p className="text-2xl font-bold">{players.length}</p>
-                    <p className="text-xs text-surface-500">Total</p>
+                    <p className="text-xs text-[var(--ink-tertiary)]">Total</p>
                 </button>
                 <button
                     onClick={() => setActiveTab('teamB')}
@@ -250,11 +250,11 @@ export function PlayerRosterImport({
                         'p-3 rounded-xl border-2 text-center transition-all',
                         activeTab === 'teamB'
                             ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                            : 'border-surface-200 dark:border-surface-700'
+                            : 'border-[var(--rule)]'
                     )}
                 >
                     <p className="text-2xl font-bold text-red-600">{teamBCounts}</p>
-                    <p className="text-xs text-surface-500 truncate">{teamBName}</p>
+                    <p className="text-xs text-[var(--ink-tertiary)] truncate">{teamBName}</p>
                 </button>
             </div>
 
@@ -263,12 +263,12 @@ export function PlayerRosterImport({
                 <div className="flex gap-2">
                     <button
                         onClick={autoAssignTeams}
-                        className="text-sm text-augusta-green hover:text-augusta-green/80 flex items-center gap-1"
+                        className="text-sm text-[var(--masters)] hover:text-[color:var(--masters)]/80 flex items-center gap-1"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Auto-assign by handicap
                     </button>
-                    <span className="text-surface-300">|</span>
+                    <span className="text-[color:var(--ink-tertiary)]/50">|</span>
                     <button
                         onClick={clearAllPlayers}
                         className="text-sm text-red-500 hover:text-red-600 flex items-center gap-1"
@@ -319,11 +319,11 @@ export function PlayerRosterImport({
                 {/* Empty state */}
                 {players.length === 0 && (
                     <div className="text-center py-12 px-4">
-                        <Users className="w-12 h-12 mx-auto text-surface-400 mb-3" />
-                        <p className="text-surface-600 dark:text-surface-400 font-medium">
+                        <Users className="w-12 h-12 mx-auto text-[var(--ink-tertiary)] mb-3" />
+                        <p className="text-[var(--ink-primary)] font-medium">
                             No players added yet
                         </p>
-                        <p className="text-sm text-surface-500 mt-1 mb-4">
+                        <p className="text-sm text-[var(--ink-tertiary)] mt-1 mb-4">
                             Add players manually or import from a spreadsheet
                         </p>
                         <div className="flex gap-2 justify-center">
@@ -360,15 +360,15 @@ export function PlayerRosterImport({
                             initial={{ opacity: 0, y: 100 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 100 }}
-                            className="bg-white dark:bg-surface-900 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
+                            className="bg-[var(--surface-raised)] rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between">
+                            <div className="p-4 border-b border-[var(--rule)] flex items-center justify-between">
                                 <h3 className="font-semibold text-lg">Import Players</h3>
                                 <button
                                     onClick={() => setShowImportModal(false)}
-                                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg"
+                                    className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -387,11 +387,11 @@ export function PlayerRosterImport({
                                     />
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-full p-6 border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-xl text-center hover:border-augusta-green transition-colors"
+                                        className="w-full p-6 border-2 border-dashed border-[color:var(--rule)]/60 rounded-xl text-center hover:border-[var(--masters)] transition-colors"
                                     >
-                                        <Upload className="w-8 h-8 mx-auto mb-2 text-surface-400" />
+                                        <Upload className="w-8 h-8 mx-auto mb-2 text-[var(--ink-tertiary)]" />
                                         <p className="font-medium">Upload CSV or TXT file</p>
-                                        <p className="text-sm text-surface-500">or paste data below</p>
+                                        <p className="text-sm text-[var(--ink-tertiary)]">or paste data below</p>
                                     </button>
                                 </div>
 
@@ -418,16 +418,16 @@ export function PlayerRosterImport({
                                 )}
 
                                 {/* Format help */}
-                                <div className="p-3 rounded-xl bg-surface-50 dark:bg-surface-800">
+                                <div className="p-3 rounded-xl bg-[var(--surface-secondary)]">
                                     <p className="text-sm font-medium mb-2">Expected format:</p>
-                                    <code className="text-xs text-surface-600 dark:text-surface-400 block">
+                                    <code className="text-xs text-[var(--ink-secondary)] block">
                                         Name, Handicap, Email<br />
                                         John Smith, 12, john@email.com<br />
                                         Jane Doe, 8, jane@email.com
                                     </code>
                                     <button
                                         onClick={downloadTemplate}
-                                        className="mt-2 text-sm text-augusta-green hover:text-augusta-green/80 flex items-center gap-1"
+                                        className="mt-2 text-sm text-[var(--masters)] hover:text-[color:var(--masters)]/80 flex items-center gap-1"
                                     >
                                         <Download className="w-4 h-4" />
                                         Download template
@@ -436,7 +436,7 @@ export function PlayerRosterImport({
                             </div>
 
                             {/* Footer */}
-                            <div className="p-4 border-t border-surface-200 dark:border-surface-700 flex gap-2">
+                            <div className="p-4 border-t border-[var(--rule)] flex gap-2">
                                 <button
                                     onClick={() => setShowImportModal(false)}
                                     className="btn-secondary flex-1"
@@ -484,7 +484,7 @@ function PlayerCard({
         <div className="card overflow-hidden">
             <div className="p-3 flex items-center gap-3">
                 {/* Drag handle */}
-                <div className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-surface-400 hover:text-surface-600">
+                <div className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]">
                     <GripVertical className="w-4 h-4" />
                 </div>
 
@@ -496,7 +496,7 @@ function PlayerCard({
                             ? 'bg-blue-500'
                             : player.team === 'B'
                                 ? 'bg-red-500'
-                                : 'bg-surface-400'
+                                : 'bg-[color:var(--ink-tertiary)]/50'
                     )}
                 >
                     {player.name ? player.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?'}
@@ -516,7 +516,7 @@ function PlayerCard({
                     ) : (
                         <p className="font-medium truncate">{player.name || 'Unnamed player'}</p>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-surface-500">
+                    <div className="flex items-center gap-2 text-sm text-[var(--ink-tertiary)]">
                         {isEditing ? (
                             <input
                                 type="number"
@@ -544,7 +544,7 @@ function PlayerCard({
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'A'
                                 ? 'bg-blue-500 text-white'
-                                : 'bg-surface-100 dark:bg-surface-700 hover:bg-blue-100'
+                                : 'bg-[var(--surface-secondary)] hover:bg-blue-500/10'
                         )}
                         title={teamAName}
                     >
@@ -556,7 +556,7 @@ function PlayerCard({
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'B'
                                 ? 'bg-red-500 text-white'
-                                : 'bg-surface-100 dark:bg-surface-700 hover:bg-red-100'
+                                : 'bg-[var(--surface-secondary)] hover:bg-red-500/10'
                         )}
                         title={teamBName}
                     >
@@ -571,8 +571,8 @@ function PlayerCard({
                         className={cn(
                             'p-2 rounded-lg transition-colors',
                             isEditing
-                                ? 'bg-augusta-green/10 text-augusta-green'
-                                : 'hover:bg-surface-100 dark:hover:bg-surface-700'
+                                ? 'bg-[color:var(--masters)]/10 text-[var(--masters)]'
+                                : 'hover:bg-[var(--surface-secondary)]'
                         )}
                     >
                         {isEditing ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}

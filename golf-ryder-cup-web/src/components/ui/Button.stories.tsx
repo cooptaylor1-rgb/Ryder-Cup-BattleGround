@@ -133,9 +133,9 @@ export const DangerActions: Story = {
 // Real-world examples
 export const RealWorldExamples: Story = {
   render: () => (
-    <div className="flex flex-col gap-6 p-6 bg-surface-base rounded-xl">
+    <div className="card flex flex-col gap-6 p-6">
       <div className="flex flex-col gap-3">
-        <h3 className="text-lg font-semibold text-canvas">Score Entry</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Score Entry</h3>
         <div className="flex gap-2">
           <Button variant="primary" size="lg">
             Submit Score
@@ -147,7 +147,7 @@ export const RealWorldExamples: Story = {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h3 className="text-lg font-semibold text-canvas">Trip Actions</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Trip Actions</h3>
         <div className="flex gap-2">
           <Button variant="outline" leftIcon={<Share size={16} />}>
             Share Trip
@@ -157,7 +157,7 @@ export const RealWorldExamples: Story = {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h3 className="text-lg font-semibold text-canvas">Destructive</h3>
+        <h3 className="text-lg font-semibold text-[var(--ink-primary)]">Destructive</h3>
         <Button variant="danger" leftIcon={<Trash2 size={16} />}>
           Leave Trip
         </Button>
