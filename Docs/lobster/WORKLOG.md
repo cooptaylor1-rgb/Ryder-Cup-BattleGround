@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 00:35 EST — Docs — WORKLOG date boundary ordering
+- `Docs/lobster/WORKLOG.md`: moved late-night Phase 2 entries (20:45–23:59) back under **2026-02-11** so the 2026-02-12 section only contains post-midnight work.
+- Minor whitespace cleanup in the moved block to keep the day reverse-chronological (latest-first).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`76ca5cd`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 00:20 EST — Phase 2 — Course + Trip Setup + Settings toggles: premium token sweep
 - `CourseSelection` (trip setup): migrated legacy `surface-*` palette usage (text/background/border/hover) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
 - `/settings/appearance` + `/settings/scoring`: toggle tracks now use token-driven neutrals (`bg-[color:var(--ink-tertiary)]/25`) and toggle knobs use `bg-[var(--surface-raised)]`.
