@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 23:59 EST — Phase 2 — Achievements + Social share/reactions: premium token sweep
+- `Achievements`: migrated remaining legacy `surface-*` palette utilities (bg/border/text) to premium tokens (`var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`) and standardized cards onto the shared `.card` surface.
+- Social: `ReactionPicker` emoji hover state now uses `hover:bg-[var(--surface-raised)]` (no legacy class).
+- Social: `ShareCard` download button border/hover migrated to `border-[var(--rule)]` + `hover:bg-[var(--surface-secondary)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`86e14cd`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 22:55 EST — Phase 2 — TrashTalkFeed + Lineup new: premium tokens for legacy surface palette
 - `TrashTalkFeed`: migrated the remaining legacy `surface-*` palette utilities (borders/surfaces/text) to premium tokens (`var(--rule)`, `var(--surface-secondary)`, `var(--surface-raised)`, `var(--ink-*)`) so the match banter UI stays consistent across themes.
 - `/lineup/new`: replaced `hover:bg-surface-100` with `hover:bg-[var(--surface-secondary)]` to avoid reliance on the legacy palette.
