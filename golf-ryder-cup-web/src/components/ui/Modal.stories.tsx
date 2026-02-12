@@ -52,7 +52,7 @@ const ModalDemo = () => {
         <div className="py-4">
           <div className="text-center mb-6">
             <div className="text-4xl font-bold text-masters-green mb-2">2 & 1</div>
-            <div className="text-text-muted">USA wins the match</div>
+            <div className="text-[var(--ink-tertiary)]">USA wins the match</div>
           </div>
           <div className="flex gap-2">
             <Button variant="secondary" fullWidth onClick={() => setIsOpen(false)}>
@@ -90,7 +90,7 @@ const SizeDemo = () => {
           description="This shows the modal size variant"
           size={size}
         >
-          <p className="py-4 text-text-secondary">
+          <p className="py-4 text-[var(--ink-secondary)]">
             Modal content with size: {size}
           </p>
           <Button onClick={() => setSize(null)} fullWidth>Close</Button>
@@ -183,7 +183,7 @@ const WarningDemo = () => {
         <div className="py-4">
           <div className="flex items-center gap-3 mb-4 p-3 bg-gold/10 rounded-lg">
             <AlertTriangle className="text-gold" size={24} />
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-[var(--ink-secondary)]">
               You will lose access to all match data and standings.
             </p>
           </div>
@@ -220,9 +220,9 @@ const ShareDemo = () => {
         size="md"
       >
         <div className="py-4 space-y-4">
-          <div className="p-4 bg-surface-card rounded-lg text-center">
+          <div className="p-4 bg-[var(--surface)] rounded-lg text-center">
             <div className="text-2xl font-bold text-masters-green mb-1">USA 15½</div>
-            <div className="text-text-muted">defeats</div>
+            <div className="text-[var(--ink-tertiary)]">defeats</div>
             <div className="text-2xl font-bold text-error mt-1">EUR 12½</div>
           </div>
 

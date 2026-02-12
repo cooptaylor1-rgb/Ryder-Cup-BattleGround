@@ -94,7 +94,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
             <div className={cn('flex items-center justify-center min-h-[50vh]', className)}>
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-masters-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-surface-500">Loading live scores...</p>
+                    <p className="text-[var(--ink-tertiary)]">Loading live scores...</p>
                 </div>
             </div>
         );
@@ -125,7 +125,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
                     </div>
 
                     {activeUsers.length > 0 && (
-                        <div className="flex items-center gap-2 text-sm text-surface-500">
+                        <div className="flex items-center gap-2 text-sm text-[var(--ink-tertiary)]">
                             <Users className="w-4 h-4" />
                             <span>{activeUsers.length} viewing</span>
                         </div>
@@ -135,12 +135,12 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
                 {/* Team totals */}
                 <div className="flex items-center gap-4">
                     <div className="text-right">
-                        <span className="text-sm text-surface-500 block">USA</span>
+                        <span className="text-sm text-[var(--ink-tertiary)] block">USA</span>
                         <span className="text-2xl font-bold text-team-usa">{teamATotal}</span>
                     </div>
-                    <div className="w-px h-8 bg-surface-300 dark:bg-surface-700" />
+                    <div className="w-px h-8 bg-[color:var(--rule)]/40" />
                     <div className="text-left">
-                        <span className="text-sm text-surface-500 block">EUR</span>
+                        <span className="text-sm text-[var(--ink-tertiary)] block">EUR</span>
                         <span className="text-2xl font-bold text-team-europe">{teamBTotal}</span>
                     </div>
                 </div>
@@ -149,7 +149,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
             {/* Active Matches - Large Cards */}
             {activeMatches.length > 0 && (
                 <div>
-                    <h3 className="text-sm font-medium text-surface-500 uppercase tracking-wide mb-3">
+                    <h3 className="text-sm font-medium text-[var(--ink-tertiary)] uppercase tracking-wide mb-3">
                         In Progress ({activeMatches.length})
                     </h3>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -179,7 +179,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
             {/* Completed Matches */}
             {completedMatches.length > 0 && (
                 <div>
-                    <h3 className="text-sm font-medium text-surface-500 uppercase tracking-wide mb-3">
+                    <h3 className="text-sm font-medium text-[var(--ink-tertiary)] uppercase tracking-wide mb-3">
                         Completed ({completedMatches.length})
                     </h3>
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -205,7 +205,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
             {/* Upcoming Matches */}
             {upcomingMatches.length > 0 && (
                 <div>
-                    <h3 className="text-sm font-medium text-surface-500 uppercase tracking-wide mb-3">
+                    <h3 className="text-sm font-medium text-[var(--ink-tertiary)] uppercase tracking-wide mb-3">
                         Upcoming ({upcomingMatches.length})
                     </h3>
                     <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
@@ -230,9 +230,9 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
             {/* Empty state */}
             {matches.length === 0 && (
                 <div className="text-center py-12">
-                    <Trophy className="w-12 h-12 mx-auto mb-4 text-surface-400" />
-                    <p className="text-lg text-surface-500">No matches yet</p>
-                    <p className="text-sm text-surface-400 mt-1">Create matches to start tracking scores</p>
+                    <Trophy className="w-12 h-12 mx-auto mb-4 text-[var(--ink-tertiary)]" />
+                    <p className="text-lg text-[var(--ink-tertiary)]">No matches yet</p>
+                    <p className="text-sm text-[var(--ink-tertiary)] mt-1">Create matches to start tracking scores</p>
                 </div>
             )}
         </div>
@@ -280,9 +280,9 @@ function LiveMatchCard({
     return (
         <div className={cn(
             'relative p-4 rounded-xl border-2 overflow-hidden',
-            'bg-surface-card transition-all duration-300',
+            'bg-[var(--surface)] transition-all duration-300',
             scoreChanged && 'animate-score-pop',
-            currentScore > 0 ? 'border-team-usa/30' : currentScore < 0 ? 'border-team-europe/30' : 'border-surface-300 dark:border-surface-700'
+            currentScore > 0 ? 'border-team-usa/30' : currentScore < 0 ? 'border-team-europe/30' : 'border-[color:var(--rule)]/40'
         )}>
             {/* Live indicator */}
             {isLive && (
@@ -295,7 +295,7 @@ function LiveMatchCard({
             )}
 
             {/* Match number */}
-            <div className="text-xs text-surface-500 mb-3">Match {matchNumber}</div>
+            <div className="text-xs text-[var(--ink-tertiary)] mb-3">Match {matchNumber}</div>
 
             {/* Score display */}
             <div className="flex items-center justify-center gap-4 mb-4">
@@ -309,7 +309,7 @@ function LiveMatchCard({
                 <div className={cn(
                     'text-4xl font-bold min-w-20 text-center',
                     scoreChanged && 'scale-110',
-                    currentScore > 0 ? 'text-team-usa' : currentScore < 0 ? 'text-team-europe' : 'text-surface-500'
+                    currentScore > 0 ? 'text-team-usa' : currentScore < 0 ? 'text-team-europe' : 'text-[var(--ink-tertiary)]'
                 )}>
                     {displayScore}
                 </div>
@@ -323,7 +323,7 @@ function LiveMatchCard({
             </div>
 
             {/* Hole indicator */}
-            <div className="text-center text-sm text-surface-500">
+            <div className="text-center text-sm text-[var(--ink-tertiary)]">
                 {holesPlayed > 0 ? (
                     <span>Thru {holesPlayed} holes</span>
                 ) : (
@@ -359,15 +359,15 @@ function CompletedMatchCard({
     return (
         <div className={cn(
             'p-3 rounded-lg border',
-            'bg-surface-card',
-            winningTeam === 'usa' ? 'border-team-usa/30' : winningTeam === 'europe' ? 'border-team-europe/30' : 'border-surface-300 dark:border-surface-700'
+            'bg-[var(--surface)]',
+            winningTeam === 'usa' ? 'border-team-usa/30' : winningTeam === 'europe' ? 'border-team-europe/30' : 'border-[color:var(--rule)]/40'
         )}>
             <div className="flex items-center gap-3">
                 <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
                     winningTeam === 'usa' ? 'bg-team-usa text-white' :
                         winningTeam === 'europe' ? 'bg-team-europe text-white' :
-                            'bg-surface-300 dark:bg-surface-600 text-surface-600 dark:text-surface-300'
+                            'bg-[color:var(--ink-tertiary)]/15 text-[var(--ink-secondary)]'
                 )}>
                     {winningTeam === 'halved' ? '=' : displayScore}
                 </div>
@@ -390,7 +390,7 @@ function CompletedMatchCard({
                 <div className="text-right">
                     {winningTeam === 'usa' && <ChevronUp className="w-5 h-5 text-team-usa" />}
                     {winningTeam === 'europe' && <ChevronDown className="w-5 h-5 text-team-europe" />}
-                    {winningTeam === 'halved' && <Minus className="w-5 h-5 text-surface-400" />}
+                    {winningTeam === 'halved' && <Minus className="w-5 h-5 text-[var(--ink-tertiary)]" />}
                 </div>
             </div>
         </div>
@@ -411,15 +411,15 @@ function UpcomingMatchCard({
     matchNumber,
 }: UpcomingMatchCardProps) {
     return (
-        <div className="p-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/50 opacity-75">
-            <div className="text-xs text-surface-400 mb-2">Match {matchNumber}</div>
+        <div className="p-3 rounded-lg border border-[color:var(--rule)]/40 bg-[color:var(--surface-secondary)]/60 opacity-80">
+            <div className="text-xs text-[var(--ink-tertiary)] mb-2">Match {matchNumber}</div>
             <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-team-usa" />
                 <span className="text-sm truncate flex-1">
                     {teamAPlayers.map(p => formatPlayerName(p.firstName, p.lastName, 'short')).join(' & ') || 'TBD'}
                 </span>
             </div>
-            <div className="text-center text-xs text-surface-400 my-1">vs</div>
+            <div className="text-center text-xs text-[var(--ink-tertiary)] my-1">vs</div>
             <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-team-europe" />
                 <span className="text-sm truncate flex-1">

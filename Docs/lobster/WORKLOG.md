@@ -44,6 +44,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-11
 
+### 23:24 EST — Phase 2 — Core UI primitives: migrate legacy surface/ink utilities to premium tokens
+- `Badge`, `Card`, `Tabs`, `Tooltip`, `SectionHeader`, `Breadcrumb`, `LiveJumbotron`: replaced remaining legacy `surface-*` palette + `text-text-*` utilities with premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`).
+- Storybook `.stories.tsx` examples for these primitives were updated to match the token system so docs don’t demonstrate deprecated classnames.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 20:25 EST — Phase 2 — ConnectionStatus: premium token sweep
 - `ConnectionStatus`: migrated remaining legacy `surface-*` palette usage (text/background/border utilities) to premium design tokens (`var(--ink-*)`, `var(--surface-secondary)`, `var(--rule)`), keeping warning/info/success states intact.
 - `ActiveUsersIndicator` + Sync error banner: standardized neutral ink/surface tokens and removed `border-surface-card`/`bg-surface-*` usage for avatar pills.

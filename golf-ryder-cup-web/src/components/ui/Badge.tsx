@@ -55,48 +55,48 @@ export function Badge({
 
                 // Color variants - Masters refined
                 variant === 'default' && [
-                    'bg-surface-elevated text-text-secondary',
-                    'border border-surface-border',
+                    'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]',
+                    'border border-[var(--rule)]',
                 ],
 
                 variant === 'primary' && [
-                    'bg-masters-green/10 text-masters-green-light',
-                    'border border-masters-green/20',
+                    'bg-[color:var(--masters)]/12 text-[var(--masters)]',
+                    'border border-[color:var(--masters)]/25',
                 ],
 
                 variant === 'success' && [
-                    'bg-masters-green/10 text-masters-green-light',
-                    'border border-masters-green/20',
+                    'bg-[color:var(--success)]/15 text-[var(--success)]',
+                    'border border-[color:var(--success)]/25',
                 ],
 
                 variant === 'warning' && [
-                    'bg-gold/10 text-gold-light',
-                    'border border-gold/20',
+                    'bg-[color:var(--warning)]/12 text-[var(--warning)]',
+                    'border border-[color:var(--warning)]/25',
                 ],
 
                 variant === 'error' && [
-                    'bg-error/10 text-error',
-                    'border border-error/20',
+                    'bg-[color:var(--error)]/12 text-[var(--error)]',
+                    'border border-[color:var(--error)]/25',
                 ],
 
                 variant === 'info' && [
-                    'bg-info/15 text-info-light',
-                    'border border-info/30',
+                    'bg-[color:var(--info)]/12 text-[var(--info)]',
+                    'border border-[color:var(--info)]/25',
                 ],
 
                 variant === 'usa' && [
-                    'bg-team-usa/10 text-team-usa-light',
-                    'border border-team-usa/20',
+                    'bg-[color:var(--team-usa)]/12 text-[var(--team-usa)]',
+                    'border border-[color:var(--team-usa)]/25',
                 ],
 
                 variant === 'europe' && [
-                    'bg-team-europe/10 text-team-europe-light',
-                    'border border-team-europe/20',
+                    'bg-[color:var(--team-europe)]/12 text-[var(--team-europe)]',
+                    'border border-[color:var(--team-europe)]/25',
                 ],
 
                 variant === 'live' && [
-                    'bg-error/15 text-error',
-                    'border border-error/30',
+                    'bg-[color:var(--error)]/12 text-[var(--error)]',
+                    'border border-[color:var(--error)]/30',
                 ],
 
                 className
@@ -107,15 +107,15 @@ export function Badge({
                 <span
                     className={cn(
                         'h-1.5 w-1.5 rounded-full',
-                        variant === 'default' && 'bg-text-secondary',
-                        variant === 'primary' && 'bg-augusta-green',
-                        variant === 'success' && 'bg-success',
-                        variant === 'warning' && 'bg-warning',
-                        variant === 'error' && 'bg-error',
-                        variant === 'info' && 'bg-info',
-                        variant === 'usa' && 'bg-team-usa',
-                        variant === 'europe' && 'bg-team-europe',
-                        variant === 'live' && 'bg-error',
+                        variant === 'default' && 'bg-[var(--ink-tertiary)]',
+                        variant === 'primary' && 'bg-[var(--masters)]',
+                        variant === 'success' && 'bg-[var(--success)]',
+                        variant === 'warning' && 'bg-[var(--warning)]',
+                        variant === 'error' && 'bg-[var(--error)]',
+                        variant === 'info' && 'bg-[var(--info)]',
+                        variant === 'usa' && 'bg-[var(--team-usa)]',
+                        variant === 'europe' && 'bg-[var(--team-europe)]',
+                        variant === 'live' && 'bg-[var(--error)]',
                         pulse && 'animate-pulse',
                     )}
                     aria-hidden="true"

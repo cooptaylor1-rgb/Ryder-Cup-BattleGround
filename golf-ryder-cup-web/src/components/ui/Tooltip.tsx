@@ -83,8 +83,8 @@ export function Tooltip({
                 role="tooltip"
                 className={cn(
                     'fixed z-[70] px-2.5 py-1.5',
-                    'bg-surface-elevated border border-surface-border',
-                    'text-xs text-text-primary font-medium',
+                    'bg-[var(--surface-raised)] border border-[var(--rule)]',
+                    'text-xs text-[var(--ink-primary)] font-medium',
                     'rounded-md shadow-lg',
                     'animate-fade-in',
                     'pointer-events-none',
@@ -107,7 +107,7 @@ export function Tooltip({
                 {/* Arrow */}
                 <span
                     className={cn(
-                        'absolute w-2 h-2 bg-surface-elevated border-surface-border',
+                        'absolute w-2 h-2 bg-[var(--surface-raised)] border-[var(--rule)]',
                         'rotate-45',
                         side === 'top' && 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-b border-r',
                         side === 'bottom' && 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-t border-l',

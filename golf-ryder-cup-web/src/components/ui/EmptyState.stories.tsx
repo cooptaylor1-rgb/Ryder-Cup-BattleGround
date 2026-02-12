@@ -126,20 +126,20 @@ export const Error: Story = {
 export const Gallery: Story = {
   render: () => (
     <div className="grid grid-cols-2 gap-8 p-8">
-      <div className="p-4 border border-surface-border rounded-xl">
-        <h3 className="text-sm font-medium text-text-muted mb-4">No Matches</h3>
+      <div className="p-4 border border-[var(--rule)] rounded-xl">
+        <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-4">No Matches</h3>
         <NoMatchesEmpty onSetupMatchups={() => {}} />
       </div>
-      <div className="p-4 border border-surface-border rounded-xl">
-        <h3 className="text-sm font-medium text-text-muted mb-4">No Players</h3>
+      <div className="p-4 border border-[var(--rule)] rounded-xl">
+        <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-4">No Players</h3>
         <NoPlayersEmpty onAddPlayer={() => {}} />
       </div>
-      <div className="p-4 border border-surface-border rounded-xl">
-        <h3 className="text-sm font-medium text-text-muted mb-4">No Standings</h3>
+      <div className="p-4 border border-[var(--rule)] rounded-xl">
+        <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-4">No Standings</h3>
         <NoStandingsEmpty />
       </div>
-      <div className="p-4 border border-surface-border rounded-xl">
-        <h3 className="text-sm font-medium text-text-muted mb-4">Offline</h3>
+      <div className="p-4 border border-[var(--rule)] rounded-xl">
+        <h3 className="text-sm font-medium text-[var(--ink-tertiary)] mb-4">Offline</h3>
         <OfflineEmpty />
       </div>
     </div>

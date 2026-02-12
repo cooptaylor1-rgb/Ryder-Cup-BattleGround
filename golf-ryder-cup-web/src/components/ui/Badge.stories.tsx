@@ -110,19 +110,19 @@ export const StatusBadges: Story = {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <Badge variant="live" dot pulse>Live</Badge>
-        <span className="text-text-muted text-sm">Match in progress</span>
+        <span className="text-[var(--ink-tertiary)] text-sm">Match in progress</span>
       </div>
       <div className="flex items-center gap-2">
         <Badge variant="success" dot>Completed</Badge>
-        <span className="text-text-muted text-sm">Match finished</span>
+        <span className="text-[var(--ink-tertiary)] text-sm">Match finished</span>
       </div>
       <div className="flex items-center gap-2">
         <Badge variant="default">Scheduled</Badge>
-        <span className="text-text-muted text-sm">Starts at 8:00 AM</span>
+        <span className="text-[var(--ink-tertiary)] text-sm">Starts at 8:00 AM</span>
       </div>
       <div className="flex items-center gap-2">
         <Badge variant="warning" dot>Paused</Badge>
-        <span className="text-text-muted text-sm">Weather delay</span>
+        <span className="text-[var(--ink-tertiary)] text-sm">Weather delay</span>
       </div>
     </div>
   ),

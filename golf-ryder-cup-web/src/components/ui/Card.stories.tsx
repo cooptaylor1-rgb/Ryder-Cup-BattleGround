@@ -42,7 +42,7 @@ export const Default: Story = {
     <Card className="w-80">
       <CardHeader title="Match Results" subtitle="Round 1 - Morning Session" />
       <CardContent>
-        <p className="text-text-secondary">
+        <p className="text-[var(--ink-secondary)]">
           View the complete results from this morning&apos;s matches.
         </p>
       </CardContent>
@@ -81,7 +81,7 @@ export const Interactive: Story = {
         <CardContent>
           <div className="flex items-center justify-between">
             <span>Click me</span>
-            <span className="text-text-muted">→</span>
+            <span className="text-[var(--ink-tertiary)]">→</span>
           </div>
         </CardContent>
       </Card>
@@ -106,21 +106,21 @@ export const MatchCard: Story = {
         <div className="flex justify-between items-center py-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-masters-green">2</div>
-            <div className="text-sm text-text-muted">USA</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">USA</div>
           </div>
-          <div className="text-text-muted">UP</div>
+          <div className="text-[var(--ink-tertiary)]">UP</div>
           <div className="text-center">
             <div className="text-2xl font-bold text-error">1</div>
-            <div className="text-sm text-text-muted">EUR</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">EUR</div>
           </div>
         </div>
-        <div className="flex gap-2 text-sm text-text-secondary">
+        <div className="flex gap-2 text-sm text-[var(--ink-secondary)]">
           <span>Smith & Jones</span>
           <span>vs</span>
           <span>García & Müller</span>
         </div>
       </CardContent>
-      <CardFooter className="border-t border-surface-border pt-4">
+      <CardFooter className="border-t border-[var(--rule)] pt-4">
         <Button variant="primary" fullWidth>
           Enter Scores
         </Button>
@@ -140,7 +140,7 @@ export const PlayerCard: Story = {
           </div>
           <div className="flex-1">
             <div className="font-semibold text-canvas">John Smith</div>
-            <div className="text-sm text-text-muted">Team USA • +3.2 HCP</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">Team USA • +3.2 HCP</div>
           </div>
           <Badge variant="primary">Captain</Badge>
         </div>
@@ -155,7 +155,7 @@ export const StatsCard: Story = {
     <Card className="w-64" padding="lg">
       <div className="text-center">
         <div className="text-4xl font-bold text-masters-green mb-1">8½</div>
-        <div className="text-sm text-text-muted uppercase tracking-wide">
+        <div className="text-sm text-[var(--ink-tertiary)] uppercase tracking-wide">
           Team Points
         </div>
       </div>
@@ -171,7 +171,7 @@ export const CardGrid: Story = {
         <Card key={match} interactive variant="outlined">
           <CardContent>
             <div className="font-semibold">{match}</div>
-            <div className="text-sm text-text-muted">In Progress</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">In Progress</div>
           </CardContent>
         </Card>
       ))}

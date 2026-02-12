@@ -127,9 +127,9 @@ export function TabList({ children, className, variant = 'default' }: TabListPro
             onKeyDown={handleKeyDown}
             className={cn(
                 'flex items-center gap-1',
-                variant === 'default' && 'p-1 bg-surface-elevated rounded-lg',
+                variant === 'default' && 'p-1 bg-[var(--surface-secondary)] rounded-lg',
                 variant === 'pills' && 'gap-2',
-                variant === 'underline' && 'border-b border-surface-border gap-0',
+                variant === 'underline' && 'border-b border-[var(--rule)] gap-0',
                 className
             )}
         >
@@ -170,13 +170,13 @@ export function TabTrigger({
                 // Base styles
                 'relative px-4 py-2 text-sm font-medium rounded-md',
                 'transition-all duration-150',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-augusta-green',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--canvas)]',
                 'disabled:pointer-events-none disabled:opacity-50',
 
                 // Active state
                 isActive
-                    ? 'bg-surface-highlight text-text-primary shadow-sm'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-highlight/50',
+                    ? 'bg-[var(--surface-raised)] text-[var(--ink-primary)] shadow-sm'
+                    : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[color:var(--surface-raised)]/50',
 
                 className
             )}

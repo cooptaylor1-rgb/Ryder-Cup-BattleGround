@@ -94,7 +94,7 @@ export const WithIcons: Story = {
       />
       <Input
         leftIcon={<User />}
-        rightIcon={<span className="text-xs text-text-muted">@</span>}
+        rightIcon={<span className="text-xs text-[var(--ink-tertiary)]">@</span>}
         placeholder="Username"
       />
     </div>
@@ -213,7 +213,7 @@ export const SearchInput: Story = {
       <Input
         leftIcon={<Search />}
         placeholder="Search courses, players, or trips..."
-        className="bg-surface-card"
+        className="bg-[var(--surface)]"
       />
     </div>
   ),

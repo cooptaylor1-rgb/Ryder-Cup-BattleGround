@@ -48,20 +48,20 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 
                     // Card variants - Masters elegance
                     variant === 'default' && [
-                        'bg-surface-card',
+                        'bg-[var(--surface)]',
                         'shadow-card-md',
-                        'border border-surface-border',
+                        'border border-[var(--rule)]',
                     ],
 
                     variant === 'elevated' && [
-                        'bg-surface-elevated',
+                        'bg-[var(--surface-raised)]',
                         'shadow-card-lg',
-                        'border border-surface-border/50',
+                        'border border-[color:var(--rule)]/50',
                     ],
 
                     variant === 'outlined' && [
                         'bg-transparent',
-                        'border border-surface-border',
+                        'border border-[var(--rule)]',
                     ],
 
                     variant === 'ghost' && [
@@ -127,12 +127,12 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
                 {title || subtitle ? (
                     <div className="flex-1 min-w-0">
                         {title && (
-                            <h3 className="text-base font-semibold text-text-primary truncate">
+                            <h3 className="text-base font-semibold text-[var(--ink-primary)] truncate">
                                 {title}
                             </h3>
                         )}
                         {subtitle && (
-                            <p className="text-sm text-text-secondary mt-0.5 truncate">
+                            <p className="text-sm text-[var(--ink-secondary)] mt-0.5 truncate">
                                 {subtitle}
                             </p>
                         )}
@@ -173,7 +173,7 @@ const CardFooter = forwardRef<
         ref={ref}
         className={cn(
             'flex items-center justify-end gap-2 pt-4',
-            'border-t border-surface-border/50 mt-4',
+            'border-t border-[color:var(--rule)]/50 mt-4',
             className
         )}
         {...props}

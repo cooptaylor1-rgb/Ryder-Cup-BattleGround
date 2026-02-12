@@ -34,7 +34,7 @@ export function SectionHeader({
                 {Icon && (
                     <div className={cn(
                         'flex items-center justify-center rounded-xl',
-                        'bg-masters-green/10 text-masters-green-light',
+                        'bg-[color:var(--masters)]/12 text-[var(--masters)]',
                         size === 'sm' && 'h-8 w-8',
                         size === 'md' && 'h-10 w-10',
                         size === 'lg' && 'h-12 w-12',
@@ -48,7 +48,7 @@ export function SectionHeader({
                 )}
                 <div className="min-w-0">
                     <h2 className={cn(
-                        'font-serif font-semibold text-canvas truncate',
+                        'font-serif font-semibold text-[var(--ink-primary)] truncate',
                         size === 'sm' && 'text-sm',
                         size === 'md' && 'text-base',
                         size === 'lg' && 'text-xl',
@@ -57,7 +57,7 @@ export function SectionHeader({
                     </h2>
                     {subtitle && (
                         <p className={cn(
-                            'text-text-secondary truncate',
+                            'text-[var(--ink-secondary)] truncate',
                             size === 'sm' && 'text-xs',
                             size === 'md' && 'text-sm',
                             size === 'lg' && 'text-sm',

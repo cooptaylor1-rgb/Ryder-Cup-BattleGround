@@ -35,7 +35,7 @@ export function Breadcrumb({
         ? [{ label: 'Home', href: '/', icon: <Home className="w-4 h-4" /> }, ...items]
         : items;
 
-    const SeparatorIcon = separator || <ChevronRight className="w-4 h-4 text-ink-tertiary" />;
+    const SeparatorIcon = separator || <ChevronRight className="w-4 h-4 text-[var(--ink-tertiary)]" />;
 
     return (
         <nav aria-label="Breadcrumb" className={cn('flex items-center', className)}>
@@ -52,7 +52,7 @@ export function Breadcrumb({
                                         href={item.href}
                                         className={cn(
                                             'flex items-center gap-1.5 px-2 py-1 rounded-lg',
-                                            'text-ink-secondary hover:text-ink hover:bg-surface-highlight',
+                                            'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[color:var(--surface-secondary)]/70',
                                             'transition-colors duration-150',
                                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold'
                                         )}
@@ -64,7 +64,7 @@ export function Breadcrumb({
                                     <span
                                         className={cn(
                                             'flex items-center gap-1.5 px-2 py-1',
-                                            isLast ? 'text-ink font-medium' : 'text-ink-secondary'
+                                            isLast ? 'text-[var(--ink-primary)] font-medium' : 'text-[var(--ink-secondary)]'
                                         )}
                                         aria-current={isLast ? 'page' : undefined}
                                     >
