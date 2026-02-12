@@ -195,18 +195,18 @@ export function SideBetOptIn({
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="font-semibold text-surface-900 dark:text-white flex items-center gap-2">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                    <h3 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
+                        <DollarSign className="w-5 h-5 text-[color:var(--success)]" />
                         Side Bets
                     </h3>
-                    <p className="text-sm text-surface-500 mt-0.5">
+                    <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                         Choose which bets you want to participate in
                     </p>
                 </div>
             </div>
 
             {/* Summary Card */}
-            <div className="bg-linear-to-r from-green-500 to-emerald-600 rounded-2xl p-4 text-white">
+            <div className="bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] rounded-2xl p-4 text-white">
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-sm opacity-90">Your buy-in</div>
@@ -242,7 +242,7 @@ export function SideBetOptIn({
 
                 return (
                     <div key={category}>
-                        <h4 className="text-sm font-medium text-surface-500 dark:text-surface-400 flex items-center gap-2 mb-3">
+                        <h4 className="text-sm font-medium text-[var(--ink-tertiary)] flex items-center gap-2 mb-3">
                             {categoryLabels[category].icon}
                             {categoryLabels[category].label}
                         </h4>
@@ -257,10 +257,10 @@ export function SideBetOptIn({
                                         key={bet.id}
                                         layout
                                         className={cn(
-                                            'bg-white dark:bg-surface-800 rounded-xl border overflow-hidden transition-colors',
+                                            'bg-[var(--surface-raised)] rounded-xl border overflow-hidden transition-colors',
                                             isOptedIn
-                                                ? 'border-green-300 dark:border-green-700'
-                                                : 'border-surface-200 dark:border-surface-700'
+                                                ? 'border-[color:var(--success)]/60'
+                                                : 'border-[color:var(--rule)]/40'
                                         )}
                                     >
                                         {/* Main Row */}
@@ -271,7 +271,7 @@ export function SideBetOptIn({
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-surface-900 dark:text-white">
+                                                    <span className="font-medium text-[var(--ink-primary)]">
                                                         {bet.name}
                                                     </span>
                                                     {bet.isRequired && (
@@ -280,8 +280,8 @@ export function SideBetOptIn({
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="text-sm text-surface-500 flex items-center gap-2">
-                                                    <span className="font-medium text-green-600">
+                                                <div className="text-sm text-[var(--ink-secondary)] flex items-center gap-2">
+                                                    <span className="font-medium text-[color:var(--success)]">
                                                         {currency}{pref?.customAmount || bet.amount}
                                                     </span>
                                                     <span>•</span>
@@ -292,12 +292,12 @@ export function SideBetOptIn({
                                             {/* Info Button */}
                                             <button
                                                 onClick={() => setExpandedBet(isExpanded ? null : bet.id)}
-                                                className="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors"
+                                                className="p-2 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
                                             >
                                                 {isExpanded ? (
-                                                    <ChevronUp className="w-4 h-4 text-surface-400" />
+                                                    <ChevronUp className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                                 ) : (
-                                                    <Info className="w-4 h-4 text-surface-400" />
+                                                    <Info className="w-4 h-4 text-[var(--ink-tertiary)]" />
                                                 )}
                                             </button>
 
@@ -309,22 +309,22 @@ export function SideBetOptIn({
                                                     'w-12 h-7 rounded-full relative transition-colors',
                                                     bet.isRequired && 'cursor-not-allowed opacity-60',
                                                     isOptedIn
-                                                        ? 'bg-green-500'
-                                                        : 'bg-surface-200 dark:bg-surface-600'
+                                                        ? 'bg-[var(--success)]'
+                                                        : 'bg-[color:var(--ink-tertiary)]/25'
                                                 )}
                                             >
                                                 <motion.div
                                                     className={cn(
-                                                        'w-5 h-5 rounded-full bg-white shadow absolute top-1',
+                                                        'w-5 h-5 rounded-full bg-[var(--surface-raised)] shadow absolute top-1',
                                                         'flex items-center justify-center'
                                                     )}
                                                     animate={{ left: isOptedIn ? 26 : 4 }}
                                                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                                                 >
                                                     {isOptedIn ? (
-                                                        <Check className="w-3 h-3 text-green-500" />
+                                                        <Check className="w-3 h-3 text-[color:var(--success)]" />
                                                     ) : (
-                                                        <X className="w-3 h-3 text-surface-400" />
+                                                        <X className="w-3 h-3 text-[var(--ink-tertiary)]" />
                                                     )}
                                                 </motion.div>
                                             </button>
@@ -339,8 +339,8 @@ export function SideBetOptIn({
                                                     exit={{ height: 0, opacity: 0 }}
                                                     className="overflow-hidden"
                                                 >
-                                                    <div className="px-4 pb-4 pt-2 border-t border-surface-100 dark:border-surface-700">
-                                                        <p className="text-sm text-surface-600 dark:text-surface-400">
+                                                    <div className="px-4 pb-4 pt-2 border-t border-[color:var(--rule)]/30">
+                                                        <p className="text-sm text-[var(--ink-secondary)]">
                                                             {bet.description}
                                                         </p>
                                                     </div>

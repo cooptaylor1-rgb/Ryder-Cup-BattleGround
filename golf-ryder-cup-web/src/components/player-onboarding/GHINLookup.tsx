@@ -165,11 +165,11 @@ export function GHINLookup({
         <div className={cn('space-y-4', className)}>
             {/* Input Section */}
             <div className="space-y-2">
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                <label className="block text-sm font-medium text-[var(--ink-secondary)]">
                     GHIN Number
                 </label>
                 <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)]">
                         <Hash className="w-5 h-5" />
                     </div>
                     <input
@@ -180,14 +180,14 @@ export function GHINLookup({
                         placeholder="Enter your 7-digit GHIN"
                         className={cn(
                             'w-full pl-11 pr-24 py-3 rounded-xl border text-lg font-mono tracking-wider',
-                            'bg-white dark:bg-surface-800',
-                            'focus:outline-none focus:ring-2 focus:ring-masters/30 focus:border-masters',
+                            'bg-[var(--surface-raised)]',
+                            'focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30 focus:border-[color:var(--masters)]',
                             'transition-all duration-200',
                             state === 'found'
-                                ? 'border-green-300 bg-green-50 dark:bg-green-900/10'
+                                ? 'border-[color:var(--success)]/60 bg-[color:var(--success)]/10'
                                 : state === 'not-found' || state === 'error'
-                                    ? 'border-red-300'
-                                    : 'border-surface-200 dark:border-surface-700'
+                                    ? 'border-[color:var(--error)]/60'
+                                    : 'border-[color:var(--rule)]/40'
                         )}
                         maxLength={7}
                     />
@@ -199,8 +199,8 @@ export function GHINLookup({
                             'px-3 py-1.5 rounded-lg font-medium text-sm',
                             'transition-all duration-200',
                             ghinNumber.length >= 7
-                                ? 'bg-masters text-white hover:bg-masters/90'
-                                : 'bg-surface-100 dark:bg-surface-700 text-surface-400'
+                                ? 'bg-[var(--masters)] text-white hover:bg-[color:var(--masters)]/90'
+                                : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
                         )}
                     >
                         {state === 'searching' ? (
@@ -210,7 +210,7 @@ export function GHINLookup({
                         )}
                     </button>
                 </div>
-                <p className="text-xs text-surface-500 dark:text-surface-400">
+                <p className="text-xs text-[var(--ink-tertiary)]">
                     Find your GHIN number on your golf club app or card
                 </p>
             </div>
@@ -223,17 +223,17 @@ export function GHINLookup({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-surface-50 dark:bg-surface-800/50 rounded-xl p-4"
+                        className="bg-[var(--surface-secondary)] rounded-xl p-4"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-masters/10 flex items-center justify-center">
-                                <Loader2 className="w-5 h-5 text-masters animate-spin" />
+                            <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/10 flex items-center justify-center">
+                                <Loader2 className="w-5 h-5 text-[color:var(--masters)] animate-spin" />
                             </div>
                             <div>
-                                <div className="font-medium text-surface-900 dark:text-white">
+                                <div className="font-medium text-[var(--ink-primary)]">
                                     Looking up your handicap...
                                 </div>
-                                <div className="text-sm text-surface-500">
+                                <div className="text-sm text-[var(--ink-secondary)]">
                                     Checking GHIN database
                                 </div>
                             </div>
@@ -247,28 +247,28 @@ export function GHINLookup({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-green-50 dark:bg-green-900/10 rounded-xl overflow-hidden border border-green-200 dark:border-green-800"
+                        className="bg-[color:var(--success)]/10 rounded-xl overflow-hidden border border-[color:var(--success)]/40"
                     >
                         {/* Success Header */}
-                        <div className="p-4 border-b border-green-200 dark:border-green-800">
+                        <div className="p-4 border-b border-[color:var(--success)]/40">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-full bg-[var(--success)] flex items-center justify-center">
                                     <CheckCircle className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="font-semibold text-green-900 dark:text-green-100">
+                                    <div className="font-semibold text-[var(--ink-primary)]">
                                         Found you!
                                     </div>
-                                    <div className="text-sm text-green-700 dark:text-green-300">
+                                    <div className="text-sm text-[color:var(--success)]">
                                         {result.clubName}
                                     </div>
                                 </div>
                                 <button
                                     onClick={handleLookup}
-                                    className="p-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-800/30 transition-colors"
+                                    className="p-2 rounded-lg hover:bg-[color:var(--success)]/15 transition-colors"
                                     title="Refresh"
                                 >
-                                    <RefreshCw className="w-4 h-4 text-green-600" />
+                                    <RefreshCw className="w-4 h-4 text-[color:var(--success)]" />
                                 </button>
                             </div>
                         </div>
@@ -276,14 +276,14 @@ export function GHINLookup({
                         {/* Player Info */}
                         <div className="p-4">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-14 h-14 rounded-full bg-linear-to-br from-masters to-emerald-600 flex items-center justify-center">
+                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] flex items-center justify-center">
                                     <User className="w-7 h-7 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-lg font-semibold text-surface-900 dark:text-white">
+                                    <div className="text-lg font-semibold text-[var(--ink-primary)]">
                                         {result.firstName} {result.lastName}
                                     </div>
-                                    <div className="text-sm text-surface-500">
+                                    <div className="text-sm text-[var(--ink-secondary)]">
                                         GHIN: {result.ghinNumber}
                                     </div>
                                 </div>
@@ -292,35 +292,35 @@ export function GHINLookup({
                             {/* Stats Grid */}
                             <div className="grid grid-cols-3 gap-3">
                                 {/* Current Index */}
-                                <div className="bg-white dark:bg-surface-800 rounded-xl p-3 text-center">
-                                    <div className="text-2xl font-bold text-masters">
+                                <div className="bg-[var(--surface-raised)] rounded-xl p-3 text-center">
+                                    <div className="text-2xl font-bold text-[color:var(--masters)]">
                                         {result.handicapIndex.toFixed(1)}
                                     </div>
-                                    <div className="text-xs text-surface-500">Current Index</div>
+                                    <div className="text-xs text-[var(--ink-tertiary)]">Current Index</div>
                                 </div>
 
                                 {/* Low Index */}
                                 {result.lowHandicap && (
-                                    <div className="bg-white dark:bg-surface-800 rounded-xl p-3 text-center">
-                                        <div className="text-2xl font-bold text-surface-700 dark:text-surface-300">
+                                    <div className="bg-[var(--surface-raised)] rounded-xl p-3 text-center">
+                                        <div className="text-2xl font-bold text-[var(--ink-secondary)]">
                                             {result.lowHandicap.toFixed(1)}
                                         </div>
-                                        <div className="text-xs text-surface-500">Low Index</div>
+                                        <div className="text-xs text-[var(--ink-tertiary)]">Low Index</div>
                                     </div>
                                 )}
 
                                 {/* Trend */}
                                 {result.trend && (
-                                    <div className="bg-white dark:bg-surface-800 rounded-xl p-3 text-center">
+                                    <div className="bg-[var(--surface-raised)] rounded-xl p-3 text-center">
                                         <div className={cn(
                                             'text-2xl font-bold flex items-center justify-center',
-                                            result.trend === 'down' && 'text-green-600',
-                                            result.trend === 'up' && 'text-red-500',
-                                            result.trend === 'stable' && 'text-surface-500'
+                                            result.trend === 'down' && 'text-[color:var(--success)]',
+                                            result.trend === 'up' && 'text-[color:var(--error)]',
+                                            result.trend === 'stable' && 'text-[var(--ink-tertiary)]'
                                         )}>
                                             <TrendIcon className="w-6 h-6" />
                                         </div>
-                                        <div className="text-xs text-surface-500">
+                                        <div className="text-xs text-[var(--ink-tertiary)]">
                                             {result.trend === 'down' ? 'Improving' : result.trend === 'up' ? 'Rising' : 'Stable'}
                                         </div>
                                     </div>
@@ -332,7 +332,7 @@ export function GHINLookup({
                                 <div className="mt-4">
                                     <button
                                         onClick={() => setShowHistory(!showHistory)}
-                                        className="flex items-center gap-2 text-sm font-medium text-masters hover:text-masters/80 transition-colors"
+                                        className="flex items-center gap-2 text-sm font-medium text-[color:var(--masters)] hover:text-[color:var(--masters)]/80 transition-colors"
                                     >
                                         <History className="w-4 h-4" />
                                         {showHistory ? 'Hide' : 'Show'} Recent Scores
@@ -350,22 +350,22 @@ export function GHINLookup({
                                                     {result.recentScores.map((score, idx) => (
                                                         <div
                                                             key={idx}
-                                                            className="flex items-center justify-between py-2 px-3 bg-white dark:bg-surface-800 rounded-lg"
+                                                            className="flex items-center justify-between py-2 px-3 bg-[var(--surface-raised)] rounded-lg"
                                                         >
-                                                            <span className="text-sm text-surface-500">
+                                                            <span className="text-sm text-[var(--ink-secondary)]">
                                                                 {new Date(score.date).toLocaleDateString('en-US', {
                                                                     month: 'short',
                                                                     day: 'numeric',
                                                                 })}
                                                             </span>
-                                                            <span className="font-semibold text-surface-900 dark:text-white">
+                                                            <span className="font-semibold text-[var(--ink-primary)]">
                                                                 {score.score}
                                                             </span>
                                                             <span className={cn(
                                                                 'text-sm font-medium',
                                                                 score.differential < result.handicapIndex
-                                                                    ? 'text-green-600'
-                                                                    : 'text-surface-500'
+                                                                    ? 'text-[color:var(--success)]'
+                                                                    : 'text-[var(--ink-tertiary)]'
                                                             )}>
                                                                 {score.differential.toFixed(1)}
                                                             </span>
@@ -380,7 +380,7 @@ export function GHINLookup({
 
                             {/* Last Updated */}
                             {result.lastRevision && (
-                                <div className="mt-4 text-xs text-surface-500 text-center">
+                                <div className="mt-4 text-xs text-[var(--ink-tertiary)] text-center">
                                     Last revised: {new Date(result.lastRevision).toLocaleDateString('en-US', {
                                         month: 'long',
                                         day: 'numeric',
@@ -444,10 +444,10 @@ export function GHINLookup({
             {/* Manual Entry Option */}
             {(state === 'idle' || state === 'not-found' || state === 'error') && (
                 <div className="text-center">
-                    <span className="text-sm text-surface-500">
+                    <span className="text-sm text-[var(--ink-secondary)]">
                         Don&apos;t have a GHIN? No problem—
                     </span>
-                    <span className="text-sm text-masters font-medium ml-1">
+                    <span className="text-sm text-[color:var(--masters)] font-medium ml-1">
                         enter your handicap below
                     </span>
                 </div>

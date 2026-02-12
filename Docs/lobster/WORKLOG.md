@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 03:03 EST — Phase 2 — Player onboarding GHIN + Side Bet: premium token sweep
+- `GHINLookup`: migrated the lookup input, success states, and history cards off legacy `surface-*` palette utilities onto premium tokens; refreshed the loading/success accents to use shared Masters/success tokens.
+- `SideBetOptIn`: replaced legacy `surface-*` toggles + info states with premium surface/ink/rule tokens and aligned the summary card and controls with the shared success tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`87a49be`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 02:56 EST — Phase 2 — ShareButton: premium tokens in fallback menu
 - `ShareButton`: migrated the non-WebShare fallback menu off legacy `surface-*` palette utilities and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`).
 - Copied state now uses the premium success token (`var(--success)`) instead of hard-coded green.
