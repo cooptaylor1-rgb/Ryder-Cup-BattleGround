@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 12:08 EST — Phase 2 — Pending sync surfaces: premium token alignment
+- `PendingSyncIndicator`, `SyncBadge`, and `SyncStatusRow`: replaced legacy `bg-white`/`bg-amber-*`/`text-stone-*` classes with premium surface/ink/rule tokens, reusing shared tone maps for syncing/pending/offline states so the widgets stay legible across themes.
+- Floating indicator now uses a neutral premium surface with tone-specific icon chips, tokenized rings, and focus-visible outlines to match the premium shell and keep offline status accessible in dark mode.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`53b6cdc`)
+
 ### 11:56 EST — Phase 2 — Course + trip setup accents: replace `augusta-green` + legacy grays with premium tokens
 - `SideBetPresets`: replaced remaining `bg-surface-*` + `augusta-green` chips and action states with premium surface/ink/rule tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--masters)`, `var(--error)`), eliminating dark-mode branches.
 - `CourseSearch`: migrated search/results UI off hard-coded `gray-*` palettes and `augusta-green` accents onto premium token-driven Tailwind; standardized inputs, cards, warnings, and error states to the shared surfaces/ink.
