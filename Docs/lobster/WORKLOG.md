@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 17:30 EST — Phase 2 — SessionWeatherPanel: premium status tokens (remove hard-coded palettes)
+- `SessionWeatherPanel`: replaced hard-coded Tailwind palette utilities (red/orange/yellow/blue/green) with premium status tokens (`var(--info)`, `var(--warning)`, `var(--success)`, `var(--error)`) for icons, alert cards, recommendation badges, and error/recommendation panels.
+- Also removed dark-mode-specific palette branches in favor of token-driven tints + premium ink.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a566d20`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimizer warnings)
+
 ### 16:56 EST — Phase 2 — TripArchiveCard: premium token + team palette sweep
 - `TripArchiveCard` (trip history): replaced legacy `bg-white`/`dark:bg-gray-*` shell + indigo/purple/blue/red palettes with the premium `.card` surface and token-driven inks/surfaces/rules.
 - Header now uses a Masters gradient (`var(--masters)` → `var(--masters-deep)`); all-time standings + timeline winner states use Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`, `text-team-*`).
