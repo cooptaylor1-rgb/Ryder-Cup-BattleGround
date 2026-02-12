@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-12
 
+## 06:55 EST — Phase 2 — StrokeAlertBanner: token-driven styling
+- `StrokeAlertBanner`: removed inline token style props for surfaces/borders/text and migrated to premium token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--masters)]`, `text-[var(--ink-*)]`, `border-[var(--rule)]`).
+- `StrokeIndicator`: refactored from passing raw `color` strings to a typed `variant` (`usa`/`europe`) so Lucide icons + labels can use class-driven token colors (and a small fixed rgba tint for the leading-strokes badge background).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b60c5c2`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 05:15 EST — Phase 2 — Trip setup FormatSelector + PlayerCountSelector: premium token sweep
 - `FormatSelector` + `PlayerCountSelector`: migrated remaining legacy `surface-*` palette usage and dark variants onto premium token-driven Tailwind (`var(--surface-*)`, `var(--rule)`, `var(--ink-*)`, `var(--masters)`).
 - Standardized the selection accents from legacy `masters-green`/`augusta-green` classes to `var(--masters)` + `var(--masters-subtle)`.

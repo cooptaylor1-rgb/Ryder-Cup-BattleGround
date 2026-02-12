@@ -1682,3 +1682,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - NassauEnhancedCard + HammerGameCard: replaced `if (!game) return null;` with a small in-component fallback card (“Game unavailable”) so the UI can’t silently render nothing if a game record can’t be loaded.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c3ee33c`)
+
+## 2026-02-12
+
+### 06:55 EST — Phase 2 — StrokeAlertBanner: token-driven styling
+- `StrokeAlertBanner`: removed inline token style props for surfaces/borders/text and migrated to premium token-driven Tailwind classes (`bg-[var(--surface)]`, `border-[var(--masters)]`, `text-[var(--ink-*)]`, `border-[var(--rule)]`).
+- `StrokeIndicator`: refactored from passing raw `color` strings to a typed `variant` (`usa`/`europe`) so Lucide icons + labels can use class-driven token colors (and a small fixed rgba tint for the leading-strokes badge background).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b60c5c2`)
