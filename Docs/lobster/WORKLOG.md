@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `IOSActionSheet`: migrated the iOS-style translucent panels and dividers off `bg-white`/`border-gray-*` and replaced iOS-blue / destructive reds with premium `var(--info)` + `var(--error)` tokens; active/pressed states now use premium surface tints.
 - `WeatherAlertBanner`: replaced hard-coded Tailwind severity palettes (`blue/yellow/orange/red`) and dark-mode branches with premium status tokens (`var(--info)`, `var(--warning)`, `var(--error)`) + neutral ink/rule so alerts remain legible across themes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`6b252b6`)
+- Commit + push ✅ (`3a01aa0`)
 
 ### 14:10 EST — Phase 2 — SyncStatusIndicator: premium token tones (remove hard-coded red/blue/amber/green)
 - `SyncStatusIndicator`: migrated minimal/compact/full variants off hard-coded Tailwind status colors (`red-500`, `blue-500`, `amber-*`, `green-*`) onto premium design tokens (`var(--warning)`, `var(--info)`, `var(--success)`, `var(--ink-tertiary)` for offline).
