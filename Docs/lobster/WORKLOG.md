@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 22:40 EST — Phase 2 — ScoreCelebration/Toast: token-driven colors + team-color mix
+- `ScoreCelebration` (hole-lost subtle feedback): replaced inline `teamColor + '40'` alpha concatenation with a token-safe `color-mix()` background and a single `--team-color` CSS variable.
+- `ScoreToast`: replaced hard-coded hex colors for info/warning with premium tokens (`var(--info)`, `var(--warning)`) and switched success to `var(--success)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`10fd177`) (pre-push `typecheck` + `test` + `build` passed; build emitted existing CSS optimization warnings)
+
 ### 22:15 EST — Phase 2 — Social Polls + PlayerStatsCard: premium `.card` + rule tokens
 - Social Poll UI (`PollCard`, `CreatePollModal`): replaced legacy `card-surface` wrapper with the shared premium `.card` surface.
 - Standardized section separators/dashed affordances off `border-[var(--surface-tertiary)]` and onto premium `border-[var(--rule)]` / `border-[color:var(--rule)]/40`.

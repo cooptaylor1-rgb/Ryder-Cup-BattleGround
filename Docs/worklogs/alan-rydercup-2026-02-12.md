@@ -1,5 +1,11 @@
 # Alan — Ryder Cup BattleGround Worklog — 2026-02-12
 
+## 22:40 EST — Phase 2 — ScoreCelebration/Toast: token-driven colors + team-color mix
+- `ScoreCelebration` (hole-lost subtle feedback): replaced inline `teamColor + '40'` alpha concatenation with a token-safe `color-mix()` background and a single `--team-color` CSS variable.
+- `ScoreToast`: replaced hard-coded hex colors for info/warning with premium tokens (`var(--info)`, `var(--warning)`) and switched success to `var(--success)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`10fd177`) (note: pre-push `typecheck` + `test` + `build` passed; build still reports existing CSS optimization warnings elsewhere)
+
 ## 21:55 EST — Phase 2 — Modal/Toast/ConfirmDialog: premium token sweep
 - `Modal`: migrated overlay + dialog surfaces/borders/text off legacy inline `var(--surface-card)` / `--border-subtle` / `--text-*` and onto premium token-driven Tailwind (`var(--surface-raised)`, `var(--rule)`, `var(--ink-*)`).
 - `Toast`: migrated toast container + item surfaces/borders/text onto premium tokens and removed legacy `hover:bg-surface-highlight` usage.
