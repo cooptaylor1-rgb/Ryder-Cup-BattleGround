@@ -259,9 +259,9 @@ export function OfflineIndicator() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--rule)]"
+            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink-primary)]"
           >
-            <Wifi size={14} className="text-green-500" />
+            <Wifi size={14} className="text-[var(--success)]" />
             <span className="text-xs font-medium">Online</span>
           </motion.div>
         )}
@@ -281,23 +281,23 @@ export function SyncStatusChip() {
 
   return (
     <div
-      className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
+      className={`flex items-center gap-1.5 px-2 py-1 rounded-full border text-[var(--ink-primary)] ${
         !isOnline
-          ? 'bg-red-500/15 border border-red-500/30'
-          : 'bg-blue-500/15 border border-blue-500/30'
+          ? 'bg-[color:var(--error)]/15 border-[color:var(--error)]/30'
+          : 'bg-[color:var(--info)]/15 border-[color:var(--info)]/30'
       }`}
     >
       {!isOnline ? (
         <>
-          <CloudOff size={12} className="text-red-500" />
-          <span className="text-xs font-medium text-red-500">
+          <CloudOff size={12} className="text-[var(--error)]" />
+          <span className="text-xs font-medium text-[var(--error)]">
             Offline {pendingCount > 0 && `(${pendingCount})`}
           </span>
         </>
       ) : (
         <>
-          <Upload size={12} className="text-blue-500 animate-pulse" />
-          <span className="text-xs font-medium text-blue-500">Syncing {pendingCount}</span>
+          <Upload size={12} className="text-[var(--info)] animate-pulse" />
+          <span className="text-xs font-medium text-[var(--info)]">Syncing {pendingCount}</span>
         </>
       )}
     </div>
@@ -313,9 +313,9 @@ export function OfflineChip() {
   if (isOnline) return null;
 
   return (
-    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-500/15 border border-red-500/30">
-      <CloudOff size={12} className="text-red-500" />
-      <span className="text-xs font-medium text-red-500">Offline</span>
+    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[color:var(--error)]/15 border border-[color:var(--error)]/30 text-[var(--ink-primary)]">
+      <CloudOff size={12} className="text-[var(--error)]" />
+      <span className="text-xs font-medium text-[var(--error)]">Offline</span>
     </div>
   );
 }

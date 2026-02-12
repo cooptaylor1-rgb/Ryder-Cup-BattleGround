@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 19:05 EST — Phase 2 — OfflineIndicator chips: tokenize sync/offline/online colors
+- `OfflineIndicator`: migrated the small **Online** pill icon off `text-green-500` and onto the premium success token (`var(--success)`).
+- `SyncStatusChip` + `OfflineChip`: replaced hard-coded red/blue palette tints (`bg-*/border-*` + `text-*`) with premium status tokens (`var(--error)`, `var(--info)`), keeping borders/tints consistent across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 18:40 EST — Phase 2 — SyncStatusBadge + StrokeScoreEntry: premium token alignment
 - `SyncStatusBadge`: replaced hard-coded Tailwind palettes (green/blue/red/gray) with premium tone tokens (`var(--success)`, `var(--info)`, `var(--error)`, `var(--ink-*)`) and token-driven tint backgrounds so the badge remains theme-consistent.
 - `StrokeScoreEntry`: replaced `bg-gray-*` separators and inline ink styles in the Hole info row with premium rule/ink token classes.
