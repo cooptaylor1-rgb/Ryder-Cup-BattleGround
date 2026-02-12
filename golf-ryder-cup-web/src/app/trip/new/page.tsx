@@ -126,10 +126,10 @@ export default function NewTripPage() {
         {step === 'configure' && selectedTemplate && (
           <section className="section-sm space-y-6">
             {/* Selected template badge */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-augusta-green/5 border border-augusta-green/20">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-[color:var(--masters)]/10 border border-[color:var(--masters)]/25">
               <span className="text-2xl">{selectedTemplate.icon}</span>
               <div>
-                <p className="text-sm text-surface-500">Template</p>
+                <p className="text-sm text-[var(--ink-tertiary)]">Template</p>
                 <p className="font-semibold">{selectedTemplate.name}</p>
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function NewTripPage() {
             {/* Trip summary */}
             <div className="card p-4 space-y-3">
               <h2 className="text-xl font-bold">{tripName}</h2>
-              <div className="flex flex-wrap gap-4 text-sm text-surface-500">
+              <div className="flex flex-wrap gap-4 text-sm text-[var(--ink-tertiary)]">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
                   <span>
@@ -229,18 +229,18 @@ export default function NewTripPage() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-3 pt-2 border-t border-surface-200 dark:border-surface-700">
+              <div className="flex gap-3 pt-2 border-t border-[var(--rule)]">
                 <div className="flex-1 text-center">
-                  <p className="text-2xl font-bold text-augusta-green">{preview.sessions.length}</p>
-                  <p className="text-xs text-surface-500">Sessions</p>
+                  <p className="text-2xl font-bold text-[var(--masters)]">{preview.sessions.length}</p>
+                  <p className="text-xs text-[var(--ink-tertiary)]">Sessions</p>
                 </div>
                 <div className="flex-1 text-center">
-                  <p className="text-2xl font-bold text-augusta-green">{preview.totalMatches}</p>
-                  <p className="text-xs text-surface-500">Matches</p>
+                  <p className="text-2xl font-bold text-[var(--masters)]">{preview.totalMatches}</p>
+                  <p className="text-xs text-[var(--ink-tertiary)]">Matches</p>
                 </div>
                 <div className="flex-1 text-center">
-                  <p className="text-2xl font-bold text-augusta-green">{preview.totalPoints}</p>
-                  <p className="text-xs text-surface-500">Points</p>
+                  <p className="text-2xl font-bold text-[var(--masters)]">{preview.totalPoints}</p>
+                  <p className="text-xs text-[var(--ink-tertiary)]">Points</p>
                 </div>
               </div>
             </div>
@@ -248,26 +248,26 @@ export default function NewTripPage() {
             {/* Teams */}
             <div className="grid grid-cols-2 gap-3">
               <div className="card p-3 border-l-4 border-team-usa">
-                <p className="text-sm text-surface-500">Team 1</p>
+                <p className="text-sm text-[var(--ink-tertiary)]">Team 1</p>
                 <p className="font-semibold">{teamAName}</p>
               </div>
               <div className="card p-3 border-r-4 border-team-europe">
-                <p className="text-sm text-surface-500">Team 2</p>
+                <p className="text-sm text-[var(--ink-tertiary)]">Team 2</p>
                 <p className="font-semibold">{teamBName}</p>
               </div>
             </div>
 
             {/* Sessions preview */}
             <div>
-              <h3 className="text-sm font-semibold text-surface-500 uppercase mb-2">Sessions</h3>
-              <div className="card divide-y divide-surface-200 dark:divide-surface-700">
+              <h3 className="text-sm font-semibold text-[var(--ink-tertiary)] uppercase mb-2">Sessions</h3>
+              <div className="card divide-y divide-[var(--rule)]">
                 {preview.sessions.map((session, i) => (
                   <div key={i} className="p-3 flex items-center justify-between">
                     <div>
                       <p className="font-medium">{session.name}</p>
-                      <p className="text-sm text-surface-500">{session.date}</p>
+                      <p className="text-sm text-[var(--ink-tertiary)]">{session.date}</p>
                     </div>
-                    <span className="text-sm text-surface-400">
+                    <span className="text-sm text-[var(--ink-tertiary)]">
                       {session.matches} {session.matches === 1 ? 'match' : 'matches'}
                     </span>
                   </div>
