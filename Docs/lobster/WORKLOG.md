@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-12
 
+### 12:31 EST — Docs — WORKLOG backfill: add missing commit hashes
+- `Docs/lobster/WORKLOG.md`: filled in missing commit hashes for two older Phase 1 entries so the historical log consistently references the exact landed changes.
+  - PWABanners InstallPrompt stub removal → `c5d78be`
+  - ConnectionStatusBadge local-only badge → `fcefb45`
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`08ab320`)
+
 ### 12:08 EST — Phase 2 — Pending sync surfaces: premium token alignment
 - `PendingSyncIndicator`, `SyncBadge`, and `SyncStatusRow`: replaced legacy `bg-white`/`bg-amber-*`/`text-stone-*` classes with premium surface/ink/rule tokens, reusing shared tone maps for syncing/pending/offline states so the widgets stay legible across themes.
 - Floating indicator now uses a neutral premium surface with tone-specific icon chips, tokenized rings, and focus-visible outlines to match the premium shell and keep offline status accessible in dark mode.
