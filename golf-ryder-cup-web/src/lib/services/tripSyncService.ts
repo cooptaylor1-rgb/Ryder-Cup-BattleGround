@@ -16,7 +16,6 @@ import { createLogger } from '@/lib/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 import { calcRetryDelay, syncSleep } from './baseSyncService';
 
-const logger = createLogger('TripSync');
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { db } from '../db';
 import type {
@@ -31,6 +30,8 @@ import type {
   TeeSet,
 } from '../types/models';
 import type { SyncEntity, SyncOperation, SyncQueueItem } from '../types/sync';
+
+const logger = createLogger('TripSync');
 
 // ============================================
 // CONSTANTS

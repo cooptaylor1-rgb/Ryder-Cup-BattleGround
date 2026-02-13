@@ -232,13 +232,13 @@ export function HoleScoreDisplay({
         <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--ink-tertiary)' }}>
           Hole {holeNumber}
         </span>
-        <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
+        <span className="w-px h-3 bg-[var(--rule)]" />
         <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
           Par {par}
         </span>
         {(teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
           <>
-            <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
+            <span className="w-px h-3 bg-[var(--rule)]" />
             <span className="text-xs" style={{ color: 'var(--masters)' }}>
               Stroke Hole
             </span>
@@ -286,7 +286,7 @@ export function HoleScoreDisplay({
               ? 'Hole Halved'
               : `${winner === 'teamA' ? teamAName : teamBName} wins hole`}
             {(teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
-              <span style={{ color: 'var(--ink-tertiary)' }}> (net)</span>
+              <span className="text-[var(--ink-tertiary)]"> (net)</span>
             )}
           </span>
         </div>
@@ -294,8 +294,8 @@ export function HoleScoreDisplay({
 
       {/* Stroke Details (optional expanded view) */}
       {showStrokeDetails && (teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
-        <div className="mt-3 p-3 rounded-xl text-xs" style={{ background: 'var(--canvas-sunken)' }}>
-          <p className="text-center" style={{ color: 'var(--ink-secondary)' }}>
+        <div className="mt-3 p-3 rounded-xl text-xs bg-[var(--canvas-sunken)]">
+          <p className="text-center text-[var(--ink-secondary)]">
             {teamAStrokesOnHole > 0 && teamBStrokesOnHole > 0 ? (
               <>
                 Both teams receive strokes: {teamAName} gets {teamAStrokesOnHole}, {teamBName} gets{' '}

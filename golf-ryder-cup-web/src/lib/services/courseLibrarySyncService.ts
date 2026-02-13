@@ -16,10 +16,11 @@
 import { createLogger } from '@/lib/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 
-const logger = createLogger('CourseSync');
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { db, type CourseSyncQueueEntry } from '../db';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
+
+const logger = createLogger('CourseSync');
 
 // ============================================
 // CONSTANTS

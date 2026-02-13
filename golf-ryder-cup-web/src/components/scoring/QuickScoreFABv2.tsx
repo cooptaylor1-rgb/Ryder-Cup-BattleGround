@@ -340,12 +340,12 @@ export function QuickScoreFABv2({
                 </button>
 
                 {/* Divider */}
-                <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
+                <div className="h-px bg-[var(--rule)] my-2" />
 
                 {/* Full Scorecard Link */}
                 <button
                   onClick={handleNavigateToScoring}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[var(--surface-secondary)] transition-colors"
                   aria-label="Open full scorecard"
                 >
                   <div className="flex items-center gap-2">
@@ -358,7 +358,7 @@ export function QuickScoreFABv2({
                 {/* Voice Mode Toggle */}
                 <button
                   onClick={() => setIsVoiceMode(true)}
-                  className="w-full flex items-center justify-center gap-2 p-2 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-[var(--ink-secondary)]"
+                  className="w-full flex items-center justify-center gap-2 p-2 text-xs font-medium rounded-lg hover:bg-[var(--surface-secondary)] transition-colors text-[var(--ink-secondary)]"
                   aria-pressed={isVoiceMode}
                   aria-label="Use voice scoring"
                 >

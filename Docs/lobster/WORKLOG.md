@@ -5,10 +5,53 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 12:45 EST — Phase 2 — Fix ESM import ordering (logger const after imports)
+- Fixed invalid `import` ordering in:
+  - `src/components/social/DaySummaryCard.tsx`
+  - `src/lib/services/courseLibrarySyncService.ts`
+  - `src/lib/services/liveUpdatesService.ts`
+  - `src/lib/services/tripSyncService.ts`
+- Ensures the files are valid ESM/TypeScript modules (no `import` statements after runtime declarations like `const logger = …`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`426d1ae`)
+
+### 12:31 EST — Phase 2 — AppShell global loading overlay: premium token alignment
+- `AppShell`: migrated the global loading overlay card and spinner off `bg-white`/`dark:bg-gray-*` + `border-gray-*` + `border-t-green-*` palettes onto premium surface/rule/ink/Masters tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, `border-t-[var(--masters)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a2d6c65`)
+
+### 12:14 EST — Phase 2 — TeeTimeGenerator: premium token sweep
+- `TeeTimeGenerator` (captain tools): migrated the generator header, settings panel, summary bar, table, and actions off legacy Tailwind palette utilities (`blue-*`, `gray-*`, dark-mode branches) onto the premium surface/ink/rule + status tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--info)`, `var(--masters)`), and standardized team labels to Ryder Cup team tokens (`text-team-usa` / `text-team-europe`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2362df1`)
+
+### 11:41 EST — Phase 2 — WeatherWidget: premium token alignment (icon + precip accents)
+- `WeatherWidget`: replaced remaining Tailwind palette icon/precipitation accents (`yellow-*`/`blue-*`/`gray-*`/`slate-*`) with premium status + ink tokens (`var(--warning)`, `var(--info)`, `var(--ink-tertiary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e367590`)
+
+### 11:37 EST — Phase 2 — Captain MatchCardGenerator: premium token sweep
+- `MatchCardGenerator`: migrated printable/shareable match cards off hard-coded hex + Tailwind gray/red/blue palettes onto premium surface/ink/rule tokens and Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`).
+- Standardized headers, dividers, info bars, player rows, and QR placeholder onto `var(--surface-*)` + `var(--ink-*)` + `var(--rule)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2726ed5`)
+
 ### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
 - `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a2a3f29`)
+
+### 09:28 EST — Phase 2 — SwipeScorePanel + HoleScoreDisplay: premium token sweep
+- `HoleScoreDisplay`: replaced remaining gray divider separators (`bg-gray-*`, dark-mode branches) with the premium rule token (`bg-[var(--rule)]`).
+- `SwipeScorePanel`: migrated halved badge + helper copy + halved tap button off gray palette utilities onto premium surface/ink tokens (`bg-[color:var(--ink-secondary)]/80`, `text-[var(--ink-tertiary)]`, `bg-[var(--surface-secondary)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d7baf4f`)
+
+### 09:18 EST — Phase 2 — Scoring mini-map + QuickScoreFABv2: premium token sweep
+- `HoleMiniMap`: replaced gray palette dividers/borders/labels (`bg-gray-*`, `text-gray-*`, `border-gray-*`, dark-mode branches) with premium rule + ink tokens (`bg-[var(--rule)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`).
+- `QuickScoreFABv2`: replaced the gray divider + hover palette classes with premium surface + rule tokens (`bg-[var(--rule)]`, `hover:bg-[var(--surface-secondary)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7c21f48`)
 
 ### 01:15 EST — Phase 2 — Trip Awards route: premium token sweep
 - `/trip/[tripId]/awards`: replaced remaining legacy `bg-white`/`text-gray-*`/`border-gray-*` utilities with premium surface + ink + rule tokens.

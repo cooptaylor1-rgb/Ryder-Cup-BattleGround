@@ -171,7 +171,7 @@ export function WeatherWidget({
                                         />
                                         <span className="text-sm font-medium">{hour.temperature}°</span>
                                         {hour.precipitationProbability > 20 && (
-                                            <span className="text-xs text-blue-500">{hour.precipitationProbability}%</span>
+                                            <span className="text-xs text-[var(--info)]">{hour.precipitationProbability}%</span>
                                         )}
                                     </div>
                                 ))}
@@ -304,7 +304,7 @@ export function WeatherWidget({
                             />
                             <span className="font-medium">{hour.temperature}°</span>
                             {hour.precipitationProbability > 20 && (
-                                <span className="text-xs text-blue-500">{hour.precipitationProbability}%</span>
+                                <span className="text-xs text-[var(--info)]">{hour.precipitationProbability}%</span>
                             )}
                         </div>
                     ))}
@@ -325,7 +325,7 @@ export function WeatherWidget({
                                 {day.condition.description}
                             </span>
                             {day.precipitationProbability > 20 && (
-                                <span className="text-xs text-blue-500">{day.precipitationProbability}%</span>
+                                <span className="text-xs text-[var(--info)]">{day.precipitationProbability}%</span>
                             )}
                             <div className="text-right">
                                 <span className="font-medium">{day.temperatureMax}°</span>
@@ -380,29 +380,29 @@ function WeatherIcon({ condition, size = 'md', isDay = true }: WeatherIconProps)
         case 'sun':
             // Show moon at night for clear conditions
             return isDay
-                ? <Sun className={cn(iconClass, 'text-yellow-400')} />
-                : <Moon className={cn(iconClass, 'text-slate-300')} />;
+                ? <Sun className={cn(iconClass, 'text-[var(--warning)]')} />
+                : <Moon className={cn(iconClass, 'text-[var(--ink-tertiary)]')} />;
         case 'cloud-sun':
             // Show cloud-moon at night for partly cloudy
             return isDay
-                ? <CloudSun className={cn(iconClass, 'text-yellow-300')} />
-                : <CloudMoon className={cn(iconClass, 'text-slate-300')} />;
+                ? <CloudSun className={cn(iconClass, 'text-[var(--warning)]')} />
+                : <CloudMoon className={cn(iconClass, 'text-[var(--ink-tertiary)]')} />;
         case 'cloud':
-            return <Cloud className={cn(iconClass, 'text-gray-300')} />;
+            return <Cloud className={cn(iconClass, 'text-[var(--ink-tertiary)]')} />;
         case 'cloud-rain':
-            return <CloudRain className={cn(iconClass, 'text-blue-400')} />;
+            return <CloudRain className={cn(iconClass, 'text-[var(--info)]')} />;
         case 'cloud-drizzle':
-            return <CloudDrizzle className={cn(iconClass, 'text-blue-300')} />;
+            return <CloudDrizzle className={cn(iconClass, 'text-[var(--info)]')} />;
         case 'cloud-snow':
             return <CloudSnow className={cn(iconClass, 'text-white')} />;
         case 'cloud-lightning':
-            return <CloudLightning className={cn(iconClass, 'text-yellow-400')} />;
+            return <CloudLightning className={cn(iconClass, 'text-[var(--warning)]')} />;
         case 'cloud-fog':
-            return <CloudFog className={cn(iconClass, 'text-gray-400')} />;
+            return <CloudFog className={cn(iconClass, 'text-[var(--ink-tertiary)]')} />;
         case 'cloud-hail':
-            return <CloudSnow className={cn(iconClass, 'text-blue-200')} />;
+            return <CloudSnow className={cn(iconClass, 'text-[var(--info)]')} />;
         default:
-            return <Cloud className={cn(iconClass, 'text-gray-300')} />;
+            return <Cloud className={cn(iconClass, 'text-[var(--ink-tertiary)]')} />;
     }
 }
 

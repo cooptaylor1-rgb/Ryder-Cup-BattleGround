@@ -10,13 +10,13 @@
 
 import { createLogger } from '@/lib/utils/logger';
 import { supabase, isSupabaseConfigured } from '../supabase/client';
-
-const logger = createLogger('LiveUpdates');
 import { db } from '../db';
 import { deleteMatchCascade } from './cascadeDelete';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Match, HoleResult, RyderCupSession } from '../types/models';
 import type { MatchDbRecord, HoleResultDbRecord, SessionDbRecord } from '../types/dbRecords';
+
+const logger = createLogger('LiveUpdates');
 
 // ============================================
 // TYPES

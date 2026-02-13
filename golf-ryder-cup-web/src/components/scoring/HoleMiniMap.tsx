@@ -179,7 +179,7 @@ export function HoleMiniMap({
             </div>
 
             {/* Turn marker */}
-            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-0.5" />
+            <div className="w-px h-5 bg-[var(--rule)] mx-0.5" />
 
             {/* Back 9 */}
             <div className="flex gap-0.5">
@@ -232,10 +232,10 @@ export function HoleMiniMap({
                 {/* Front 9 */}
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <span className="text-xs font-medium text-[var(--ink-tertiary)] uppercase tracking-wider">
                             Front 9
                         </span>
-                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                        <div className="flex-1 h-px bg-[var(--rule)]" />
                     </div>
                     <div className="grid grid-cols-9 gap-1">
                         {Array.from({ length: 9 }, (_, i) => i + 1).map((hole) => {
@@ -280,10 +280,10 @@ export function HoleMiniMap({
                 {/* Back 9 */}
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <span className="text-xs font-medium text-[var(--ink-tertiary)] uppercase tracking-wider">
                             Back 9
                         </span>
-                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                        <div className="flex-1 h-px bg-[var(--rule)]" />
                     </div>
                     <div className="grid grid-cols-9 gap-1">
                         {Array.from({ length: 9 }, (_, i) => i + 10).map((hole) => {
@@ -326,24 +326,24 @@ export function HoleMiniMap({
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center justify-center gap-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-center gap-4 pt-2 border-t border-[var(--rule)]">
                     <div className="flex items-center gap-1.5">
                         <div
                             className="w-3 h-3 rounded-sm"
                             style={{ background: teamAColor }}
                         />
-                        <span className="text-xs text-gray-600 dark:text-gray-400">{teamAName}</span>
+                        <span className="text-xs text-[var(--ink-secondary)]">{teamAName}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div
                             className="w-3 h-3 rounded-sm"
                             style={{ background: teamBColor }}
                         />
-                        <span className="text-xs text-gray-600 dark:text-gray-400">{teamBName}</span>
+                        <span className="text-xs text-[var(--ink-secondary)]">{teamBName}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-sm bg-gray-500" />
-                        <span className="text-xs text-gray-600 dark:text-gray-400">Halved</span>
+                        <div className="w-3 h-3 rounded-sm bg-[color:var(--ink-tertiary)]" />
+                        <span className="text-xs text-[var(--ink-secondary)]">Halved</span>
                     </div>
                 </div>
             </div>
@@ -370,7 +370,7 @@ export function HoleMiniMap({
                 </div>
                 <button
                     onClick={toggleExpanded}
-                    className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
                     style={{ color: 'var(--masters)' }}
                 >
                     {isExpanded ? (
@@ -396,7 +396,7 @@ export function HoleMiniMap({
             </AnimatePresence>
 
             {/* Quick stats bar */}
-            <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-[var(--rule)]">
                 <div className="flex items-center gap-2">
                     <div
                         className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
@@ -408,7 +408,7 @@ export function HoleMiniMap({
                 </div>
 
                 <div className="flex items-center gap-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-gray-500 text-white">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-[color:var(--ink-tertiary)] text-white">
                         {halved}
                     </div>
                     <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Halved</span>

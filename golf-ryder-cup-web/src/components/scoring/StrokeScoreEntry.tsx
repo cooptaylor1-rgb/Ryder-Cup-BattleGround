@@ -305,7 +305,7 @@ export function StrokeScoreEntry({
       </div>
 
       {/* Result Preview */}
-      <div className="p-3 rounded-xl text-center" style={{ background: 'var(--canvas-sunken)' }}>
+      <div className="p-3 rounded-xl text-center bg-[var(--canvas-sunken)]">
         <span
           className="text-sm font-medium"
           style={{
@@ -321,7 +321,7 @@ export function StrokeScoreEntry({
             ? 'Hole Halved'
             : `${winner === 'teamA' ? teamAName : teamBName} wins hole`}
           {(teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
-            <span style={{ color: 'var(--ink-tertiary)' }}> (net)</span>
+            <span className="text-[var(--ink-tertiary)]"> (net)</span>
           )}
         </span>
       </div>
@@ -331,11 +331,7 @@ export function StrokeScoreEntry({
         onClick={handleSubmit}
         disabled={isSubmitting}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold text-white transition-all"
-        style={{
-          background: 'var(--masters)',
-          opacity: isSubmitting ? 0.7 : 1,
-        }}
+        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold text-white transition-all bg-[var(--masters)] disabled:opacity-70"
       >
         {isSubmitting ? (
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -348,7 +344,7 @@ export function StrokeScoreEntry({
       </motion.button>
 
       {/* Score Summary */}
-      <div className="text-center text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+      <div className="text-center text-xs text-[var(--ink-tertiary)]">
         {teamAName}: {teamAScore} gross
         {teamAStrokesOnHole > 0 && ` → ${teamANetScore} net`}
         {' • '}
