@@ -88,8 +88,8 @@ export function SessionLockManager({
             >
                 {isLocked ? (
                     <>
-                        <Lock className="w-4 h-4 text-amber-500" />
-                        <span className="text-amber-700 dark:text-amber-400">Locked</span>
+                        <Lock className="w-4 h-4 text-[var(--warning)]" />
+                        <span className="text-[var(--warning)]">Locked</span>
                     </>
                 ) : (
                     <>
@@ -106,20 +106,20 @@ export function SessionLockManager({
                 title="Finalize Session?"
             >
                 <div className="space-y-4">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-amber-100 dark:bg-amber-900/30">
-                        <Lock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-[color:var(--warning)]/12">
+                        <Lock className="w-6 h-6 text-[var(--warning)]" />
                     </div>
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                    <p className="text-sm text-[var(--ink-secondary)] text-center">
                         Locking this session will prevent any score changes.
                         Only the Captain can unlock it with the PIN.
                     </p>
 
-                    <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+                    <Card className="bg-[color:var(--warning)]/10 border-[color:var(--warning)]/25">
                         <CardContent className="p-3">
                             <div className="flex items-start gap-2">
-                                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                                <p className="text-xs text-amber-800 dark:text-amber-300">
+                                <AlertTriangle className="w-4 h-4 text-[var(--warning)] shrink-0 mt-0.5" />
+                                <p className="text-xs text-[var(--warning)]">
                                     Make sure all scores have been verified before finalizing.
                                 </p>
                             </div>
@@ -135,7 +135,7 @@ export function SessionLockManager({
                             Cancel
                         </Button>
                         <Button
-                            className="flex-1 bg-amber-600 hover:bg-amber-700"
+                            className="flex-1 bg-[var(--warning)] text-white hover:bg-[color:var(--warning)]/90"
                             onClick={handleLockSession}
                             disabled={isProcessing}
                         >
@@ -163,16 +163,16 @@ export function SessionLockManager({
                 title="Unlock Session"
             >
                 <div className="space-y-4">
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-blue-100 dark:bg-blue-900/30">
-                        <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-[color:var(--info)]/12">
+                        <Shield className="w-6 h-6 text-[var(--info)]" />
                     </div>
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                    <p className="text-sm text-[var(--ink-secondary)] text-center">
                         Enter the Captain PIN to unlock this session for editing.
                     </p>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
                             Captain PIN
                         </label>
                         <input
@@ -184,16 +184,16 @@ export function SessionLockManager({
                                 setPinInput(e.target.value.replace(/\D/g, ''));
                                 setError(null);
                             }}
-                            className="w-full px-4 py-3 text-center text-2xl tracking-widest border rounded-lg
-                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                     dark:bg-gray-800 dark:border-gray-700"
+                            className="w-full px-4 py-3 text-center text-2xl tracking-widest rounded-lg border border-[var(--rule)]
+                                     bg-[var(--surface-raised)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)]
+                                     focus:outline-none focus:ring-2 focus:ring-[color:var(--info)]/40 focus:border-[color:var(--info)]/40"
                             placeholder="••••"
                             autoFocus
                         />
                     </div>
 
                     {error && (
-                        <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                        <p className="text-sm text-[var(--error)] text-center">
                             {error}
                         </p>
                     )}
@@ -238,9 +238,9 @@ export function SessionLockBadge({ isLocked }: { isLocked: boolean }) {
     if (!isLocked) return null;
 
     return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium
-                       bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400
-                       rounded-full">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full
+                       bg-[color:var(--warning)]/12 text-[var(--warning)]
+                       border border-[color:var(--warning)]/25">
             <Lock className="w-3 h-3" />
             Finalized
         </span>
