@@ -87,11 +87,11 @@ function getInitials(firstName: string, lastName: string): string {
  * Get handicap display color based on index
  */
 function getHandicapColor(handicap: number): string {
-    if (handicap <= 5) return '#006747'; // Scratch/low - Masters green
-    if (handicap <= 10) return '#0047AB'; // Single digit
-    if (handicap <= 18) return '#666666'; // Mid
-    if (handicap <= 25) return '#8B4513'; // High
-    return '#8B0000'; // Very high
+    if (handicap <= 5) return 'var(--masters)';
+    if (handicap <= 10) return 'var(--info)';
+    if (handicap <= 18) return 'var(--ink-tertiary)';
+    if (handicap <= 25) return 'var(--warning)';
+    return 'var(--error)';
 }
 
 /**
@@ -100,15 +100,15 @@ function getHandicapColor(handicap: number): string {
 function getFormIndicator(form: FormTrend) {
     switch (form) {
         case 'hot':
-            return { icon: Flame, color: '#FF4500', label: 'On Fire' };
+            return { icon: Flame, color: 'var(--warning)', label: 'On Fire' };
         case 'rising':
-            return { icon: TrendingUp, color: '#22C55E', label: 'Rising' };
+            return { icon: TrendingUp, color: 'var(--success)', label: 'Rising' };
         case 'stable':
-            return { icon: Minus, color: '#666666', label: 'Stable' };
+            return { icon: Minus, color: 'var(--ink-tertiary)', label: 'Stable' };
         case 'cooling':
-            return { icon: TrendingDown, color: '#F59E0B', label: 'Cooling' };
+            return { icon: TrendingDown, color: 'var(--warning)', label: 'Cooling' };
         case 'cold':
-            return { icon: Snowflake, color: '#3B82F6', label: 'Cold' };
+            return { icon: Snowflake, color: 'var(--info)', label: 'Cold' };
     }
 }
 
@@ -221,12 +221,12 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                     className={cn(
                         'flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all',
                         isDragging && 'shadow-lg ring-2',
-                        isDropTarget && 'ring-2 ring-green-500',
-                        player.isSelected && 'ring-2 ring-blue-500',
+                        isDropTarget && 'ring-2 ring-[var(--success)]',
+                        player.isSelected && 'ring-2 ring-[var(--info)]',
                         className
                     )}
                     style={{
-                        background: isDragging ? 'var(--canvas)' : 'var(--surface)',
+                        background: isDragging ? 'var(--surface-raised)' : 'var(--surface-card)',
                         borderLeft: `3px solid ${teamColor}`,
                         ['--tw-ring-color' as string]: isDragging ? teamColor : undefined,
                     }}
@@ -256,7 +256,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                     </div>
 
                     {/* Name */}
-                    <span className="text-sm font-medium truncate flex-1" style={{ color: 'var(--ink)' }}>
+                    <span className="text-sm font-medium truncate flex-1 text-[var(--ink-primary)]">
                         {player.firstName} {player.lastName.charAt(0)}.
                     </span>
 
@@ -287,13 +287,13 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                 className={cn(
                     'relative p-3 rounded-xl transition-all group',
                     isDragging && 'shadow-xl z-50',
-                    isDropTarget && 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900/20',
-                    player.isSelected && 'ring-2 ring-blue-500',
+                    isDropTarget && 'ring-2 ring-[var(--success)] bg-[color:var(--success)]/10',
+                    player.isSelected && 'ring-2 ring-[var(--info)]',
                     !isDragging && 'hover:shadow-md',
                     className
                 )}
                 style={{
-                    background: isDragging ? 'var(--canvas)' : 'var(--surface)',
+                    background: isDragging ? 'var(--surface-raised)' : 'var(--surface-card)',
                     border: `1px solid ${isDragging ? teamColor : 'var(--rule)'}`,
                 }}
             >
@@ -449,10 +449,10 @@ export function PlayerCardSkeleton({ variant = 'standard' }: { variant?: 'compac
     if (variant === 'compact') {
         return (
             <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg animate-pulse" style={{ background: 'var(--surface)' }}>
-                <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700" />
-                <div className="flex-1 h-4 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="w-10 h-5 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="w-4 h-4 rounded bg-[var(--surface-secondary)]" />
+                <div className="w-7 h-7 rounded-full bg-[var(--surface-secondary)]" />
+                <div className="flex-1 h-4 rounded bg-[var(--surface-secondary)]" />
+                <div className="w-10 h-5 rounded bg-[var(--surface-secondary)]" />
             </div>
         );
     }
@@ -460,13 +460,13 @@ export function PlayerCardSkeleton({ variant = 'standard' }: { variant?: 'compac
     return (
         <div className="p-3 rounded-xl animate-pulse" style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}>
             <div className="flex items-center gap-3 pl-2">
-                <div className="w-4 h-8 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="w-4 h-8 rounded bg-[var(--surface-secondary)]" />
+                <div className="w-12 h-12 rounded-full bg-[var(--surface-secondary)]" />
                 <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-                    <div className="h-3 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-4 w-2/3 rounded bg-[var(--surface-secondary)]" />
+                    <div className="h-3 w-1/3 rounded bg-[var(--surface-secondary)]" />
                 </div>
-                <div className="w-12 h-8 rounded-lg bg-gray-200 dark:bg-gray-700" />
+                <div className="w-12 h-8 rounded-lg bg-[var(--surface-secondary)]" />
             </div>
         </div>
     );

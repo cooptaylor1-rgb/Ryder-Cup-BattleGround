@@ -98,10 +98,10 @@ function calculateHandicapBalance(teamA: number, teamB: number): {
  */
 function getBalanceColor(level: 'excellent' | 'good' | 'fair' | 'poor'): string {
     switch (level) {
-        case 'excellent': return '#22C55E'; // Green
-        case 'good': return '#006747'; // Masters green
-        case 'fair': return '#F59E0B'; // Amber
-        case 'poor': return '#EF4444'; // Red
+        case 'excellent': return 'var(--success)';
+        case 'good': return 'var(--masters)';
+        case 'fair': return 'var(--warning)';
+        case 'poor': return 'var(--error)';
     }
 }
 
@@ -246,7 +246,7 @@ function BalanceIndicator({ teamAHandicap, teamBHandicap, teamAColor, teamBColor
             {/* Balance Bar */}
             <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'var(--rule)' }}>
                 {/* Center line */}
-                <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/50 z-10" />
+                <div className="absolute top-0 bottom-0 left-1/2 w-px bg-[color:var(--ink-tertiary)]/40 z-10" />
 
                 {/* Team A (left side) */}
                 <motion.div
@@ -311,16 +311,23 @@ export function MatchSlot({
     const statusConfig = useMemo(() => {
         switch (match.status) {
             case 'in_progress':
-                return { icon: Clock, color: '#F59E0B', label: 'In Progress' };
+                return { icon: Clock, tone: 'warning' as const, label: 'In Progress' };
             case 'completed':
-                return { icon: Trophy, color: '#22C55E', label: 'Completed' };
+                return { icon: Trophy, tone: 'success' as const, label: 'Completed' };
             default:
                 if (isComplete) {
-                    return { icon: CheckCircle2, color: '#006747', label: 'Ready' };
+                    return { icon: CheckCircle2, tone: 'masters' as const, label: 'Ready' };
                 }
-                return { icon: AlertTriangle, color: '#F59E0B', label: 'Needs Players' };
+                return { icon: AlertTriangle, tone: 'warning' as const, label: 'Needs Players' };
         }
     }, [match.status, isComplete]);
+
+    const statusToneClass =
+        statusConfig.tone === 'success'
+            ? 'bg-[color:var(--success)]/10 text-[var(--success)]'
+            : statusConfig.tone === 'masters'
+                ? 'bg-[color:var(--masters)]/10 text-[var(--masters)]'
+                : 'bg-[color:var(--warning)]/10 text-[var(--warning)]';
 
     return (
         <motion.div
@@ -333,14 +340,14 @@ export function MatchSlot({
                 className
             )}
             style={{
-                background: 'var(--canvas)',
+                background: 'var(--surface-card)',
                 border: '1px solid var(--rule)',
                 ['--tw-ring-color' as string]: 'var(--masters)',
             }}
         >
             {/* Match Header */}
             <div
-                className="flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                className="flex items-center justify-between px-4 py-3 cursor-pointer transition-colors hover:bg-[var(--surface-secondary)]"
                 onClick={onToggleExpand}
             >
                 <div className="flex items-center gap-3">
@@ -357,10 +364,10 @@ export function MatchSlot({
                     </div>
 
                     <div>
-                        <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>
+                        <h3 className="font-semibold text-[var(--ink-primary)]">
                             Match {match.matchNumber}
                         </h3>
-                        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                        <div className="flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
                             {match.teeTime && (
                                 <span className="flex items-center gap-1">
                                     <Clock size={10} />
@@ -377,8 +384,10 @@ export function MatchSlot({
                 <div className="flex items-center gap-3">
                     {/* Status Badge */}
                     <div
-                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                        style={{ background: `${statusConfig.color}20`, color: statusConfig.color }}
+                        className={cn(
+                            'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                            statusToneClass
+                        )}
                     >
                         <statusConfig.icon size={12} />
                         {statusConfig.label}
@@ -389,7 +398,7 @@ export function MatchSlot({
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                     >
-                        <ChevronDown size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                        <ChevronDown size={20} className="text-[var(--ink-tertiary)]" />
                     </motion.div>
                 </div>
             </div>

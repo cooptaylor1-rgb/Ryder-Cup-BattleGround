@@ -133,11 +133,11 @@ function PlayerPool({
     isLocked: _isLocked,
 }: PlayerPoolProps) {
     return (
-        <div className="rounded-2xl overflow-hidden bg-[var(--canvas)] border border-[var(--rule)]">
+        <div className="rounded-2xl overflow-hidden bg-[var(--surface-card)] border border-[var(--rule)]">
             {/* Header */}
             <button
                 onClick={onToggle}
-                className="w-full flex items-center justify-between px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                className="w-full flex items-center justify-between px-4 py-3 transition-colors hover:bg-[var(--surface-secondary)]"
             >
                 <div className="flex items-center gap-3">
                     <div
@@ -147,10 +147,10 @@ function PlayerPool({
                         <Users size={16} className="text-white" />
                     </div>
                     <div className="text-left">
-                        <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>
+                        <h3 className="font-semibold text-[var(--ink-primary)]">
                             {teamName}
                         </h3>
-                        <p className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                        <p className="text-xs text-[var(--ink-tertiary)]">
                             {players.length} available
                         </p>
                     </div>
@@ -160,7 +160,7 @@ function PlayerPool({
                     animate={{ rotate: isExpanded ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <ChevronDown size={20} style={{ color: 'var(--ink-tertiary)' }} />
+                    <ChevronDown size={20} className="text-[var(--ink-tertiary)]" />
                 </motion.div>
             </button>
 
@@ -176,7 +176,7 @@ function PlayerPool({
                     >
                         <div className="px-3 pb-3 space-y-2 max-h-[300px] overflow-y-auto">
                             {players.length === 0 ? (
-                                <p className="text-center py-4 text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+                                <p className="text-center py-4 text-sm text-[var(--ink-tertiary)]">
                                     All players assigned
                                 </p>
                             ) : (
@@ -211,18 +211,18 @@ interface FairnessPanelProps {
 function FairnessPanel({ score, isCalculating }: FairnessPanelProps) {
     if (isCalculating) {
         return (
-            <div className="p-4 rounded-xl animate-pulse" style={{ background: 'var(--surface)' }}>
-                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-                <div className="h-8 w-full bg-gray-200 dark:bg-gray-700 rounded" />
+            <div className="p-4 rounded-xl animate-pulse bg-[var(--surface-card)]">
+                <div className="h-4 w-24 bg-[var(--surface-secondary)] rounded mb-3" />
+                <div className="h-8 w-full bg-[var(--surface-secondary)] rounded" />
             </div>
         );
     }
 
     if (!score) {
         return (
-            <div className="p-4 rounded-xl text-center" style={{ background: 'var(--surface)' }}>
-                <Scale size={24} className="mx-auto mb-2" style={{ color: 'var(--ink-tertiary)' }} />
-                <p className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
+            <div className="p-4 rounded-xl text-center bg-[var(--surface-card)]">
+                <Scale size={24} className="mx-auto mb-2 text-[var(--ink-tertiary)]" />
+                <p className="text-sm text-[var(--ink-tertiary)]">
                     Add players to see fairness score
                 </p>
             </div>
@@ -230,20 +230,20 @@ function FairnessPanel({ score, isCalculating }: FairnessPanelProps) {
     }
 
     const getScoreColor = (value: number) => {
-        if (value >= 80) return '#22C55E';
-        if (value >= 60) return '#006747';
-        if (value >= 40) return '#F59E0B';
-        return '#EF4444';
+        if (value >= 80) return 'var(--success)';
+        if (value >= 60) return 'var(--masters)';
+        if (value >= 40) return 'var(--warning)';
+        return 'var(--error)';
     };
 
     const overallColor = getScoreColor(score.overall);
 
     return (
-        <div className="p-4 rounded-xl" style={{ background: 'var(--surface)' }}>
+        <div className="p-4 rounded-xl bg-[var(--surface-card)]">
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     <Scale size={16} style={{ color: overallColor }} />
-                    <span className="text-sm font-medium" style={{ color: 'var(--ink)' }}>
+                    <span className="text-sm font-medium text-[var(--ink-primary)]">
                         Lineup Fairness
                     </span>
                 </div>
@@ -294,7 +294,7 @@ function FairnessPanel({ score, isCalculating }: FairnessPanelProps) {
             {score.warnings.length > 0 && (
                 <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--rule)' }}>
                     {score.warnings.map((warning, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs" style={{ color: '#F59E0B' }}>
+                        <div key={i} className="flex items-start gap-2 text-xs text-[var(--warning)]">
                             <AlertTriangle size={12} className="shrink-0 mt-0.5" />
                             <span>{warning}</span>
                         </div>
@@ -533,18 +533,17 @@ export function LineupCanvas({
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold" style={{ color: 'var(--ink)' }}>
+                        <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                             {session.name}
                         </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                        <p className="text-sm text-[var(--ink-secondary)]">
                             {session.type} • {session.matchCount} matches • {session.pointsPerMatch} pts each
                         </p>
                     </div>
 
                     {isLocked ? (
                         <div
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium"
-                            style={{ background: 'var(--surface)', color: 'var(--ink-secondary)' }}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium bg-[var(--surface-card)] text-[var(--ink-secondary)]"
                         >
                             <Lock size={14} />
                             Locked
@@ -554,18 +553,17 @@ export function LineupCanvas({
                             {/* Reset Button */}
                             <button
                                 onClick={handleReset}
-                                className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="p-2 rounded-lg transition-colors hover:bg-[var(--surface-secondary)]"
                                 title="Clear all"
                             >
-                                <RotateCcw size={18} style={{ color: 'var(--ink-secondary)' }} />
+                                <RotateCcw size={18} className="text-[var(--ink-secondary)]" />
                             </button>
 
                             {/* Auto Balance */}
                             {onAutoBalance && (
                                 <button
                                     onClick={handleAutoBalance}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                                    style={{ background: 'var(--surface)', color: 'var(--masters)' }}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-[var(--surface-card)] text-[var(--masters)] hover:bg-[var(--surface-secondary)]"
                                 >
                                     <Wand2 size={16} />
                                     Auto Balance
@@ -584,8 +582,7 @@ export function LineupCanvas({
                         {validation.errors.map((error, i) => (
                             <div
                                 key={`error-${i}`}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                                style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[color:var(--error)]/10 text-[var(--error)]"
                             >
                                 <AlertTriangle size={14} />
                                 {error}
@@ -594,8 +591,7 @@ export function LineupCanvas({
                         {validation.warnings.map((warning, i) => (
                             <div
                                 key={`warning-${i}`}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                                style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[color:var(--warning)]/10 text-[var(--warning)]"
                             >
                                 <AlertTriangle size={14} />
                                 {warning}
