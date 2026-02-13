@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 18:02 EST — Phase 2 — WeatherBanner: premium token alignment
+- `WeatherBanner`: replaced legacy emerald/amber/red palette utilities for delay states with premium status tokens (`var(--success)`, `var(--warning)`, `var(--error)`) and tokenized the weather icons to keep the banner consistent across themes.
+- Neutral weather fallback now uses premium masters/ink tokens without dark-mode branches, and high-precipitation copy leans on the shared warning tone instead of bespoke Tailwind colors.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`520d741`)
+
 ### 16:55 EST — Phase 2 — CaptainToolkit: avoid silent empty panel on unknown section
 - `CaptainToolkit`: replaced the fallback `return null` in `renderActiveSection()` with a compact `EmptyStatePremium` so unexpected/invalid section IDs don’t yield an empty card.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
