@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 15:05 EST — Phase 2 — MatchCardGenerator + SettingsPanel toggle: premium token cleanup
+- `MatchCardGenerator`: migrated remaining legacy ink/border/hover palette fragments (`var(--ink)`, `var(--ink-muted)`, `rgba(...)`, `hover:bg-white/10`, `text-green-500`) onto premium tokens (`var(--ink-primary/secondary/tertiary)`, `var(--rule)`, `bg-[color:var(--ink-primary)]/10`, `var(--success)`), keeping the printable match cards UI consistent with the premium shell.
+- `SettingsPanel`: tokenized the toggle knob to use premium surfaces/rules instead of `bg-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c393f20`)
+
 ### 15:02 EST — Phase 2 — DraftBoard: premium token alignment
 - `DraftBoard` (captain tools): migrated the draft mode selection cards, in-progress header controls, pick banners, tables, and action buttons off hard-coded Tailwind palette utilities (`gray-*`, `blue-*`, `green-*`, `red-*`, dark variants) onto the premium surface/ink/rule + status tokens.
 - Team pick banners and team headers now use Ryder Cup team tokens (`bg-team-usa/10`, `bg-team-europe/10`, border team accents).

@@ -2,6 +2,9 @@
 
 All times America/New_York.
 
+## 2026-02-13
+- 15:05 — Shipped batch: `MatchCardGenerator` migrated remaining legacy ink/border/hover palette fragments (`var(--ink)`, `var(--ink-muted)`, `rgba(...)`, `hover:bg-white/10`, `text-green-500`) onto premium tokens (`var(--ink-primary/secondary/tertiary)`, `var(--rule)`, `bg-[color:var(--ink-primary)]/10`, `var(--success)`), keeping the printable match cards UI consistent with the premium shell. Also tokenized `SettingsPanel` toggle knob to use premium surfaces/rules instead of `bg-white`. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted existing CSS optimization warnings). (commit c393f20)
+
 ## 2026-02-12
 - 21:25 — Shipped batch: scoring UI cleanup — `StrokeScoreEntry` + `HoleScoreDisplay` replaced inline premium token style props (`background: var(--canvas-sunken)`, `color: var(--ink-*)`, submit button `background: var(--masters)` + manual opacity) with token-driven Tailwind arbitrary-value classes (`bg-[var(--canvas-sunken)]`, `text-[var(--ink-secondary)]`, `bg-[var(--masters)]`, `disabled:opacity-70`) to reduce silent style drift and keep the scoring flow class-driven. (commit 9da8d9b)
 - 08:30 — Shipped batch: `ProfilePhotoUpload` migrated legacy `surface-*` palette utilities (`bg-white`, `dark:bg-surface-*`, `border-surface-*`, `text-surface-*`) to premium token-driven Tailwind (`var(--surface-raised)`, `var(--surface-secondary)`, `var(--rule)`, `var(--ink-*)`), keeping the onboarding photo picker consistent across themes. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted existing CSS optimization warnings). (commit 5fbac9d)
