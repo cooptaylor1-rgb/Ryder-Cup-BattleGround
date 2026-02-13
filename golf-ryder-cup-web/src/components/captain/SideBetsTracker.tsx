@@ -1,27 +1,28 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
-  createSideGame,
-  createExpense,
   calculatePlayerBalances,
   calculateSettlements,
-  SideGame,
-  TripExpense,
+  createExpense,
+  createSideGame,
+  type SideGame,
+  type TripExpense,
 } from '@/lib/services/sideBetsService';
-import { Player } from '@/lib/types';
+import type { Player } from '@/lib/types';
 import {
-  DollarSign,
-  Trophy,
-  Target,
-  PlusCircle,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
   ArrowRight,
   Check,
-  AlertCircle,
+  CreditCard,
+  DollarSign,
+  PlusCircle,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Trophy,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 
 interface SideBetsTrackerProps {
   tripId: string;
@@ -30,6 +31,33 @@ interface SideBetsTrackerProps {
 }
 
 type TabType = 'games' | 'expenses' | 'settlements';
+
+const TABS: { id: TabType; label: string }[] = [
+  { id: 'games', label: 'Games' },
+  { id: 'expenses', label: 'Expenses' },
+  { id: 'settlements', label: 'Settlements' },
+];
+
+function getPlayerName(players: Player[], playerId: string) {
+  const p = players.find((pl) => pl.id === playerId);
+  return p ? `${p.firstName} ${p.lastName}` : 'Unknown';
+}
+
+function formatCurrency(amount: number) {
+  const absAmount = Math.abs(amount);
+  return `$${absAmount.toFixed(2)}`;
+}
+
+function FieldLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className="mb-1 block text-sm font-medium text-[var(--ink-secondary)]">
+      {children}
+    </span>
+  );
+}
+
+const inputClassName =
+  'w-full rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface)] px-[var(--space-3)] py-[var(--space-2)] text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--canvas)]';
 
 export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerProps) {
   const [activeTab, setActiveTab] = useState<TabType>('games');
@@ -48,15 +76,17 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
   const [newExpensePaidBy, setNewExpensePaidBy] = useState('');
   const [newExpenseSplitBetween, setNewExpenseSplitBetween] = useState<string[]>([]);
 
-  // Calculate balances
-  const balances = useMemo(() => {
-    return calculatePlayerBalances(expenses, players);
-  }, [expenses, players]);
+  const balances = useMemo(() => calculatePlayerBalances(expenses, players), [expenses, players]);
+  const settlements = useMemo(() => calculateSettlements(balances), [balances]);
 
-  // Calculate settlements
-  const settlements = useMemo(() => {
-    return calculateSettlements(balances);
-  }, [balances]);
+  const togglePlayer = (playerId: string, list: string[], setList: (l: string[]) => void) => {
+    if (list.includes(playerId)) {
+      setList(list.filter((id) => id !== playerId));
+      return;
+    }
+
+    setList([...list, playerId]);
+  };
 
   const handleAddGame = () => {
     if (selectedPlayers.length < 2) return;
@@ -68,6 +98,7 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
       newGameAmount,
       selectedPlayers
     );
+
     setSideGames([...sideGames, game]);
     setShowAddGame(false);
     setSelectedPlayers([]);
@@ -80,12 +111,13 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
 
     const expense = createExpense(
       tripId,
-      'other',  // default category
+      'other',
       newExpenseDescription || 'Expense',
       newExpenseAmount,
       newExpensePaidBy,
       newExpenseSplitBetween
     );
+
     setExpenses([...expenses, expense]);
     setShowAddExpense(false);
     setNewExpenseDescription('');
@@ -95,53 +127,34 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
     onUpdate?.();
   };
 
-  const togglePlayer = (playerId: string, list: string[], setList: (l: string[]) => void) => {
-    if (list.includes(playerId)) {
-      setList(list.filter(id => id !== playerId));
-    } else {
-      setList([...list, playerId]);
-    }
-  };
-
-  const getPlayerName = (playerId: string) => {
-    const p = players.find(p => p.id === playerId);
-    return p ? `${p.firstName} ${p.lastName}` : 'Unknown';
-  };
-
-  const formatCurrency = (amount: number) => {
-    const absAmount = Math.abs(amount);
-    return `$${absAmount.toFixed(2)}`;
-  };
-
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <DollarSign className="w-6 h-6 text-green-500" />
+          <DollarSign className="w-6 h-6 text-[var(--masters)]" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">
-              Side Bets & Expenses
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Track skins, nassau, and trip expenses
-            </p>
+            <h3 className="font-semibold text-[var(--ink-primary)]">Side Bets & Expenses</h3>
+            <p className="text-sm text-[var(--ink-tertiary)]">Track skins, nassau, and trip expenses</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-        {(['games', 'expenses', 'settlements'] as TabType[]).map(tab => (
+      <div className="flex gap-1 rounded-[var(--radius-lg)] bg-[var(--surface-secondary)] p-1">
+        {TABS.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === tab
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex-1 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors',
+              activeTab === tab.id
+                ? 'bg-[var(--surface)] text-[var(--ink-primary)] shadow-card-sm'
+                : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[color:var(--ink-tertiary)]/10'
+            )}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -151,79 +164,98 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
         <div className="space-y-4">
           {!showAddGame ? (
             <button
+              type="button"
               onClick={() => setShowAddGame(true)}
-              className="w-full p-4 border-2 border-dashed dark:border-gray-700 rounded-lg hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors flex items-center justify-center gap-2"
+              className={cn(
+                'w-full rounded-[var(--radius-lg)] border-2 border-dashed border-[color:var(--rule)]/40',
+                'p-4 transition-colors',
+                'hover:border-[color:var(--masters)]/50 hover:bg-[color:var(--masters)]/5',
+                'flex items-center justify-center gap-2'
+              )}
             >
-              <PlusCircle className="w-5 h-5 text-green-500" />
-              <span className="text-gray-600 dark:text-gray-300">Add Side Game</span>
+              <PlusCircle className="w-5 h-5 text-[var(--masters)]" />
+              <span className="text-[var(--ink-secondary)]">Add Side Game</span>
             </button>
           ) : (
-            <div className="p-4 border dark:border-gray-700 rounded-lg space-y-4">
-              <h4 className="font-medium text-gray-900 dark:text-white">New Side Game</h4>
+            <div className="card p-4 space-y-4">
+              <h4 className="font-medium text-[var(--ink-primary)]">New Side Game</h4>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Game Type
+                  <label className="block">
+                    <FieldLabel>Game Type</FieldLabel>
+                    <select
+                      value={newGameType}
+                      onChange={(e) => setNewGameType(e.target.value as SideGame['type'])}
+                      className={inputClassName}
+                    >
+                      <option value="skins">Skins</option>
+                      <option value="nassau">Nassau</option>
+                      <option value="kp">Closest to Pin</option>
+                      <option value="longest-drive">Longest Drive</option>
+                      <option value="custom">Custom</option>
+                    </select>
                   </label>
-                  <select
-                    value={newGameType}
-                    onChange={(e) => setNewGameType(e.target.value as SideGame['type'])}
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  >
-                    <option value="skins">Skins</option>
-                    <option value="nassau">Nassau</option>
-                    <option value="kp">Closest to Pin</option>
-                    <option value="longest-drive">Longest Drive</option>
-                    <option value="custom">Custom</option>
-                  </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Amount ($)
+                  <label className="block">
+                    <FieldLabel>Amount ($)</FieldLabel>
+                    <input
+                      type="number"
+                      value={newGameAmount}
+                      onChange={(e) => setNewGameAmount(parseFloat(e.target.value) || 0)}
+                      min={1}
+                      className={inputClassName}
+                    />
                   </label>
-                  <input
-                    type="number"
-                    value={newGameAmount}
-                    onChange={(e) => setNewGameAmount(parseFloat(e.target.value) || 0)}
-                    min={1}
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Participants
-                </label>
+                <FieldLabel>Participants</FieldLabel>
                 <div className="flex flex-wrap gap-2">
-                  {players.map(player => (
-                    <button
-                      key={player.id}
-                      onClick={() => togglePlayer(player.id, selectedPlayers, setSelectedPlayers)}
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${selectedPlayers.includes(player.id)
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }`}
-                    >
-                      {player.firstName} {player.lastName}
-                    </button>
-                  ))}
+                  {players.map((player) => {
+                    const isSelected = selectedPlayers.includes(player.id);
+                    return (
+                      <button
+                        key={player.id}
+                        type="button"
+                        onClick={() => togglePlayer(player.id, selectedPlayers, setSelectedPlayers)}
+                        className={cn(
+                          'rounded-full px-3 py-1 text-sm transition-colors',
+                          isSelected
+                            ? 'bg-[var(--masters)] text-white'
+                            : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[color:var(--ink-tertiary)]/10 hover:text-[var(--ink-primary)]'
+                        )}
+                      >
+                        {player.firstName} {player.lastName}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowAddGame(false)}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className={cn(
+                    'rounded-[var(--radius-md)] px-4 py-2 transition-colors',
+                    'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
+                  )}
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleAddGame}
                   disabled={selectedPlayers.length < 2}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className={cn(
+                    'rounded-[var(--radius-md)] px-4 py-2 font-medium transition-colors',
+                    'bg-[var(--masters)] text-white hover:brightness-95',
+                    'disabled:bg-[color:var(--ink-tertiary)]/25 disabled:text-[var(--ink-tertiary)] disabled:cursor-not-allowed'
+                  )}
                 >
                   Create Game
                 </button>
@@ -234,26 +266,21 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
           {/* Game List */}
           {sideGames.length > 0 && (
             <div className="space-y-2">
-              {sideGames.map(game => (
-                <div
-                  key={game.id}
-                  className="p-4 border dark:border-gray-700 rounded-lg"
-                >
-                  <div className="flex items-center justify-between mb-2">
+              {sideGames.map((game) => (
+                <div key={game.id} className="card p-4">
+                  <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {game.type === 'skins' && <Target className="w-4 h-4 text-purple-500" />}
-                      {game.type === 'nassau' && <Trophy className="w-4 h-4 text-yellow-500" />}
-                      {game.type === 'kp' && <Target className="w-4 h-4 text-blue-500" />}
-                      <span className="font-medium text-gray-900 dark:text-white capitalize">
+                      {game.type === 'skins' && <Target className="h-4 w-4 text-[var(--info)]" />}
+                      {game.type === 'nassau' && <Trophy className="h-4 w-4 text-[var(--warning)]" />}
+                      {game.type === 'kp' && <Target className="h-4 w-4 text-[var(--color-accent)]" />}
+                      <span className="font-medium text-[var(--ink-primary)] capitalize">
                         {game.type.replace('_', ' ')}
                       </span>
                     </div>
-                    <span className="text-green-600 dark:text-green-400 font-medium">
-                      ${game.buyIn}
-                    </span>
+                    <span className="font-medium text-[var(--success)]">${game.buyIn}</span>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {game.playerIds.map(getPlayerName).join(', ')}
+                  <p className="text-sm text-[var(--ink-tertiary)]">
+                    {game.playerIds.map((id) => getPlayerName(players, id)).join(', ')}
                   </p>
                 </div>
               ))}
@@ -267,82 +294,91 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
         <div className="space-y-4">
           {!showAddExpense ? (
             <button
+              type="button"
               onClick={() => setShowAddExpense(true)}
-              className="w-full p-4 border-2 border-dashed dark:border-gray-700 rounded-lg hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center justify-center gap-2"
+              className={cn(
+                'w-full rounded-[var(--radius-lg)] border-2 border-dashed border-[color:var(--rule)]/40',
+                'p-4 transition-colors',
+                'hover:border-[color:var(--info)]/50 hover:bg-[color:var(--info)]/5',
+                'flex items-center justify-center gap-2'
+              )}
             >
-              <PlusCircle className="w-5 h-5 text-blue-500" />
-              <span className="text-gray-600 dark:text-gray-300">Add Expense</span>
+              <PlusCircle className="w-5 h-5 text-[var(--info)]" />
+              <span className="text-[var(--ink-secondary)]">Add Expense</span>
             </button>
           ) : (
-            <div className="p-4 border dark:border-gray-700 rounded-lg space-y-4">
-              <h4 className="font-medium text-gray-900 dark:text-white">New Expense</h4>
+            <div className="card p-4 space-y-4">
+              <h4 className="font-medium text-[var(--ink-primary)]">New Expense</h4>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Description
-                </label>
+              <label className="block">
+                <FieldLabel>Description</FieldLabel>
                 <input
                   type="text"
                   value={newExpenseDescription}
                   onChange={(e) => setNewExpenseDescription(e.target.value)}
                   placeholder="e.g., Golf cart rental"
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className={inputClassName}
                 />
-              </div>
+              </label>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Amount ($)
-                  </label>
+                <label className="block">
+                  <FieldLabel>Amount ($)</FieldLabel>
                   <input
                     type="number"
                     value={newExpenseAmount}
                     onChange={(e) => setNewExpenseAmount(parseFloat(e.target.value) || 0)}
                     min={0}
                     step={0.01}
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={inputClassName}
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Paid By
-                  </label>
+                <label className="block">
+                  <FieldLabel>Paid By</FieldLabel>
                   <select
                     value={newExpensePaidBy}
                     onChange={(e) => setNewExpensePaidBy(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={inputClassName}
                   >
                     <option value="">Select...</option>
-                    {players.map(p => (
-                      <option key={p.id} value={p.id}>{p.firstName} {p.lastName}</option>
+                    {players.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.firstName} {p.lastName}
+                      </option>
                     ))}
                   </select>
-                </div>
+                </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Split Between
-                </label>
+                <FieldLabel>Split Between</FieldLabel>
                 <div className="flex flex-wrap gap-2">
-                  {players.map(player => (
-                    <button
-                      key={player.id}
-                      onClick={() => togglePlayer(player.id, newExpenseSplitBetween, setNewExpenseSplitBetween)}
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${newExpenseSplitBetween.includes(player.id)
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }`}
-                    >
-                      {player.firstName} {player.lastName}
-                    </button>
-                  ))}
+                  {players.map((player) => {
+                    const isSelected = newExpenseSplitBetween.includes(player.id);
+                    return (
+                      <button
+                        key={player.id}
+                        type="button"
+                        onClick={() =>
+                          togglePlayer(player.id, newExpenseSplitBetween, setNewExpenseSplitBetween)
+                        }
+                        className={cn(
+                          'rounded-full px-3 py-1 text-sm transition-colors',
+                          isSelected
+                            ? 'bg-[var(--info)] text-white'
+                            : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[color:var(--ink-tertiary)]/10 hover:text-[var(--ink-primary)]'
+                        )}
+                      >
+                        {player.firstName} {player.lastName}
+                      </button>
+                    );
+                  })}
                 </div>
                 <button
-                  onClick={() => setNewExpenseSplitBetween(players.map(p => p.id))}
-                  className="text-xs text-blue-500 hover:text-blue-600 mt-2"
+                  type="button"
+                  onClick={() => setNewExpenseSplitBetween(players.map((p) => p.id))}
+                  className="mt-2 text-xs font-medium text-[var(--info)] hover:brightness-95"
                 >
                   Select All
                 </button>
@@ -350,15 +386,24 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
 
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setShowAddExpense(false)}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className={cn(
+                    'rounded-[var(--radius-md)] px-4 py-2 transition-colors',
+                    'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
+                  )}
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleAddExpense}
                   disabled={!newExpensePaidBy || newExpenseSplitBetween.length === 0 || newExpenseAmount <= 0}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className={cn(
+                    'rounded-[var(--radius-md)] px-4 py-2 font-medium transition-colors',
+                    'bg-[var(--info)] text-white hover:brightness-95',
+                    'disabled:bg-[color:var(--ink-tertiary)]/25 disabled:text-[var(--ink-tertiary)] disabled:cursor-not-allowed'
+                  )}
                 >
                   Add Expense
                 </button>
@@ -369,22 +414,15 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
           {/* Expense List */}
           {expenses.length > 0 && (
             <div className="space-y-2">
-              {expenses.map(expense => (
-                <div
-                  key={expense.id}
-                  className="p-4 border dark:border-gray-700 rounded-lg"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {expense.description}
-                    </span>
-                    <span className="text-blue-600 dark:text-blue-400 font-medium">
-                      ${expense.amount.toFixed(2)}
-                    </span>
+              {expenses.map((expense) => (
+                <div key={expense.id} className="card p-4">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="font-medium text-[var(--ink-primary)]">{expense.description}</span>
+                    <span className="font-medium text-[var(--info)]">${expense.amount.toFixed(2)}</span>
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Paid by {getPlayerName(expense.paidBy)} •
-                    Split {expense.splitAmong.length} ways
+                  <p className="text-sm text-[var(--ink-tertiary)]">
+                    Paid by {getPlayerName(players, expense.paidBy)} • Split {expense.splitAmong.length}{' '}
+                    ways
                   </p>
                 </div>
               ))}
@@ -398,31 +436,36 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
         <div className="space-y-4">
           {/* Player Balances */}
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Player Balances</h4>
+            <h4 className="mb-3 font-medium text-[var(--ink-primary)]">Player Balances</h4>
             <div className="space-y-2">
-              {balances.map(balance => (
+              {balances.map((balance) => (
                 <div
                   key={balance.playerId}
-                  className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-between"
+                  className="flex items-center justify-between rounded-[var(--radius-lg)] bg-[var(--surface-secondary)] p-3"
                 >
-                  <span className="text-gray-900 dark:text-white">
-                    {getPlayerName(balance.playerId)}
+                  <span className="text-[var(--ink-primary)]">
+                    {getPlayerName(players, balance.playerId)}
                   </span>
                   <div className="flex items-center gap-2">
                     {balance.netBalance > 0 ? (
-                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      <TrendingUp className="h-4 w-4 text-[var(--success)]" />
                     ) : balance.netBalance < 0 ? (
-                      <TrendingDown className="w-4 h-4 text-red-500" />
+                      <TrendingDown className="h-4 w-4 text-[var(--error)]" />
                     ) : (
-                      <Check className="w-4 h-4 text-gray-400" />
+                      <Check className="h-4 w-4 text-[var(--ink-tertiary)]" />
                     )}
-                    <span className={`font-medium ${balance.netBalance > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : balance.netBalance < 0
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-500'
-                      }`}>
-                      {balance.netBalance >= 0 ? '+' : ''}{formatCurrency(balance.netBalance)}
+                    <span
+                      className={cn(
+                        'font-medium',
+                        balance.netBalance > 0
+                          ? 'text-[var(--success)]'
+                          : balance.netBalance < 0
+                            ? 'text-[var(--error)]'
+                            : 'text-[var(--ink-tertiary)]'
+                      )}
+                    >
+                      {balance.netBalance >= 0 ? '+' : ''}
+                      {formatCurrency(balance.netBalance)}
                     </span>
                   </div>
                 </div>
@@ -433,35 +476,35 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
           {/* Settlement Transactions */}
           {settlements.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-3">
-                To Settle Up
-              </h4>
+              <h4 className="mb-3 font-medium text-[var(--ink-primary)]">To Settle Up</h4>
               <div className="space-y-2">
                 {settlements.map((settlement, idx) => (
                   <div
                     key={idx}
-                    className={`p-4 border rounded-lg flex items-center justify-between ${settlement.settled
-                      ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                      : 'dark:border-gray-700'
-                      }`}
+                    className={cn(
+                      'flex items-center justify-between rounded-[var(--radius-lg)] border p-4',
+                      settlement.settled
+                        ? 'border-[color:var(--success)]/25 bg-[color:var(--success)]/10'
+                        : 'border-[var(--rule)] bg-[var(--surface)]'
+                    )}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-gray-900 dark:text-white">
-                        {getPlayerName(settlement.fromPlayerId)}
+                      <span className="text-[var(--ink-primary)]">
+                        {getPlayerName(players, settlement.fromPlayerId)}
                       </span>
-                      <ArrowRight className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-900 dark:text-white">
-                        {getPlayerName(settlement.toPlayerId)}
+                      <ArrowRight className="h-4 w-4 text-[var(--ink-tertiary)]" />
+                      <span className="text-[var(--ink-primary)]">
+                        {getPlayerName(players, settlement.toPlayerId)}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-[var(--ink-primary)]">
                         {formatCurrency(settlement.amount)}
                       </span>
                       {settlement.settled ? (
-                        <Check className="w-5 h-5 text-green-500" />
+                        <Check className="h-5 w-5 text-[var(--success)]" />
                       ) : (
-                        <CreditCard className="w-5 h-5 text-gray-400" />
+                        <CreditCard className="h-5 w-5 text-[var(--ink-tertiary)]" />
                       )}
                     </div>
                   </div>
@@ -471,12 +514,38 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
           )}
 
           {balances.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
-              <p>No balances to settle</p>
-              <p className="text-sm">Add some games or expenses to track</p>
+            <div className="card p-4">
+              <EmptyStatePremium
+                illustration="trophy"
+                title="No balances to settle"
+                description="Add some games or expenses to start tracking." 
+                variant="compact"
+              />
             </div>
           )}
+        </div>
+      )}
+
+      {/* Empty states for first-time use */}
+      {activeTab === 'games' && sideGames.length === 0 && !showAddGame && (
+        <div className="card p-4">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No side games yet"
+            description="Create a skins or Nassau game to start tracking." 
+            variant="compact"
+          />
+        </div>
+      )}
+
+      {activeTab === 'expenses' && expenses.length === 0 && !showAddExpense && (
+        <div className="card p-4">
+          <EmptyStatePremium
+            illustration="scorecard"
+            title="No expenses recorded"
+            description="Add shared trip expenses to calculate balances automatically." 
+            variant="compact"
+          />
         </div>
       )}
     </div>
