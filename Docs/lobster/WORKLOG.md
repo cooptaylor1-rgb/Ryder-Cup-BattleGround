@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 11:37 EST — Phase 2 — Captain MatchCardGenerator: premium token sweep
+- `MatchCardGenerator`: migrated printable/shareable match cards off hard-coded hex + Tailwind gray/red/blue palettes onto premium surface/ink/rule tokens and Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`).
+- Standardized headers, dividers, info bars, player rows, and QR placeholder onto `var(--surface-*)` + `var(--ink-*)` + `var(--rule)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2726ed5`)
+
 ### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
 - `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
