@@ -166,7 +166,8 @@ export function AppShell({
             className={cn(
               'flex flex-col items-center gap-4',
               'p-6 rounded-2xl',
-              'bg-white dark:bg-gray-800',
+              'bg-[var(--surface-raised)]',
+              'border border-[var(--rule)]',
               'shadow-xl',
             )}
           >
@@ -174,14 +175,14 @@ export function AppShell({
             <div
               className={cn(
                 'w-10 h-10 rounded-full',
-                'border-4 border-gray-200 border-t-green-600',
+                'border-4 border-[color:var(--rule)] border-t-[var(--masters)]',
                 'animate-spin',
               )}
             />
 
             {/* Message */}
             {globalLoadingMessage && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 text-center max-w-[200px]">
+              <p className="text-sm text-[var(--ink-secondary)] text-center max-w-[200px]">
                 {globalLoadingMessage}
               </p>
             )}
