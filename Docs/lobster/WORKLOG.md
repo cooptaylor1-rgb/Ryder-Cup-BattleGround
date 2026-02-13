@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 16:55 EST — Phase 2 — CaptainToolkit: avoid silent empty panel on unknown section
 - `CaptainToolkit`: replaced the fallback `return null` in `renderActiveSection()` with a compact `EmptyStatePremium` so unexpected/invalid section IDs don’t yield an empty card.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`5c02b73`)
 
 ### 16:40 EST — Phase 2 — SideBetsTracker: premium token sweep + explicit empty states
 - `SideBetsTracker` (captain tools): migrated legacy Tailwind gray/green/blue palettes + dark-mode branches to the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--info)`, `var(--success)`, `var(--error)`), and standardized the tabs + form controls to the shared look.
