@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { uiLogger } from '@/lib/utils/logger';
+import { useRealtimeScoring } from '@/lib/hooks/useRealtimeScoring';
 import { EmptyStatePremium } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import {
@@ -14,29 +15,34 @@ import {
   Maximize2,
   Volume2,
   VolumeX,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
-// (removed unused skeleton imports)
 
 import type { Match, Player } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
+import type { ScoreUpdate } from '@/lib/services/realtimeSyncService';
 
 /**
  * LIVE PAGE — Jumbotron View
  *
- * TV-optimized view for displaying all matches in real-time
- * Perfect for the clubhouse or 19th hole
+ * TV-optimized view for displaying all matches in real-time.
+ * Uses Supabase Realtime for instant score updates — no polling.
  */
 export default function LivePage() {
   const router = useRouter();
   const { currentTrip, players, getActiveSession } = useTripStore();
-  const { matchStates, loadSessionMatches } = useScoringStore();
+  const { matchStates, loadSessionMatches, refreshMatchState } = useScoringStore();
   const [, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  // Track which match just received an update for flash animation
+  const [flashMatchId, setFlashMatchId] = useState<string | null>(null);
+  const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const activeSession = getActiveSession();
 
-  // Load matches for active session
+  // Load matches for active session from IndexedDB (reactive)
   const matches = useLiveQuery(
     async () => {
       if (!activeSession) return [];
@@ -49,60 +55,67 @@ export default function LivePage() {
     []
   );
 
-  // No redirect when no trip is selected — render a premium empty state instead.
-
+  // Initial load of session matches
   useEffect(() => {
     if (activeSession) {
       loadSessionMatches(activeSession.id);
     }
   }, [activeSession, loadSessionMatches]);
 
-  // Auto-refresh every 30 seconds (only when tab is visible for battery optimization)
+  // Handle incoming realtime score updates
+  const handleScoreUpdate = useCallback(
+    (update: ScoreUpdate) => {
+      uiLogger.log(`Live: realtime score update for match ${update.matchId}, hole ${update.holeNumber}`);
+
+      // Refresh the specific match state from DB
+      refreshMatchState(update.matchId);
+      setLastUpdate(new Date());
+
+      // Flash animation on the card that just updated
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+      setFlashMatchId(update.matchId);
+      flashTimeoutRef.current = setTimeout(() => setFlashMatchId(null), 2000);
+
+      // Play sound if enabled
+      if (soundEnabled) {
+        try {
+          const audio = new Audio('/sounds/score-tick.mp3');
+          audio.volume = 0.3;
+          audio.play().catch(() => {});
+        } catch {
+          // Sound not available
+        }
+      }
+    },
+    [refreshMatchState, soundEnabled]
+  );
+
+  // Subscribe to trip-level realtime channel
+  const { isConnected } = useRealtimeScoring({
+    tripId: currentTrip?.id,
+    onScoreUpdate: handleScoreUpdate,
+    enabled: !!currentTrip,
+  });
+
+  // Fallback: refresh when tab becomes visible (covers reconnect scenarios)
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    const startPolling = () => {
-      if (interval) return;
-      interval = setInterval(() => {
-        if (activeSession && document.visibilityState === 'visible') {
-          loadSessionMatches(activeSession.id);
-          setLastUpdate(new Date());
-        }
-      }, 30000);
-    };
-
-    const stopPolling = () => {
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
-    };
-
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        // Refresh immediately when tab becomes visible
-        if (activeSession) {
-          loadSessionMatches(activeSession.id);
-          setLastUpdate(new Date());
-        }
-        startPolling();
-      } else {
-        stopPolling();
+      if (document.visibilityState === 'visible' && activeSession) {
+        loadSessionMatches(activeSession.id);
+        setLastUpdate(new Date());
       }
     };
-
-    // Start polling if visible
-    if (document.visibilityState === 'visible') {
-      startPolling();
-    }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      stopPolling();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [activeSession, loadSessionMatches]);
+
+  // Cleanup flash timeout
+  useEffect(() => {
+    return () => {
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+    };
+  }, []);
 
   const toggleFullscreen = async () => {
     try {
@@ -114,7 +127,6 @@ export default function LivePage() {
         setIsFullscreen(false);
       }
     } catch (error) {
-      // Fullscreen may not be supported or user denied permission
       uiLogger.warn('Fullscreen toggle failed:', error);
     }
   };
@@ -127,7 +139,6 @@ export default function LivePage() {
     return matchStates.get(matchId);
   };
 
-  // Check if matches are still loading
   const isLoadingMatches = matches === undefined;
 
   if (!currentTrip) {
@@ -163,6 +174,23 @@ export default function LivePage() {
         onBack={() => router.back()}
         rightSlot={
           <div className="flex items-center gap-2">
+            {/* Connection status indicator */}
+            <div
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--surface-card)] border border-[var(--rule)]"
+              title={isConnected ? 'Live — connected' : 'Offline — using cached data'}
+            >
+              {isConnected ? (
+                <>
+                  <Wifi size={14} className="text-[var(--success)]" />
+                  <span className="text-xs text-[var(--success)] font-medium hidden sm:inline">Live</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff size={14} className="text-[var(--ink-tertiary)]" />
+                  <span className="text-xs text-[var(--ink-tertiary)] hidden sm:inline">Offline</span>
+                </>
+              )}
+            </div>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
@@ -196,7 +224,16 @@ export default function LivePage() {
         {activeSession && (
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="type-caption">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+            <p className="type-caption">
+              {isConnected ? (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-[var(--success)] mr-1.5 animate-pulse" />
+                  Live — last update {lastUpdate.toLocaleTimeString()}
+                </>
+              ) : (
+                <>Last updated: {lastUpdate.toLocaleTimeString()}</>
+              )}
+            </p>
           </div>
         )}
 
@@ -231,7 +268,13 @@ export default function LivePage() {
                 {matches.map((match) => {
                   const state = getMatchState(match.id);
                   return (
-                    <LiveMatchCard key={match.id} match={match} state={state} getPlayer={getPlayer} />
+                    <LiveMatchCard
+                      key={match.id}
+                      match={match}
+                      state={state}
+                      getPlayer={getPlayer}
+                      isFlashing={flashMatchId === match.id}
+                    />
                   );
                 })}
               </div>
@@ -267,9 +310,10 @@ interface LiveMatchCardProps {
   match: Match;
   state?: MatchState;
   getPlayer: (id: string) => Player | undefined;
+  isFlashing?: boolean;
 }
 
-function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
+function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardProps) {
   const teamAPlayers = match.teamAPlayerIds.map(id => getPlayer(id)).filter(Boolean) as Player[];
   const teamBPlayers = match.teamBPlayerIds.map(id => getPlayer(id)).filter(Boolean) as Player[];
 
@@ -301,7 +345,13 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
   };
 
   return (
-    <div className="card rounded-2xl overflow-hidden border border-[var(--rule)] bg-[var(--surface-card)]">
+    <div
+      className={`card rounded-2xl overflow-hidden border bg-[var(--surface-card)] transition-all duration-500 ${
+        isFlashing
+          ? 'border-[var(--masters)] shadow-lg shadow-[var(--masters)]/20 scale-[1.02]'
+          : 'border-[var(--rule)]'
+      }`}
+    >
       {/* Match Header */}
       <div className="px-4 py-2 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--rule)]">
         <span className="text-sm text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
@@ -315,6 +365,9 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
                 : 'bg-[var(--surface-card)] text-[var(--ink-tertiary)] border-[var(--rule)]')
           }
         >
+          {state?.status === 'inProgress' && (
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--error)] mr-1 animate-pulse" />
+          )}
           {getStatusText()}
         </span>
       </div>
@@ -336,7 +389,9 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
             </span>
           </div>
           {isTeamAWinning && (
-            <span className="text-lg font-bold text-[var(--team-usa)]">{getScoreDisplay()}</span>
+            <span className={`text-lg font-bold text-[var(--team-usa)] ${isFlashing ? 'animate-bounce' : ''}`}>
+              {getScoreDisplay()}
+            </span>
           )}
         </div>
 
@@ -355,7 +410,9 @@ function LiveMatchCard({ match, state, getPlayer }: LiveMatchCardProps) {
             </span>
           </div>
           {isTeamBWinning && (
-            <span className="text-lg font-bold text-[var(--team-europe)]">{getScoreDisplay()}</span>
+            <span className={`text-lg font-bold text-[var(--team-europe)] ${isFlashing ? 'animate-bounce' : ''}`}>
+              {getScoreDisplay()}
+            </span>
           )}
         </div>
 

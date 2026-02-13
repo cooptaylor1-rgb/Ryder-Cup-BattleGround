@@ -26,6 +26,7 @@ import {
   BarChart3,
   Award,
   Coins,
+  Trophy,
   // Settings
   Palette,
   Bell,
@@ -230,6 +231,13 @@ export default function MorePage() {
         description: 'Fun wagers & pools',
         icon: <Coins size={20} />,
         href: '/bets',
+      },
+      {
+        id: 'recap',
+        label: 'Trip Recap',
+        description: 'Highlight reel & year in review',
+        icon: <Trophy size={20} />,
+        href: '/recap',
       },
     ],
   };

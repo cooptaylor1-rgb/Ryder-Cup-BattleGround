@@ -18,6 +18,7 @@ import type {
   MatchStatus,
   MatchResultType,
   HoleResultEdit,
+  PlayerHoleScore,
 } from '../types/models';
 import {
   ScoringEventType,
@@ -251,7 +252,9 @@ export async function recordHoleResult(
   teamBScore?: number,
   scoredBy?: string,
   editReason?: string,
-  isCaptainOverride?: boolean
+  isCaptainOverride?: boolean,
+  teamAPlayerScores?: PlayerHoleScore[],
+  teamBPlayerScores?: PlayerHoleScore[],
 ): Promise<HoleResult> {
   if (!isValidHoleNumber(holeNumber)) {
     throw new Error(`Invalid hole number: ${holeNumber}. Must be 1-${TOTAL_HOLES}.`);
@@ -289,6 +292,9 @@ export async function recordHoleResult(
       winner,
       teamAScore,
       teamBScore,
+      // Individual player scores for fourball/best ball
+      teamAPlayerScores: teamAPlayerScores ?? existing?.teamAPlayerScores,
+      teamBPlayerScores: teamBPlayerScores ?? existing?.teamBPlayerScores,
       scoredBy: existing ? existing.scoredBy : scoredBy, // Keep original scorer
       timestamp: existing?.timestamp || now, // Keep original timestamp
       // P0-4: Audit fields
