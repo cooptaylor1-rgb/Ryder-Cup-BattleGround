@@ -271,7 +271,14 @@ export function CaptainToolkit({
         );
 
       default:
-        return null;
+        return (
+          <EmptyStatePremium
+            illustration="scorecard"
+            title="No tool selected"
+            description="Pick a tool from the Captain’s Toolkit to get started."
+            variant="compact"
+          />
+        );
     }
   };
 
