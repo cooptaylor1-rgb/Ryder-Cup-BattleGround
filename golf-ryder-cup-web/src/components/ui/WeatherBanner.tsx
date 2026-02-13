@@ -74,24 +74,24 @@ interface WeatherBannerProps {
 const TONE_STYLES: Record<DelayTone, ToneStyles> = {
   success: {
     container:
-      'border border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-400/25 dark:bg-emerald-400/10',
-    iconContainer: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
-    label: 'text-emerald-600 dark:text-emerald-300',
-    duration: 'text-emerald-600/80 dark:text-emerald-300/80',
+      'border border-[color:var(--success)]/35 bg-[color:var(--success)]/12',
+    iconContainer: 'bg-[color:var(--success)]/18 text-[var(--success)]',
+    label: 'text-[var(--success)]',
+    duration: 'text-[var(--success)] opacity-80',
   },
   warning: {
     container:
-      'border border-amber-500/30 bg-amber-500/10 dark:border-amber-400/25 dark:bg-amber-400/10',
-    iconContainer: 'bg-amber-500/15 text-amber-600 dark:text-amber-300',
-    label: 'text-amber-600 dark:text-amber-300',
-    duration: 'text-amber-600/80 dark:text-amber-200/80',
+      'border border-[color:var(--warning)]/35 bg-[color:var(--warning)]/12',
+    iconContainer: 'bg-[color:var(--warning)]/18 text-[var(--warning)]',
+    label: 'text-[var(--warning)]',
+    duration: 'text-[var(--warning)] opacity-80',
   },
   danger: {
     container:
-      'border border-red-500/30 bg-red-500/10 dark:border-red-400/25 dark:bg-red-400/10',
-    iconContainer: 'bg-red-500/15 text-red-600 dark:text-red-300',
-    label: 'text-red-600 dark:text-red-300',
-    duration: 'text-red-600/80 dark:text-red-200/80',
+      'border border-[color:var(--error)]/35 bg-[color:var(--error)]/12',
+    iconContainer: 'bg-[color:var(--error)]/18 text-[var(--error)]',
+    label: 'text-[var(--error)]',
+    duration: 'text-[var(--error)] opacity-80',
   },
 };
 
@@ -132,12 +132,12 @@ function WeatherIcon({ icon }: { icon?: string }) {
   const commonProps = { strokeWidth: 1.5 } as const;
 
   if (normalized.includes('snow')) {
-    return <CloudSnow {...commonProps} className="h-8 w-8 text-sky-300" />;
+    return <CloudSnow {...commonProps} className="h-8 w-8 text-[color:var(--info)]/80" />;
   }
 
   switch (normalized) {
     case 'sun':
-      return <Sun {...commonProps} className="h-8 w-8 text-amber-400" />;
+      return <Sun {...commonProps} className="h-8 w-8 text-[var(--gold)]" />;
     case 'cloud-sun':
       return <CloudSun {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
     case 'cloud':
@@ -145,9 +145,9 @@ function WeatherIcon({ icon }: { icon?: string }) {
     case 'cloud-rain':
     case 'cloud-drizzle':
     case 'cloud-rain-wind':
-      return <CloudRain {...commonProps} className="h-8 w-8 text-sky-500" />;
+      return <CloudRain {...commonProps} className="h-8 w-8 text-[var(--info)]" />;
     case 'cloud-lightning':
-      return <CloudLightning {...commonProps} className="h-8 w-8 text-amber-600" />;
+      return <CloudLightning {...commonProps} className="h-8 w-8 text-[var(--warning)]" />;
     case 'wind':
       return <Wind {...commonProps} className="h-8 w-8 text-[var(--ink-tertiary)]" />;
     default:
@@ -210,7 +210,9 @@ export function WeatherBanner({
     <div
       className={cn(
         'relative rounded-[var(--radius-xl)] px-[var(--space-4)] py-[var(--space-3)] transition-colors',
-        isActive ? toneStyle.container : 'border border-[var(--rule)] bg-[var(--canvas-raised)]'
+        isActive
+          ? toneStyle.container
+          : 'border border-[color:var(--rule)]/35 bg-[var(--canvas-raised)]'
       )}
     >
       {/* Main row */}
@@ -220,7 +222,7 @@ export function WeatherBanner({
             'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--ink-secondary)]',
             isActive
               ? toneStyle.iconContainer
-              : 'bg-[var(--masters)]/10 text-[var(--ink-secondary)] dark:bg-[var(--masters)]/15'
+              : 'bg-[color:var(--masters)]/12 text-[var(--ink-secondary)]'
           )}
         >
           {isActive ? config.icon : <WeatherIcon icon={weatherIcon} />}
@@ -264,7 +266,7 @@ export function WeatherBanner({
                     className={cn(
                       'font-medium',
                       precipChance > 60
-                        ? 'text-amber-600 dark:text-amber-300'
+                        ? 'text-[var(--warning)]'
                         : 'text-[var(--ink-secondary)]'
                     )}
                   >
@@ -365,8 +367,8 @@ interface DelayButtonProps {
 function DelayButton({ label, icon, variant, onClick }: DelayButtonProps) {
   const variantClasses =
     variant === 'warning'
-      ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 hover:bg-amber-500/15 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
-      : 'border-red-500/30 bg-red-500/10 text-red-600 hover:bg-red-500/15 dark:border-red-400/30 dark:bg-red-400/10 dark:text-red-300';
+      ? 'border-[color:var(--warning)]/35 bg-[color:var(--warning)]/12 text-[var(--warning)] hover:bg-[color:var(--warning)]/18'
+      : 'border-[color:var(--error)]/35 bg-[color:var(--error)]/12 text-[var(--error)] hover:bg-[color:var(--error)]/18';
 
   return (
     <button
