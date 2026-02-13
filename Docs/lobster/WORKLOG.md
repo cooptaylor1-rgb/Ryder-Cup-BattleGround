@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `FourballScoreEntry`: migrated remaining inline `style={{ color: 'var(--…)' }}` usages (icon + labels + helper text) onto token-driven Tailwind classes (`text-[var(--ink-secondary)]`, `text-[var(--ink-tertiary)]`, etc.).
 - Best-ball badge now uses a CSS variable (`--team-color`) + Tailwind `bg-[color:var(--team-color)]/20` for consistent theming without manual hex alpha concatenation.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`c5f03f8`)
+- Commit + push ✅ (`3241408`, docs `4051124`)
 
 ### 15:45 EST — Docs — WORKLOG: restore chronological ordering
 - Reordered the 2026-02-13 entries so the late-night **SessionLockManager** checkpoint (20:58) appears in correct time order within the day.
