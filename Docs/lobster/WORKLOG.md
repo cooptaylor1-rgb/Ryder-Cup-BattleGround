@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 14:10 EST — Phase 2 — Root layout loading fallback: remove CSS var fallbacks
+- `src/app/layout.tsx`: removed `bg-[var(--canvas,#...)]` / `border-[var(--rule,#...)]` / `border-t-[var(--masters,#...)]` / `text-[var(--ink-secondary,#...)]` fallback forms from the global `Suspense` loading UI.
+- Standardizes the last “fallback token” usage onto the premium token system and reduces Tailwind/CSS optimizer warnings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`488b79c`)
+
 ### 12:45 EST — Phase 2 — Fix ESM import ordering (logger const after imports)
 - Fixed invalid `import` ordering in:
   - `src/components/social/DaySummaryCard.tsx`

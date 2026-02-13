@@ -164,13 +164,13 @@ export default function RootLayout({
               >
                 <Suspense
                   fallback={
-                    <div className="min-h-screen flex items-center justify-center bg-[var(--canvas,#f8fafc)]">
+                    <div className="min-h-screen flex items-center justify-center bg-[var(--canvas)]">
                       <div className="text-center">
                         <div
-                          className="w-12 h-12 mx-auto mb-4 border-[3px] border-[var(--rule,#e2e8f0)] border-t-[var(--masters,#1a472a)] rounded-full animate-spin"
+                          className="w-12 h-12 mx-auto mb-4 border-[3px] border-[var(--rule)] border-t-[var(--masters)] rounded-full animate-spin"
                           aria-hidden
                         />
-                        <p className="text-sm text-[var(--ink-secondary,#64748b)]">Loading...</p>
+                        <p className="text-sm text-[var(--ink-secondary)]">Loading...</p>
                       </div>
                     </div>
                   }
