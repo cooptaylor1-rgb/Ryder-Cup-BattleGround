@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`5c02b73`)
 
+### 17:00 EST — Phase 2 — MatchStatusHeader: avoid silent gap when no match is resolved
+- `MatchStatusHeader` (live-play): replaced the render-level `return null` when `statusData` can’t be derived with a compact “No match in progress” affordance that routes to `/schedule`.
+- Prevents an unexplained blank gap at the top of screens when a trip exists but there’s no in-progress match for the default player.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d2acb8c`)
+
 ### 16:40 EST — Phase 2 — SideBetsTracker: premium token sweep + explicit empty states
 - `SideBetsTracker` (captain tools): migrated legacy Tailwind gray/green/blue palettes + dark-mode branches to the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--info)`, `var(--success)`, `var(--error)`), and standardized the tabs + form controls to the shared look.
 - Replaced first-time-use silent gaps with compact `EmptyStatePremium` cards for **No side games**, **No expenses**, and **No balances**.
