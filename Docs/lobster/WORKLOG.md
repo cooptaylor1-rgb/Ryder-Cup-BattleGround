@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 18:09 EST — Phase 2 — Undo toast + offline indicator: premium token alignment
+- `UndoToast`: replaced inline `surface-card`/`masters-gold` styling with premium surface, rule, and ink token classes; added focus ring + tone-consistent label colors so the undo affordance stays legible across themes.
+- `OfflineIndicator`: removed inline background/border colors in favor of premium status + surface tokens, keeping the banner readable for offline + back-online states and adding subtle elevation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3debaf6`)
+
 ### 18:02 EST — Phase 2 — WeatherBanner: premium token alignment
 - `WeatherBanner`: replaced legacy emerald/amber/red palette utilities for delay states with premium status tokens (`var(--success)`, `var(--warning)`, `var(--error)`) and tokenized the weather icons to keep the banner consistent across themes.
 - Neutral weather fallback now uses premium masters/ink tokens without dark-mode branches, and high-precipitation copy leans on the shared warning tone instead of bespoke Tailwind colors.
