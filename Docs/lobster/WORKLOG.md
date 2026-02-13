@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 15:35 EST — Phase 2 — Captain lineup builder: premium token alignment
+- `LineupCanvas`, `MatchSlot`, `PlayerCard`: migrated remaining Tailwind gray palettes (`bg-gray-*`, `hover:bg-gray-*`) and hard-coded hex status colors to the premium surface/ink/rule + status token system.
+- Standardized skeleton/loading placeholders to premium neutral surfaces (`var(--surface-secondary)`), and replaced ring/selection colors with tokenized tones (`var(--success)` / `var(--info)`).
+- Status badges now use token-driven tint backgrounds (`bg-[color:var(--tone)]/10`) instead of manual hex + alpha concatenation.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`624e163`)
+
 ### 15:05 EST — Phase 2 — MatchCardGenerator + SettingsPanel toggle: premium token cleanup
 - `MatchCardGenerator`: migrated remaining legacy ink/border/hover palette fragments (`var(--ink)`, `var(--ink-muted)`, `rgba(...)`, `hover:bg-white/10`, `text-green-500`) onto premium tokens (`var(--ink-primary/secondary/tertiary)`, `var(--rule)`, `bg-[color:var(--ink-primary)]/10`, `var(--success)`), keeping the printable match cards UI consistent with the premium shell.
 - `SettingsPanel`: tokenized the toggle knob to use premium surfaces/rules instead of `bg-white`.
