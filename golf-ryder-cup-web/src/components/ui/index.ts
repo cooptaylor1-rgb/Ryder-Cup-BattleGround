@@ -50,9 +50,6 @@ export {
   withErrorBoundary,
 } from './ErrorBoundary';
 
-// Celebration & success
-export { SuccessOverlay, VictoryCelebration, PointScored, AchievementBadge } from './Celebration';
-
 // Navigation & organization
 export { Tabs, TabList, TabTrigger, TabContent, type TabsProps } from './Tabs';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
@@ -118,18 +115,10 @@ export {
   type BreadcrumbProps,
 } from './Breadcrumb';
 
-// Legacy aliases for backwards compatibility
+// Legacy alias (still actively used by TournamentList)
 export { NoTripsEmpty as NoTournamentsEmpty } from './EmptyState';
-export { EmptyState as EmptyStateNew } from './EmptyState';
-export { NoTripsEmpty as NoTripsEmptyNew } from './EmptyState';
-export { NoMatchesEmpty as NoMatchesEmptyNew } from './EmptyState';
-export { NoSessionsEmpty as NoSessionsEmptyNew } from './EmptyState';
-export { NoPlayersEmpty as NoPlayersEmptyNew } from './EmptyState';
-export { NoStandingsEmpty as NoStandingsEmptyNew } from './EmptyState';
-export { NoCoursesEmpty as NoCoursesEmptyNew } from './EmptyState';
-export { NoScoresEmpty as NoScoresEmptyNew } from './EmptyState';
 
-// Premium aliases for backwards compatibility
+// Premium aliases (still actively used by 5 pages — migrate to direct names when convenient)
 export { NoMatchesEmpty as NoMatchesPremiumEmpty } from './EmptyState';
 export { NoSessionsEmpty as NoSessionsPremiumEmpty } from './EmptyState';
 export { NoPlayersEmpty as NoPlayersPremiumEmpty } from './EmptyState';
@@ -167,14 +156,11 @@ export { PullToRefresh, usePullToRefresh } from './PullToRefresh';
 
 export { SyncStatus, FloatingSyncStatus } from './SyncStatus';
 
-// ─── Heavy animation components ───────────────────────────────────
-// Import directly from source files to keep the barrel bundle lean:
-//   ConfettiCannon       → '@/components/ui/ConfettiCannon'
-//   VictoryModal         → '@/components/ui/VictoryModal'
-//   AnimatedCounter      → '@/components/ui/AnimatedCounter'
-//   ScoreCelebration     → '@/components/ui/ScoreCelebration'
-//   MicroInteractions    → '@/components/ui/MicroInteractions'
-//   PremiumComponents    → '@/components/ui/PremiumComponents'
+// ─── Removed: orphan animation/celebration components ─────────────
+// Deleted (never imported): ConfettiCannon, VictoryModal,
+// AnimatedCounter, ScoreCelebration (ui), MicroInteractions,
+// PremiumComponents, Celebration, ShareButton, ConnectionStatus,
+// PageTransitions, SuccessConfetti, EmptyStateIllustrations
 // ──────────────────────────────────────────────────────────────────
 
 // P0 UX Components
@@ -195,12 +181,6 @@ export {
   SkeletonWrapper,
 } from './SkeletonLoaders';
 
-// ─── More heavy animation components ──────────────────────────────
-// Import directly from source files:
-//   PageTransitions      → '@/components/ui/PageTransitions'
-//   SuccessConfetti      → '@/components/ui/SuccessConfetti'
-//   EmptyStateIllustrations → '@/components/ui/EmptyStateIllustrations'
-// ──────────────────────────────────────────────────────────────────
 
 // Keyboard Shortcuts
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
