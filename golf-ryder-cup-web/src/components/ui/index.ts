@@ -50,9 +50,6 @@ export {
   withErrorBoundary,
 } from './ErrorBoundary';
 
-// Celebration & success
-export { SuccessOverlay, VictoryCelebration, PointScored, AchievementBadge } from './Celebration';
-
 // Navigation & organization
 export { Tabs, TabList, TabTrigger, TabContent, type TabsProps } from './Tabs';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
@@ -118,18 +115,10 @@ export {
   type BreadcrumbProps,
 } from './Breadcrumb';
 
-// Legacy aliases for backwards compatibility
+// Legacy alias (still actively used by TournamentList)
 export { NoTripsEmpty as NoTournamentsEmpty } from './EmptyState';
-export { EmptyState as EmptyStateNew } from './EmptyState';
-export { NoTripsEmpty as NoTripsEmptyNew } from './EmptyState';
-export { NoMatchesEmpty as NoMatchesEmptyNew } from './EmptyState';
-export { NoSessionsEmpty as NoSessionsEmptyNew } from './EmptyState';
-export { NoPlayersEmpty as NoPlayersEmptyNew } from './EmptyState';
-export { NoStandingsEmpty as NoStandingsEmptyNew } from './EmptyState';
-export { NoCoursesEmpty as NoCoursesEmptyNew } from './EmptyState';
-export { NoScoresEmpty as NoScoresEmptyNew } from './EmptyState';
 
-// Premium aliases for backwards compatibility
+// Premium aliases (still actively used by 5 pages — migrate to direct names when convenient)
 export { NoMatchesEmpty as NoMatchesPremiumEmpty } from './EmptyState';
 export { NoSessionsEmpty as NoSessionsPremiumEmpty } from './EmptyState';
 export { NoPlayersEmpty as NoPlayersPremiumEmpty } from './EmptyState';
@@ -167,70 +156,12 @@ export { PullToRefresh, usePullToRefresh } from './PullToRefresh';
 
 export { SyncStatus, FloatingSyncStatus } from './SyncStatus';
 
-// Celebrations & Delight
-export {
-  ConfettiProvider,
-  ConfettiBurst,
-  CelebrationParticles,
-  GoldShimmer,
-  useConfetti,
-  type ConfettiTheme,
-  type BurstPattern,
-} from './ConfettiCannon';
-
-export {
-  VictoryModal,
-  VictoryToast,
-  type MatchResult,
-  type TournamentResult,
-} from './VictoryModal';
-
-export {
-  AnimatedCounter,
-  RollingDigits,
-  ScoreTicker,
-  StatCounter,
-  Countdown,
-} from './AnimatedCounter';
-
-export {
-  CelebrationProvider,
-  ScoreBadge,
-  MatchStatusIndicator,
-  HoleResult,
-  useCelebration,
-  type CelebrationType,
-  type CelebrationEvent,
-} from './ScoreCelebration';
-
-// Micro Interactions
-export {
-  Pressable,
-  AnimatedReveal,
-  StaggeredList,
-  ShimmerSkeleton,
-  SuccessCheckmark,
-  ErrorShake,
-  BounceIndicator,
-  PulseDot,
-  TypingIndicator,
-  ProgressRing,
-  SwipeHint,
-  LongPressProgress,
-} from './MicroInteractions';
-
-// Premium Components (v3.0)
-export {
-  PremiumLiveMatchBanner,
-  HoleProgressStrip,
-  PremiumProgressBar,
-  AnimatedScore,
-  PremiumStandingsCard,
-  PremiumMatchCard,
-  PageTransition,
-  PremiumSectionHeader,
-  PremiumEmptyState,
-} from './PremiumComponents';
+// ─── Removed: orphan animation/celebration components ─────────────
+// Deleted (never imported): ConfettiCannon, VictoryModal,
+// AnimatedCounter, ScoreCelebration (ui), MicroInteractions,
+// PremiumComponents, Celebration, ShareButton, ConnectionStatus,
+// PageTransitions, SuccessConfetti, EmptyStateIllustrations
+// ──────────────────────────────────────────────────────────────────
 
 // P0 UX Components
 export { YourMatchCard } from './YourMatchCard';
@@ -250,42 +181,6 @@ export {
   SkeletonWrapper,
 } from './SkeletonLoaders';
 
-export {
-  PageTransition as PageTransitionV2,
-  TransitionPresence,
-  StaggeredContainer,
-  StaggeredItem,
-  ModalTransition,
-  SheetTransition,
-  SlideOver,
-  AnimatedList,
-  CollapseTransition,
-  LoadingTransition,
-  TabTransition,
-  fadeVariants,
-  slideUpVariants,
-  slideDownVariants,
-  slideLeftVariants,
-  slideRightVariants,
-  scaleUpVariants,
-  popInVariants,
-  springTransition,
-  smoothTransition,
-  quickTransition,
-  type TransitionType,
-} from './PageTransitions';
-
-export {
-  SuccessConfetti,
-  ConfettiCannon,
-  GolfCelebration,
-  useConfetti as useConfettiV2,
-} from './SuccessConfetti';
-
-export {
-  EmptyState as EmptyStateIllustrated,
-  type EmptyStateType,
-} from './EmptyStateIllustrations';
 
 // Keyboard Shortcuts
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';

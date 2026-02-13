@@ -1698,86 +1698,6 @@ textarea:focus-visible {
   overflow: hidden;
 }
 
-.confetti-particle {
-  position: absolute;
-  top: -10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  animation: confettiDrop 3s ease-out forwards;
-}
-
-@keyframes confettiDrop {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-/* Success overlay */
-.success-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(253, 252, 250, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 99;
-  animation: overlayIn var(--duration-normal) var(--ease-out);
-}
-
-.success-overlay.exiting {
-  animation: overlayOut var(--duration-normal) var(--ease-out) forwards;
-}
-
-@keyframes overlayIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes overlayOut {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
-.success-overlay-content {
-  text-align: center;
-  animation: successBounceIn var(--duration-slow) var(--ease-spring);
-}
-
-@keyframes successBounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 /* Success checkmark */
 .success-checkmark {
   width: 80px;
@@ -1790,38 +1710,6 @@ textarea:focus-visible {
   height: 100%;
 }
 
-.success-checkmark-circle {
-  fill: none;
-  stroke: var(--masters);
-  stroke-width: 2;
-  stroke-dasharray: 166;
-  stroke-dashoffset: 166;
-  animation: checkmarkCircle 0.6s var(--ease-out) forwards;
-}
-
-.success-checkmark-check {
-  fill: none;
-  stroke: var(--masters);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: checkmarkDraw 0.4s var(--ease-out) 0.4s forwards;
-}
-
-@keyframes checkmarkCircle {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes checkmarkDraw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 .success-overlay-title {
   font-family: var(--font-serif);
   font-size: var(--text-2xl);
@@ -1832,46 +1720,6 @@ textarea:focus-visible {
 .success-overlay-subtitle {
   font-size: var(--text-base);
   color: var(--ink-secondary);
-}
-
-/* Victory celebration */
-.victory-celebration {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(253, 252, 250, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 100;
-  animation: overlayIn var(--duration-slow) var(--ease-out);
-}
-
-.victory-celebration-content {
-  text-align: center;
-  animation: successBounceIn var(--duration-slow) var(--ease-spring) 0.2s both;
-}
-
-.victory-celebration-title {
-  font-family: var(--font-serif);
-  font-size: var(--text-4xl);
-  font-weight: 400;
-  margin-top: var(--space-4);
-  margin-bottom: var(--space-6);
-  animation: victoryTitle 0.6s var(--ease-spring) 0.4s both;
-}
-
-@keyframes victoryTitle {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .victory-celebration-score {
@@ -1894,75 +1742,9 @@ textarea:focus-visible {
   color: var(--ink-tertiary);
 }
 
-.victory-celebration-button {
-  padding: var(--space-4) var(--space-10);
-  font-family: var(--font-sans);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--cream);
-  background: var(--masters);
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
-  animation: victoryTitle 0.6s var(--ease-spring) 0.6s both;
-}
-
 .victory-celebration-button:hover {
   background: var(--masters-dark);
   transform: scale(1.05);
-}
-
-/* Point scored floating text */
-.point-scored {
-  position: fixed;
-  font-family: var(--font-serif);
-  font-size: var(--text-3xl);
-  font-weight: 400;
-  pointer-events: none;
-  z-index: 101;
-  animation: pointScored 1s var(--ease-out) forwards;
-}
-
-@keyframes pointScored {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(-40px) scale(1.2);
-  }
-}
-
-/* Achievement badge */
-.achievement-badge {
-  position: fixed;
-  top: var(--space-6);
-  right: var(--space-6);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  background: var(--canvas-raised);
-  border: 1px solid var(--gold);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2);
-  z-index: 100;
-  animation: achievementIn var(--duration-slow) var(--ease-spring);
-}
-
-@keyframes achievementIn {
-  0% {
-    opacity: 0;
-    transform: translateX(100px) rotate(5deg);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0) rotate(0deg);
-  }
 }
 
 .achievement-badge-icon {
@@ -3685,19 +3467,6 @@ html.dark body {
   animation: slideOutLeft var(--duration-normal) var(--ease-in-out);
 }
 
-/* ---- SKELETON CHOREOGRAPHY ----
-   Loading states that feel alive */
-
-@keyframes skeletonWave {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
-}
-
 .skeleton-group .skeleton:nth-child(1) {
   animation-delay: 0ms;
 }
@@ -3712,21 +3481,6 @@ html.dark body {
 
 .skeleton-group .skeleton:nth-child(4) {
   animation-delay: 300ms;
-}
-
-/* Skeleton fade out when content loads */
-@keyframes skeletonFadeOut {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
-.skeleton-exit {
-  animation: skeletonFadeOut var(--duration-fast) var(--ease-out) forwards;
 }
 
 /* ---- FOCUS RINGS ----
@@ -3782,86 +3536,6 @@ html.dark body {
 
 .toggle-switch[data-checked='true']::after {
   transform: translateX(20px);
-}
-
-/* ---- PULSE EFFECTS ----
-   Attention-grabbing pulses */
-
-@keyframes attentionPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 var(--masters-glow);
-  }
-
-  50% {
-    box-shadow: 0 0 0 8px transparent;
-  }
-}
-
-.pulse-attention {
-  animation: attentionPulse 2s var(--ease-in-out) infinite;
-}
-
-/* ---- NUMBER COUNTER ----
-   Animated number changes */
-
-@keyframes countUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes countDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.number-animate-up {
-  animation: countUp var(--duration-normal) var(--ease-out);
-}
-
-.number-animate-down {
-  animation: countDown var(--duration-normal) var(--ease-out);
-}
-
-/* ---- CONFETTI BURST ----
-   Victory celebration */
-
-@keyframes confettiBurst {
-  0% {
-    transform: scale(0) rotate(0deg);
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(1.5) rotate(180deg);
-    opacity: 0;
-  }
-}
-
-.confetti-particle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-sm);
-  animation: confettiBurst var(--duration-slower) var(--ease-out) forwards;
 }
 
 /* ---- SHAKE EFFECT ----
@@ -4160,39 +3834,6 @@ html.dark body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-/* Toast animations */
-.toast-enter {
-  animation: toastEnter var(--duration-normal) var(--ease-spring);
-}
-
-.toast-exit {
-  animation: toastExit var(--duration-fast) var(--ease-out) forwards;
-}
-
-@keyframes toastEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes toastExit {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.95);
   }
 }
 
@@ -5203,10 +4844,10 @@ html.dark body {
   height: 8px;
   background: white;
   border-radius: var(--radius-full);
-  animation: livePulse 2s ease-in-out infinite;
+  animation: livePulseGlow 2s ease-in-out infinite;
 }
 
-@keyframes livePulse {
+@keyframes livePulseGlow {
   0%,
   100% {
     opacity: 1;
@@ -5218,37 +4859,6 @@ html.dark body {
     opacity: 0.8;
     transform: scale(1.1);
     box-shadow: 0 0 0 4px rgba(255, 255, 255, 0);
-  }
-}
-
-/* Premium live card glow */
-.live-card-glow {
-  position: relative;
-}
-
-.live-card-glow::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(22, 163, 74, 0.4) 0%,
-    rgba(22, 163, 74, 0.1) 50%,
-    rgba(22, 163, 74, 0.4) 100%
-  );
-  z-index: -1;
-  animation: cardGlow 3s ease-in-out infinite;
-}
-
-@keyframes cardGlow {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 1;
   }
 }
 
@@ -5273,30 +4883,6 @@ html.dark body {
   transition: width 800ms var(--ease-spring);
   position: relative;
   overflow: hidden;
-}
-
-.progress-premium-fill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
-  animation: progressShimmer 2s ease-in-out infinite;
-  transform: translateX(-100%);
-}
-
-@keyframes progressShimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 .progress-premium-fill.team-usa {
@@ -5476,31 +5062,6 @@ html.dark body {
   animation: scoreWin 600ms var(--ease-spring);
 }
 
-/* Gold sparkle effect for wins */
-@keyframes goldSparkle {
-  0%,
-  100% {
-    background-position: 200% center;
-  }
-
-  50% {
-    background-position: 0% center;
-  }
-}
-
-.sparkle-gold {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(212, 175, 55, 0.5) 25%,
-    rgba(255, 215, 0, 0.8) 50%,
-    rgba(212, 175, 55, 0.5) 75%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: goldSparkle 2s ease-in-out;
-}
-
 /* ---- PREMIUM BUTTON STATES ---- */
 
 .btn-premium {
@@ -5652,24 +5213,6 @@ html.dark body {
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
-/* ---- PULL TO REFRESH ----
-   Custom refresh animation */
-
-.ptr-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--rule);
-  border-top-color: var(--masters);
-  border-radius: var(--radius-full);
-  animation: ptrSpin 800ms linear infinite;
-}
-
-@keyframes ptrSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* ---- MATCH CARD PREMIUM ----
    Enhanced match card with better visual hierarchy */
 
@@ -5695,32 +5238,6 @@ html.dark body {
 
 .match-card-premium.live {
   border-color: rgba(22, 163, 74, 0.3);
-}
-
-.match-card-premium.live::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(22, 163, 74, 0.2) 0%,
-    transparent 50%,
-    rgba(22, 163, 74, 0.1) 100%
-  );
-  z-index: -1;
-  animation: liveGlow 3s ease-in-out infinite;
-}
-
-@keyframes liveGlow {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 1;
-  }
 }
 
 .dark .match-card-premium {
@@ -5925,43 +5442,6 @@ html.dark body {
   background: var(--masters);
   border-radius: 50%;
   animation: pulse 1s ease-in-out infinite;
-}
-
-/* Success flash */
-.success-flash {
-  animation: successFlash 0.3s ease-out;
-}
-
-@keyframes successFlash {
-  0% {
-    background-color: rgba(0, 102, 68, 0.2);
-  }
-
-  100% {
-    background-color: transparent;
-  }
-}
-
-/* Error shake */
-.error-shake {
-  animation: errorShake 0.4s ease-out;
-}
-
-@keyframes errorShake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  20%,
-  60% {
-    transform: translateX(-8px);
-  }
-
-  40%,
-  80% {
-    transform: translateX(8px);
-  }
 }
 
 /* Touch-optimized scrolling */

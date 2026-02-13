@@ -13,6 +13,7 @@ import type {
     HoleResult,
     HoleWinner,
     RyderCupSession,
+    PlayerHoleScore,
 } from '../types/models';
 import type { MatchState } from '../types/computed';
 import { db } from '../db';
@@ -24,6 +25,14 @@ import {
 } from '../services/scoringEngine';
 import { ScoringEventType } from '../types/events';
 import { queueSyncOperation } from '../services/tripSyncService';
+import {
+    broadcastScoreUpdate,
+    broadcastMatchUpdate,
+    calculateCupScore,
+} from '../services/realtimeSyncService';
+import { checkForDrama } from '../services/dramaNotificationService';
+import { generateTrashTalk } from '../services/autoTrashTalkService';
+import { supabase, isSupabaseConfigured } from '../supabase/client';
 
 // ============================================
 // TYPES
@@ -62,7 +71,7 @@ interface ScoringState {
     clearActiveMatch: () => void;
 
     // Scoring actions
-    scoreHole: (winner: HoleWinner, teamAScore?: number, teamBScore?: number) => Promise<void>;
+    scoreHole: (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => Promise<void>;
     undoLastHole: () => Promise<void>;
     goToHole: (holeNumber: number) => void;
     nextHole: () => void;
@@ -279,7 +288,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
     },
 
     // Score a hole
-    scoreHole: async (winner: HoleWinner, teamAScore?: number, teamBScore?: number) => {
+    scoreHole: async (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => {
         const { activeMatch, currentHole, isSessionLocked } = get();
         if (!activeMatch) return;
 
@@ -292,18 +301,26 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
         set({ isSaving: true, error: null });
 
         try {
+            // Snapshot previous state for drama detection
+            const previousMatchState = get().activeMatchState;
+
             // Get previous result for undo stack
             const previousResult = await db.holeResults
                 .where({ matchId: activeMatch.id, holeNumber: currentHole })
                 .first() || null;
 
-            // Record the hole result
+            // Record the hole result (including individual player scores for fourball)
             await recordHoleResult(
                 activeMatch.id,
                 currentHole,
                 winner,
                 teamAScore,
-                teamBScore
+                teamBScore,
+                undefined, // scoredBy
+                undefined, // editReason
+                undefined, // isCaptainOverride
+                teamAPlayerScores,
+                teamBPlayerScores,
             );
 
             // Refresh match state
@@ -333,6 +350,25 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                         updatedAt: new Date().toISOString(),
                     };
                     queueSyncOperation('match', activeMatch.id, 'update', session.tripId, matchToSync);
+
+                    // Broadcast to realtime subscribers (live page, spectators)
+                    if (isSupabaseConfigured && supabase) {
+                        const scoreUpdate = {
+                            matchId: activeMatch.id,
+                            holeNumber: currentHole,
+                            teamAScore: teamAScore ?? 0,
+                            teamBScore: teamBScore ?? 0,
+                            timestamp: new Date().toISOString(),
+                            updatedBy: '',
+                            updatedByName: '',
+                        };
+                        broadcastScoreUpdate(supabase, session.tripId, activeMatch.id, scoreUpdate).catch(() => {});
+
+                        // Broadcast match update if match just completed
+                        if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
+                            broadcastMatchUpdate(supabase, session.tripId, matchToSync as Match).catch(() => {});
+                        }
+                    }
 
                     // BUG-007 FIX: Persist match status to local database (not just sync queue)
                     // Update local match record with new status when closeout occurs
@@ -367,6 +403,59 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
             // Update session match states too
             const matchStates = new Map(get().matchStates);
             matchStates.set(activeMatch.id, newMatchState);
+
+            // Drama detection — fire push notifications for exciting moments
+            if (previousMatchState) {
+                try {
+                    const trip = await db.trips.get(
+                        (await db.sessions.get(activeMatch.sessionId))?.tripId ?? ''
+                    );
+                    const teamAPlayers = await Promise.all(
+                        activeMatch.teamAPlayerIds.map(id => db.players.get(id))
+                    );
+                    const teamBPlayers = await Promise.all(
+                        activeMatch.teamBPlayerIds.map(id => db.players.get(id))
+                    );
+                    const teamANames = teamAPlayers.filter(Boolean).map(p => p!.lastName).join(' / ') || 'Team A';
+                    const teamBNames = teamBPlayers.filter(Boolean).map(p => p!.lastName).join(' / ') || 'Team B';
+
+                    // Calculate cup scores for cup-lead-change detection
+                    const { sessionMatches: allMatches } = get();
+                    const completedBefore = allMatches.filter(m =>
+                        m.id !== activeMatch.id && m.status === 'completed'
+                    );
+                    const cupBefore = calculateCupScore(completedBefore);
+                    const completedAfter = [...completedBefore];
+                    if (newMatchState.status === 'completed') {
+                        completedAfter.push(activeMatch);
+                    }
+                    const cupAfter = calculateCupScore(completedAfter);
+
+                    const dramaCtx = {
+                        previousState: previousMatchState,
+                        newState: newMatchState,
+                        holeNumber: currentHole,
+                        teamANames,
+                        teamBNames,
+                        tripName: trip?.name ?? '',
+                        cupScoreBefore: cupBefore,
+                        cupScoreAfter: cupAfter,
+                    };
+                    checkForDrama(dramaCtx);
+
+                    // Auto-post trash talk to the social feed
+                    generateTrashTalk({
+                        previousState: previousMatchState,
+                        newState: newMatchState,
+                        holeNumber: currentHole,
+                        teamANames,
+                        teamBNames,
+                        tripId: trip?.id ?? '',
+                    }).catch(() => {});
+                } catch {
+                    // Drama + trash talk are best-effort — don't block scoring
+                }
+            }
 
             set({
                 activeMatchState: newMatchState,

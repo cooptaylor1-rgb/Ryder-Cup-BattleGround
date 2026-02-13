@@ -461,17 +461,25 @@ export async function getUnsyncedEvents() {
 const MAX_AUDIT_LOG_ENTRIES = 500;
 
 /**
+ * Deterministic prune interval: prune every N writes instead of random chance.
+ * This ensures pruning happens predictably and avoids unbounded growth.
+ */
+const PRUNE_INTERVAL = 10;
+let auditLogWriteCount = 0;
+
+/**
  * Prune audit log entries to prevent unbounded growth.
  * Keeps the most recent MAX_AUDIT_LOG_ENTRIES entries per trip.
  */
 export async function pruneAuditLog(tripId: string): Promise<number> {
-  const entries = await db.auditLog.where('tripId').equals(tripId).reverse().sortBy('timestamp');
+  const count = await db.auditLog.where('tripId').equals(tripId).count();
 
-  if (entries.length <= MAX_AUDIT_LOG_ENTRIES) {
+  if (count <= MAX_AUDIT_LOG_ENTRIES) {
     return 0; // Nothing to prune
   }
 
-  // Get IDs of entries to delete (oldest entries beyond the limit)
+  // Only fetch and delete the overflow entries
+  const entries = await db.auditLog.where('tripId').equals(tripId).reverse().sortBy('timestamp');
   const entriesToDelete = entries.slice(MAX_AUDIT_LOG_ENTRIES);
   const idsToDelete = entriesToDelete.map((e) => e.id);
 
@@ -480,13 +488,16 @@ export async function pruneAuditLog(tripId: string): Promise<number> {
 }
 
 /**
- * Add an audit log entry with automatic pruning
+ * Add an audit log entry with deterministic pruning.
+ * Prunes every PRUNE_INTERVAL writes instead of random chance,
+ * ensuring predictable cleanup without unbounded growth.
  */
 export async function addAuditLogEntry(entry: AuditLogEntry): Promise<void> {
   await db.auditLog.add(entry);
 
-  // Prune old entries periodically (1 in 10 chance to avoid overhead)
-  if (Math.random() < 0.1) {
+  auditLogWriteCount++;
+  if (auditLogWriteCount >= PRUNE_INTERVAL) {
+    auditLogWriteCount = 0;
     await pruneAuditLog(entry.tripId);
   }
 }

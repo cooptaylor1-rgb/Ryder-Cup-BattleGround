@@ -27,13 +27,11 @@ function Bone({
   height,
   rounded = 'var(--radius-sm)',
   className = '',
-  style,
 }: {
   width?: string | number;
   height?: string | number;
   rounded?: string;
   className?: string;
-  style?: React.CSSProperties;
 }) {
   return (
     <div
@@ -42,7 +40,6 @@ function Bone({
         width: width ?? '100%',
         height: height ?? 16,
         borderRadius: rounded,
-        ...style,
       }}
       aria-hidden
     />
@@ -68,7 +65,7 @@ export function PageLoadingSkeleton({
           <div className="flex items-center gap-3">
             {showBackButton && <Bone width={32} height={32} rounded="var(--radius-lg)" />}
             <div>
-              <Bone width={100} height={16} style={{ marginBottom: 4 }} />
+              <Bone width={100} height={16} className="mb-1" />
               <Bone width={64} height={12} />
             </div>
           </div>
@@ -77,7 +74,7 @@ export function PageLoadingSkeleton({
       </header>
 
       {/* Content Skeleton */}
-      <main className="container-editorial" style={{ paddingTop: 'var(--space-6)' }}>
+      <main className="container-editorial pt-[var(--space-6)]">
         {variant === 'default' && <DefaultSkeleton cardCount={cardCount} />}
         {variant === 'list' && <ListSkeleton cardCount={cardCount} />}
         {variant === 'grid' && <GridSkeleton cardCount={cardCount} />}
@@ -87,17 +84,12 @@ export function PageLoadingSkeleton({
 
       {/* Bottom Navigation Skeleton */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg"
-        style={{
-          background: 'rgba(250, 248, 245, 0.88)',
-          borderTop: '1px solid var(--rule)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
+        className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-[rgba(250,248,245,0.88)] border-t border-[var(--rule)] pb-[env(safe-area-inset-bottom)]"
       >
         <div className="flex justify-around items-center h-16">
           {[Home, Target, Users, Trophy, MoreHorizontal].map((Icon, i) => (
             <div key={i} className="flex flex-col items-center gap-0.5 p-2 opacity-30">
-              <Icon size={22} style={{ color: 'var(--ink-tertiary)' }} />
+              <Icon size={22} className="text-[var(--ink-tertiary)]" />
               <Bone width={32} height={8} />
             </div>
           ))}
@@ -117,32 +109,23 @@ function DefaultSkeleton({ cardCount }: { cardCount: number }) {
   return (
     <>
       {/* Hero / headline area -- editorial, wide and airy */}
-      <div
-        className="card-editorial"
-        style={{ padding: 'var(--space-8)', marginBottom: 'var(--space-5)' }}
-      >
-        <Bone width="60%" height={24} rounded="var(--radius-sm)" style={{ marginBottom: 16 }} />
-        <Bone width="100%" height={14} style={{ marginBottom: 10 }} />
-        <Bone width="85%" height={14} style={{ marginBottom: 10 }} />
+      <div className="card-editorial p-[var(--space-8)] mb-[var(--space-5)]">
+        <Bone width="60%" height={24} rounded="var(--radius-sm)" className="mb-4" />
+        <Bone width="100%" height={14} className="mb-2.5" />
+        <Bone width="85%" height={14} className="mb-2.5" />
         <Bone width="40%" height={14} />
       </div>
 
       {/* Article-style content rows */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+      <div className="flex flex-col gap-[var(--space-3)]">
         {Array.from({ length: cardCount }).map((_, i) => (
           <div
             key={i}
-            className="card-editorial"
-            style={{
-              padding: 'var(--space-5)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-4)',
-            }}
+            className="card-editorial p-[var(--space-5)] flex items-center gap-[var(--space-4)]"
           >
             <Bone width={48} height={48} rounded="var(--radius-xl)" />
-            <div style={{ flex: 1 }}>
-              <Bone width="55%" height={16} style={{ marginBottom: 8 }} />
+            <div className="flex-1">
+              <Bone width="55%" height={16} className="mb-2" />
               <Bone width="35%" height={12} />
             </div>
           </div>
@@ -157,17 +140,16 @@ function DefaultSkeleton({ cardCount }: { cardCount: number }) {
  */
 function ListSkeleton({ cardCount }: { cardCount: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+    <div className="flex flex-col gap-[var(--space-3)]">
       {Array.from({ length: cardCount }).map((_, i) => (
         <div
           key={i}
-          className="card-editorial"
-          style={{ padding: 'var(--space-5)' }}
+          className="card-editorial p-[var(--space-5)]"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+          <div className="flex items-center gap-[var(--space-4)]">
             <Bone width={44} height={44} rounded="var(--radius-full)" />
-            <div style={{ flex: 1 }}>
-              <Bone width="50%" height={16} style={{ marginBottom: 8 }} />
+            <div className="flex-1">
+              <Bone width="50%" height={16} className="mb-2" />
               <Bone width="30%" height={12} />
             </div>
           </div>
@@ -182,14 +164,13 @@ function ListSkeleton({ cardCount }: { cardCount: number }) {
  */
 function GridSkeleton({ cardCount }: { cardCount: number }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+    <div className="grid grid-cols-2 gap-[var(--space-4)]">
       {Array.from({ length: cardCount }).map((_, i) => (
         <div
           key={i}
-          className="card-editorial"
-          style={{ padding: 'var(--space-5)', aspectRatio: '4 / 3' }}
+          className="card-editorial p-[var(--space-5)] aspect-[4/3]"
         >
-          <Bone width="70%" height={14} style={{ marginBottom: 12 }} />
+          <Bone width="70%" height={14} className="mb-3" />
           <Bone width="50%" height={12} />
         </div>
       ))}
@@ -204,14 +185,11 @@ function DetailSkeleton() {
   return (
     <>
       {/* Hero section */}
-      <div
-        className="card-editorial"
-        style={{ padding: 'var(--space-8)', marginBottom: 'var(--space-5)' }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)', marginBottom: 'var(--space-6)' }}>
+      <div className="card-editorial p-[var(--space-8)] mb-[var(--space-5)]">
+        <div className="flex items-center gap-[var(--space-5)] mb-[var(--space-6)]">
           <Bone width={64} height={64} rounded="var(--radius-2xl, 16px)" />
-          <div style={{ flex: 1 }}>
-            <Bone width="60%" height={20} style={{ marginBottom: 8 }} />
+          <div className="flex-1">
+            <Bone width="60%" height={20} className="mb-2" />
             <Bone width="35%" height={14} />
           </div>
         </div>
@@ -219,23 +197,22 @@ function DetailSkeleton() {
       </div>
 
       {/* Stats row -- editorial, not dashboard */}
-      <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+      <div className="flex gap-[var(--space-4)] mb-[var(--space-5)]">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="card-editorial"
-            style={{ flex: 1, padding: 'var(--space-5)', textAlign: 'center' }}
+            className="card-editorial flex-1 p-[var(--space-5)] text-center"
           >
-            <Bone width={48} height={24} rounded="var(--radius-sm)" style={{ margin: '0 auto 8px' }} />
-            <Bone width={64} height={12} rounded="var(--radius-sm)" style={{ margin: '0 auto' }} />
+            <Bone width={48} height={24} rounded="var(--radius-sm)" className="mx-auto mb-2" />
+            <Bone width={64} height={12} rounded="var(--radius-sm)" className="mx-auto" />
           </div>
         ))}
       </div>
 
       {/* Body text block */}
-      <div className="card-editorial" style={{ padding: 'var(--space-6)' }}>
-        <Bone width={100} height={16} style={{ marginBottom: 'var(--space-5)' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="card-editorial p-[var(--space-6)]">
+        <Bone width={100} height={16} className="mb-[var(--space-5)]" />
+        <div className="flex flex-col gap-2">
           {[1, 2, 3, 4].map((i) => (
             <Bone key={i} width={`${100 - i * 5}%`} height={13} />
           ))}
@@ -250,21 +227,21 @@ function DetailSkeleton() {
  */
 function FormSkeleton() {
   return (
-    <div className="card-editorial" style={{ padding: 'var(--space-8)' }}>
-      <Bone width={140} height={20} style={{ marginBottom: 'var(--space-8)' }} />
+    <div className="card-editorial p-[var(--space-8)]">
+      <Bone width={140} height={20} className="mb-[var(--space-8)]" />
 
       {/* Form fields */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      <div className="flex flex-col gap-[var(--space-6)]">
         {[1, 2, 3].map((i) => (
           <div key={i}>
-            <Bone width={80} height={12} style={{ marginBottom: 8 }} />
+            <Bone width={80} height={12} className="mb-2" />
             <Bone width="100%" height={48} rounded="var(--radius-lg)" />
           </div>
         ))}
       </div>
 
       {/* Submit button */}
-      <Bone width="100%" height={48} rounded="var(--radius-lg)" style={{ marginTop: 'var(--space-8)' }} />
+      <Bone width="100%" height={48} rounded="var(--radius-lg)" className="mt-[var(--space-8)]" />
     </div>
   );
 }
@@ -282,7 +259,7 @@ export function InlineLoadingSkeleton({ lines = 3 }: { lines?: number }) {
           key={i}
           width={LINE_WIDTHS[i % LINE_WIDTHS.length]}
           height={16}
-          style={{ marginBottom: 8 }}
+          className="mb-2"
         />
       ))}
     </div>
@@ -295,15 +272,14 @@ export function InlineLoadingSkeleton({ lines = 3 }: { lines?: number }) {
 export function CardLoadingSkeleton({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`card-editorial ${className}`}
-      style={{ padding: 'var(--space-5)' }}
+      className={`card-editorial p-[var(--space-5)] ${className}`}
       role="progressbar"
       aria-busy="true"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+      <div className="flex items-center gap-[var(--space-4)]">
         <Bone width={48} height={48} rounded="var(--radius-xl)" />
-        <div style={{ flex: 1 }}>
-          <Bone width="55%" height={16} style={{ marginBottom: 8 }} />
+        <div className="flex-1">
+          <Bone width="55%" height={16} className="mb-2" />
           <Bone width="35%" height={12} />
         </div>
       </div>

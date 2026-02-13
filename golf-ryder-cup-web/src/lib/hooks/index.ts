@@ -98,6 +98,13 @@ export {
   type ShortcutConfig,
 } from './useKeyboardShortcuts';
 
+// Compound query hooks (N+1 optimization)
+export {
+  useSessionMatchData,
+  useTripMatchData,
+  type SessionMatchData,
+} from './useSessionMatchData';
+
 // Visibility-based polling (battery optimization)
 export { useVisibilityPolling } from './useVisibilityPolling';
 

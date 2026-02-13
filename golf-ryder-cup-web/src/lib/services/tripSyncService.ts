@@ -14,6 +14,7 @@
 
 import { createLogger } from '@/lib/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
+import { calcRetryDelay, syncSleep } from './baseSyncService';
 
 import { supabase, isSupabaseConfigured } from '../supabase/client';
 import { db } from '../db';
@@ -145,14 +146,11 @@ function getTable(name: string): any {
   return supabase.from(name);
 }
 
-function getRetryDelay(retryCount: number): number {
-  const delay = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, retryCount), MAX_RETRY_DELAY_MS);
-  return delay * (0.8 + Math.random() * 0.4);
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// Retry delay and sleep utilities are imported from baseSyncService
+// to avoid duplicating exponential backoff logic.
+const getRetryDelay = (retryCount: number) =>
+  calcRetryDelay(retryCount, BASE_RETRY_DELAY_MS, MAX_RETRY_DELAY_MS);
+const sleep = syncSleep;
 
 async function persistQueueItem(item: SyncQueueItem): Promise<void> {
   try {

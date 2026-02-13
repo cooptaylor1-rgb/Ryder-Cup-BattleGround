@@ -18,11 +18,10 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Trophy, ChevronDown, Circle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/db';
+import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -86,32 +85,8 @@ export function QuickStandingsOverlay({
             sessions.find(s => s.status === 'scheduled');
     }, [sessions]);
 
-    // Get all matches for session
-    const matches = useLiveQuery(
-        async () => {
-            if (!activeSession) return [];
-            return db.matches
-                .where('sessionId')
-                .equals(activeSession.id)
-                .toArray();
-        },
-        [activeSession?.id],
-        []
-    );
-
-    // Get all hole results
-    const allHoleResults = useLiveQuery(
-        async () => {
-            if (!matches?.length) return [];
-            const matchIds = matches.map(m => m.id);
-            return db.holeResults
-                .where('matchId')
-                .anyOf(matchIds)
-                .toArray();
-        },
-        [matches],
-        []
-    );
+    // Get matches and hole results in a single compound query (eliminates N+1 pattern)
+    const { matches, holeResults: allHoleResults } = useSessionMatchData(activeSession?.id);
 
     // Calculate team standings
     const standings = useMemo((): { teamA: TeamStanding; teamB: TeamStanding; magicNumber: number } | null => {

@@ -22,7 +22,8 @@ import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/s
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
-import { addAuditLogEntry } from '@/lib/db';
+import { addAuditLogEntry, db } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
 import { track, trackFeature, trackScoreEntry } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
@@ -90,29 +91,23 @@ import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { BottomNav } from '@/components/layout';
 
-// Demo side bets for testing - in production these come from the bets store
-const DEMO_SIDE_BETS = [
-  {
-    id: 'ctp-7',
-    type: 'ctp' as const,
-    name: 'Closest to Pin #7',
-    holes: [7],
-    buyIn: 5,
-    pot: 40,
-    participants: [],
-    status: 'active' as const,
-  },
-  {
-    id: 'long-12',
-    type: 'long_drive' as const,
-    name: 'Long Drive #12',
-    holes: [12],
-    buyIn: 5,
-    pot: 40,
-    participants: [],
-    status: 'active' as const,
-  },
-];
+import type { SideBet as DBSideBet } from '@/lib/types/models';
+import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
+
+/** Map DB side bet to the shape SideBetReminder expects */
+function toReminderBet(bet: DBSideBet): ReminderSideBet {
+  return {
+    id: bet.id,
+    type: bet.type === 'longdrive' ? 'long_drive' : bet.type,
+    name: bet.name,
+    description: bet.description,
+    holes: bet.hole ? [bet.hole] : undefined,
+    buyIn: bet.perHole ?? bet.pot ?? 0,
+    pot: bet.pot ?? 0,
+    participants: bet.participantIds,
+    status: bet.status,
+  };
+}
 
 /**
  * Enhanced Match Scoring Page
@@ -125,6 +120,23 @@ export default function EnhancedMatchScoringPage() {
   const matchId = params.matchId as string;
 
   const { currentTrip, players, teams, teeSets, sessions } = useTripStore();
+
+  // Load real side bets for this trip from IndexedDB
+  const dbSideBets = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      return db.sideBets
+        .where('tripId')
+        .equals(currentTrip.id)
+        .toArray();
+    },
+    [currentTrip?.id],
+    []
+  );
+  const activeSideBets = useMemo(
+    () => (dbSideBets ?? []).filter(b => b.status === 'active').map(toReminderBet),
+    [dbSideBets]
+  );
   const { currentUser, isAuthenticated } = useAuthStore();
   const { showToast, scoringPreferences, getScoringModeForFormat, setScoringModeForFormat } =
     useUIStore();
@@ -466,7 +478,9 @@ export default function EnhancedMatchScoringPage() {
       winner: HoleWinner,
       teamAStrokeScore?: number,
       teamBStrokeScore?: number,
-      source?: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice'
+      source?: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice',
+      teamAPlayerScores?: PlayerHoleScore[],
+      teamBPlayerScores?: PlayerHoleScore[],
     ) => {
       if (!matchState) return;
       const wasUnscored = !currentHoleResult || currentHoleResult.winner === 'none';
@@ -481,10 +495,10 @@ export default function EnhancedMatchScoringPage() {
       // Show saving indicator
       setSavingIndicator('Saving score...');
 
-      // Score the hole
+      // Score the hole (with optional individual player scores for fourball)
       haptic.scorePoint();
       if (teamAStrokeScore !== undefined && teamBStrokeScore !== undefined) {
-        await scoreHole(winner, teamAStrokeScore, teamBStrokeScore);
+        await scoreHole(winner, teamAStrokeScore, teamBStrokeScore, teamAPlayerScores, teamBPlayerScores);
       } else {
         await scoreHole(winner);
       }
@@ -682,14 +696,13 @@ export default function EnhancedMatchScoringPage() {
       winner: HoleWinner,
       teamABestScore: number,
       teamBBestScore: number,
-      _teamAPlayerScores: PlayerHoleScore[],
-      _teamBPlayerScores: PlayerHoleScore[]
+      teamAPlayerScores: PlayerHoleScore[],
+      teamBPlayerScores: PlayerHoleScore[]
     ) => {
       if (isSaving || !matchState) return;
 
-      // TODO: Store individual player scores in HoleResult
-      // For now, just record the best ball scores
-      await executeScore(winner, teamABestScore, teamBBestScore, 'fourball');
+      // Pass individual player scores through to be stored on the HoleResult
+      await executeScore(winner, teamABestScore, teamBBestScore, 'fourball', teamAPlayerScores, teamBPlayerScores);
     },
     [isSaving, matchState, executeScore]
   );
@@ -1415,7 +1428,7 @@ export default function EnhancedMatchScoringPage() {
 
                   <SideBetReminder
                     currentHole={currentHole}
-                    bets={DEMO_SIDE_BETS}
+                    bets={activeSideBets}
                     currentPlayerId={teamAPlayers[0]?.id}
                   />
                 </div>

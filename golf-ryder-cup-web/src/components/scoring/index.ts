@@ -38,8 +38,6 @@ export { MatchScorecard, type MatchScorecardProps, type PlayerScore } from './Ma
 
 export { StablefordScorecard } from './StablefordScorecard';
 
-export { SessionLockManager, SessionLockBadge } from './SessionLockManager';
-
 // Phase 1: Core Flow Excellence Components
 export { SwipeScorePanel } from './SwipeScorePanel';
 

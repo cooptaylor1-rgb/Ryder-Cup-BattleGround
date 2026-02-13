@@ -90,3 +90,21 @@ export * from './narrativeService';
 export { default as HandicapCalculator } from './handicapCalculator';
 export { default as ScoringEngine } from './scoringEngine';
 export { default as TournamentEngine } from './tournamentEngine';
+
+// Lazy service loaders (dynamic imports for heavy services)
+export {
+  loadPDFExportService,
+  loadExtendedSideGamesService,
+  loadCourseLibrarySyncService,
+  loadStatisticsService,
+  loadLineupBuilderService,
+  loadNarrativeService,
+  loadShareCardService,
+} from './lazyServices';
+
+// Cascade delete (includes deleteTripCascade)
+export {
+  deleteMatchCascade,
+  deleteSessionCascade,
+  deleteTripCascade,
+} from './cascadeDelete';

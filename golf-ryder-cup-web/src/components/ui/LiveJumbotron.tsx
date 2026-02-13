@@ -13,12 +13,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { useLiveScores, useRealtime } from '@/lib/supabase';
 import type { Player, Match } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 import { db, useLiveQuery } from '@/lib/db';
+import { useTripMatchData } from '@/lib/hooks/useSessionMatchData';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { Radio, Users, Trophy, ChevronUp, ChevronDown, Minus, WifiOff } from 'lucide-react';
 
@@ -32,31 +33,21 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
     const { isConnected, activeUsers, connectionStatus: _connectionStatus } = useRealtime(tripId);
     const { scores, isLoading } = useLiveScores(tripId);
 
-    // Get matches from local DB
-    const matches = useLiveQuery(async () => {
-        if (sessionId) {
-            return db.matches.where('sessionId').equals(sessionId).toArray();
-        }
-        // Get all sessions for this trip and their matches
-        const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
-        const sessionIds = sessions.map(s => s.id);
-        return db.matches.where('sessionId').anyOf(sessionIds).toArray();
-    }, [tripId, sessionId]);
+    // Get matches and hole results in a single compound query (eliminates N+1 pattern)
+    const { matches, holeResults, isLoading: matchDataLoading } = useTripMatchData(tripId);
 
     // Get players for lookup
     const players = useLiveQuery(() => db.players.toArray(), []);
-    const playerMap = new Map(players?.map(p => [p.id, p]) || []);
+    const playerMap = useMemo(
+        () => new Map(players?.map(p => [p.id, p]) || []),
+        [players]
+    );
 
-    // Get hole results for match states
-    const holeResults = useLiveQuery(async () => {
-        if (!matches) return [];
-        const matchIds = matches.map(m => m.id);
-        return db.holeResults.where('matchId').anyOf(matchIds).toArray();
-    }, [matches]);
+    // Calculate match states (memoized to avoid recalculating on every render)
+    const matchStates = useMemo(() => {
+        const states = new Map<string, MatchState>();
+        if (!matches || !holeResults) return states;
 
-    // Calculate match states
-    const matchStates = new Map<string, MatchState>();
-    if (matches && holeResults) {
         const resultsByMatch = new Map<string, typeof holeResults>();
         for (const result of holeResults) {
             const existing = resultsByMatch.get(result.matchId) || [];
@@ -66,30 +57,33 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
 
         for (const match of matches) {
             const results = resultsByMatch.get(match.id) || [];
-            matchStates.set(match.id, calculateMatchState(match, results));
+            states.set(match.id, calculateMatchState(match, results));
         }
-    }
+        return states;
+    }, [matches, holeResults]);
 
-    // Separate matches by status
-    const activeMatches = matches?.filter(m => m.status === 'inProgress') || [];
-    const completedMatches = matches?.filter(m => m.status === 'completed') || [];
-    const upcomingMatches = matches?.filter(m => m.status === 'scheduled') || [];
+    // Separate matches by status (memoized to avoid re-filtering on every render)
+    const { activeMatches, completedMatches, upcomingMatches } = useMemo(() => ({
+        activeMatches: matches?.filter(m => m.status === 'inProgress') || [],
+        completedMatches: matches?.filter(m => m.status === 'completed') || [],
+        upcomingMatches: matches?.filter(m => m.status === 'scheduled') || [],
+    }), [matches]);
 
-    // Calculate team totals
-    let teamATotal = 0;
-    let teamBTotal = 0;
-    for (const state of matchStates.values()) {
-        if (state.status === 'completed') {
-            if (state.currentScore > 0) teamATotal += 1;
-            else if (state.currentScore < 0) teamBTotal += 1;
-            else {
-                teamATotal += 0.5;
-                teamBTotal += 0.5;
+    // Calculate team totals (memoized)
+    const { teamATotal, teamBTotal } = useMemo(() => {
+        let a = 0;
+        let b = 0;
+        for (const state of matchStates.values()) {
+            if (state.status === 'completed') {
+                if (state.currentScore > 0) a += 1;
+                else if (state.currentScore < 0) b += 1;
+                else { a += 0.5; b += 0.5; }
             }
         }
-    }
+        return { teamATotal: a, teamBTotal: b };
+    }, [matchStates]);
 
-    if (isLoading || !matches) {
+    if (isLoading || matchDataLoading) {
         return (
             <div className={cn('flex items-center justify-center min-h-[50vh]', className)}>
                 <div className="text-center">
@@ -253,7 +247,7 @@ interface LiveMatchCardProps {
     lastUpdate?: Date;
 }
 
-function LiveMatchCard({
+const LiveMatchCard = memo(function LiveMatchCard({
     match: _match,
     matchState,
     teamAPlayers,
@@ -337,7 +331,7 @@ function LiveMatchCard({
             </div>
         </div>
     );
-}
+});
 
 interface CompletedMatchCardProps {
     match: Match;
@@ -346,7 +340,7 @@ interface CompletedMatchCardProps {
     teamBPlayers: Player[];
 }
 
-function CompletedMatchCard({
+const CompletedMatchCard = memo(function CompletedMatchCard({
     match: _match,
     matchState,
     teamAPlayers,
@@ -395,7 +389,7 @@ function CompletedMatchCard({
             </div>
         </div>
     );
-}
+});
 
 interface UpcomingMatchCardProps {
     match: Match;
@@ -404,7 +398,7 @@ interface UpcomingMatchCardProps {
     matchNumber: number;
 }
 
-function UpcomingMatchCard({
+const UpcomingMatchCard = memo(function UpcomingMatchCard({
     match: _match,
     teamAPlayers,
     teamBPlayers,
@@ -428,6 +422,6 @@ function UpcomingMatchCard({
             </div>
         </div>
     );
-}
+});
 
 export default LiveJumbotron;
