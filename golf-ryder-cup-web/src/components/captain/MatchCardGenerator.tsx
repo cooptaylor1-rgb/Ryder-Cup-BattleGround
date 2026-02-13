@@ -110,58 +110,53 @@ function MatchCard({ match, size = 'medium', showQR = true, tripName }: MatchCar
     return (
         <div
             className={cn(
-                'rounded-xl shadow-lg print:shadow-none',
+                'rounded-xl shadow-lg print:shadow-none bg-[var(--surface-card)] text-[var(--ink-primary)]',
                 sizeClasses[size]
             )}
             style={{
-                background: '#FFFFFF',
-                color: '#1a1a1a',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
             }}
         >
             {/* Header */}
-            <div className="border-b border-gray-200 pb-3 mb-3">
+            <div className="border-b border-[var(--rule)] pb-3 mb-3">
                 <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-gray-900">{tripName || 'Ryder Cup'}</span>
-                    <span className="text-gray-500">Match {match.matchNumber}/{match.totalMatches}</span>
+                    <span className="font-bold text-[var(--ink-primary)]">{tripName || 'Ryder Cup'}</span>
+                    <span className="text-[var(--ink-tertiary)]">Match {match.matchNumber}/{match.totalMatches}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-700">{match.sessionName}</span>
-                    <span className="text-gray-500">{match.date}</span>
+                    <span className="font-semibold text-[var(--ink-secondary)]">{match.sessionName}</span>
+                    <span className="text-[var(--ink-tertiary)]">{match.date}</span>
                 </div>
             </div>
 
             {/* Match Info Bar */}
-            <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2 mb-3">
+            <div className="flex items-center justify-between bg-[var(--surface-secondary)] rounded-lg p-2 mb-3">
                 <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
+                    <Clock className="w-4 h-4 text-[var(--ink-tertiary)]" />
                     <span className="font-semibold">{match.teeTime}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Flag className="w-4 h-4 text-gray-500" />
+                    <Flag className="w-4 h-4 text-[var(--ink-tertiary)]" />
                     <span className="font-semibold">Hole {match.startingHole}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-gray-500">{match.teeSetName}</span>
+                    <span className="text-[var(--ink-tertiary)]">{match.teeSetName}</span>
                 </div>
             </div>
 
             {/* Teams */}
             <div className="space-y-3">
                 {/* Team A */}
-                <div
-                    className="rounded-lg p-3"
-                    style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
-                >
+                <div className="rounded-lg p-3 bg-team-usa/10 border border-team-usa/30">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <span className="font-bold text-red-700">{match.teamAName || 'Team A'}</span>
+                        <div className="w-3 h-3 rounded-full bg-team-usa" />
+                        <span className="font-bold text-team-usa">{match.teamAName || 'Team USA'}</span>
                     </div>
                     <div className="space-y-1">
                         {teamADisplay.map((player, idx) => (
                             <div key={idx} className="flex items-center justify-between">
-                                <span className="font-medium text-gray-800">{player.name}</span>
-                                <span className="text-gray-600 font-mono">HCP {player.hcp}</span>
+                                <span className="font-medium text-[var(--ink-primary)]">{player.name}</span>
+                                <span className="text-[var(--ink-secondary)] font-mono">HCP {player.hcp}</span>
                             </div>
                         ))}
                     </div>
@@ -169,23 +164,20 @@ function MatchCard({ match, size = 'medium', showQR = true, tripName }: MatchCar
 
                 {/* VS */}
                 <div className="text-center">
-                    <span className="text-gray-400 font-bold text-lg">VS</span>
+                    <span className="text-[var(--ink-tertiary)] font-bold text-lg">VS</span>
                 </div>
 
                 {/* Team B */}
-                <div
-                    className="rounded-lg p-3"
-                    style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)' }}
-                >
+                <div className="rounded-lg p-3 bg-team-europe/10 border border-team-europe/30">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="w-3 h-3 rounded-full bg-blue-500" />
-                        <span className="font-bold text-blue-700">{match.teamBName || 'Team B'}</span>
+                        <div className="w-3 h-3 rounded-full bg-team-europe" />
+                        <span className="font-bold text-team-europe">{match.teamBName || 'Team Europe'}</span>
                     </div>
                     <div className="space-y-1">
                         {teamBDisplay.map((player, idx) => (
                             <div key={idx} className="flex items-center justify-between">
-                                <span className="font-medium text-gray-800">{player.name}</span>
-                                <span className="text-gray-600 font-mono">HCP {player.hcp}</span>
+                                <span className="font-medium text-[var(--ink-primary)]">{player.name}</span>
+                                <span className="text-[var(--ink-secondary)] font-mono">HCP {player.hcp}</span>
                             </div>
                         ))}
                     </div>
@@ -193,22 +185,22 @@ function MatchCard({ match, size = 'medium', showQR = true, tripName }: MatchCar
             </div>
 
             {/* Format Rules */}
-            <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-gray-500 text-center italic">
+            <div className="mt-3 pt-3 border-t border-[var(--rule)]">
+                <p className="text-[var(--ink-tertiary)] text-center italic">
                     {FORMAT_RULES[match.format]}
                 </p>
             </div>
 
             {/* Course Info */}
-            <div className="mt-2 text-center text-gray-400">
+            <div className="mt-2 text-center text-[var(--ink-tertiary)]">
                 {match.courseName}
             </div>
 
             {/* QR Code Placeholder */}
             {showQR && (
                 <div className="mt-3 flex justify-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <QrCode className="w-10 h-10 text-gray-300" />
+                    <div className="w-16 h-16 bg-[var(--surface-secondary)] rounded-lg flex items-center justify-center">
+                        <QrCode className="w-10 h-10 text-[color:var(--ink-tertiary)]/50" />
                     </div>
                 </div>
             )}
