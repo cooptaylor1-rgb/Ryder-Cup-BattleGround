@@ -3,6 +3,12 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-13
+
+### 00:35 EST — Phase 2 — InstallPrompt: premium token sweep (PWA + iOS install UI)
+- `InstallPrompt` (PWA install banners + iOS instructions): migrated remaining legacy `bg-white` / `border-stone-*` / iOS-blue palettes to premium surfaces + rule + status tokens (`var(--surface-*)`, `var(--rule)`, `var(--info)`, `var(--masters)`), and standardized copy onto premium ink tokens (`var(--ink-primary)` / `var(--ink-secondary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ## 2026-02-12
 
 ### 19:05 EST — Phase 2 — OfflineIndicator chips: tokenize sync/offline/online colors

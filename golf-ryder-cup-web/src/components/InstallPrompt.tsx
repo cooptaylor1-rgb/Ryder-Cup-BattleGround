@@ -158,19 +158,19 @@ export function InstallBanner({ position = 'bottom', className = '' }: InstallBa
             paddingTop: position === 'top' ? 'calc(1rem + env(safe-area-inset-top))' : undefined,
           }}
         >
-          <div className="mx-auto max-w-md bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+          <div className="mx-auto max-w-md bg-[var(--surface-raised)] rounded-2xl shadow-lg border border-[var(--rule)] overflow-hidden">
             <div className="flex items-center gap-3 p-4">
               {/* App Icon */}
-              <div className="flex-shrink-0 w-12 h-12 bg-masters/10 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-masters" viewBox="0 0 24 24" fill="currentColor">
+              <div className="flex-shrink-0 w-12 h-12 bg-[color:var(--masters)]/10 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-[color:var(--masters)]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
                 </svg>
               </div>
 
               {/* Text */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-ink text-[15px]">Install Golf Buddies</p>
-                <p className="text-ink-secondary text-[13px]">
+                <p className="font-semibold text-[var(--ink-primary)] text-[15px]">Install Golf Buddies</p>
+                <p className="text-[var(--ink-secondary)] text-[13px]">
                   Add to home screen for the best experience
                 </p>
               </div>
@@ -178,7 +178,7 @@ export function InstallBanner({ position = 'bottom', className = '' }: InstallBa
               {/* Dismiss button */}
               <button
                 onClick={handleDismiss}
-                className="flex-shrink-0 p-2 -mr-1 text-ink-secondary hover:text-ink transition-colors"
+                className="flex-shrink-0 p-2 -mr-1 text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
                 aria-label="Dismiss"
               >
                 <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -195,7 +195,7 @@ export function InstallBanner({ position = 'bottom', className = '' }: InstallBa
             <div className="px-4 pb-4">
               <button
                 onClick={handleInstall}
-                className="w-full py-3 bg-masters text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
+                className="w-full py-3 bg-[color:var(--masters)] text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
               >
                 Install App
               </button>
@@ -223,7 +223,7 @@ export function InstallButton({ className = '', variant = 'primary' }: InstallBu
 
   if (isInstalled) {
     return (
-      <div className={`flex items-center gap-2 text-masters font-medium ${className}`}>
+      <div className={`flex items-center gap-2 text-[color:var(--masters)] font-medium ${className}`}>
         <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
           <path
             fillRule="evenodd"
@@ -241,9 +241,9 @@ export function InstallButton({ className = '', variant = 'primary' }: InstallBu
   }
 
   const variantClasses = {
-    primary: 'bg-masters text-white hover:bg-masters/90',
-    secondary: 'bg-masters/10 text-masters hover:bg-masters/20',
-    ghost: 'text-masters hover:bg-masters/10',
+    primary: 'bg-[color:var(--masters)] text-white hover:bg-[color:var(--masters-deep)]',
+    secondary: 'bg-[color:var(--masters)]/10 text-[color:var(--masters)] hover:bg-[color:var(--masters)]/15',
+    ghost: 'text-[color:var(--masters)] hover:bg-[color:var(--masters)]/10',
   };
 
   return (
@@ -299,35 +299,35 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--surface-raised)] rounded-t-3xl overflow-hidden"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-stone-300 rounded-full" />
+              <div className="w-10 h-1 bg-[var(--rule)] rounded-full" />
             </div>
 
             {/* Content */}
             <div className="px-6 pb-6">
-              <h2 className="text-xl font-bold text-ink mb-1">Install Golf Buddies</h2>
-              <p className="text-ink-secondary text-sm mb-6">
+              <h2 className="text-xl font-bold text-[var(--ink-primary)] mb-1">Install Golf Buddies</h2>
+              <p className="text-[var(--ink-secondary)] text-sm mb-6">
                 Add to your home screen for the best experience
               </p>
 
               {/* Steps */}
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
                     1
                   </div>
                   <div className="flex-1 pt-1">
-                    <p className="font-medium text-ink">Tap the Share button</p>
-                    <p className="text-sm text-ink-secondary mt-0.5">
+                    <p className="font-medium text-[var(--ink-primary)]">Tap the Share button</p>
+                    <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                       It&apos;s at the bottom of Safari (the box with arrow)
                     </p>
-                    <div className="mt-2 p-3 bg-stone-100 rounded-xl inline-flex">
+                    <div className="mt-2 p-3 bg-[var(--surface-secondary)] rounded-xl inline-flex">
                       <svg
-                        className="w-6 h-6 text-blue-500"
+                        className="w-6 h-6 text-[color:var(--info)]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -344,34 +344,34 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
                     2
                   </div>
                   <div className="flex-1 pt-1">
-                    <p className="font-medium text-ink">Tap &quot;Add to Home Screen&quot;</p>
-                    <p className="text-sm text-ink-secondary mt-0.5">
+                    <p className="font-medium text-[var(--ink-primary)]">Tap &quot;Add to Home Screen&quot;</p>
+                    <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                       Scroll down in the share menu to find it
                     </p>
-                    <div className="mt-2 p-3 bg-stone-100 rounded-xl inline-flex items-center gap-2">
+                    <div className="mt-2 p-3 bg-[var(--surface-secondary)] rounded-xl inline-flex items-center gap-2">
                       <svg
-                        className="w-5 h-5 text-ink-secondary"
+                        className="w-5 h-5 text-[var(--ink-secondary)]"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
                         <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
                       </svg>
-                      <span className="font-medium text-ink text-sm">Add to Home Screen</span>
+                      <span className="font-medium text-[var(--ink-primary)] text-sm">Add to Home Screen</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
                     3
                   </div>
                   <div className="flex-1 pt-1">
-                    <p className="font-medium text-ink">Tap &quot;Add&quot;</p>
-                    <p className="text-sm text-ink-secondary mt-0.5">
+                    <p className="font-medium text-[var(--ink-primary)]">Tap &quot;Add&quot;</p>
+                    <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
                       Confirm to add the app to your home screen
                     </p>
                   </div>
@@ -381,7 +381,7 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="w-full mt-6 py-3 bg-stone-100 text-ink font-semibold rounded-xl active:scale-[0.98] transition-transform"
+                className="w-full mt-6 py-3 bg-[var(--surface-secondary)] text-[var(--ink-primary)] font-semibold rounded-xl active:scale-[0.98] transition-transform"
               >
                 Got it
               </button>
@@ -457,16 +457,16 @@ export function SmartInstallPrompt() {
           className="fixed bottom-0 left-0 right-0 z-50 p-4"
           style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
         >
-          <div className="mx-auto max-w-md bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+          <div className="mx-auto max-w-md bg-[var(--surface-raised)] rounded-2xl shadow-lg border border-[var(--rule)] overflow-hidden">
             <div className="flex items-center gap-3 p-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-masters/10 rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-masters" viewBox="0 0 24 24" fill="currentColor">
+              <div className="flex-shrink-0 w-12 h-12 bg-[color:var(--masters)]/10 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-[color:var(--masters)]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-ink text-[15px]">Install Golf Buddies</p>
-                <p className="text-ink-secondary text-[13px]">
+                <p className="font-semibold text-[var(--ink-primary)] text-[15px]">Install Golf Buddies</p>
+                <p className="text-[var(--ink-secondary)] text-[13px]">
                   Add to home screen for the best experience
                 </p>
               </div>
@@ -475,7 +475,7 @@ export function SmartInstallPrompt() {
                   setShowPrompt(false);
                   localStorage.setItem('pwa-install-dismissed', Date.now().toString());
                 }}
-                className="flex-shrink-0 p-2 -mr-1 text-ink-secondary hover:text-ink transition-colors"
+                className="flex-shrink-0 p-2 -mr-1 text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
                 aria-label="Dismiss"
               >
                 <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -490,7 +490,7 @@ export function SmartInstallPrompt() {
             <div className="px-4 pb-4">
               <button
                 onClick={() => setShowIOSInstructions(true)}
-                className="w-full py-3 bg-masters text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
+                className="w-full py-3 bg-[color:var(--masters)] text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
               >
                 Show Me How
               </button>
