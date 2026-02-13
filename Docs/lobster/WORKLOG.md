@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 15:02 EST — Phase 2 — DraftBoard: premium token alignment
+- `DraftBoard` (captain tools): migrated the draft mode selection cards, in-progress header controls, pick banners, tables, and action buttons off hard-coded Tailwind palette utilities (`gray-*`, `blue-*`, `green-*`, `red-*`, dark variants) onto the premium surface/ink/rule + status tokens.
+- Team pick banners and team headers now use Ryder Cup team tokens (`bg-team-usa/10`, `bg-team-europe/10`, border team accents).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`df6e950`)
+
 ### 14:30 EST — Fix — dramaNotificationService: remove unsupported `renotify` option
 - `dramaNotificationService`: removed the `renotify` field from `sendNotification` options to satisfy TypeScript (`NotificationOptions` type in this project does not include `renotify`).
 - Unblocks the pre-push `typecheck` gate after rebasing on latest `origin/main`.
