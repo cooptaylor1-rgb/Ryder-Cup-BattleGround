@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-13
+- 16:25 — Shipped batch: `FourballScoreEntry` removed remaining inline `style={{ color: 'var(--…)' }}` token props and switched to token-driven Tailwind classes (`text-[var(--ink-secondary)]`, `text-[var(--ink-tertiary)]`, `text-[var(--masters)]`). Best-ball badge now uses a `--team-color` CSS var + Tailwind `bg-[color:var(--team-color)]/20` / `text-[var(--team-color)]` for consistent dynamic theming without `#RRGGBBAA` strings. (commit c5f03f8)
 - 15:05 — Shipped batch: `MatchCardGenerator` migrated remaining legacy ink/border/hover palette fragments (`var(--ink)`, `var(--ink-muted)`, `rgba(...)`, `hover:bg-white/10`, `text-green-500`) onto premium tokens (`var(--ink-primary/secondary/tertiary)`, `var(--rule)`, `bg-[color:var(--ink-primary)]/10`, `var(--success)`), keeping the printable match cards UI consistent with the premium shell. Also tokenized `SettingsPanel` toggle knob to use premium surfaces/rules instead of `bg-white`. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted existing CSS optimization warnings). (commit c393f20)
 
 ## 2026-02-12
