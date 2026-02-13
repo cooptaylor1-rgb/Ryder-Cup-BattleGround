@@ -13,12 +13,12 @@ import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components
 function AwardCard({ award }: { award: Award }) {
   if (!award.winner) {
     return (
-      <div className="bg-gray-50 rounded-lg p-4 opacity-60">
+      <div className="bg-[var(--surface-secondary)] rounded-lg p-4 opacity-60">
         <div className="flex items-center gap-3">
           <span className="text-2xl">{award.icon}</span>
           <div>
-            <div className="font-medium text-gray-600">{award.title}</div>
-            <div className="text-sm text-gray-400">No winner yet</div>
+            <div className="font-medium text-[var(--ink-secondary)]">{award.title}</div>
+            <div className="text-sm text-[var(--ink-tertiary)]">No winner yet</div>
           </div>
         </div>
       </div>
@@ -26,13 +26,13 @@ function AwardCard({ award }: { award: Award }) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-gray-100">
+    <div className="bg-[var(--surface-card)] rounded-xl overflow-hidden border border-[var(--rule)] shadow-card-sm">
+      <div className="p-4 border-b border-[var(--rule)]">
         <div className="flex items-center gap-3">
           <span className="text-3xl">{award.icon}</span>
           <div>
-            <div className="font-semibold text-gray-900">{award.title}</div>
-            <div className="text-sm text-gray-500">{award.description}</div>
+            <div className="font-semibold text-[var(--ink-primary)]">{award.title}</div>
+            <div className="text-sm text-[var(--ink-secondary)]">{award.description}</div>
           </div>
         </div>
       </div>
@@ -50,9 +50,9 @@ function AwardCard({ award }: { award: Award }) {
           </div>
           <div className="flex-1">
             <div className="font-medium">{award.winner.playerName}</div>
-            <div className="text-sm text-gray-500">{award.winner.value}</div>
+            <div className="text-sm text-[var(--ink-secondary)]">{award.winner.value}</div>
           </div>
-          <Medal className="w-6 h-6 text-yellow-500" />
+          <Medal className="w-6 h-6 text-gold" />
         </div>
 
         {/* Runner-up */}
@@ -68,7 +68,7 @@ function AwardCard({ award }: { award: Award }) {
             </div>
             <div className="flex-1">
               <div className="font-medium">{award.runnerUp.playerName}</div>
-              <div className="text-sm text-gray-500">{award.runnerUp.value}</div>
+              <div className="text-sm text-[var(--ink-secondary)]">{award.runnerUp.value}</div>
             </div>
           </div>
         )}
@@ -79,11 +79,13 @@ function AwardCard({ award }: { award: Award }) {
 
 function PlayerStatsCard({ stats, rank }: { stats: PlayerStats; rank: number }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
+    <div className="flex items-center gap-3 p-3 bg-[var(--surface-card)] rounded-lg border border-[var(--rule)]">
       <div
         className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
-          rank <= 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
+          rank <= 3
+            ? 'bg-[color:var(--gold)]/10 text-gold'
+            : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
         )}
       >
         {rank}
@@ -96,13 +98,13 @@ function PlayerStatsCard({ stats, rank }: { stats: PlayerStats; rank: number }) 
       />
       <div className="flex-1 min-w-0">
         <div className="font-medium truncate">{stats.playerName}</div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-[var(--ink-secondary)]">
           {stats.wins}W - {stats.losses}L - {stats.halves}H
         </div>
       </div>
       <div className="text-right">
         <div className="font-bold text-lg">{stats.points}</div>
-        <div className="text-xs text-gray-500">pts</div>
+        <div className="text-xs text-[var(--ink-secondary)]">pts</div>
       </div>
     </div>
   );
@@ -251,9 +253,9 @@ export default function AwardsPage() {
         ) : (
           <>
             {/* Final Score Card */}
-            <section className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <section className="bg-[var(--surface-card)] rounded-xl overflow-hidden border border-[var(--rule)] shadow-card-sm">
               <div className="p-6 text-center">
-                <div className="text-sm text-gray-500 uppercase tracking-wide mb-2">
+                <div className="text-sm text-[var(--ink-secondary)] uppercase tracking-wide mb-2">
                   Final Score
                 </div>
                 <div className="flex items-center justify-center gap-6">
@@ -266,9 +268,9 @@ export default function AwardsPage() {
                     >
                       {records.finalScore.usa}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">USA</div>
+                    <div className="text-sm text-[var(--ink-secondary)] mt-1">USA</div>
                   </div>
-                  <div className="text-2xl text-gray-300">—</div>
+                  <div className="text-2xl text-[var(--ink-tertiary)]">—</div>
                   <div className="text-center">
                     <div
                       className={cn(
@@ -278,7 +280,7 @@ export default function AwardsPage() {
                     >
                       {records.finalScore.europe}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">Europe</div>
+                    <div className="text-sm text-[var(--ink-secondary)] mt-1">Europe</div>
                   </div>
                 </div>
                 {records.winner !== 'halved' && (
@@ -346,10 +348,10 @@ export default function AwardsPage() {
                   ))}
 
                 {records.playerStats.length === 0 && (
-                  <div className="bg-white rounded-xl p-8 text-center">
-                    <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-gray-500">No player stats yet</p>
-                    <p className="text-sm text-gray-400 mt-1">
+                  <div className="bg-[var(--surface-card)] rounded-xl border border-[var(--rule)] p-8 text-center">
+                    <Users className="w-12 h-12 mx-auto mb-4 text-[var(--ink-tertiary)]" />
+                    <p className="text-[var(--ink-secondary)]">No player stats yet</p>
+                    <p className="text-sm text-[var(--ink-tertiary)] mt-1">
                       Complete some matches to see the leaderboard
                     </p>
                   </div>
@@ -359,7 +361,7 @@ export default function AwardsPage() {
 
             {/* Biggest Session Win */}
             {records.biggestSessionWin && (
-              <section className="bg-white rounded-xl shadow-sm p-4">
+              <section className="bg-[var(--surface-card)] rounded-xl border border-[var(--rule)] shadow-card-sm p-4">
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
@@ -373,7 +375,7 @@ export default function AwardsPage() {
                   </div>
                   <div>
                     <div className="font-medium">Biggest Session Win</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-[var(--ink-secondary)]">
                       {records.biggestSessionWin.winningTeam === 'usa' ? 'USA' : 'Europe'} won{' '}
                       {records.biggestSessionWin.sessionType} by {records.biggestSessionWin.margin}{' '}
                       points

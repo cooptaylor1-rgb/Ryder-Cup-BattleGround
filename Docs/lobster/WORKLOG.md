@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 01:15 EST — Phase 2 — Trip Awards route: premium token sweep
+- `/trip/[tripId]/awards`: replaced remaining legacy `bg-white`/`text-gray-*`/`border-gray-*` utilities with premium surface + ink + rule tokens.
+- Award cards + leaderboard rows now use token-driven surfaces (`var(--surface-card)` / `var(--surface-secondary)`), ink (`var(--ink-*)`), and card borders/shadows (`border-[var(--rule)]`, `shadow-card-sm`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 00:35 EST — Phase 2 — InstallPrompt: premium token sweep (PWA + iOS install UI)
 - `InstallPrompt` (PWA install banners + iOS instructions): migrated remaining legacy `bg-white` / `border-stone-*` / iOS-blue palettes to premium surfaces + rule + status tokens (`var(--surface-*)`, `var(--rule)`, `var(--info)`, `var(--masters)`), and standardized copy onto premium ink tokens (`var(--ink-primary)` / `var(--ink-secondary)`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
