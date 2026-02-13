@@ -199,10 +199,6 @@ const config: Config = {
                 '4xl': '64px',
                 '5xl': '80px',
                 '6xl': '96px',
-                xxl: '32px',
-                xxxl: '48px',
-                hero: '64px',
-                massive: '96px',
             },
 
             // ============================================
@@ -217,7 +213,6 @@ const config: Config = {
                 '2xl': '20px',
                 '3xl': '24px',
                 full: '9999px',
-                xxl: '24px',
             },
 
             // ============================================
@@ -226,18 +221,10 @@ const config: Config = {
             boxShadow: {
                 'card-sm': 'var(--shadow-sm)',
                 'card': 'var(--shadow-md)',
-                'card-md': 'var(--shadow-md)',
                 'card-lg': 'var(--shadow-lg)',
-                'card-xl': 'var(--shadow-lg)',
-                'card-default': 'var(--shadow-md)',
-                'card-hover': 'var(--shadow-md)',
-                'card-elevated': 'var(--shadow-lg)',
                 'elevated': 'var(--shadow-lg)',
                 'glow-gold': 'var(--shadow-glow-gold)',
                 'glow-green': 'var(--shadow-glow-masters)',
-                'glow-subtle': '0 0 12px rgba(201, 162, 39, 0.1)',
-                'inner-gold': 'inset 0 1px 0 rgba(201, 162, 39, 0.08)',
-                'inner-light': 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
             },
 
             // ============================================

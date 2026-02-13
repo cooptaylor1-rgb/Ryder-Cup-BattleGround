@@ -241,3 +241,43 @@ export abstract class BaseSyncService {
         }
     }
 }
+
+// ============================================
+// STANDALONE UTILITIES
+// Shared by functional-style sync modules (tripSyncService, etc.)
+// that don't extend the class but need the same retry/backoff logic.
+// ============================================
+
+/**
+ * Calculate exponential backoff delay with jitter.
+ * Standalone version of BaseSyncService.getRetryDelay for use in
+ * functional modules that can't extend the class.
+ */
+export function calcRetryDelay(
+    retryCount: number,
+    baseDelayMs: number = DEFAULT_CONFIG.baseRetryDelayMs,
+    maxDelayMs: number = DEFAULT_CONFIG.maxRetryDelayMs
+): number {
+    const delay = Math.min(baseDelayMs * Math.pow(2, retryCount), maxDelayMs);
+    return delay * (0.8 + Math.random() * 0.4);
+}
+
+/**
+ * Sleep for specified milliseconds.
+ */
+export function syncSleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Check if retry count is below maximum.
+ */
+export function canRetry(
+    retryCount: number,
+    maxRetryCount: number = DEFAULT_CONFIG.maxRetryCount
+): boolean {
+    return retryCount < maxRetryCount;
+}
+
+/** Re-export default config for use by functional sync modules */
+export { DEFAULT_CONFIG as SYNC_DEFAULTS };

@@ -227,18 +227,15 @@ export default function HomePage() {
         {activeTrip && (
           <>
             {/* TODAY HEADER */}
-            <section style={{ paddingTop: 'var(--space-8)' }}>
-              <p className="type-overline" style={{ letterSpacing: '0.18em', color: 'var(--ink-tertiary)' }}>
+            <section className="pt-[var(--space-8)]">
+              <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
                 {formatDate(new Date()).toUpperCase()}
               </p>
-              <h1
-                className="type-display"
-                style={{ marginTop: 'var(--space-2)', color: 'var(--ink)' }}
-              >
+              <h1 className="type-display mt-[var(--space-2)] text-[var(--ink)]">
                 {activeTrip.name}
               </h1>
               {activeTrip.location && (
-                <p className="type-body-sm" style={{ marginTop: 'var(--space-1)', color: 'var(--ink-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <p className="type-body-sm mt-[var(--space-1)] text-[var(--ink-secondary)] flex items-center gap-[var(--space-2)]">
                   <MapPin size={14} strokeWidth={1.5} />
                   {activeTrip.location}
                 </p>
@@ -247,33 +244,23 @@ export default function HomePage() {
 
             {/* SCORE HERO — Monumental, breathing */}
             {standings ? (
-              <section style={{ paddingTop: 'var(--space-10)', paddingBottom: 'var(--space-8)' }}>
+              <section className="pt-[var(--space-10)] pb-[var(--space-8)]">
                 <button
                   onClick={() => handleSelectTrip(activeTrip.id)}
-                  style={{
-                    width: '100%',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                  className="press-scale"
+                  className="w-full bg-transparent border-none cursor-pointer p-0 press-scale"
                 >
                   {/* Live badge */}
                   {liveMatchesCount > 0 && (
-                    <div className="live-indicator" style={{ marginBottom: 'var(--space-6)', justifyContent: 'center', display: 'flex' }}>
+                    <div className="live-indicator mb-[var(--space-6)] flex justify-center">
                       Live
                     </div>
                   )}
 
                   {/* Score blocks */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-6)' }}>
+                  <div className="flex items-center justify-center gap-[var(--space-6)]">
                     {/* Team A */}
-                    <div style={{ textAlign: 'center', flex: 1 }}>
-                      <span
-                        className="team-dot team-dot-lg team-dot-usa"
-                        style={{ display: 'inline-block', marginBottom: 'var(--space-3)' }}
-                      />
+                    <div className="text-center flex-1">
+                      <span className="team-dot team-dot-lg team-dot-usa inline-block mb-[var(--space-3)]" />
                       <p
                         className="score-monumental"
                         style={{
@@ -284,22 +271,19 @@ export default function HomePage() {
                       >
                         {standings.teamAPoints}
                       </p>
-                      <p className="type-overline" style={{ marginTop: 'var(--space-3)', color: 'var(--team-usa)' }}>
+                      <p className="type-overline mt-[var(--space-3)] text-[var(--team-usa)]">
                         {teamAName || 'USA'}
                       </p>
                     </div>
 
                     {/* Divider */}
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-2xl)', color: 'var(--ink-faint)', paddingTop: 'var(--space-4)' }}>
+                    <div className="font-serif text-2xl text-[var(--ink-faint)] pt-[var(--space-4)]">
                       –
                     </div>
 
                     {/* Team B */}
-                    <div style={{ textAlign: 'center', flex: 1 }}>
-                      <span
-                        className="team-dot team-dot-lg team-dot-europe"
-                        style={{ display: 'inline-block', marginBottom: 'var(--space-3)' }}
-                      />
+                    <div className="text-center flex-1">
+                      <span className="team-dot team-dot-lg team-dot-europe inline-block mb-[var(--space-3)]" />
                       <p
                         className="score-monumental"
                         style={{
@@ -310,7 +294,7 @@ export default function HomePage() {
                       >
                         {standings.teamBPoints}
                       </p>
-                      <p className="type-overline" style={{ marginTop: 'var(--space-3)', color: 'var(--team-europe)' }}>
+                      <p className="type-overline mt-[var(--space-3)] text-[var(--team-europe)]">
                         {teamBName || 'EUR'}
                       </p>
                     </div>
@@ -318,30 +302,13 @@ export default function HomePage() {
 
                   {/* Score narrative */}
                   {scoreNarrative ? (
-                    <p
-                      className="type-body-sm"
-                      style={{
-                        textAlign: 'center',
-                        marginTop: 'var(--space-6)',
-                        color: 'var(--ink-secondary)',
-                        fontStyle: 'italic',
-                      }}
-                    >
+                    <p className="type-body-sm text-center mt-[var(--space-6)] text-[var(--ink-secondary)] italic">
                       {scoreNarrative}
                     </p>
                   ) : null}
 
                   {/* View standings CTA */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--space-2)',
-                    marginTop: 'var(--space-8)',
-                    color: 'var(--masters)',
-                    fontWeight: 500,
-                    fontSize: 'var(--text-sm)',
-                  }}>
+                  <div className="flex items-center justify-center gap-[var(--space-2)] mt-[var(--space-8)] text-[var(--masters)] font-medium text-sm">
                     <span>View full standings</span>
                     <ChevronRight size={16} strokeWidth={2} />
                   </div>
@@ -349,13 +316,13 @@ export default function HomePage() {
               </section>
             ) : (
               /* Active trip without standings yet */
-              <section style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-6)' }}>
+              <section className="pt-[var(--space-8)] pb-[var(--space-6)]">
                 <button
                   onClick={() => handleSelectTrip(activeTrip.id)}
-                  style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+                  className="w-full bg-transparent border-none cursor-pointer p-0 text-left"
                 >
-                  <div className="live-indicator" style={{ marginBottom: 'var(--space-4)' }}>Active</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-4)', color: 'var(--masters)', fontWeight: 500 }}>
+                  <div className="live-indicator mb-[var(--space-4)]">Active</div>
+                  <div className="flex items-center gap-[var(--space-2)] mt-[var(--space-4)] text-[var(--masters)] font-medium">
                     <span>Continue</span>
                     <ChevronRight size={16} strokeWidth={2} />
                   </div>
@@ -368,8 +335,8 @@ export default function HomePage() {
             {/* YOUR MATCH — If user has an active match */}
             {userMatchData && currentUserPlayer && (
               <>
-                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-                  <p className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--ink-tertiary)', marginBottom: 'var(--space-4)' }}>
+                <section className="py-[var(--space-6)]">
+                  <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)] mb-[var(--space-4)]">
                     YOUR MATCH
                   </p>
                   <YourMatchCard
@@ -390,18 +357,17 @@ export default function HomePage() {
             {/* LIVE NOW — Clean text list */}
             {liveMatchesCount > 0 && liveMatches && !userMatchData && (
               <>
-                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <section className="py-[var(--space-6)]">
+                  <div className="flex items-center justify-between mb-[var(--space-4)]">
+                    <div className="flex items-center gap-[var(--space-2)]">
                       <div className="live-indicator">Live Now</div>
-                      <span className="type-caption" style={{ color: 'var(--ink-tertiary)' }}>
+                      <span className="type-caption text-[var(--ink-tertiary)]">
                         {liveMatchesCount} match{liveMatchesCount !== 1 ? 'es' : ''}
                       </span>
                     </div>
                     <Link
                       href="/live"
-                      className="type-caption"
-                      style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--masters)', textDecoration: 'none' }}
+                      className="type-caption flex items-center gap-[var(--space-1)] text-[var(--masters)] no-underline"
                     >
                       Watch <Tv size={14} />
                     </Link>
@@ -414,16 +380,16 @@ export default function HomePage() {
             {/* SETUP GUIDE — For captains with incomplete setup */}
             {isCaptainMode && players.length < 4 && sessions.length === 0 && (
               <>
-                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-                  <p className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--maroon)', marginBottom: 'var(--space-4)' }}>
-                    <Shield size={12} style={{ display: 'inline', marginRight: 'var(--space-1)', verticalAlign: 'middle' }} />
+                <section className="py-[var(--space-6)]">
+                  <p className="type-overline tracking-[0.15em] text-[var(--maroon)] mb-[var(--space-4)]">
+                    <Shield size={12} className="inline mr-[var(--space-1)] align-middle" />
                     CAPTAIN SETUP
                   </p>
                   <div className="card-captain">
-                    <p className="type-title-sm" style={{ marginBottom: 'var(--space-4)' }}>
+                    <p className="type-title-sm mb-[var(--space-4)]">
                       Get Your Trip Ready
                     </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    <div className="flex flex-col gap-[var(--space-2)]">
                       <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added`} />
                       <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && players.some(() => teams.some((t) => t.id))} href="/captain/draft" hint="Draft players to teams" />
                       <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new" hint="Set up matchups" />
@@ -437,32 +403,31 @@ export default function HomePage() {
             {/* CAPTAIN QUICK TOOLS */}
             {isCaptainMode && (
               <>
-                <section style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
-                    <p className="type-overline" style={{ letterSpacing: '0.15em', color: 'var(--maroon)' }}>
-                      <Shield size={12} style={{ display: 'inline', marginRight: 'var(--space-1)', verticalAlign: 'middle' }} />
+                <section className="py-[var(--space-6)]">
+                  <div className="flex items-center justify-between mb-[var(--space-4)]">
+                    <p className="type-overline tracking-[0.15em] text-[var(--maroon)]">
+                      <Shield size={12} className="inline mr-[var(--space-1)] align-middle" />
                       CAPTAIN TOOLS
                     </p>
                     <Link
                       href="/captain"
-                      className="type-caption"
-                      style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--maroon)', textDecoration: 'none' }}
+                      className="type-caption flex items-center gap-[var(--space-1)] text-[var(--maroon)] no-underline"
                     >
                       All Tools <ChevronRight size={14} />
                     </Link>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)' }}>
-                    <Link href="/lineup/new" className="quick-action-btn press-scale" style={{ textDecoration: 'none', borderColor: 'var(--maroon-subtle)' }}>
-                      <Users size={18} style={{ color: 'var(--maroon)' }} />
-                      <span className="type-micro" style={{ color: 'var(--ink)' }}>Lineup</span>
+                  <div className="grid grid-cols-3 gap-[var(--space-3)]">
+                    <Link href="/lineup/new" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
+                      <Users size={18} className="text-[var(--maroon)]" />
+                      <span className="type-micro text-[var(--ink)]">Lineup</span>
                     </Link>
-                    <Link href="/captain/checklist" className="quick-action-btn press-scale" style={{ textDecoration: 'none', borderColor: 'var(--maroon-subtle)' }}>
-                      <ClipboardCheck size={18} style={{ color: 'var(--maroon)' }} />
-                      <span className="type-micro" style={{ color: 'var(--ink)' }}>Pre-Flight</span>
+                    <Link href="/captain/checklist" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
+                      <ClipboardCheck size={18} className="text-[var(--maroon)]" />
+                      <span className="type-micro text-[var(--ink)]">Pre-Flight</span>
                     </Link>
-                    <Link href="/players" className="quick-action-btn press-scale" style={{ textDecoration: 'none', borderColor: 'var(--maroon-subtle)' }}>
-                      <Users size={18} style={{ color: 'var(--maroon)' }} />
-                      <span className="type-micro" style={{ color: 'var(--ink)' }}>Players</span>
+                    <Link href="/players" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
+                      <Users size={18} className="text-[var(--maroon)]" />
+                      <span className="type-micro text-[var(--ink)]">Players</span>
                     </Link>
                   </div>
                 </section>
@@ -473,24 +438,15 @@ export default function HomePage() {
         )}
 
         {/* ── TOURNAMENT ARCHIVE ── */}
-        <section style={{ paddingTop: activeTrip ? 'var(--space-6)' : 'var(--space-10)', paddingBottom: 'var(--space-10)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-6)' }}>
-            <h2 className="type-overline" style={{ letterSpacing: '0.15em' }}>
+        <section className={`${activeTrip ? 'pt-[var(--space-6)]' : 'pt-[var(--space-10)]'} pb-[var(--space-10)]`}>
+          <div className="flex items-center justify-between mb-[var(--space-6)]">
+            <h2 className="type-overline tracking-[0.15em]">
               {hasTrips ? (activeTrip ? 'Past Tournaments' : 'Tournaments') : 'Get Started'}
             </h2>
             {hasTrips && (
               <button
                 onClick={() => setShowQuickStart(true)}
-                className="btn-premium press-scale"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  padding: 'var(--space-2) var(--space-4)',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: 'var(--text-sm)',
-                  minHeight: '44px',
-                }}
+                className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
               >
                 <Plus size={14} strokeWidth={2.5} />
                 New
@@ -573,38 +529,26 @@ function SetupStep({ number, label, done, href, hint }: SetupStepProps) {
   return (
     <Link
       href={href}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-3)',
-        padding: 'var(--space-3)',
-        borderRadius: 'var(--radius-md)',
-        background: done ? 'var(--masters-subtle)' : 'var(--canvas-sunken)',
-        border: `1px solid ${done ? 'rgba(0, 102, 68, 0.2)' : 'var(--rule)'}`,
-        textDecoration: 'none',
-        color: 'var(--ink)',
-        transition: 'background var(--duration-fast) var(--ease-out)',
-      }}
+      className={`flex items-center gap-[var(--space-3)] p-[var(--space-3)] rounded-[var(--radius-md)] no-underline text-[var(--ink)] transition-[background] duration-fast ease-out ${
+        done
+          ? 'bg-[var(--masters-subtle)] border border-[rgba(0,102,68,0.2)]'
+          : 'bg-[var(--canvas-sunken)] border border-[var(--rule)]'
+      }`}
     >
-      <div style={{
-        width: '24px',
-        height: '24px',
-        borderRadius: 'var(--radius-full)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 'var(--text-xs)',
-        fontWeight: 700,
-        background: done ? 'var(--masters)' : 'var(--rule)',
-        color: done ? 'white' : 'var(--ink-tertiary)',
-      }}>
+      <div
+        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+          done
+            ? 'bg-[var(--masters)] text-white'
+            : 'bg-[var(--rule)] text-[var(--ink-tertiary)]'
+        }`}
+      >
         {done ? '✓' : number}
       </div>
-      <div style={{ flex: 1 }}>
-        <p className="type-title-sm" style={{ color: done ? 'var(--masters)' : 'var(--ink)' }}>{label}</p>
-        {hint && <p className="type-micro" style={{ marginTop: '2px' }}>{hint}</p>}
+      <div className="flex-1">
+        <p className={`type-title-sm ${done ? 'text-[var(--masters)]' : 'text-[var(--ink)]'}`}>{label}</p>
+        {hint && <p className="type-micro mt-[2px]">{hint}</p>}
       </div>
-      <ChevronRight size={14} style={{ color: done ? 'var(--masters)' : 'var(--ink-tertiary)' }} />
+      <ChevronRight size={14} className={done ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'} />
     </Link>
   );
 }

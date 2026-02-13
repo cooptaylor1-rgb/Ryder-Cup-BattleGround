@@ -22,6 +22,7 @@ import type {
     HoleResult,
     UUID,
 } from '@/lib/types/models';
+import { countHoleWins } from './multiRoundStatsService';
 
 // ============================================
 // ENHANCED PLAYER STATISTICS
@@ -457,13 +458,7 @@ export function calculateRivalry(
         if (p1TeamA === p2TeamA) continue; // Same team, not opponents
 
         const results = holeResults.filter(hr => hr.matchId === match.id);
-        let teamAScore = 0;
-        let teamBScore = 0;
-
-        for (const hr of results) {
-            if (hr.winner === 'teamA') teamAScore++;
-            else if (hr.winner === 'teamB') teamBScore++;
-        }
+        const { teamAWins: teamAScore, teamBWins: teamBScore } = countHoleWins(results);
 
         let result: 'player1' | 'player2' | 'halved';
         let score: string;

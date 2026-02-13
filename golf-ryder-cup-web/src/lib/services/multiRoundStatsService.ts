@@ -360,7 +360,12 @@ export async function getHeadToHead(
 // HELPERS
 // ============================================
 
-function countHoleWins(holeResults: HoleResult[]): {
+/**
+ * Count hole wins by team from a set of hole results.
+ * Shared utility - also used by statisticsService.calculateRivalry()
+ * for consistent hole counting logic.
+ */
+export function countHoleWins(holeResults: HoleResult[]): {
   teamAWins: number;
   teamBWins: number;
 } {
