@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 12:31 EST — Phase 2 — AppShell global loading overlay: premium token alignment
 - `AppShell`: migrated the global loading overlay card and spinner off `bg-white`/`dark:bg-gray-*` + `border-gray-*` + `border-t-green-*` palettes onto premium surface/rule/ink/Masters tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, `border-t-[var(--masters)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`a2d6c65`)
 
 ### 12:14 EST — Phase 2 — TeeTimeGenerator: premium token sweep
 - `TeeTimeGenerator` (captain tools): migrated the generator header, settings panel, summary bar, table, and actions off legacy Tailwind palette utilities (`blue-*`, `gray-*`, dark-mode branches) onto the premium surface/ink/rule + status tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--info)`, `var(--masters)`), and standardized team labels to Ryder Cup team tokens (`text-team-usa` / `text-team-europe`).
