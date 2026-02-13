@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a2a3f29`)
 
+### 09:28 EST — Phase 2 — SwipeScorePanel + HoleScoreDisplay: premium token sweep
+- `HoleScoreDisplay`: replaced remaining gray divider separators (`bg-gray-*`, dark-mode branches) with the premium rule token (`bg-[var(--rule)]`).
+- `SwipeScorePanel`: migrated halved badge + helper copy + halved tap button off gray palette utilities onto premium surface/ink tokens (`bg-[color:var(--ink-secondary)]/80`, `text-[var(--ink-tertiary)]`, `bg-[var(--surface-secondary)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d7baf4f`)
+
 ### 09:18 EST — Phase 2 — Scoring mini-map + QuickScoreFABv2: premium token sweep
 - `HoleMiniMap`: replaced gray palette dividers/borders/labels (`bg-gray-*`, `text-gray-*`, `border-gray-*`, dark-mode branches) with premium rule + ink tokens (`bg-[var(--rule)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`).
 - `QuickScoreFABv2`: replaced the gray divider + hover palette classes with premium surface + rule tokens (`bg-[var(--rule)]`, `hover:bg-[var(--surface-secondary)]`).
