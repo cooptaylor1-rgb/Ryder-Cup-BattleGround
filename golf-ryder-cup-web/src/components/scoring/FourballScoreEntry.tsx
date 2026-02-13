@@ -17,6 +17,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import type { CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Minus, Check, CircleDot, Crown, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -150,20 +151,15 @@ function PlayerScoreInput({
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <User size={14} style={{ color: teamColor }} />
-          <span
-            className="text-xs font-medium truncate max-w-[100px]"
-            style={{ color: 'var(--ink-secondary)' }}
-          >
+          <span className="text-xs font-medium truncate max-w-[100px] text-[var(--ink-secondary)]">
             {player.name}
           </span>
-          <span className="text-[10px]" style={{ color: 'var(--ink-tertiary)' }}>
-            ({player.courseHandicap})
-          </span>
+          <span className="text-[10px] text-[var(--ink-tertiary)]">({player.courseHandicap})</span>
         </div>
         {isBestBall && (
           <div
-            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-            style={{ background: `${teamColor}20`, color: teamColor }}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[color:var(--team-color)]/20 text-[var(--team-color)]"
+            style={{ '--team-color': teamColor } as CSSProperties}
           >
             <Crown size={10} />
             Best
@@ -177,14 +173,13 @@ function PlayerScoreInput({
         <button
           onClick={handleDecrement}
           disabled={disabled || grossScore <= 1}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{
-            background: 'var(--canvas)',
-            border: '1px solid var(--rule)',
-            opacity: grossScore <= 1 ? 0.3 : 1,
-          }}
+          className={cn(
+            'w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95',
+            'bg-[var(--canvas)] border border-[var(--rule)]',
+            grossScore <= 1 ? 'opacity-30' : 'opacity-100'
+          )}
         >
-          <Minus size={16} style={{ color: 'var(--ink-secondary)' }} />
+          <Minus size={16} className="text-[var(--ink-secondary)]" />
         </button>
 
         {/* Score Display */}
@@ -195,32 +190,27 @@ function PlayerScoreInput({
             </span>
             {hasStroke && (
               <>
-                <span className="text-sm" style={{ color: 'var(--ink-tertiary)' }}>
-                  /
-                </span>
+                <span className="text-sm text-[var(--ink-tertiary)]">/</span>
                 <span className="text-lg font-semibold" style={{ color: netColor }}>
                   {netScore}
                 </span>
               </>
             )}
           </div>
-          <span className="text-[10px]" style={{ color: 'var(--ink-tertiary)' }}>
-            {grossLabel}
-          </span>
+          <span className="text-[10px] text-[var(--ink-tertiary)]">{grossLabel}</span>
         </div>
 
         {/* Increment */}
         <button
           onClick={handleIncrement}
           disabled={disabled || grossScore >= 15}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{
-            background: 'var(--canvas)',
-            border: '1px solid var(--rule)',
-            opacity: grossScore >= 15 ? 0.3 : 1,
-          }}
+          className={cn(
+            'w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95',
+            'bg-[var(--canvas)] border border-[var(--rule)]',
+            grossScore >= 15 ? 'opacity-30' : 'opacity-100'
+          )}
         >
-          <Plus size={16} style={{ color: 'var(--ink-secondary)' }} />
+          <Plus size={16} className="text-[var(--ink-secondary)]" />
         </button>
       </div>
 
@@ -228,9 +218,9 @@ function PlayerScoreInput({
       {hasStroke && (
         <div className="flex items-center justify-center gap-0.5 mt-2">
           {Array.from({ length: strokesOnHole }).map((_, i) => (
-            <CircleDot key={i} size={10} style={{ color: 'var(--masters)' }} />
+            <CircleDot key={i} size={10} className="text-[var(--masters)]" />
           ))}
-          <span className="text-[10px] ml-1" style={{ color: 'var(--ink-tertiary)' }}>
+          <span className="text-[10px] ml-1 text-[var(--ink-tertiary)]">
             {strokesOnHole === 1 ? 'stroke' : 'strokes'}
           </span>
         </div>
@@ -472,14 +462,14 @@ export function FourballScoreEntry({
         transition={{ duration: 0.3 }}
         key={winner}
       >
-        <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+        <p className="text-sm font-semibold text-[var(--ink-primary)]">
           {winner === 'teamA'
             ? `${teamAName} wins hole`
             : winner === 'teamB'
               ? `${teamBName} wins hole`
               : 'Hole halved'}
         </p>
-        <p className="text-xs mt-1" style={{ color: 'var(--ink-tertiary)' }}>
+        <p className="text-xs mt-1 text-[var(--ink-tertiary)]">
           Best balls: {teamAName} {teamANetScores[teamABestIndex]} net -{' '}
           {teamBNetScores[teamBBestIndex]} net {teamBName}
         </p>
@@ -490,7 +480,10 @@ export function FourballScoreEntry({
         onClick={handleSubmit}
         disabled={isSubmitting || !hasValidScores}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed"
+        className={cn(
+          'w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed',
+          isSubmitting || !hasValidScores ? 'opacity-50' : 'opacity-100'
+        )}
         style={{
           background:
             winner === 'teamA'
@@ -498,7 +491,6 @@ export function FourballScoreEntry({
               : winner === 'teamB'
                 ? teamBColor
                 : 'var(--ink-secondary)',
-          opacity: isSubmitting || !hasValidScores ? 0.5 : 1,
         }}
         aria-disabled={isSubmitting || !hasValidScores}
       >
@@ -506,7 +498,7 @@ export function FourballScoreEntry({
         Record Score
       </motion.button>
       {!hasValidScores && (
-        <p className="text-xs text-center" style={{ color: 'var(--ink-tertiary)' }}>
+        <p className="text-xs text-center text-[var(--ink-tertiary)]">
           Enter a valid score (1–15) for every player to record this hole.
         </p>
       )}
