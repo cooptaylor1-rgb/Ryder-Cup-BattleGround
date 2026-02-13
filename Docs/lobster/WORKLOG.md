@@ -18,6 +18,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - BatchScoreGrid save footer + error banner moved onto masters/error token classes for consistent call-to-action and validation states.
 - LiveMatchMonitor status config + alert ring now map to premium success/warning/error tokens instead of hard-coded hex colors.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`13f59a3`)
 
 ### 18:24 EST — Phase 2 — PreFlightChecklist: premium token sweep
 - `PreFlightChecklist` (captain dashboard): migrated the summary header, progress meter, and status sections off Tailwind gray/green/yellow palettes onto premium surface/ink/status tokens, eliminating dark-mode branches and inline color mixes.
