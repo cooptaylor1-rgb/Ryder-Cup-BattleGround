@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
+- `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a2a3f29`)
+
 ### 01:15 EST — Phase 2 — Trip Awards route: premium token sweep
 - `/trip/[tripId]/awards`: replaced remaining legacy `bg-white`/`text-gray-*`/`border-gray-*` utilities with premium surface + ink + rule tokens.
 - Award cards + leaderboard rows now use token-driven surfaces (`var(--surface-card)` / `var(--surface-secondary)`), ink (`var(--ink-*)`), and card borders/shadows (`border-[var(--rule)]`, `shadow-card-sm`).
