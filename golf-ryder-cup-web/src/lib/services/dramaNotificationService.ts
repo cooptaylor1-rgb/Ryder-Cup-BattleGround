@@ -147,6 +147,5 @@ function sendDramaNotification(title: string, body: string, tripName: string): v
     type: 'score-update',
     tag: `drama-${Date.now()}`,
     data: { tripName },
-    renotify: true,
   });
 }
