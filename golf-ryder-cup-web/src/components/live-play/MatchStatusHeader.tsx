@@ -80,7 +80,7 @@ export function MatchStatusHeader({
     }, [sessions]);
 
     // Get matches and hole results in a single compound query (eliminates N+1 pattern)
-    const { matches, holeResults: allHoleResults } = useSessionMatchData(activeSession?.id);
+    const { matches, holeResults: allHoleResults, isLoading: matchDataLoading } = useSessionMatchData(activeSession?.id);
 
     // Track updates for animation
     const totalResults = allHoleResults?.length || 0;
@@ -186,7 +186,29 @@ export function MatchStatusHeader({
         router.push(`/score/${statusData.match.id}`);
     };
 
-    if (shouldHide || !statusData) return null;
+    if (shouldHide) return null;
+
+    // Show compact skeleton while match data is loading
+    if (matchDataLoading && !statusData) {
+        return (
+            <div className={cn(
+                'mx-4 mt-2 rounded-xl overflow-hidden',
+                'shadow-md backdrop-blur-md',
+                'bg-[#1a1814]/95 border border-[#807868]/20',
+                'flex items-center gap-3 px-4 py-2.5',
+                className,
+            )}>
+                <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse" />
+                <div className="flex-1 flex items-center gap-2">
+                    <div className="h-3.5 w-20 rounded bg-white/10 animate-pulse" />
+                    <div className="h-3 w-12 rounded bg-white/5 animate-pulse" />
+                </div>
+                <ChevronDown className="w-4 h-4 text-white/20" />
+            </div>
+        );
+    }
+
+    if (!statusData) return null;
 
     const {
         teamAPlayers,

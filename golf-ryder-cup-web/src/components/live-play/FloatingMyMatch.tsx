@@ -18,11 +18,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, ChevronUp, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/db';
+import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -82,32 +81,8 @@ export function FloatingMyMatch({
             sessions.find(s => s.status === 'scheduled');
     }, [sessions]);
 
-    // Get all matches for active session
-    const matches = useLiveQuery(
-        async () => {
-            if (!activeSession) return [];
-            return db.matches
-                .where('sessionId')
-                .equals(activeSession.id)
-                .toArray();
-        },
-        [activeSession?.id],
-        []
-    );
-
-    // Get all hole results for these matches
-    const allHoleResults = useLiveQuery(
-        async () => {
-            if (!matches?.length) return [];
-            const matchIds = matches.map(m => m.id);
-            return db.holeResults
-                .where('matchId')
-                .anyOf(matchIds)
-                .toArray();
-        },
-        [matches],
-        []
-    );
+    // Get matches and hole results in a single compound query (eliminates N+1 pattern)
+    const { matches, holeResults: allHoleResults, isLoading: matchDataLoading } = useSessionMatchData(activeSession?.id);
 
     // Find "my" match - the one containing the specified player
     const myMatchData = useMemo((): MyMatchData | null => {
@@ -226,6 +201,19 @@ export function FloatingMyMatch({
     // Don't render if no trip, or on scoring page
     if (!currentTrip || shouldHide) {
         return null;
+    }
+
+    // Show skeleton FAB while match data is loading
+    if (matchDataLoading && !myMatchData) {
+        return (
+            <div
+                className="fixed right-4 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg bg-[#1a1814]/80 backdrop-blur-sm animate-pulse"
+                style={{ bottom: `${bottomOffset}px` }}
+            >
+                <Target className="w-5 h-5 text-white/20" />
+                <div className="h-3.5 w-14 rounded bg-white/10" />
+            </div>
+        );
     }
 
     // If we can't resolve a match yet, show a gentle affordance instead of disappearing.

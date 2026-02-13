@@ -167,70 +167,15 @@ export { PullToRefresh, usePullToRefresh } from './PullToRefresh';
 
 export { SyncStatus, FloatingSyncStatus } from './SyncStatus';
 
-// Celebrations & Delight
-export {
-  ConfettiProvider,
-  ConfettiBurst,
-  CelebrationParticles,
-  GoldShimmer,
-  useConfetti,
-  type ConfettiTheme,
-  type BurstPattern,
-} from './ConfettiCannon';
-
-export {
-  VictoryModal,
-  VictoryToast,
-  type MatchResult,
-  type TournamentResult,
-} from './VictoryModal';
-
-export {
-  AnimatedCounter,
-  RollingDigits,
-  ScoreTicker,
-  StatCounter,
-  Countdown,
-} from './AnimatedCounter';
-
-export {
-  CelebrationProvider,
-  ScoreBadge,
-  MatchStatusIndicator,
-  HoleResult,
-  useCelebration,
-  type CelebrationType,
-  type CelebrationEvent,
-} from './ScoreCelebration';
-
-// Micro Interactions
-export {
-  Pressable,
-  AnimatedReveal,
-  StaggeredList,
-  ShimmerSkeleton,
-  SuccessCheckmark,
-  ErrorShake,
-  BounceIndicator,
-  PulseDot,
-  TypingIndicator,
-  ProgressRing,
-  SwipeHint,
-  LongPressProgress,
-} from './MicroInteractions';
-
-// Premium Components (v3.0)
-export {
-  PremiumLiveMatchBanner,
-  HoleProgressStrip,
-  PremiumProgressBar,
-  AnimatedScore,
-  PremiumStandingsCard,
-  PremiumMatchCard,
-  PageTransition,
-  PremiumSectionHeader,
-  PremiumEmptyState,
-} from './PremiumComponents';
+// ─── Heavy animation components ───────────────────────────────────
+// Import directly from source files to keep the barrel bundle lean:
+//   ConfettiCannon       → '@/components/ui/ConfettiCannon'
+//   VictoryModal         → '@/components/ui/VictoryModal'
+//   AnimatedCounter      → '@/components/ui/AnimatedCounter'
+//   ScoreCelebration     → '@/components/ui/ScoreCelebration'
+//   MicroInteractions    → '@/components/ui/MicroInteractions'
+//   PremiumComponents    → '@/components/ui/PremiumComponents'
+// ──────────────────────────────────────────────────────────────────
 
 // P0 UX Components
 export { YourMatchCard } from './YourMatchCard';
@@ -250,42 +195,12 @@ export {
   SkeletonWrapper,
 } from './SkeletonLoaders';
 
-export {
-  PageTransition as PageTransitionV2,
-  TransitionPresence,
-  StaggeredContainer,
-  StaggeredItem,
-  ModalTransition,
-  SheetTransition,
-  SlideOver,
-  AnimatedList,
-  CollapseTransition,
-  LoadingTransition,
-  TabTransition,
-  fadeVariants,
-  slideUpVariants,
-  slideDownVariants,
-  slideLeftVariants,
-  slideRightVariants,
-  scaleUpVariants,
-  popInVariants,
-  springTransition,
-  smoothTransition,
-  quickTransition,
-  type TransitionType,
-} from './PageTransitions';
-
-export {
-  SuccessConfetti,
-  ConfettiCannon,
-  GolfCelebration,
-  useConfetti as useConfettiV2,
-} from './SuccessConfetti';
-
-export {
-  EmptyState as EmptyStateIllustrated,
-  type EmptyStateType,
-} from './EmptyStateIllustrations';
+// ─── More heavy animation components ──────────────────────────────
+// Import directly from source files:
+//   PageTransitions      → '@/components/ui/PageTransitions'
+//   SuccessConfetti      → '@/components/ui/SuccessConfetti'
+//   EmptyStateIllustrations → '@/components/ui/EmptyStateIllustrations'
+// ──────────────────────────────────────────────────────────────────
 
 // Keyboard Shortcuts
 export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
