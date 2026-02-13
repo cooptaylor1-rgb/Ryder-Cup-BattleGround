@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 12:14 EST — Phase 2 — TeeTimeGenerator: premium token sweep
+- `TeeTimeGenerator` (captain tools): migrated the generator header, settings panel, summary bar, table, and actions off legacy Tailwind palette utilities (`blue-*`, `gray-*`, dark-mode branches) onto the premium surface/ink/rule + status tokens (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--info)`, `var(--masters)`), and standardized team labels to Ryder Cup team tokens (`text-team-usa` / `text-team-europe`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2362df1`)
+
 ### 11:41 EST — Phase 2 — WeatherWidget: premium token alignment (icon + precip accents)
 - `WeatherWidget`: replaced remaining Tailwind palette icon/precipitation accents (`yellow-*`/`blue-*`/`gray-*`/`slate-*`) with premium status + ink tokens (`var(--warning)`, `var(--info)`, `var(--ink-tertiary)`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
