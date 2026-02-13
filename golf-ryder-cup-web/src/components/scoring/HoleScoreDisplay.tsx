@@ -232,13 +232,13 @@ export function HoleScoreDisplay({
         <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--ink-tertiary)' }}>
           Hole {holeNumber}
         </span>
-        <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
+        <span className="w-px h-3 bg-[var(--rule)]" />
         <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
           Par {par}
         </span>
         {(teamAStrokesOnHole > 0 || teamBStrokesOnHole > 0) && (
           <>
-            <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
+            <span className="w-px h-3 bg-[var(--rule)]" />
             <span className="text-xs" style={{ color: 'var(--masters)' }}>
               Stroke Hole
             </span>

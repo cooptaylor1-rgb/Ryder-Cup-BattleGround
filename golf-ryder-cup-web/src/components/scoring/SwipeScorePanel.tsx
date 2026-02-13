@@ -306,7 +306,7 @@ export function SwipeScorePanel({
         className="absolute top-0 left-0 right-0 h-20 flex items-center justify-center pointer-events-none"
         style={{ opacity: halvedOpacity }}
       >
-        <div className="px-6 py-3 rounded-2xl bg-gray-600 flex items-center gap-2">
+        <div className="px-6 py-3 rounded-2xl bg-[color:var(--ink-secondary)]/80 flex items-center gap-2">
           <Minus className="w-5 h-5 text-white" />
           <span className="text-white font-semibold">Halved</span>
         </div>
@@ -374,7 +374,7 @@ export function SwipeScorePanel({
           {/* Gesture hints */}
           {gestureState === 'idle' && !disabled && (
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Swipe to score</span>
+              <span className="text-xs text-[var(--ink-tertiary)]">Swipe to score</span>
             </div>
           )}
         </motion.div>
@@ -428,7 +428,7 @@ export function SwipeScorePanel({
         <button
           onClick={handleTapHalved}
           disabled={disabled}
-          className="px-4 py-2 rounded-xl text-sm font-medium bg-gray-200 dark:bg-gray-700 opacity-60 hover:opacity-100 transition-opacity"
+          className="px-4 py-2 rounded-xl text-sm font-medium bg-[var(--surface-secondary)] text-[var(--ink-secondary)] opacity-60 hover:opacity-100 transition-opacity"
           aria-label="Hole halved"
         >
           Halved
