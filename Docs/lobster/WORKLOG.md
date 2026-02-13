@@ -13,7 +13,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
   - `src/lib/services/tripSyncService.ts`
 - Ensures the files are valid ESM/TypeScript modules (no `import` statements after runtime declarations like `const logger = …`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (see commit below)
+- Commit + push ✅ (`426d1ae`)
 
 ### 12:31 EST — Phase 2 — AppShell global loading overlay: premium token alignment
 - `AppShell`: migrated the global loading overlay card and spinner off `bg-white`/`dark:bg-gray-*` + `border-gray-*` + `border-t-green-*` palettes onto premium surface/rule/ink/Masters tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, `border-t-[var(--masters)]`).
