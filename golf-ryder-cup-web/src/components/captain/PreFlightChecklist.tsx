@@ -27,6 +27,7 @@ import {
   Rocket,
 } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
+import { cn } from '@/lib/utils';
 
 const logger = createLogger('PreFlight');
 
@@ -123,14 +124,14 @@ export function PreFlightChecklist({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <span className="ml-3 text-gray-600 dark:text-gray-300">Running pre-flight checks...</span>
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--info)]" />
+        <span className="ml-3 text-[var(--ink-secondary)]">Running pre-flight checks...</span>
       </div>
     );
   }
 
   if (!result) {
-    return <div className="text-center p-8 text-red-500">Failed to run pre-flight checks</div>;
+    return <div className="text-center p-8 text-[var(--error)]">Failed to run pre-flight checks</div>;
   }
 
   const summary = getPreFlightSummary(result);
@@ -138,46 +139,50 @@ export function PreFlightChecklist({
     <div className="space-y-4">
       {/* Summary Header */}
       <div
-        className={`rounded-xl p-6 border-2 ${
+        className={cn(
+          'rounded-xl p-6 border-2 transition-colors',
           result.isReady
-            ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
-            : 'bg-yellow-50 border-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-700'
-        }`}
+            ? 'bg-[color:var(--success)]/15 border-[color:var(--success)]/40'
+            : 'bg-[color:var(--warning)]/15 border-[color:var(--warning)]/40'
+        )}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {result.isReady ? (
-              <Rocket className="w-10 h-10 text-green-600" />
+              <Rocket className="w-10 h-10 text-[var(--success)]" />
             ) : (
-              <AlertTriangle className="w-10 h-10 text-yellow-600" />
+              <AlertTriangle className="w-10 h-10 text-[var(--warning)]" />
             )}
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-xl font-bold text-[var(--ink-primary)]">
                 {result.isReady ? 'All Systems Go!' : 'Pre-Flight Review Needed'}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-[var(--ink-secondary)]">
                 {summary.icon} {summary.message}
               </p>
             </div>
           </div>
           <button
             onClick={runCheck}
-            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
             title="Re-run checks"
           >
-            <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <RefreshCw className="w-5 h-5 text-[var(--ink-tertiary)]" />
           </button>
         </div>
 
         {/* Completion Percentage */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+        <div className="mt-4 pt-4 border-t border-[var(--rule)]">
+          <div className="flex justify-between text-sm text-[var(--ink-secondary)] mb-2">
             <span>Completion</span>
             <span>{result.completionPercentage}%</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-[var(--surface-secondary)] rounded-full h-2">
             <div
-              className={`h-2 rounded-full transition-all ${result.isReady ? 'bg-green-500' : 'bg-yellow-500'}`}
+              className={cn(
+                'h-2 rounded-full transition-all',
+                result.isReady ? 'bg-[color:var(--success)]/80' : 'bg-[color:var(--warning)]/80'
+              )}
               style={{ width: `${result.completionPercentage}%` }}
             />
           </div>
@@ -186,20 +191,20 @@ export function PreFlightChecklist({
         {/* Stats */}
         <div className="flex gap-6 mt-4">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-sm text-gray-600 dark:text-gray-300">
+            <CheckCircle className="w-4 h-4 text-[var(--success)]" />
+            <span className="text-sm text-[var(--ink-secondary)]">
               {result.info.length} Info
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm text-gray-600 dark:text-gray-300">
+            <AlertTriangle className="w-4 h-4 text-[var(--warning)]" />
+            <span className="text-sm text-[var(--ink-secondary)]">
               {result.warnings.length} Warnings
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-red-500" />
-            <span className="text-sm text-gray-600 dark:text-gray-300">
+            <XCircle className="w-4 h-4 text-[var(--error)]" />
+            <span className="text-sm text-[var(--ink-secondary)]">
               {result.errors.length} Errors
             </span>
           </div>
@@ -208,27 +213,27 @@ export function PreFlightChecklist({
 
       {/* Errors Section */}
       {result.errors.length > 0 && (
-        <div className="border border-red-200 dark:border-red-800 rounded-lg overflow-hidden">
-          <div className="bg-red-50 dark:bg-red-900/20 px-4 py-3 flex items-center gap-2">
-            <XCircle className="w-5 h-5 text-red-500" />
-            <span className="font-semibold text-red-800 dark:text-red-200">
+        <div className="border border-[color:var(--error)]/30 rounded-lg overflow-hidden">
+          <div className="bg-[color:var(--error)]/15 px-4 py-3 flex items-center gap-2">
+            <XCircle className="w-5 h-5 text-[var(--error)]" />
+            <span className="font-semibold text-[var(--error)]">
               Errors ({result.errors.length})
             </span>
           </div>
-          <div className="p-4 space-y-2 bg-white dark:bg-gray-900">
+          <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
             {result.errors.map((item, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+                className="p-3 rounded-lg bg-[color:var(--error)]/15 border border-[color:var(--error)]/30"
               >
-                <p className="font-medium text-red-800 dark:text-red-200">{item.title}</p>
+                <p className="font-medium text-[var(--error)]">{item.title}</p>
                 {item.description && (
-                  <p className="text-sm text-red-600 dark:text-red-300 mt-1">{item.description}</p>
+                  <p className="text-sm text-[color:var(--error)]/80 mt-1">{item.description}</p>
                 )}
                 {item.actionLabel && item.actionHref && (
                   <a
                     href={item.actionHref}
-                    className="text-sm text-blue-600 dark:text-blue-400 mt-2 inline-block"
+                    className="text-sm text-[var(--info)] mt-2 inline-block"
                   >
                     {item.actionLabel} →
                   </a>
@@ -241,29 +246,29 @@ export function PreFlightChecklist({
 
       {/* Warnings Section */}
       {result.warnings.length > 0 && (
-        <div className="border border-yellow-200 dark:border-yellow-800 rounded-lg overflow-hidden">
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-yellow-500" />
-            <span className="font-semibold text-yellow-800 dark:text-yellow-200">
+        <div className="border border-[color:var(--warning)]/30 rounded-lg overflow-hidden">
+          <div className="bg-[color:var(--warning)]/15 px-4 py-3 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-[var(--warning)]" />
+            <span className="font-semibold text-[var(--warning)]">
               Warnings ({result.warnings.length})
             </span>
           </div>
-          <div className="p-4 space-y-2 bg-white dark:bg-gray-900">
+          <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
             {result.warnings.map((item, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800"
+                className="p-3 rounded-lg bg-[color:var(--warning)]/15 border border-[color:var(--warning)]/30"
               >
-                <p className="font-medium text-yellow-800 dark:text-yellow-200">{item.title}</p>
+                <p className="font-medium text-[var(--warning)]">{item.title}</p>
                 {item.description && (
-                  <p className="text-sm text-yellow-600 dark:text-yellow-300 mt-1">
+                  <p className="text-sm text-[color:var(--warning)]/80 mt-1">
                     {item.description}
                   </p>
                 )}
                 {item.actionLabel && item.actionHref && (
                   <a
                     href={item.actionHref}
-                    className="text-sm text-blue-600 dark:text-blue-400 mt-2 inline-block"
+                    className="text-sm text-[var(--info)] mt-2 inline-block"
                   >
                     {item.actionLabel} →
                   </a>
@@ -276,31 +281,31 @@ export function PreFlightChecklist({
 
       {/* Info Section */}
       {result.info.length > 0 && (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div className="border border-[var(--rule)] rounded-lg overflow-hidden">
           <button
             onClick={() => toggleSection('info')}
-            className="w-full bg-gray-50 dark:bg-gray-800 px-4 py-3 flex items-center justify-between"
+            className="w-full bg-[var(--surface-secondary)] px-4 py-3 flex items-center justify-between"
           >
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              <span className="font-semibold text-gray-800 dark:text-gray-200">
+              <CheckCircle className="w-5 h-5 text-[var(--success)]" />
+              <span className="font-semibold text-[var(--ink-primary)]">
                 Passed Checks ({result.info.length})
               </span>
             </div>
             {expandedSections.has('info') ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
             )}
           </button>
           {expandedSections.has('info') && (
-            <div className="p-4 space-y-2 bg-white dark:bg-gray-900">
+            <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
               {result.info.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+                  className="p-3 rounded-lg bg-[color:var(--success)]/10 border border-[color:var(--success)]/30"
                 >
-                  <p className="text-green-800 dark:text-green-200">{item.title}</p>
+                  <p className="text-[var(--success)]">{item.title}</p>
                 </div>
               ))}
             </div>
