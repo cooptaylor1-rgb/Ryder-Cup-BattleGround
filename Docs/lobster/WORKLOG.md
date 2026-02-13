@@ -12,6 +12,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`e0caf6c`)
 
+### 15:55 EST — Phase 2 — Captain DirectMessage: premium token alignment
+- `DirectMessage` (captain tools): migrated remaining inline styles / legacy tokens (`var(--ink)`, `var(--ink-muted)`, `rgba(...)`, `hover:bg-white/*`) onto the premium surface/ink/rule + status tokens (`var(--surface-*)`, `var(--ink-primary/tertiary)`, `var(--rule)`, `var(--error)`, `var(--masters)`), and standardized team dots to Ryder Cup team tokens (`bg-team-usa`, `bg-team-europe`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4364868`)
+
 ### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
 - `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
