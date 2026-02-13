@@ -5,6 +5,15 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 15:45 EST — Docs — WORKLOG: restore chronological ordering
+- Reordered the 2026-02-13 entries so the late-night **SessionLockManager** checkpoint (20:58) appears in correct time order within the day.
+- No code changes; documentation-only cleanup to keep the Lobster log scannable.
+
+### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
+- `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a2a3f29`)
+
 ### 15:35 EST — Phase 2 — Captain lineup builder: premium token alignment
 - `LineupCanvas`, `MatchSlot`, `PlayerCard`: migrated remaining Tailwind gray palettes (`bg-gray-*`, `hover:bg-gray-*`) and hard-coded hex status colors to the premium surface/ink/rule + status token system.
 - Standardized skeleton/loading placeholders to premium neutral surfaces (`var(--surface-secondary)`), and replaced ring/selection colors with tokenized tones (`var(--success)` / `var(--info)`).
@@ -66,11 +75,6 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Standardized headers, dividers, info bars, player rows, and QR placeholder onto `var(--surface-*)` + `var(--ink-*)` + `var(--rule)`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`2726ed5`)
-
-### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
-- `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
-- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`a2a3f29`)
 
 ### 09:28 EST — Phase 2 — SwipeScorePanel + HoleScoreDisplay: premium token sweep
 - `HoleScoreDisplay`: replaced remaining gray divider separators (`bg-gray-*`, dark-mode branches) with the premium rule token (`bg-[var(--rule)]`).
