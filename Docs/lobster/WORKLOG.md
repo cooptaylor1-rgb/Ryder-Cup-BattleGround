@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 18:24 EST — Phase 2 — PreFlightChecklist: premium token sweep
+- `PreFlightChecklist` (captain dashboard): migrated the summary header, progress meter, and status sections off Tailwind gray/green/yellow palettes onto premium surface/ink/status tokens, eliminating dark-mode branches and inline color mixes.
+- Error/warning/info cards now use shared tone tints (`bg-[color:var(--success/warning/error)]/…`) and tokenized typography so captains get consistent feedback across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1b86443`)
+
 ### 18:09 EST — Phase 2 — Undo toast + offline indicator: premium token alignment
 - `UndoToast`: replaced inline `surface-card`/`masters-gold` styling with premium surface, rule, and ink token classes; added focus ring + tone-consistent label colors so the undo affordance stays legible across themes.
 - `OfflineIndicator`: removed inline background/border colors in favor of premium status + surface tokens, keeping the banner readable for offline + back-online states and adding subtle elevation.
