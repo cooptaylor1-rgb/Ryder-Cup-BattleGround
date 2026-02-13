@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 16:40 EST — Phase 2 — SideBetsTracker: premium token sweep + explicit empty states
+- `SideBetsTracker` (captain tools): migrated legacy Tailwind gray/green/blue palettes + dark-mode branches to the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--info)`, `var(--success)`, `var(--error)`), and standardized the tabs + form controls to the shared look.
+- Replaced first-time-use silent gaps with compact `EmptyStatePremium` cards for **No side games**, **No expenses**, and **No balances**.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dd78c53`)
+
 ### 16:25 EST — Phase 2 — FourballScoreEntry: remove inline token style props
 - `FourballScoreEntry`: migrated remaining inline `style={{ color: 'var(--…)' }}` usages (icon + labels + helper text) onto token-driven Tailwind classes (`text-[var(--ink-secondary)]`, `text-[var(--ink-tertiary)]`, etc.).
 - Best-ball badge now uses a CSS variable (`--team-color`) + Tailwind `bg-[color:var(--team-color)]/20` for consistent theming without manual hex alpha concatenation.
