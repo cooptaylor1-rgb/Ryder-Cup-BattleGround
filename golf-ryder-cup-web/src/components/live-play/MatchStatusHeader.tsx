@@ -208,7 +208,37 @@ export function MatchStatusHeader({
         );
     }
 
-    if (!statusData) return null;
+    // If we can't resolve a match yet (e.g., no sessions/matches), show a gentle affordance
+    // instead of disappearing and leaving a mysterious blank gap.
+    if (!statusData) {
+        return (
+            <button
+                type="button"
+                onClick={() => {
+                    trigger('selection');
+                    router.push('/schedule');
+                }}
+                className={cn(
+                    'mx-4 mt-2 rounded-xl overflow-hidden',
+                    'shadow-md backdrop-blur-md',
+                    'bg-[#1a1814]/90 border border-[#807868]/20',
+                    'flex items-center justify-between gap-3 px-4 py-2.5',
+                    'text-left',
+                    className,
+                )}
+                aria-label="No match in progress. View schedule"
+            >
+                <div className="flex items-center gap-3">
+                    <Target className="w-4 h-4 text-white/70" />
+                    <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-white/90">No match in progress</span>
+                        <span className="text-xs text-white/60">Tap to view schedule</span>
+                    </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-white/30 -rotate-90" />
+            </button>
+        );
+    }
 
     const {
         teamAPlayers,
