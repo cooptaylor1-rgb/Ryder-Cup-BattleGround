@@ -11,7 +11,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `PointsCalculator`: aligned the “Final” badge and scenario summary success state to premium success tokens.
 - `SessionCloner`: migrated player rows and exclude/replace controls off inline ink + hard-coded red/green colors onto premium ink + success/error tokens.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`fc5ab1f`)
+
+### 18:43 EST — Phase 2 — Captain dashboards: success token alignment
+- Updated PointsCalculator projected chips and target callouts to use premium success tokens instead of legacy `var(--positive)` / `--positive-bg`.
+- BatchScoreGrid status bar, AlertCenter summary/empty state, and SessionCloner roster controls now lean on shared success/warning/error/info token classes (no inline hex colors), keeping captain tooling consistent across themes.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
 ### 18:24 EST — Phase 2 — PreFlightChecklist: premium token sweep
 - `PreFlightChecklist` (captain dashboard): migrated the summary header, progress meter, and status sections off Tailwind gray/green/yellow palettes onto premium surface/ink/status tokens, eliminating dark-mode branches and inline color mixes.
