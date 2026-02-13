@@ -278,7 +278,7 @@ function MatchRow({
                         }
                     }
 
-                    if (holesPlayed === 0) return <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>—</span>;
+                    if (holesPlayed === 0) return <span className="text-xs text-[var(--ink-tertiary)]">—</span>;
 
                     const diff = teamBTotal - teamATotal; // Positive means Team A is up (lower is better in golf)
                     return (
@@ -635,28 +635,28 @@ export function BatchScoreGrid({
             </AnimatePresence>
 
             {/* Status Bar */}
-            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--surface)' }}>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--surface)]">
                 <div className="flex items-center gap-4">
                     {dirtyCount > 0 && (
                         <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                            <span className="text-xs" style={{ color: 'var(--ink-secondary)' }}>
+                            <div className="h-2 w-2 rounded-full bg-[color:var(--warning)]" />
+                            <span className="text-xs text-[var(--ink-secondary)]">
                                 {dirtyCount} unsaved
                             </span>
                         </div>
                     )}
                     {errorCount > 0 && (
                         <div className="flex items-center gap-1.5">
-                            <AlertTriangle size={12} style={{ color: '#EF4444' }} />
-                            <span className="text-xs" style={{ color: '#EF4444' }}>
+                            <AlertTriangle className="h-3 w-3 text-[var(--error)]" />
+                            <span className="text-xs text-[var(--error)]">
                                 {errorCount} errors
                             </span>
                         </div>
                     )}
                     {dirtyCount === 0 && errorCount === 0 && (
                         <div className="flex items-center gap-1.5">
-                            <CheckCircle2 size={12} style={{ color: 'var(--positive)' }} />
-                            <span className="text-xs" style={{ color: 'var(--positive)' }}>
+                            <CheckCircle2 className="h-3 w-3 text-[var(--success)]" />
+                            <span className="text-xs text-[var(--success)]">
                                 All saved
                             </span>
                         </div>
@@ -670,22 +670,22 @@ export function BatchScoreGrid({
                             onClick={handleScrollLeft}
                             className={cn(
                                 'p-1.5 rounded',
-                                scrollPosition === 'front' && 'bg-gray-200 dark:bg-gray-700'
+                                scrollPosition === 'front' && 'bg-[var(--surface-secondary)]'
                             )}
                         >
-                            <ChevronLeft size={16} style={{ color: 'var(--ink-secondary)' }} />
+                            <ChevronLeft className="h-4 w-4 text-[var(--ink-secondary)]" />
                         </button>
-                        <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                        <span className="text-xs text-[var(--ink-tertiary)]">
                             {scrollPosition === 'front' ? 'Front 9' : 'Back 9'}
                         </span>
                         <button
                             onClick={handleScrollRight}
                             className={cn(
                                 'p-1.5 rounded',
-                                scrollPosition === 'back' && 'bg-gray-200 dark:bg-gray-700'
+                                scrollPosition === 'back' && 'bg-[var(--surface-secondary)]'
                             )}
                         >
-                            <ChevronRight size={16} style={{ color: 'var(--ink-secondary)' }} />
+                            <ChevronRight className="h-4 w-4 text-[var(--ink-secondary)]" />
                         </button>
                     </div>
                 )}
@@ -694,8 +694,7 @@ export function BatchScoreGrid({
             {/* Grid Container */}
             <div
                 ref={containerRef}
-                className="border rounded-xl overflow-x-auto"
-                style={{ borderColor: 'var(--rule)' }}
+                className="border rounded-xl overflow-x-auto border-[var(--rule)]"
             >
                 {/* Header Row */}
                 <div className="flex border-b sticky top-0 z-10" style={{ borderColor: 'var(--rule)', background: 'var(--bg)' }}>

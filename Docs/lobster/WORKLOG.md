@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 18:50 EST — Phase 2 — Captain dashboard + session tools: premium token cleanup
+- `AlertCenter`: tokenized alert summary counts (warning/info/neutral) and replaced inline styles with premium ink/status classes.
+- `BatchScoreGrid`: tokenized the status bar + scroll controls (warning/error/success dots + icons, selected segment surfaces) and removed remaining inline ink/rule styles.
+- `PointsCalculator`: aligned the “Final” badge and scenario summary success state to premium success tokens.
+- `SessionCloner`: migrated player rows and exclude/replace controls off inline ink + hard-coded red/green colors onto premium ink + success/error tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
+
 ### 18:24 EST — Phase 2 — PreFlightChecklist: premium token sweep
 - `PreFlightChecklist` (captain dashboard): migrated the summary header, progress meter, and status sections off Tailwind gray/green/yellow palettes onto premium surface/ink/status tokens, eliminating dark-mode branches and inline color mixes.
 - Error/warning/info cards now use shared tone tints (`bg-[color:var(--success/warning/error)]/…`) and tokenized typography so captains get consistent feedback across themes.

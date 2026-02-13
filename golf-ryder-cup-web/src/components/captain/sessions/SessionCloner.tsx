@@ -166,12 +166,15 @@ function PlayerSwapCard({
                         </div>
                     )}
                     <div>
-                        <p className={cn('text-sm font-medium', isExcluded && 'line-through')}
-                            style={{ color: 'var(--ink)' }}
+                        <p
+                            className={cn(
+                                'text-sm font-medium text-[var(--ink-primary)]',
+                                isExcluded && 'line-through'
+                            )}
                         >
                             {player.name}
                         </p>
-                        <p className="text-[10px]" style={{ color: 'var(--ink-tertiary)' }}>
+                        <p className="text-[10px] text-[var(--ink-tertiary)]">
                             {player.handicap} HCP
                         </p>
                     </div>
@@ -189,23 +192,26 @@ function PlayerSwapCard({
 
                     <button
                         onClick={() => { haptic.tap(); onToggleExclude(); }}
-                        className="p-1.5 rounded-lg transition-colors"
-                        style={{ background: isExcluded ? 'rgba(239, 68, 68, 0.1)' : 'var(--rule)' }}
+                        className={cn(
+                            'p-1.5 rounded-lg transition-colors',
+                            isExcluded
+                                ? 'bg-[color:var(--success)]/12 text-[var(--success)] hover:bg-[color:var(--success)]/18'
+                                : 'bg-[color:var(--error)]/10 text-[var(--error)] hover:bg-[color:var(--error)]/15'
+                        )}
                     >
                         {isExcluded ? (
-                            <UserPlus size={14} style={{ color: 'var(--positive)' }} />
+                            <UserPlus className="h-3.5 w-3.5" />
                         ) : (
-                            <UserMinus size={14} style={{ color: '#EF4444' }} />
+                            <UserMinus className="h-3.5 w-3.5" />
                         )}
                     </button>
 
                     {!isExcluded && (
                         <button
                             onClick={() => { haptic.tap(); onSelectReplacement(); }}
-                            className="p-1.5 rounded-lg"
-                            style={{ background: 'var(--rule)' }}
+                            className="p-1.5 rounded-lg bg-[var(--rule)] text-[var(--ink-secondary)]"
                         >
-                            <Shuffle size={14} style={{ color: 'var(--ink-secondary)' }} />
+                            <Shuffle className="h-3.5 w-3.5" />
                         </button>
                     )}
                 </div>

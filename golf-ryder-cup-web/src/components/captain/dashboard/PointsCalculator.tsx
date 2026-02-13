@@ -230,7 +230,7 @@ function MatchProjectionRow({
             {/* Current Status */}
             <div className="px-3 text-center">
                 {match.isCompleted ? (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--positive-bg)] text-[var(--positive)]">
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[color:var(--success)]/12 text-[var(--success)]">
                         Final
                     </span>
                 ) : (
@@ -329,7 +329,7 @@ function ScenarioSummaryCard({
             <div className="mt-3 pt-3 border-t" style={{ borderColor: `${teamColor}30` }}>
                 <div className="flex items-center justify-between text-sm">
                     <span className="text-[var(--ink-secondary)]">Need to win:</span>
-                    <span className="font-semibold" style={{ color: willReach ? 'var(--positive)' : 'var(--ink)' }}>
+                    <span className={cn('font-semibold', willReach ? 'text-[var(--success)]' : 'text-[var(--ink)]')}>
                         {formatDecimal(pointsNeeded)} pts
                     </span>
                 </div>

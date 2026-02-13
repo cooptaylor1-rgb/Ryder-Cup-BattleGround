@@ -347,40 +347,40 @@ function AlertSummaryBar({
     if (total === 0) return null;
 
     return (
-        <div className="flex items-center gap-4 p-3 rounded-lg" style={{ background: 'var(--surface)' }}>
+        <div className="flex items-center gap-4 rounded-lg bg-[var(--surface)] p-3">
             {criticalCount > 0 && (
                 <div className="flex items-center gap-1.5">
-                    <AlertTriangle size={14} color="#EF4444" />
-                    <span className="text-sm font-semibold" style={{ color: '#EF4444' }}>
+                    <AlertTriangle className="h-3.5 w-3.5 text-[var(--error)]" />
+                    <span className="text-sm font-semibold text-[var(--error)]">
                         {criticalCount}
                     </span>
                 </div>
             )}
             {highCount > 0 && (
                 <div className="flex items-center gap-1.5">
-                    <AlertCircle size={14} color="#F59E0B" />
-                    <span className="text-sm font-semibold" style={{ color: '#F59E0B' }}>
+                    <AlertCircle className="h-3.5 w-3.5 text-[var(--warning)]" />
+                    <span className="text-sm font-semibold text-[var(--warning)]">
                         {highCount}
                     </span>
                 </div>
             )}
             {mediumCount > 0 && (
                 <div className="flex items-center gap-1.5">
-                    <Info size={14} color="#3B82F6" />
-                    <span className="text-sm font-semibold" style={{ color: '#3B82F6' }}>
+                    <Info className="h-3.5 w-3.5 text-[var(--info)]" />
+                    <span className="text-sm font-semibold text-[var(--info)]">
                         {mediumCount}
                     </span>
                 </div>
             )}
             {lowCount > 0 && (
                 <div className="flex items-center gap-1.5">
-                    <Info size={14} color="#6B7280" />
-                    <span className="text-sm font-semibold" style={{ color: '#6B7280' }}>
+                    <Info className="h-3.5 w-3.5 text-[var(--ink-tertiary)]" />
+                    <span className="text-sm font-semibold text-[var(--ink-tertiary)]">
                         {lowCount}
                     </span>
                 </div>
             )}
-            <span className="ml-auto text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+            <span className="ml-auto text-xs text-[var(--ink-tertiary)]">
                 {total} alert{total !== 1 ? 's' : ''}
             </span>
         </div>
@@ -393,9 +393,9 @@ function AlertSummaryBar({
 
 function EmptyAlertState() {
     return (
-        <div className="text-center py-12" style={{ color: 'var(--ink-tertiary)' }}>
-            <CheckCircle2 size={48} className="mx-auto mb-4 opacity-30" style={{ color: 'var(--positive)' }} />
-            <p className="text-lg font-medium" style={{ color: 'var(--positive)' }}>
+        <div className="py-12 text-center text-[var(--ink-tertiary)]">
+            <CheckCircle2 className="mx-auto mb-4 h-12 w-12 opacity-30 text-[var(--success)]" />
+            <p className="text-lg font-medium text-[var(--success)]">
                 All Clear!
             </p>
             <p className="text-sm">No alerts requiring attention</p>
