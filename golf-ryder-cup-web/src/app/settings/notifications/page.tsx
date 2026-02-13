@@ -145,11 +145,11 @@ export default function NotificationSettingsPage() {
             description="Notifications are blocked for this site. Please enable them in your browser settings."
           />
         ) : permissionStatus === 'granted' && preferences.enabled ? (
-          <div className="card p-4 border border-emerald-500/35">
+          <div className="card p-4 border border-[color:var(--success)]/35">
             <div className="flex items-start gap-3">
-              <Bell className="w-5 h-5 shrink-0 mt-0.5 text-emerald-500" />
+              <Bell className="w-5 h-5 shrink-0 mt-0.5 text-[var(--success)]" />
               <div className="flex-1">
-                <h3 className="font-semibold text-emerald-500">Notifications enabled</h3>
+                <h3 className="font-semibold text-[var(--success)]">Notifications enabled</h3>
                 <p className="text-sm mt-1 text-[var(--ink-tertiary)]">
                   {pendingCount > 0
                     ? `${pendingCount} reminder${pendingCount !== 1 ? 's' : ''} scheduled`
@@ -195,8 +195,8 @@ export default function NotificationSettingsPage() {
               <div className="card p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10">
-                      <Clock className="w-5 h-5 text-emerald-500" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[color:var(--success)]/10">
+                      <Clock className="w-5 h-5 text-[var(--success)]" />
                     </div>
                     <div>
                       <h3 className="font-medium text-[var(--ink)]">Tee time reminders</h3>

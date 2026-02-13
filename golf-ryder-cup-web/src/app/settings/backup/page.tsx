@@ -321,12 +321,12 @@ export default function BackupRestorePage() {
 
                         {exportSuccess ? (
                             <div
-                                className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-4 py-3 text-[var(--ink)]"
+                                className="mt-4 flex items-center gap-2 rounded-xl border border-[color:var(--success)]/35 bg-[color:var(--success)]/10 px-4 py-3 text-[var(--ink-primary)]"
                                 role="status"
                                 aria-live="polite"
                             >
-                                <CheckCircle className="w-5 h-5 text-emerald-500" />
-                                <span className="text-sm text-[var(--ink)]">{exportSuccess}</span>
+                                <CheckCircle className="w-5 h-5 text-[var(--success)]" />
+                                <span className="text-sm text-[var(--ink-primary)]">{exportSuccess}</span>
                             </div>
                         ) : null}
 
@@ -359,8 +359,8 @@ export default function BackupRestorePage() {
                     {/* Import */}
                     <section className="card p-[var(--space-5)]">
                         <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border border-blue-400/25 bg-blue-400/15">
-                                <Upload className="w-5 h-5 text-blue-400" />
+                            <div className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border border-[color:var(--info)]/25 bg-[color:var(--info)]/15">
+                                <Upload className="w-5 h-5 text-[var(--info)]" />
                             </div>
                             <div className="min-w-0">
                                 <p className="type-title-sm">Import trip</p>
@@ -380,9 +380,9 @@ export default function BackupRestorePage() {
                         <div className="mt-5">
                             {importPreview ? (
                                 importPreview.valid ? (
-                                    <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 p-4">
+                                    <div className="rounded-xl border border-[color:var(--success)]/25 bg-[color:var(--success)]/10 p-4">
                                         <div className="flex items-start gap-3">
-                                            <FileJson className="w-5 h-5 mt-0.5 text-emerald-500" />
+                                            <FileJson className="w-5 h-5 mt-0.5 text-[var(--success)]" />
                                             <div className="min-w-0">
                                                 <p className="font-medium text-[var(--ink)]">{importPreview.tripName}</p>
                                                 <p className="text-sm text-[var(--ink-tertiary)]">Ready to import</p>
@@ -426,14 +426,14 @@ export default function BackupRestorePage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4">
+                                    <div className="rounded-xl border border-[color:var(--error)]/25 bg-[color:var(--error)]/10 p-4">
                                         <div className="flex items-start gap-3">
-                                            <XCircle className="w-5 h-5 mt-0.5 text-red-500" />
+                                            <XCircle className="w-5 h-5 mt-0.5 text-[var(--error)]" />
                                             <div className="min-w-0">
                                                 <p className="font-medium text-[var(--ink)]">Invalid file</p>
                                                 <ul className="mt-2 space-y-1">
                                                     {importPreview.errors.map((errorText, i) => (
-                                                        <li key={i} className="text-sm text-red-500">
+                                                        <li key={i} className="text-sm text-[var(--error)]">
                                                             • {errorText}
                                                         </li>
                                                     ))}
@@ -453,15 +453,15 @@ export default function BackupRestorePage() {
                                     className={cn(
                                         'rounded-xl border p-4',
                                         importResult.success
-                                            ? 'border-emerald-500/25 bg-emerald-500/10'
-                                            : 'border-red-500/25 bg-red-500/10'
+                                            ? 'border-[color:var(--success)]/25 bg-[color:var(--success)]/10'
+                                            : 'border-[color:var(--error)]/25 bg-[color:var(--error)]/10'
                                     )}
                                 >
                                     <div className="flex items-start gap-3">
                                         {importResult.success ? (
-                                            <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                            <CheckCircle className="w-5 h-5 text-[var(--success)]" />
                                         ) : (
-                                            <XCircle className="w-5 h-5 text-red-500" />
+                                            <XCircle className="w-5 h-5 text-[var(--error)]" />
                                         )}
                                         <div>
                                             <p className="text-[var(--ink)]">{importResult.message}</p>
