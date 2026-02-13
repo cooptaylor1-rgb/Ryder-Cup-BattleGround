@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 11:41 EST — Phase 2 — WeatherWidget: premium token alignment (icon + precip accents)
+- `WeatherWidget`: replaced remaining Tailwind palette icon/precipitation accents (`yellow-*`/`blue-*`/`gray-*`/`slate-*`) with premium status + ink tokens (`var(--warning)`, `var(--info)`, `var(--ink-tertiary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e367590`)
+
 ### 11:37 EST — Phase 2 — Captain MatchCardGenerator: premium token sweep
 - `MatchCardGenerator`: migrated printable/shareable match cards off hard-coded hex + Tailwind gray/red/blue palettes onto premium surface/ink/rule tokens and Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`).
 - Standardized headers, dividers, info bars, player rows, and QR placeholder onto `var(--surface-*)` + `var(--ink-*)` + `var(--rule)`.
