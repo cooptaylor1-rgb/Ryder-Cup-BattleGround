@@ -13,9 +13,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`fc5ab1f`)
 
-### 18:43 EST — Phase 2 — Captain dashboards: success token alignment
-- Updated PointsCalculator projected chips and target callouts to use premium success tokens instead of legacy `var(--positive)` / `--positive-bg`.
-- BatchScoreGrid status bar, AlertCenter summary/empty state, and SessionCloner roster controls now lean on shared success/warning/error/info token classes (no inline hex colors), keeping captain tooling consistent across themes.
+### 18:45 EST — Phase 2 — Captain monitors: status token alignment
+- SessionCloner roster summary and preview badges now use premium success/warning tokens (no inline rgba/hex overrides) while keeping neutral copy on the shared ink palette.
+- BatchScoreGrid save footer + error banner moved onto masters/error token classes for consistent call-to-action and validation states.
+- LiveMatchMonitor status config + alert ring now map to premium success/warning/error tokens instead of hard-coded hex colors.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
 ### 18:24 EST — Phase 2 — PreFlightChecklist: premium token sweep

@@ -743,10 +743,9 @@ export function BatchScoreGrid({
                 onClick={handleSave}
                 disabled={dirtyCount === 0 || errorCount > 0 || isSaving}
                 className={cn(
-                    'w-full py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2',
+                    'w-full rounded-xl bg-[var(--masters)] py-3 font-semibold text-[var(--canvas)] flex items-center justify-center gap-2',
                     (dirtyCount === 0 || errorCount > 0 || isSaving) && 'opacity-50 cursor-not-allowed'
                 )}
-                style={{ background: 'var(--masters)' }}
                 whileTap={{ scale: 0.98 }}
             >
                 {isSaving ? (
@@ -770,10 +769,9 @@ export function BatchScoreGrid({
             {/* Error Warning */}
             {errorCount > 0 && (
                 <div
-                    className="p-3 rounded-lg flex items-center gap-2 text-sm"
-                    style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}
+                    className="flex items-center gap-2 rounded-lg bg-[color:var(--error)]/10 p-3 text-sm text-[var(--error)]"
                 >
-                    <AlertTriangle size={16} />
+                    <AlertTriangle className="h-4 w-4" />
                     Please fix {errorCount} error{errorCount !== 1 ? 's' : ''} before saving
                 </div>
             )}

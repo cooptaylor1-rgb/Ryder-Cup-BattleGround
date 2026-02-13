@@ -100,7 +100,7 @@ function getMatchStatusConfig(match: LiveMatchData) {
   if (match.status === 'needs_attention') {
     return {
       icon: AlertTriangle,
-      color: '#EF4444',
+      color: 'var(--error)',
       label: 'Needs Attention',
       pulse: true,
     };
@@ -108,7 +108,7 @@ function getMatchStatusConfig(match: LiveMatchData) {
   if (match.isClosedOut || match.status === 'completed') {
     return {
       icon: CheckCircle2,
-      color: '#22C55E',
+      color: 'var(--success)',
       label: 'Complete',
       pulse: false,
     };
@@ -116,7 +116,7 @@ function getMatchStatusConfig(match: LiveMatchData) {
   if (match.isDormie) {
     return {
       icon: Zap,
-      color: '#F59E0B',
+      color: 'var(--warning)',
       label: 'Dormie',
       pulse: true,
     };
@@ -124,14 +124,14 @@ function getMatchStatusConfig(match: LiveMatchData) {
   if (match.status === 'in_progress') {
     return {
       icon: Activity,
-      color: '#006747',
+      color: 'var(--masters)',
       label: `Hole ${match.holesPlayed + 1}`,
       pulse: false,
     };
   }
   return {
     icon: Clock,
-    color: '#6B7280',
+    color: 'var(--ink-tertiary)',
     label: 'Pending',
     pulse: false,
   };
@@ -208,7 +208,7 @@ function LiveMatchCard({
         match.hasAlert && 'ring-2 ring-offset-2 ring-offset-[var(--canvas)]'
       )}
       style={{
-        ['--tw-ring-color' as string]: match.alertType === 'error' ? '#EF4444' : '#F59E0B',
+        ['--tw-ring-color' as string]: match.alertType === 'error' ? 'var(--error)' : 'var(--warning)',
       }}
     >
       {/* Status Indicator */}

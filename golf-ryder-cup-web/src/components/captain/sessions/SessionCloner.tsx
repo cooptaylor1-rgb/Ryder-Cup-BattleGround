@@ -630,7 +630,7 @@ export function SessionCloner({
                     animate={{ opacity: 1 }}
                     className="space-y-4"
                 >
-                    <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                    <p className="text-sm text-[var(--ink-secondary)]">
                         Adjust player roster for the new session:
                     </p>
 
@@ -653,16 +653,30 @@ export function SessionCloner({
                     </div>
 
                     {/* Summary */}
-                    <div className="p-3 rounded-lg" style={{ background: 'var(--surface)' }}>
+                    <div className="rounded-lg bg-[var(--surface)] p-3">
                         <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'var(--ink-secondary)' }}>Excluded</span>
-                            <span className="font-semibold" style={{ color: excludedPlayerIds.size > 0 ? '#EF4444' : 'var(--ink)' }}>
+                            <span className="text-[var(--ink-secondary)]">Excluded</span>
+                            <span
+                                className={cn(
+                                    'font-semibold',
+                                    excludedPlayerIds.size > 0
+                                        ? 'text-[var(--error)]'
+                                        : 'text-[var(--ink)]'
+                                )}
+                            >
                                 {excludedPlayerIds.size} players
                             </span>
                         </div>
                         <div className="flex items-center justify-between text-sm mt-1">
-                            <span style={{ color: 'var(--ink-secondary)' }}>Replacements</span>
-                            <span className="font-semibold" style={{ color: Object.keys(replacements).length > 0 ? '#F59E0B' : 'var(--ink)' }}>
+                            <span className="text-[var(--ink-secondary)]">Replacements</span>
+                            <span
+                                className={cn(
+                                    'font-semibold',
+                                    Object.keys(replacements).length > 0
+                                        ? 'text-[var(--warning)]'
+                                        : 'text-[var(--ink)]'
+                                )}
+                            >
                                 {Object.keys(replacements).length} swaps
                             </span>
                         </div>
@@ -678,13 +692,11 @@ export function SessionCloner({
                     className="space-y-4"
                 >
                     <div className="flex items-center justify-between">
-                        <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                        <p className="text-sm text-[var(--ink-secondary)]">
                             Preview cloned session:
                         </p>
                         {modifiedCount > 0 && (
-                            <span className="text-xs px-2 py-1 rounded-full"
-                                style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}
-                            >
+                                                        <span className="text-xs px-2 py-1 rounded-full bg-[color:var(--warning)]/12 text-[var(--warning)]">
                                 {modifiedCount} modified
                             </span>
                         )}
@@ -705,17 +717,14 @@ export function SessionCloner({
                     </div>
 
                     {/* Clone Summary */}
-                    <div
-                        className="p-4 rounded-lg"
-                        style={{ background: 'rgba(0, 103, 71, 0.1)' }}
-                    >
+                                        <div className="rounded-lg bg-[color:var(--masters)]/10 p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle2 size={16} style={{ color: 'var(--masters)' }} />
-                            <span className="font-semibold" style={{ color: 'var(--masters)' }}>
+                            <CheckCircle2 className="h-4 w-4 text-[var(--masters)]" />
+                            <span className="font-semibold text-[var(--masters)]">
                                 Ready to Clone
                             </span>
                         </div>
-                        <ul className="text-xs space-y-1" style={{ color: 'var(--ink-secondary)' }}>
+                        <ul className="text-xs space-y-1 text-[var(--ink-secondary)]">
                             <li>• Name: {newName}</li>
                             <li>• Date: {formatDate(newDate)}</li>
                             <li>• Time: {newStartTime}</li>
