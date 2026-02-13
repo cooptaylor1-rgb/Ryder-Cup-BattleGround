@@ -5,6 +5,16 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 12:45 EST — Phase 2 — Fix ESM import ordering (logger const after imports)
+- Fixed invalid `import` ordering in:
+  - `src/components/social/DaySummaryCard.tsx`
+  - `src/lib/services/courseLibrarySyncService.ts`
+  - `src/lib/services/liveUpdatesService.ts`
+  - `src/lib/services/tripSyncService.ts`
+- Ensures the files are valid ESM/TypeScript modules (no `import` statements after runtime declarations like `const logger = …`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (see commit below)
+
 ### 12:31 EST — Phase 2 — AppShell global loading overlay: premium token alignment
 - `AppShell`: migrated the global loading overlay card and spinner off `bg-white`/`dark:bg-gray-*` + `border-gray-*` + `border-t-green-*` palettes onto premium surface/rule/ink/Masters tokens (`bg-[var(--surface-raised)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`, `border-t-[var(--masters)]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

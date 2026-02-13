@@ -25,14 +25,14 @@ import {
 } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
 import { EmptyStatePremium, LoadingEmpty } from '@/components/ui';
-
-const logger = createLogger('DaySummary');
 import { useTripStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { MatchState } from '@/lib/types/computed';
 import { format } from 'date-fns';
+
+const logger = createLogger('DaySummary');
 
 interface DaySummary {
     date: string;
