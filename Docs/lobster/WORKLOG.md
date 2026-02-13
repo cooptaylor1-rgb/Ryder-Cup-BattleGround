@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `dramaNotificationService`: removed the `renotify` field from `sendNotification` options to satisfy TypeScript (`NotificationOptions` type in this project does not include `renotify`).
 - Unblocks the pre-push `typecheck` gate after rebasing on latest `origin/main`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`816af59`)
 
 ### 14:10 EST — Phase 2 — Root layout loading fallback: remove CSS var fallbacks
 - `src/app/layout.tsx`: removed `bg-[var(--canvas,#...)]` / `border-[var(--rule,#...)]` / `border-t-[var(--masters,#...)]` / `text-[var(--ink-secondary,#...)]` fallback forms from the global `Suspense` loading UI.
