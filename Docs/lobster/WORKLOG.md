@@ -8,8 +8,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 15:45 EST — Docs — WORKLOG: restore chronological ordering
 - Reordered the 2026-02-13 entries so the late-night **SessionLockManager** checkpoint (20:58) appears in correct time order within the day.
 - Documentation-only cleanup to keep the Lobster log scannable.
+- Reorder commit: `ac32795`
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`ac32795`)
+- Commit + push ✅ (`e0caf6c`)
 
 ### 20:58 EST — Phase 2 — SessionLockManager: premium token sweep
 - `SessionLockManager` (scoring finalize/lock flow): migrated remaining hard-coded Tailwind palettes (amber/blue/grays/reds) onto premium status + surface + ink tokens (`var(--warning)`, `var(--info)`, `var(--error)`, `var(--surface-*)`, `var(--ink-*)`, `var(--rule)`), including modal icon treatments, warning callout, PIN input focus styles, and the finalized badge.
