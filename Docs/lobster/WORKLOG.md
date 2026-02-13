@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a2a3f29`)
 
+### 09:18 EST — Phase 2 — Scoring mini-map + QuickScoreFABv2: premium token sweep
+- `HoleMiniMap`: replaced gray palette dividers/borders/labels (`bg-gray-*`, `text-gray-*`, `border-gray-*`, dark-mode branches) with premium rule + ink tokens (`bg-[var(--rule)]`, `border-[var(--rule)]`, `text-[var(--ink-*)]`).
+- `QuickScoreFABv2`: replaced the gray divider + hover palette classes with premium surface + rule tokens (`bg-[var(--rule)]`, `hover:bg-[var(--surface-secondary)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7c21f48`)
+
 ### 01:15 EST — Phase 2 — Trip Awards route: premium token sweep
 - `/trip/[tripId]/awards`: replaced remaining legacy `bg-white`/`text-gray-*`/`border-gray-*` utilities with premium surface + ink + rule tokens.
 - Award cards + leaderboard rows now use token-driven surfaces (`var(--surface-card)` / `var(--surface-secondary)`), ink (`var(--ink-*)`), and card borders/shadows (`border-[var(--rule)]`, `shadow-card-sm`).
