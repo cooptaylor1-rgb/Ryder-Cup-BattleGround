@@ -18,11 +18,10 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Target, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/db';
+import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore, useScoringStore } from '@/lib/stores';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import type { Match, Player } from '@/lib/types/models';
@@ -80,32 +79,8 @@ export function MatchStatusHeader({
             sessions.find(s => s.status === 'scheduled');
     }, [sessions]);
 
-    // Get all matches
-    const matches = useLiveQuery(
-        async () => {
-            if (!activeSession) return [];
-            return db.matches
-                .where('sessionId')
-                .equals(activeSession.id)
-                .toArray();
-        },
-        [activeSession?.id],
-        []
-    );
-
-    // Get all hole results
-    const allHoleResults = useLiveQuery(
-        async () => {
-            if (!matches?.length) return [];
-            const matchIds = matches.map(m => m.id);
-            return db.holeResults
-                .where('matchId')
-                .anyOf(matchIds)
-                .toArray();
-        },
-        [matches],
-        []
-    );
+    // Get matches and hole results in a single compound query (eliminates N+1 pattern)
+    const { matches, holeResults: allHoleResults } = useSessionMatchData(activeSession?.id);
 
     // Track updates for animation
     const totalResults = allHoleResults?.length || 0;

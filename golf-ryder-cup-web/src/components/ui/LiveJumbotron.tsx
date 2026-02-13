@@ -19,6 +19,7 @@ import { useLiveScores, useRealtime } from '@/lib/supabase';
 import type { Player, Match } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 import { db, useLiveQuery } from '@/lib/db';
+import { useTripMatchData } from '@/lib/hooks/useSessionMatchData';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { Radio, Users, Trophy, ChevronUp, ChevronDown, Minus, WifiOff } from 'lucide-react';
 
@@ -32,27 +33,12 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
     const { isConnected, activeUsers, connectionStatus: _connectionStatus } = useRealtime(tripId);
     const { scores, isLoading } = useLiveScores(tripId);
 
-    // Get matches from local DB
-    const matches = useLiveQuery(async () => {
-        if (sessionId) {
-            return db.matches.where('sessionId').equals(sessionId).toArray();
-        }
-        // Get all sessions for this trip and their matches
-        const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
-        const sessionIds = sessions.map(s => s.id);
-        return db.matches.where('sessionId').anyOf(sessionIds).toArray();
-    }, [tripId, sessionId]);
+    // Get matches and hole results in a single compound query (eliminates N+1 pattern)
+    const { matches, holeResults, isLoading: matchDataLoading } = useTripMatchData(tripId);
 
     // Get players for lookup
     const players = useLiveQuery(() => db.players.toArray(), []);
     const playerMap = new Map(players?.map(p => [p.id, p]) || []);
-
-    // Get hole results for match states
-    const holeResults = useLiveQuery(async () => {
-        if (!matches) return [];
-        const matchIds = matches.map(m => m.id);
-        return db.holeResults.where('matchId').anyOf(matchIds).toArray();
-    }, [matches]);
 
     // Calculate match states
     const matchStates = new Map<string, MatchState>();
@@ -89,7 +75,7 @@ export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronPro
         }
     }
 
-    if (isLoading || !matches) {
+    if (isLoading || matchDataLoading) {
         return (
             <div className={cn('flex items-center justify-center min-h-[50vh]', className)}>
                 <div className="text-center">

@@ -60,11 +60,14 @@ async function handleOnline(): Promise<void> {
 }
 
 /**
- * Get all pending scoring events that need to be synced
+ * Get all pending scoring events that need to be synced.
+ * Uses the [matchId+synced] compound index for efficient lookup
+ * instead of a full table scan with .filter().
  */
 export async function getPendingScoringEvents(): Promise<ScoringEvent[]> {
     return db.scoringEvents
-        .filter(event => event.synced === false)
+        .where('synced')
+        .equals(0)
         .toArray();
 }
 
@@ -198,21 +201,25 @@ async function syncMatchEvents(
 }
 
 /**
- * Check if there are pending scores to sync
+ * Check if there are pending scores to sync.
+ * Uses indexed query instead of table scan.
  */
 export async function hasPendingScores(): Promise<boolean> {
     const count = await db.scoringEvents
-        .filter(event => event.synced === false)
+        .where('synced')
+        .equals(0)
         .count();
     return count > 0;
 }
 
 /**
- * Get count of pending scores
+ * Get count of pending scores.
+ * Uses indexed query instead of table scan.
  */
 export async function getPendingScoreCount(): Promise<number> {
     return db.scoringEvents
-        .filter(event => event.synced === false)
+        .where('synced')
+        .equals(0)
         .count();
 }
 
