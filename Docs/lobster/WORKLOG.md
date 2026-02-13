@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 19:05 EST — Phase 2 — Bulk import modal: premium token alignment
+- `BulkImportModal`: replaced legacy `bg-white`/`text-gray-*`/`border-gray-*` classes with premium surface/ink/rule tokens, added border + card shadow so the import dialog matches the editorial shell.
+- Success/warning/error summaries now use token-tinted backgrounds + icon colors (`var(--success)`, `var(--warning)`, `var(--error)`) and the preview table relies on neutral rule/ink tokens instead of Tailwind grays.
+- CTA buttons, method cards, and helper links now lean on Masters brand tokens for hover/focus states, with disabled styling mapped to neutral ink tints.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c299eb7`).
+
 ### 18:50 EST — Phase 2 — Captain dashboard + session tools: premium token cleanup
 - `AlertCenter`: tokenized alert summary counts (warning/info/neutral) and replaced inline styles with premium ink/status classes.
 - `BatchScoreGrid`: tokenized the status bar + scroll controls (warning/error/success dots + icons, selected segment surfaces) and removed remaining inline ink/rule styles.
