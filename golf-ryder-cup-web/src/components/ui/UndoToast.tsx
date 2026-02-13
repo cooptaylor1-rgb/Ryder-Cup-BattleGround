@@ -52,25 +52,14 @@ export function UndoToast({
                 onClick={handleUndo}
                 className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-lg',
-                    'min-w-[280px] cursor-pointer',
-                    'transition-transform press-scale'
+                    'min-w-[280px] cursor-pointer transition-transform transition-colors duration-200',
+                    'press-scale border border-[var(--rule)] bg-[var(--surface-raised)] text-[var(--ink)] shadow-[var(--shadow-card-lg)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--canvas)]'
                 )}
-                style={{
-                    background: 'var(--surface-card)',
-                    border: '1px solid var(--masters-gold)',
-                    boxShadow: 'var(--shadow-card-lg)',
-                    color: 'var(--text-primary)',
-                }}
             >
-                <Undo2
-                    className="w-5 h-5 shrink-0"
-                    style={{ color: 'var(--masters-gold)' }}
-                />
-                <span className="flex-1 text-sm font-medium text-left">{message}</span>
-                <span
-                    className="text-xs"
-                    style={{ color: 'var(--text-tertiary)' }}
-                >
+                <Undo2 className="w-5 h-5 shrink-0 text-[var(--premium-gold)]" />
+                <span className="flex-1 text-sm font-medium text-left text-[var(--ink)]">{message}</span>
+                <span className="text-xs font-medium text-[var(--ink-tertiary)]">
                     Tap to undo
                 </span>
             </button>

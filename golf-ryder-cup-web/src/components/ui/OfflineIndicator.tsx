@@ -11,6 +11,7 @@
 'use client';
 
 import { useOnlineStatus } from '@/lib/hooks';
+import { cn } from '@/lib/utils';
 import { WifiOff, Wifi } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -38,24 +39,24 @@ export function OfflineIndicator() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium flex items-center justify-center gap-2 toast-enter"
-      style={{
-        background: isOnline ? 'var(--success)' : 'var(--surface-card)',
-        borderBottom: isOnline ? 'none' : '1px solid var(--warning)',
-        color: isOnline ? 'white' : 'var(--text-primary)',
-      }}
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium flex items-center justify-center gap-2 toast-enter transition-colors duration-200',
+        isOnline
+          ? 'bg-[var(--success)] text-[var(--canvas)]'
+          : 'bg-[var(--surface-raised)] border-b border-[var(--warning)] text-[var(--ink)] shadow-[var(--shadow-card-sm)]'
+      )}
       role="status"
       aria-live="polite"
     >
       {isOnline ? (
         <>
-          <Wifi className="w-4 h-4" />
-          <span>Back online</span>
+          <Wifi className="w-4 h-4 text-[var(--canvas)]" />
+          <span className="text-[var(--canvas)]">Back online</span>
         </>
       ) : (
         <>
-          <WifiOff className="w-4 h-4" style={{ color: 'var(--warning)' }} />
-          <span>Offline — scores saved locally</span>
+          <WifiOff className="w-4 h-4 text-[var(--warning)]" />
+          <span className="text-[var(--ink-secondary)]">Offline — scores saved locally</span>
         </>
       )}
     </div>
