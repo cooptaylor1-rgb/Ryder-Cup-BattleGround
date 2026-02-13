@@ -369,7 +369,7 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
 
     if (matches.length === 0) {
         return (
-            <div className="p-8 text-center text-[var(--ink-muted)]">
+            <div className="p-8 text-center text-[var(--ink-secondary)]">
                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No matches to generate cards for</p>
             </div>
@@ -379,32 +379,32 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
     return (
         <div className={cn('flex flex-col', className)}>
             {/* Header */}
-            <div className="p-4 border-b border-[rgba(128,120,104,0.2)]">
+            <div className="p-4 border-b border-[var(--rule)]">
                 <div className="flex items-center justify-between mb-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-[var(--ink)]">Match Cards</h2>
-                        <p className="text-sm text-[var(--ink-muted)]">
+                        <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Match Cards</h2>
+                        <p className="text-sm text-[var(--ink-secondary)]">
                             {matches.length} matches • Ready to print or share
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleShare}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--ink-primary)]/10 transition-colors"
                             title="Share"
                         >
                             {copied ? (
-                                <Check className="w-5 h-5 text-green-500" />
+                                <Check className="w-5 h-5 text-[var(--success)]" />
                             ) : (
-                                <Share2 className="w-5 h-5 text-[var(--ink-muted)]" />
+                                <Share2 className="w-5 h-5 text-[var(--ink-tertiary)]" />
                             )}
                         </button>
                         <button
                             onClick={handlePrint}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--ink-primary)]/10 transition-colors"
                             title="Print"
                         >
-                            <Printer className="w-5 h-5 text-[var(--ink-muted)]" />
+                            <Printer className="w-5 h-5 text-[var(--ink-tertiary)]" />
                         </button>
                     </div>
                 </div>
@@ -414,14 +414,14 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
                     <button
                         onClick={selectAllCards}
                         className={cn(
-                            'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-[var(--ink)] border border-[rgba(128,120,104,0.2)]',
-                            selectedCards.size === matches.length ? 'bg-white/10' : ''
+                            'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-[var(--ink-primary)] border border-[var(--rule)] hover:bg-[color:var(--ink-primary)]/10',
+                            selectedCards.size === matches.length ? 'bg-[color:var(--ink-primary)]/10' : ''
                         )}
                     >
                         {selectedCards.size === matches.length ? 'Deselect All' : 'Select All'}
                     </button>
                     {selectedCards.size > 0 && (
-                        <span className="text-sm text-[var(--ink-muted)]">{selectedCards.size} selected</span>
+                        <span className="text-sm text-[var(--ink-secondary)]">{selectedCards.size} selected</span>
                     )}
                 </div>
             </div>
@@ -439,26 +439,26 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
                     <button
                         onClick={handlePrevious}
                         disabled={currentIndex === 0}
-                        className="p-2 rounded-lg disabled:opacity-30 hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg disabled:opacity-30 hover:bg-[color:var(--ink-primary)]/10 transition-colors"
                     >
-                        <ChevronLeft className="w-6 h-6 text-[var(--ink)]" />
+                        <ChevronLeft className="w-6 h-6 text-[var(--ink-primary)]" />
                     </button>
-                    <span className="text-sm font-medium text-[var(--ink)]">
+                    <span className="text-sm font-medium text-[var(--ink-primary)]">
                         {currentIndex + 1} of {matches.length}
                     </span>
                     <button
                         onClick={handleNext}
                         disabled={currentIndex === matches.length - 1}
-                        className="p-2 rounded-lg disabled:opacity-30 hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg disabled:opacity-30 hover:bg-[color:var(--ink-primary)]/10 transition-colors"
                     >
-                        <ChevronRight className="w-6 h-6 text-[var(--ink)]" />
+                        <ChevronRight className="w-6 h-6 text-[var(--ink-primary)]" />
                     </button>
                 </div>
             </div>
 
             {/* Card Grid Selection */}
-            <div className="border-t border-[rgba(128,120,104,0.2)] p-4">
-                <p className="text-sm font-medium mb-2 text-[var(--ink-muted)]">Quick Select</p>
+            <div className="border-t border-[var(--rule)] p-4">
+                <p className="text-sm font-medium mb-2 text-[var(--ink-secondary)]">Quick Select</p>
                 <div className="flex flex-wrap gap-2">
                     {matches.map((match, idx) => (
                         <button
@@ -468,7 +468,7 @@ ${currentMatch.teamBPlayers.map(p => `   ${p.firstName} ${p.lastName} (${p.handi
                                 toggleCardSelection(match.id);
                             }}
                             className={cn(
-                                'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-[rgba(128,120,104,0.2)] bg-[var(--surface)] text-[var(--ink)]',
+                                'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[color:var(--ink-primary)]/10',
                                 currentIndex === idx && 'ring-2 ring-[var(--masters)]',
                                 selectedCards.has(match.id) && 'bg-[var(--masters-muted)] text-[var(--masters)]'
                             )}
