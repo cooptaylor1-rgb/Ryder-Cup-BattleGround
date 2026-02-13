@@ -16,6 +16,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d2acb8c`)
 
+### 17:35 EST — Phase 2 — Settings Backup + Notifications: premium status token sweep
+- `/settings/backup`: replaced hard-coded Tailwind palettes (`emerald-*`, `red-*`, `blue-*`) with premium status tokens (`var(--success)`, `var(--error)`, `var(--info)`) for success banners, import previews, and import result cards.
+- `/settings/notifications`: tokenized the “Notifications enabled” status card and tee time reminder icon treatment off `emerald-*` and onto `var(--success)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`21dfd7e`)
+
 ### 16:40 EST — Phase 2 — SideBetsTracker: premium token sweep + explicit empty states
 - `SideBetsTracker` (captain tools): migrated legacy Tailwind gray/green/blue palettes + dark-mode branches to the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--masters)`, `var(--info)`, `var(--success)`, `var(--error)`), and standardized the tabs + form controls to the shared look.
 - Replaced first-time-use silent gaps with compact `EmptyStatePremium` cards for **No side games**, **No expenses**, and **No balances**.
