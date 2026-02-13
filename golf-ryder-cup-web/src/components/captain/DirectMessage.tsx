@@ -15,6 +15,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Send,
@@ -49,7 +50,7 @@ export interface MessageRecipient {
 
 export interface QuickMessageTemplate {
     id: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     label: string;
     message: string;
     urgency: 'normal' | 'urgent';
@@ -250,13 +251,13 @@ export function DirectMessage({
     return (
         <div className={cn('flex flex-col h-full', className)}>
             {/* Header */}
-            <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
+            <div className="p-4 border-b border-[var(--rule)]">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
+                        <h2 className="text-lg font-semibold text-[var(--ink-primary)]">
                             Quick Message
                         </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                        <p className="text-sm text-[var(--ink-tertiary)]">
                             Send announcements to players
                         </p>
                     </div>
@@ -264,10 +265,10 @@ export function DirectMessage({
                         onClick={() => setShowHistory(!showHistory)}
                         className={cn(
                             'p-2 rounded-lg transition-colors',
-                            showHistory ? 'bg-white/10' : ''
+                            showHistory ? 'bg-[color:var(--ink-primary)]/5' : 'hover:bg-[color:var(--ink-primary)]/5'
                         )}
                     >
-                        <History className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
+                        <History className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     </button>
                 </div>
             </div>
@@ -279,15 +280,14 @@ export function DirectMessage({
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden border-b"
-                        style={{ borderColor: 'rgba(128, 120, 104, 0.2)', background: 'var(--surface)' }}
+                        className="overflow-hidden border-b border-[var(--rule)] bg-[var(--surface)]"
                     >
                         <div className="p-4 max-h-48 overflow-y-auto">
-                            <p className="text-sm font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>
+                            <p className="text-sm font-medium mb-3 text-[var(--ink-tertiary)]">
                                 Recent Messages
                             </p>
                             {sentMessages.length === 0 ? (
-                                <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
+                                <p className="text-sm text-[var(--ink-tertiary)]">
                                     No messages sent yet
                                 </p>
                             ) : (
@@ -295,12 +295,12 @@ export function DirectMessage({
                                     {sentMessages.slice(0, 5).map(msg => (
                                         <div
                                             key={msg.id}
-                                            className="p-3 rounded-lg bg-[var(--canvas)]"
+                                            className="p-3 rounded-lg bg-[var(--surface-secondary)]"
                                         >
-                                            <p className="text-sm" style={{ color: 'var(--ink)' }}>
+                                            <p className="text-sm text-[var(--ink-primary)]">
                                                 {msg.message}
                                             </p>
-                                            <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                                            <div className="flex items-center gap-3 mt-2 text-xs text-[var(--ink-tertiary)]">
                                                 <span>{msg.recipients.map(r => r.name).join(', ')}</span>
                                                 <span>•</span>
                                                 <span>{msg.timestamp.toLocaleTimeString()}</span>
@@ -319,8 +319,8 @@ export function DirectMessage({
             </AnimatePresence>
 
             {/* Quick Templates */}
-            <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
-                <p className="text-sm font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>
+            <div className="p-4 border-b border-[var(--rule)]">
+                <p className="text-sm font-medium mb-3 text-[var(--ink-tertiary)]">
                     Quick Messages
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -329,20 +329,24 @@ export function DirectMessage({
                             key={template.id}
                             onClick={() => handleSelectTemplate(template)}
                             className={cn(
-                                'flex items-center gap-2 p-3 rounded-lg text-left transition-colors',
-                                'hover:bg-white/10'
+                                'flex items-center gap-2 p-3 rounded-lg text-left transition-colors border',
+                                template.urgency === 'urgent'
+                                    ? 'bg-[color:var(--error)]/10 border-[color:var(--error)]/30 hover:bg-[color:var(--error)]/15'
+                                    : 'bg-[var(--surface)] border-[var(--rule)] hover:bg-[color:var(--ink-primary)]/5'
                             )}
-                            style={{
-                                background: template.urgency === 'urgent' ? 'rgba(239, 68, 68, 0.1)' : 'var(--surface)',
-                                border: '1px solid rgba(128, 120, 104, 0.2)',
-                            }}
                         >
-                            <span style={{ color: template.urgency === 'urgent' ? '#ef4444' : 'var(--ink-muted)' }}>
+                            <span
+                                className={cn(
+                                    template.urgency === 'urgent' ? 'text-[var(--error)]' : 'text-[var(--ink-tertiary)]'
+                                )}
+                            >
                                 {template.icon}
                             </span>
                             <span
-                                className="text-sm font-medium"
-                                style={{ color: template.urgency === 'urgent' ? '#ef4444' : 'var(--ink)' }}
+                                className={cn(
+                                    'text-sm font-medium',
+                                    template.urgency === 'urgent' ? 'text-[var(--error)]' : 'text-[var(--ink-primary)]'
+                                )}
                             >
                                 {template.label}
                             </span>
@@ -352,8 +356,8 @@ export function DirectMessage({
             </div>
 
             {/* Recipient Selector */}
-            <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
-                <p className="text-sm font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>
+            <div className="p-4 border-b border-[var(--rule)]">
+                <p className="text-sm font-medium mb-3 text-[var(--ink-tertiary)]">
                     Send To
                 </p>
 
@@ -363,8 +367,7 @@ export function DirectMessage({
                         {selectedRecipients.map(recipient => (
                             <span
                                 key={recipient.id}
-                                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-sm"
-                                style={{ background: 'var(--masters-muted)', color: 'var(--masters)' }}
+                                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-sm bg-[color:var(--masters)]/10 text-[var(--masters)]"
                             >
                                 {recipient.type === 'all' && <Users className="w-3 h-3" />}
                                 {recipient.type === 'team' && <Users className="w-3 h-3" />}
@@ -385,17 +388,23 @@ export function DirectMessage({
                 {/* Recipient Picker */}
                 <button
                     onClick={() => setShowRecipientPicker(!showRecipientPicker)}
-                    className="w-full flex items-center justify-between p-3 rounded-lg"
-                    style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
+                    className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--surface)] border border-[var(--rule)] hover:bg-[color:var(--ink-primary)]/5 transition-colors"
                 >
-                    <span style={{ color: selectedRecipients.length > 0 ? 'var(--ink)' : 'var(--ink-muted)' }}>
+                    <span
+                        className={cn(
+                            'text-sm',
+                            selectedRecipients.length > 0 ? 'text-[var(--ink-primary)]' : 'text-[var(--ink-tertiary)]'
+                        )}
+                    >
                         {selectedRecipients.length > 0
                             ? `${getRecipientCount()} player${getRecipientCount() !== 1 ? 's' : ''} selected`
                             : 'Choose recipients...'}
                     </span>
                     <ChevronDown
-                        className={cn('w-5 h-5 transition-transform', showRecipientPicker && 'rotate-180')}
-                        style={{ color: 'var(--ink-muted)' }}
+                        className={cn(
+                            'w-5 h-5 transition-transform text-[var(--ink-tertiary)]',
+                            showRecipientPicker && 'rotate-180'
+                        )}
                     />
                 </button>
 
@@ -408,12 +417,11 @@ export function DirectMessage({
                             className="overflow-hidden"
                         >
                             <div
-                                className="mt-2 p-3 rounded-lg max-h-48 overflow-y-auto"
-                                style={{ background: 'var(--surface)' }}
+                                className="mt-2 p-3 rounded-lg max-h-48 overflow-y-auto bg-[var(--surface)] border border-[var(--rule)]"
                             >
                                 {/* Groups */}
                                 <div className="mb-3">
-                                    <p className="text-xs font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--ink-muted)' }}>
+                                    <p className="text-xs font-medium uppercase tracking-wide mb-2 text-[var(--ink-tertiary)]">
                                         Groups
                                     </p>
                                     <div className="space-y-1">
@@ -424,21 +432,21 @@ export function DirectMessage({
                                                 className={cn(
                                                     'w-full flex items-center justify-between p-2 rounded-lg transition-colors',
                                                     selectedRecipients.find(r => r.id === option.id)
-                                                        ? 'bg-white/10'
-                                                        : 'hover:bg-white/5'
+                                                        ? 'bg-[color:var(--ink-primary)]/5'
+                                                        : 'hover:bg-[color:var(--ink-primary)]/3'
                                                 )}
                                             >
                                                 <span className="flex items-center gap-2">
                                                     {option.type === 'team' && option.teamId === 'A' && (
-                                                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                                                        <div className="w-3 h-3 rounded-full bg-team-usa" />
                                                     )}
                                                     {option.type === 'team' && option.teamId === 'B' && (
-                                                        <div className="w-3 h-3 rounded-full bg-blue-500" />
+                                                        <div className="w-3 h-3 rounded-full bg-team-europe" />
                                                     )}
-                                                    <span style={{ color: 'var(--ink)' }}>{option.name}</span>
+                                                    <span className="text-[var(--ink-primary)]">{option.name}</span>
                                                 </span>
                                                 {selectedRecipients.find(r => r.id === option.id) && (
-                                                    <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--masters)' }} />
+                                                    <CheckCircle2 className="w-4 h-4 text-[var(--masters)]" />
                                                 )}
                                             </button>
                                         ))}
@@ -447,7 +455,7 @@ export function DirectMessage({
 
                                 {/* Tee Times */}
                                 <div className="mb-3">
-                                    <p className="text-xs font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--ink-muted)' }}>
+                                    <p className="text-xs font-medium uppercase tracking-wide mb-2 text-[var(--ink-tertiary)]">
                                         Tee Times
                                     </p>
                                     <div className="space-y-1">
@@ -458,13 +466,13 @@ export function DirectMessage({
                                                 className={cn(
                                                     'w-full flex items-center justify-between p-2 rounded-lg transition-colors',
                                                     selectedRecipients.find(r => r.id === option.id)
-                                                        ? 'bg-white/10'
-                                                        : 'hover:bg-white/5'
+                                                        ? 'bg-[color:var(--ink-primary)]/5'
+                                                        : 'hover:bg-[color:var(--ink-primary)]/3'
                                                 )}
                                             >
-                                                <span style={{ color: 'var(--ink)' }}>{option.name}</span>
+                                                <span className="text-[var(--ink-primary)]">{option.name}</span>
                                                 {selectedRecipients.find(r => r.id === option.id) && (
-                                                    <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--masters)' }} />
+                                                    <CheckCircle2 className="w-4 h-4 text-[var(--masters)]" />
                                                 )}
                                             </button>
                                         ))}
@@ -473,7 +481,7 @@ export function DirectMessage({
 
                                 {/* Individuals */}
                                 <div>
-                                    <p className="text-xs font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--ink-muted)' }}>
+                                    <p className="text-xs font-medium uppercase tracking-wide mb-2 text-[var(--ink-tertiary)]">
                                         Individuals
                                     </p>
                                     <div className="space-y-1 max-h-32 overflow-y-auto">
@@ -484,13 +492,13 @@ export function DirectMessage({
                                                 className={cn(
                                                     'w-full flex items-center justify-between p-2 rounded-lg transition-colors',
                                                     selectedRecipients.find(r => r.id === option.id)
-                                                        ? 'bg-white/10'
-                                                        : 'hover:bg-white/5'
+                                                        ? 'bg-[color:var(--ink-primary)]/5'
+                                                        : 'hover:bg-[color:var(--ink-primary)]/3'
                                                 )}
                                             >
-                                                <span style={{ color: 'var(--ink)' }}>{option.name}</span>
+                                                <span className="text-[var(--ink-primary)]">{option.name}</span>
                                                 {selectedRecipients.find(r => r.id === option.id) && (
-                                                    <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--masters)' }} />
+                                                    <CheckCircle2 className="w-4 h-4 text-[var(--masters)]" />
                                                 )}
                                             </button>
                                         ))}
@@ -504,38 +512,30 @@ export function DirectMessage({
 
             {/* Message Composer */}
             <div className="flex-1 p-4">
-                <p className="text-sm font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>
+                <p className="text-sm font-medium mb-3 text-[var(--ink-tertiary)]">
                     Message
                 </p>
                 <textarea
                     value={customMessage}
                     onChange={(e) => setCustomMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="w-full h-32 p-3 rounded-lg resize-none"
-                    style={{
-                        background: 'var(--surface)',
-                        color: 'var(--ink)',
-                        border: '1px solid rgba(128, 120, 104, 0.2)',
-                    }}
+                    className="w-full h-32 p-3 rounded-lg resize-none bg-[var(--surface)] text-[var(--ink-primary)] border border-[var(--rule)] focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/30"
                 />
 
                 {/* Delivery Method */}
                 <div className="flex items-center gap-4 mt-3">
-                    <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Send via:</p>
+                    <p className="text-sm text-[var(--ink-tertiary)]">Send via:</p>
                     <div className="flex gap-2">
                         {(['sms', 'push', 'both'] as const).map(method => (
                             <button
                                 key={method}
                                 onClick={() => setDeliveryMethod(method)}
                                 className={cn(
-                                    'px-3 py-1.5 rounded-lg text-sm capitalize transition-colors',
-                                    deliveryMethod === method ? 'bg-white/10' : ''
+                                    'px-3 py-1.5 rounded-lg text-sm capitalize transition-colors border border-[var(--rule)]',
+                                    deliveryMethod === method
+                                        ? 'bg-[color:var(--masters)]/10 text-[var(--masters)]'
+                                        : 'bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[color:var(--ink-primary)]/5'
                                 )}
-                                style={{
-                                    background: deliveryMethod === method ? 'var(--masters-muted)' : 'var(--surface)',
-                                    color: deliveryMethod === method ? 'var(--masters)' : 'var(--ink)',
-                                    border: '1px solid rgba(128, 120, 104, 0.2)',
-                                }}
                             >
                                 {method === 'sms' ? 'SMS' : method === 'push' ? 'Push' : 'Both'}
                             </button>
@@ -545,18 +545,15 @@ export function DirectMessage({
             </div>
 
             {/* Send Button */}
-            <div className="p-4 border-t" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
+            <div className="p-4 border-t border-[var(--rule)]">
                 <button
                     onClick={handleSend}
                     disabled={!customMessage.trim() || selectedRecipients.length === 0 || sending}
                     className={cn(
                         'w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors',
+                        'bg-[var(--masters)] text-white',
                         'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
-                    style={{
-                        background: 'var(--masters)',
-                        color: 'white',
-                    }}
                 >
                     {sending ? (
                         <>
