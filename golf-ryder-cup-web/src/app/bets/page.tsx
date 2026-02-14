@@ -8,6 +8,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium, NoBetsEmpty } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
+import dynamic from 'next/dynamic';
 import {
   Target,
   Users,
@@ -23,7 +24,12 @@ import {
   X,
   Flag,
   Ruler,
+  Calculator,
 } from 'lucide-react';
+
+const SettlementView = dynamic(() => import('@/components/SettlementView'), {
+  loading: () => <div className="py-12 text-center type-body text-[var(--ink-tertiary)]">Loading...</div>,
+});
 
 /**
  * BETS PAGE — Side Bets & Games
@@ -36,7 +42,7 @@ export default function BetsPage() {
   const router = useRouter();
   const { currentTrip, players, sessions: _sessions } = useTripStore();
   const { showToast } = useUIStore();
-  const [selectedTab, setSelectedTab] = useState<'active' | 'completed'>('active');
+  const [selectedTab, setSelectedTab] = useState<'active' | 'completed' | 'settle'>('active');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [newBetType, setNewBetType] = useState<SideBetType>('skins');
@@ -291,26 +297,39 @@ export default function BetsPage() {
             onClick={() => setSelectedTab('completed')}
             className={`${selectedTab === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
           >
-            Completed ({completedBets.length})
+            Done ({completedBets.length})
+          </button>
+          <button
+            onClick={() => setSelectedTab('settle')}
+            className={`${selectedTab === 'settle' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1 flex items-center justify-center gap-[var(--space-1)]`}
+          >
+            <Calculator size={14} />
+            Settle Up
           </button>
         </div>
 
+        {/* Settle Up Tab */}
+        {selectedTab === 'settle' && <SettlementView />}
+
         {/* Bets List */}
-        <div className="flex flex-col gap-[var(--space-3)]">
-          {(selectedTab === 'active' ? activeBets : completedBets).map((bet) => (
-            <BetCard
-              key={bet.id}
-              bet={bet}
-              icon={getBetIcon(bet.type)}
-              getPlayer={getPlayer}
-            />
-          ))}
-        </div>
+        {selectedTab !== 'settle' && (
+          <div className="flex flex-col gap-[var(--space-3)]">
+            {(selectedTab === 'active' ? activeBets : completedBets).map((bet) => (
+              <BetCard
+                key={bet.id}
+                bet={bet}
+                icon={getBetIcon(bet.type)}
+                getPlayer={getPlayer}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
-        {(selectedTab === 'active' ? activeBets : completedBets).length === 0 && (
-          <NoBetsEmpty isActive={selectedTab === 'active'} />
-        )}
+        {selectedTab !== 'settle' &&
+          (selectedTab === 'active' ? activeBets : completedBets).length === 0 && (
+            <NoBetsEmpty isActive={selectedTab === 'active'} />
+          )}
 
         {/* Quick Add Section */}
         {selectedTab === 'active' && (

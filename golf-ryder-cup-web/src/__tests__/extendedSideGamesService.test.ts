@@ -43,10 +43,10 @@ import type { Player } from '@/lib/types/models';
 const PLAYER_IDS = ['p1', 'p2', 'p3', 'p4'] as const;
 
 const PLAYERS: Player[] = [
-  { id: 'p1', tripId: 'trip1', firstName: 'Tiger', lastName: 'Woods', teamId: 't1', createdAt: '' },
-  { id: 'p2', tripId: 'trip1', firstName: 'Phil', lastName: 'Mickelson', teamId: 't1', createdAt: '' },
-  { id: 'p3', tripId: 'trip1', firstName: 'Rory', lastName: 'McIlroy', teamId: 't2', createdAt: '' },
-  { id: 'p4', tripId: 'trip1', firstName: 'Jon', lastName: 'Rahm', teamId: 't2', createdAt: '' },
+  { id: 'p1', tripId: 'trip1', firstName: 'Tiger', lastName: 'Woods', team: 'usa', createdAt: '' },
+  { id: 'p2', tripId: 'trip1', firstName: 'Phil', lastName: 'Mickelson', team: 'usa', createdAt: '' },
+  { id: 'p3', tripId: 'trip1', firstName: 'Rory', lastName: 'McIlroy', team: 'europe', createdAt: '' },
+  { id: 'p4', tripId: 'trip1', firstName: 'Jon', lastName: 'Rahm', team: 'europe', createdAt: '' },
 ] as Player[];
 
 // ============================================
