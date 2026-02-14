@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 20:35 EST — Phase 2 — iOS install sheet + stroke alert banner: remove remaining white overlays
+- `IOSInstallPrompt`: replaced the remaining `bg-white/*` close button + app icon capsule tints with token-driven canvas tints so the iOS install sheet stays consistent across themes.
+- `StrokeAlertBanner`: replaced the header dismiss hover `bg-white/20` tint with a tokenized canvas overlay.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`323a374`)
+
 ### 20:15 EST — Phase 2 — Live play capture affordances: premium token sweep
 - `QuickPhotoCapture`: replaced gradient + white overlay styles with premium surface/ink tokens, added tokenized focus ring + hover states, and swapped capture button halos to `var(--canvas-raised)` tints so the camera tray stays readable across themes.
 - `VoiceScoring`: migrated idle/listening/processing/error shells off raw `bg-white/*` overlays and inline rgba backgrounds onto premium Masters/error tone tokens; standardized cancel/retry actions on shared neutral overlays and swapped the loader accent to `var(--masters)`.
