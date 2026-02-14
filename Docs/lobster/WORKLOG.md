@@ -9,6 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `SwipeScorePanel`: replaced the keyboard shortcut hint + current score pill backgrounds off `bg-black/*` + `dark:bg-white/*` forks onto a single neutral ink tint (`bg-[color:var(--ink)]/…`) with canvas text so overlays stay consistent across themes.
 - `PhotoGallery` full-screen viewer: migrated close + navigation button hover/fill tints off `bg-white/*` and onto token-driven canvas overlays (`bg-[color:var(--canvas)]/…`) for theme-safe controls on the dark viewer shell.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`57d71fc`)
 
 
 ### 02:48 EST — Phase 2 — Onboarding chips + Toast progress track: remove remaining white/black overlays
