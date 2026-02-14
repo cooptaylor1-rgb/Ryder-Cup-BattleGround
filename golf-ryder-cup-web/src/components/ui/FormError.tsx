@@ -43,31 +43,43 @@ export interface FormErrorProps {
     ariaAtomic?: boolean;
 }
 
-const variantConfig = {
+const variantConfig: Record<FormErrorVariant, {
+    icon: typeof AlertCircle;
+    iconClass: string;
+    containerClass: string;
+    headingClass: string;
+}> = {
     error: {
         icon: AlertCircle,
-        containerClass: 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800',
-        textClass: 'text-red-700 dark:text-red-400',
-        iconClass: 'text-red-500 dark:text-red-400',
+        iconClass: 'text-[var(--error)]',
+        containerClass: 'bg-[color:var(--error)]/12 border border-[color:var(--error)]/25',
+        headingClass: 'text-[var(--error)]',
     },
     warning: {
         icon: AlertTriangle,
-        containerClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800',
-        textClass: 'text-amber-700 dark:text-amber-400',
-        iconClass: 'text-amber-500 dark:text-amber-400',
+        iconClass: 'text-[var(--warning)]',
+        containerClass: 'bg-[color:var(--warning)]/12 border border-[color:var(--warning)]/25',
+        headingClass: 'text-[var(--warning)]',
     },
     success: {
         icon: CheckCircle,
-        containerClass: 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800',
-        textClass: 'text-green-700 dark:text-green-400',
-        iconClass: 'text-green-500 dark:text-green-400',
+        iconClass: 'text-[var(--success)]',
+        containerClass: 'bg-[color:var(--success)]/12 border border-[color:var(--success)]/25',
+        headingClass: 'text-[var(--success)]',
     },
     info: {
         icon: Info,
-        containerClass: 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800',
-        textClass: 'text-blue-700 dark:text-blue-400',
-        iconClass: 'text-blue-500 dark:text-blue-400',
+        iconClass: 'text-[var(--info)]',
+        containerClass: 'bg-[color:var(--info)]/12 border border-[color:var(--info)]/25',
+        headingClass: 'text-[var(--info)]',
     },
+};
+
+const summaryLeadCopy: Record<FormErrorVariant, string> = {
+    error: 'Please fix the following errors:',
+    warning: 'Please review the following:',
+    success: 'Success!',
+    info: 'Note:',
 };
 
 /**
@@ -116,8 +128,7 @@ export function FormError({
                 aria-live={ariaLive}
                 aria-atomic={ariaAtomic}
                 className={cn(
-                    'flex items-start gap-2 text-sm mt-1.5',
-                    config.textClass,
+                    'flex items-start gap-2 text-sm mt-1.5 text-[var(--ink-secondary)]',
                     className
                 )}
             >
@@ -141,12 +152,12 @@ export function FormError({
                 aria-live={ariaLive}
                 aria-atomic={ariaAtomic}
                 className={cn(
-                    'rounded-lg border p-3 text-sm',
+                    'rounded-lg p-3 text-sm space-y-1',
                     config.containerClass,
                     className
                 )}
             >
-                <div className={cn('flex items-start gap-2', config.textClass)}>
+                <div className="flex items-start gap-2 text-[var(--ink-secondary)]">
                     {showIcon && (
                         <Icon
                             className={cn('w-4 h-4 shrink-0 mt-0.5', config.iconClass)}
@@ -154,15 +165,14 @@ export function FormError({
                         />
                     )}
                     <div className="flex-1">
-                        <p className="font-medium">
-                            {variant === 'error' && 'Please fix the following errors:'}
-                            {variant === 'warning' && 'Please review the following:'}
-                            {variant === 'success' && 'Success!'}
-                            {variant === 'info' && 'Note:'}
+                        <p className={cn('font-medium text-[var(--ink-primary)]', config.headingClass)}>
+                            {summaryLeadCopy[variant]}
                         </p>
                         <ul className="list-disc list-inside mt-1 space-y-0.5">
                             {messages.map((msg, index) => (
-                                <li key={index}>{msg}</li>
+                                <li key={index} className="text-[var(--ink-secondary)]">
+                                    {msg}
+                                </li>
                             ))}
                         </ul>
                     </div>
@@ -198,7 +208,7 @@ export function FormHint({ message, className, id }: FormHintProps) {
             id={hintId}
             className={cn(
                 'text-sm mt-1.5',
-                'text-slate-500 dark:text-slate-400',
+                'text-[var(--ink-tertiary)]',
                 className
             )}
         >
@@ -244,29 +254,28 @@ export function FormErrorSummary({
             tabIndex={-1}
             className={cn(
                 'rounded-xl border p-4',
-                'bg-red-50 dark:bg-red-950/30',
-                'border-red-200 dark:border-red-800',
-                'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
+                'bg-[color:var(--error)]/12 border-[color:var(--error)]/30',
+                'focus:outline-none focus:ring-2 focus:ring-[color:var(--error)] focus:ring-offset-2',
                 className
             )}
         >
             <div className="flex items-start gap-3">
                 <AlertCircle
-                    className="w-5 h-5 text-red-500 shrink-0 mt-0.5"
+                    className="w-5 h-5 text-[var(--error)] shrink-0 mt-0.5"
                     aria-hidden="true"
                 />
-                <div className="flex-1">
-                    <h2 className="text-base font-semibold text-red-700 dark:text-red-400">
+                <div className="flex-1 text-[var(--ink-secondary)]">
+                    <h2 className="text-base font-semibold text-[var(--ink-primary)]">
                         {title}
                     </h2>
                     <ul className="mt-2 space-y-1">
                         {errors.map((error, index) => (
                             <li
                                 key={index}
-                                className="text-sm text-red-600 dark:text-red-400"
+                                className="text-sm"
                             >
                                 {error.field && (
-                                    <span className="font-medium">{error.field}: </span>
+                                    <span className="font-medium text-[var(--ink-primary)]">{error.field}: </span>
                                 )}
                                 {error.message}
                             </li>

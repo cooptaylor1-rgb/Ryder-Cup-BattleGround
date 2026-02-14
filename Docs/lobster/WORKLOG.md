@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 21:56 EST — Phase 2 — Form errors adopt premium token system
+- `FormError` inline + summary states now rely on premium error/warning/success/info tokens for surfaces, borders, and icons rather than legacy Tailwind palette utilities; inline copy stays on neutral ink tokens for readability.
+- `FormErrorSummary` focus ring, icon, and body copy moved onto premium tokens, and `FormHint` now uses the shared ink tertiary tone to avoid dark-mode forks.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 21:35 EST — Phase 2 — PhotoCapture + TripMemories + AchievementUnlock overlays: remove remaining `bg-white/*`
 - `PhotoCapture`: replaced the remaining hard-coded `bg-white` capture button + error CTA with token-driven `var(--canvas-raised)` surfaces/rings so the camera UI stays consistent across themes.
 - `TripMemories`: replaced the score progress divider + MVP avatar background off `bg-white` and onto subtle `var(--canvas-raised)` tints with blur for legibility on the gold hero gradient.
