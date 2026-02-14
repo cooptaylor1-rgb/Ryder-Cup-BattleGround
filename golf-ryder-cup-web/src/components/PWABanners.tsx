@@ -33,7 +33,7 @@ export function PWABanners() {
             {/* Update Available Banner */}
             {hasUpdate && !isDismissed && (
                 <div className="fixed bottom-20 left-4 right-4 z-50 sm:left-auto sm:right-4 sm:w-80">
-                    <div className="bg-[var(--masters)] text-white rounded-lg shadow-lg p-4">
+                    <div className="bg-[var(--masters)] text-[var(--canvas)] rounded-lg shadow-lg p-4">
                         <div className="flex items-start gap-3">
                             <div className="shrink-0">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ export function PWABanners() {
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-semibold">Update Available</h3>
-                                <p className="text-sm text-white/80 mt-1">A new version of the app is ready.</p>
+                                <p className="text-sm text-[color:var(--canvas)]/80 mt-1">A new version of the app is ready.</p>
                                 <div className="mt-3 flex gap-2">
                                     <button
                                         onClick={updateApp}
@@ -57,7 +57,7 @@ export function PWABanners() {
                                     </button>
                                     <button
                                         onClick={() => setIsDismissed(true)}
-                                        className="text-white/80 px-3 py-1.5 rounded text-sm hover:text-white transition-colors"
+                                        className="text-[color:var(--canvas)]/80 px-3 py-1.5 rounded text-sm hover:text-[var(--canvas)] transition-colors"
                                     >
                                         Later
                                     </button>

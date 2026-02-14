@@ -249,11 +249,11 @@ describe('getTeamColorClass', () => {
 
 describe('getWinnerStyles', () => {
     it('returns USA styles for teamA winner', () => {
-        expect(getWinnerStyles('teamA')).toBe('bg-team-usa text-white');
+        expect(getWinnerStyles('teamA')).toBe('bg-team-usa text-[var(--canvas)]');
     });
 
     it('returns Europe styles for teamB winner', () => {
-        expect(getWinnerStyles('teamB')).toBe('bg-team-europe text-white');
+        expect(getWinnerStyles('teamB')).toBe('bg-team-europe text-[var(--canvas)]');
     });
 
     it('returns neutral styles for halved', () => {

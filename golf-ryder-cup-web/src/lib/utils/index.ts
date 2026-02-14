@@ -144,9 +144,9 @@ export function getWinnerStyles(
 ): string {
     switch (winner) {
         case 'teamA':
-            return 'bg-team-usa text-white';
+            return 'bg-team-usa text-[var(--canvas)]';
         case 'teamB':
-            return 'bg-team-europe text-white';
+            return 'bg-team-europe text-[var(--canvas)]';
         case 'halved':
             return 'bg-[color:var(--ink-tertiary)]/12 text-[var(--ink-secondary)]';
         default:
