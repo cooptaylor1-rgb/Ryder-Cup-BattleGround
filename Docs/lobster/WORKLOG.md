@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 00:36 EST — Phase 2 — Side bet reminders adopt premium inverse tokens
+- `SideBetReminder`: replaced rgba white overlays and hex palettes with premium tone tokens (`var(--masters)`, `var(--warning)`, `var(--info)`) for current/upcoming/result-needed states so the cards stay legible on light and dark shells.
+- Icon chips, status badges, inputs, and actions now rely on inverse canvas ink tokens (`var(--canvas-raised)`) with tokenized focus/disabled treatments; dynamic CSS vars drive background/border mixes instead of inline rgba strings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`00090b3`)
+
 ### 00:08 EST — Phase 2 — Live play status widgets adopt premium inverse tokens
 - `MatchStatusHeader`: replaced remaining hard-coded ink/white overlays with inverse canvas/ink tokens, giving skeletons, momentum badge, and fallback states tokenized surfaces + team shades so the mini-scoreboard stays legible across shells.
 - `FloatingMyMatch`: swapped inline gradients, white overlays, and red/green hexes for premium gradient tokens, team/status tone classes, and inverse canvas chips; detail drawer now leans on tokenized borders/ink instead of rgba hacks.
