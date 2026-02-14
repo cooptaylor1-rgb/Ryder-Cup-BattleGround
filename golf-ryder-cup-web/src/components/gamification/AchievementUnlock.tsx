@@ -318,7 +318,7 @@ export function AchievementUnlock({
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white z-10"
+                    className="absolute top-4 right-4 z-10 rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-white backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
                 >
                     <X size={24} />
                 </button>
@@ -369,7 +369,7 @@ export function AchievementUnlock({
 
                                 {/* Stat if present */}
                                 {achievement.stat && (
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10">
+                                    <div className="inline-flex items-center gap-2 rounded-full bg-[color:var(--canvas-raised)]/15 px-4 py-2 text-white backdrop-blur-sm">
                                         <span className="text-white/60">{achievement.stat.label}:</span>
                                         <span className="text-white font-bold">{achievement.stat.value}</span>
                                     </div>

@@ -402,14 +402,17 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                 {/* Header */}
                 <div className={cn('p-6', format.color)}>
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[color:var(--canvas-raised)]/20 text-white backdrop-blur-sm">
                             {getIcon(format.icon)}
                         </div>
                         <div className="flex-1 text-white">
                             <h2 className="text-xl font-bold">{format.name}</h2>
                             <p className="text-white/80 text-sm">{format.category.replace(/([A-Z])/g, ' $1').trim()}</p>
                         </div>
-                        <button onClick={onClose} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                        <button
+                            onClick={onClose}
+                            className="rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-white backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
+                        >
                             <X className="w-5 h-5 text-white" />
                         </button>
                     </div>

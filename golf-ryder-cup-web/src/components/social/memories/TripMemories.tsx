@@ -245,7 +245,7 @@ function TeamBattleSection({ stats }: { stats: TripStats }) {
                             initial={{ opacity: 0 }}
                             animate={isInView ? { opacity: 1 } : {}}
                             transition={{ delay: 2 }}
-                            className="absolute top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded"
+                            className="absolute top-1/2 h-6 w-1 -translate-y-1/2 rounded bg-[color:var(--canvas-raised)]"
                             style={{ left: `${usaPercent}%`, marginLeft: '-2px' }}
                         />
                     </div>
@@ -572,7 +572,7 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
                 <span className="text-white/80 text-sm uppercase tracking-wider font-semibold">Trip MVP</span>
 
                 {/* Avatar */}
-                <div className="w-20 h-20 rounded-full mx-auto my-4 bg-white flex items-center justify-center text-3xl overflow-hidden relative">
+                <div className="relative mx-auto my-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--canvas-raised)]/25 text-3xl backdrop-blur-sm">
                     {mvp.avatarUrl ? (
                         <Image src={mvp.avatarUrl} alt={mvp.name} fill className="object-cover" sizes="80px" />
                     ) : (

@@ -220,7 +220,7 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
             <p className="text-white text-lg mb-4">{error}</p>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-white text-black rounded-lg font-medium"
+              className="rounded-lg bg-[var(--canvas-raised)] px-4 py-2 font-medium text-[var(--ink-primary)] shadow-card-sm"
             >
               Close
             </button>
@@ -244,10 +244,9 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
             onClick={handleCapture}
             disabled={isLoading || !!error}
             whileTap={{ scale: 0.9 }}
-            className="w-20 h-20 rounded-full bg-white flex items-center justify-center"
-            style={{ boxShadow: '0 0 0 4px rgba(255,255,255,0.3)' }}
+            className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--canvas-raised)] ring-4 ring-[color:var(--canvas-raised)]/30"
           >
-            <div className="w-16 h-16 rounded-full bg-white border-4 border-gray-200" />
+            <div className="h-16 w-16 rounded-full bg-[var(--canvas-raised)] ring-4 ring-[var(--rule)]" />
           </motion.button>
 
           {/* Flip */}
