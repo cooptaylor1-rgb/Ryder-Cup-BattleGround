@@ -17,7 +17,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     DollarSign,
@@ -92,6 +92,32 @@ interface SideBetReminderProps {
     className?: string;
 }
 
+type ReminderTone = 'upcoming' | 'current' | 'result_needed';
+
+type ToneCSSVariables = CSSProperties & {
+    '--tone-accent': string;
+    '--tone-surface': string;
+    '--tone-border': string;
+};
+
+const reminderToneStyles: Record<ReminderTone, { accent: string; surface: string; border: string }> = {
+    current: {
+        accent: 'var(--masters)',
+        surface: 'color-mix(in srgb, var(--masters) 18%, transparent)',
+        border: 'color-mix(in srgb, var(--masters) 42%, transparent)',
+    },
+    result_needed: {
+        accent: 'var(--warning)',
+        surface: 'color-mix(in srgb, var(--warning) 18%, transparent)',
+        border: 'color-mix(in srgb, var(--warning) 42%, transparent)',
+    },
+    upcoming: {
+        accent: 'var(--info)',
+        surface: 'color-mix(in srgb, var(--info) 18%, transparent)',
+        border: 'color-mix(in srgb, var(--info) 40%, transparent)',
+    },
+};
+
 // ============================================
 // COMPONENT
 // ============================================
@@ -160,7 +186,7 @@ export function SideBetReminder({
 
         // Sort by priority: current > result_needed > upcoming
         return results.sort((a, b) => {
-            const priority = { current: 0, result_needed: 1, upcoming: 2 };
+            const priority = { current: 0, result_needed: 1, upcoming: 2 } satisfies Record<ReminderTone, number>;
             return priority[a.type] - priority[b.type];
         });
     }, [bets, currentHole, dismissedBets]);
@@ -229,30 +255,6 @@ export function SideBetReminder({
         }
     };
 
-    // Get reminder colors
-    const getReminderColors = (type: 'upcoming' | 'current' | 'result_needed') => {
-        switch (type) {
-            case 'current':
-                return {
-                    bg: 'rgba(0, 103, 71, 0.15)',
-                    border: 'rgba(34, 197, 94, 0.4)',
-                    accent: 'var(--masters)',
-                };
-            case 'result_needed':
-                return {
-                    bg: 'rgba(217, 119, 6, 0.15)',
-                    border: 'rgba(251, 191, 36, 0.4)',
-                    accent: '#F59E0B',
-                };
-            case 'upcoming':
-                return {
-                    bg: 'rgba(59, 130, 246, 0.15)',
-                    border: 'rgba(96, 165, 250, 0.4)',
-                    accent: '#3B82F6',
-                };
-        }
-    };
-
     // Get player name
     const getPlayerName = (playerId: string) => {
         const player = players.find(p => p.id === playerId);
@@ -269,11 +271,11 @@ export function SideBetReminder({
             <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-secondary-gold" />
-                    <span className="text-xs font-medium text-white/60 uppercase tracking-wider">
+                    <span className="text-xs font-medium text-[color:var(--canvas-raised)]/60 uppercase tracking-wider">
                         Side Bets
                     </span>
                     {reminders.length > 2 && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-[10px] text-white/40">
+                        <span className="px-1.5 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/10 text-[10px] text-[color:var(--canvas-raised)]/40">
                             {reminders.length}
                         </span>
                     )}
@@ -281,7 +283,7 @@ export function SideBetReminder({
                 {reminders.length > 2 && (
                     <button
                         onClick={() => setShowAll(!showAll)}
-                        className="text-xs text-white/40 hover:text-white/60"
+                        className="text-xs text-[color:var(--canvas-raised)]/45 hover:text-[color:var(--canvas-raised)]/70 transition-colors"
                     >
                         {showAll ? 'Show less' : 'Show all'}
                     </button>
@@ -291,7 +293,12 @@ export function SideBetReminder({
             {/* Reminder cards */}
             <AnimatePresence mode="popLayout">
                 {displayReminders.map(({ bet, holeNumber, type }) => {
-                    const colors = getReminderColors(type);
+                    const tone = reminderToneStyles[type];
+                    const toneVars: ToneCSSVariables = {
+                        '--tone-accent': tone.accent,
+                        '--tone-surface': tone.surface,
+                        '--tone-border': tone.border,
+                    };
                     const isExpanded = expandedBet === bet.id;
 
                     return (
@@ -302,13 +309,10 @@ export function SideBetReminder({
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             layout
                             className={cn(
-                                'rounded-xl overflow-hidden',
-                                'backdrop-blur-md',
+                                'rounded-xl overflow-hidden border',
+                                'backdrop-blur-md bg-[color:var(--tone-surface)] border-[color:var(--tone-border)]'
                             )}
-                            style={{
-                                background: colors.bg,
-                                border: `1px solid ${colors.border}`,
-                            }}
+                            style={toneVars}
                         >
                             {/* Main content */}
                             <button
@@ -316,30 +320,21 @@ export function SideBetReminder({
                                 className="w-full flex items-center gap-3 p-4"
                             >
                                 {/* Icon */}
-                                <div
-                                    className="shrink-0 p-2 rounded-xl"
-                                    style={{ background: `${colors.accent}20`, color: colors.accent }}
-                                >
+                                <div className="shrink-0 p-2 rounded-xl bg-[color:var(--tone-accent)]/15 text-[color:var(--tone-accent)]">
                                     {getBetIcon(bet.type)}
                                 </div>
 
                                 {/* Info */}
                                 <div className="flex-1 min-w-0 text-left">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-white text-sm">
+                                        <span className="font-semibold text-[color:var(--canvas-raised)] text-sm">
                                             {bet.name}
                                         </span>
-                                        <span
-                                            className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
-                                            style={{
-                                                background: `${colors.accent}30`,
-                                                color: colors.accent,
-                                            }}
-                                        >
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[color:var(--tone-accent)]/15 text-[color:var(--tone-accent)]">
                                             {type === 'current' ? 'NOW' : type === 'result_needed' ? 'NEEDS RESULT' : 'UPCOMING'}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-3 mt-1 text-xs text-white/60">
+                                    <div className="flex items-center gap-3 mt-1 text-xs text-[color:var(--canvas-raised)]/60">
                                         <span className="flex items-center gap-1">
                                             <MapPin className="w-3 h-3" />
                                             Hole {holeNumber}
@@ -354,7 +349,7 @@ export function SideBetReminder({
                                 {/* Arrow */}
                                 <ArrowRight
                                     className={cn(
-                                        'w-5 h-5 text-white/40 transition-transform',
+                                        'w-5 h-5 text-[color:var(--canvas-raised)]/45 transition-transform',
                                         isExpanded && 'rotate-90'
                                     )}
                                 />
@@ -370,13 +365,13 @@ export function SideBetReminder({
                                         className="overflow-hidden"
                                     >
                                         <div className="px-4 pb-4 space-y-3">
-                                            <div className="h-px bg-white/10" />
+                                            <div className="h-px bg-[color:var(--canvas-raised)]/10" />
 
                                             {/* CTP/Long Drive result entry */}
                                             {(bet.type === 'ctp' || bet.type === 'long_drive') && type !== 'upcoming' && (
                                                 <div className="space-y-2">
-                                                    <label className="text-xs text-white/60">
-                                                        {bet.type === 'ctp' ? 'Enter distance (feet\'inches)' : 'Enter distance (yards)'}
+                                                    <label className="text-xs text-[color:var(--canvas-raised)]/60">
+                                                        {bet.type === 'ctp' ? "Enter distance (feet'inches)" : 'Enter distance (yards)'}
                                                     </label>
                                                     <div className="flex gap-2">
                                                         <input
@@ -385,23 +380,20 @@ export function SideBetReminder({
                                                             onChange={(e) => setCtpValue(e.target.value)}
                                                             placeholder={bet.type === 'ctp' ? "e.g., 4'6\"" : 'e.g., 285'}
                                                             className={cn(
-                                                                'flex-1 px-3 py-2 rounded-lg',
-                                                                'bg-white/10 text-white placeholder-white/30',
-                                                                'border border-white/10',
-                                                                'focus:outline-none focus:ring-2 focus:ring-white/20',
-                                                                'text-sm',
+                                                                'flex-1 px-3 py-2 rounded-lg text-sm',
+                                                                'bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)] placeholder-[color:var(--canvas-raised)]/30',
+                                                                'border border-[color:var(--canvas-raised)]/10',
+                                                                'focus:outline-none focus:ring-2 focus:ring-[color:var(--canvas-raised)]/20 focus:border-[color:var(--canvas-raised)]/20'
                                                             )}
                                                         />
                                                         <button
                                                             onClick={() => handleResultSubmit(bet.id, holeNumber)}
                                                             disabled={!ctpValue}
                                                             className={cn(
-                                                                'px-4 py-2 rounded-lg',
-                                                                'text-white font-medium text-sm',
-                                                                'transition-colors',
+                                                                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                                                                 ctpValue
-                                                                    ? 'bg-masters hover:bg-masters/80'
-                                                                    : 'bg-white/10 opacity-50 cursor-not-allowed',
+                                                                    ? 'bg-[var(--masters)] text-[color:var(--canvas)] hover:bg-[color:var(--masters)]/85'
+                                                                    : 'bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/60 opacity-50 cursor-not-allowed'
                                                             )}
                                                         >
                                                             <Check className="w-4 h-4" />
@@ -413,7 +405,7 @@ export function SideBetReminder({
                                             {/* Current results */}
                                             {bet.results && bet.results.length > 0 && (
                                                 <div className="space-y-1">
-                                                    <span className="text-xs text-white/40">Current Standings</span>
+                                                    <span className="text-xs text-[color:var(--canvas-raised)]/45">Current Standings</span>
                                                     {bet.results
                                                         .filter(r => !bet.holes || bet.holes.includes(r.holeNumber || 0))
                                                         .map((result, i) => (
@@ -421,10 +413,10 @@ export function SideBetReminder({
                                                                 key={i}
                                                                 className="flex items-center justify-between text-xs"
                                                             >
-                                                                <span className="text-white/80">
+                                                                <span className="text-[color:var(--canvas-raised)]/75">
                                                                     {getPlayerName(result.playerId)}
                                                                 </span>
-                                                                <span className="font-mono text-white/60">
+                                                                <span className="font-mono text-[color:var(--canvas-raised)]/60">
                                                                     {result.value}
                                                                 </span>
                                                             </div>
@@ -436,14 +428,14 @@ export function SideBetReminder({
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => handleDismiss(bet.id, true)}
-                                                    className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/10 text-white/60 text-xs hover:bg-white/20 transition-colors"
+                                                    className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/65 text-xs hover:bg-[color:var(--canvas-raised)]/16 transition-colors"
                                                 >
                                                     <Clock className="w-3 h-3" />
                                                     Snooze
                                                 </button>
                                                 <button
                                                     onClick={() => handleDismiss(bet.id)}
-                                                    className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/10 text-white/60 text-xs hover:bg-white/20 transition-colors"
+                                                    className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/65 text-xs hover:bg-[color:var(--canvas-raised)]/16 transition-colors"
                                                 >
                                                     <BellOff className="w-3 h-3" />
                                                     Dismiss
