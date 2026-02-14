@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 02:48 EST — Phase 2 — Onboarding chips + Toast progress track: remove remaining white/black overlays
+- `TripWelcomeCard`: replaced remaining `bg-white/*`, `text-white/*`, and `border-white/*` utilities in hero badges, metadata row, and stat dividers with token-driven `var(--canvas-raised)` opacity classes so the invite hero stays theme-safe.
+- `SideBetOptIn`: updated “All In / None” buttons to use `var(--canvas-raised)` tint overlays instead of `bg-white/*` utilities for consistent legibility on the Masters gradient.
+- `Toast`: swapped the progress-track background off `bg-black/15 dark:bg-white/15` and onto a single neutral ink tint (`bg-[color:var(--ink)]/12`) to avoid dark-mode forks.
+- Lobster checkpoint: pending (run lint/typecheck + approval gate)
+
 ### 02:32 EST — Phase 2 — Smart pairing suggestions adopt premium tokens
 - `SmartPairingSuggestions`: migrated the captain pairing recommender UI off legacy Tailwind gray/blue/yellow palettes and dark-mode forks onto the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--info)`, `var(--warning)`, `var(--success)`, `var(--error)`, `var(--masters)`).
 - Fairness score, format toggles, suggestion cards, history table, and analysis panel now use tokenized surfaces/typography with consistent hover states.

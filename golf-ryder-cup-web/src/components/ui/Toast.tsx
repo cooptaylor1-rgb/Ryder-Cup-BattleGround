@@ -73,7 +73,7 @@ function ToastProgress({
   }, [isPaused, duration, onComplete, progress]);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-black/15 dark:bg-white/15">
+    <div className="absolute bottom-0 left-0 right-0 h-1 rounded-b-lg overflow-hidden bg-[color:var(--ink)]/12">
       <div
         className="h-full"
         style={{

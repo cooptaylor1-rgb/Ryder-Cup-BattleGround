@@ -121,11 +121,11 @@ export function TripWelcomeCard({
                         transition={{ delay: 0.2 }}
                         className="flex items-center gap-2 mb-6"
                     >
-                        <div className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-sm font-medium flex items-center gap-1.5">
+                        <div className="px-3 py-1.5 rounded-full bg-[color:var(--canvas-raised)]/18 backdrop-blur-sm text-sm font-medium flex items-center gap-1.5">
                             <Sparkles className="w-4 h-4" />
                             You&apos;re invited!
                         </div>
-                        <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-sm">
+                        <div className="px-3 py-1.5 rounded-full bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm text-sm">
                             {daysUntilTrip()}
                         </div>
                     </motion.div>
@@ -145,7 +145,7 @@ export function TripWelcomeCard({
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="flex flex-wrap gap-4 text-white/90 text-sm"
+                        className="flex flex-wrap gap-4 text-[color:var(--canvas-raised)]/90 text-sm"
                     >
                         <span className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
@@ -164,20 +164,20 @@ export function TripWelcomeCard({
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="flex gap-6 mt-6 pt-6 border-t border-white/20"
+                        className="flex gap-6 mt-6 pt-6 border-t border-[color:var(--canvas-raised)]/18"
                     >
                         <div className="text-center">
                             <div className="text-2xl font-bold">{trip.playerCount}</div>
-                            <div className="text-xs text-white/70">Players</div>
+                            <div className="text-xs text-[color:var(--canvas-raised)]/70">Players</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl font-bold">{trip.sessionsCount}</div>
-                            <div className="text-xs text-white/70">Sessions</div>
+                            <div className="text-xs text-[color:var(--canvas-raised)]/70">Sessions</div>
                         </div>
                         {trip.courseName && (
                             <div className="flex-1 text-right">
                                 <div className="text-sm font-medium truncate">{trip.courseName}</div>
-                                <div className="text-xs text-white/70">Course</div>
+                                <div className="text-xs text-[color:var(--canvas-raised)]/70">Course</div>
                             </div>
                         )}
                     </motion.div>

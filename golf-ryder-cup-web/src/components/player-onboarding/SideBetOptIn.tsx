@@ -220,13 +220,13 @@ export function SideBetOptIn({
                     <div className="flex gap-2">
                         <button
                             onClick={() => toggleAll(true)}
-                            className="px-3 py-1.5 rounded-lg bg-white/20 text-sm font-medium hover:bg-white/30 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-[color:var(--canvas-raised)]/18 text-sm font-medium hover:bg-[color:var(--canvas-raised)]/26 transition-colors"
                         >
                             All In
                         </button>
                         <button
                             onClick={() => toggleAll(false)}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 text-sm font-medium hover:bg-white/20 transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-[color:var(--canvas-raised)]/10 text-sm font-medium hover:bg-[color:var(--canvas-raised)]/18 transition-colors"
                         >
                             None
                         </button>
