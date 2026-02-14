@@ -347,7 +347,7 @@ export default function EnhancedMatchScoringPage() {
       try {
         await addAuditLogEntry(entry);
       } catch (error) {
-        console.warn('[Score Audit] Failed to record audit entry', error);
+        // Audit logging is best-effort; don't pollute the console in production
       }
     },
     [currentTrip, activeMatch, actorName]

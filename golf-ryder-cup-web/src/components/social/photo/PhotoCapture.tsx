@@ -408,7 +408,7 @@ function PhotoPreview({
                     {player.avatarUrl ? (
                       <Image
                         src={player.avatarUrl}
-                        alt=""
+                        alt={`${player.name} avatar`}
                         width={20}
                         height={20}
                         className="w-5 h-5 rounded-full"

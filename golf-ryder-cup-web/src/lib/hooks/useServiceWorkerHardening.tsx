@@ -92,7 +92,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
         activeWorker.postMessage({ type: 'KEEP_ALIVE' }, [channel.port2]);
       });
     } catch (error) {
-      console.warn('[SW Hardening] Keep-alive failed:', error);
+      // Keep-alive is best-effort; failures are expected when offline
       return false;
     }
   }, []);
@@ -107,10 +107,10 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
       const registration = await navigator.serviceWorker.ready;
       if (registration.active) {
         registration.active.postMessage({ type: 'REFRESH_CACHE' });
-        console.log('[SW Hardening] Cache refresh requested');
+        // Cache refresh requested silently
       }
     } catch (error) {
-      console.warn('[SW Hardening] Cache refresh request failed:', error);
+      // Cache refresh is best-effort; failures are expected when offline
     }
   }, []);
 
@@ -135,7 +135,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
         activeWorker.postMessage({ type: 'GET_CACHE_STATUS' }, [channel.port2]);
       });
     } catch (error) {
-      console.warn('[SW Hardening] Get cache status failed:', error);
+      // Cache status check is best-effort
       return null;
     }
   }, []);

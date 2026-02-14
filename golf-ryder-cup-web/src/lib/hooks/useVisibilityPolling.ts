@@ -90,7 +90,7 @@ export function useVisibilityPolling(
       lastFetchRef.current = Date.now();
       await fetchFnRef.current();
     } catch (error) {
-      console.error('[VisibilityPolling] Fetch error:', error);
+      // Swallow — callers handle their own error states
     }
   }, []);
 

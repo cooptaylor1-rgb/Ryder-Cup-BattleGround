@@ -440,6 +440,8 @@ function CompetitionTab({
                 entry={entry}
                 rank={index + 1}
                 isTeamA={entry.teamId === teamA?.id}
+                teamALabel={teamAName?.slice(0, 3).toUpperCase()}
+                teamBLabel={teamBName?.slice(0, 3).toUpperCase()}
                 animationDelay={index * 50}
               />
             ))}
@@ -903,10 +905,12 @@ interface PlayerRowProps {
   entry: PlayerLeaderboard;
   rank: number;
   isTeamA: boolean;
+  teamALabel?: string;
+  teamBLabel?: string;
   animationDelay?: number;
 }
 
-function PlayerRow({ entry, rank, isTeamA, animationDelay = 0 }: PlayerRowProps) {
+function PlayerRow({ entry, rank, isTeamA, teamALabel, teamBLabel, animationDelay = 0 }: PlayerRowProps) {
   const isTopThree = rank <= 3;
   const teamClass = isTeamA
     ? 'team-row-usa team-row-accent-usa'
@@ -928,7 +932,7 @@ function PlayerRow({ entry, rank, isTeamA, animationDelay = 0 }: PlayerRowProps)
       <span
         className={`${isTeamA ? 'team-badge team-badge-usa' : 'team-badge team-badge-europe'} text-xs py-[var(--space-1)] px-[var(--space-2)]`}
       >
-        {isTeamA ? 'USA' : 'EUR'}
+        {isTeamA ? (teamALabel || 'USA') : (teamBLabel || 'EUR')}
       </span>
 
       {/* Player Info */}
