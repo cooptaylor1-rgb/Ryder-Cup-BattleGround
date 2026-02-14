@@ -41,6 +41,8 @@ import {
   Share2,
   BarChart3,
   ArrowRight,
+  Shield,
+  Pencil,
 } from 'lucide-react';
 import type { HoleWinner, PlayerHoleScore } from '@/lib/types/models';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
@@ -884,6 +886,10 @@ export default function EnhancedMatchScoringPage() {
 
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
+  // Captain score correction state
+  const { isCaptainMode } = useUIStore();
+  const [isEditingScores, setIsEditingScores] = useState(false);
+
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
       {/* Celebration Overlay - Lazy loaded for performance */}
@@ -1153,8 +1159,25 @@ export default function EnhancedMatchScoringPage() {
         </AnimatePresence>
 
         {/* Scoring Area */}
-        {!isMatchComplete ? (
+        {!isMatchComplete || isEditingScores ? (
           <section className="space-y-4">
+            {/* Captain score correction banner */}
+            {isEditingScores && isMatchComplete && (
+              <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-[var(--gold-subtle)] border border-[var(--gold)]">
+                <div className="flex items-center gap-2">
+                  <Shield size={16} className="text-[var(--gold)] shrink-0" />
+                  <p className="text-sm font-medium text-[var(--ink)]">
+                    Captain: Editing completed match
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsEditingScores(false)}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[var(--canvas)] border border-[var(--rule)]"
+                >
+                  Done
+                </button>
+              </div>
+            )}
             {/* Hole Navigation Header — immersive, focused */}
             <div className="flex items-center justify-between px-[var(--space-2)]">
               <button
@@ -1747,6 +1770,20 @@ export default function EnhancedMatchScoringPage() {
                   <Share2 size={18} />
                   Share Result
                 </button>
+
+                {/* Captain: Edit Scores */}
+                {isCaptainMode && (
+                  <button
+                    onClick={() => {
+                      setIsEditingScores(true);
+                      goToHole(1);
+                    }}
+                    className="w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-canvas-raised border border-rule text-ink"
+                  >
+                    <Pencil size={16} />
+                    Correct a Score
+                  </button>
+                )}
 
                 {/* Back to Matches */}
                 <button

@@ -27,6 +27,8 @@ import {
   TrendingUp,
   Star,
   Medal,
+  Share2,
+  PartyPopper,
 } from 'lucide-react';
 import { EmptyStatePremium, NoStandingsPremiumEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { BottomNav, PageHeader } from '@/components/layout';
@@ -394,6 +396,20 @@ function CompetitionTab({
         <p className="type-micro mt-[var(--space-8)]">
           {standings.matchesCompleted} of {standings.totalMatches} matches complete
         </p>
+
+        {/* Trip Complete — Recap CTA */}
+        {standings.remainingMatches === 0 && standings.matchesCompleted > 0 && (
+          <div className="mt-[var(--space-6)] mx-auto max-w-sm">
+            <Link
+              href="/recap"
+              className="flex items-center justify-center gap-[var(--space-2)] w-full py-[var(--space-3)] px-[var(--space-5)] rounded-xl font-semibold text-[length:var(--text-sm)] bg-[var(--masters)] text-white press-scale"
+            >
+              <PartyPopper size={18} />
+              View Trip Recap & Share
+              <Share2 size={16} />
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* Path to Victory */}

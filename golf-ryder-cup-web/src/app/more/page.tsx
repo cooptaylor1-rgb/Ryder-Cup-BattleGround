@@ -38,6 +38,7 @@ import {
   // Info
   Heart,
   Info,
+  HelpCircle,
 } from 'lucide-react';
 import { PageHeader, BottomNav } from '@/components/layout';
 
@@ -238,6 +239,13 @@ export default function MorePage() {
         description: 'Highlight reel & year in review',
         icon: <Trophy size={20} />,
         href: '/recap',
+      },
+      {
+        id: 'help',
+        label: 'Help & FAQ',
+        description: 'How to score, captain mode & more',
+        icon: <HelpCircle size={20} />,
+        href: '/help',
       },
     ],
   };

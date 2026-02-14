@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '@/lib/db';
+import { FirstLaunchWalkthrough } from '@/components/FirstLaunchWalkthrough';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { tripLogger } from '@/lib/utils/logger';
@@ -572,6 +573,7 @@ export default function HomePage() {
       </main>
 
       <BottomNav badges={navBadges} activeMatchId={activeMatchId} />
+      <FirstLaunchWalkthrough />
     </div>
     </>
   );
