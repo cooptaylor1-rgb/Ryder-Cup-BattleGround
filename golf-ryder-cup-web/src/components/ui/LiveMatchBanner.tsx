@@ -58,14 +58,15 @@ export function LiveMatchBanner({
         className
       )}
       style={{
-        background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+        background: 'linear-gradient(135deg, var(--error) 0%, color-mix(in srgb, var(--error) 72%, black 28%) 100%)',
       }}
     >
       {/* Pulsing background effect */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          background: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.2) 0%, transparent 50%)',
+          background:
+            'radial-gradient(circle at 30% 50%, color-mix(in srgb, var(--canvas-raised) 22%, transparent) 0%, transparent 55%)',
           animation: 'pulse 2s ease-in-out infinite',
         }}
       />
@@ -74,10 +75,10 @@ export function LiveMatchBanner({
       {onDismiss && (
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-[color:var(--canvas-raised)]/10 hover:bg-[color:var(--canvas-raised)]/20 transition-colors z-10"
           aria-label="Dismiss"
         >
-          <X className="w-4 h-4 text-white/80" />
+          <X className="w-4 h-4 text-[color:var(--canvas-raised)]/80" />
         </button>
       )}
 
@@ -87,14 +88,14 @@ export function LiveMatchBanner({
           <div className="relative">
             <div
               className="w-14 h-14 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(255,255,255,0.15)' }}
+              style={{ background: 'color-mix(in srgb, var(--canvas-raised) 18%, transparent)' }}
             >
-              <Tv className="w-7 h-7 text-white" />
+              <Tv className="w-7 h-7 text-[color:var(--canvas-raised)]" />
             </div>
             {/* Pulsing dot */}
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--canvas-raised)] opacity-75" />
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-[color:var(--canvas-raised)]" />
             </span>
           </div>
         </div>
@@ -102,34 +103,34 @@ export function LiveMatchBanner({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-white text-red-600">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[color:var(--canvas-raised)] text-[color:var(--error)]">
               <Play className="w-3 h-3 fill-current" />
               LIVE
             </span>
             {currentHole && (
-              <span className="text-white/80 text-sm font-medium">
+              <span className="text-[color:var(--canvas-raised)]/80 text-sm font-medium">
                 Hole {currentHole}
               </span>
             )}
           </div>
 
-          <p className="text-white font-semibold text-lg">
+          <p className="text-[color:var(--canvas-raised)] font-semibold text-lg">
             {matchCount} {matchCount === 1 ? 'Match' : 'Matches'} in Progress
           </p>
 
           {closestMatch && (
-            <p className="text-white/80 text-sm mt-0.5 truncate">
+            <p className="text-[color:var(--canvas-raised)]/80 text-sm mt-0.5 truncate">
               {closestMatch.teamA} vs {closestMatch.teamB} • {closestMatch.score}
             </p>
           )}
         </div>
 
         {/* Arrow */}
-        <ChevronRight className="w-6 h-6 text-white/60 group-hover:text-white transition-colors shrink-0" />
+        <ChevronRight className="w-6 h-6 text-[color:var(--canvas-raised)]/60 group-hover:text-[color:var(--canvas-raised)] transition-colors shrink-0" />
       </div>
 
       {/* Bottom action hint */}
-      <div className="relative mt-3 pt-3 border-t border-white/20 flex items-center justify-center gap-2 text-white/80 text-sm">
+      <div className="relative mt-3 pt-3 border-t border-[color:var(--canvas-raised)]/20 flex items-center justify-center gap-2 text-[color:var(--canvas-raised)]/80 text-sm">
         <Users className="w-4 h-4" />
         <span>Tap to watch live scoring</span>
       </div>
@@ -160,14 +161,14 @@ export function LiveMatchPill({ matchCount, onClick, className }: LiveMatchPillP
         className
       )}
       style={{
-        background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+        background: 'linear-gradient(135deg, var(--error) 0%, color-mix(in srgb, var(--error) 72%, black 28%) 100%)',
       }}
     >
       <span className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--canvas-raised)] opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-[color:var(--canvas-raised)]" />
       </span>
-      <span className="text-white text-sm font-semibold">
+      <span className="text-[color:var(--canvas-raised)] text-sm font-semibold">
         {matchCount} Live
       </span>
     </button>
