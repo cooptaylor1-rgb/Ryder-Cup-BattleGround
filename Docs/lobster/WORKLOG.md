@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 20:15 EST — Phase 2 — Live play capture affordances: premium token sweep
+- `QuickPhotoCapture`: replaced gradient + white overlay styles with premium surface/ink tokens, added tokenized focus ring + hover states, and swapped capture button halos to `var(--canvas-raised)` tints so the camera tray stays readable across themes.
+- `VoiceScoring`: migrated idle/listening/processing/error shells off raw `bg-white/*` overlays and inline rgba backgrounds onto premium Masters/error tone tokens; standardized cancel/retry actions on shared neutral overlays and swapped the loader accent to `var(--masters)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 19:52 EST — Phase 2 — Live scoring affordances: premium overlay tokens
 - `QuickScoreFABv2`: replaced the remaining `bg-white/*` overlays (pulse halo, icon capsule, LIVE badge, menu close control) with `var(--canvas-raised)` tone-driven tints so the quick-score affordance stays legible across light/dark themes.
 - `OfflineIndicator`: swapped offline queue badges and detail dividers off hard-coded `white/*` backgrounds onto shared surface tokens to keep status chips and retry counts readable without blowing out dark mode.

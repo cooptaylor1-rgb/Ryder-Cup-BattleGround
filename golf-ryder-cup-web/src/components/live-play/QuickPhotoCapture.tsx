@@ -294,19 +294,17 @@ export function QuickPhotoCapture({
                 whileTap={{ scale: 0.9 }}
                 className={cn(
                     'relative flex items-center justify-center',
-                    'rounded-full shadow-md',
+                    'rounded-full shadow-lg border border-[var(--rule)]',
+                    'bg-[var(--surface-raised)] text-[var(--ink-primary)]',
                     'transition-all duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                    'hover:bg-[var(--surface-secondary)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                    'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]',
                     compact
                         ? 'w-10 h-10'
                         : 'w-12 h-12 lg:w-14 lg:h-14',
                     className,
                 )}
-                style={{
-                    background: 'linear-gradient(135deg, var(--surface) 0%, #2A2520 100%)',
-                    color: '#F5F1E8',
-                    border: '1px solid rgba(128, 120, 104, 0.3)',
-                }}
                 aria-label={`Capture photo for hole ${holeNumber}`}
             >
                 <Camera className={cn(compact ? 'w-5 h-5' : 'w-6 h-6')} />
@@ -314,11 +312,7 @@ export function QuickPhotoCapture({
                 {/* Hole badge */}
                 {!compact && (
                     <span
-                        className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold"
-                        style={{
-                            background: 'var(--masters)',
-                            color: 'white',
-                        }}
+                        className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-[var(--masters)] text-white"
                     >
                         {holeNumber}
                     </span>
@@ -338,7 +332,7 @@ export function QuickPhotoCapture({
                         <div className="flex items-center justify-between p-4">
                             <button
                                 onClick={handleClose}
-                                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                                className="p-2 rounded-full bg-[color:var(--canvas-raised)]/10 hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                                 aria-label="Close camera"
                             >
                                 <X className="w-6 h-6 text-white" />
@@ -351,7 +345,7 @@ export function QuickPhotoCapture({
 
                             <button
                                 onClick={handleSwitchCamera}
-                                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                                className="p-2 rounded-full bg-[color:var(--canvas-raised)]/10 hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                                 aria-label="Switch camera"
                             >
                                 <RotateCcw className="w-5 h-5 text-white" />
@@ -393,7 +387,7 @@ export function QuickPhotoCapture({
                                         animate={{ opacity: 0 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.15 }}
-                                        className="absolute inset-0 bg-white"
+                                        className="absolute inset-0 bg-[color:var(--canvas-raised)]"
                                     />
                                 )}
                             </AnimatePresence>
@@ -417,9 +411,9 @@ export function QuickPhotoCapture({
                                         placeholder="Add a caption..."
                                         className={cn(
                                             'flex-1 px-4 py-3 rounded-xl',
-                                            'bg-white/10 text-white placeholder-white/40',
-                                            'border border-white/10',
-                                            'focus:outline-none focus:ring-2 focus:ring-white/20',
+                                            'bg-[color:var(--canvas-raised)]/10 text-white placeholder-white/40',
+                                            'border border-[color:var(--canvas-raised)]/10',
+                                            'focus:outline-none focus:ring-2 focus:ring-[color:var(--canvas-raised)]/20',
                                         )}
                                     />
                                     <button
@@ -428,7 +422,7 @@ export function QuickPhotoCapture({
                                             'p-3 rounded-xl transition-colors',
                                             isListening
                                                 ? 'bg-red-500 text-white'
-                                                : 'bg-white/10 text-white hover:bg-white/20',
+                                                : 'bg-[color:var(--canvas-raised)]/10 text-white hover:bg-[color:var(--canvas-raised)]/20',
                                         )}
                                         aria-label={isListening ? 'Stop listening' : 'Voice input'}
                                     >
@@ -466,8 +460,8 @@ export function QuickPhotoCapture({
                                         onClick={handleRetake}
                                         className={cn(
                                             'flex flex-col items-center gap-2 p-4 rounded-2xl',
-                                            'bg-white/10 text-white',
-                                            'hover:bg-white/20 transition-colors',
+                                            'bg-[color:var(--canvas-raised)]/10 text-white',
+                                            'hover:bg-[color:var(--canvas-raised)]/20 transition-colors',
                                         )}
                                     >
                                         <RotateCcw className="w-6 h-6" />
@@ -480,10 +474,8 @@ export function QuickPhotoCapture({
                                         className={cn(
                                             'flex flex-col items-center gap-2 px-8 py-4 rounded-2xl',
                                             'text-white font-medium',
+                                            'bg-[var(--masters)]',
                                         )}
-                                        style={{
-                                            background: 'var(--masters)',
-                                        }}
                                     >
                                         <Check className="w-6 h-6" />
                                         <span className="text-xs">Save</span>
@@ -499,17 +491,13 @@ export function QuickPhotoCapture({
                                             'w-20 h-20 rounded-full',
                                             'flex items-center justify-center',
                                             'transition-all duration-200',
+                                            'bg-[color:var(--canvas-raised)]/10 border-[4px] border-[color:var(--canvas-raised)]',
                                             error && 'opacity-30 cursor-not-allowed',
                                         )}
-                                        style={{
-                                            background: 'rgba(255, 255, 255, 0.1)',
-                                            border: '4px solid white',
-                                        }}
                                         aria-label="Take photo"
                                     >
                                         <div
-                                            className="w-14 h-14 rounded-full"
-                                            style={{ background: 'white' }}
+                                            className="w-14 h-14 rounded-full bg-[color:var(--canvas-raised)]"
                                         />
                                     </motion.button>
                                 </div>

@@ -391,14 +391,13 @@ export function VoiceScoring({
             onClick={startListening}
             className={cn(
               'flex items-center justify-center',
-              'w-14 h-14 rounded-full shadow-lg',
-              'transition-colors duration-150'
+              'w-14 h-14 rounded-full shadow-lg border border-[var(--rule)]',
+              'bg-[var(--surface-raised)] text-[var(--ink-primary)]',
+              'transition-colors duration-150',
+              'hover:bg-[var(--surface-secondary)]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+              'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]'
             )}
-            style={{
-              background: 'linear-gradient(135deg, var(--surface) 0%, #2A2520 100%)',
-              border: '1px solid rgba(128, 120, 104, 0.3)',
-              color: '#F5F1E8',
-            }}
             aria-label="Start voice scoring"
           >
             <Mic className="w-6 h-6" />
@@ -414,11 +413,10 @@ export function VoiceScoring({
             exit={{ scale: 0.9, opacity: 0 }}
             className={cn(
               'flex flex-col items-center gap-3 p-4 rounded-2xl',
-              'shadow-lg backdrop-blur-md'
+              'shadow-lg backdrop-blur-md',
+              'border border-[color:var(--masters)]/40 bg-[color:var(--masters)]/95'
             )}
             style={{
-              background: 'rgba(0, 103, 71, 0.95)',
-              border: '1px solid rgba(34, 197, 94, 0.4)',
               minWidth: '200px',
             }}
             role="status"
@@ -433,24 +431,24 @@ export function VoiceScoring({
             >
               <div
                 className={cn(
-                  'absolute inset-0 bg-white/20 rounded-full',
+                  'absolute inset-0 bg-[color:var(--canvas-raised)]/20 rounded-full',
                   !prefersReducedMotion && 'animate-ping'
                 )}
               />
-              <div className="relative p-4 rounded-full bg-white/10">
+              <div className="relative p-4 rounded-full bg-[color:var(--canvas-raised)]/10">
                 <Mic className="w-8 h-8 text-white" />
               </div>
             </motion.div>
 
             <div className="text-center">
               <p className="text-white font-medium">Listening...</p>
-              <p className="text-white/60 text-xs mt-1">Hole {currentHole}</p>
+              <p className="text-[color:var(--canvas-raised)]/60 text-xs mt-1">Hole {currentHole}</p>
             </div>
 
             {/* Live transcript */}
             {transcript && (
               <p
-                className="text-white/80 text-sm italic text-center"
+                className="text-[color:var(--canvas-raised)]/80 text-sm italic text-center"
                 aria-live="polite"
                 aria-atomic="true"
               >
@@ -461,7 +459,7 @@ export function VoiceScoring({
             {/* Cancel button */}
             <button
               onClick={stopListening}
-              className="mt-2 px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm hover:bg-white/20 transition-colors"
+              className="mt-2 px-4 py-2 rounded-full bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/80 text-sm hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
             >
               Cancel
             </button>
@@ -475,13 +473,13 @@ export function VoiceScoring({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className={cn('flex items-center justify-center', 'w-14 h-14 rounded-full shadow-lg')}
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid rgba(128, 120, 104, 0.3)',
-            }}
+            className={cn(
+              'flex items-center justify-center',
+              'w-14 h-14 rounded-full shadow-lg border border-[var(--rule)]',
+              'bg-[var(--surface-raised)] text-[var(--ink-primary)]'
+            )}
           >
-            <Loader2 className="w-6 h-6 text-white animate-spin" />
+            <Loader2 className="w-6 h-6 text-[var(--masters)] animate-spin" />
           </motion.div>
         )}
 
@@ -494,24 +492,24 @@ export function VoiceScoring({
             exit={{ scale: 0.9, opacity: 0 }}
             className={cn(
               'flex flex-col items-center gap-3 p-4 rounded-2xl',
-              'shadow-lg backdrop-blur-md'
+              'shadow-lg backdrop-blur-md',
+              'border-2 border-transparent bg-[color:var(--surface)]/95'
             )}
             style={{
-              background: 'rgba(26, 24, 20, 0.95)',
-              border: `2px solid ${getWinnerColor(recognizedScore.winner)}`,
+              borderColor: getWinnerColor(recognizedScore.winner),
               minWidth: '220px',
             }}
           >
             {/* Result preview */}
             <div className="text-center">
-              <p className="text-white/60 text-xs uppercase tracking-wider">Hole {currentHole}</p>
+              <p className="text-[color:var(--canvas-raised)]/60 text-xs uppercase tracking-wider">Hole {currentHole}</p>
               <p
                 className="text-2xl font-bold mt-1"
                 style={{ color: getWinnerColor(recognizedScore.winner) }}
               >
                 {getWinnerDisplay(recognizedScore.winner)}
               </p>
-              <p className="text-white/40 text-xs mt-2 italic">
+              <p className="text-[color:var(--canvas-raised)]/40 text-xs mt-2 italic">
                 &quot;{recognizedScore.rawTranscript}&quot;
               </p>
             </div>
@@ -522,8 +520,8 @@ export function VoiceScoring({
                 onClick={cancel}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-full',
-                  'bg-white/10 text-white/80 text-sm',
-                  'hover:bg-white/20 transition-colors'
+                  'bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/80 text-sm',
+                  'hover:bg-[color:var(--canvas-raised)]/20 transition-colors'
                 )}
               >
                 <X className="w-4 h-4" />
@@ -555,11 +553,10 @@ export function VoiceScoring({
             exit={{ scale: 0.9, opacity: 0 }}
             className={cn(
               'flex flex-col items-center gap-3 p-4 rounded-2xl',
-              'shadow-lg backdrop-blur-md'
+              'shadow-lg backdrop-blur-md',
+              'border border-[color:var(--error)]/40 bg-[color:var(--error)]/95'
             )}
             style={{
-              background: 'rgba(185, 28, 28, 0.95)',
-              border: '1px solid rgba(239, 68, 68, 0.4)',
               minWidth: '200px',
             }}
             role="alert"
@@ -567,17 +564,17 @@ export function VoiceScoring({
             aria-atomic="true"
           >
             <AlertCircle className="w-8 h-8 text-white" />
-            <p className="text-white/90 text-sm text-center">{errorMessage}</p>
+            <p className="text-[color:var(--canvas-raised)]/90 text-sm text-center">{errorMessage}</p>
             <div className="flex gap-2">
               <button
                 onClick={cancel}
-                className="px-4 py-2 rounded-full bg-white/10 text-white/80 text-sm hover:bg-white/20 transition-colors"
+                className="px-4 py-2 rounded-full bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas-raised)]/80 text-sm hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={startListening}
-                className="px-4 py-2 rounded-full bg-white/20 text-white text-sm hover:bg-white/30 transition-colors"
+                className="px-4 py-2 rounded-full bg-[color:var(--canvas-raised)]/20 text-white text-sm hover:bg-[color:var(--canvas-raised)]/30 transition-colors"
               >
                 Try Again
               </button>
