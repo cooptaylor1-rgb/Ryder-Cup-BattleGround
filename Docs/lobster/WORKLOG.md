@@ -3,6 +3,13 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-14
+
+### 00:08 EST — Phase 2 — Live play status widgets adopt premium inverse tokens
+- `MatchStatusHeader`: replaced remaining hard-coded ink/white overlays with inverse canvas/ink tokens, giving skeletons, momentum badge, and fallback states tokenized surfaces + team shades so the mini-scoreboard stays legible across shells.
+- `FloatingMyMatch`: swapped inline gradients, white overlays, and red/green hexes for premium gradient tokens, team/status tone classes, and inverse canvas chips; detail drawer now leans on tokenized borders/ink instead of rgba hacks.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ## 2026-02-13
 
 ### 23:42 EST — Phase 2 — Tokenize remaining white overlay chips (Nassau + Archives + Notifications toggle)

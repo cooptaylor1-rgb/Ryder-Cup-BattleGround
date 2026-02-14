@@ -207,11 +207,11 @@ export function FloatingMyMatch({
     if (matchDataLoading && !myMatchData) {
         return (
             <div
-                className="fixed right-4 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg bg-[#1a1814]/80 backdrop-blur-sm animate-pulse"
+                className="fixed right-4 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg border border-[color:var(--ink-secondary)]/30 bg-[color:var(--ink)]/80 text-[color:var(--canvas-raised)] backdrop-blur-sm animate-pulse"
                 style={{ bottom: `${bottomOffset}px` }}
             >
-                <Target className="w-5 h-5 text-white/20" />
-                <div className="h-3.5 w-14 rounded bg-white/10" />
+                <Target className="w-5 h-5 text-[color:var(--canvas-raised)]/30" />
+                <div className="h-3.5 w-14 rounded bg-[color:var(--canvas-raised)]/15" />
             </div>
         );
     }
@@ -245,6 +245,30 @@ export function FloatingMyMatch({
 
     const { scoreDisplay, isWinning, isLosing, currentHole, teammateNames, opponentNames } = myMatchData;
 
+    const gradientStyle = isWinning
+        ? 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)'
+        : isLosing
+            ? 'linear-gradient(135deg, var(--error) 0%, color-mix(in srgb, var(--error) 85%, black) 100%)'
+            : 'linear-gradient(135deg, color-mix(in srgb, var(--ink) 72%, transparent) 0%, color-mix(in srgb, var(--ink) 90%, transparent) 100%)';
+
+    const pulseToneClass = isWinning
+        ? 'bg-[var(--masters)]'
+        : isLosing
+            ? 'bg-[var(--error)]'
+            : 'bg-[color:var(--ink)]/60';
+
+    const primaryBoxShadow = hasNewUpdate
+        ? '0 0 20px color-mix(in srgb, var(--masters) 45%, transparent), 0 4px 20px rgba(0, 0, 0, 0.3)'
+        : '0 4px 20px rgba(0, 0, 0, 0.24)';
+
+    const scoreEmphasisClass = isWinning
+        ? 'text-[color:var(--success)]'
+        : isLosing
+            ? 'text-[color:var(--error)]'
+            : 'text-[color:var(--canvas-raised)]/80';
+
+    const circleFill = isWinning ? 'var(--masters)' : isLosing ? 'var(--error)' : 'var(--ink-tertiary)';
+
     return (
         <AnimatePresence>
             <motion.div
@@ -262,37 +286,22 @@ export function FloatingMyMatch({
                     onClick={handleClick}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
-                        'relative flex items-center gap-3',
-                        'rounded-full shadow-lg',
+                        'relative flex items-center gap-3 px-4 py-3',
+                        'rounded-full shadow-lg text-[color:var(--canvas-raised)]',
                         'transition-all duration-300 ease-out',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                        // Sizing based on expanded state
-                        isExpanded ? 'px-4 py-3' : 'px-4 py-3',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                        'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--canvas)]',
                     )}
                     style={{
-                        background: isWinning
-                            ? 'linear-gradient(135deg, var(--masters) 0%, #004D35 100%)'
-                            : isLosing
-                                ? 'linear-gradient(135deg, #B91C1C 0%, #991B1B 100%)'
-                                : 'linear-gradient(135deg, var(--surface) 0%, #2A2520 100%)',
-                        boxShadow: hasNewUpdate
-                            ? '0 0 20px rgba(0, 103, 71, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3)'
-                            : '0 4px 20px rgba(0, 0, 0, 0.3)',
-                        color: '#F5F1E8',
+                        background: gradientStyle,
+                        boxShadow: primaryBoxShadow,
                     }}
                     aria-label={`My match: ${scoreDisplay}. Tap to ${isExpanded ? 'go to scoring' : 'expand'}`}
                 >
                     {/* Pulse ring for updates */}
                     {hasNewUpdate && (
                         <motion.div
-                            className="absolute inset-0 rounded-full"
-                            style={{
-                                background: isWinning
-                                    ? 'var(--masters)'
-                                    : isLosing
-                                        ? '#B91C1C'
-                                        : 'var(--surface)',
-                            }}
+                            className={cn('absolute inset-0 rounded-full', pulseToneClass)}
                             initial={{ opacity: 0.6, scale: 1 }}
                             animate={{ opacity: 0, scale: 1.5 }}
                             transition={{ duration: 1.5, repeat: Infinity }}
@@ -301,15 +310,9 @@ export function FloatingMyMatch({
 
                     {/* Icon */}
                     <div className="relative">
-                        <Target className="w-5 h-5" />
+                        <Target className="w-5 h-5 text-current" />
                         {/* Hole number badge */}
-                        <span
-                            className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full text-[10px] font-bold"
-                            style={{
-                                background: 'rgba(0, 0, 0, 0.4)',
-                                backdropFilter: 'blur(4px)',
-                            }}
-                        >
+                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[color:var(--ink)]/60 text-[10px] font-bold leading-none text-[color:var(--canvas-raised)] backdrop-blur-sm">
                             {currentHole}
                         </span>
                     </div>
@@ -324,7 +327,7 @@ export function FloatingMyMatch({
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="text-[10px] opacity-80"
+                                className="text-[10px] text-[color:var(--canvas-raised)]/70"
                             >
                                 Tap to score
                             </motion.span>
@@ -334,10 +337,7 @@ export function FloatingMyMatch({
                     {/* Expand/collapse toggle */}
                     <button
                         onClick={handleExpandToggle}
-                        className={cn(
-                            'p-1 rounded-full transition-transform duration-200',
-                            'hover:bg-white/10',
-                        )}
+                        className="p-1 rounded-full transition-transform duration-200 hover:bg-[color:var(--canvas-raised)]/20"
                         aria-label={isExpanded ? 'Collapse' : 'Expand'}
                     >
                         <ChevronUp
@@ -361,49 +361,36 @@ export function FloatingMyMatch({
                                 'absolute bottom-full right-0 mb-2',
                                 'w-56 p-3 rounded-xl',
                                 'shadow-xl backdrop-blur-md',
+                                'bg-[color:var(--ink)]/90 border border-[color:var(--ink-secondary)]/30 text-[color:var(--canvas-raised)]',
                             )}
-                            style={{
-                                background: 'rgba(26, 24, 20, 0.95)',
-                                border: '1px solid rgba(128, 120, 104, 0.2)',
-                            }}
                         >
-                            {/* Match info */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[10px] uppercase tracking-wider opacity-60">
+                                    <span className="text-[10px] uppercase tracking-wider text-[color:var(--canvas-raised)]/60">
                                         Your Team
                                     </span>
-                                    <Circle
-                                        className="w-2 h-2"
-                                        fill={isWinning ? 'var(--masters)' : isLosing ? '#EF4444' : '#6B7280'}
-                                        stroke="none"
-                                    />
+                                    <Circle className="w-2 h-2" style={{ fill: circleFill }} stroke="none" />
                                 </div>
                                 <p className="text-sm font-medium">
                                     {teammateNames.join(' & ')}
                                 </p>
 
-                                <div className="h-px bg-white/10 my-2" />
+                                <div className="my-2 h-px bg-[color:var(--canvas-raised)]/12" />
 
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[10px] uppercase tracking-wider opacity-60">
+                                    <span className="text-[10px] uppercase tracking-wider text-[color:var(--canvas-raised)]/60">
                                         Opponents
                                     </span>
                                 </div>
-                                <p className="text-sm opacity-80">
+                                <p className="text-sm text-[color:var(--canvas-raised)]/80">
                                     {opponentNames.join(' & ')}
                                 </p>
 
-                                <div className="h-px bg-white/10 my-2" />
+                                <div className="my-2 h-px bg-[color:var(--canvas-raised)]/12" />
 
-                                {/* Quick stats */}
                                 <div className="flex items-center justify-between text-xs">
-                                    <span className="opacity-60">Hole {currentHole} of 18</span>
-                                    <span className={cn(
-                                        'font-semibold',
-                                        isWinning && 'text-green-400',
-                                        isLosing && 'text-red-400',
-                                    )}>
+                                    <span className="text-[color:var(--canvas-raised)]/70">Hole {currentHole} of 18</span>
+                                    <span className={cn('font-semibold', scoreEmphasisClass)}>
                                         {scoreDisplay}
                                     </span>
                                 </div>

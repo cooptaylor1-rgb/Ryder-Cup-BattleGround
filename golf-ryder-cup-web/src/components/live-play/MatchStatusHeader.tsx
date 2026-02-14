@@ -194,16 +194,16 @@ export function MatchStatusHeader({
             <div className={cn(
                 'mx-4 mt-2 rounded-xl overflow-hidden',
                 'shadow-md backdrop-blur-md',
-                'bg-[#1a1814]/95 border border-[#807868]/20',
+                'bg-[color:var(--ink)]/85 border border-[color:var(--ink-secondary)]/30 text-[color:var(--canvas-raised)]',
                 'flex items-center gap-3 px-4 py-2.5',
                 className,
             )}>
-                <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-[color:var(--canvas-raised)]/20 animate-pulse" />
                 <div className="flex-1 flex items-center gap-2">
-                    <div className="h-3.5 w-20 rounded bg-white/10 animate-pulse" />
-                    <div className="h-3 w-12 rounded bg-white/5 animate-pulse" />
+                    <div className="h-3.5 w-20 rounded bg-[color:var(--canvas-raised)]/12 animate-pulse" />
+                    <div className="h-3 w-12 rounded bg-[color:var(--canvas-raised)]/10 animate-pulse" />
                 </div>
-                <ChevronDown className="w-4 h-4 text-white/20" />
+                <ChevronDown className="w-4 h-4 text-[color:var(--canvas-raised)]/30" />
             </div>
         );
     }
@@ -221,7 +221,7 @@ export function MatchStatusHeader({
                 className={cn(
                     'mx-4 mt-2 rounded-xl overflow-hidden',
                     'shadow-md backdrop-blur-md',
-                    'bg-[#1a1814]/90 border border-[#807868]/20',
+                    'bg-[color:var(--ink)]/80 border border-[color:var(--ink-secondary)]/30 text-[color:var(--canvas-raised)]',
                     'flex items-center justify-between gap-3 px-4 py-2.5',
                     'text-left',
                     className,
@@ -229,13 +229,13 @@ export function MatchStatusHeader({
                 aria-label="No match in progress. View schedule"
             >
                 <div className="flex items-center gap-3">
-                    <Target className="w-4 h-4 text-white/70" />
+                    <Target className="w-4 h-4 text-[color:var(--canvas-raised)]/70" />
                     <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-white/90">No match in progress</span>
-                        <span className="text-xs text-white/60">Tap to view schedule</span>
+                        <span className="text-sm font-semibold text-[color:var(--canvas-raised)]/90">No match in progress</span>
+                        <span className="text-xs text-[color:var(--canvas-raised)]/60">Tap to view schedule</span>
                     </div>
                 </div>
-                <ChevronDown className="w-4 h-4 text-white/30 -rotate-90" />
+                <ChevronDown className="w-4 h-4 text-[color:var(--canvas-raised)]/40 -rotate-90" />
             </button>
         );
     }
@@ -276,7 +276,7 @@ export function MatchStatusHeader({
             className={cn(
                 'mx-4 mt-2 rounded-xl overflow-hidden',
                 'shadow-md backdrop-blur-md',
-                'bg-[#1a1814]/95 border border-[#807868]/20',
+                'bg-[color:var(--ink)]/85 border border-[color:var(--ink-secondary)]/30 text-[color:var(--canvas-raised)]',
                 className,
             )}
         >
@@ -292,7 +292,7 @@ export function MatchStatusHeader({
                             'w-2 h-2 rounded-full',
                             !isComplete && 'animate-pulse',
                             isComplete
-                                ? 'bg-gray-500'
+                                ? 'bg-[color:var(--ink-tertiary)]'
                                 : isTeamAUp
                                     ? 'bg-[var(--team-usa)]'
                                     : isTeamBUp
@@ -303,11 +303,11 @@ export function MatchStatusHeader({
 
                     {/* Score display */}
                     <div className="flex items-baseline gap-2">
-                        <span className="text-sm font-bold text-white">
+                        <span className="text-sm font-bold text-[color:var(--canvas-raised)]">
                             {formatScore()}
                         </span>
                         {!isComplete && currentHole > 1 && (
-                            <span className="text-xs text-white/50">
+                            <span className="text-xs text-[color:var(--canvas-raised)]/60">
                                 thru {currentHole - 1}
                             </span>
                         )}
@@ -318,9 +318,9 @@ export function MatchStatusHeader({
                         <div
                             className={cn(
                                 'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
-                                momentum === 'teamA' && 'bg-red-500/15 text-red-400',
-                                momentum === 'teamB' && 'bg-blue-500/15 text-blue-300',
-                                momentum === 'neutral' && 'bg-white/10 text-white/60',
+                                momentum === 'teamA' && 'bg-[color:var(--team-usa)]/18 text-[color:var(--team-usa)]/90',
+                                momentum === 'teamB' && 'bg-[color:var(--team-europe)]/18 text-[color:var(--team-europe)]/85',
+                                momentum === 'neutral' && 'bg-[color:var(--canvas-raised)]/12 text-[color:var(--canvas-raised)]/60',
                             )}
                         >
                             <Flame className="w-3 h-3" />
@@ -332,7 +332,7 @@ export function MatchStatusHeader({
                 {/* Expand toggle */}
                 <ChevronDown
                     className={cn(
-                        'w-4 h-4 text-white/40 transition-transform duration-200',
+                        'w-4 h-4 text-[color:var(--canvas-raised)]/50 transition-transform duration-200',
                         isExpanded && 'rotate-180',
                     )}
                 />
@@ -350,7 +350,7 @@ export function MatchStatusHeader({
                     >
                         <div className="px-4 pb-3 space-y-3">
                             {/* Divider */}
-                            <div className="h-px bg-white/10" />
+                            <div className="h-px bg-[color:var(--canvas-raised)]/12" />
 
                             {/* Teams */}
                             <div className="flex items-center justify-between text-sm">
@@ -358,34 +358,34 @@ export function MatchStatusHeader({
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
                                         <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
-                                        <span className="text-xs text-white/60 uppercase tracking-wider">
+                                        <span className="text-xs text-[color:var(--canvas-raised)]/60 uppercase tracking-wider">
                                             USA
                                         </span>
                                     </div>
-                                    <p className="font-medium text-white text-xs">
+                                    <p className="font-medium text-[color:var(--canvas-raised)] text-xs">
                                         {teamAPlayers.map(p => `${p.firstName || '?'} ${p.lastName?.[0] || '?'}.`).join(' / ')}
                                     </p>
-                                    <p className="text-xl font-bold text-white mt-1">{teamAWins}</p>
+                                    <p className="text-xl font-bold text-[color:var(--canvas-raised)] mt-1">{teamAWins}</p>
                                 </div>
 
                                 {/* VS */}
                                 <div className="px-4 text-center">
-                                    <span className="text-xs text-white/40">VS</span>
-                                    <p className="text-xs text-white/30 mt-1">{halves} halved</p>
+                                    <span className="text-xs text-[color:var(--canvas-raised)]/50">VS</span>
+                                    <p className="text-xs text-[color:var(--canvas-raised)]/40 mt-1">{halves} halved</p>
                                 </div>
 
                                 {/* Team B */}
                                 <div className="flex-1 text-right">
                                     <div className="flex items-center gap-2 mb-1 justify-end">
-                                        <span className="text-xs text-white/60 uppercase tracking-wider">
+                                        <span className="text-xs text-[color:var(--canvas-raised)]/60 uppercase tracking-wider">
                                             EUR
                                         </span>
                                         <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
                                     </div>
-                                    <p className="font-medium text-white text-xs">
+                                    <p className="font-medium text-[color:var(--canvas-raised)] text-xs">
                                         {teamBPlayers.map(p => `${p.firstName || '?'} ${p.lastName?.[0] || '?'}.`).join(' / ')}
                                     </p>
-                                    <p className="text-xl font-bold text-white mt-1">{teamBWins}</p>
+                                    <p className="text-xl font-bold text-[color:var(--canvas-raised)] mt-1">{teamBWins}</p>
                                 </div>
                             </div>
 
@@ -397,7 +397,7 @@ export function MatchStatusHeader({
                                         'w-full flex items-center justify-center gap-2',
                                         'py-2 rounded-lg',
                                         'text-sm font-medium',
-                                        'bg-[var(--masters)] text-white hover:opacity-90',
+                                        'bg-[var(--masters)] text-[color:var(--canvas-raised)] hover:opacity-90',
                                         'transition-opacity duration-150',
                                     )}
                                 >
