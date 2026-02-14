@@ -28,6 +28,37 @@ interface SmartPairingSuggestionsProps {
   onApplySuggestion?: (suggestion: PairingSuggestion) => void;
 }
 
+type FairnessTone = 'success' | 'warning' | 'error';
+
+function getFairnessTone(score: number): FairnessTone {
+  if (score >= 0.8) return 'success';
+  if (score >= 0.6) return 'warning';
+  return 'error';
+}
+
+function toneStyles(tone: FairnessTone) {
+  switch (tone) {
+    case 'success':
+      return {
+        bg: 'bg-[color:var(--success)]/12',
+        text: 'text-[var(--success)]',
+        badge: 'bg-[color:var(--success)]/15 text-[var(--success)]',
+      };
+    case 'warning':
+      return {
+        bg: 'bg-[color:var(--warning)]/12',
+        text: 'text-[var(--warning)]',
+        badge: 'bg-[color:var(--warning)]/15 text-[var(--warning)]',
+      };
+    case 'error':
+      return {
+        bg: 'bg-[color:var(--error)]/12',
+        text: 'text-[var(--error)]',
+        badge: 'bg-[color:var(--error)]/15 text-[var(--error)]',
+      };
+  }
+}
+
 export function SmartPairingSuggestions({
   players,
   teams,
@@ -151,10 +182,13 @@ export function SmartPairingSuggestions({
     return avgScore / 100;
   }, [suggestions]);
 
+  const overallTone = getFairnessTone(overallFairness);
+  const overallToneStyles = toneStyles(overallTone);
+
   // Early return AFTER all hooks
   if (!tripId) {
     return (
-      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+      <div className="card p-4 text-center text-[var(--ink-tertiary)]">
         No active trip found. Please create a trip first.
       </div>
     );
@@ -174,22 +208,24 @@ export function SmartPairingSuggestions({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Lightbulb className="w-6 h-6 text-yellow-500" />
+          <Lightbulb className="w-6 h-6 text-[var(--color-accent)]" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">
+            <h3 className="font-semibold text-[var(--ink-primary)]">
               Smart Pairing Suggestions
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-[var(--ink-tertiary)]">
               AI-powered recommendations based on history
             </p>
           </div>
         </div>
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className={`p-2 rounded-lg transition-colors ${showHistory
-            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
-            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
-            }`}
+          className={
+            `p-2 rounded-lg transition-colors ${showHistory
+              ? 'bg-[color:var(--info)]/12 text-[var(--info)]'
+              : 'hover:bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
+            }`
+          }
           title="View pairing history"
         >
           <History className="w-5 h-5" />
@@ -197,30 +233,23 @@ export function SmartPairingSuggestions({
       </div>
 
       {/* Fairness Score */}
-      <div className="p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+      <div className="p-4 rounded-lg border border-[var(--rule)] bg-linear-to-r from-[color:var(--info)]/10 to-[color:var(--color-accent)]/8">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Overall Pairing Fairness</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-sm text-[var(--ink-secondary)]">Overall Pairing Fairness</p>
+            <p className="text-2xl font-bold text-[var(--ink-primary)]">
               {Math.round(overallFairness * 100)}%
             </p>
           </div>
-          <div className={`p-3 rounded-full ${overallFairness >= 0.8
-            ? 'bg-green-100 dark:bg-green-900/30'
-            : overallFairness >= 0.6
-              ? 'bg-yellow-100 dark:bg-yellow-900/30'
-              : 'bg-red-100 dark:bg-red-900/30'
-            }`}>
-            {overallFairness >= 0.8 ? (
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            ) : overallFairness >= 0.6 ? (
-              <AlertTriangle className="w-6 h-6 text-yellow-600" />
+          <div className={`p-3 rounded-full ${overallToneStyles.bg}`}>
+            {overallTone === 'success' ? (
+              <CheckCircle className={`w-6 h-6 ${overallToneStyles.text}`} />
             ) : (
-              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <AlertTriangle className={`w-6 h-6 ${overallToneStyles.text}`} />
             )}
           </div>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-sm text-[var(--ink-tertiary)] mt-2">
           {overallFairness >= 0.8
             ? 'Pairings are well-distributed across players'
             : overallFairness >= 0.6
@@ -231,7 +260,7 @@ export function SmartPairingSuggestions({
 
       {/* Format Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
           Match Format
         </label>
         <div className="flex gap-2">
@@ -239,10 +268,12 @@ export function SmartPairingSuggestions({
             <button
               key={format}
               onClick={() => setSelectedFormat(format)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedFormat === format
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+              className={
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedFormat === format
+                  ? 'bg-[var(--masters)] text-white'
+                  : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
+                }`
+              }
             >
               {format.charAt(0).toUpperCase() + format.slice(1)}
             </button>
@@ -252,140 +283,140 @@ export function SmartPairingSuggestions({
 
       {/* Suggestions */}
       <div className="space-y-3">
-        <h4 className="font-medium text-gray-900 dark:text-white">
+        <h4 className="font-medium text-[var(--ink-primary)]">
           Recommended Pairings
         </h4>
         {suggestions.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+          <p className="text-[var(--ink-tertiary)] text-center py-4">
             No suggestions available. Add more players to generate pairings.
           </p>
         ) : (
-          suggestions.map((suggestion, idx) => (
-            <div
-              key={idx}
-              className="p-4 border dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${suggestion.fairnessScore >= 80
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : suggestion.fairnessScore >= 60
-                        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
-                      Score: {suggestion.fairnessScore}
-                    </span>
-                    {suggestion.fairnessScore >= 80 && (
-                      <Star className="w-4 h-4 text-yellow-500" />
+          suggestions.map((suggestion, idx) => {
+            const suggestionTone = getFairnessTone(suggestion.fairnessScore / 100);
+            const suggestionToneStyles = toneStyles(suggestionTone);
+
+            return (
+              <div
+                key={idx}
+                className="p-4 border border-[var(--rule)] bg-[var(--surface)] rounded-lg hover:border-[color:var(--masters)]/60 transition-colors"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${suggestionToneStyles.badge}`}>
+                        Score: {suggestion.fairnessScore}
+                      </span>
+                      {suggestion.fairnessScore >= 80 && (
+                        <Star className="w-4 h-4 text-[var(--warning)]" />
+                      )}
+                    </div>
+
+                    {/* Team A */}
+                    <div className="mb-2">
+                      <p className="text-xs text-[var(--info)] mb-1">
+                        {getTeamName(0)}
+                      </p>
+                      <div className="flex items-center gap-2 text-[var(--ink-primary)]">
+                        <Users className="w-4 h-4 text-[var(--ink-tertiary)]" />
+                        {suggestion.teamAPlayers.map(getPlayerName).join(' & ')}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center my-2">
+                      <span className="text-sm text-[var(--ink-tertiary)]">vs</span>
+                    </div>
+
+                    {/* Team B */}
+                    <div>
+                      <p className="text-xs text-[var(--error)] mb-1">
+                        {getTeamName(1)}
+                      </p>
+                      <div className="flex items-center gap-2 text-[var(--ink-primary)]">
+                        <Users className="w-4 h-4 text-[var(--ink-tertiary)]" />
+                        {suggestion.teamBPlayers.map(getPlayerName).join(' & ')}
+                      </div>
+                    </div>
+
+                    {/* Handicap Gap */}
+                    {suggestion.handicapGap > 0 && (
+                      <div className="mt-2 text-xs text-[var(--ink-tertiary)]">
+                        Handicap gap: {suggestion.handicapGap.toFixed(1)} strokes
+                      </div>
+                    )}
+
+                    {/* Reasoning */}
+                    {suggestion.reasoning.length > 0 && (
+                      <div className="mt-3 flex items-start gap-2">
+                        <Info className="w-4 h-4 text-[var(--ink-tertiary)] mt-0.5" />
+                        <p className="text-sm text-[var(--ink-secondary)]">
+                          {suggestion.reasoning.join(' • ')}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Warnings */}
+                    {suggestion.warnings.length > 0 && (
+                      <div className="mt-2 flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-[var(--warning)] mt-0.5" />
+                        <p className="text-sm text-[var(--warning)]">
+                          {suggestion.warnings.join(' • ')}
+                        </p>
+                      </div>
                     )}
                   </div>
 
-                  {/* Team A */}
-                  <div className="mb-2">
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mb-1">
-                      {getTeamName(0)}
-                    </p>
-                    <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      {suggestion.teamAPlayers.map(getPlayerName).join(' & ')}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center my-2">
-                    <span className="text-sm text-gray-400">vs</span>
-                  </div>
-
-                  {/* Team B */}
-                  <div>
-                    <p className="text-xs text-red-600 dark:text-red-400 mb-1">
-                      {getTeamName(1)}
-                    </p>
-                    <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      {suggestion.teamBPlayers.map(getPlayerName).join(' & ')}
-                    </div>
-                  </div>
-
-                  {/* Handicap Gap */}
-                  {suggestion.handicapGap > 0 && (
-                    <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                      Handicap gap: {suggestion.handicapGap.toFixed(1)} strokes
-                    </div>
-                  )}
-
-                  {/* Reasoning */}
-                  {suggestion.reasoning.length > 0 && (
-                    <div className="mt-3 flex items-start gap-2">
-                      <Info className="w-4 h-4 text-gray-400 mt-0.5" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {suggestion.reasoning.join(' • ')}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Warnings */}
-                  {suggestion.warnings.length > 0 && (
-                    <div className="mt-2 flex items-start gap-2">
-                      <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5" />
-                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                        {suggestion.warnings.join(' • ')}
-                      </p>
-                    </div>
+                  {onApplySuggestion && (
+                    <button
+                      onClick={() => onApplySuggestion(suggestion)}
+                      className="ml-4 p-2 bg-[var(--masters)] text-white rounded-lg hover:bg-[var(--masters-deep)] transition-colors"
+                      title="Apply this pairing"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   )}
                 </div>
-
-                {onApplySuggestion && (
-                  <button
-                    onClick={() => onApplySuggestion(suggestion)}
-                    className="ml-4 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    title="Apply this pairing"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
       {/* Pairing History */}
       {showHistory && (
-        <div className="border dark:border-gray-700 rounded-lg overflow-hidden">
-          <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b dark:border-gray-700">
-            <h4 className="font-medium text-gray-900 dark:text-white">
+        <div className="border border-[var(--rule)] rounded-lg overflow-hidden bg-[var(--surface)]">
+          <div className="bg-[var(--surface-secondary)] px-4 py-3 border-b border-[var(--rule)]">
+            <h4 className="font-medium text-[var(--ink-primary)]">
               Pairing History
             </h4>
           </div>
           <div className="max-h-64 overflow-y-auto">
             {pairingHistory.length === 0 ? (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+              <p className="text-center text-[var(--ink-tertiary)] py-4">
                 No pairing history yet
               </p>
             ) : (
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                <thead className="bg-[var(--surface-secondary)] sticky top-0">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Players</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Type</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Format</th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Date</th>
+                    <th className="px-4 py-2 text-left font-medium text-[var(--ink-secondary)]">Players</th>
+                    <th className="px-4 py-2 text-left font-medium text-[var(--ink-secondary)]">Type</th>
+                    <th className="px-4 py-2 text-left font-medium text-[var(--ink-secondary)]">Format</th>
+                    <th className="px-4 py-2 text-left font-medium text-[var(--ink-secondary)]">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-gray-700">
+                <tbody className="divide-y divide-[color:var(--rule)]">
                   {pairingHistory.slice(0, 20).map((entry, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    <tr key={idx} className="hover:bg-[var(--surface-secondary)]">
+                      <td className="px-4 py-2 text-[var(--ink-primary)]">
                         {getPlayerName(entry.player1Id)} & {getPlayerName(entry.player2Id)}
                       </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300 capitalize">
+                      <td className="px-4 py-2 text-[var(--ink-secondary)] capitalize">
                         {entry.relationship}
                       </td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-300 capitalize">
+                      <td className="px-4 py-2 text-[var(--ink-secondary)] capitalize">
                         {entry.sessionType}
                       </td>
-                      <td className="px-4 py-2 text-gray-500 dark:text-gray-400 text-xs">
+                      <td className="px-4 py-2 text-[var(--ink-tertiary)] text-xs">
                         {entry.timestamp
                           ? new Date(entry.timestamp).toLocaleDateString()
                           : '-'}
@@ -401,33 +432,33 @@ export function SmartPairingSuggestions({
 
       {/* Current Session Analysis */}
       {currentSessionAnalysis && (
-        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+        <div className="p-4 rounded-lg border border-[var(--rule)] bg-[var(--surface-secondary)]">
+          <h4 className="font-medium text-[var(--ink-primary)] mb-2">
             Current Session Analysis
           </h4>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-[var(--ink-primary)]">
                 {currentSessionAnalysis.overallFairnessScore}%
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Fairness Score</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Fairness Score</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-[var(--ink-primary)]">
                 {currentSessionAnalysis.repeatMatchupCount}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Repeat Matchups</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Repeat Matchups</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-[var(--ink-primary)]">
                 {currentSessionAnalysis.handicapBalance}%
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Handicap Balance</p>
+              <p className="text-xs text-[var(--ink-tertiary)]">Handicap Balance</p>
             </div>
           </div>
           {currentSessionAnalysis.suggestions.length > 0 && (
-            <div className="mt-3 pt-3 border-t dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="mt-3 pt-3 border-t border-[var(--rule)]">
+              <p className="text-sm text-[var(--ink-secondary)]">
                 💡 {currentSessionAnalysis.suggestions[0]}
               </p>
             </div>
