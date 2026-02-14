@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `QuickStandingsOverlay`: swapped linear-gradient team cards and white overlays for tone-driven team surfaces, premium ink typography, and neutral match summaries so live standings read cleanly in light/dark shells.
 - `StickyUndoBanner`: moved the undo banner onto raised premium surfaces with tokenized progress, controls, and focus treatments, removing inline rgba backgrounds on undo/dismiss affordances.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`ee5f23f`)
+- Commit + push ✅ (`5a67da2`)
 
 ### 00:36 EST — Phase 2 — Side bet reminders adopt premium inverse tokens
 - `SideBetReminder`: replaced rgba white overlays and hex palettes with premium tone tokens (`var(--masters)`, `var(--warning)`, `var(--info)`) for current/upcoming/result-needed states so the cards stay legible on light and dark shells.
