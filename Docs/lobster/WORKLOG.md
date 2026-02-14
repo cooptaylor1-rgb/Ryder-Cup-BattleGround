@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 04:35 EST — Phase 2 — Tokenize remaining black/white overlay controls (SwipeScorePanel + PhotoGallery)
+- `SwipeScorePanel`: replaced the keyboard shortcut hint + current score pill backgrounds off `bg-black/*` + `dark:bg-white/*` forks onto a single neutral ink tint (`bg-[color:var(--ink)]/…`) with canvas text so overlays stay consistent across themes.
+- `PhotoGallery` full-screen viewer: migrated close + navigation button hover/fill tints off `bg-white/*` and onto token-driven canvas overlays (`bg-[color:var(--canvas)]/…`) for theme-safe controls on the dark viewer shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
+
 ### 02:48 EST — Phase 2 — Onboarding chips + Toast progress track: remove remaining white/black overlays
 - `TripWelcomeCard`: replaced remaining `bg-white/*`, `text-white/*`, and `border-white/*` utilities in hero badges, metadata row, and stat dividers with token-driven `var(--canvas-raised)` opacity classes so the invite hero stays theme-safe.
 - `SideBetOptIn`: updated “All In / None” buttons to use `var(--canvas-raised)` tint overlays instead of `bg-white/*` utilities for consistent legibility on the Masters gradient.

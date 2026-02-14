@@ -286,7 +286,7 @@ function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount 
                 <span className="text-sm">{currentIndex} of {totalCount}</span>
                 <button
                     onClick={onClose}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-full hover:bg-[color:var(--canvas)]/10 transition-colors"
                 >
                     <X className="w-6 h-6" />
                 </button>
@@ -307,7 +307,7 @@ function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount 
             <div className="flex items-center justify-between p-4">
                 <button
                     onClick={onPrev}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    className="p-3 rounded-full bg-[color:var(--canvas)]/10 hover:bg-[color:var(--canvas)]/18 transition-colors"
                 >
                     <ChevronLeft className="w-6 h-6 text-white" />
                 </button>
@@ -318,7 +318,7 @@ function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount 
 
                 <button
                     onClick={onNext}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    className="p-3 rounded-full bg-[color:var(--canvas)]/10 hover:bg-[color:var(--canvas)]/18 transition-colors"
                 >
                     <ChevronRight className="w-6 h-6 text-white" />
                 </button>

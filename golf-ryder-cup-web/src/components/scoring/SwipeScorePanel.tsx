@@ -450,14 +450,14 @@ export function SwipeScorePanel({
         className="absolute bottom-20 left-1/2 -translate-x-1/2 opacity-0 focus-within:opacity-100 transition-opacity pointer-events-none"
         aria-hidden="true"
       >
-        <div className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm">
-          <span className="text-xs text-white/80">← A wins • ↑ Halved • B wins →</span>
+        <div className="px-3 py-1.5 rounded-lg bg-[color:var(--ink)]/45 backdrop-blur-sm">
+          <span className="text-xs text-[color:var(--canvas)]/85">← A wins • ↑ Halved • B wins →</span>
         </div>
       </div>
 
       {/* Current score display */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2">
-        <div className="px-4 py-1.5 rounded-full bg-black/20 dark:bg-white/10 backdrop-blur-sm">
+        <div className="px-4 py-1.5 rounded-full bg-[color:var(--ink)]/12 backdrop-blur-sm">
           <span className="text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>
             {getScoreDisplay()}
           </span>
