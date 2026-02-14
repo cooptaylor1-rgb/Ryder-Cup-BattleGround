@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 19:12 EST — Phase 2 — Live match banner CTA: premium token sweep
+- `LiveMatchBanner` + `LiveMatchPill`: replaced hard-coded crimson gradients, white overlays, and text treatments with premium error + canvas tokens (`var(--error)`, `var(--canvas-raised)`) and token-driven `color-mix` tints so the live CTA matches the editorial palette across themes.
+- Dismiss affordance, live badges, and pulse indicators now rely on tokenized Tailwind classes instead of `bg-white/*` utilities, keeping hover/focus states readable in both light and dark contexts.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3fd8882`).
+
 ### 19:05 EST — Phase 2 — Bulk import modal: premium token alignment
 - `BulkImportModal`: replaced legacy `bg-white`/`text-gray-*`/`border-gray-*` classes with premium surface/ink/rule tokens, added border + card shadow so the import dialog matches the editorial shell.
 - Success/warning/error summaries now use token-tinted backgrounds + icon colors (`var(--success)`, `var(--warning)`, `var(--error)`) and the preview table relies on neutral rule/ink tokens instead of Tailwind grays.
