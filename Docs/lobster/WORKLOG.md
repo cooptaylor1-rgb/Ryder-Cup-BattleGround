@@ -9,6 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `AvailabilityCalendar`: replaced hard-coded Tailwind palette utilities (`green-*`, `amber-*`, `red-*`, `blue-*`) with premium status tokens (`var(--success)`, `var(--warning)`, `var(--error)`, `var(--info)`) for session icons and Yes/Maybe/No selection states; removed dark-mode forks in favor of token tints.
 - `PlayerRosterImport`: mapped Team A/B assignment buttons to Ryder Cup team tokens (`bg-team-usa` / `bg-team-europe`) and moved destructive remove affordance onto `var(--error)` tokens instead of raw `red-*` classes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f41d745`)
 
 ### 07:15 EST — Phase 2 — Button component: replace hard-coded Masters hex with tokens
 - `Button` (UI primitive): primary + danger variants now use premium tokens instead of hard-coded hex/`text-white` (`bg-[var(--masters)]`, `bg-[var(--error)]`, `text-[var(--canvas)]`) with token-driven hover/active states.
