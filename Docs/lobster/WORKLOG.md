@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 22:27 EST — Phase 2 — Course details weather surfaces: premium token sweep
+- `CourseDetails`: swapped gradient quick-action overlays to canvas token tints (`bg-[color:var(--canvas)]/15 → /25`) and aligned header metadata on the inverse canvas text tone so the module keeps legibility without raw `white/*` utilities.
+- `WeatherWidget`: replaced the refresh button, stat row, and hero typography with canvas token overlays/text, parameterized the background pattern fill, and moved icon defaults to the premium inverse tone to eliminate the remaining `white/*` classes in course weather.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6e2a081`)
+
 ### 21:56 EST — Phase 2 — Form errors adopt premium token system
 - `FormError` inline + summary states now rely on premium error/warning/success/info tokens for surfaces, borders, and icons rather than legacy Tailwind palette utilities; inline copy stays on neutral ink tokens for readability.
 - `FormErrorSummary` focus ring, icon, and body copy moved onto premium tokens, and `FormHint` now uses the shared ink tertiary tone to avoid dark-mode forks.
