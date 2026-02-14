@@ -2152,3 +2152,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `StrokeIndicator`: refactored from passing raw `color` strings to a typed `variant` (`usa`/`europe`) so Lucide icons + labels can use class-driven token colors (and a small fixed rgba tint for the leading-strokes badge background).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`b60c5c2`)
+
+## 2026-02-14
+
+### 08:23 EST — Phase 2 — AchievementUnlock: reduce inline styles
+- `AchievementUnlock` / `AchievementBadge`: replaced a few remaining inline `style={{ ... }}` props with Tailwind classes (overlay uses `bg-black/90`, shine uses `bg-[linear-gradient(...)]`).
+- Introduced a single CSS custom property `--rarity-color` on the badge wrapper so repeated rarity-colored fills can be class-driven (`bg-[color:var(--rarity-color)]`) instead of duplicating inline styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c3501d5`)
