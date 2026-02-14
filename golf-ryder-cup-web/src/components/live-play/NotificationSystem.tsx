@@ -87,6 +87,59 @@ interface NotificationContextValue {
 }
 
 // ============================================
+// VISUAL TOKENS
+// ============================================
+
+type NotificationToneClasses = {
+    container: string;
+    icon: string;
+    title: string;
+    message: string;
+    action: string;
+    dismiss: string;
+    dismissIcon: string;
+};
+
+const NOTIFICATION_TONE_CLASSES: Record<NotificationPriority, NotificationToneClasses> = {
+    urgent: {
+        container: 'border border-[color:var(--error)]/45 bg-[color:var(--error)]/92 text-white',
+        icon: 'bg-[color:var(--canvas)]/20 text-white',
+        title: 'text-white',
+        message: 'text-white/80',
+        action: 'text-white/90 hover:text-white',
+        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-white/70',
+    },
+    high: {
+        container: 'border border-[color:var(--warning)]/40 bg-[color:var(--warning)]/92 text-white',
+        icon: 'bg-[color:var(--canvas)]/20 text-white',
+        title: 'text-white',
+        message: 'text-white/85',
+        action: 'text-white/90 hover:text-white',
+        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-white/70',
+    },
+    medium: {
+        container: 'border border-[color:var(--success)]/40 bg-[color:var(--success)]/92 text-white',
+        icon: 'bg-[color:var(--canvas)]/20 text-white',
+        title: 'text-white',
+        message: 'text-white/85',
+        action: 'text-white/90 hover:text-white',
+        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-white/70',
+    },
+    low: {
+        container: 'border border-[color:var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)]',
+        icon: 'bg-[color:var(--surface)] text-[var(--ink-secondary)]',
+        title: 'text-[var(--ink-primary)]',
+        message: 'text-[var(--ink-secondary)]',
+        action: 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]',
+        dismiss: 'text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)] hover:bg-[color:var(--surface)]/70',
+        dismissIcon: 'text-[var(--ink-tertiary)]',
+    },
+};
+
+// ============================================
 // CONTEXT
 // ============================================
 
@@ -273,6 +326,7 @@ export function NotificationToast({
     autoHideDuration = 5000,
 }: NotificationToastProps) {
     const { trigger } = useHaptic();
+    const tone = NOTIFICATION_TONE_CLASSES[notification.priority] ?? NOTIFICATION_TONE_CLASSES.low;
 
     // Auto-dismiss
     useEffect(() => {
@@ -302,37 +356,6 @@ export function NotificationToast({
         }
     };
 
-    const getColors = () => {
-        switch (notification.priority) {
-            case 'urgent':
-                return {
-                    bg: 'rgba(185, 28, 28, 0.95)',
-                    border: 'rgba(239, 68, 68, 0.5)',
-                    icon: '#FCA5A5',
-                };
-            case 'high':
-                return {
-                    bg: 'rgba(217, 119, 6, 0.95)',
-                    border: 'rgba(251, 191, 36, 0.5)',
-                    icon: '#FDE68A',
-                };
-            case 'medium':
-                return {
-                    bg: 'rgba(0, 103, 71, 0.95)',
-                    border: 'rgba(34, 197, 94, 0.5)',
-                    icon: '#86EFAC',
-                };
-            default:
-                return {
-                    bg: 'rgba(26, 24, 20, 0.95)',
-                    border: 'rgba(128, 120, 104, 0.3)',
-                    icon: '#A09080',
-                };
-        }
-    };
-
-    const colors = getColors();
-
     return (
         <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -340,28 +363,22 @@ export function NotificationToast({
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-                'max-w-sm w-full p-4 rounded-2xl shadow-lg backdrop-blur-md',
-                'flex items-start gap-3',
+                'max-w-sm w-full p-4 rounded-2xl backdrop-blur-md border shadow-[var(--shadow-card-lg)]',
+                'flex items-start gap-3 transition-colors',
+                tone.container,
             )}
-            style={{
-                background: colors.bg,
-                border: `1px solid ${colors.border}`,
-            }}
         >
             {/* Icon */}
-            <div
-                className="shrink-0 p-2 rounded-xl"
-                style={{ background: 'rgba(255, 255, 255, 0.1)', color: colors.icon }}
-            >
+            <div className={cn('shrink-0 p-2 rounded-xl transition-colors', tone.icon)}>
                 {getIcon()}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-white text-sm">
+                <h4 className={cn('font-semibold text-sm', tone.title)}>
                     {notification.title}
                 </h4>
-                <p className="text-white/80 text-xs mt-0.5 line-clamp-2">
+                <p className={cn('mt-0.5 text-xs line-clamp-2', tone.message)}>
                     {notification.message}
                 </p>
 
@@ -373,7 +390,12 @@ export function NotificationToast({
                             notification.action?.onClick();
                             onDismiss();
                         }}
-                        className="flex items-center gap-1 mt-2 text-xs font-medium text-white/90 hover:text-white"
+                        className={cn(
+                            'mt-2 flex items-center gap-1 text-xs font-medium transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                            'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]',
+                            tone.action,
+                        )}
                     >
                         {notification.action.label}
                         <ChevronRight className="w-3 h-3" />
@@ -387,10 +409,15 @@ export function NotificationToast({
                     trigger('light');
                     onDismiss();
                 }}
-                className="shrink-0 p-1 rounded-full hover:bg-white/10 transition-colors"
+                className={cn(
+                    'shrink-0 p-1 rounded-full transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                    'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]',
+                    tone.dismiss,
+                )}
                 aria-label="Dismiss"
             >
-                <X className="w-4 h-4 text-white/60" />
+                <X className={cn('w-4 h-4 transition-colors', tone.dismissIcon)} />
             </button>
         </motion.div>
     );
@@ -420,7 +447,7 @@ export function NotificationStack({
         'top-center': 'top-4 left-1/2 -translate-x-1/2',
         'bottom-right': 'bottom-24 right-4',
         'bottom-center': 'bottom-24 left-1/2 -translate-x-1/2',
-    };
+    } as const;
 
     return (
         <div className={cn('fixed z-50 space-y-2', positionClasses[position])}>
@@ -461,13 +488,18 @@ export function NotificationBell({ className, onClick }: NotificationBellProps) 
                     trigger('selection');
                     setSoundEnabled(!soundEnabled);
                 }}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                className={cn(
+                    'p-2 rounded-full transition-colors',
+                    'hover:bg-[color:var(--canvas-raised)]/15',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                    'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]',
+                )}
                 aria-label={soundEnabled ? 'Mute notifications' : 'Unmute notifications'}
             >
                 {soundEnabled ? (
-                    <Volume2 className="w-5 h-5 text-white/60" />
+                    <Volume2 className="w-5 h-5 text-[var(--ink-secondary)]" />
                 ) : (
-                    <VolumeX className="w-5 h-5 text-white/40" />
+                    <VolumeX className="w-5 h-5 text-[var(--ink-tertiary)]" />
                 )}
             </button>
 
@@ -477,15 +509,20 @@ export function NotificationBell({ className, onClick }: NotificationBellProps) 
                     trigger('medium');
                     onClick?.();
                 }}
-                className="relative p-2 rounded-full hover:bg-white/10 transition-colors"
+                className={cn(
+                    'relative p-2 rounded-full transition-colors',
+                    'hover:bg-[color:var(--canvas-raised)]/15',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                    'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--focus-ring-offset)]',
+                )}
                 aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
             >
-                <Bell className="w-5 h-5 text-white/80" />
+                <Bell className="w-5 h-5 text-[var(--ink-secondary)]" />
                 {unreadCount > 0 && (
                     <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold"
+                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[var(--error)] text-white text-[10px] font-bold shadow-[var(--shadow-card-sm)]"
                     >
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </motion.span>
