@@ -171,7 +171,7 @@ export default function RecapPage() {
               onClick={() => setActiveSection(id)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeSection === id
-                  ? 'bg-[var(--masters)] text-white'
+                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-card)] text-[var(--ink-tertiary)] border border-[var(--rule)]'
               }`}
             >
@@ -204,20 +204,20 @@ export default function RecapPage() {
 function HeroBanner({ recap }: { recap: TripRecapData }) {
   const winnerGradient =
     recap.winner === 'usa'
-      ? 'from-[#1E3A5F] to-[#0D1F35]'
+      ? 'from-[color:var(--team-usa-gradient-start)] to-[color:var(--team-usa-gradient-end)]'
       : recap.winner === 'europe'
-        ? 'from-[#722F37] to-[#3D181C]'
-        : 'from-[#006747] to-[#004D35]';
+        ? 'from-[color:var(--team-europe-gradient-start)] to-[color:var(--team-europe-gradient-end)]'
+        : 'from-[color:var(--masters)] to-[color:var(--masters-deep)]';
 
   return (
     <div className={`relative p-8 rounded-2xl overflow-hidden bg-gradient-to-br ${winnerGradient}`}>
       <div className="absolute top-4 right-4 opacity-10">
-        <Trophy className="w-28 h-28 text-white" />
+        <Trophy className="w-28 h-28 text-[var(--canvas)]" />
       </div>
 
       <div className="relative z-10">
-        <h1 className="text-2xl font-bold text-white">{recap.narrative.headline}</h1>
-        <p className="text-white/70 text-sm mt-2 leading-relaxed max-w-lg">
+        <h1 className="text-2xl font-bold text-[var(--canvas)]">{recap.narrative.headline}</h1>
+        <p className="text-[color:var(--canvas)]/70 text-sm mt-2 leading-relaxed max-w-lg">
           {recap.narrative.body}
         </p>
 
@@ -225,23 +225,23 @@ function HeroBanner({ recap }: { recap: TripRecapData }) {
         <div className="flex items-center gap-8 mt-8">
           <div className={`text-center ${recap.winner === 'usa' ? 'scale-110' : ''}`}>
             <div className="text-3xl mb-1">🇺🇸</div>
-            <div className="text-white text-4xl font-bold">{recap.finalScore.usa}</div>
-            <div className="text-white/60 text-sm">USA</div>
+            <div className="text-[var(--canvas)] text-4xl font-bold">{recap.finalScore.usa}</div>
+            <div className="text-[color:var(--canvas)]/60 text-sm">USA</div>
           </div>
 
-          <div className="text-white/30 text-2xl font-light">-</div>
+          <div className="text-[color:var(--canvas)]/30 text-2xl font-light">-</div>
 
           <div className={`text-center ${recap.winner === 'europe' ? 'scale-110' : ''}`}>
             <div className="text-3xl mb-1">🇪🇺</div>
-            <div className="text-white text-4xl font-bold">{recap.finalScore.europe}</div>
-            <div className="text-white/60 text-sm">EUR</div>
+            <div className="text-[var(--canvas)] text-4xl font-bold">{recap.finalScore.europe}</div>
+            <div className="text-[color:var(--canvas)]/60 text-sm">EUR</div>
           </div>
         </div>
 
         {/* Winner badge */}
         <div className="mt-6">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-semibold">
-            <Trophy size={16} className="text-yellow-400" />
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--canvas)]/12 text-[var(--canvas)] text-sm font-semibold">
+            <Trophy size={16} className="text-[color:var(--gold)]" />
             {recap.winner === 'halved'
               ? 'Cup Halved!'
               : `Team ${recap.winner.toUpperCase()} Wins!`}
@@ -264,13 +264,13 @@ function OverviewSection({ recap }: { recap: TripRecapData }) {
     <div className="space-y-4">
       {/* MVP Card */}
       {mvp?.winner && (
-        <div className="p-4 rounded-xl bg-[color:rgb(255,215,0)]/10 border border-[color:rgb(255,215,0)]/30">
+        <div className="p-4 rounded-xl bg-[color:var(--gold)]/12 border border-[color:var(--gold)]/30">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-[color:rgb(255,215,0)]/20">
-              <Award className="w-6 h-6 text-[color:rgb(255,215,0)]" />
+            <div className="p-3 rounded-full bg-[color:var(--gold)]/20">
+              <Award className="w-6 h-6 text-[color:var(--gold)]" />
             </div>
             <div className="flex-1">
-              <div className="text-sm text-[color:rgb(255,215,0)] font-medium">Tournament MVP</div>
+              <div className="text-sm text-[color:var(--gold)] font-medium">Tournament MVP</div>
               <div className="text-lg font-bold">{mvp.winner.playerName}</div>
               <div className="text-sm text-[var(--ink-tertiary)]">
                 {mvp.description}
@@ -375,7 +375,7 @@ function LeaderboardSection({ recap }: { recap: TripRecapData }) {
           className="flex items-center gap-3 p-4 rounded-xl bg-[var(--surface-card)] border border-[var(--rule)]"
         >
           <div className="text-lg font-bold text-[var(--ink-tertiary)] w-8 text-center">
-            {i === 0 ? <Medal size={20} className="text-yellow-500 mx-auto" /> : `#${i + 1}`}
+            {i === 0 ? <Medal size={20} className="text-[color:var(--gold-light)] mx-auto" /> : `#${i + 1}`}
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-medium">{player.playerName}</div>
@@ -560,14 +560,14 @@ function PhotosSection({ recap }: { recap: TripRecapData }) {
                 sizes={i === 0 ? '100vw' : '50vw'}
               />
               {photo.isMomentOfTrip && (
-                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/50 text-white text-xs flex items-center gap-1">
-                  <Star size={10} className="text-yellow-400" />
+                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-[color:var(--ink)]/70 text-[var(--canvas)] text-xs flex items-center gap-1">
+                  <Star size={10} className="text-[color:var(--gold)]" />
                   Moment of the Trip
                 </div>
               )}
               {photo.caption && (
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-white text-xs">{photo.caption}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-[color:var(--ink)]/70 to-transparent">
+                  <p className="text-[var(--canvas)] text-xs">{photo.caption}</p>
                 </div>
               )}
             </div>
