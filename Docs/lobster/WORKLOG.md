@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 21:05 EST — Phase 2 — Notification system overlays: premium token sweep
+- `NotificationToast` now uses premium tone maps for urgent/high/medium/low priorities instead of inline rgba backgrounds, with tokenized icon, action, and dismiss treatments to stay legible on light/dark shells.
+- `NotificationBell` + stack controls swapped lingering `bg-white/*` hover states and the red badge for premium canvas/error tokens with shared focus rings.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d9c05f2`)
+
 ### 20:35 EST — Phase 2 — iOS install sheet + stroke alert banner: remove remaining white overlays
 - `IOSInstallPrompt`: replaced the remaining `bg-white/*` close button + app icon capsule tints with token-driven canvas tints so the iOS install sheet stays consistent across themes.
 - `StrokeAlertBanner`: replaced the header dismiss hover `bg-white/20` tint with a tokenized canvas overlay.
