@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 21:20 EST — Phase 2 — Remove remaining `bg-white` UI fragments (iOS + Achievements + Lineup)
+- `IOSScrollContainer`: pull-to-refresh indicator now uses premium raised surface + rule border tokens instead of `bg-white`; icon tint aligned to `var(--masters)`.
+- `/achievements`: progress bar track/fill now use `var(--canvas)` tints instead of `bg-white/*` so the hero stays consistent across theme shells.
+- `/lineup/new`: “Use Defaults & Continue” CTA now uses token-driven canvas tints + `backdrop-blur-sm` instead of inline `rgba(255,255,255,…)` + `hover:bg-white/30`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 21:05 EST — Phase 2 — Notification system overlays: premium token sweep
 - `NotificationToast` now uses premium tone maps for urgent/high/medium/low priorities instead of inline rgba backgrounds, with tokenized icon, action, and dismiss treatments to stay legible on light/dark shells.
 - `NotificationBell` + stack controls swapped lingering `bg-white/*` hover states and the red badge for premium canvas/error tokens with shared focus rings.

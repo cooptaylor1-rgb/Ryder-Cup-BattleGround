@@ -652,8 +652,7 @@ export default function NewLineupPage() {
                     setPointsPerMatch(1);
                     setStep('lineup');
                   }}
-                  className="w-full py-3 rounded-lg font-semibold transition-all hover:bg-white/30"
-                  style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}
+                  className="w-full py-3 rounded-lg font-semibold transition-all bg-[color:var(--canvas)]/20 hover:bg-[color:var(--canvas)]/30 backdrop-blur-sm"
                 >
                   Use Defaults & Continue →
                 </button>

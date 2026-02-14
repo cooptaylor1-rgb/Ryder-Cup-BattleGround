@@ -248,9 +248,9 @@ export default function AchievementsPage() {
           <p className="type-body opacity-80">Trip Progress</p>
 
           {/* Progress Bar */}
-          <div className="mt-[var(--space-4)] h-2 rounded-full bg-white/20 overflow-hidden">
+          <div className="mt-[var(--space-4)] h-2 rounded-full bg-[color:var(--canvas)]/20 overflow-hidden">
             <div
-              className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
+              className="h-full rounded-full bg-[color:var(--canvas)] transition-[width] duration-500 ease-out"
               style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
             />
           </div>

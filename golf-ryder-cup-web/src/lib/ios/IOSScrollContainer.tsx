@@ -271,13 +271,13 @@ export const IOSScrollContainer = forwardRef<
         >
           <div
             className={cn(
-              'w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center',
+              'w-8 h-8 rounded-full bg-[var(--surface-raised)] border border-[var(--rule)] shadow-md flex items-center justify-center',
               isRefreshing && 'animate-spin'
             )}
           >
             <svg
               className={cn(
-                'w-4 h-4 text-masters',
+                'w-4 h-4 text-[var(--masters)]',
                 !isRefreshing && 'transition-transform'
               )}
               style={{
