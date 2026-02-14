@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 02:32 EST — Phase 2 — Smart pairing suggestions adopt premium tokens
+- `SmartPairingSuggestions`: migrated the captain pairing recommender UI off legacy Tailwind gray/blue/yellow palettes and dark-mode forks onto the premium surface/ink/rule + status token system (`var(--surface-*)`, `var(--ink-*)`, `var(--rule)`, `var(--info)`, `var(--warning)`, `var(--success)`, `var(--error)`, `var(--masters)`).
+- Fairness score, format toggles, suggestion cards, history table, and analysis panel now use tokenized surfaces/typography with consistent hover states.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ea1aa41`)
+
 ### 01:55 EST — Phase 2 — Profile completion reward: premium token cleanup
 - `ProfileCompletionReward`: replaced hard-coded confetti + trophy palette hexes with premium tone tokens (`var(--masters)`, `var(--success)`, `var(--warning)`, `var(--info)`, `var(--error)`, `var(--color-accent)`) for theme-safe celebration effects.
 - Trophy icon now uses `var(--canvas)` instead of `text-white`, and the team header fallback background uses `var(--ink-primary)` instead of a hard-coded hex.
