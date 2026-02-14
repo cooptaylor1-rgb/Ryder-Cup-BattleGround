@@ -65,7 +65,14 @@ function Confetti() {
     // Deterministic “random” values (pure) to keep render idempotent.
     const confettiPieces = useMemo(() => {
         const rng = makeSeededRng(seed);
-        const colors = ['#FFD700', '#32CD32', '#FF6B6B', '#4ECDC4', '#9B59B6', '#3498DB'];
+        const colors = [
+            'var(--masters)',
+            'var(--warning)',
+            'var(--success)',
+            'var(--info)',
+            'var(--error)',
+            'var(--color-accent)',
+        ];
         return Array.from({ length: 50 }, (_, i) => ({
             id: i,
             color: colors[Math.floor(rng() * colors.length)],
@@ -143,22 +150,22 @@ export function ProfileCompletionReward({
         data.stats?.profileComplete && {
             icon: Check,
             label: 'Profile Complete',
-            color: 'text-green-500',
+            color: 'text-[color:var(--success)]',
         },
         data.stats?.ghinVerified && {
             icon: Star,
             label: 'GHIN Verified',
-            color: 'text-amber-500',
+            color: 'text-[color:var(--warning)]',
         },
         data.stats?.photoUploaded && {
             icon: Heart,
             label: 'Photo Added',
-            color: 'text-pink-500',
+            color: 'text-[color:var(--color-accent)]',
         },
         data.stats?.availabilitySet && {
             icon: Calendar,
             label: 'Availability Set',
-            color: 'text-blue-500',
+            color: 'text-[color:var(--info)]',
         },
     ].filter((achievement): achievement is EarnedAchievement => Boolean(achievement));
 
@@ -188,8 +195,8 @@ export function ProfileCompletionReward({
                             }}
                             className="relative"
                         >
-                            <div className="w-32 h-32 rounded-full bg-linear-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-2xl shadow-amber-500/30">
-                                <Trophy className="w-16 h-16 text-white" />
+                            <div className="w-32 h-32 rounded-full bg-[color:var(--masters)] flex items-center justify-center shadow-2xl shadow-masters/30">
+                                <Trophy className="w-16 h-16 text-[var(--canvas)]" />
                             </div>
                             {/* Sparkles */}
                             {[...Array(6)].map((_, i) => (
@@ -209,7 +216,7 @@ export function ProfileCompletionReward({
                                         transform: 'translate(-50%, -50%)',
                                     }}
                                 >
-                                    <Sparkles className="w-6 h-6 text-amber-500" />
+                                    <Sparkles className="w-6 h-6 text-[color:var(--warning)]" />
                                 </motion.div>
                             ))}
                         </motion.div>
@@ -247,9 +254,9 @@ export function ProfileCompletionReward({
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 mx-auto mb-4 flex items-center justify-center"
+                                className="w-16 h-16 rounded-full bg-[color:var(--success)]/15 mx-auto mb-4 flex items-center justify-center"
                             >
-                                <Check className="w-8 h-8 text-green-600" />
+                                <Check className="w-8 h-8 text-[color:var(--success)]" />
                             </motion.div>
                             <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                                 Profile Complete!
@@ -303,10 +310,10 @@ export function ProfileCompletionReward({
                             >
                                 <div
                                     className="p-4 text-white"
-                                    style={{ backgroundColor: data.teamColor || '#0f1729' }}
+                                    style={{ backgroundColor: data.teamColor || 'var(--ink-primary)' }}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                        <div className="w-12 h-12 rounded-full bg-[color:var(--canvas-raised)]/20 flex items-center justify-center">
                                             <Flag className="w-6 h-6" />
                                         </div>
                                         <div>
@@ -348,9 +355,9 @@ export function ProfileCompletionReward({
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                className="bg-masters/10 rounded-2xl p-4 mb-6"
+                                className="bg-[color:var(--masters)]/12 rounded-2xl p-4 mb-6"
                             >
-                                <h4 className="text-sm font-medium text-masters flex items-center gap-2">
+                                <h4 className="text-sm font-medium text-[color:var(--masters)] flex items-center gap-2">
                                     <Calendar className="w-4 h-4" />
                                     First Up
                                 </h4>
@@ -388,7 +395,7 @@ export function ProfileCompletionReward({
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.7 }}
                                     onClick={onViewTeam}
-                                    className="w-full py-3 text-center text-masters font-medium hover:text-masters/80 transition-colors"
+                                    className="w-full py-3 text-center text-[color:var(--masters)] font-medium hover:text-[color:var(--masters)]/80 transition-colors"
                                 >
                                     View Full Team Roster
                                 </motion.button>

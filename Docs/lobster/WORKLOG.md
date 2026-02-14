@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 01:55 EST — Phase 2 — Profile completion reward: premium token cleanup
+- `ProfileCompletionReward`: replaced hard-coded confetti + trophy palette hexes with premium tone tokens (`var(--masters)`, `var(--success)`, `var(--warning)`, `var(--info)`, `var(--error)`, `var(--color-accent)`) for theme-safe celebration effects.
+- Trophy icon now uses `var(--canvas)` instead of `text-white`, and the team header fallback background uses `var(--ink-primary)` instead of a hard-coded hex.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 00:58 EST — Phase 2 — Live play overlays adopt premium tokens
 - `WeatherAlerts`: replaced rgba severity palettes with premium tone tokens, chip/icon color-mix overlays, and canvas-based refresh/dismiss controls so alerts stay legible across themes with proper focus rings.
 - `QuickStandingsOverlay`: swapped linear-gradient team cards and white overlays for tone-driven team surfaces, premium ink typography, and neutral match summaries so live standings read cleanly in light/dark shells.
