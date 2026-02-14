@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import {
     Trophy,
@@ -206,11 +206,11 @@ function AchievementBadge({ achievement, config }: AchievementBadgeProps) {
         <motion.div
             animate={controls}
             className="relative"
+            style={{ '--rarity-color': config.color } as CSSProperties}
         >
             {/* Glow effect */}
             <motion.div
-                className="absolute inset-0 rounded-full blur-2xl"
-                style={{ background: config.color, opacity: 0.4 }}
+                className="absolute inset-0 rounded-full blur-2xl bg-[color:var(--rarity-color)] opacity-40"
                 animate={{
                     scale: [1, 1.3, 1],
                     opacity: [0.4, 0.6, 0.4],
@@ -234,10 +234,7 @@ function AchievementBadge({ achievement, config }: AchievementBadgeProps) {
 
                 {/* Shine effect */}
                 <motion.div
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                        background: 'linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%)',
-                    }}
+                    className="absolute inset-0 rounded-full bg-[linear-gradient(135deg,transparent_30%,rgba(255,255,255,0.4)_50%,transparent_70%)]"
                     animate={{
                         rotate: [0, 360],
                     }}
@@ -250,8 +247,7 @@ function AchievementBadge({ achievement, config }: AchievementBadgeProps) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring' }}
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-white text-sm font-bold"
-                style={{ background: config.color }}
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-white text-sm font-bold bg-[color:var(--rarity-color)]"
             >
                 +{achievement.points} pts
             </motion.div>
@@ -309,8 +305,7 @@ export function AchievementUnlock({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center"
-                style={{ background: 'rgba(0, 0, 0, 0.9)' }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
             >
                 {/* Confetti */}
                 <ConfettiSystem color={config.particleColor} isActive={true} />
