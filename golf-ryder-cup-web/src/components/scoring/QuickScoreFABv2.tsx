@@ -248,7 +248,7 @@ export function QuickScoreFABv2({
                   setIsExpanded(false);
                   setIsVoiceMode(false);
                 }}
-                className="p-1 rounded-full hover:bg-white/20 transition-colors"
+                className="p-1 rounded-full hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                 aria-label="Close quick score menu"
               >
                 <X className="w-5 h-5 text-white" />
@@ -396,8 +396,8 @@ export function QuickScoreFABv2({
           <>
             {/* Pulse indicator */}
             <div className="relative">
-              <span className="absolute inset-0 rounded-full animate-ping opacity-75 bg-white/40" />
-              <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/20">
+              <span className="absolute inset-0 rounded-full animate-ping opacity-75 bg-[color:var(--canvas-raised)]/40" />
+              <div className="relative w-10 h-10 rounded-full flex items-center justify-center bg-[color:var(--canvas-raised)]/20">
                 <Target className="w-5 h-5" />
               </div>
             </div>
@@ -406,7 +406,7 @@ export function QuickScoreFABv2({
             <div className="text-left">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold">{activeMatchData.displayScore}</span>
-                <span className="text-xs px-1.5 py-0.5 rounded bg-white/20">
+                <span className="text-xs px-1.5 py-0.5 rounded bg-[color:var(--canvas-raised)]/20">
                   LIVE
                 </span>
               </div>

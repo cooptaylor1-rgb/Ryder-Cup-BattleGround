@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 19:52 EST — Phase 2 — Live scoring affordances: premium overlay tokens
+- `QuickScoreFABv2`: replaced the remaining `bg-white/*` overlays (pulse halo, icon capsule, LIVE badge, menu close control) with `var(--canvas-raised)` tone-driven tints so the quick-score affordance stays legible across light/dark themes.
+- `OfflineIndicator`: swapped offline queue badges and detail dividers off hard-coded `white/*` backgrounds onto shared surface tokens to keep status chips and retry counts readable without blowing out dark mode.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 19:16 EST — Phase 2 — Trip recap hero: premium token alignment
 - `HeroBanner` on `/recap`: swapped hard-coded USA/EUR gradients, white typography, and badge overlays for token-driven team gradients (`var(--team-usa/europe-gradient-*)`), canvas text, and gold accents so the headline and scoreline stay readable across themes.
 - `OverviewSection` MVP card + leaderboard medals now rely on premium gold tokens instead of raw `rgb()` yellows.
