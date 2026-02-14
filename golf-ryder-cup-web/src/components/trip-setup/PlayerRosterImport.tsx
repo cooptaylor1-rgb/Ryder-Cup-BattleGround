@@ -543,8 +543,8 @@ function PlayerCard({
                         className={cn(
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'A'
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-[var(--surface-secondary)] hover:bg-blue-500/10'
+                                ? 'bg-team-usa text-white'
+                                : 'bg-[var(--surface-secondary)] hover:bg-team-usa/10'
                         )}
                         title={teamAName}
                     >
@@ -555,8 +555,8 @@ function PlayerCard({
                         className={cn(
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'B'
-                                ? 'bg-red-500 text-white'
-                                : 'bg-[var(--surface-secondary)] hover:bg-red-500/10'
+                                ? 'bg-team-europe text-white'
+                                : 'bg-[var(--surface-secondary)] hover:bg-team-europe/10'
                         )}
                         title={teamBName}
                     >
@@ -579,9 +579,9 @@ function PlayerCard({
                     </button>
                     <button
                         onClick={onRemove}
-                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors hover:bg-[color:var(--error)]/10"
                     >
-                        <X className="w-4 h-4 text-red-500" />
+                        <X className="w-4 h-4 text-[var(--error)]" />
                     </button>
                 </div>
             </div>

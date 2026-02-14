@@ -282,13 +282,13 @@ export function AvailabilityCalendar({
                                                         <div className="flex items-center justify-between mb-3">
                                                             <div className="flex items-center gap-2">
                                                                 {session.time === 'morning' && (
-                                                                    <Sun className="w-4 h-4 text-amber-500" />
+                                                                    <Sun className="w-4 h-4 text-[var(--warning)]" />
                                                                 )}
                                                                 {session.time === 'afternoon' && (
-                                                                    <Sunset className="w-4 h-4 text-orange-500" />
+                                                                    <Sunset className="w-4 h-4 text-[var(--warning)]" />
                                                                 )}
                                                                 {session.time === 'full' && (
-                                                                    <Calendar className="w-4 h-4 text-blue-500" />
+                                                                    <Calendar className="w-4 h-4 text-[var(--info)]" />
                                                                 )}
                                                                 <span className="font-medium text-[var(--ink-primary)]">
                                                                     {session.name}
@@ -314,8 +314,8 @@ export function AvailabilityCalendar({
                                                                 className={cn(
                                                                     'flex-1 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1',
                                                                     sessionAvailability.status === 'available'
-                                                                        ? 'bg-green-500 text-white'
-                                                                        : 'bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400'
+                                                                        ? 'bg-[var(--success)] text-[var(--canvas)] hover:brightness-95'
+                                                                        : 'bg-[color:var(--success)]/10 text-[var(--success)] hover:bg-[color:var(--success)]/15'
                                                                 )}
                                                             >
                                                                 <Check className="w-4 h-4" />
@@ -334,8 +334,8 @@ export function AvailabilityCalendar({
                                                                 className={cn(
                                                                     'flex-1 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1',
                                                                     sessionAvailability.status === 'maybe'
-                                                                        ? 'bg-amber-500 text-white'
-                                                                        : 'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400'
+                                                                        ? 'bg-[var(--warning)] text-[var(--canvas)] hover:brightness-95'
+                                                                        : 'bg-[color:var(--warning)]/10 text-[var(--warning)] hover:bg-[color:var(--warning)]/15'
                                                                 )}
                                                             >
                                                                 <HelpCircle className="w-4 h-4" />
@@ -354,8 +354,8 @@ export function AvailabilityCalendar({
                                                                 className={cn(
                                                                     'flex-1 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1',
                                                                     sessionAvailability.status === 'unavailable'
-                                                                        ? 'bg-red-500 text-white'
-                                                                        : 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400'
+                                                                        ? 'bg-[var(--error)] text-[var(--canvas)] hover:brightness-95'
+                                                                        : 'bg-[color:var(--error)]/10 text-[var(--error)] hover:bg-[color:var(--error)]/15'
                                                                 )}
                                                             >
                                                                 <X className="w-4 h-4" />
