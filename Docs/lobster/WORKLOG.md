@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 06:55 EST — Phase 2 — Tokenize Masters buttons + spinners (Availability + Login)
+- `/captain/availability`: selected session pill now uses `text-[var(--canvas)]` and the in-progress pulse dot uses `bg-[color:var(--canvas)]` so the Masters-highlighted state stays theme-safe.
+- `/login`: primary sign-in CTA and loading spinner swapped `text-white` / `border-white` utilities for canvas tokens (`text-[var(--canvas)]`, `border-[color:var(--canvas)]/...`) to remove hard-coded white overlays.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b800d58`)
+
+
 ### 04:35 EST — Phase 2 — Tokenize remaining black/white overlay controls (SwipeScorePanel + PhotoGallery)
 - `SwipeScorePanel`: replaced the keyboard shortcut hint + current score pill backgrounds off `bg-black/*` + `dark:bg-white/*` forks onto a single neutral ink tint (`bg-[color:var(--ink)]/…`) with canvas text so overlays stay consistent across themes.
 - `PhotoGallery` full-screen viewer: migrated close + navigation button hover/fill tints off `bg-white/*` and onto token-driven canvas overlays (`bg-[color:var(--canvas)]/…`) for theme-safe controls on the dark viewer shell.
