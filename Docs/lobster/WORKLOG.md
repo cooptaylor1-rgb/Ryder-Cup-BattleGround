@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 22:52 EST — Phase 2 — More page admin toggles: premium token alignment
+- `/more`: moved the “Exit trip” CTA off `bg-white/15`/`text-white` and onto canvas token overlays with hover states so the button remains legible without hard-coded white overlays on the Masters gradient.
+- Admin Mode tile, modal, and toggle knob now rely on premium error/canvas tokens (`var(--error)`, `var(--canvas)`, `var(--surface-raised)`) instead of `#dc2626`/`rgba(...)`/`bg-white`, keeping destructive affordances theme-safe across shells.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 22:27 EST — Phase 2 — Course details weather surfaces: premium token sweep
 - `CourseDetails`: swapped gradient quick-action overlays to canvas token tints (`bg-[color:var(--canvas)]/15 → /25`) and aligned header metadata on the inverse canvas text tone so the module keeps legibility without raw `white/*` utilities.
 - `WeatherWidget`: replaced the refresh button, stat row, and hero typography with canvas token overlays/text, parameterized the background pattern fill, and moved icon defaults to the premium inverse tone to eliminate the remaining `white/*` classes in course weather.

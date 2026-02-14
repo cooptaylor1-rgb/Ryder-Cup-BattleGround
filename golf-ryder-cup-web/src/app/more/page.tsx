@@ -337,7 +337,7 @@ export default function MorePage() {
             icon: <Shield size={20} />,
             href: '/admin',
             badge: 'Admin',
-            badgeColor: '#dc2626',
+            badgeColor: 'var(--error)',
           },
           {
             id: 'clear-admin',
@@ -447,7 +447,7 @@ export default function MorePage() {
               </div>
               <button
                 onClick={() => setShowExitTripConfirm(true)}
-                className="flex items-center gap-1.5 py-2 px-3 bg-white/15 border-none rounded-[var(--radius-md)] text-white font-[var(--font-sans)] text-xs font-semibold cursor-pointer"
+                className="flex items-center gap-1.5 py-2 px-3 rounded-[var(--radius-md)] border border-[color:var(--canvas)]/25 bg-[color:var(--canvas)]/15 text-[var(--canvas)] font-[var(--font-sans)] text-xs font-semibold cursor-pointer transition-colors hover:bg-[color:var(--canvas)]/25"
               >
                 <LogOut size={14} />
                 Exit
@@ -501,13 +501,13 @@ export default function MorePage() {
           onClick={() => (isAdminMode ? disableAdminMode() : setShowAdminModal(true))}
           className={`w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-8)] cursor-pointer text-left ${
             isAdminMode
-              ? 'bg-[rgba(220,38,38,0.06)] border-2 border-[#dc2626]'
+              ? 'bg-[color:var(--error)]/12 border border-[color:var(--error)]/40'
               : 'bg-[var(--canvas-raised)] border border-[var(--rule)]'
           }`}
         >
           <div
             className={`w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${
-              isAdminMode ? 'bg-[#dc2626] text-white' : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
+              isAdminMode ? 'bg-[var(--error)] text-[var(--canvas)]' : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
             }`}
           >
             <Shield size={22} />
@@ -515,7 +515,7 @@ export default function MorePage() {
           <div className="flex-1">
             <p
               className={`font-[var(--font-sans)] font-semibold ${
-                isAdminMode ? 'text-[#dc2626]' : 'text-[var(--ink-primary)]'
+                isAdminMode ? 'text-[var(--error)]' : 'text-[var(--ink-primary)]'
               }`}
             >
               Admin Mode
@@ -524,7 +524,7 @@ export default function MorePage() {
               {isAdminMode ? 'Enabled -- Data management access' : 'Delete trips & manage data'}
             </p>
           </div>
-          <Toggle enabled={isAdminMode} color={isAdminMode ? '#dc2626' : undefined} />
+          <Toggle enabled={isAdminMode} color={isAdminMode ? 'var(--error)' : undefined} />
         </motion.button>
 
         {/* Organized Menu Sections */}
@@ -688,8 +688,8 @@ export default function MorePage() {
 
         {showAdminModal && (
           <Modal onClose={() => setShowAdminModal(false)}>
-            <div className="w-14 h-14 rounded-full bg-[rgba(220,38,38,0.1)] flex items-center justify-center mx-auto mb-4">
-              <Shield size={28} className="text-[#dc2626]" />
+            <div className="w-14 h-14 rounded-full bg-[color:var(--error)]/12 flex items-center justify-center mx-auto mb-4">
+              <Shield size={28} className="text-[var(--error)]" />
             </div>
             <h2 className="font-[var(--font-serif)] text-xl font-normal mb-2 text-center text-[var(--ink-primary)]">
               Enable Admin Mode
@@ -721,7 +721,7 @@ export default function MorePage() {
                 disabled={adminPin.length < 4}
                 className={`flex-1 p-3.5 rounded-[var(--radius-md)] border-none font-[var(--font-sans)] font-semibold ${
                   adminPin.length >= 4
-                    ? 'bg-[#dc2626] text-white cursor-pointer'
+                    ? 'bg-[var(--error)] text-[var(--canvas)] cursor-pointer'
                     : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed'
                 }`}
               >
@@ -830,7 +830,7 @@ function Toggle({ enabled, color }: { enabled: boolean; color?: string }) {
       <motion.div
         animate={{ x: enabled ? 22 : 2 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className="absolute top-[2px] w-6 h-6 rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+        className="absolute top-[2px] w-6 h-6 rounded-full bg-[var(--surface-raised)] shadow-sm"
       />
     </div>
   );
