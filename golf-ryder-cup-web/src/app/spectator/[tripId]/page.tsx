@@ -105,8 +105,27 @@ export default function SpectatorPage() {
     useEffect(() => {
         loadData();
 
-        // Auto-refresh every 15 seconds
-        const interval = setInterval(loadData, 15000);
+        // Auto-refresh every 15 seconds, pause when tab is hidden to save battery
+        let interval: ReturnType<typeof setInterval> | null = null;
+
+        const startPolling = () => {
+            if (!interval) interval = setInterval(loadData, 15000);
+        };
+        const stopPolling = () => {
+            if (interval) { clearInterval(interval); interval = null; }
+        };
+
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible') {
+                loadData();
+                startPolling();
+            } else {
+                stopPolling();
+            }
+        };
+
+        if (document.visibilityState === 'visible') startPolling();
+        document.addEventListener('visibilitychange', handleVisibility);
 
         // Track online status
         const handleOnline = () => setIsOnline(true);
@@ -115,7 +134,8 @@ export default function SpectatorPage() {
         window.addEventListener('offline', handleOffline);
 
         return () => {
-            clearInterval(interval);
+            stopPolling();
+            document.removeEventListener('visibilitychange', handleVisibility);
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
         };

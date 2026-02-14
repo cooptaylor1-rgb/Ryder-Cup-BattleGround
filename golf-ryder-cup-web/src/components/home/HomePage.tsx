@@ -399,14 +399,38 @@ export default function HomePage() {
                     CAPTAIN SETUP
                   </p>
                   <div className="card-captain">
-                    <p className="type-title-sm mb-[var(--space-4)]">
-                      Get Your Trip Ready
-                    </p>
+                    {(() => {
+                      const steps = [players.length >= 4, teams.length >= 2 && teamMembers.length >= 4, sessions.length > 0];
+                      const done = steps.filter(Boolean).length;
+                      const pct = Math.round((done / steps.length) * 100);
+                      return (
+                        <>
+                          <div className="flex items-center gap-[var(--space-3)] mb-[var(--space-4)]">
+                            <p className="type-title-sm flex-1">Get Your Trip Ready</p>
+                            <span className="type-micro font-semibold text-[var(--masters)]">{pct}%</span>
+                          </div>
+                          <div className="h-1 rounded-full mb-[var(--space-4)] bg-[var(--canvas-sunken)]" style={{ overflow: 'hidden' }}>
+                            <div className="h-full rounded-full bg-[var(--masters)] transition-all duration-500" style={{ width: `${pct}%` }} />
+                          </div>
+                        </>
+                      );
+                    })()}
                     <div className="flex flex-col gap-[var(--space-2)]">
                       <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added — need at least 4`} />
                       <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && teamMembers.length >= 4} href="/captain/draft" hint="Draft players to teams" />
                       <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new" hint="Set up matchups" />
                     </div>
+
+                    {/* Prominent invite CTA after setup steps */}
+                    {players.length >= 2 && (
+                      <button
+                        onClick={handleInviteFriends}
+                        className="mt-[var(--space-4)] w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-xl font-medium text-[var(--text-sm)] bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)] press-scale"
+                      >
+                        <Share2 size={16} className="text-[var(--masters)]" />
+                        Share invite link with your group
+                      </button>
+                    )}
                   </div>
                 </section>
                 <hr className="divider-subtle" />
