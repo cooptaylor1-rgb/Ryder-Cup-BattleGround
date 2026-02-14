@@ -403,7 +403,7 @@ export function NassauEnhancedCard({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="rounded-full p-2 text-white/80 transition-colors hover:text-white hover:bg-white/10"
+              className="rounded-full p-2 text-white/80 transition-colors hover:text-white hover:bg-[color:var(--canvas)]/15"
             >
               ✕
             </button>

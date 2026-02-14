@@ -301,7 +301,7 @@ function ToggleSwitch({
     >
       <span
         className={cn(
-          'absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform',
+          'absolute top-1 left-1 w-5 h-5 rounded-full bg-[var(--surface-raised)] shadow-card-sm transition-transform',
           checked ? 'translate-x-5' : 'translate-x-0'
         )}
       />

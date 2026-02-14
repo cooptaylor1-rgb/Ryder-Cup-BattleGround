@@ -105,7 +105,7 @@ export function TripArchiveCard({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               compareMode
                 ? 'bg-[var(--surface-raised)] text-[var(--ink-primary)]'
-                : 'bg-white/20 text-white hover:bg-white/30'
+                : 'bg-[color:var(--canvas)]/15 text-[var(--canvas)] hover:bg-[color:var(--canvas)]/25'
             }`}
           >
             {compareMode ? 'Exit Compare' : 'Compare Years'}
