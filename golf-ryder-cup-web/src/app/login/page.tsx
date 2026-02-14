@@ -158,13 +158,13 @@ function LoginPageContent() {
             className={cn(
               'btn-premium press-scale w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity] border border-transparent',
               canSubmit
-                ? 'bg-[var(--masters)] text-white'
+                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                 : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed opacity-90'
             )}
           >
             {isSubmitting || isLoading ? (
               <>
-                <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                <span className="h-4 w-4 rounded-full border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] animate-spin" />
                 Signing In...
               </>
             ) : (

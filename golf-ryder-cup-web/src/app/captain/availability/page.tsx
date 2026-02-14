@@ -214,13 +214,13 @@ export default function AvailabilityPage() {
                   key={session.id}
                   onClick={() => setSelectedSession(session.id)}
                   className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${selectedSession === session.id
-                    ? 'bg-masters text-white'
+                    ? 'bg-masters text-[var(--canvas)]'
                     : 'bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)] hover:border-[color:var(--rule)]/60'
                     }`}
                 >
                   {session.name}
                   {session.status === 'inProgress' && (
-                    <span className="ml-2 w-2 h-2 rounded-full bg-white inline-block animate-pulse" />
+                    <span className="ml-2 w-2 h-2 rounded-full bg-[color:var(--canvas)] inline-block animate-pulse" />
                   )}
                 </button>
               ))}
