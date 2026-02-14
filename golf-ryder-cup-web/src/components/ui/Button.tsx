@@ -71,11 +71,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
                     // Variant styles - Masters elegance
                     variant === 'primary' && [
-                        'bg-[#006747] text-white font-semibold',
-                        'hover:bg-[#1B8F6A]',
+                        'bg-[var(--masters)] text-[var(--canvas)] font-semibold',
+                        'hover:bg-[color:var(--masters)]/92',
                         'shadow-md hover:shadow-lg',
-                        'active:shadow-inner active:bg-[#004D35]',
-                        'border border-[#004D35]/20',
+                        'active:shadow-inner active:bg-[color:var(--masters)]/86',
+                        'border border-[color:var(--masters)]/25',
                     ],
 
                     variant === 'secondary' && [
@@ -91,10 +91,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ],
 
                     variant === 'danger' && [
-                        'bg-error text-white',
-                        'hover:bg-error/90',
+                        'bg-[var(--error)] text-[var(--canvas)]',
+                        'hover:bg-[color:var(--error)]/92',
                         'shadow-sm hover:shadow-lg',
-                        'active:shadow-inner',
+                        'active:shadow-inner active:bg-[color:var(--error)]/86',
                     ],
 
                     variant === 'outline' && [

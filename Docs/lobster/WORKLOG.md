@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 07:15 EST — Phase 2 — Button component: replace hard-coded Masters hex with tokens
+- `Button` (UI primitive): primary + danger variants now use premium tokens instead of hard-coded hex/`text-white` (`bg-[var(--masters)]`, `bg-[var(--error)]`, `text-[var(--canvas)]`) with token-driven hover/active states.
+- Keeps core CTAs theme-safe and consistent with the Phase 2 token system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 06:55 EST — Phase 2 — Tokenize Masters buttons + spinners (Availability + Login)
 - `/captain/availability`: selected session pill now uses `text-[var(--canvas)]` and the in-progress pulse dot uses `bg-[color:var(--canvas)]` so the Masters-highlighted state stays theme-safe.
 - `/login`: primary sign-in CTA and loading spinner swapped `text-white` / `border-white` utilities for canvas tokens (`text-[var(--canvas)]`, `border-[color:var(--canvas)]/...`) to remove hard-coded white overlays.
