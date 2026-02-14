@@ -47,7 +47,7 @@ import { BottomNav, PageHeader, type NavBadges } from '@/components/layout';
  */
 export default function HomePage() {
   const router = useRouter();
-  const { loadTrip, currentTrip: _currentTrip, players, teams, sessions } = useTripStore();
+  const { loadTrip, currentTrip: _currentTrip, players, teams, teamMembers, sessions } = useTripStore();
   const { isCaptainMode } = useUIStore();
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [showJoinTrip, setShowJoinTrip] = useState(false);
@@ -390,8 +390,8 @@ export default function HomePage() {
               </>
             )}
 
-            {/* SETUP GUIDE — For captains with incomplete setup */}
-            {isCaptainMode && players.length < 4 && sessions.length === 0 && (
+            {/* SETUP GUIDE — For captains until setup is complete */}
+            {isCaptainMode && sessions.length === 0 && (
               <>
                 <section className="py-[var(--space-6)]">
                   <p className="type-overline tracking-[0.15em] text-[var(--maroon)] mb-[var(--space-4)]">
@@ -403,9 +403,29 @@ export default function HomePage() {
                       Get Your Trip Ready
                     </p>
                     <div className="flex flex-col gap-[var(--space-2)]">
-                      <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added`} />
-                      <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && players.some(() => teams.some((t) => t.id))} href="/captain/draft" hint="Draft players to teams" />
+                      <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added — need at least 4`} />
+                      <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && teamMembers.length >= 4} href="/captain/draft" hint="Draft players to teams" />
                       <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new" hint="Set up matchups" />
+                    </div>
+                  </div>
+                </section>
+                <hr className="divider-subtle" />
+              </>
+            )}
+
+            {/* NON-CAPTAIN GUIDANCE — Show when not captain and no sessions exist */}
+            {!isCaptainMode && sessions.length === 0 && players.length > 0 && (
+              <>
+                <section className="py-[var(--space-6)]">
+                  <div className="card-editorial" style={{ padding: 'var(--space-5)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)' }}>
+                    <Shield size={20} strokeWidth={1.5} className="text-[var(--masters)] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
+                        Your captain is setting things up
+                      </p>
+                      <p className="type-caption text-[var(--ink-secondary)]">
+                        Sessions and matchups will appear here once your captain creates the lineup. Hang tight!
+                      </p>
                     </div>
                   </div>
                 </section>
