@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 23:42 EST — Phase 2 — Tokenize remaining white overlay chips (Nassau + Archives + Notifications toggle)
+- `NassauEnhancedCard`: close button hover tint now uses tokenized canvas overlay instead of `hover:bg-white/10` so the header action stays premium across themes.
+- `/settings/notifications`: toggle knob now uses `var(--surface-raised)` + `shadow-card-sm` instead of `bg-white`.
+- `TripArchiveCard`: compare mode toggle now uses tokenized canvas overlay for the non-compare state instead of `bg-white/20`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2a6837e`)
+
 ### 23:17 EST — Phase 2 — Captain invitations & announcements adopt premium overlays
 - `InvitationManager` quick-share card now uses premium canvas-raised overlays for the icon chip, join-code panel, and copy/share CTAs (no `bg-white/*`); the share button now sits on the neutral canvas surface with Masters-accent text.
 - `AnnouncementBanner` icon, dismiss, and “View Details” actions moved to tokenized canvas-raised tints with hover states so urgent/standard banners stay legible across themes without raw white overlays.
