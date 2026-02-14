@@ -19,7 +19,7 @@ describe('Button Component', () => {
         it('renders with default variant (primary)', () => {
             render(<Button>Primary</Button>);
             const button = screen.getByRole('button');
-            expect(button).toHaveClass('bg-[#006747]');
+            expect(button).toHaveClass('bg-[var(--masters)]');
         });
 
         it('renders secondary variant', () => {
@@ -37,7 +37,7 @@ describe('Button Component', () => {
         it('renders danger variant', () => {
             render(<Button variant="danger">Danger</Button>);
             const button = screen.getByRole('button');
-            expect(button).toHaveClass('bg-error');
+            expect(button).toHaveClass('bg-[var(--error)]');
         });
 
         it('renders outline variant', () => {
