@@ -207,10 +207,10 @@ export function WeatherWidget({
                 )}
             >
                 {/* Background pattern */}
-                <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0 opacity-10 text-[color:var(--canvas)]">
                     <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                         <pattern id="weather-pattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-                            <circle cx="5" cy="5" r="1" fill="white" />
+                            <circle cx="5" cy="5" r="1" fill="currentColor" />
                         </pattern>
                         <rect width="100" height="100" fill="url(#weather-pattern)" />
                     </svg>
@@ -221,15 +221,15 @@ export function WeatherWidget({
                     <div className="flex items-start justify-between mb-4">
                         <div>
                             {courseName && (
-                                <div className="text-white/70 text-sm mb-1">{courseName}</div>
+                                <div className="text-[color:var(--canvas)]/70 text-sm mb-1">{courseName}</div>
                             )}
-                            <div className="text-white text-lg font-medium">Current Weather</div>
+                            <div className="text-[var(--canvas)] text-lg font-medium">Current Weather</div>
                         </div>
                         <button
                             onClick={loadWeather}
-                            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            className="p-2 rounded-full bg-[color:var(--canvas)]/15 hover:bg-[color:var(--canvas)]/25 transition-colors"
                         >
-                            <RefreshCw className="w-4 h-4 text-white" />
+                            <RefreshCw className="w-4 h-4 text-[var(--canvas)]" />
                         </button>
                     </div>
 
@@ -237,23 +237,23 @@ export function WeatherWidget({
                     <div className="flex items-center gap-6">
                         <WeatherIcon condition={current.condition.icon} size="lg" isDay={current.isDay} />
                         <div>
-                            <div className="text-white text-6xl font-bold">{current.temperature}°</div>
-                            <div className="text-white/80">{current.condition.description}</div>
-                            <div className="text-white/60 text-sm">Feels like {current.feelsLike}°</div>
+                            <div className="text-[var(--canvas)] text-6xl font-bold">{current.temperature}°</div>
+                            <div className="text-[color:var(--canvas)]/80">{current.condition.description}</div>
+                            <div className="text-[color:var(--canvas)]/60 text-sm">Feels like {current.feelsLike}°</div>
                         </div>
                     </div>
 
                     {/* Stats row */}
-                    <div className="flex items-center gap-6 mt-6 pt-4 border-t border-white/20">
-                        <div className="flex items-center gap-2 text-white/80">
+                    <div className="flex items-center gap-6 mt-6 pt-4 border-t border-[color:var(--canvas)]/25">
+                        <div className="flex items-center gap-2 text-[color:var(--canvas)]/80">
                             <Wind className="w-4 h-4" />
                             <span>{current.windSpeed} mph {getWindDirection(current.windDirection)}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/80">
+                        <div className="flex items-center gap-2 text-[color:var(--canvas)]/80">
                             <Droplets className="w-4 h-4" />
                             <span>{current.humidity}%</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/80">
+                        <div className="flex items-center gap-2 text-[color:var(--canvas)]/80">
                             <Sun className="w-4 h-4" />
                             <span>UV {current.uvIndex}</span>
                         </div>
@@ -374,7 +374,7 @@ function WeatherIcon({ condition, size = 'md', isDay = true }: WeatherIconProps)
         lg: 'w-16 h-16',
     };
 
-    const iconClass = cn(sizeClasses[size], 'text-white');
+    const iconClass = cn(sizeClasses[size], 'text-[var(--canvas)]');
 
     switch (condition) {
         case 'sun':
@@ -394,7 +394,7 @@ function WeatherIcon({ condition, size = 'md', isDay = true }: WeatherIconProps)
         case 'cloud-drizzle':
             return <CloudDrizzle className={cn(iconClass, 'text-[var(--info)]')} />;
         case 'cloud-snow':
-            return <CloudSnow className={cn(iconClass, 'text-white')} />;
+            return <CloudSnow className={cn(iconClass, 'text-[var(--canvas)]')} />;
         case 'cloud-lightning':
             return <CloudLightning className={cn(iconClass, 'text-[var(--warning)]')} />;
         case 'cloud-fog':

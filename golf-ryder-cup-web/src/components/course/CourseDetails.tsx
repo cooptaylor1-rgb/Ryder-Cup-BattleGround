@@ -74,7 +74,7 @@ export function CourseDetails({
             {/* Course Header */}
             <div className="p-6 rounded-2xl bg-linear-to-br from-masters-primary to-masters-primary-dark text-white">
                 <h1 className="text-2xl font-bold mb-1">{course.course_name}</h1>
-                <div className="text-white/80">{course.club_name}</div>
+                <div className="text-[color:var(--canvas)]/80">{course.club_name}</div>
 
                 <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export function CourseDetails({
                             href={`https://www.google.com/maps/dir/?api=1&destination=${course.location.latitude},${course.location.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[color:var(--canvas)]/15 hover:bg-[color:var(--canvas)]/25 transition-colors"
                         >
                             <Navigation className="w-4 h-4" />
                             <span className="text-sm">Directions</span>
@@ -100,7 +100,7 @@ export function CourseDetails({
                         href={`https://www.google.com/search?q=${encodeURIComponent(course.club_name + ' ' + course.course_name + ' tee times')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[color:var(--canvas)]/15 hover:bg-[color:var(--canvas)]/25 transition-colors"
                     >
                         <ExternalLink className="w-4 h-4" />
                         <span className="text-sm">Book Tee Time</span>
