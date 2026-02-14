@@ -155,7 +155,7 @@ export function InvitationManager({
             </p>
           </div>
           <div
-            className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center"
+            className="w-12 h-12 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center"
           >
             <UserPlus className="w-6 h-6 text-white" />
           </div>
@@ -163,7 +163,7 @@ export function InvitationManager({
 
         {/* Share Code */}
         <div
-          className="p-3 rounded-xl bg-white/10 backdrop-blur-sm mb-3"
+          className="p-3 rounded-xl bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm mb-3"
         >
           <p className="text-white/60 text-xs mb-1">Join Code</p>
           <p className="text-white font-mono text-2xl tracking-wider">
@@ -175,7 +175,7 @@ export function InvitationManager({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handleCopyLink}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/20 text-white font-medium transition-colors"
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[color:var(--canvas-raised)]/20 text-white font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
           >
             {copiedLink ? (
               <>
@@ -191,8 +191,7 @@ export function InvitationManager({
           </button>
           <button
             onClick={handleNativeShare}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-masters font-medium transition-colors"
-            style={{ color: 'var(--masters)' }}
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--canvas)] text-[var(--masters)] font-medium transition-colors hover:bg-[color:var(--canvas)]/90"
           >
             <Share2 className="w-5 h-5" />
             Share

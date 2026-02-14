@@ -187,7 +187,7 @@ export function CaptainDashboard({
           }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-[color:var(--canvas-raised)] animate-pulse" />
             <span className="text-white font-medium text-sm">Live Now</span>
           </div>
           <div className="space-y-2">
@@ -195,7 +195,7 @@ export function CaptainDashboard({
               <Link
                 key={session.id}
                 href={`/lineup/${session.id}`}
-                className="block p-3 rounded-xl bg-white/10 backdrop-blur-sm"
+                className="block p-3 rounded-xl bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">{session.name}</span>
@@ -462,7 +462,7 @@ function AttentionCard({ title, description, sessions, tripId: _tripId }: Attent
               <Link
                 key={session.id}
                 href={`/lineup/${session.id}`}
-                className="block p-3 rounded-xl bg-white/20 backdrop-blur-sm"
+                className="block p-3 rounded-xl bg-[color:var(--canvas-raised)]/18 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between">
                   <div>

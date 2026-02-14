@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 23:17 EST — Phase 2 — Captain invitations & announcements adopt premium overlays
+- `InvitationManager` quick-share card now uses premium canvas-raised overlays for the icon chip, join-code panel, and copy/share CTAs (no `bg-white/*`); the share button now sits on the neutral canvas surface with Masters-accent text.
+- `AnnouncementBanner` icon, dismiss, and “View Details” actions moved to tokenized canvas-raised tints with hover states so urgent/standard banners stay legible across themes without raw white overlays.
+- `CaptainDashboard` live session & attention cards now rely on premium canvas-raised pulses and list items instead of white translucency, keeping realtime cards aligned with the premium shell.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 22:52 EST — Phase 2 — More page admin toggles: premium token alignment
 - `/more`: moved the “Exit trip” CTA off `bg-white/15`/`text-white` and onto canvas token overlays with hover states so the button remains legible without hard-coded white overlays on the Masters gradient.
 - Admin Mode tile, modal, and toggle knob now rely on premium error/canvas tokens (`var(--error)`, `var(--canvas)`, `var(--surface-raised)`) instead of `#dc2626`/`rgba(...)`/`bg-white`, keeping destructive affordances theme-safe across shells.

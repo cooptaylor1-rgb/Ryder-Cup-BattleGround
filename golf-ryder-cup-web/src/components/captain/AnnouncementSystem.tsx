@@ -544,7 +544,7 @@ export function AnnouncementBanner({
       }}
     >
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center">
           {isUrgent ? (
             <AlertCircle className="w-5 h-5 text-white" />
           ) : (
@@ -563,7 +563,7 @@ export function AnnouncementBanner({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="p-1 rounded-lg bg-white/20 text-white"
+            className="p-1 rounded-lg bg-[color:var(--canvas-raised)]/20 text-white transition-colors hover:bg-[color:var(--canvas-raised)]/30"
           >
             <X className="w-4 h-4" />
           </button>
@@ -573,7 +573,7 @@ export function AnnouncementBanner({
       {onView && (
         <button
           onClick={onView}
-          className="w-full mt-3 py-2 rounded-xl bg-white/20 text-white text-sm font-medium"
+          className="w-full mt-3 py-2 rounded-xl bg-[color:var(--canvas-raised)]/20 text-white text-sm font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
         >
           View Details
         </button>
