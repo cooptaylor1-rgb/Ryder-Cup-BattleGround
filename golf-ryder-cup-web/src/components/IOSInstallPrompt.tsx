@@ -107,14 +107,14 @@ export function IOSInstallPrompt({
         <div className="relative bg-linear-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] p-6 text-white">
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 active:scale-95 transition-all duration-150"
+            className="absolute top-4 right-4 p-2 rounded-full bg-[color:var(--canvas)]/15 hover:bg-[color:var(--canvas)]/25 active:scale-95 transition-all duration-150"
             aria-label="Dismiss"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center overflow-hidden shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-[color:var(--canvas)]/15 flex items-center justify-center overflow-hidden shadow-lg">
               <Image
                 src="/icons/icon-96.png"
                 alt="Golf Ryder Cup"

@@ -125,7 +125,7 @@ export function StrokeAlertBanner({
               </div>
               <button
                 onClick={handleDismiss}
-                className="p-1 rounded hover:bg-white/20 transition-colors"
+                className="p-1 rounded hover:bg-[color:var(--canvas)]/20 transition-colors"
                 aria-label="Dismiss"
               >
                 <X size={16} />
