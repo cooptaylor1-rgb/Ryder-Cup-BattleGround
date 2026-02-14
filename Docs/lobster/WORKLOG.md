@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 21:35 EST — Phase 2 — PhotoCapture + TripMemories + AchievementUnlock overlays: remove remaining `bg-white/*`
+- `PhotoCapture`: replaced the remaining hard-coded `bg-white` capture button + error CTA with token-driven `var(--canvas-raised)` surfaces/rings so the camera UI stays consistent across themes.
+- `TripMemories`: replaced the score progress divider + MVP avatar background off `bg-white` and onto subtle `var(--canvas-raised)` tints with blur for legibility on the gold hero gradient.
+- `AchievementUnlock` + trip setup `FormatSelector` modal header: swapped close/stat/hero capsules off `bg-white/*` overlays and onto tokenized `var(--canvas-raised)` blur treatments.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2bab66a`)
+
 ### 21:20 EST — Phase 2 — Remove remaining `bg-white` UI fragments (iOS + Achievements + Lineup)
 - `IOSScrollContainer`: pull-to-refresh indicator now uses premium raised surface + rule border tokens instead of `bg-white`; icon tint aligned to `var(--masters)`.
 - `/achievements`: progress bar track/fill now use `var(--canvas)` tints instead of `bg-white/*` so the hero stays consistent across theme shells.
