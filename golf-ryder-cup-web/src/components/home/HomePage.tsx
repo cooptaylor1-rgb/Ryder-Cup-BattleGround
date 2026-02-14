@@ -16,8 +16,10 @@ import {
   Users,
   ClipboardCheck,
   Tv,
+  Share2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { shareTrip } from '@/lib/utils/share';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   NoTournamentsEmpty,
@@ -84,6 +86,17 @@ export default function HomePage() {
       router.push(`/score/${userMatchData.match.id}`);
     }
   }, [router, userMatchData]);
+
+  const handleInviteFriends = useCallback(async () => {
+    if (!activeTrip) return;
+    // Derive a 6-char code from the trip ID (deterministic, shareable)
+    const code = activeTrip.id.replace(/-/g, '').slice(0, 6).toUpperCase();
+    const result = await shareTrip(activeTrip.name, code);
+    if (result.shared && result.method === 'clipboard') {
+      // User will see the system share sheet for 'native', only show toast for clipboard
+      // No-op: the clipboard copy is its own confirmation
+    }
+  }, [activeTrip]);
 
   const handleQuickStartComplete = useCallback(
     async (tripData: {
@@ -429,6 +442,10 @@ export default function HomePage() {
                       <Users size={18} className="text-[var(--maroon)]" />
                       <span className="type-micro text-[var(--ink)]">Players</span>
                     </Link>
+                    <button onClick={handleInviteFriends} className="quick-action-btn press-scale border-[var(--maroon-subtle)]">
+                      <Share2 size={18} className="text-[var(--maroon)]" />
+                      <span className="type-micro text-[var(--ink)]">Invite</span>
+                    </button>
                   </div>
                 </section>
                 <hr className="divider-subtle" />

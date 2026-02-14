@@ -20,6 +20,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
+import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { addAuditLogEntry, db } from '@/lib/db';
@@ -32,6 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertCircle,
+  Check,
   Mic,
   Trophy,
   X,
@@ -141,6 +143,7 @@ export default function EnhancedMatchScoringPage() {
   const { showToast, scoringPreferences, getScoringModeForFormat, setScoringModeForFormat } =
     useUIStore();
   const haptic = useHaptic();
+  const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const confettiPieces = useMemo(() => {
@@ -521,8 +524,9 @@ export default function EnhancedMatchScoringPage() {
         method: analyticsMethod,
       });
 
-      // Clear saving indicator
-      setSavingIndicator(null);
+      // Show save confirmation with sync context
+      setSavingIndicator(isOnline ? 'Score saved' : 'Saved offline');
+      setTimeout(() => setSavingIndicator(null), 1500);
 
       // Check for match closeout
       const wouldCloseOut =
@@ -610,6 +614,7 @@ export default function EnhancedMatchScoringPage() {
       scoringPreferences.soundEffects,
       nextHole,
       recordScoreAudit,
+      isOnline,
     ]
   );
 
@@ -1126,9 +1131,22 @@ export default function EnhancedMatchScoringPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit bg-masters text-white"
+              className={cn(
+                'mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit text-white',
+                savingIndicator === 'Saving score...'
+                  ? 'bg-masters'
+                  : savingIndicator === 'Saved offline'
+                    ? 'bg-[var(--warning)]'
+                    : 'bg-[var(--success)]'
+              )}
+              role="status"
+              aria-live="polite"
             >
-              <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              {savingIndicator === 'Saving score...' ? (
+                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Check size={14} strokeWidth={3} />
+              )}
               <span className="text-sm font-medium">{savingIndicator}</span>
             </motion.div>
           )}
