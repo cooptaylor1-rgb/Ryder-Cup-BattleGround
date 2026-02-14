@@ -18,6 +18,7 @@ import {
   Image as ImageIcon,
   Flame,
   Share2,
+  Trash2,
 } from 'lucide-react';
 import type { Player, BanterPost } from '@/lib/types/models';
 
@@ -136,6 +137,19 @@ export default function SocialPage() {
     [showToast]
   );
 
+  const handleDeletePost = useCallback(
+    async (postId: string) => {
+      try {
+        await db.banterPosts.delete(postId);
+        showToast('success', 'Post deleted');
+      } catch (error) {
+        uiLogger.error('Failed to delete post:', error);
+        showToast('error', 'Failed to delete post');
+      }
+    },
+    [showToast]
+  );
+
   const quickEmojis = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
 
   if (!currentTrip) {
@@ -205,6 +219,7 @@ export default function SocialPage() {
                 currentUserId={currentUserId}
                 onToggleReaction={handleToggleReaction}
                 onShare={handleSharePost}
+                onDelete={handleDeletePost}
               />
             );
           })}
@@ -353,11 +368,14 @@ interface PostCardProps {
   currentUserId?: string;
   onToggleReaction: (postId: string, emoji: string) => void;
   onShare: (post: BanterPost) => void;
+  onDelete: (postId: string) => void;
 }
 
-function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: PostCardProps) {
+function PostCard({ post, player, currentUserId, onToggleReaction, onShare, onDelete }: PostCardProps) {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const isOwnPost = currentUserId === post.authorId;
 
   // Update time periodically for "time ago" display
   useEffect(() => {
@@ -448,6 +466,47 @@ function PostCard({ post, player, currentUserId, onToggleReaction, onShare }: Po
         >
           <Share2 size={16} />
         </button>
+        {/* Delete Button — own posts only */}
+        {isOwnPost && (
+          confirmDelete ? (
+            <button
+              onClick={() => {
+                onDelete(post.id);
+                setConfirmDelete(false);
+              }}
+              aria-label="Confirm delete"
+              style={{
+                padding: 'var(--space-1) var(--space-2)',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--error)',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 600,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Delete?
+            </button>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              aria-label="Delete post"
+              style={{
+                padding: 'var(--space-2)',
+                borderRadius: 'var(--radius-sm)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--ink-tertiary)',
+                transition: 'color 0.15s ease',
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          )
+        )}
       </div>
 
       {/* Content */}
