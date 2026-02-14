@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-13
 
+### 19:16 EST — Phase 2 — Trip recap hero: premium token alignment
+- `HeroBanner` on `/recap`: swapped hard-coded USA/EUR gradients, white typography, and badge overlays for token-driven team gradients (`var(--team-usa/europe-gradient-*)`), canvas text, and gold accents so the headline and scoreline stay readable across themes.
+- `OverviewSection` MVP card + leaderboard medals now rely on premium gold tokens instead of raw `rgb()` yellows.
+- `PhotosSection`: replaced black/white overlays with ink/canvas token tints so moment badges and captions stay legible without breaking dark mode.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`85f4f0d`).
+
 ### 19:12 EST — Phase 2 — Live match banner CTA: premium token sweep
 - `LiveMatchBanner` + `LiveMatchPill`: replaced hard-coded crimson gradients, white overlays, and text treatments with premium error + canvas tokens (`var(--error)`, `var(--canvas-raised)`) and token-driven `color-mix` tints so the live CTA matches the editorial palette across themes.
 - Dismiss affordance, live badges, and pulse indicators now rely on tokenized Tailwind classes instead of `bg-white/*` utilities, keeping hover/focus states readable in both light and dark contexts.
