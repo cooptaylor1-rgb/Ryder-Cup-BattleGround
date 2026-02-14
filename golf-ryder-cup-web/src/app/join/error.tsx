@@ -1,13 +1,5 @@
 'use client';
 
-/**
- * Route Error Page
- *
- * Next.js 13+ error boundary for route-level error handling.
- * This catches errors in the route tree and displays a recovery UI.
- * Reports errors to Sentry for monitoring.
- */
-
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -33,7 +25,7 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
 
   const title = isNetworkError ? 'Connection issue' : 'Something went wrong';
   const description = isNetworkError
-    ? 'Looks like you\'re offline or have a weak signal. Your scores are saved locally and will sync when you reconnect.'
+    ? 'Looks like you\'re offline or have a weak signal. Your data is saved locally and will sync when you reconnect.'
     : 'We encountered an unexpected error. Your data is safe \u2014 please try again or return to the home screen.';
 
   return (
@@ -51,24 +43,6 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
       <p className="text-center max-w-md mb-8 text-[var(--ink-secondary)]">
         {description}
       </p>
-
-      {process.env.NODE_ENV === 'development' && (
-        <details className="w-full max-w-lg mb-8 rounded-xl overflow-hidden bg-[var(--surface)] border border-[var(--rule)]">
-          <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-[var(--ink-secondary)]">
-            Error Details
-          </summary>
-          <div className="px-4 pb-4">
-            <pre className="text-xs overflow-auto p-3 rounded bg-[var(--canvas)] text-[var(--ink-tertiary)] max-h-[200px]">
-              {error.message}
-              {'\n\n'}
-              {error.stack}
-            </pre>
-            {error.digest && (
-              <p className="mt-2 text-xs text-[var(--ink-tertiary)]">Error ID: {error.digest}</p>
-            )}
-          </div>
-        </details>
-      )}
 
       <div className="flex gap-4">
         <button

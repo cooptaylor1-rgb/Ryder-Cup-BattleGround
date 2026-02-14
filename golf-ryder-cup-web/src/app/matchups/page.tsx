@@ -189,6 +189,36 @@ export default function MatchupsPage() {
             )}
           </div>
 
+          {/* Guard rail: warn captain if teams aren't ready */}
+          {isCaptainMode && sessions.length === 0 && (teamAPlayers.length < 2 || teamBPlayers.length < 2) && (
+            <div
+              className="card-editorial"
+              style={{
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-4)',
+                borderLeft: '3px solid var(--warning)',
+                background: 'var(--canvas-sunken)',
+              }}
+            >
+              <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
+                Teams need more players
+              </p>
+              <p className="type-caption text-[var(--ink-secondary)]">
+                Each team needs at least 2 players before you can create a session.
+                {teamAPlayers.length < 2 && ` ${teamA?.name || 'USA'} has ${teamAPlayers.length}.`}
+                {teamBPlayers.length < 2 && ` ${teamB?.name || 'Europe'} has ${teamBPlayers.length}.`}
+              </p>
+              <button
+                onClick={() => router.push('/captain/draft')}
+                className="btn-premium press-scale"
+                style={{ marginTop: 'var(--space-3)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)' }}
+              >
+                <Users size={14} style={{ marginRight: '4px' }} />
+                Assign Players to Teams
+              </button>
+            </div>
+          )}
+
           {sessions.length > 0 ? (
             <div>
               {sessions.map(session => (

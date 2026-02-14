@@ -22,11 +22,11 @@ import type {
 import { db } from '../db';
 import {
   queueSyncOperation,
-  purgeQueueForTrip,
   syncTripToCloudFull,
   getTripSyncStatus,
   type SyncStatus,
 } from '../services/tripSyncService';
+import { deleteTripCascade } from '../services/cascadeDelete';
 import { createLogger } from '../utils/logger';
 import { useUIStore } from './uiStore';
 
@@ -260,73 +260,10 @@ export const useTripStore = create<TripState>()(
       },
 
       deleteTrip: async (tripId) => {
-        // Delete all related data with proper cascade
-        const teams = await db.teams.where('tripId').equals(tripId).toArray();
-        const teamIds = teams.map((t) => t.id);
-
-        const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
-        const sessionIds = sessions.map((s) => s.id);
-
-        const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
-        const matchIds = matches.map((m) => m.id);
-
-        // Get photo albums for cascade
-        const photoAlbums = await db.photoAlbums.where('tripId').equals(tripId).toArray();
-        const albumIds = photoAlbums.map((a) => a.id);
-
-        // Get chat threads for cascade
-        const chatThreads = await db.chatThreads.where('tripId').equals(tripId).toArray();
-        const threadIds = chatThreads.map((t) => t.id);
-
-        // Delete in dependency order (leaves → roots)
-        // Scoring data
-        await db.holeResults.where('matchId').anyOf(matchIds).delete();
-        await db.scoringEvents.where('matchId').anyOf(matchIds).delete();
-
-        // Side games (extended)
-        await db.wolfGames.where('tripId').equals(tripId).delete();
-        await db.vegasGames.where('tripId').equals(tripId).delete();
-        await db.hammerGames.where('tripId').equals(tripId).delete();
-        await db.nassauGames.where('tripId').equals(tripId).delete();
-        await db.settlements.where('tripId').equals(tripId).delete();
-
-        // Social features
-        await db.photos.where('albumId').anyOf(albumIds).delete();
-        await db.photoAlbums.where('tripId').equals(tripId).delete();
-        await db.chatMessages.where('threadId').anyOf(threadIds).delete();
-        await db.chatThreads.where('tripId').equals(tripId).delete();
-        await db.trashTalks.where('tripId').equals(tripId).delete();
-        await db.polls.where('tripId').equals(tripId).delete();
-        await db.headToHeadRecords.where('tripId').equals(tripId).delete();
-
-        // Social & bets (legacy)
-        await db.sideBets.where('tripId').equals(tripId).delete();
-        await db.banterPosts.where('tripId').equals(tripId).delete();
-
-        // Audit & stats
-        await db.auditLog.where('tripId').equals(tripId).delete();
-        await db.tripStats.where('tripId').equals(tripId).delete();
-        await db.tripAwards.where('tripId').equals(tripId).delete();
-
-        // Archive
-        await db.tripArchives.where('tripId').equals(tripId).delete();
-
-        // Schedule
-        await db.scheduleDays.where('tripId').equals(tripId).delete();
-        await db.scheduleItems.where('tripId').equals(tripId).delete();
-
-        // Core entities (original order)
-        await db.teamMembers.where('teamId').anyOf(teamIds).delete();
-        await db.matches.where('sessionId').anyOf(sessionIds).delete();
-        await db.sessions.where('tripId').equals(tripId).delete();
-        await db.teams.where('tripId').equals(tripId).delete();
-        await db.trips.delete(tripId);
-
-        // Purge stale pending operations for this trip; we only want to sync the trip delete.
-        await purgeQueueForTrip(tripId);
-
-        // Queue cloud delete
-        queueSyncOperation('trip', tripId, 'delete', tripId);
+        // Use the centralized cascade delete which covers all 30 tables
+        // atomically, including finances, sync queue, and schedule items
+        // that the previous inline logic missed.
+        await deleteTripCascade(tripId, { sync: true });
 
         const { currentTrip } = get();
         if (currentTrip?.id === tripId) {

@@ -259,7 +259,7 @@ export function MomentCard({
                     {moment.author.avatarUrl ? (
                         <Image
                             src={moment.author.avatarUrl}
-                            alt=""
+                            alt="User avatar"
                             width={40}
                             height={40}
                             className="w-10 h-10 rounded-full object-cover"
@@ -355,7 +355,7 @@ export function MomentCard({
                                         {player.avatarUrl ? (
                                             <Image
                                                 src={player.avatarUrl}
-                                                alt=""
+                                                alt="User avatar"
                                                 fill
                                                 className="rounded-full object-cover"
                                                 sizes="24px"
@@ -429,7 +429,7 @@ export function MomentCard({
                                 {previewComment.userAvatar ? (
                                     <Image
                                         src={previewComment.userAvatar}
-                                        alt=""
+                                        alt="User avatar"
                                         fill
                                         className="rounded-full object-cover"
                                         sizes="24px"

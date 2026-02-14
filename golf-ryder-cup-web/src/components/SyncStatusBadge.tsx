@@ -41,8 +41,41 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
         };
 
         updateStatus();
-        const interval = setInterval(updateStatus, 5000);
-        return () => clearInterval(interval);
+
+        // Only poll when the tab is visible to save battery on the course
+        let interval: ReturnType<typeof setInterval> | null = null;
+
+        const startPolling = () => {
+            if (!interval) {
+                interval = setInterval(updateStatus, 5000);
+            }
+        };
+
+        const stopPolling = () => {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+        };
+
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible') {
+                updateStatus(); // Immediate refresh on return
+                startPolling();
+            } else {
+                stopPolling();
+            }
+        };
+
+        if (document.visibilityState === 'visible') {
+            startPolling();
+        }
+        document.addEventListener('visibilitychange', handleVisibility);
+
+        return () => {
+            stopPolling();
+            document.removeEventListener('visibilitychange', handleVisibility);
+        };
     }, [currentTrip]);
 
     const handleManualSync = async () => {

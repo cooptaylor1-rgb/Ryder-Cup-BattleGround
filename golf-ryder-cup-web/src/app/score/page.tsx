@@ -18,6 +18,7 @@ import {
   NoScoresPremiumEmpty,
 } from '@/components/ui';
 import { BottomNav } from '@/components/layout';
+import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 
 /**
  * SCORE PAGE — Match List
@@ -203,6 +204,7 @@ export default function ScorePage() {
                 subtitle={currentTrip.name}
                 icon={<Target size={16} className="text-[var(--masters)]" />}
                 onBack={() => router.back()}
+                rightSlot={<SyncStatusBadge showText />}
             />
 
             <main className="container-editorial">

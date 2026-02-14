@@ -351,7 +351,7 @@ export function PhotoStrip({ photos, onViewAll, className }: PhotoStripProps) {
                 >
                     <Image
                         src={photo.thumbnailUrl || photo.url}
-                        alt=""
+                        alt={photo.caption || 'Trip photo'}
                         fill
                         className="object-cover"
                         sizes="40px"
