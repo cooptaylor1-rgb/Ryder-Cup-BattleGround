@@ -179,6 +179,8 @@ export function StickyUndoBanner({
 
     if (!action) return null;
 
+    const resultColor = getResultColor(action.metadata?.result);
+
     return (
         <AnimatePresence mode="wait">
             <motion.div
@@ -206,18 +208,16 @@ export function StickyUndoBanner({
                         'relative overflow-hidden',
                         'flex items-center gap-3',
                         'px-4 py-3 rounded-2xl',
-                        'shadow-lg backdrop-blur-md',
+                        'border border-[color:var(--rule)]/40',
+                        'bg-[var(--surface-elevated)] backdrop-blur-md',
+                        'shadow-[var(--shadow-card-lg)] text-[var(--ink)]',
                     )}
-                    style={{
-                        background: 'rgba(26, 24, 20, 0.95)',
-                        border: '1px solid rgba(128, 120, 104, 0.3)',
-                    }}
                 >
                     {/* Progress bar (countdown) */}
                     <motion.div
                         className="absolute bottom-0 left-0 h-1 rounded-full"
                         style={{
-                            background: getResultColor(action.metadata?.result),
+                            background: resultColor,
                             width: `${progress}%`,
                         }}
                         transition={{ duration: 0.1 }}
@@ -227,22 +227,22 @@ export function StickyUndoBanner({
                     <div
                         className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
                         style={{
-                            background: `${getResultColor(action.metadata?.result)}20`,
+                            background: `color-mix(in srgb, ${resultColor} 18%, transparent)`,
                         }}
                     >
                         <Check
                             className="w-5 h-5"
-                            style={{ color: getResultColor(action.metadata?.result) }}
+                            style={{ color: resultColor }}
                         />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-sm font-medium text-[var(--ink)] truncate">
                             {action.description || 'Score recorded'}
                         </p>
                         {action.metadata && (
-                            <p className="text-xs opacity-60 truncate">
+                            <p className="text-xs text-[var(--ink-tertiary)] truncate">
                                 {formatResult(action.metadata)}
                             </p>
                         )}
@@ -255,18 +255,16 @@ export function StickyUndoBanner({
                         whileTap={{ scale: 0.9 }}
                         className={cn(
                             'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
-                            'text-sm font-medium',
+                            'text-sm font-medium text-[var(--ink)]',
                             'transition-colors duration-150',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30',
+                            'bg-[var(--surface-secondary)] hover:bg-[color:var(--surface-secondary)]/80',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                            'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-elevated)]',
                             isUndoing && 'opacity-50 cursor-not-allowed',
                         )}
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            color: '#F5F1E8',
-                        }}
                         aria-label="Undo last action"
                     >
-                        <Undo2 className={cn('w-4 h-4', isUndoing && 'animate-spin')} />
+                        <Undo2 className={cn('w-4 h-4 text-[var(--ink-secondary)]', isUndoing && 'animate-spin')} />
                         <span>Undo</span>
                     </motion.button>
 
@@ -274,14 +272,15 @@ export function StickyUndoBanner({
                     <button
                         onClick={handleDismiss}
                         className={cn(
-                            'p-1.5 rounded-full',
+                            'p-1.5 rounded-full text-[var(--ink-tertiary)]',
                             'transition-colors duration-150',
-                            'hover:bg-white/10',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30',
+                            'hover:text-[var(--ink-secondary)] hover:bg-[color:var(--surface)]/60',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                            'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-elevated)]',
                         )}
                         aria-label="Dismiss"
                     >
-                        <X className="w-4 h-4 opacity-60" />
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
@@ -290,7 +289,7 @@ export function StickyUndoBanner({
                     initial={{ opacity: 0.8 }}
                     animate={{ opacity: 0 }}
                     transition={{ duration: 2, delay: 1 }}
-                    className="text-[10px] text-center opacity-40 mt-1"
+                    className="text-[10px] text-center text-[var(--ink-tertiary)] opacity-60 mt-1"
                 >
                     Swipe to dismiss
                 </motion.p>

@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Trophy, ChevronDown, Circle, Zap } from 'lucide-react';
@@ -271,6 +271,15 @@ export function QuickStandingsOverlay({
 
     if (!shouldEnable) return null;
 
+    const teamALeading = standings ? standings.teamA.points >= standings.teamB.points : false;
+    const teamBLeading = standings ? standings.teamB.points > standings.teamA.points : false;
+    const teamAToneStyle = {
+        '--team-tone': 'var(--team-usa)',
+    } as CSSProperties & Record<'--team-tone', string>;
+    const teamBToneStyle = {
+        '--team-tone': 'var(--team-europe)',
+    } as CSSProperties & Record<'--team-tone', string>;
+
     return (
         <>
             {/* Pull indicator (when not visible) */}
@@ -281,11 +290,11 @@ export function QuickStandingsOverlay({
                 >
                     <div className="flex justify-center pt-2">
                         <motion.div
-                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--surface)]/80 border border-[color:var(--rule)]/30 backdrop-blur-sm"
+                            className="flex items-center gap-2 rounded-full border border-[color:var(--rule)]/30 bg-[color:var(--surface)]/80 px-4 py-2 text-[var(--ink-secondary)] backdrop-blur-sm"
                             style={{ y: pullProgress }}
                         >
-                            <ChevronDown className="w-4 h-4 text-white/60" />
-                            <span className="text-xs text-white/60">Pull for standings</span>
+                            <ChevronDown className="h-4 w-4 text-[var(--ink-tertiary)]" />
+                            <span className="text-xs">Pull for standings</span>
                         </motion.div>
                     </div>
                 </motion.div>
@@ -326,29 +335,27 @@ export function QuickStandingsOverlay({
                             className={cn(
                                 'fixed top-0 left-0 right-0 z-50',
                                 'max-h-[80vh] overflow-y-auto',
-                                'rounded-b-3xl shadow-2xl',
+                                'rounded-b-3xl border-b border-[color:var(--rule)]/30',
+                                'bg-[var(--surface-raised)] text-[var(--ink)] shadow-[var(--shadow-card-lg)]',
                                 className,
                             )}
-                            style={{
-                                background: 'var(--surface, #1A1814)',
-                            }}
                         >
                             {/* Pull handle */}
-                            <div className="sticky top-0 flex justify-center py-3 bg-inherit">
-                                <div className="w-12 h-1.5 rounded-full bg-white/20" />
+                            <div className="sticky top-0 flex justify-center bg-inherit py-3">
+                                <div className="h-1.5 w-12 rounded-full bg-[color:var(--ink-tertiary)]/40" />
                             </div>
 
                             {/* Header */}
                             <div className="px-6 pb-4">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <Trophy className="w-5 h-5 text-secondary-gold" />
+                                    <h2 className="flex items-center gap-2 text-lg font-bold text-[var(--ink)]">
+                                        <Trophy className="h-5 w-5 text-[var(--premium-gold)]" />
                                         Live Standings
                                     </h2>
                                     {standings.magicNumber > 0 && (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-gold/20">
-                                            <Zap className="w-4 h-4 text-secondary-gold" />
-                                            <span className="text-sm font-medium text-secondary-gold">
+                                        <div className="flex items-center gap-1.5 rounded-full bg-[color:var(--premium-gold)]/18 px-3 py-1 text-[color:var(--premium-gold)]">
+                                            <Zap className="h-4 w-4" />
+                                            <span className="text-sm font-medium">
                                                 Magic #: {standings.magicNumber}
                                             </span>
                                         </div>
@@ -362,64 +369,66 @@ export function QuickStandingsOverlay({
                                     {/* Team A */}
                                     <div
                                         className={cn(
-                                            'flex-1 p-4 rounded-2xl',
-                                            'relative overflow-hidden',
+                                            'relative flex-1 overflow-hidden rounded-2xl border p-4',
+                                            teamALeading
+                                                ? 'border-[color:color-mix(in_srgb,var(--team-tone)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--team-tone)_18%,transparent)] shadow-[var(--shadow-card-sm)]'
+                                                : 'border-[color:var(--rule)]/40 bg-[var(--surface)]',
                                         )}
-                                        style={{
-                                            background: standings.teamA.points >= standings.teamB.points
-                                                ? 'linear-gradient(135deg, rgba(185, 28, 28, 0.3) 0%, rgba(185, 28, 28, 0.1) 100%)'
-                                                : 'rgba(255, 255, 255, 0.05)',
-                                            border: standings.teamA.points >= standings.teamB.points
-                                                ? '1px solid rgba(185, 28, 28, 0.3)'
-                                                : '1px solid rgba(255, 255, 255, 0.1)',
-                                        }}
+                                        style={teamAToneStyle}
                                     >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <div
-                                                className="w-4 h-4 rounded-full"
-                                                style={{ background: 'var(--team-usa, #B91C1C)' }}
-                                            />
-                                            <span className="text-sm font-medium text-white/80">USA</span>
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <div className="h-4 w-4 rounded-full bg-[color:var(--team-usa)]" />
+                                            <span
+                                                className={cn(
+                                                    'text-sm font-medium',
+                                                    teamALeading
+                                                        ? 'text-[color:var(--team-tone)]'
+                                                        : 'text-[var(--ink-secondary)]',
+                                                )}
+                                            >
+                                                USA
+                                            </span>
                                         </div>
-                                        <p className="text-4xl font-bold text-white">
+                                        <p className="text-4xl font-bold text-[var(--ink)]">
                                             {standings.teamA.points}
                                         </p>
-                                        <p className="text-xs text-white/50 mt-1">
+                                        <p className="mt-1 text-xs text-[var(--ink-tertiary)]">
                                             {standings.teamA.matchesWon}W - {standings.teamA.matchesLost}L
                                         </p>
                                     </div>
 
                                     {/* VS */}
                                     <div className="flex flex-col items-center justify-center">
-                                        <span className="text-xs text-white/30 font-medium">VS</span>
+                                        <span className="text-xs font-medium text-[var(--ink-tertiary)]">VS</span>
                                     </div>
 
                                     {/* Team B */}
                                     <div
                                         className={cn(
-                                            'flex-1 p-4 rounded-2xl',
-                                            'relative overflow-hidden',
+                                            'relative flex-1 overflow-hidden rounded-2xl border p-4',
+                                            teamBLeading
+                                                ? 'border-[color:color-mix(in_srgb,var(--team-tone)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--team-tone)_18%,transparent)] shadow-[var(--shadow-card-sm)]'
+                                                : 'border-[color:var(--rule)]/40 bg-[var(--surface)]',
                                         )}
-                                        style={{
-                                            background: standings.teamB.points > standings.teamA.points
-                                                ? 'linear-gradient(135deg, rgba(30, 64, 175, 0.3) 0%, rgba(30, 64, 175, 0.1) 100%)'
-                                                : 'rgba(255, 255, 255, 0.05)',
-                                            border: standings.teamB.points > standings.teamA.points
-                                                ? '1px solid rgba(30, 64, 175, 0.3)'
-                                                : '1px solid rgba(255, 255, 255, 0.1)',
-                                        }}
+                                        style={teamBToneStyle}
                                     >
-                                        <div className="flex items-center gap-2 mb-2 justify-end">
-                                            <span className="text-sm font-medium text-white/80">EUR</span>
-                                            <div
-                                                className="w-4 h-4 rounded-full"
-                                                style={{ background: 'var(--team-europe, #1E40AF)' }}
-                                            />
+                                        <div className="mb-2 flex items-center justify-end gap-2">
+                                            <span
+                                                className={cn(
+                                                    'text-sm font-medium',
+                                                    teamBLeading
+                                                        ? 'text-[color:var(--team-tone)]'
+                                                        : 'text-[var(--ink-secondary)]',
+                                                )}
+                                            >
+                                                EUR
+                                            </span>
+                                            <div className="h-4 w-4 rounded-full bg-[color:var(--team-europe)]" />
                                         </div>
-                                        <p className="text-4xl font-bold text-white text-right">
+                                        <p className="text-right text-4xl font-bold text-[var(--ink)]">
                                             {standings.teamB.points}
                                         </p>
-                                        <p className="text-xs text-white/50 mt-1 text-right">
+                                        <p className="mt-1 text-right text-xs text-[var(--ink-tertiary)]">
                                             {standings.teamB.matchesWon}W - {standings.teamB.matchesLost}L
                                         </p>
                                     </div>
@@ -429,52 +438,56 @@ export function QuickStandingsOverlay({
                             {/* Match summaries */}
                             {matchSummaries.length > 0 && (
                                 <div className="px-6 pb-8">
-                                    <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+                                    <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--ink-tertiary)]">
                                         Match Status
                                     </h3>
                                     <div className="space-y-2">
                                         {matchSummaries.map((match, index) => (
                                             <div
                                                 key={match.id}
-                                                className="flex items-center gap-3 p-3 rounded-xl"
-                                                style={{
-                                                    background: 'rgba(255, 255, 255, 0.03)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                                                }}
+                                                className="flex items-center gap-3 rounded-xl border border-[color:var(--rule)]/40 bg-[color:var(--surface)]/70 p-3"
                                             >
-                                                <span className="text-xs text-white/30 w-4">
+                                                <span className="w-4 text-xs text-[var(--ink-tertiary)]">
                                                     {index + 1}
                                                 </span>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 text-xs">
-                                                        <span className={cn(
-                                                            'truncate',
-                                                            match.leader === 'teamA' && 'text-red-400 font-medium',
-                                                            match.leader !== 'teamA' && 'text-white/60',
-                                                        )}>
+                                                        <span
+                                                            className={cn(
+                                                                'truncate',
+                                                                match.leader === 'teamA'
+                                                                    ? 'text-[color:var(--team-usa)] font-medium'
+                                                                    : 'text-[var(--ink-secondary)]',
+                                                            )}
+                                                        >
                                                             {match.teamANames}
                                                         </span>
-                                                        <span className="text-white/30">vs</span>
-                                                        <span className={cn(
-                                                            'truncate',
-                                                            match.leader === 'teamB' && 'text-blue-400 font-medium',
-                                                            match.leader !== 'teamB' && 'text-white/60',
-                                                        )}>
+                                                        <span className="text-[var(--ink-tertiary)]">vs</span>
+                                                        <span
+                                                            className={cn(
+                                                                'truncate',
+                                                                match.leader === 'teamB'
+                                                                    ? 'text-[color:var(--team-europe)] font-medium'
+                                                                    : 'text-[var(--ink-secondary)]',
+                                                            )}
+                                                        >
                                                             {match.teamBNames}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className={cn(
-                                                        'text-xs font-medium',
-                                                        match.leader === 'teamA' && 'text-red-400',
-                                                        match.leader === 'teamB' && 'text-blue-400',
-                                                        match.leader === 'tied' && 'text-white/60',
-                                                    )}>
+                                                    <span
+                                                        className={cn(
+                                                            'text-xs font-medium',
+                                                            match.leader === 'teamA' && 'text-[color:var(--team-usa)]',
+                                                            match.leader === 'teamB' && 'text-[color:var(--team-europe)]',
+                                                            match.leader === 'tied' && 'text-[var(--ink-secondary)]',
+                                                        )}
+                                                    >
                                                         {match.scoreDisplay}
                                                     </span>
                                                     {match.status === 'inProgress' && (
-                                                        <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse" />
+                                                        <Circle className="h-2 w-2 animate-pulse fill-[var(--info)] text-[var(--info)]" />
                                                     )}
                                                 </div>
                                             </div>
@@ -485,7 +498,7 @@ export function QuickStandingsOverlay({
 
                             {/* Swipe hint */}
                             <div className="flex justify-center pb-6">
-                                <p className="text-[10px] text-white/30">Swipe up to close</p>
+                                <p className="text-[10px] text-[var(--ink-tertiary)]">Swipe up to close</p>
                             </div>
                         </motion.div>
                     </>

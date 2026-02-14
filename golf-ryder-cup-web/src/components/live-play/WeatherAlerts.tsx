@@ -18,7 +18,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { weatherLogger } from '@/lib/utils/logger';
 import {
@@ -344,38 +344,26 @@ export function WeatherAlerts({
         setDismissedAlerts(prev => new Set([...prev, alertId]));
     }, [trigger]);
 
-    // Get severity colors
-    const getSeverityColors = (severity: AlertSeverity) => {
-        switch (severity) {
-            case 'warning':
-                return {
-                    bg: 'rgba(185, 28, 28, 0.15)',
-                    border: 'rgba(239, 68, 68, 0.4)',
-                    text: '#FCA5A5',
-                    icon: '#EF4444',
-                };
-            case 'watch':
-                return {
-                    bg: 'rgba(217, 119, 6, 0.15)',
-                    border: 'rgba(251, 191, 36, 0.4)',
-                    text: '#FDE68A',
-                    icon: '#F59E0B',
-                };
-            case 'advisory':
-                return {
-                    bg: 'rgba(59, 130, 246, 0.15)',
-                    border: 'rgba(96, 165, 250, 0.4)',
-                    text: '#93C5FD',
-                    icon: '#3B82F6',
-                };
-            default:
-                return {
-                    bg: 'rgba(128, 120, 104, 0.15)',
-                    border: 'rgba(128, 120, 104, 0.4)',
-                    text: '#A09080',
-                    icon: '#807868',
-                };
-        }
+    // Get severity-specific tone classes
+    const getSeverityStyles = (severity: AlertSeverity) => {
+        const toneMap: Record<AlertSeverity, string> = {
+            warning: 'var(--error)',
+            watch: 'var(--warning)',
+            advisory: 'var(--info)',
+            info: 'var(--masters)',
+        };
+
+        const tone = toneMap[severity] ?? 'var(--info)';
+
+        return {
+            containerClass: 'border border-[color:color-mix(in_srgb,var(--alert-tone)_36%,transparent)] bg-[color:color-mix(in_srgb,var(--alert-tone)_12%,transparent)]',
+            titleClass: 'text-[color:var(--alert-tone)]',
+            iconClass: 'text-[color:var(--alert-tone)]',
+            chipClass: 'bg-[color:color-mix(in_srgb,var(--alert-tone)_22%,transparent)] text-[color:var(--alert-tone)]',
+            style: {
+                '--alert-tone': tone,
+            } as CSSProperties & Record<'--alert-tone', string>,
+        };
     };
 
     // Get alert icon
@@ -411,35 +399,33 @@ export function WeatherAlerts({
                     className={cn(
                         'flex items-center justify-between gap-4 px-4 py-2 rounded-xl',
                         'backdrop-blur-md',
+                        'border border-[color:var(--rule)]/35',
+                        'bg-[var(--surface-elevated)]/90 text-[var(--ink)]',
                     )}
-                    style={{
-                        background: 'rgba(26, 24, 20, 0.8)',
-                        border: '1px solid rgba(128, 120, 104, 0.2)',
-                    }}
                 >
                     <div className="flex items-center gap-3">
                         <span className="text-2xl">{weather.icon}</span>
                         <div>
-                            <p className="text-sm font-medium text-white">
+                            <p className="text-sm font-medium text-[var(--ink)]">
                                 {Math.round(weather.temperature)}°F
                             </p>
-                            <p className="text-[10px] text-white/50">
+                            <p className="text-[10px] text-[var(--ink-tertiary)]">
                                 Feels like {Math.round(weather.feelsLike)}°
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-white/60">
+                    <div className="flex items-center gap-4 text-xs text-[var(--ink-secondary)]">
                         <div className="flex items-center gap-1">
-                            <Wind className="w-3 h-3" />
+                            <Wind className="w-3 h-3 text-[var(--ink-tertiary)]" />
                             {Math.round(weather.windSpeed)} mph
                         </div>
                         <div className="flex items-center gap-1">
-                            <Droplets className="w-3 h-3" />
+                            <Droplets className="w-3 h-3 text-[var(--ink-tertiary)]" />
                             {Math.round(weather.humidity)}%
                         </div>
                         <div className="flex items-center gap-1">
-                            <Sunset className="w-3 h-3" />
+                            <Sunset className="w-3 h-3 text-[var(--ink-tertiary)]" />
                             {weather.sunset}
                         </div>
                     </div>
@@ -447,10 +433,15 @@ export function WeatherAlerts({
                     <button
                         onClick={updateWeather}
                         disabled={isLoading}
-                        className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                        className={cn(
+                            'p-1.5 rounded-full text-[var(--ink-tertiary)]',
+                            'transition-colors hover:text-[var(--ink-secondary)] hover:bg-[color:var(--surface)]/60',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                            'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-elevated)]'
+                        )}
                         aria-label="Refresh weather"
                     >
-                        <RefreshCw className={cn('w-4 h-4 text-white/40', isLoading && 'animate-spin')} />
+                        <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
                     </button>
                 </motion.div>
             )}
@@ -458,7 +449,7 @@ export function WeatherAlerts({
             {/* Alert cards */}
             <AnimatePresence mode="popLayout">
                 {activeAlerts.map(alert => {
-                    const colors = getSeverityColors(alert.severity);
+                    const severityStyles = getSeverityStyles(alert.severity);
 
                     return (
                         <motion.div
@@ -469,33 +460,39 @@ export function WeatherAlerts({
                             layout
                             className={cn(
                                 'flex items-start gap-3 p-4 rounded-xl',
-                                'backdrop-blur-md',
+                                'backdrop-blur-md text-[var(--ink)]',
+                                severityStyles.containerClass,
                             )}
-                            style={{
-                                background: colors.bg,
-                                border: `1px solid ${colors.border}`,
-                            }}
+                            style={severityStyles.style}
                         >
                             {/* Icon */}
-                            <div style={{ color: colors.icon }}>
+                            <div
+                                className={cn(
+                                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+                                    'bg-[color:color-mix(in_srgb,var(--alert-tone)_18%,transparent)]',
+                                    severityStyles.iconClass,
+                                )}
+                            >
                                 {getAlertIcon(alert.type)}
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 text-[var(--ink)]">
                                 <div className="flex items-center gap-2">
-                                    <h4 className="font-semibold text-sm" style={{ color: colors.text }}>
+                                    <h4 className={cn('font-semibold text-sm', severityStyles.titleClass)}>
                                         {alert.title}
                                     </h4>
                                     <span
-                                        className="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold"
-                                        style={{ background: `${colors.icon}30`, color: colors.icon }}
+                                        className={cn(
+                                            'px-2 py-0.5 rounded-full text-[10px] uppercase font-bold',
+                                            severityStyles.chipClass,
+                                        )}
                                     >
                                         {alert.severity}
                                     </span>
                                 </div>
-                                <p className="text-white/70 text-xs mt-1">{alert.message}</p>
-                                <p className="text-white/50 text-xs mt-2 italic">
+                                <p className="mt-1 text-xs text-[var(--ink-secondary)]">{alert.message}</p>
+                                <p className="mt-2 text-xs italic text-[var(--ink-tertiary)]">
                                     💡 {alert.recommendation}
                                 </p>
                             </div>
@@ -503,10 +500,15 @@ export function WeatherAlerts({
                             {/* Dismiss */}
                             <button
                                 onClick={() => dismissAlert(alert.id)}
-                                className="shrink-0 p-1 rounded-full hover:bg-white/10 transition-colors"
+                                className={cn(
+                                    'shrink-0 p-1 rounded-full text-[var(--ink-tertiary)]',
+                                    'transition-colors hover:text-[var(--ink-secondary)] hover:bg-[color:var(--surface)]/60',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--focus-ring)]',
+                                    'focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--surface-elevated)]',
+                                )}
                                 aria-label="Dismiss alert"
                             >
-                                <X className="w-4 h-4 text-white/40" />
+                                <X className="w-4 h-4" />
                             </button>
                         </motion.div>
                     );
