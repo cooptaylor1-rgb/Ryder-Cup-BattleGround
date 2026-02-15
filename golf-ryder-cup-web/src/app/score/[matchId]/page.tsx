@@ -1141,7 +1141,7 @@ export default function EnhancedMatchScoringPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className={cn(
-                'mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit text-white',
+                'mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit text-[var(--canvas)]',
                 savingIndicator === 'Saving score...'
                   ? 'bg-masters'
                   : savingIndicator === 'Saved offline'
@@ -1152,7 +1152,7 @@ export default function EnhancedMatchScoringPage() {
               aria-live="polite"
             >
               {savingIndicator === 'Saving score...' ? (
-                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="w-3 h-3 border-2 border-[color:var(--canvas)]/30 border-t-[var(--canvas)] rounded-full animate-spin" />
               ) : (
                 <Check size={14} strokeWidth={3} />
               )}
@@ -1388,7 +1388,7 @@ export default function EnhancedMatchScoringPage() {
                     <button
                       onClick={() => handleScore('teamA')}
                       disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition bg-[color:var(--team-usa)] ${
+                      className={`py-4 px-4 rounded-xl text-[var(--canvas)] font-sans font-semibold border-[3px] transition bg-[color:var(--team-usa)] ${
                         isSaving ? 'opacity-50' : 'opacity-100'
                       } ${
                         currentHoleResult?.winner === 'teamA' ? 'border-gold' : 'border-transparent'
@@ -1418,7 +1418,7 @@ export default function EnhancedMatchScoringPage() {
                     <button
                       onClick={() => handleScore('teamB')}
                       disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-white font-sans font-semibold border-[3px] transition bg-[color:var(--team-europe)] ${
+                      className={`py-4 px-4 rounded-xl text-[var(--canvas)] font-sans font-semibold border-[3px] transition bg-[color:var(--team-europe)] ${
                         isSaving ? 'opacity-50' : 'opacity-100'
                       } ${
                         currentHoleResult?.winner === 'teamB' ? 'border-gold' : 'border-transparent'
@@ -1506,7 +1506,7 @@ export default function EnhancedMatchScoringPage() {
                         </p>
                         <button
                           onClick={dismissScoringModeTip}
-                          className="mt-2 text-xs font-medium px-2 py-1 rounded bg-masters text-white"
+                          className="mt-2 text-xs font-medium px-2 py-1 rounded bg-masters text-[var(--canvas)]"
                         >
                           Got it!
                         </button>
@@ -1554,7 +1554,7 @@ export default function EnhancedMatchScoringPage() {
                     onClick={() => handleScoringModeChange('fourball')}
                     className={`px-3 py-1 rounded-full transition-all ${
                       scoringMode === 'fourball'
-                        ? 'bg-masters text-white shadow-card-sm'
+                        ? 'bg-masters text-[var(--canvas)] shadow-card-sm'
                         : 'bg-transparent text-ink-tertiary shadow-none'
                     }`}
                   >
@@ -1565,7 +1565,7 @@ export default function EnhancedMatchScoringPage() {
                   onClick={() => handleScoringModeChange('oneHanded')}
                   className={`px-3 py-1 rounded-full transition-all ${
                     scoringMode === 'oneHanded'
-                      ? 'bg-masters text-white shadow-card-sm'
+                      ? 'bg-masters text-[var(--canvas)] shadow-card-sm'
                       : 'bg-transparent text-ink-tertiary shadow-none'
                   }`}
                 >
@@ -1634,7 +1634,7 @@ export default function EnhancedMatchScoringPage() {
                       : 'bg-[color:var(--ink-tertiary)]'
                 )}
               >
-                <Trophy className="w-10 h-10 text-white" />
+                <Trophy className="w-10 h-10 text-[var(--canvas)]" />
               </div>
 
               {/* Winner Announcement — serif display */}
@@ -1718,7 +1718,7 @@ export default function EnhancedMatchScoringPage() {
                   </button>
                   <button
                     onClick={handleExportSummary}
-                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-masters text-white"
+                    className="w-full py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-masters text-[var(--canvas)]"
                   >
                     <Trophy size={16} />
                     Export PDF Keepsake
@@ -1732,7 +1732,7 @@ export default function EnhancedMatchScoringPage() {
                 {nextIncompleteMatch && (
                   <button
                     onClick={() => router.push(`/score/${nextIncompleteMatch.id}`)}
-                    className="w-full py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-semibold bg-masters text-white"
+                    className="w-full py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-semibold bg-masters text-[var(--canvas)]"
                   >
                     Score Next Match
                     <ArrowRight size={20} />
@@ -1745,7 +1745,7 @@ export default function EnhancedMatchScoringPage() {
                   className={`w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2 font-sans ${
                     nextIncompleteMatch
                       ? 'font-medium bg-canvas-raised border border-rule text-ink'
-                      : 'font-semibold bg-masters text-white'
+                      : 'font-semibold bg-masters text-[var(--canvas)]'
                   }`}
                 >
                   <BarChart3 size={nextIncompleteMatch ? 18 : 20} />
@@ -1824,7 +1824,7 @@ export default function EnhancedMatchScoringPage() {
         <div className="fixed bottom-24 right-4 z-40">
           <button
             onClick={() => setShowVoiceModal(true)}
-            className="w-14 h-14 rounded-full flex items-center justify-center bg-masters text-white shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity"
+            className="w-14 h-14 rounded-full flex items-center justify-center bg-masters text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity"
             aria-label="Voice scoring"
           >
             <Mic size={24} />
