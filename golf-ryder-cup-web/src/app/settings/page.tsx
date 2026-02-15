@@ -83,7 +83,7 @@ export default function SettingsPage() {
           <div className="card p-[var(--space-4)]">
             <div className="flex items-center gap-[var(--space-3)]">
               <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--masters)]">
-                <Palette size={20} className="text-white" />
+                <Palette size={20} className="text-[var(--canvas)]" />
               </div>
               <div className="flex-1">
                 <p className="type-title-sm">Current Theme</p>

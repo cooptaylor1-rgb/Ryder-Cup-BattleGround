@@ -118,7 +118,7 @@ export default function NotificationSettingsPage() {
       <main className="container-editorial py-6 space-y-6 pb-8">
         {savedMessage ? (
           <div
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[var(--masters)] text-white text-sm font-medium flex items-center gap-2 shadow-lg"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[var(--masters)] text-[var(--canvas)] text-sm font-medium flex items-center gap-2 shadow-lg"
             role="status"
             aria-live="polite"
           >
@@ -227,7 +227,7 @@ export default function NotificationSettingsPage() {
                             className={cn(
                               'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
                               active
-                                ? 'bg-[var(--masters)] text-white'
+                                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                 : 'bg-[var(--surface-card)] border border-[var(--rule)] text-[var(--ink-tertiary)]'
                             )}
                           >

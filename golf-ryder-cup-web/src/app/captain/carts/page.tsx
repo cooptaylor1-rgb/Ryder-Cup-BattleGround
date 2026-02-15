@@ -95,7 +95,7 @@ export default function CartsPage() {
       <PageHeader
         title="Cart Assignments"
         subtitle="Assign golf carts"
-        icon={<Car size={16} className="text-white" />}
+        icon={<Car size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-[0_0_16px_rgba(6,182,212,0.3)]"
         onBack={() => router.back()}
       />
