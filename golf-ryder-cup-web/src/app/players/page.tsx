@@ -294,7 +294,7 @@ export default function PlayersPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowBulkAdd(true)}
-                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-white shadow-[0_2px_8px_rgba(0,103,71,0.3)]"
+                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,103,71,0.3)]"
                 title="Add multiple players at once"
               >
                 <UsersRound size={16} />
@@ -661,7 +661,7 @@ function PlayerRow({
     <div className="match-row">
       {/* Avatar */}
       <div
-        className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold text-white ${
+        className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold text-[var(--canvas)] ${
           teamColor ? 'opacity-100' : 'opacity-50'
         }`}
         style={{ background: bgColor }}

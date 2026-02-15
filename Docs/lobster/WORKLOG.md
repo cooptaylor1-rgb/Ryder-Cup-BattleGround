@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 23:35 EST — Phase 2 — Players/Captain pages: remove remaining `text-white` overlays
+- `/players`: captain bulk-add CTA and player avatar initials now use `text-[var(--canvas)]` so inverse text stays theme-safe on Masters/team surfaces.
+- `/captain`: header + status icon chips, Live Sessions zap chip, “Locked” pill, and “Assign” CTA now use `text-[var(--canvas)]` on Masters/maroon surfaces.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 23:15 EST — Phase 2 — Player onboarding: Masters CTAs use canvas tokens
 - `TripWelcomeCard`, `PlayerOnboardingWizard`, `ProfileCompletionReward`: replaced remaining `text-white` on Masters/brand CTAs and inverse headers with `text-[var(--canvas)]` for theme-safe inverse typography.
 - Team/flag icons now inherit the same inverse canvas token on colored team chips.

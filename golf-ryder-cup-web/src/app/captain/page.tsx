@@ -214,7 +214,7 @@ export default function CaptainPage() {
         <main className="container-editorial py-12">
           <div className="card p-[var(--space-6)] text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]">
-              <Shield size={32} className="text-white" />
+              <Shield size={32} className="text-[var(--canvas)]" />
             </div>
             <h2 className="type-title mb-[var(--space-2)]">Captain Mode</h2>
             <p className="type-body-sm text-[var(--ink-secondary)] mb-[var(--space-6)]">
@@ -290,7 +290,7 @@ export default function CaptainPage() {
       <PageHeader
         title="Captain Command"
         subtitle={currentTrip.name}
-        icon={<Shield size={16} className="text-white" />}
+        icon={<Shield size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
         onBack={() => router.back()}
         rightSlot={
@@ -318,11 +318,11 @@ export default function CaptainPage() {
               <div className="flex items-center gap-[var(--space-3)]">
                 {readinessPercent === 100 ? (
                   <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] flex items-center justify-center">
-                    <Zap size={20} className="text-white" />
+                    <Zap size={20} className="text-[var(--canvas)]" />
                   </div>
                 ) : (
                   <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--warning)] opacity-90 flex items-center justify-center">
-                    <AlertTriangle size={20} className="text-white" />
+                    <AlertTriangle size={20} className="text-[var(--canvas)]" />
                   </div>
                 )}
                 <div>
@@ -477,7 +477,7 @@ export default function CaptainPage() {
             <div className="flex flex-col gap-[var(--space-3)]">
               {activeSessions.map((session) => (
                 <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] text-white flex items-center justify-center">
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] text-[var(--canvas)] flex items-center justify-center">
                     <Zap size={18} />
                   </div>
                   <div className="flex-1">
@@ -530,7 +530,7 @@ export default function CaptainPage() {
                   <span
                     className={`py-[3px] px-[8px] rounded-[6px] font-[family-name:var(--font-sans)] text-[10px] font-semibold uppercase tracking-[0.05em] ${
                       session.isLocked
-                        ? 'bg-[var(--maroon)] text-white'
+                        ? 'bg-[var(--maroon)] text-[var(--canvas)]'
                         : 'bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
                     }`}
                   >
@@ -627,7 +627,7 @@ export default function CaptainPage() {
                 </div>
                 <Link
                   href="/captain/draft"
-                  className="btn btn-sm bg-[var(--maroon)] text-white font-[family-name:var(--font-sans)]"
+                  className="btn btn-sm bg-[var(--maroon)] text-[var(--canvas)] font-[family-name:var(--font-sans)]"
                 >
                   Assign
                 </Link>
