@@ -341,13 +341,13 @@ export function NassauEnhancedCard({
   if (!game) {
     return (
       <div className="card overflow-hidden">
-        <div className="bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)] px-6 py-4 text-white">
+        <div className="bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)] px-6 py-4 text-[var(--canvas)]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🏆</span>
               <div>
-                <h2 className="type-body-lg font-semibold text-white">Nassau</h2>
-                <p className="type-caption text-white/80">Game unavailable</p>
+                <h2 className="type-body-lg font-semibold text-[var(--canvas)]">Nassau</h2>
+                <p className="type-caption text-[color:var(--canvas)]/80">Game unavailable</p>
               </div>
             </div>
             {onClose && (
@@ -355,7 +355,7 @@ export function NassauEnhancedCard({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="rounded-full p-2 text-white/80 transition-colors hover:text-white"
+                className="rounded-full p-2 text-[color:var(--canvas)]/80 transition-colors hover:text-[var(--canvas)]"
               >
                 ✕
               </button>
@@ -387,13 +387,13 @@ export function NassauEnhancedCard({
   return (
     <div className="card overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)] px-6 py-4 text-white">
+      <div className="bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)] px-6 py-4 text-[var(--canvas)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-3xl">🏆</span>
             <div>
-              <h2 className="type-body-lg font-semibold text-white">{game.name}</h2>
-              <p className="type-caption text-white/80">
+              <h2 className="type-body-lg font-semibold text-[var(--canvas)]">{game.name}</h2>
+              <p className="type-caption text-[color:var(--canvas)]/80">
                 Hole {currentHole} of 18 • ${game.baseValue}/nine
               </p>
             </div>
@@ -403,7 +403,7 @@ export function NassauEnhancedCard({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="rounded-full p-2 text-white/80 transition-colors hover:text-white hover:bg-[color:var(--canvas)]/15"
+              className="rounded-full p-2 text-[color:var(--canvas)]/80 transition-colors hover:text-[var(--canvas)] hover:bg-[color:var(--canvas)]/15"
             >
               ✕
             </button>

@@ -276,7 +276,7 @@ function TabButton({
       onClick={onClick}
       className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
         active
-          ? 'border-0 bg-[var(--masters)] text-white font-semibold'
+          ? 'border-0 bg-[var(--masters)] text-[var(--canvas)] font-semibold'
           : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
       }`}
       aria-label={`${label} tab`}
@@ -402,7 +402,7 @@ function CompetitionTab({
           <div className="mt-[var(--space-6)] mx-auto max-w-sm">
             <Link
               href="/recap"
-              className="flex items-center justify-center gap-[var(--space-2)] w-full py-[var(--space-3)] px-[var(--space-5)] rounded-xl font-semibold text-[length:var(--text-sm)] bg-[var(--masters)] text-white press-scale"
+              className="flex items-center justify-center gap-[var(--space-2)] w-full py-[var(--space-3)] px-[var(--space-5)] rounded-xl font-semibold text-[length:var(--text-sm)] bg-[var(--masters)] text-[var(--canvas)] press-scale"
             >
               <PartyPopper size={18} />
               View Trip Recap & Share
