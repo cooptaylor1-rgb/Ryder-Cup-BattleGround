@@ -353,7 +353,7 @@ export function PlayerRosterImport({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4"
+                        className="fixed inset-0 bg-[color:var(--ink)]/50 z-50 flex items-end sm:items-center justify-center p-4"
                         onClick={() => setShowImportModal(false)}
                     >
                         <motion.div
@@ -491,12 +491,12 @@ function PlayerCard({
                 {/* Avatar */}
                 <div
                     className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm',
+                        'w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm',
                         player.team === 'A'
-                            ? 'bg-blue-500'
+                            ? 'bg-blue-500 text-[var(--canvas)]'
                             : player.team === 'B'
-                                ? 'bg-red-500'
-                                : 'bg-[color:var(--ink-tertiary)]/50'
+                                ? 'bg-red-500 text-[var(--canvas)]'
+                                : 'bg-[color:var(--ink-tertiary)]/15 text-[var(--ink-secondary)]'
                     )}
                 >
                     {player.name ? player.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?'}
@@ -543,7 +543,7 @@ function PlayerCard({
                         className={cn(
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'A'
-                                ? 'bg-team-usa text-white'
+                                ? 'bg-team-usa text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] hover:bg-team-usa/10'
                         )}
                         title={teamAName}
@@ -555,7 +555,7 @@ function PlayerCard({
                         className={cn(
                             'px-2 py-1 rounded text-xs font-medium transition-all',
                             player.team === 'B'
-                                ? 'bg-team-europe text-white'
+                                ? 'bg-team-europe text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] hover:bg-team-europe/10'
                         )}
                         title={teamBName}
