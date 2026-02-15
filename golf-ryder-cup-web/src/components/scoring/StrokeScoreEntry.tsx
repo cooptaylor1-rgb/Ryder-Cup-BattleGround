@@ -331,10 +331,10 @@ export function StrokeScoreEntry({
         onClick={handleSubmit}
         disabled={isSubmitting}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold text-white transition-all bg-[var(--masters)] disabled:opacity-70"
+        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold text-[var(--canvas)] transition-all bg-[var(--masters)] disabled:opacity-70"
       >
         {isSubmitting ? (
-          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[color:var(--canvas)]/90 border-t-transparent rounded-full animate-spin" />
         ) : (
           <>
             <Check size={20} />

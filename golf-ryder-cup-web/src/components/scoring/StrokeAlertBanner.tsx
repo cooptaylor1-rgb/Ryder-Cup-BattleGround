@@ -118,7 +118,7 @@ export function StrokeAlertBanner({
         >
           <div className="rounded-xl shadow-lg overflow-hidden bg-[var(--surface)] border-2 border-[var(--masters)]">
             {/* Header */}
-            <div className="px-4 py-2 flex items-center justify-between bg-[var(--masters)] text-white">
+            <div className="px-4 py-2 flex items-center justify-between bg-[var(--masters)] text-[var(--canvas)]">
               <div className="flex items-center gap-2">
                 <Award size={18} />
                 <span className="font-medium">Stroke Hole</span>

@@ -88,7 +88,7 @@ export function PressTracker({
           <Zap size={18} className="text-[var(--masters)]" />
           <span className="font-medium text-[var(--ink)]">Press Bets</span>
           {activePresses.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--masters)] text-white">
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--masters)] text-[var(--canvas)]">
               {activePresses.length} Active
             </span>
           )}
@@ -150,7 +150,7 @@ export function PressTracker({
                       className={cn(
                         'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
                         teamACanPress && holesRemaining > 1
-                          ? 'press-scale bg-[var(--team-usa)] text-white'
+                          ? 'press-scale bg-[var(--team-usa)] text-[var(--canvas)]'
                           : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
                       )}
                     >
@@ -165,7 +165,7 @@ export function PressTracker({
                       className={cn(
                         'py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all',
                         teamBCanPress && holesRemaining > 1
-                          ? 'press-scale bg-[var(--team-europe)] text-white'
+                          ? 'press-scale bg-[var(--team-europe)] text-[var(--canvas)]'
                           : 'opacity-40 cursor-not-allowed bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
                       )}
                     >
@@ -214,7 +214,7 @@ export function PressTracker({
                       <span className="text-[var(--ink-secondary)]">
                         Auto-press at {autoPressThreshold} down
                       </span>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--masters)] text-white">
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-[var(--masters)] text-[var(--canvas)]">
                         ON
                       </span>
                     </div>

@@ -481,7 +481,7 @@ export function FourballScoreEntry({
         disabled={isSubmitting || !hasValidScores}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          'w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed',
+          'w-full py-4 rounded-xl font-semibold text-[var(--canvas)] flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed',
           isSubmitting || !hasValidScores ? 'opacity-50' : 'opacity-100'
         )}
         style={{
