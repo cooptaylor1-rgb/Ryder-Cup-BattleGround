@@ -2411,3 +2411,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Introduced a single CSS custom property `--rarity-color` on the badge wrapper so repeated rarity-colored fills can be class-driven (`bg-[color:var(--rarity-color)]`) instead of duplicating inline styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`c3501d5`)
+
+## 2026-02-15
+
+### 15:24 EST — Phase 2 — Match cards + tee swatches: reduce inline styles
+- `MatchCardGenerator` / `MatchCard`: removed the inline `fontFamily` style (default system fonts already apply).
+- Trip setup `CourseSelection`: replaced the tee color swatch inline `backgroundColor` style with class-driven colors for common tee variants (`gold`, `white`) and a single CSS custom property (`--tee-color`) for any other color.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`74a96a9`)
