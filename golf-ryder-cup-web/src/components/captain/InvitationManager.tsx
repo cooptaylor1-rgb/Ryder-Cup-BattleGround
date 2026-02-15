@@ -142,22 +142,19 @@ export function InvitationManager({
     <div className={cn('space-y-4', className)}>
       {/* Quick Share Card */}
       <div
-        className="p-4 rounded-2xl"
-        style={{
-          background: 'linear-gradient(135deg, var(--masters) 0%, #004D35 100%)',
-        }}
+        className="p-4 rounded-2xl bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="font-bold text-white text-lg">Invite Players</h3>
-            <p className="text-white/70 text-sm mt-0.5">
+            <h3 className="font-bold text-[var(--canvas)] text-lg">Invite Players</h3>
+            <p className="text-[color:var(--canvas)]/70 text-sm mt-0.5">
               Share this link to let players join your trip
             </p>
           </div>
           <div
             className="w-12 h-12 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center"
           >
-            <UserPlus className="w-6 h-6 text-white" />
+            <UserPlus className="w-6 h-6 text-[var(--canvas)]" />
           </div>
         </div>
 
@@ -165,8 +162,8 @@ export function InvitationManager({
         <div
           className="p-3 rounded-xl bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm mb-3"
         >
-          <p className="text-white/60 text-xs mb-1">Join Code</p>
-          <p className="text-white font-mono text-2xl tracking-wider">
+          <p className="text-[color:var(--canvas)]/60 text-xs mb-1">Join Code</p>
+          <p className="text-[var(--canvas)] font-mono text-2xl tracking-wider">
             {tripInfo.shareCode}
           </p>
         </div>
@@ -175,7 +172,7 @@ export function InvitationManager({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={handleCopyLink}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[color:var(--canvas-raised)]/20 text-white font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
+            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
           >
             {copiedLink ? (
               <>

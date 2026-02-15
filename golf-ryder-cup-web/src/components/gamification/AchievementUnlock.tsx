@@ -227,14 +227,14 @@ function AchievementBadge({ achievement, config }: AchievementBadgeProps) {
                 style={{ boxShadow: `0 0 60px ${config.color}50` }}
             >
                 {/* Inner ring */}
-                <div className="absolute inset-2 rounded-full border-4 border-white/30" />
+                <div className="absolute inset-2 rounded-full border-4 border-[color:var(--canvas)]/30" />
 
                 {/* Icon */}
                 <span className="text-5xl">{achievement.icon}</span>
 
                 {/* Shine effect */}
                 <motion.div
-                    className="absolute inset-0 rounded-full bg-[linear-gradient(135deg,transparent_30%,rgba(255,255,255,0.4)_50%,transparent_70%)]"
+                    className="absolute inset-0 rounded-full bg-[linear-gradient(135deg,transparent_30%,color-mix(in_oklab,var(--canvas)_40%,transparent)_50%,transparent_70%)]"
                     animate={{
                         rotate: [0, 360],
                     }}
@@ -247,7 +247,7 @@ function AchievementBadge({ achievement, config }: AchievementBadgeProps) {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring' }}
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-white text-sm font-bold bg-[color:var(--rarity-color)]"
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[var(--canvas)] text-sm font-bold bg-[color:var(--rarity-color)]"
             >
                 +{achievement.points} pts
             </motion.div>
@@ -305,7 +305,7 @@ export function AchievementUnlock({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/90"
             >
                 {/* Confetti */}
                 <ConfettiSystem color={config.particleColor} isActive={true} />
@@ -313,7 +313,7 @@ export function AchievementUnlock({
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-10 rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-white backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
+                    className="absolute top-4 right-4 z-10 rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-[var(--canvas)] backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
                 >
                     <X size={24} />
                 </button>
@@ -345,7 +345,7 @@ export function AchievementUnlock({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
-                        className="text-3xl font-bold text-white mb-2"
+                        className="text-3xl font-bold text-[var(--canvas)] mb-2"
                     >
                         {achievement.title}
                     </motion.h2>
@@ -358,15 +358,15 @@ export function AchievementUnlock({
                                 animate={{ opacity: 1, y: 0 }}
                                 className="space-y-4"
                             >
-                                <p className="text-white/70 text-lg max-w-sm mx-auto">
+                                <p className="text-[color:var(--canvas)]/70 text-lg max-w-sm mx-auto">
                                     {achievement.description}
                                 </p>
 
                                 {/* Stat if present */}
                                 {achievement.stat && (
-                                    <div className="inline-flex items-center gap-2 rounded-full bg-[color:var(--canvas-raised)]/15 px-4 py-2 text-white backdrop-blur-sm">
-                                        <span className="text-white/60">{achievement.stat.label}:</span>
-                                        <span className="text-white font-bold">{achievement.stat.value}</span>
+                                    <div className="inline-flex items-center gap-2 rounded-full bg-[color:var(--canvas-raised)]/15 px-4 py-2 text-[var(--canvas)] backdrop-blur-sm">
+                                        <span className="text-[color:var(--canvas)]/60">{achievement.stat.label}:</span>
+                                        <span className="text-[var(--canvas)] font-bold">{achievement.stat.value}</span>
                                     </div>
                                 )}
 
@@ -375,7 +375,7 @@ export function AchievementUnlock({
                                     onClick={handleShare}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white"
+                                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-[var(--canvas)]"
                                     style={{ background: config.color }}
                                 >
                                     <Share2 size={18} />
@@ -383,7 +383,7 @@ export function AchievementUnlock({
                                 </motion.button>
 
                                 {/* Tap to dismiss */}
-                                <p className="text-white/40 text-sm mt-4">
+                                <p className="text-[color:var(--canvas)]/40 text-sm mt-4">
                                     Tap anywhere to dismiss
                                 </p>
                             </motion.div>

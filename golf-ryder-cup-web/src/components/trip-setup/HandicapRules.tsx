@@ -227,7 +227,7 @@ export function HandicapRules({
                                         className={cn(
                                             'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                             settings.maxHandicap === cap
-                                                ? 'bg-[var(--masters)] text-white'
+                                                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                 : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)] text-[var(--ink-primary)]'
                                         )}
                                     >
@@ -243,7 +243,7 @@ export function HandicapRules({
                 {settings.useNetScoring && (
                     <div className="p-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--rule)]">
                         <div className="flex items-start gap-2">
-                            <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5" />
+                            <Lightbulb className="w-4 h-4 text-[var(--warning)] mt-0.5" />
                             <div className="text-sm">
                                 <p className="font-medium">Example Calculation</p>
                                 <p className="text-[var(--ink-tertiary)] mt-1">

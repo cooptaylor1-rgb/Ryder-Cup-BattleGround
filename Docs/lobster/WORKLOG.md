@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 13:51 EST — Phase 2 — Tokenize remaining white/black utilities (AchievementUnlock + Invite card + CTAs)
+- `AchievementUnlock`: replaced remaining `bg-black/90`, `border-white/*`, and `text-white/*` utilities with premium ink/canvas tokens (overlay now `bg-[color:var(--ink)]/90`; copy/icons now inherit `text-[var(--canvas)]`; shine effect uses a token-driven `color-mix` highlight).
+- `InvitationManager`: quick-share invite card migrated off inline gradient `#004D35` + `text-white` onto a token-driven Masters gradient (`var(--masters)` → `var(--masters-deep)`) and canvas typography.
+- `DirectMessage` + `HandicapRules`: Masters CTAs now use `text-[var(--canvas)]` (no `text-white`), and the net-scoring example bulb icon now uses the premium warning token.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 13:35 EST — Phase 2 — Error routes: tokenize remaining `text-white` on Masters CTAs
 - `/recap/error`, `/settings/error`, `/captain/error`, `/admin/error`: “Try Again” CTA text now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button for theme-safe inverse typography.
 - `/recap/error`: error icon shell migrated from `bg-[rgba(239,68,68,0.1)]` to tokenized `bg-[color:var(--error)]/10`.

@@ -551,7 +551,7 @@ export function DirectMessage({
                     disabled={!customMessage.trim() || selectedRecipients.length === 0 || sending}
                     className={cn(
                         'w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors',
-                        'bg-[var(--masters)] text-white',
+                        'bg-[var(--masters)] text-[var(--canvas)]',
                         'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
                 >
@@ -570,7 +570,7 @@ export function DirectMessage({
                             <Send className="w-5 h-5" />
                             Send Message
                             {selectedRecipients.length > 0 && (
-                                <span className="px-2 py-0.5 rounded-full text-xs bg-white/20">
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)]">
                                     {getRecipientCount()}
                                 </span>
                             )}
