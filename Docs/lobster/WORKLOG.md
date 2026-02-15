@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 07:26 EST — Phase 2 — Error boundaries: tokenized Masters inverse CTAs + error icon shells
+- `/finances/error`, `/more/error`, `/live/error`, `/trip/error`, `/bets/error`:
+  - Primary “Try Again” CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
+  - Error icon shell migrated from `bg-[rgba(239,68,68,0.1)]` to tokenized `bg-[color:var(--error)]/10`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e5164df`)
+
 ### 07:18 EST — Phase 2 — Player onboarding: tokenize remaining `text-white` inverse accents
 - `QuickProfileMode`: header Zap icon + primary CTA now use `text-[var(--canvas)]` instead of `text-white` on accented surfaces.
 - `PlayingStyleSurvey`: hero Sparkles icon, selected check icon, and Done CTA now use `text-[var(--canvas)]` instead of `text-white`.
