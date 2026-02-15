@@ -11,7 +11,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `Achievements`: active category filter + earned achievement icons now use `text-[var(--canvas)]` instead of `text-white` for theme-safe inverse typography.
 - `PlayerStatsCard`: avatar initials now use `text-[var(--canvas)]` instead of `text-white` on the accent gradient.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`TBD`)
+- Commit + push ✅ (`54281b1`)
 
 ### 11:20 EST — Phase 2 — Lineup Builder + Captain Manage + Social Photos: tokenize remaining white overlays
 - `/lineup/builder`: selected-player indicator now uses inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`) instead of `text-white`.
