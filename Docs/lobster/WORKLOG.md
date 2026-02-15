@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 21:32 EST — Phase 2 — Error routes: remove `text-white` + hard-coded error tints
+- `/error`, `/stats/error`, `/spectator/error`: primary "Try Again" CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button.
+- Tokenized error icon shells off inline `rgba(239,68,68,0.1)` / `#DC2626` and onto `bg-[color:var(--error)]/10` + `text-[var(--error)]` for theme-safe consistency.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b1b0262`)
+
 ### 21:10 EST — Phase 2 — Replace remaining `text-white` overlays with canvas tokens (Standings + Help error + Nassau)
 - `/standings`: migrated active tab + “View Trip Recap” CTA off `text-white` and onto `text-[var(--canvas)]` so Masters-accented states remain theme-safe.
 - `/help` error route: updated the primary “Try Again” button to use `text-[var(--canvas)]` instead of `text-white`.
