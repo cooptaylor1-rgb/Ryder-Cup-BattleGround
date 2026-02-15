@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `PlayingStyleSurvey`: hero Sparkles icon, selected check icon, and Done CTA now use `text-[var(--canvas)]` instead of `text-white`.
 - `GolfSuperlatives`: trophy hero icon + Next/Finish CTA now use `text-[var(--canvas)]` instead of `text-white`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`cccfb15`)
+- Commit + push ✅ (`47301e3`)
 
 ### 07:15 EST — Phase 2 — Finances + MomentumMeter: tokenize remaining `text-white` on Masters surfaces
 - `/finances`: PageHeader icon, active tab/button states, and captain-only actions now use `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
