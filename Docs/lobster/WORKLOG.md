@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 14:35 EST — Phase 2 — Social chat + live reactions: remove remaining `text-white`/`bg-black` fragments
+- `ChatMessage`: own-avatar + own-message bubble now use inverse canvas tokens (`text-[var(--canvas)]`) on the accent surface.
+- `ChatRoom`: thread selector pills, emoji picker active state, and send button now use `text-[var(--canvas)]` on the accent surface.
+- `LiveReactionStream`: player-name pill + score-celebration overlay migrated off hard-coded `text-white` + `rgba(0,0,0,0.6)` and onto token-driven canvas/ink classes (`text-[var(--canvas)]`, `bg-[color:var(--ink)]/60`); quick-react active feedback uses an ink tint instead of `bg-black/5`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`791922d`)
+
 ### 13:51 EST — Phase 2 — Tokenize remaining white/black utilities (AchievementUnlock + Invite card + CTAs)
 - `AchievementUnlock`: replaced remaining `bg-black/90`, `border-white/*`, and `text-white/*` utilities with premium ink/canvas tokens (overlay now `bg-[color:var(--ink)]/90`; copy/icons now inherit `text-[var(--canvas)]`; shine effect uses a token-driven `color-mix` highlight).
 - `InvitationManager`: quick-share invite card migrated off inline gradient `#004D35` + `text-white` onto a token-driven Masters gradient (`var(--masters)` → `var(--masters-deep)`) and canvas typography.
