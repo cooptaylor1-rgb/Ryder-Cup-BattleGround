@@ -601,7 +601,7 @@ function SetupStep({ number, label, done, href, hint }: SetupStepProps) {
       <div
         className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
           done
-            ? 'bg-[var(--masters)] text-white'
+            ? 'bg-[var(--masters)] text-[var(--canvas)]'
             : 'bg-[var(--rule)] text-[var(--ink-tertiary)]'
         }`}
       >

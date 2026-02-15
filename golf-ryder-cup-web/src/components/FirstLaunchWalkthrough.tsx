@@ -87,7 +87,7 @@ export function FirstLaunchWalkthrough() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm px-6"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-[color:var(--ink)]/60 backdrop-blur-sm px-6"
       onClick={dismiss}
     >
       <div
@@ -107,7 +107,7 @@ export function FirstLaunchWalkthrough() {
 
         {/* Content */}
         <div className="px-6 pb-2 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-[var(--masters)] text-white">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-[var(--masters)] text-[var(--canvas)]">
             {step.icon}
           </div>
           <p className="type-overline text-[var(--masters)] mb-2">
@@ -149,7 +149,7 @@ export function FirstLaunchWalkthrough() {
           )}
           <button
             onClick={next}
-            className="flex-[2] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-[var(--masters)] text-white"
+            className="flex-[2] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-[var(--masters)] text-[var(--canvas)]"
           >
             {isLast ? "Let's Go" : 'Next'}
             {!isLast && <ChevronRight size={16} />}

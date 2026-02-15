@@ -335,10 +335,10 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
             >
               <span className="text-2xl">{activity.data.achievement.icon}</span>
               <div>
-                <p className="font-semibold text-white text-sm">
+                <p className="font-semibold text-[var(--canvas)] text-sm">
                   {activity.data.achievement.name}
                 </p>
-                <p className="text-xs text-white/70 capitalize">
+                <p className="text-xs text-[color:var(--canvas)]/70 capitalize">
                   {activity.data.achievement.rarity}
                 </p>
               </div>
