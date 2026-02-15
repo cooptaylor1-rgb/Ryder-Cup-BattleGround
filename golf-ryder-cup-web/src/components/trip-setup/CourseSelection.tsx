@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
@@ -328,12 +328,19 @@ export function CourseSelection({
                                                     className="px-2 py-1 rounded-lg bg-[var(--surface-secondary)] text-xs flex items-center gap-2"
                                                 >
                                                     <div
-                                                        className="w-3 h-3 rounded-full"
-                                                        style={{
-                                                            backgroundColor: tee.color === 'gold' ? '#D4AF37'
-                                                                : tee.color === 'white' ? '#E5E7EB'
-                                                                    : tee.color
-                                                        }}
+                                                        className={cn(
+                                                            'w-3 h-3 rounded-full',
+                                                            tee.color === 'gold'
+                                                                ? 'bg-[#D4AF37]'
+                                                                : tee.color === 'white'
+                                                                    ? 'bg-[#E5E7EB]'
+                                                                    : 'bg-[color:var(--tee-color)]'
+                                                        )}
+                                                        style={
+                                                            tee.color === 'gold' || tee.color === 'white'
+                                                                ? undefined
+                                                                : ({ '--tee-color': tee.color } as CSSProperties)
+                                                        }
                                                     />
                                                     <span>{tee.name}</span>
                                                     <span className="text-[var(--ink-tertiary)]">

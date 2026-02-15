@@ -113,9 +113,6 @@ function MatchCard({ match, size = 'medium', showQR = true, tripName }: MatchCar
                 'rounded-xl shadow-lg print:shadow-none bg-[var(--surface-card)] text-[var(--ink-primary)]',
                 sizeClasses[size]
             )}
-            style={{
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-            }}
         >
             {/* Header */}
             <div className="border-b border-[var(--rule)] pb-3 mb-3">
