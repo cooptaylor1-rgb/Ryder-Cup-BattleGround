@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 06:18 EST — Phase 2 — Schedule/Score routes + QuickScoreFAB: tokenize remaining `text-white` inverse states
+- `/schedule`: selected tab buttons + Day badge now use `text-[var(--canvas)]` on the Masters surface.
+- `/score`: “Your Match” badge now uses `text-[var(--canvas)]` on the Masters surface.
+- `QuickScoreFABv2`: header/close icon, voice mic listening state, team trophies, and FAB base now use `text-[var(--canvas)]` (no hard-coded `text-white`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`25934b7`)
+
 ### 05:24 EST — Phase 2 — First launch walkthrough + Home setup steps + ActivityFeed rarity card: remove remaining `text-white` + `bg-black` overlays
 - `FirstLaunchWalkthrough`: modal backdrop now uses tokenized ink tint (`bg-[color:var(--ink)]/60`); Masters icon shell + Next CTA now use `text-[var(--canvas)]` instead of `text-white`.
 - `HomePage` setup step: completed step badge now uses `text-[var(--canvas)]` on the Masters surface.
