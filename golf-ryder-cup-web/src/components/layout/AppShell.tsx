@@ -156,7 +156,7 @@ export function AppShell({
           className={cn(
             'fixed inset-0 z-[60]',
             'flex items-center justify-center',
-            'bg-black/50 backdrop-blur-sm',
+            'bg-[color:var(--ink)]/50 backdrop-blur-sm',
           )}
           role="dialog"
           aria-modal="true"

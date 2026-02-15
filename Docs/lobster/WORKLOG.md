@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 17:20 EST — Phase 2 — More + Admin + AppShell: tokenize remaining inverse overlays
+- `/more`: replaced remaining `text-white` inverse typography (avatar initials, Masters CTAs, modals, badges) with `text-[var(--canvas)]` for theme-safe contrast.
+- `/admin`: active trip badge now uses `text-[var(--canvas)]` instead of `text-white`.
+- `AppShell` global loading overlay: backdrop migrated from `bg-black/50` to token-driven `bg-[color:var(--ink)]/50`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 16:30 EST — Phase 2 — Lint hygiene: remove unused imports/args in UI routes + widgets
 - `/help`: removed unused `Wifi` icon import.
 - `/score/[matchId]`: use bare `catch {}` for best-effort audit logging (no unused catch var).

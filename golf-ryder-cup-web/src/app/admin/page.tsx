@@ -501,7 +501,7 @@ export default function AdminPage() {
                       <div className="flex items-center gap-[var(--space-2)] mb-[4px]">
                         <h3 className="type-title-sm">{trip.name}</h3>
                         {currentTrip?.id === trip.id && (
-                          <span className="bg-[var(--masters)] text-white text-[10px] px-[6px] py-[2px] rounded-[4px] font-semibold">
+                          <span className="bg-[var(--masters)] text-[var(--canvas)] text-[10px] px-[6px] py-[2px] rounded-[4px] font-semibold">
                             ACTIVE
                           </span>
                         )}

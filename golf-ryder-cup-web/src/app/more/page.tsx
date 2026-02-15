@@ -389,7 +389,7 @@ export default function MorePage() {
               className="flex items-center gap-[var(--space-4)] no-underline text-inherit"
             >
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-[var(--font-sans)] font-bold text-base bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
+                className="w-12 h-12 rounded-full flex items-center justify-center text-[var(--canvas)] font-[var(--font-sans)] font-bold text-base bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
               >
                 {currentUser.firstName?.[0] || '?'}
                 {currentUser.lastName?.[0] || '?'}
@@ -408,7 +408,7 @@ export default function MorePage() {
             <div className="flex gap-[var(--space-3)]">
               <Link
                 href="/login"
-                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--masters)] text-white rounded-[var(--radius-md)] font-[var(--font-sans)] font-semibold text-sm no-underline"
+                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--masters)] text-[var(--canvas)] rounded-[var(--radius-md)] font-[var(--font-sans)] font-semibold text-sm no-underline"
               >
                 <LogIn size={18} />
                 Sign In
@@ -430,7 +430,7 @@ export default function MorePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-white bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
+            className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-[var(--canvas)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -480,7 +480,7 @@ export default function MorePage() {
             className={cn(
               'w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
               isCaptainMode
-                ? 'text-white bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
+                ? 'text-[var(--canvas)] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
                 : 'text-[var(--ink-secondary)] bg-[var(--canvas-sunken)]'
             )}
           >
@@ -572,7 +572,7 @@ export default function MorePage() {
         >
           <div className="flex items-center gap-[var(--space-4)] mb-[var(--space-4)]">
             <div
-              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-white font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
+              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-[var(--canvas)] font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
             >
               RC
             </div>
@@ -629,7 +629,7 @@ export default function MorePage() {
                 disabled={captainPin.length < 4}
                 className={`flex-1 p-3.5 rounded-[var(--radius-md)] border-none font-[var(--font-sans)] font-semibold ${
                   captainPin.length >= 4
-                    ? 'bg-[var(--maroon)] text-white cursor-pointer'
+                    ? 'bg-[var(--maroon)] text-[var(--canvas)] cursor-pointer'
                     : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed'
                 }`}
               >
@@ -660,7 +660,7 @@ export default function MorePage() {
               </button>
               <button
                 onClick={handleClearData}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--error)] text-white font-[var(--font-sans)] font-semibold cursor-pointer"
+                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--error)] text-[var(--canvas)] font-[var(--font-sans)] font-semibold cursor-pointer"
               >
                 Clear All
               </button>
@@ -686,7 +686,7 @@ export default function MorePage() {
               </button>
               <button
                 onClick={handleExitTrip}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--masters)] text-white font-[var(--font-sans)] font-semibold cursor-pointer"
+                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--masters)] text-[var(--canvas)] font-[var(--font-sans)] font-semibold cursor-pointer"
               >
                 Exit Trip
               </button>
@@ -785,7 +785,7 @@ function MenuItemRow({
       </div>
       {item.badge && (
         <span
-          className="py-[3px] px-2 rounded-[6px] text-white font-[var(--font-sans)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em] bg-[var(--badge-bg)]"
+          className="py-[3px] px-2 rounded-[6px] text-[var(--canvas)] font-[var(--font-sans)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em] bg-[var(--badge-bg)]"
           style={{ '--badge-bg': item.badgeColor || 'var(--masters)' } as React.CSSProperties}
         >
           {item.badge}
