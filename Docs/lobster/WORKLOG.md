@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 22:05 EST — Phase 2 — Remove remaining `text-white` on Masters/team surfaces (Settings + CourseDetails + Hammer)
+- `SettingsPanel`: Masters-primary segmented controls + sync button now use `text-[var(--canvas)]` instead of `text-white`.
+- `CourseDetails`: header shell, active tabs, scorecard tee selector, and totals column now use `text-[var(--canvas)]` so Masters surfaces stay theme-safe.
+- `HammerGameCard`: USA/EUR team chips and Masters header titles now use `text-[var(--canvas)]` instead of `text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 21:32 EST — Phase 2 — Error routes: remove `text-white` + hard-coded error tints
 - `/error`, `/stats/error`, `/spectator/error`: primary "Try Again" CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button.
 - Tokenized error icon shells off inline `rgba(239,68,68,0.1)` / `#DC2626` and onto `bg-[color:var(--error)]/10` + `text-[var(--error)]` for theme-safe consistency.

@@ -232,7 +232,7 @@ export function HammerGameCard({
                   onClick={() => togglePlayer(player.id, 'team1')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     team1.includes(player.id)
-                      ? 'bg-team-usa text-white'
+                      ? 'bg-team-usa text-[var(--canvas)]'
                       : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
                   }`}
                 >
@@ -253,7 +253,7 @@ export function HammerGameCard({
                   onClick={() => togglePlayer(player.id, 'team2')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     team2.includes(player.id)
-                      ? 'bg-team-europe text-white'
+                      ? 'bg-team-europe text-[var(--canvas)]'
                       : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
                   }`}
                 >
@@ -286,7 +286,7 @@ export function HammerGameCard({
             <div className="flex items-center gap-3">
               <span className="text-3xl">🔨</span>
               <div>
-                <h2 className="text-xl font-bold text-white">Hammer Game</h2>
+                <h2 className="text-xl font-bold text-[var(--canvas)]">Hammer Game</h2>
                 <p className="text-[color:var(--canvas)]/80 text-sm">Game unavailable</p>
               </div>
             </div>
@@ -332,7 +332,7 @@ export function HammerGameCard({
           <div className="flex items-center gap-3">
             <span className="text-3xl">🔨</span>
             <div>
-              <h2 className="text-xl font-bold text-white">{game.name}</h2>
+              <h2 className="text-xl font-bold text-[var(--canvas)]">{game.name}</h2>
               <p className="text-[color:var(--canvas)]/80 text-sm">
                 Hole {currentHole} • Current Value: ${game.currentValue}
               </p>

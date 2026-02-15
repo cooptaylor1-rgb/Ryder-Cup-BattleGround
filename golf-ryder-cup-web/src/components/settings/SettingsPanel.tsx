@@ -187,7 +187,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                                 className={cn(
                                     'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
                                     preferences.scoringHand === hand
-                                        ? 'bg-masters-primary text-white'
+                                        ? 'bg-masters-primary text-[var(--canvas)]'
                                         : 'bg-[var(--surface)] text-[var(--ink-secondary)] border border-[var(--rule)]'
                                 )}
                             >
@@ -261,7 +261,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
                     <SettingsRow label="Pending changes" description="Changes waiting to sync">
                         <button
                             onClick={() => syncService.syncPendingChanges()}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-masters-primary text-white text-sm"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-masters-primary text-[var(--canvas)] text-sm"
                         >
                             <RefreshCw className={cn('w-4 h-4', syncStatus.isSyncing && 'animate-spin')} />
                             Sync ({syncStatus.pendingChanges})

@@ -72,7 +72,7 @@ export function CourseDetails({
     return (
         <div className={cn('space-y-6', className)}>
             {/* Course Header */}
-            <div className="p-6 rounded-2xl bg-linear-to-br from-masters-primary to-masters-primary-dark text-white">
+            <div className="p-6 rounded-2xl bg-linear-to-br from-masters-primary to-masters-primary-dark text-[var(--canvas)]">
                 <h1 className="text-2xl font-bold mb-1">{course.course_name}</h1>
                 <div className="text-[color:var(--canvas)]/80">{course.club_name}</div>
 
@@ -117,7 +117,7 @@ export function CourseDetails({
                         className={cn(
                             'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                             activeTab === tab
-                                ? 'bg-masters-primary text-white'
+                                ? 'bg-masters-primary text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
                         )}
                     >
@@ -279,7 +279,7 @@ function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
             {/* Selected indicator */}
             {isSelected && (
                 <div className="w-6 h-6 rounded-full bg-masters-primary flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-[var(--canvas)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
@@ -320,7 +320,7 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                             className={cn(
                                 'flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors',
                                 selectedTee.tee_name === tee.tee_name
-                                    ? 'bg-masters-primary text-white'
+                                    ? 'bg-masters-primary text-[var(--canvas)]'
                                     : 'bg-[var(--surface-secondary)]'
                             )}
                         >
@@ -391,7 +391,7 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                                 </th>
                             ))}
                             <th className="px-2 py-2 text-center font-medium bg-[var(--surface)]">In</th>
-                            <th className="px-2 py-2 text-center font-medium bg-masters-primary text-white">Tot</th>
+                            <th className="px-2 py-2 text-center font-medium bg-masters-primary text-[var(--canvas)]">Tot</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -426,7 +426,7 @@ function ScorecardView({ tees }: ScorecardViewProps) {
                             <td className="px-2 py-2 text-center font-bold bg-masters-primary/10">
                                 {backNine.reduce((sum, h) => sum + h.par, 0)}
                             </td>
-                            <td className="px-2 py-2 text-center font-bold bg-masters-primary text-white">
+                            <td className="px-2 py-2 text-center font-bold bg-masters-primary text-[var(--canvas)]">
                                 {selectedTee.par_total}
                             </td>
                         </tr>
