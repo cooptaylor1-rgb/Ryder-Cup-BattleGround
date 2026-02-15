@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 15:03 EST — Phase 2 — Settings + Captain carts: tokenize remaining inverse `text-white`
+- `/settings`: Current Theme palette icon now uses `text-[var(--canvas)]` on the Masters surface.
+- `/settings/notifications`: “saved” toast and active lead-time pills now use `text-[var(--canvas)]` on the Masters surface.
+- `/captain/carts`: PageHeader icon now uses `text-[var(--canvas)]` on the cyan gradient chip.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`179de1d`)
+
 ### 14:35 EST — Phase 2 — Social chat + live reactions: remove remaining `text-white`/`bg-black` fragments
 - `ChatMessage`: own-avatar + own-message bubble now use inverse canvas tokens (`text-[var(--canvas)]`) on the accent surface.
 - `ChatRoom`: thread selector pills, emoji picker active state, and send button now use `text-[var(--canvas)]` on the accent surface.
