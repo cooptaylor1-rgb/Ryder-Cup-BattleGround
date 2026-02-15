@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `FormatSelector` (trip setup): replaced remaining `text-white`/`text-white/80` with inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`), replaced the modal backdrop `bg-black/50` with tokenized ink tint (`bg-[color:var(--ink)]/50`), and mapped the popular-formats star accent to `var(--warning)`.
 - `/bets` pot summary card: replaced the remaining `text-white` on the Masters gradient header with `text-[var(--canvas)]` for theme-safe inverse typography.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (see git history)
+- Commit + push ✅ (`12e6d2e`)
 
 ### 11:55 EST — Phase 2 — Live play capture: remove remaining `text-white`/`bg-black` from VoiceScoring + QuickPhotoCapture
 - `VoiceScoring`: replaced remaining `text-white` icon + button treatments with token-driven inverse canvas (`text-[var(--canvas)]`) so mic/listening/confirm/error states stay theme-safe.
