@@ -156,23 +156,23 @@ export function OfflineIndicator() {
               <div className="flex items-center justify-center gap-2">
                 {!isOnline ? (
                   <>
-                    <WifiOff size={16} className="text-white" />
-                    <span className="text-sm font-medium text-white">You&apos;re offline</span>
+                    <WifiOff size={16} className="text-[var(--canvas)]" />
+                    <span className="text-sm font-medium text-[var(--canvas)]">You&apos;re offline</span>
                     {pendingCount > 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/20 text-white">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)]">
                         {pendingCount} pending
                       </span>
                     )}
                   </>
                 ) : isSyncing ? (
                   <>
-                    <RefreshCw size={16} className="text-white animate-spin" />
-                    <span className="text-sm font-medium text-white">Syncing changes...</span>
+                    <RefreshCw size={16} className="text-[var(--canvas)] animate-spin" />
+                    <span className="text-sm font-medium text-[var(--canvas)]">Syncing changes...</span>
                   </>
                 ) : (
                   <>
-                    <Check size={16} className="text-white" />
-                    <span className="text-sm font-medium text-white">
+                    <Check size={16} className="text-[var(--canvas)]" />
+                    <span className="text-sm font-medium text-[var(--canvas)]">
                       Back online - all synced!
                     </span>
                   </>
@@ -183,7 +183,7 @@ export function OfflineIndicator() {
               {!isOnline && pendingCount > 0 && (
                 <button
                   onClick={() => setShowDetails(!showDetails)}
-                  className="w-full flex items-center justify-center gap-1 mt-1 text-white/80 hover:text-white"
+                  className="w-full flex items-center justify-center gap-1 mt-1 text-[color:var(--canvas)]/80 hover:text-[var(--canvas)]"
                 >
                   <span className="text-xs">{showDetails ? 'Hide' : 'View'} pending changes</span>
                   {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -201,27 +201,27 @@ export function OfflineIndicator() {
                   >
                     <div className="mt-2 pt-2 border-t border-[color:var(--canvas-raised)]/20 space-y-1 max-h-32 overflow-y-auto">
                       {queueItems.slice(0, 5).map((item) => (
-                        <div key={item.id} className="flex flex-col gap-1 text-white/90 text-xs">
+                        <div key={item.id} className="flex flex-col gap-1 text-[color:var(--canvas)]/90 text-xs">
                           <div className="flex items-center gap-2">
                             <Clock size={12} className="shrink-0" />
                             <span className="truncate flex-1">{item.description}</span>
                             {item.retryCount > 0 && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/10 text-white/80">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas)]/80">
                                 Retry {item.retryCount}
                               </span>
                             )}
                             <span
                               className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                                 item.status === 'failed'
-                                  ? 'bg-[color:var(--canvas-raised)]/20 text-white'
+                                  ? 'bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)]'
                                   : item.status === 'syncing'
-                                    ? 'bg-[color:var(--canvas-raised)]/15 text-white/90'
-                                    : 'bg-[color:var(--canvas-raised)]/10 text-white/80'
+                                    ? 'bg-[color:var(--canvas-raised)]/15 text-[color:var(--canvas)]/90'
+                                    : 'bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas)]/80'
                               }`}
                             >
                               {item.status}
                             </span>
-                            <span className="text-white/60">
+                            <span className="text-[color:var(--canvas)]/60">
                               {new Date(item.timestamp).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -229,19 +229,19 @@ export function OfflineIndicator() {
                             </span>
                           </div>
                           {item.error && (
-                            <div className="text-[10px] text-white/70 pl-5" title={item.error}>
+                            <div className="text-[10px] text-[color:var(--canvas)]/70 pl-5" title={item.error}>
                               Last error: {item.error}
                             </div>
                           )}
                         </div>
                       ))}
                       {queueItems.length > 5 && (
-                        <p className="text-xs text-white/60 text-center">
+                        <p className="text-xs text-[color:var(--canvas)]/60 text-center">
                           +{queueItems.length - 5} more items
                         </p>
                       )}
                     </div>
-                    <p className="text-xs text-white/70 text-center mt-2">
+                    <p className="text-xs text-[color:var(--canvas)]/70 text-center mt-2">
                       Changes will sync when you&apos;re back online
                     </p>
                   </motion.div>

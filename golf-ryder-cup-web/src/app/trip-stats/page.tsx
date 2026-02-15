@@ -163,7 +163,7 @@ function StatCard({
                       e.stopPropagation();
                       onIncrement(player.id);
                     }}
-                    className="w-10 h-10 rounded-full bg-[var(--masters)] text-white
+                    className="w-10 h-10 rounded-full bg-[var(--masters)] text-[var(--canvas)]
                              flex items-center justify-center text-xl font-bold
                              hover:opacity-90 active:scale-95 transition-all"
                   >

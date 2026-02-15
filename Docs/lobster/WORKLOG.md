@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 22:20 EST — Phase 2 — Tokenize remaining `text-white` on Masters/accent UI (TripStats + OfflineIndicator + PDF export)
+- `/trip-stats`: increment (+) button now uses `text-[var(--canvas)]` on the Masters surface.
+- `OfflineIndicator`: migrated banner/pill copy and status chips off `text-white/*` onto canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) for theme-safe inverse readability.
+- `PDFExportPanel`: selected icon chip and primary export CTA now use `text-[var(--canvas)]` instead of `text-white` on accent surfaces.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 22:05 EST — Phase 2 — Remove remaining `text-white` on Masters/team surfaces (Settings + CourseDetails + Hammer)
 - `SettingsPanel`: Masters-primary segmented controls + sync button now use `text-[var(--canvas)]` instead of `text-white`.
 - `CourseDetails`: header shell, active tabs, scorecard tee selector, and totals column now use `text-[var(--canvas)]` so Masters surfaces stay theme-safe.

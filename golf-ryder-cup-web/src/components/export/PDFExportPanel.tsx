@@ -210,7 +210,7 @@ export function PDFExportPanel({
               <div className={cn(
                 'p-2 rounded-lg',
                 isSelected
-                  ? 'bg-[var(--accent)] text-white'
+                  ? 'bg-[var(--accent)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
               )}>
                 <Icon size={18} />
@@ -263,7 +263,7 @@ export function PDFExportPanel({
           className={cn(
             'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all',
             canExport() && !isExporting
-              ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
+              ? 'bg-[var(--accent)] text-[var(--canvas)] hover:bg-[var(--accent-hover)]'
               : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] cursor-not-allowed'
           )}
         >
