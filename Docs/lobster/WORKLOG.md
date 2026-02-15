@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 23:15 EST — Phase 2 — Player onboarding: Masters CTAs use canvas tokens
+- `TripWelcomeCard`, `PlayerOnboardingWizard`, `ProfileCompletionReward`: replaced remaining `text-white` on Masters/brand CTAs and inverse headers with `text-[var(--canvas)]` for theme-safe inverse typography.
+- Team/flag icons now inherit the same inverse canvas token on colored team chips.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7e106a5`)
+
 ### 23:05 EST — Phase 2 — ErrorBoundary: tokenize inverse CTA + error surfaces
 - `ErrorBoundary` / `MiniErrorFallback` / `ErrorCard`: replaced `text-white` with `text-[var(--canvas)]` on Masters CTAs so inverse copy remains theme-safe.
 - Migrated remaining inline error tint palettes (`rgba(220,38,38,…)`, `#DC2626`) to the premium error token system (`bg-[color:var(--error)]/…`, `border-[color:var(--error)]/…`, `text-[var(--error)]`).
