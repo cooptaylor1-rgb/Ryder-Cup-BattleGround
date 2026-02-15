@@ -11,6 +11,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `DirectMessage` + `HandicapRules`: Masters CTAs now use `text-[var(--canvas)]` (no `text-white`), and the net-scoring example bulb icon now uses the premium warning token.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+### 14:10 EST — Phase 2 — Trip setup: tokenized search/import modal backdrops + inverse avatar text
+- `CourseSelection`: search modal backdrop migrated off `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
+- `PlayerRosterImport`: import modal backdrop migrated off `bg-black/50` to `bg-[color:var(--ink)]/50`.
+- `PlayerRosterImport`: player avatar initials + selected team buttons now use inverse canvas tokens (`text-[var(--canvas)]`) instead of `text-white`; unassigned avatar uses a softer ink surface tint with readable ink text.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`7b37027`)
+
 ### 13:35 EST — Phase 2 — Error routes: tokenize remaining `text-white` on Masters CTAs
 - `/recap/error`, `/settings/error`, `/captain/error`, `/admin/error`: “Try Again” CTA text now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button for theme-safe inverse typography.
 - `/recap/error`: error icon shell migrated from `bg-[rgba(239,68,68,0.1)]` to tokenized `bg-[color:var(--error)]/10`.
