@@ -107,7 +107,7 @@ function CourseCard({
                         <span className="text-sm text-[var(--ink-secondary)]">Delete?</span>
                         <button
                             onClick={handleDelete}
-                            className="px-3 py-1 bg-[var(--error)] text-white text-sm rounded-lg hover:bg-[color:var(--error)]/90"
+                            className="px-3 py-1 bg-[var(--error)] text-[var(--canvas)] text-sm rounded-lg hover:bg-[color:var(--error)]/90"
                         >
                             Yes
                         </button>

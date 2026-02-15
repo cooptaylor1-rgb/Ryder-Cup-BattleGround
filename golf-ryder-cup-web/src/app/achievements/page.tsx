@@ -237,9 +237,9 @@ export default function AchievementsPage() {
 
       <main className="container-editorial py-4">
         {/* Progress Overview */}
-        <div className="card text-center text-white p-[var(--space-6)] mb-[var(--space-6)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)]">
+        <div className="card text-center text-[var(--canvas)] p-[var(--space-6)] mb-[var(--space-6)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)]">
           <div className="flex justify-center mb-[var(--space-3)] opacity-90">
-            <Award size={48} className="text-white" />
+            <Award size={48} className="text-[var(--canvas)]" />
           </div>
 
           <h2 className="score-large mb-[var(--space-1)]">
@@ -337,7 +337,7 @@ function AchievementCard({ achievement }: AchievementCardProps) {
         className="h-12 w-12 rounded-[var(--radius-lg)] flex items-center justify-center mb-[var(--space-3)]"
         style={{
           background: achievement.unlocked ? colors.bg : 'var(--rule)',
-          color: achievement.unlocked ? 'white' : 'var(--ink-tertiary)',
+          color: achievement.unlocked ? 'var(--canvas)' : 'var(--ink-tertiary)',
         }}
       >
         {achievement.unlocked ? achievement.icon : <Lock size={24} />}

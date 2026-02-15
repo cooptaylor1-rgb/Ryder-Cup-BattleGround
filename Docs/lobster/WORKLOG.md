@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 02:10 EST — Phase 2 — Achievements + Course Library: remove remaining `text-white` overlays
+- `/achievements`: progress hero card + trophy icon now use `text-[var(--canvas)]` (no hard-coded `text-white`) on the Masters gradient.
+- `AchievementCard`: unlocked icon shell now uses `color: var(--canvas)` instead of inline `'white'` so inverse icon treatments stay theme-safe.
+- `/courses`: delete confirmation “Yes” CTA now uses `text-[var(--canvas)]` on the error surface.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 01:25 EST — Phase 2 — Tokenize remaining Masters inverse text (StandingsCard + ContinueScoringBanner + Profile error)
 - `/profile` error boundary: primary “Try Again” CTA now uses `text-[var(--canvas)]` (no hard-coded `text-white`), and the error icon shell uses the premium error tint token (`bg-[color:var(--error)]/10`).
 - `StandingsCard`: Masters header gradient now uses `var(--masters-deep)` (no hard-coded hex), and header copy/icon now uses canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) for theme-safe inverse typography.
