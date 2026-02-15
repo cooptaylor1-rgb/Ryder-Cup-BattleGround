@@ -3,6 +3,15 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-15
+
+### 00:58 EST — Phase 2 — Scoring widgets: tokenize inverse CTA/badge text
+- `StrokeAlertBanner`: header overlay now uses `text-[var(--canvas)]` on the Masters surface.
+- `PressTracker`: active/ON badges and team press buttons now use `text-[var(--canvas)]` on Masters/team surfaces.
+- `StrokeScoreEntry` + `FourballScoreEntry`: submit CTAs now use `text-[var(--canvas)]` (plus tokenized submit spinner stroke) for theme-safe inverse legibility.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6c4a352`)
+
 ## 2026-02-14
 
 ### 23:35 EST — Phase 2 — Players/Captain pages: remove remaining `text-white` overlays
