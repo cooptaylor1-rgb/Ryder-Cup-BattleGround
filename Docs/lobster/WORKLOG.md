@@ -10,6 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `/admin`: active trip badge now uses `text-[var(--canvas)]` instead of `text-white`.
 - `AppShell` global loading overlay: backdrop migrated from `bg-black/50` to token-driven `bg-[color:var(--ink)]/50`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d0cf348`)
 
 ### 16:30 EST — Phase 2 — Lint hygiene: remove unused imports/args in UI routes + widgets
 - `/help`: removed unused `Wifi` icon import.
