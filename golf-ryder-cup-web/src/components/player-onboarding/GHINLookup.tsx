@@ -199,7 +199,7 @@ export function GHINLookup({
                             'px-3 py-1.5 rounded-lg font-medium text-sm',
                             'transition-all duration-200',
                             ghinNumber.length >= 7
-                                ? 'bg-[var(--masters)] text-white hover:bg-[color:var(--masters)]/90'
+                                ? 'bg-[var(--masters)] text-[var(--canvas)] hover:bg-[color:var(--masters)]/90'
                                 : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
                         )}
                     >
@@ -253,7 +253,7 @@ export function GHINLookup({
                         <div className="p-4 border-b border-[color:var(--success)]/40">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-[var(--success)] flex items-center justify-center">
-                                    <CheckCircle className="w-5 h-5 text-white" />
+                                    <CheckCircle className="w-5 h-5 text-[var(--canvas)]" />
                                 </div>
                                 <div className="flex-1">
                                     <div className="font-semibold text-[var(--ink-primary)]">
@@ -277,7 +277,7 @@ export function GHINLookup({
                         <div className="p-4">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] flex items-center justify-center">
-                                    <User className="w-7 h-7 text-white" />
+                                    <User className="w-7 h-7 text-[var(--canvas)]" />
                                 </div>
                                 <div>
                                     <div className="text-lg font-semibold text-[var(--ink-primary)]">

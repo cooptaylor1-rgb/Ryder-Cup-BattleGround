@@ -92,8 +92,8 @@ export function TripArchiveCard({
           <div className="flex items-center gap-3">
             <span className="text-3xl">🏆</span>
             <div>
-              <h2 className="text-xl font-bold text-white">Trip Archives</h2>
-              <p className="text-white/80 text-sm">{archives.length} trips recorded</p>
+              <h2 className="text-xl font-bold text-[var(--canvas)]">Trip Archives</h2>
+              <p className="text-[color:var(--canvas)]/80 text-sm">{archives.length} trips recorded</p>
             </div>
           </div>
           <button
@@ -246,7 +246,7 @@ export function TripArchiveCard({
                   {onViewTrip && (
                     <button
                       onClick={() => onViewTrip(selectedArchive.tripId)}
-                      className="px-3 py-1 text-sm bg-[var(--masters)] text-white rounded-lg hover:bg-[color:var(--masters-deep)]"
+                      className="px-3 py-1 text-sm bg-[var(--masters)] text-[var(--canvas)] rounded-lg hover:bg-[color:var(--masters-deep)]"
                     >
                       View Full Trip
                     </button>
