@@ -11,6 +11,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a6acd71`)
 
+### 09:05 EST — Phase 2 — /score/[matchId]: remove remaining `text-white` + tokenize inverse indicators
+- `Saving Indicator`: swapped `text-white` + spinner border utilities for `text-[var(--canvas)]` and token-driven canvas border/tints.
+- Scoring buttons + match-complete CTAs: replaced remaining `bg-masters text-white` and team buttons `text-white` with `text-[var(--canvas)]`.
+- Trophy icon + voice scoring FAB now inherit the same inverse canvas token (no hard-coded white).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2899f55`)
+
 ### 08:30 EST — Phase 2 — FormError: avoid silent null return fallback
 - `FormError`: replaced the final `return null` fallback with an SR-only, stable `role="alert"` live region so callers never experience a silent gap if control flow changes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
