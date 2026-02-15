@@ -177,7 +177,7 @@ export function ErrorFallback({
             className={cn(
               'flex items-center justify-center gap-2 px-4 py-2 rounded-lg',
               'font-medium transition-colors',
-              'bg-[var(--masters)] text-white',
+              'bg-[var(--masters)] text-[var(--canvas)]',
               isCompact ? 'text-sm' : 'text-base',
             )}
           >
@@ -267,8 +267,8 @@ export function MiniErrorFallback({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[rgba(220,38,38,0.1)] border border-[rgba(220,38,38,0.2)]">
-      <AlertTriangle className="w-4 h-4 text-[#DC2626]" />
+    <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-[color:var(--error)]/10 border border-[color:var(--error)]/20">
+      <AlertTriangle className="w-4 h-4 text-[var(--error)]" />
       <span className="text-[var(--ink)]">{message}</span>
       {onRetry && (
         <button
@@ -303,9 +303,9 @@ export function ErrorCard({
       )}
     >
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center mb-3 bg-[rgba(220,38,38,0.1)]"
+        className="w-10 h-10 rounded-full flex items-center justify-center mb-3 bg-[color:var(--error)]/10"
       >
-        <AlertTriangle className="w-5 h-5 text-[#DC2626]" />
+        <AlertTriangle className="w-5 h-5 text-[var(--error)]" />
       </div>
       <h3
         className="font-medium text-sm mb-1 text-[var(--ink)]"
@@ -320,7 +320,7 @@ export function ErrorCard({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--masters)] text-white"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--masters)] text-[var(--canvas)]"
         >
           <RefreshCw className="w-3 h-3" />
           Try Again
