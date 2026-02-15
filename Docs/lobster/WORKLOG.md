@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 18:05 EST — Phase 2 — Lineup builder: remove remaining `text-white` in captain lineup UI
+- `LineupCanvas` + `MatchSlot` + `PlayerCard`: replaced remaining inverse typography (`text-white` + inline `'white'`) with token-driven `text-[var(--canvas)]` / `color: var(--canvas)` so team-colored chips, previews, and destructive controls stay theme-safe.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c4d00be`)
+
 ### 17:20 EST — Phase 2 — More + Admin + AppShell: tokenize remaining inverse overlays
 - `/more`: replaced remaining `text-white` inverse typography (avatar initials, Masters CTAs, modals, badges) with `text-[var(--canvas)]` for theme-safe contrast.
 - `/admin`: active trip badge now uses `text-[var(--canvas)]` instead of `text-white`.
