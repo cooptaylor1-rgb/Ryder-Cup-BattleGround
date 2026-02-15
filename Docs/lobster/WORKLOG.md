@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
   - Primary “Try Again” CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
   - Error icon shell migrated from `bg-[rgba(239,68,68,0.1)]` to tokenized `bg-[color:var(--error)]/10`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`e5164df`)
+- Commit + push ✅ (`aae81e1`)
 
 ### 07:18 EST — Phase 2 — Player onboarding: tokenize remaining `text-white` inverse accents
 - `QuickProfileMode`: header Zap icon + primary CTA now use `text-[var(--canvas)]` instead of `text-white` on accented surfaces.
