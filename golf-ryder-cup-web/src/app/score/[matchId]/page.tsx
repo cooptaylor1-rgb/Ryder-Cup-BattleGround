@@ -353,7 +353,7 @@ export default function EnhancedMatchScoringPage() {
 
       try {
         await addAuditLogEntry(entry);
-      } catch (error) {
+      } catch {
         // Audit logging is best-effort; don't pollute the console in production
       }
     },

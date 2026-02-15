@@ -105,7 +105,7 @@ export default function SettlementView() {
     );
   }, [currentTrip, wolfGames, vegasGames, hammerGames, nassauGames, sideBets, players]);
 
-  const handleMarkSettled = async (txId: string) => {
+  const handleMarkSettled = async (_txId: string) => {
     // For now, just show a toast — in a future version this would persist to DB
     showToast('success', 'Marked as settled');
     setExpandedTx(null);

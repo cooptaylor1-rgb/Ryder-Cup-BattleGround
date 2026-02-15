@@ -29,7 +29,7 @@ interface LiveJumbotronProps {
     className?: string;
 }
 
-export function LiveJumbotron({ tripId, sessionId, className }: LiveJumbotronProps) {
+export function LiveJumbotron({ tripId, sessionId: _sessionId, className }: LiveJumbotronProps) {
     const { isConnected, activeUsers, connectionStatus: _connectionStatus } = useRealtime(tripId);
     const { scores, isLoading } = useLiveScores(tripId);
 

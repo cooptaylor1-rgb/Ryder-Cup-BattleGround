@@ -15,7 +15,6 @@ import {
   Shield,
   Target,
   Trophy,
-  Wifi,
   WifiOff,
   Users,
   Gamepad2,
