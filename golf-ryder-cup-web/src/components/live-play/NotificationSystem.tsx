@@ -102,31 +102,31 @@ type NotificationToneClasses = {
 
 const NOTIFICATION_TONE_CLASSES: Record<NotificationPriority, NotificationToneClasses> = {
     urgent: {
-        container: 'border border-[color:var(--error)]/45 bg-[color:var(--error)]/92 text-white',
-        icon: 'bg-[color:var(--canvas)]/20 text-white',
-        title: 'text-white',
-        message: 'text-white/80',
-        action: 'text-white/90 hover:text-white',
-        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
-        dismissIcon: 'text-white/70',
+        container: 'border border-[color:var(--error)]/45 bg-[color:var(--error)]/92 text-[var(--canvas)]',
+        icon: 'bg-[color:var(--canvas)]/20 text-[var(--canvas)]',
+        title: 'text-[var(--canvas)]',
+        message: 'text-[color:var(--canvas)]/80',
+        action: 'text-[color:var(--canvas)]/90 hover:text-[var(--canvas)]',
+        dismiss: 'text-[color:var(--canvas)]/70 hover:text-[var(--canvas)] hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-[color:var(--canvas)]/70',
     },
     high: {
-        container: 'border border-[color:var(--warning)]/40 bg-[color:var(--warning)]/92 text-white',
-        icon: 'bg-[color:var(--canvas)]/20 text-white',
-        title: 'text-white',
-        message: 'text-white/85',
-        action: 'text-white/90 hover:text-white',
-        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
-        dismissIcon: 'text-white/70',
+        container: 'border border-[color:var(--warning)]/40 bg-[color:var(--warning)]/92 text-[var(--canvas)]',
+        icon: 'bg-[color:var(--canvas)]/20 text-[var(--canvas)]',
+        title: 'text-[var(--canvas)]',
+        message: 'text-[color:var(--canvas)]/85',
+        action: 'text-[color:var(--canvas)]/90 hover:text-[var(--canvas)]',
+        dismiss: 'text-[color:var(--canvas)]/70 hover:text-[var(--canvas)] hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-[color:var(--canvas)]/70',
     },
     medium: {
-        container: 'border border-[color:var(--success)]/40 bg-[color:var(--success)]/92 text-white',
-        icon: 'bg-[color:var(--canvas)]/20 text-white',
-        title: 'text-white',
-        message: 'text-white/85',
-        action: 'text-white/90 hover:text-white',
-        dismiss: 'text-white/70 hover:text-white hover:bg-[color:var(--canvas)]/20',
-        dismissIcon: 'text-white/70',
+        container: 'border border-[color:var(--success)]/40 bg-[color:var(--success)]/92 text-[var(--canvas)]',
+        icon: 'bg-[color:var(--canvas)]/20 text-[var(--canvas)]',
+        title: 'text-[var(--canvas)]',
+        message: 'text-[color:var(--canvas)]/85',
+        action: 'text-[color:var(--canvas)]/90 hover:text-[var(--canvas)]',
+        dismiss: 'text-[color:var(--canvas)]/70 hover:text-[var(--canvas)] hover:bg-[color:var(--canvas)]/20',
+        dismissIcon: 'text-[color:var(--canvas)]/70',
     },
     low: {
         container: 'border border-[color:var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)]',
@@ -522,7 +522,7 @@ export function NotificationBell({ className, onClick }: NotificationBellProps) 
                     <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[var(--error)] text-white text-[10px] font-bold shadow-[var(--shadow-card-sm)]"
+                        className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[var(--error)] text-[var(--canvas)] text-[10px] font-bold shadow-[var(--shadow-card-sm)]"
                     >
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </motion.span>

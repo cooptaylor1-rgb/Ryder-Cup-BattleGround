@@ -324,7 +324,7 @@ export function WeatherBanner({
               <button
                 type="button"
                 onClick={() => handleSetDelay('resumed')}
-                className="flex flex-1 items-center justify-center gap-1 rounded-[var(--radius-md)] bg-[var(--masters)] px-[var(--space-3)] py-[var(--space-2)] font-sans text-xs font-semibold text-white transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35"
+                className="flex flex-1 items-center justify-center gap-1 rounded-[var(--radius-md)] bg-[var(--masters)] px-[var(--space-3)] py-[var(--space-2)] font-sans text-xs font-semibold text-[var(--canvas)] transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--masters)]/35"
               >
                 <Play className="h-3.5 w-3.5" /> Resume Play
               </button>

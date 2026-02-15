@@ -129,7 +129,7 @@ export default function InvitesPage() {
           {/* Share Invite Button */}
           <button
             onClick={() => handleShare(shareCode, currentTrip.name)}
-            className="press-scale flex w-full items-center justify-center gap-[var(--space-2)] mt-[var(--space-4)] rounded-[var(--radius-lg)] border-2 border-[var(--masters)] bg-[var(--masters)] px-[var(--space-5)] py-[var(--space-3)] text-[length:var(--text-base)] font-semibold text-white"
+            className="press-scale flex w-full items-center justify-center gap-[var(--space-2)] mt-[var(--space-4)] rounded-[var(--radius-lg)] border-2 border-[var(--masters)] bg-[var(--masters)] px-[var(--space-5)] py-[var(--space-3)] text-[length:var(--text-base)] font-semibold text-[var(--canvas)]"
           >
             <Share2 size={18} />
             Share Invite
