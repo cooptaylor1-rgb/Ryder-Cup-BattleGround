@@ -206,7 +206,7 @@ export function SideBetOptIn({
             </div>
 
             {/* Summary Card */}
-            <div className="bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] rounded-2xl p-4 text-white">
+            <div className="bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] rounded-2xl p-4 text-[var(--canvas)]">
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-sm opacity-90">Your buy-in</div>

@@ -39,13 +39,13 @@ interface ProfilePhotoUploadProps {
 // ============================================
 
 const avatarColors = [
-    { bg: 'bg-linear-to-br from-blue-400 to-blue-600', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-green-400 to-green-600', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-purple-400 to-purple-600', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-amber-400 to-orange-500', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-pink-400 to-rose-500', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-cyan-400 to-teal-500', text: 'text-white' },
-    { bg: 'bg-linear-to-br from-masters to-emerald-600', text: 'text-white' },
+    { bg: 'bg-linear-to-br from-blue-400 to-blue-600', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-green-400 to-green-600', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-purple-400 to-purple-600', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-amber-400 to-orange-500', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-pink-400 to-rose-500', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-cyan-400 to-teal-500', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-masters to-emerald-600', text: 'text-[var(--canvas)]' },
 ];
 
 const getAvatarColor = (name?: string) => {
@@ -257,7 +257,7 @@ export function ProfilePhotoUpload({
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowOptions(true)}
                     >
-                        <Camera className="w-5 h-5 text-white" />
+                        <Camera className="w-5 h-5 text-[var(--canvas)]" />
                     </motion.div>
                 </motion.div>
 
@@ -416,7 +416,7 @@ export function ProfilePhotoUpload({
                                 </button>
                                 <button
                                     onClick={confirmPhoto}
-                                    className="flex-1 py-3 rounded-xl bg-masters text-white font-medium flex items-center justify-center gap-2"
+                                    className="flex-1 py-3 rounded-xl bg-[var(--masters)] text-[var(--canvas)] font-medium flex items-center justify-center gap-2 hover:bg-[color:var(--masters)]/90 transition-colors"
                                 >
                                     <Check className="w-4 h-4" />
                                     Use Photo

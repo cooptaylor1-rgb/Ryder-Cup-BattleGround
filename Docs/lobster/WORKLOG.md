@@ -18,6 +18,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`2899f55`)
 
+### 09:39 EST — Phase 2 — Onboarding widgets: remove remaining `text-white` + tokenize status pills
+- `SideBetOptIn`: summary hero card now uses `text-[var(--canvas)]` instead of `text-white` on the Masters gradient.
+- `AvailabilityCalendar`: status dots now use premium status tokens (`var(--success)`/`var(--warning)`/`var(--error)`) and their icons inherit `text-[var(--canvas)]`.
+- `ProfilePhotoUpload`: edit badge + confirmation CTA now use `text-[var(--canvas)]` on the Masters surface (no hard-coded `text-white`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 09:25 EST — Phase 2 — Error routes + skip link: tokenize inverse Masters CTAs
 - `/score/[matchId]/error`, `/lineup/error`, `/social/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
 - Error icon shells standardized to token-driven `bg-[color:var(--error)]/10`.

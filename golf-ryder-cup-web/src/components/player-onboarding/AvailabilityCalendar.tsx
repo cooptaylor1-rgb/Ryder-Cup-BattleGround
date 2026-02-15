@@ -241,14 +241,14 @@ export function AvailabilityCalendar({
                                                 key={session.id}
                                                 className={cn(
                                                     'w-6 h-6 rounded-full flex items-center justify-center',
-                                                    status === 'available' && 'bg-green-500',
-                                                    status === 'unavailable' && 'bg-red-500',
-                                                    status === 'maybe' && 'bg-amber-500'
+                                                    status === 'available' && 'bg-[color:var(--success)]',
+                                                    status === 'unavailable' && 'bg-[color:var(--error)]',
+                                                    status === 'maybe' && 'bg-[color:var(--warning)]'
                                                 )}
                                             >
-                                                {status === 'available' && <Check className="w-3.5 h-3.5 text-white" />}
-                                                {status === 'unavailable' && <X className="w-3.5 h-3.5 text-white" />}
-                                                {status === 'maybe' && <HelpCircle className="w-3.5 h-3.5 text-white" />}
+                                                {status === 'available' && <Check className="w-3.5 h-3.5 text-[var(--canvas)]" />}
+                                                {status === 'unavailable' && <X className="w-3.5 h-3.5 text-[var(--canvas)]" />}
+                                                {status === 'maybe' && <HelpCircle className="w-3.5 h-3.5 text-[var(--canvas)]" />}
                                             </div>
                                         );
                                     })}
@@ -434,7 +434,7 @@ export function AvailabilityCalendar({
                                 </button>
                                 <button
                                     onClick={() => updateNote(noteModal.sessionId, noteModal.note)}
-                                    className="flex-1 py-2.5 rounded-lg bg-masters text-white font-medium"
+                                    className="flex-1 py-2.5 rounded-lg bg-[var(--masters)] text-[var(--canvas)] font-medium hover:bg-[color:var(--masters)]/90 transition-colors"
                                 >
                                     Save Note
                                 </button>
