@@ -340,7 +340,7 @@ export default function CaptainManagePage() {
                                                 />
                                                 <button
                                                     onClick={() => handleDeleteSession(session.id)}
-                                                    className="press-scale p-[var(--space-2)] bg-[var(--error)] text-white border-none rounded-[var(--radius-md)] cursor-pointer flex items-center gap-[var(--space-1)] text-[length:var(--text-sm)]"
+                                                    className="press-scale p-[var(--space-2)] bg-[var(--error)] text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer flex items-center gap-[var(--space-1)] text-[length:var(--text-sm)]"
                                                 >
                                                     <Trash2 size={14} />
                                                     Delete

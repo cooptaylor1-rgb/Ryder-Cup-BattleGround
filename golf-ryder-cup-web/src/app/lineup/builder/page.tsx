@@ -405,14 +405,14 @@ function LineupBuilderPageContent() {
             {selectedPlayer && (
                 <div className="mx-4 mt-4 p-3 bg-[var(--masters)] rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Check className="w-5 h-5 text-white" />
-                        <span className="text-white font-medium">
+                        <Check className="w-5 h-5 text-[var(--canvas)]" />
+                        <span className="text-[var(--canvas)] font-medium">
                             {selectedPlayer.player.name} selected
                         </span>
                     </div>
                     <button
                         onClick={() => setSelectedPlayer(null)}
-                        className="text-white/80 text-sm"
+                        className="text-[color:var(--canvas)]/80 text-sm"
                     >
                         Cancel
                     </button>

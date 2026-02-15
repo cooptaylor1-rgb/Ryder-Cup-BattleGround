@@ -198,8 +198,8 @@ export default function PhotosPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 33vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-2">
-                  <div className="flex items-center gap-2 text-white text-xs">
+                <div className="absolute inset-0 bg-linear-to-t from-[color:var(--ink)]/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-2">
+                  <div className="flex items-center gap-2 text-[var(--canvas)] text-xs">
                     <Heart size={12} />
                     <span>{photo.likes}</span>
                   </div>
@@ -215,13 +215,12 @@ export default function PhotosPage() {
       {/* Photo Modal */}
       {selectedPhoto && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.95)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/95"
           onClick={() => setSelectedPhoto(null)}
         >
           <button
             onClick={() => setSelectedPhoto(null)}
-            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white"
+            className="absolute top-4 right-4 p-2 text-[color:var(--canvas)]/70 hover:text-[var(--canvas)]"
             aria-label="Close photo viewer"
           >
             <X size={28} />
@@ -237,20 +236,20 @@ export default function PhotosPage() {
               sizes="(max-width: 1024px) 100vw, 1024px"
             />
 
-            <div className="mt-4 text-white">
+            <div className="mt-4 text-[var(--canvas)]">
               {selectedPhoto.caption && <p className="text-lg mb-2">{selectedPhoto.caption}</p>}
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <button
-                    className="flex items-center gap-2 text-white/70 hover:text-white"
+                    className="flex items-center gap-2 text-[color:var(--canvas)]/70 hover:text-[var(--canvas)]"
                     aria-label={`Like photo, ${selectedPhoto.likes} likes`}
                   >
                     <Heart size={20} />
                     <span>{selectedPhoto.likes}</span>
                   </button>
                   <button
-                    className="flex items-center gap-2 text-white/70 hover:text-white"
+                    className="flex items-center gap-2 text-[color:var(--canvas)]/70 hover:text-[var(--canvas)]"
                     aria-label="Comment on photo"
                   >
                     <MessageCircle size={20} />
@@ -259,11 +258,11 @@ export default function PhotosPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button className="p-2 text-white/70 hover:text-white" aria-label="Share photo">
+                  <button className="p-2 text-[color:var(--canvas)]/70 hover:text-[var(--canvas)]" aria-label="Share photo">
                     <Share2 size={20} />
                   </button>
                   <button
-                    className="p-2 text-white/70 hover:text-white"
+                    className="p-2 text-[color:var(--canvas)]/70 hover:text-[var(--canvas)]"
                     aria-label="Download photo"
                   >
                     <Download size={20} />
@@ -272,8 +271,8 @@ export default function PhotosPage() {
               </div>
 
               {/* Uploader info */}
-              <div className="mt-4 pt-4 border-t border-white/20">
-                <p className="text-sm text-white/50">
+              <div className="mt-4 pt-4 border-t border-[color:var(--canvas)]/20">
+                <p className="text-sm text-[color:var(--canvas)]/50">
                   Uploaded by{' '}
                   {getPlayer(selectedPhoto.uploadedBy)
                     ? `${getPlayer(selectedPhoto.uploadedBy)?.firstName} ${getPlayer(selectedPhoto.uploadedBy)?.lastName}`
