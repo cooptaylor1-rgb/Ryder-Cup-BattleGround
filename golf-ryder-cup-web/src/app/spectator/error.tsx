@@ -27,8 +27,8 @@ export default function SpectatorError({ error, reset }: ErrorPageProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
       {/* Icon */}
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-[rgba(220,38,38,0.1)]">
-        <Tv size={40} className="text-[#DC2626]" />
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-[color:var(--error)]/10">
+        <Tv size={40} className="text-[var(--error)]" />
       </div>
 
       {/* Title */}
@@ -62,7 +62,7 @@ export default function SpectatorError({ error, reset }: ErrorPageProps) {
       <div className="flex gap-4">
         <button
           onClick={reset}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90 bg-[var(--masters)] text-white"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90 bg-[var(--masters)] text-[var(--canvas)]"
         >
           <RefreshCw size={18} />
           Try Again
