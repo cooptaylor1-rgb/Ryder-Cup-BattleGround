@@ -128,12 +128,10 @@ export function ActivityFeed({
               onClick={() => onFilterChange(f.value)}
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                filter === f.value
+                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
+                  : 'bg-[var(--surface)] text-[var(--ink-secondary)] border border-[var(--rule)]',
               )}
-              style={{
-                background: filter === f.value ? 'var(--masters)' : 'var(--surface)',
-                color: filter === f.value ? 'white' : 'var(--ink-secondary)',
-                border: filter === f.value ? 'none' : '1px solid var(--rule)',
-              }}
             >
               {f.icon}
               {f.label}
@@ -155,24 +153,15 @@ export function ActivityFeed({
         {/* Loading */}
         {isLoading && (
           <div className="py-8 text-center">
-            <div
-              className="w-8 h-8 mx-auto border-2 rounded-full animate-spin"
-              style={{
-                borderColor: 'var(--rule)',
-                borderTopColor: 'var(--masters)',
-              }}
-            />
+            <div className="w-8 h-8 mx-auto border-2 rounded-full animate-spin border-[var(--rule)] border-t-[var(--masters)]" />
           </div>
         )}
 
         {/* Empty State */}
         {!isLoading && filteredActivities.length === 0 && (
           <div className="py-12 text-center">
-            <Clock
-              className="w-12 h-12 mx-auto mb-4"
-              style={{ color: 'var(--ink-tertiary)' }}
-            />
-            <p style={{ color: 'var(--ink-secondary)' }}>
+            <Clock className="w-12 h-12 mx-auto mb-4 text-[var(--ink-tertiary)]" />
+            <p className="type-body text-[var(--ink-secondary)]">
               No activity yet. Start playing to see updates here!
             </p>
           </div>
@@ -182,12 +171,7 @@ export function ActivityFeed({
         {hasMore && !isLoading && (
           <button
             onClick={onLoadMore}
-            className="w-full py-3 rounded-xl text-sm font-medium transition-colors"
-            style={{
-              background: 'var(--surface)',
-              color: 'var(--masters)',
-              border: '1px solid var(--rule)',
-            }}
+            className="w-full py-3 rounded-xl text-sm font-medium transition-colors bg-[var(--surface)] text-[var(--masters)] border border-[var(--rule)]"
           >
             Load more
           </button>
@@ -212,13 +196,9 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
   return (
     <div
       className={cn(
-        'p-4 rounded-xl transition-all',
+        'p-4 rounded-xl transition-all bg-[var(--surface)] border border-[var(--rule)]',
         isFirst && 'ring-2 ring-masters ring-offset-2 ring-offset-canvas',
       )}
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
@@ -236,25 +216,16 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p
-                className="font-medium text-sm"
-                style={{ color: 'var(--ink)' }}
-              >
+              <p className="font-medium text-sm text-[var(--ink)]">
                 {title}
               </p>
               {subtitle && (
-                <p
-                  className="text-xs mt-0.5"
-                  style={{ color: 'var(--ink-secondary)' }}
-                >
+                <p className="text-xs mt-0.5 text-[var(--ink-secondary)]">
                   {subtitle}
                 </p>
               )}
             </div>
-            <span
-              className="text-xs whitespace-nowrap"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
+            <span className="text-xs whitespace-nowrap text-[var(--ink-tertiary)]">
               {formatRelativeTime(activity.timestamp)}
             </span>
           </div>
@@ -276,50 +247,36 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
           )}
 
           {activity.type === 'comment_posted' && activity.data.comment && (
-            <p
-              className="mt-2 text-sm p-3 rounded-lg"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--ink-secondary)',
-              }}
-            >
+            <p className="mt-2 text-sm p-3 rounded-lg bg-[var(--surface-raised)] text-[var(--ink-secondary)]">
               &quot;{activity.data.comment}&quot;
             </p>
           )}
 
           {activity.type === 'match_completed' && activity.data.result && (
-            <div
-              className="mt-3 p-3 rounded-lg flex items-center justify-between"
-              style={{ background: 'var(--surface-raised)' }}
-            >
+            <div className="mt-3 p-3 rounded-lg flex items-center justify-between bg-[var(--surface-raised)]">
               <div className="flex items-center gap-4">
                 <span
-                  className="font-semibold"
-                  style={{
-                    color: activity.data.result.winner === 'A'
-                      ? 'var(--team-usa)'
-                      : 'var(--ink-secondary)',
-                  }}
+                  className={cn(
+                    'font-semibold',
+                    activity.data.result.winner === 'A' ? 'text-team-usa' : 'text-[var(--ink-secondary)]',
+                  )}
                 >
                   {activity.data.result.teamA}
                 </span>
-                <span style={{ color: 'var(--ink-tertiary)' }}>vs</span>
+                <span className="text-[var(--ink-tertiary)]">vs</span>
                 <span
-                  className="font-semibold"
-                  style={{
-                    color: activity.data.result.winner === 'B'
-                      ? 'var(--team-europe)'
-                      : 'var(--ink-secondary)',
-                  }}
+                  className={cn(
+                    'font-semibold',
+                    activity.data.result.winner === 'B'
+                      ? 'text-team-europe'
+                      : 'text-[var(--ink-secondary)]',
+                  )}
                 >
                   {activity.data.result.teamB}
                 </span>
               </div>
               {activity.data.result.margin && (
-                <span
-                  className="text-sm font-bold"
-                  style={{ color: 'var(--masters)' }}
-                >
+                <span className="text-sm font-bold text-[var(--masters)]">
                   {activity.data.result.margin}
                 </span>
               )}
@@ -349,8 +306,7 @@ function ActivityCard({ activity, isFirst }: ActivityCardProps) {
           {action && (
             <Link
               href={action.href}
-              className="mt-3 flex items-center gap-1 text-xs font-medium"
-              style={{ color: 'var(--masters)' }}
+              className="mt-3 flex items-center gap-1 text-xs font-medium text-[var(--masters)]"
             >
               {action.label}
               <ChevronRight className="w-3 h-3" />
@@ -507,10 +463,7 @@ export function CompactActivity({ activity, className }: CompactActivityProps) {
   const { icon, color, title } = getActivityDisplay(activity);
 
   return (
-    <div
-      className={cn('flex items-center gap-3 py-2', className)}
-      style={{ borderBottom: '1px solid var(--rule)' }}
-    >
+    <div className={cn('flex items-center gap-3 py-2 border-b border-[var(--rule)]', className)}>
       <div
         className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
         style={{
@@ -520,16 +473,10 @@ export function CompactActivity({ activity, className }: CompactActivityProps) {
       >
         {icon}
       </div>
-      <p
-        className="flex-1 text-sm truncate"
-        style={{ color: 'var(--ink-secondary)' }}
-      >
+      <p className="flex-1 text-sm truncate text-[var(--ink-secondary)]">
         {title}
       </p>
-      <span
-        className="text-xs"
-        style={{ color: 'var(--ink-tertiary)' }}
-      >
+      <span className="text-xs text-[var(--ink-tertiary)]">
         {formatRelativeTime(activity.timestamp)}
       </span>
     </div>

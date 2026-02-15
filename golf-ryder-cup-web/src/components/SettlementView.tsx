@@ -196,15 +196,13 @@ export default function SettlementView() {
               >
                 <span className="type-body-sm font-medium">{balance.playerName}</span>
                 <span
-                  className="type-body-sm font-bold"
-                  style={{
-                    color:
-                      balance.netAmount > 0
-                        ? 'var(--success)'
-                        : balance.netAmount < 0
-                          ? 'var(--error)'
-                          : 'var(--ink-secondary)',
-                  }}
+                  className={`type-body-sm font-bold ${
+                    balance.netAmount > 0
+                      ? 'text-[var(--success)]'
+                      : balance.netAmount < 0
+                        ? 'text-[var(--error)]'
+                        : 'text-[var(--ink-secondary)]'
+                  }`}
                 >
                   {balance.netAmount >= 0 ? '+' : ''}${balance.netAmount.toFixed(2)}
                 </span>
