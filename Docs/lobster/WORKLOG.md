@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `InstallPrompt`: swapped primary CTA and iOS instruction step numbers off `text-white` onto `text-[var(--canvas)]`; updated iOS modal backdrop from `bg-black/50` to token-driven `bg-[color:var(--ink)]/50`.
 - `StablefordScorecard`: replaced selected/active states off `text-white` / `text-white/50` onto `var(--canvas)` token classes so Masters-accent chips remain theme-safe.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`c8f3329`)
+- Commit + push ✅ (`b8bf6c2`)
 
 ### 07:45 EST — Phase 2 — Tokenize onboarding availability status controls + roster team assignment buttons
 - `AvailabilityCalendar`: replaced hard-coded Tailwind palette utilities (`green-*`, `amber-*`, `red-*`, `blue-*`) with premium status tokens (`var(--success)`, `var(--warning)`, `var(--error)`, `var(--info)`) for session icons and Yes/Maybe/No selection states; removed dark-mode forks in favor of token tints.
