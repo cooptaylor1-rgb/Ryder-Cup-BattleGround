@@ -239,7 +239,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
 
                     {/* Avatar */}
                     <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 relative overflow-hidden"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--canvas)] text-xs font-semibold shrink-0 relative overflow-hidden"
                         style={{ background: teamColor }}
                     >
                         {player.avatarUrl ? (
@@ -312,7 +312,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                     {/* Avatar */}
                     <div className="relative shrink-0">
                         <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm relative overflow-hidden"
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-[var(--canvas)] font-bold text-lg shadow-sm relative overflow-hidden"
                             style={{ background: teamColor }}
                         >
                             {player.avatarUrl ? (
@@ -345,7 +345,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                                 style={{ background: formIndicator.color }}
                                 title={formIndicator.label}
                             >
-                                <formIndicator.icon size={10} className="text-white" />
+                                <formIndicator.icon size={10} className="text-[var(--canvas)]" />
                             </div>
                         )}
                     </div>
@@ -359,7 +359,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                             {player.isRookie && (
                                 <span
                                     className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase"
-                                    style={{ background: 'var(--accent)', color: 'white' }}
+                                    style={{ background: 'var(--accent)', color: 'var(--canvas)' }}
                                 >
                                     Rookie
                                 </span>
@@ -397,7 +397,7 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                                 onRemove();
                             }}
                             className="absolute top-1 right-1 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                            style={{ background: 'var(--error)', color: 'white' }}
+                            style={{ background: 'var(--error)', color: 'var(--canvas)' }}
                         >
                             ×
                         </button>

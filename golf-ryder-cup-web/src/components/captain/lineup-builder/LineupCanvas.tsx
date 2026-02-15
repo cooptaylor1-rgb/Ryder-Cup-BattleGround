@@ -144,7 +144,7 @@ function PlayerPool({
                         className="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{ background: teamColor }}
                     >
-                        <Users size={16} className="text-white" />
+                        <Users size={16} className="text-[var(--canvas)]" />
                     </div>
                     <div className="text-left">
                         <h3 className="font-semibold text-[var(--ink-primary)]">
@@ -665,7 +665,7 @@ export function LineupCanvas({
                         <button
                             onClick={handlePublish}
                             disabled={!validation.isValid || isSaving}
-                            className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-white"
+                            className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all text-[var(--canvas)]"
                             style={{
                                 background: validation.isValid ? 'var(--masters)' : 'var(--ink-tertiary)',
                                 opacity: validation.isValid ? 1 : 0.5,

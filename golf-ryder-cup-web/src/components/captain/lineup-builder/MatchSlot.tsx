@@ -472,7 +472,7 @@ export function MatchSlot({
                             {match.teamAPlayers.slice(0, 2).map((p) => (
                                 <div
                                     key={p.id}
-                                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--canvas)] text-xs font-semibold"
                                     style={{ background: teamAColor }}
                                     title={`${p.firstName} ${p.lastName}`}
                                 >
@@ -491,7 +491,7 @@ export function MatchSlot({
                             {match.teamBPlayers.slice(0, 2).map((p) => (
                                 <div
                                     key={p.id}
-                                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--canvas)] text-xs font-semibold"
                                     style={{ background: teamBColor }}
                                     title={`${p.firstName} ${p.lastName}`}
                                 >
