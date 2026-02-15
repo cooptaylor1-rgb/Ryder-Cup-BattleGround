@@ -181,7 +181,16 @@ export function FormError({
         );
     }
 
-    return null;
+    // Fallback: keep a stable live region even if we somehow reach here.
+    return (
+        <div
+            id={errorId}
+            role="alert"
+            aria-live={ariaLive}
+            aria-atomic={ariaAtomic}
+            className="sr-only"
+        />
+    );
 }
 
 /**
