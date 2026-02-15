@@ -166,7 +166,7 @@ export function ChatRoom({
             className={cn(
               'px-3 py-1.5 rounded-full type-caption font-medium whitespace-nowrap transition-colors',
               !selectedThread
-                ? 'bg-[var(--accent)] text-white'
+                ? 'bg-[var(--accent)] text-[var(--canvas)]'
                 : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
             )}
           >
@@ -180,7 +180,7 @@ export function ChatRoom({
               className={cn(
                 'px-3 py-1.5 rounded-full type-caption font-medium whitespace-nowrap transition-colors',
                 selectedThread === thread.id
-                  ? 'bg-[var(--accent)] text-white'
+                  ? 'bg-[var(--accent)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
               )}
             >
@@ -275,7 +275,7 @@ export function ChatRoom({
               className={cn(
                 'p-2 rounded-lg transition-colors',
                 showEmojiPicker
-                  ? 'bg-[var(--accent)] text-white'
+                  ? 'bg-[var(--accent)] text-[var(--canvas)]'
                   : 'text-[var(--ink-tertiary)] hover:bg-[var(--surface-secondary)]'
               )}
             >
@@ -318,7 +318,7 @@ export function ChatRoom({
             className={cn(
               'p-2 rounded-lg transition-all',
               message.trim()
-                ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
+                ? 'bg-[var(--accent)] text-[var(--canvas)] hover:bg-[var(--accent-hover)]'
                 : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
             )}
           >

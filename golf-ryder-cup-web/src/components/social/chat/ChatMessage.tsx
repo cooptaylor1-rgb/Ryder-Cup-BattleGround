@@ -163,7 +163,7 @@ export function ChatMessage({
           <div className={cn(
             'shrink-0 w-8 h-8 rounded-full flex items-center justify-center type-caption font-semibold',
             isOwn
-              ? 'bg-[var(--accent)] text-white'
+              ? 'bg-[var(--accent)] text-[var(--canvas)]'
               : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
           )}>
             {message.senderName.charAt(0).toUpperCase()}
@@ -211,7 +211,7 @@ export function ChatMessage({
             <div className={cn(
               'inline-block rounded-2xl px-4 py-2 max-w-[85%]',
               isOwn
-                ? 'bg-[var(--accent)] text-white rounded-br-md'
+                ? 'bg-[var(--accent)] text-[var(--canvas)] rounded-br-md'
                 : 'bg-[var(--surface-secondary)] text-[var(--ink-primary)] rounded-bl-md'
             )}>
               {message.imageUrl && (

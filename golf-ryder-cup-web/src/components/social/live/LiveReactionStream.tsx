@@ -129,7 +129,7 @@ function FloatingReaction({ reaction, onComplete, position }: FloatingReactionPr
                 <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-xs font-bold whitespace-nowrap px-2 py-0.5 rounded-full text-white mt-1"
+                    className="text-xs font-bold whitespace-nowrap px-2 py-0.5 rounded-full text-[var(--canvas)] mt-1"
                     style={{
                         background: reaction.team ? TEAM_COLORS[reaction.team] : 'var(--masters)',
                     }}
@@ -269,7 +269,7 @@ function QuickReactBar({ onReact }: QuickReactBarProps) {
                     key={type}
                     whileTap={{ scale: 1.3 }}
                     onClick={() => handleReact(type)}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl active:bg-black/5"
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl active:bg-[color:var(--ink)]/5"
                 >
                     {REACTION_CONFIG[type].emoji}
                 </motion.button>
@@ -386,8 +386,7 @@ export function ScoreCelebration({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-            style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none bg-[color:var(--ink)]/60"
         >
             {/* Burst effect */}
             <ReactionBurst type={type} count={8} />
@@ -405,7 +404,7 @@ export function ScoreCelebration({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="text-4xl font-bold text-white mt-4"
+                    className="text-4xl font-bold text-[var(--canvas)] mt-4"
                 >
                     {config.label}
                 </motion.h2>
@@ -414,11 +413,11 @@ export function ScoreCelebration({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-white/80 mt-2"
+                    className="text-[color:var(--canvas)]/80 mt-2"
                 >
                     <span
                         className="font-semibold"
-                        style={{ color: team ? TEAM_COLORS[team] : 'white' }}
+                        style={{ color: team ? TEAM_COLORS[team] : 'var(--canvas)' }}
                     >
                         {playerName}
                     </span>
