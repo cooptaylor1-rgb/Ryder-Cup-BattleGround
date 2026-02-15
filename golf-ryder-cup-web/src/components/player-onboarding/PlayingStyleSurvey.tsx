@@ -182,7 +182,7 @@ export function PlayingStyleSurvey({
                     transition={{ type: 'spring', bounce: 0.5 }}
                     className="w-14 h-14 rounded-2xl bg-linear-to-br from-purple-500 to-indigo-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-purple-500/30"
                 >
-                    <Sparkles className="w-7 h-7 text-white" />
+                    <Sparkles className="w-7 h-7 text-[var(--canvas)]" />
                 </motion.div>
                 <h2 className="text-lg font-bold text-[var(--ink-primary)]">
                     Know Your Game
@@ -268,7 +268,7 @@ export function PlayingStyleSurvey({
                                         animate={{ scale: 1 }}
                                         className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center"
                                     >
-                                        <Check className="w-4 h-4 text-white" />
+                                        <Check className="w-4 h-4 text-[var(--canvas)]" />
                                     </motion.div>
                                 )}
                             </motion.button>
@@ -307,7 +307,7 @@ export function PlayingStyleSurvey({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         onClick={() => onComplete(answers as PlayingStyle)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500 text-[var(--canvas)] font-medium hover:bg-purple-600 transition-colors"
                     >
                         Done
                         <ChevronRight className="w-4 h-4" />

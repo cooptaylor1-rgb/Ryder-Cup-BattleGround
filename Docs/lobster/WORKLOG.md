@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 07:18 EST — Phase 2 — Player onboarding: tokenize remaining `text-white` inverse accents
+- `QuickProfileMode`: header Zap icon + primary CTA now use `text-[var(--canvas)]` instead of `text-white` on accented surfaces.
+- `PlayingStyleSurvey`: hero Sparkles icon, selected check icon, and Done CTA now use `text-[var(--canvas)]` instead of `text-white`.
+- `GolfSuperlatives`: trophy hero icon + Next/Finish CTA now use `text-[var(--canvas)]` instead of `text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cccfb15`)
+
 ### 07:15 EST — Phase 2 — Finances + MomentumMeter: tokenize remaining `text-white` on Masters surfaces
 - `/finances`: PageHeader icon, active tab/button states, and captain-only actions now use `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
 - `MomentumMeter`: last-5-hole trend icons now use `text-[var(--canvas)]` on team-colored pills instead of `text-white`.

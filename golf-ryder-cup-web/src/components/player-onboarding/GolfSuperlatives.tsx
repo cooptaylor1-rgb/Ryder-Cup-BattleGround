@@ -149,7 +149,7 @@ export function GolfSuperlatives({
                     transition={{ type: 'spring', bounce: 0.5 }}
                     className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-400 to-yellow-500 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-amber-500/30"
                 >
-                    <Trophy className="w-8 h-8 text-white" />
+                    <Trophy className="w-8 h-8 text-[var(--canvas)]" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                     Golf Superlatives 🏆
@@ -268,7 +268,7 @@ export function GolfSuperlatives({
                     className={cn(
                         'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
                         currentAnswer.trim()
-                            ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30'
+                            ? 'bg-amber-500 text-[var(--canvas)] shadow-lg shadow-amber-500/30'
                             : 'bg-[var(--surface-secondary)] text-[color:var(--ink-tertiary)]/70'
                     )}
                 >

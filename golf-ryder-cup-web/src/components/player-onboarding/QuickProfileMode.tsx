@@ -123,7 +123,7 @@ export function QuickProfileMode({
                     transition={{ type: 'spring', bounce: 0.5 }}
                     className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-amber-500/30"
                 >
-                    <Zap className="w-8 h-8 text-white" />
+                    <Zap className="w-8 h-8 text-[var(--canvas)]" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-[var(--ink-primary)]">
                     Quick Setup
@@ -230,7 +230,7 @@ export function QuickProfileMode({
                 className={cn(
                     'w-full py-4 px-6 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2 transition-all',
                     progress === 4
-                        ? 'bg-masters text-white shadow-lg shadow-masters/30'
+                        ? 'bg-masters text-[var(--canvas)] shadow-lg shadow-masters/30'
                         : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)]'
                 )}
             >
