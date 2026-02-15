@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 21:10 EST — Phase 2 — Replace remaining `text-white` overlays with canvas tokens (Standings + Help error + Nassau)
+- `/standings`: migrated active tab + “View Trip Recap” CTA off `text-white` and onto `text-[var(--canvas)]` so Masters-accented states remain theme-safe.
+- `/help` error route: updated the primary “Try Again” button to use `text-[var(--canvas)]` instead of `text-white`.
+- `NassauEnhancedCard`: tokenized header copy + close affordance off `text-white`/`text-white/80` to canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`) for consistent legibility on the Masters gradient.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a77bd60`)
+
 ### 20:57 EST — Phase 2 — Replace remaining `text-white` overlays with canvas tokens (InstallPrompt + StablefordScorecard)
 - `InstallPrompt`: swapped primary CTA and iOS instruction step numbers off `text-white` onto `text-[var(--canvas)]`; updated iOS modal backdrop from `bg-black/50` to token-driven `bg-[color:var(--ink)]/50`.
 - `StablefordScorecard`: replaced selected/active states off `text-white` / `text-white/50` onto `var(--canvas)` token classes so Masters-accent chips remain theme-safe.
