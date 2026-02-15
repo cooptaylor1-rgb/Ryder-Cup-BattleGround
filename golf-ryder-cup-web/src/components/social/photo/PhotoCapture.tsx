@@ -194,7 +194,7 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50">
+    <div className="fixed inset-0 bg-[color:var(--ink)] z-50">
       {/* Camera Preview */}
       <video
         ref={videoRef}
@@ -208,16 +208,16 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
 
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-          <Loader2 className="w-8 h-8 text-white animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[color:var(--ink)]/80">
+          <Loader2 className="w-8 h-8 text-[var(--canvas)] animate-spin" />
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-[color:var(--ink)]/80 p-4">
           <div className="text-center">
-            <p className="text-white text-lg mb-4">{error}</p>
+            <p className="text-[var(--canvas)] text-lg mb-4">{error}</p>
             <button
               onClick={onClose}
               className="rounded-lg bg-[var(--canvas-raised)] px-4 py-2 font-medium text-[var(--ink-primary)] shadow-card-sm"
@@ -234,9 +234,9 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
           {/* Close */}
           <button
             onClick={onClose}
-            className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-[color:var(--ink)]/50 flex items-center justify-center"
           >
-            <X className="w-6 h-6 text-white" />
+            <X className="w-6 h-6 text-[var(--canvas)]" />
           </button>
 
           {/* Capture */}
@@ -252,9 +252,9 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
           {/* Flip */}
           <button
             onClick={handleFlip}
-            className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-[color:var(--ink)]/50 flex items-center justify-center"
           >
-            <FlipHorizontal className="w-6 h-6 text-white" />
+            <FlipHorizontal className="w-6 h-6 text-[var(--canvas)]" />
           </button>
         </div>
       </div>
@@ -262,7 +262,7 @@ function CameraView({ onCapture, onClose }: CameraViewProps) {
       {/* Top Safe Area */}
       <div className="absolute top-0 left-0 right-0 pt-safe">
         <div className="flex items-center justify-center py-4">
-          <span className="text-white/70 text-sm font-medium">Take Photo</span>
+          <span className="text-[color:var(--canvas)]/70 text-sm font-medium">Take Photo</span>
         </div>
       </div>
     </div>
@@ -315,7 +315,7 @@ function PhotoPreview({
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[color:var(--ink)] z-50 flex flex-col">
       {/* Photo */}
       <div className="flex-1 relative overflow-hidden">
         <Image src={dataUrl} alt="Captured" fill className="object-contain" unoptimized />
@@ -336,7 +336,7 @@ function PhotoPreview({
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
                   context.momentType === type
-                    ? 'text-white ring-2 ring-offset-2 ring-offset-[var(--surface)]'
+                    ? 'text-[var(--canvas)] ring-2 ring-offset-2 ring-offset-[var(--surface)]'
                     : 'text-[var(--ink-secondary)] bg-[var(--surface-tertiary)] hover:bg-[color:var(--surface-tertiary)]/80'
                 )}
                 style={{
@@ -401,7 +401,7 @@ function PhotoPreview({
                     className={cn(
                       'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all',
                       isTagged
-                        ? 'bg-[var(--masters)] text-white'
+                        ? 'bg-[var(--masters)] text-[var(--canvas)]'
                         : 'bg-[var(--surface-tertiary)] text-[var(--ink-secondary)] hover:bg-[color:var(--surface-tertiary)]/80'
                     )}
                   >
@@ -455,7 +455,7 @@ function PhotoPreview({
           <button
             onClick={onConfirm}
             disabled={isUploading}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--success)] text-white font-semibold hover:bg-[color:var(--success)]/90 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--success)] text-[var(--canvas)] font-semibold hover:bg-[color:var(--success)]/90 transition-colors"
           >
             {isUploading ? (
               <>

@@ -269,7 +269,7 @@ function TeamBattleSection({ stats }: { stats: TripStats }) {
                         className="text-center"
                     >
                         <span
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-semibold"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[var(--canvas)] font-semibold"
                             style={{
                                 background: stats.usaPoints > stats.europePoints ? TEAM_COLORS.usa : TEAM_COLORS.europe,
                             }}
@@ -568,8 +568,8 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
                     transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
                 />
 
-                <Crown className="w-12 h-12 mx-auto mb-3 text-white" />
-                <span className="text-white/80 text-sm uppercase tracking-wider font-semibold">Trip MVP</span>
+                <Crown className="w-12 h-12 mx-auto mb-3 text-[var(--canvas)]" />
+                <span className="text-[color:var(--canvas)]/80 text-sm uppercase tracking-wider font-semibold">Trip MVP</span>
 
                 {/* Avatar */}
                 <div className="relative mx-auto my-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--canvas-raised)]/25 text-3xl backdrop-blur-sm">
@@ -580,8 +580,8 @@ function MVPSection({ mvp }: { mvp: TripData['mvp'] }) {
                     )}
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-1">{mvp.name}</h3>
-                <p className="text-white/80">{mvp.points} total points</p>
+                <h3 className="text-2xl font-bold text-[var(--canvas)] mb-1">{mvp.name}</h3>
+                <p className="text-[color:var(--canvas)]/80">{mvp.points} total points</p>
             </div>
         </motion.section>
     );
@@ -603,7 +603,7 @@ function ShareFooter({ onShare, onExport }: { onShare?: () => void; onExport?: (
                         haptic.press();
                         onShare?.();
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-white bg-[var(--masters)]"
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-[var(--canvas)] bg-[var(--masters)]"
                 >
                     <Share2 size={18} />
                     Share Recap
