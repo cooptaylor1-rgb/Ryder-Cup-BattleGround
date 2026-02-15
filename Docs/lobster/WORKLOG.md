@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 11:05 EST — Phase 2 — ActivityFeed + SettlementView: prefer token-driven classes over inline styles
+- `ActivityFeed`: migrated most `style={{ ... }}` UI tokens (ink/surface/rule/masters colors, borders) onto Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`) for theme safety + fewer inline overrides.
+- `CompactActivity`: same token-class sweep for border + typography so compact list rows match the premium token system.
+- `SettlementView`: removed the remaining inline `style={{ color: ... }}` for net balance amounts; now uses conditional token classes (`text-[var(--success)]` / `text-[var(--error)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f104929`)
+
 ### 10:55 EST — Phase 2 — PointsCalculator: add explicit empty-state instead of silent gap
 - `PointsCalculator`: when no matches exist yet, render a compact `EmptyStatePremium` (trophy illustration) so captains understand what to do next.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
