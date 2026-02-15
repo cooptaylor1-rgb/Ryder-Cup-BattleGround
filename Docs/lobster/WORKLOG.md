@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 11:20 EST — Phase 2 — Lineup Builder + Captain Manage + Social Photos: tokenize remaining white overlays
+- `/lineup/builder`: selected-player indicator now uses inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`) instead of `text-white`.
+- `/captain/manage`: destructive Delete session button now uses `text-[var(--canvas)]` on the error surface instead of `text-white`.
+- `/social/photos`: migrated photo grid hover overlay + full-screen viewer chrome off raw `black/white` and inline `rgba(0,0,0,0.95)` and onto token-driven classes (`bg-[color:var(--ink)]/95`, `text-[var(--canvas)]`, `border-[color:var(--canvas)]/…`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ce7f3b9`)
+
 ### 11:05 EST — Phase 2 — ActivityFeed + SettlementView: prefer token-driven classes over inline styles
 - `ActivityFeed`: migrated most `style={{ ... }}` UI tokens (ink/surface/rule/masters colors, borders) onto Tailwind arbitrary-value classes (e.g. `bg-[var(--surface)]`, `border-[var(--rule)]`, `text-[var(--ink-secondary)]`) for theme safety + fewer inline overrides.
 - `CompactActivity`: same token-class sweep for border + typography so compact list rows match the premium token system.
