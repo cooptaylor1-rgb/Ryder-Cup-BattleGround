@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 06:48 EST — Phase 2 — SwipeScorePanel + HoleMiniMap: remove remaining `text-white` + tokenized confirmation overlay
+- `SwipeScorePanel`: zone indicators, orb labels, confirm badge icons, and completion check now use canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white`.
+- Confirmation backdrop now uses tokenized ink tint (`bg-[color:var(--ink)]/50`) instead of `bg-black/50`.
+- `HoleMiniMap`: quick stats counters now use `text-[var(--canvas)]` instead of `text-white` on team/neutral pills.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a83569b`)
+
 ### 06:18 EST — Phase 2 — Schedule/Score routes + QuickScoreFAB: tokenize remaining `text-white` inverse states
 - `/schedule`: selected tab buttons + Day badge now use `text-[var(--canvas)]` on the Masters surface.
 - `/score`: “Your Match” badge now uses `text-[var(--canvas)]` on the Masters surface.
