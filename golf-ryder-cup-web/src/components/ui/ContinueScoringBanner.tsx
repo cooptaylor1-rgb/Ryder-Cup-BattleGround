@@ -71,7 +71,7 @@ export function ContinueScoringBanner({
       <div className="relative flex items-center gap-3">
         {/* Play icon */}
         <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--masters)]">
-          <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+          <Play className="w-5 h-5 text-[var(--canvas)] ml-0.5" fill="currentColor" />
         </div>
 
         {/* Text */}

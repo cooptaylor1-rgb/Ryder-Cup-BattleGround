@@ -69,7 +69,7 @@ export function StandingsCard({
             <div
                 className="p-4 relative"
                 style={{
-                    background: 'linear-gradient(135deg, var(--masters) 0%, #004D35 100%)',
+                    background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
                 }}
             >
                 {/* Subtle pattern overlay */}
@@ -79,14 +79,14 @@ export function StandingsCard({
                         backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23fff' fill-opacity='0.3'/%3E%3C/svg%3E")`,
                     }}
                 />
-                <div className="relative flex items-center justify-between text-white">
+                <div className="relative flex items-center justify-between text-[var(--canvas)]">
                     <div>
-                        <h2 className="type-title text-white/90">Tournament Standings</h2>
-                        <p className="type-caption text-white/70 mt-0.5">
+                        <h2 className="type-title text-[var(--canvas)]">Tournament Standings</h2>
+                        <p className="type-caption text-[color:var(--canvas)]/75 mt-0.5">
                             {matchesCompleted} of {totalMatches} matches complete
                         </p>
                     </div>
-                    <Trophy className="w-6 h-6 text-white/80" />
+                    <Trophy className="w-6 h-6 text-[color:var(--canvas)]/80" />
                 </div>
             </div>
 

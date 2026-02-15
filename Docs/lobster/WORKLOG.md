@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 01:25 EST — Phase 2 — Tokenize remaining Masters inverse text (StandingsCard + ContinueScoringBanner + Profile error)
+- `/profile` error boundary: primary “Try Again” CTA now uses `text-[var(--canvas)]` (no hard-coded `text-white`), and the error icon shell uses the premium error tint token (`bg-[color:var(--error)]/10`).
+- `StandingsCard`: Masters header gradient now uses `var(--masters-deep)` (no hard-coded hex), and header copy/icon now uses canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) for theme-safe inverse typography.
+- `ContinueScoringBanner`: play icon now uses canvas tokens and `fill="currentColor"` instead of hard-coded white.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 00:58 EST — Phase 2 — Scoring widgets: tokenize inverse CTA/badge text
 - `StrokeAlertBanner`: header overlay now uses `text-[var(--canvas)]` on the Masters surface.
 - `PressTracker`: active/ON badges and team press buttons now use `text-[var(--canvas)]` on Masters/team surfaces.
