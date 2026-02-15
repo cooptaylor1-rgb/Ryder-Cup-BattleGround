@@ -156,11 +156,7 @@ export default function SettlementView() {
     <div>
       {/* Total pot header */}
       <div
-        className="card text-center p-[var(--space-5)] mb-[var(--space-4)]"
-        style={{
-          background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-hover) 100%)',
-          color: 'white',
-        }}
+        className="card text-center p-[var(--space-5)] mb-[var(--space-4)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)] text-[var(--canvas)]"
       >
         <Calculator size={28} className="mx-auto mb-[var(--space-2)] opacity-90" />
         <p className="type-overline opacity-80 mb-[var(--space-1)]">Total Action</p>

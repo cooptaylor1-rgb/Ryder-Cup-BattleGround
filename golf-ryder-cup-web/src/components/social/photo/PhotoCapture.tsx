@@ -571,9 +571,9 @@ export function PhotoCapture({
         whileTap={{ scale: 0.95 }}
         className={cn(
           'relative flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all',
+          'bg-[var(--masters)] text-[var(--canvas)]',
           className
         )}
-        style={{ background: 'var(--masters)', color: 'white' }}
       >
         <Camera size={18} />
         Capture Moment
