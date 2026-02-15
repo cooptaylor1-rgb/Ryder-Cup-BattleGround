@@ -18,6 +18,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`2899f55`)
 
+### 09:25 EST — Phase 2 — Error routes + skip link: tokenize inverse Masters CTAs
+- `/score/[matchId]/error`, `/lineup/error`, `/social/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
+- Error icon shells standardized to token-driven `bg-[color:var(--error)]/10`.
+- Match scoring error “offline saved” banner now uses `var(--success)` tokens instead of inline green hex/rgba.
+- Root layout skip link now uses `focus:text-[var(--canvas)]` (no hard-coded white).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`c96bf92`)
+
 ### 08:30 EST — Phase 2 — FormError: avoid silent null return fallback
 - `FormError`: replaced the final `return null` fallback with an SR-only, stable `role="alert"` live region so callers never experience a silent gap if control flow changes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
