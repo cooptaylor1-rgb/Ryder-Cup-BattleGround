@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 05:24 EST — Phase 2 — First launch walkthrough + Home setup steps + ActivityFeed rarity card: remove remaining `text-white` + `bg-black` overlays
+- `FirstLaunchWalkthrough`: modal backdrop now uses tokenized ink tint (`bg-[color:var(--ink)]/60`); Masters icon shell + Next CTA now use `text-[var(--canvas)]` instead of `text-white`.
+- `HomePage` setup step: completed step badge now uses `text-[var(--canvas)]` on the Masters surface.
+- `ActivityFeed`: achievement rarity gradient card now uses canvas token typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/70`) instead of `text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`92fac97`)
+
 ### 05:08 EST — Phase 2 — Live notifications + WeatherBanner + Captain Invites: remove remaining `text-white` overlays
 - `NotificationSystem`: urgent/high/medium tone classes now use inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/...`) instead of `text-white` so alert toasts stay theme-safe.
 - `WeatherBanner`: Resume Play CTA now uses `text-[var(--canvas)]` on the Masters surface.
