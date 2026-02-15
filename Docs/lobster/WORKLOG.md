@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 05:08 EST — Phase 2 — Live notifications + WeatherBanner + Captain Invites: remove remaining `text-white` overlays
+- `NotificationSystem`: urgent/high/medium tone classes now use inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/...`) instead of `text-white` so alert toasts stay theme-safe.
+- `WeatherBanner`: Resume Play CTA now uses `text-[var(--canvas)]` on the Masters surface.
+- `/captain/invites`: Share Invite CTA now uses `text-[var(--canvas)]` on the Masters surface.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`1ea951d`)
+
 ### 04:36 EST — Phase 2 — Trip setup widgets: tokenize inverse Masters selections + icon chips
 - `SessionBuilder`: selected day and points-per-match pills now use `text-[var(--canvas)]` instead of `text-white` on Masters surfaces.
 - `SideBetPresets`: bet-type icon chips and selected amount pills now use canvas tokens; tip icon migrated off `text-yellow-500` to `text-[var(--warning)]`.
