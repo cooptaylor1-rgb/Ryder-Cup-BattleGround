@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 04:36 EST — Phase 2 — Trip setup widgets: tokenize inverse Masters selections + icon chips
+- `SessionBuilder`: selected day and points-per-match pills now use `text-[var(--canvas)]` instead of `text-white` on Masters surfaces.
+- `SideBetPresets`: bet-type icon chips and selected amount pills now use canvas tokens; tip icon migrated off `text-yellow-500` to `text-[var(--warning)]`.
+- `PlayerCountSelector`: team icon dots now use `text-[var(--canvas)]` instead of `text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0c72344`)
+
 ### 02:25 EST — Phase 2 — Error routes + CourseSearch + ScoreCelebration: tokenize remaining Masters inverse copy
 - `/achievements/error`, `/courses/error`, `/join/error`, `/score/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]` (no hard-coded `text-white`) on the Masters button.
 - `CourseSearch`: Masters search/import buttons now use `text-[var(--canvas)]` instead of `text-white`.
