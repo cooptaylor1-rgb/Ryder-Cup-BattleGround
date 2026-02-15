@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 18:25 EST — Phase 2 — TripMemories + PhotoCapture: remove remaining `text-white`/`bg-black` overlays
+- `TripMemories`: winner badge + MVP hero + Share CTA now use token-driven inverse canvas typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white` so team/gold/Masters surfaces remain theme-safe.
+- `PhotoCapture`: camera/preview shells migrated off `bg-black`/`bg-black/*` and `text-white` to token-driven ink/canvas overlays (`bg-[color:var(--ink)]/…`, `text-[var(--canvas)]`) including moment-type/tag pills and the success save CTA.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8eccd06`)
+
 ### 18:05 EST — Phase 2 — Lineup builder: remove remaining `text-white` in captain lineup UI
 - `LineupCanvas` + `MatchSlot` + `PlayerCard`: replaced remaining inverse typography (`text-white` + inline `'white'`) with token-driven `text-[var(--canvas)]` / `color: var(--canvas)` so team-colored chips, previews, and destructive controls stay theme-safe.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
