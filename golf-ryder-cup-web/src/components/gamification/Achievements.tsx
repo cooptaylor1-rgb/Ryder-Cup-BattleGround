@@ -319,7 +319,7 @@ export function Achievements({
                         className={cn(
                             'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                             activeCategory === cat.value
-                                ? 'bg-secondary-gold text-white'
+                                ? 'bg-secondary-gold text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                         )}
                     >
@@ -405,7 +405,7 @@ function AchievementCard({ definition, achievement, earned }: AchievementCardPro
                     )}
                 >
                     {earned ? (
-                        <AchievementIcon icon={definition.icon} className="w-6 h-6 text-white" />
+                        <AchievementIcon icon={definition.icon} className="w-6 h-6 text-[var(--canvas)]" />
                     ) : (
                         <Lock className="w-5 h-5 text-[var(--ink-tertiary)]" />
                     )}
@@ -479,7 +479,7 @@ export function AchievementBadge({ definition, earned, size = 'md' }: Achievemen
             title={earned ? definition.name : 'Locked'}
         >
             {earned ? (
-                <AchievementIcon icon={definition.icon} className={cn(iconSizes[size], 'text-white')} />
+                <AchievementIcon icon={definition.icon} className={cn(iconSizes[size], 'text-[var(--canvas)]')} />
             ) : (
                 <Lock className={cn(iconSizes[size], 'text-[var(--ink-tertiary)]')} />
             )}

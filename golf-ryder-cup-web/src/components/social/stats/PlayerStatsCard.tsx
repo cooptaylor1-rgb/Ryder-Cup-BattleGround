@@ -91,7 +91,7 @@ export function PlayerStatsCard({
         <div className="flex items-start gap-4">
           {/* Avatar with rank */}
           <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--masters)] flex items-center justify-center text-white text-xl font-bold">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--masters)] flex items-center justify-center text-[var(--canvas)] text-xl font-bold">
               {player.firstName.charAt(0)}{player.lastName.charAt(0)}
             </div>
             {rank && rank <= 3 && (

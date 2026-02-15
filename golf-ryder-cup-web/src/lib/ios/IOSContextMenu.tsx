@@ -122,8 +122,8 @@ function MenuItem({ item, onSelect, isHovered, onHover }: MenuItemProps) {
         className={cn(
           'w-full flex items-center gap-3 px-4 py-3',
           'text-left transition-colors duration-100',
-          isHovered && !item.disabled && 'bg-gray-100',
-          item.destructive && 'text-red-600',
+          isHovered && !item.disabled && 'bg-[color:var(--surface-secondary)]',
+          item.destructive && 'text-[color:var(--error)]',
           item.disabled && 'opacity-40 cursor-not-allowed',
           !item.disabled && !item.destructive && 'text-ink'
         )}
@@ -133,7 +133,7 @@ function MenuItem({ item, onSelect, isHovered, onHover }: MenuItemProps) {
           <span
             className={cn(
               'w-5 h-5 shrink-0',
-              item.destructive ? 'text-red-600' : 'text-ink-secondary'
+              item.destructive ? 'text-[color:var(--error)]' : 'text-ink-secondary'
             )}
           >
             {item.icon}
@@ -396,7 +396,7 @@ export function IOSContextMenu({
         <>
           {/* Backdrop with blur */}
           <div
-            className="fixed inset-0 z-9998 bg-black/20 backdrop-blur-sm animate-in fade-in duration-150"
+            className="fixed inset-0 z-9998 bg-[color:var(--ink)]/20 backdrop-blur-sm animate-in fade-in duration-150"
             onClick={closeMenu}
           />
 

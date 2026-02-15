@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 11:35 EST — Phase 2 — iOS sheets + Achievements + PlayerStatsCard: remove remaining black/white palette utilities
+- `IOSBottomSheet`, `IOSActionSheet`: backdrop overlay now uses token-driven ink tint (`bg-[color:var(--ink)]/40`) instead of hard-coded `bg-black/40` so modal backdrops match theme.
+- `IOSContextMenu`: backdrop moved off `bg-black/20` and hovered menu items now use premium surfaces (`bg-[color:var(--surface-secondary)]`) with destructive actions mapped to the premium error token (`text-[color:var(--error)]`).
+- `Achievements`: active category filter + earned achievement icons now use `text-[var(--canvas)]` instead of `text-white` for theme-safe inverse typography.
+- `PlayerStatsCard`: avatar initials now use `text-[var(--canvas)]` instead of `text-white` on the accent gradient.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`TBD`)
+
 ### 11:20 EST — Phase 2 — Lineup Builder + Captain Manage + Social Photos: tokenize remaining white overlays
 - `/lineup/builder`: selected-player indicator now uses inverse canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`) instead of `text-white`.
 - `/captain/manage`: destructive Delete session button now uses `text-[var(--canvas)]` on the error surface instead of `text-white`.

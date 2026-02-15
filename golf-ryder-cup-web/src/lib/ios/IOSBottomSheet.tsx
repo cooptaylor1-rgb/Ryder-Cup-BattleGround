@@ -349,7 +349,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
         {/* Backdrop */}
         <div
           className={cn(
-            'fixed inset-0 z-9998 bg-black/40 backdrop-blur-sm',
+            'fixed inset-0 z-9998 bg-[color:var(--ink)]/40 backdrop-blur-sm',
             'transition-opacity duration-200',
             isAnimating && !isOpen ? 'opacity-0' : 'opacity-100'
           )}
