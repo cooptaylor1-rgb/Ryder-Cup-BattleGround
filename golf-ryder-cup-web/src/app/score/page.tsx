@@ -336,7 +336,7 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
         >
             {/* Your Match Badge (P0-3) */}
             {isUserMatch && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--masters)] px-3 py-[3px] text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-white">
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--masters)] px-3 py-[3px] text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-[var(--canvas)]">
                     Your Match
                 </div>
             )}

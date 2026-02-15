@@ -362,7 +362,7 @@ export default function SchedulePage() {
             className={cn(
               'flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2',
               selectedTab === 'my'
-                ? 'bg-[var(--masters)] text-white'
+                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                 : 'bg-[var(--surface)] border border-[var(--rule)]'
             )}
           >
@@ -377,7 +377,7 @@ export default function SchedulePage() {
             className={cn(
               'flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2',
               selectedTab === 'all'
-                ? 'bg-[var(--masters)] text-white'
+                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                 : 'bg-[var(--surface)] border border-[var(--rule)]'
             )}
           >
@@ -437,7 +437,7 @@ export default function SchedulePage() {
             <div key={day.date} className="mb-8">
               {/* Day Header */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-12 w-12 flex-col items-center justify-center rounded-xl bg-[var(--masters)] text-white">
+                <div className="flex h-12 w-12 flex-col items-center justify-center rounded-xl bg-[var(--masters)] text-[var(--canvas)]">
                   <span className="text-xs font-medium opacity-80">Day</span>
                   <span className="text-lg font-bold leading-none">{day.dayNumber}</span>
                 </div>

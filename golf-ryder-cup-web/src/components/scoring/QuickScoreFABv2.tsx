@@ -239,7 +239,7 @@ export function QuickScoreFABv2({
           >
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between bg-[var(--masters)]">
-              <div className="text-white">
+              <div className="text-[var(--canvas)]">
                 <p className="text-xs opacity-80">Hole {activeMatchData.currentHole}</p>
                 <p className="font-semibold">{activeMatchData.displayScore}</p>
               </div>
@@ -251,7 +251,7 @@ export function QuickScoreFABv2({
                 className="p-1 rounded-full hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                 aria-label="Close quick score menu"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-[var(--canvas)]" />
               </button>
             </div>
 
@@ -269,7 +269,7 @@ export function QuickScoreFABv2({
                   >
                     <Mic
                       className={`w-8 h-8 ${
-                        isListening ? 'text-white' : 'text-[var(--ink-secondary)]'
+                        isListening ? 'text-[var(--canvas)]' : 'text-[var(--ink-secondary)]'
                       }`}
                     />
                   </motion.div>
@@ -297,7 +297,7 @@ export function QuickScoreFABv2({
                   aria-label={`Score hole: ${activeMatchData.teamAName} wins`}
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--team-usa)]">
-                    <Trophy className="w-5 h-5 text-white" />
+                    <Trophy className="w-5 h-5 text-[var(--canvas)]" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold text-[var(--team-usa)]">
@@ -314,7 +314,7 @@ export function QuickScoreFABv2({
                   aria-label="Score hole: Halved"
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[color:var(--ink-tertiary)]/40">
-                    <Minus className="w-5 h-5 text-white" />
+                    <Minus className="w-5 h-5 text-[var(--canvas)]" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold text-[var(--ink-primary)]">Hole Halved</p>
@@ -329,7 +329,7 @@ export function QuickScoreFABv2({
                   aria-label={`Score hole: ${activeMatchData.teamBName} wins`}
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--team-europe)]">
-                    <Trophy className="w-5 h-5 text-white" />
+                    <Trophy className="w-5 h-5 text-[var(--canvas)]" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold text-[var(--team-europe)]">
@@ -379,7 +379,7 @@ export function QuickScoreFABv2({
         whileTap={{ scale: 0.95 }}
         className={`
           relative flex items-center gap-3 px-4 py-3 rounded-2xl
-          transition-all duration-200 text-white
+          transition-all duration-200 text-[var(--canvas)]
           ${
             isExpanded
               ? 'rounded-full w-12 h-12 p-0 justify-center bg-[var(--ink-secondary)] shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
