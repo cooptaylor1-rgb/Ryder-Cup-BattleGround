@@ -179,7 +179,7 @@ export function FormatSelector({
             {showPopular && !searchQuery && (
                 <div>
                     <h4 className="text-sm font-medium text-[var(--ink-tertiary)] mb-2 flex items-center gap-2">
-                        <Star className="w-4 h-4 text-yellow-500" />
+                        <Star className="w-4 h-4 text-[var(--warning)]" />
                         Popular Formats
                     </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -195,7 +195,7 @@ export function FormatSelector({
                                 )}
                             >
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center text-white', format.color)}>
+                                    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center text-[var(--canvas)]', format.color)}>
                                         {getFormatIcon(format.icon)}
                                     </div>
                                     <span className="font-medium text-sm">{format.shortName}</span>
@@ -211,7 +211,7 @@ export function FormatSelector({
             {selectedFormat && (
                 <div className="p-4 rounded-xl bg-[var(--masters-subtle)] border border-[color:var(--masters)]/20">
                     <div className="flex items-start gap-3">
-                        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0', selectedFormat.color)}>
+                        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-[var(--canvas)] shrink-0', selectedFormat.color)}>
                             {getFormatIcon(selectedFormat.icon)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -340,7 +340,7 @@ function FormatCard({ format, isSelected, onSelect, onShowDetails, getIcon }: Fo
             onClick={onSelect}
         >
             <div className="flex items-start gap-3">
-                <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0', format.color)}>
+                <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center text-[var(--canvas)] shrink-0', format.color)}>
                     {getIcon(format.icon)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -389,7 +389,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[color:var(--ink)]/50"
             onClick={onClose}
         >
             <motion.div
@@ -402,18 +402,18 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                 {/* Header */}
                 <div className={cn('p-6', format.color)}>
                     <div className="flex items-center gap-4">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[color:var(--canvas-raised)]/20 text-white backdrop-blur-sm">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] backdrop-blur-sm">
                             {getIcon(format.icon)}
                         </div>
-                        <div className="flex-1 text-white">
+                        <div className="flex-1 text-[var(--canvas)]">
                             <h2 className="text-xl font-bold">{format.name}</h2>
-                            <p className="text-white/80 text-sm">{format.category.replace(/([A-Z])/g, ' $1').trim()}</p>
+                            <p className="text-[color:var(--canvas)]/80 text-sm">{format.category.replace(/([A-Z])/g, ' $1').trim()}</p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-white backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
+                            className="rounded-full bg-[color:var(--canvas-raised)]/15 p-2 text-[var(--canvas)] backdrop-blur-sm transition-colors hover:bg-[color:var(--canvas-raised)]/25"
                         >
-                            <X className="w-5 h-5 text-white" />
+                            <X className="w-5 h-5 text-[var(--canvas)]" />
                         </button>
                     </div>
                 </div>
@@ -485,7 +485,7 @@ function FormatDetailsModal({ format, onClose, onSelect, isSelected, getIcon }: 
                             'w-full py-3 rounded-xl font-semibold transition-all',
                             isSelected
                                 ? 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
-                                : 'bg-[var(--masters)] text-white hover:bg-[color:var(--masters)]/90'
+                                : 'bg-[var(--masters)] text-[var(--canvas)] hover:bg-[color:var(--masters)]/90'
                         )}
                     >
                         {isSelected ? 'Currently Selected' : 'Select This Format'}

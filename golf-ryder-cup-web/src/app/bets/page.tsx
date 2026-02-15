@@ -279,7 +279,7 @@ export default function BetsPage() {
 
       <main className="container-editorial py-[var(--space-4)]">
         {/* Pot Summary */}
-        <div className="card text-center bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)] text-white p-[var(--space-6)] mb-[var(--space-6)]">
+        <div className="card text-center bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-hover)_100%)] text-[var(--canvas)] p-[var(--space-6)] mb-[var(--space-6)]">
           <DollarSign size={32} className="mx-auto mb-[var(--space-2)] opacity-90" />
           <h2 className="score-large mb-[var(--space-1)]">${totalPot}</h2>
           <p className="type-body opacity-80">Total in Play</p>
