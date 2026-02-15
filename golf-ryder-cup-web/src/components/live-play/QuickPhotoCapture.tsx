@@ -312,7 +312,7 @@ export function QuickPhotoCapture({
                 {/* Hole badge */}
                 {!compact && (
                     <span
-                        className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-[var(--masters)] text-white"
+                        className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-[var(--masters)] text-[var(--canvas)]"
                     >
                         {holeNumber}
                     </span>
@@ -326,7 +326,7 @@ export function QuickPhotoCapture({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex flex-col bg-black"
+                        className="fixed inset-0 z-[100] flex flex-col bg-[color:var(--ink)]"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-4">
@@ -335,10 +335,10 @@ export function QuickPhotoCapture({
                                 className="p-2 rounded-full bg-[color:var(--canvas-raised)]/10 hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                                 aria-label="Close camera"
                             >
-                                <X className="w-6 h-6 text-white" />
+                                <X className="w-6 h-6 text-[var(--canvas)]" />
                             </button>
 
-                            <div className="flex items-center gap-2 text-white">
+                            <div className="flex items-center gap-2 text-[var(--canvas)]">
                                 <Hash className="w-4 h-4 opacity-60" />
                                 <span className="text-sm font-medium">Hole {holeNumber}</span>
                             </div>
@@ -348,7 +348,7 @@ export function QuickPhotoCapture({
                                 className="p-2 rounded-full bg-[color:var(--canvas-raised)]/10 hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                                 aria-label="Switch camera"
                             >
-                                <RotateCcw className="w-5 h-5 text-white" />
+                                <RotateCcw className="w-5 h-5 text-[var(--canvas)]" />
                             </button>
                         </div>
 
@@ -357,8 +357,8 @@ export function QuickPhotoCapture({
                             {error ? (
                                 <div className="absolute inset-0 flex items-center justify-center p-8">
                                     <div className="text-center">
-                                        <Camera className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                                        <p className="text-white/80 text-sm">{error}</p>
+                                        <Camera className="w-16 h-16 text-[color:var(--canvas)]/30 mx-auto mb-4" />
+                                        <p className="text-[color:var(--canvas)]/80 text-sm">{error}</p>
                                     </div>
                                 </div>
                             ) : capturedImage ? (
@@ -401,7 +401,7 @@ export function QuickPhotoCapture({
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="p-4 bg-black/80 backdrop-blur-md"
+                                className="p-4 bg-[color:var(--ink)]/80 backdrop-blur-md"
                             >
                                 <div className="flex items-center gap-2">
                                     <input
@@ -411,7 +411,7 @@ export function QuickPhotoCapture({
                                         placeholder="Add a caption..."
                                         className={cn(
                                             'flex-1 px-4 py-3 rounded-xl',
-                                            'bg-[color:var(--canvas-raised)]/10 text-white placeholder-white/40',
+                                            'bg-[color:var(--canvas-raised)]/10 text-[var(--canvas)] placeholder-[color:var(--canvas)]/40',
                                             'border border-[color:var(--canvas-raised)]/10',
                                             'focus:outline-none focus:ring-2 focus:ring-[color:var(--canvas-raised)]/20',
                                         )}
@@ -421,8 +421,8 @@ export function QuickPhotoCapture({
                                         className={cn(
                                             'p-3 rounded-xl transition-colors',
                                             isListening
-                                                ? 'bg-red-500 text-white'
-                                                : 'bg-[color:var(--canvas-raised)]/10 text-white hover:bg-[color:var(--canvas-raised)]/20',
+                                                ? 'bg-[var(--error)] text-[var(--canvas)]'
+                                                : 'bg-[color:var(--canvas-raised)]/10 text-[var(--canvas)] hover:bg-[color:var(--canvas-raised)]/20',
                                         )}
                                         aria-label={isListening ? 'Stop listening' : 'Voice input'}
                                     >
@@ -435,7 +435,7 @@ export function QuickPhotoCapture({
                                 </div>
 
                                 {/* Metadata tags */}
-                                <div className="flex items-center gap-3 mt-3 text-white/60 text-xs">
+                                <div className="flex items-center gap-3 mt-3 text-[color:var(--canvas)]/60 text-xs">
                                     <span className="flex items-center gap-1">
                                         <MapPin className="w-3 h-3" />
                                         Hole {holeNumber}
@@ -460,7 +460,7 @@ export function QuickPhotoCapture({
                                         onClick={handleRetake}
                                         className={cn(
                                             'flex flex-col items-center gap-2 p-4 rounded-2xl',
-                                            'bg-[color:var(--canvas-raised)]/10 text-white',
+                                            'bg-[color:var(--canvas-raised)]/10 text-[var(--canvas)]',
                                             'hover:bg-[color:var(--canvas-raised)]/20 transition-colors',
                                         )}
                                     >
@@ -473,7 +473,7 @@ export function QuickPhotoCapture({
                                         whileTap={{ scale: 0.95 }}
                                         className={cn(
                                             'flex flex-col items-center gap-2 px-8 py-4 rounded-2xl',
-                                            'text-white font-medium',
+                                            'text-[var(--canvas)] font-medium',
                                             'bg-[var(--masters)]',
                                         )}
                                     >

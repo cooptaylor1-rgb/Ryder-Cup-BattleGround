@@ -436,12 +436,12 @@ export function VoiceScoring({
                 )}
               />
               <div className="relative p-4 rounded-full bg-[color:var(--canvas-raised)]/10">
-                <Mic className="w-8 h-8 text-white" />
+                <Mic className="w-8 h-8 text-[var(--canvas)]" />
               </div>
             </motion.div>
 
             <div className="text-center">
-              <p className="text-white font-medium">Listening...</p>
+              <p className="text-[var(--canvas)] font-medium">Listening...</p>
               <p className="text-[color:var(--canvas-raised)]/60 text-xs mt-1">Hole {currentHole}</p>
             </div>
 
@@ -532,7 +532,7 @@ export function VoiceScoring({
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-full',
-                  'text-white font-medium text-sm',
+                  'text-[var(--canvas)] font-medium text-sm',
                   'transition-colors'
                 )}
                 style={{ background: getWinnerColor(recognizedScore.winner) }}
@@ -563,7 +563,7 @@ export function VoiceScoring({
             aria-live="assertive"
             aria-atomic="true"
           >
-            <AlertCircle className="w-8 h-8 text-white" />
+            <AlertCircle className="w-8 h-8 text-[var(--canvas)]" />
             <p className="text-[color:var(--canvas-raised)]/90 text-sm text-center">{errorMessage}</p>
             <div className="flex gap-2">
               <button
@@ -574,7 +574,7 @@ export function VoiceScoring({
               </button>
               <button
                 onClick={startListening}
-                className="px-4 py-2 rounded-full bg-[color:var(--canvas-raised)]/20 text-white text-sm hover:bg-[color:var(--canvas-raised)]/30 transition-colors"
+                className="px-4 py-2 rounded-full bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] text-sm hover:bg-[color:var(--canvas-raised)]/30 transition-colors"
               >
                 Try Again
               </button>
