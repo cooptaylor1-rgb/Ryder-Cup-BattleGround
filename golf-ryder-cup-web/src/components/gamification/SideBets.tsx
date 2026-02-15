@@ -451,7 +451,7 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                             className={cn(
                                 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
                                 betType === option.type
-                                    ? 'bg-secondary-gold text-white shadow-sm'
+                                    ? 'bg-secondary-gold text-[var(--canvas)] shadow-sm'
                                     : 'bg-[color:var(--surface)]/60 text-[var(--ink-primary)] hover:bg-[var(--surface)]'
                             )}
                         >
@@ -520,7 +520,7 @@ function AddBetForm({ tripId, matchId, players: _players, onSubmit, onCancel }: 
                 </button>
                 <button
                     type="submit"
-                    className="flex-1 py-2 rounded-lg bg-secondary-gold text-white font-medium transition-colors hover:bg-secondary-gold/90"
+                    className="flex-1 py-2 rounded-lg bg-secondary-gold text-[var(--canvas)] font-medium transition-colors hover:bg-secondary-gold/90"
                 >
                     Add Bet
                 </button>

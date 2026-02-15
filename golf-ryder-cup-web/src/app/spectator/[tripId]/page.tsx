@@ -189,10 +189,10 @@ export default function SpectatorPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#004225] border-t-transparent mx-auto mb-4" />
-                    <p className="text-[#A0A0A0]">Loading scoreboard...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--masters)] border-t-transparent mx-auto mb-4" />
+                    <p className="text-[var(--ink-secondary)]">Loading scoreboard...</p>
                 </div>
             </div>
         );
@@ -200,13 +200,13 @@ export default function SpectatorPage() {
 
     if (!spectatorView) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+            <div className="min-h-screen bg-[var(--surface)] flex items-center justify-center p-4">
                 <div className="text-center">
-                    <Trophy className="w-16 h-16 text-[#505050] mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-white mb-2">
+                    <Trophy className="w-16 h-16 text-[var(--ink-tertiary)] mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-[var(--ink-primary)] mb-2">
                         {loadError ? 'Unable to Load Scoreboard' : 'Tournament Not Found'}
                     </h2>
-                    <p className="text-[#A0A0A0] mb-6">
+                    <p className="text-[var(--ink-secondary)] mb-6">
                         {loadError
                             ? loadError
                             : "This tournament doesn\'t exist or has been removed."}
@@ -215,14 +215,14 @@ export default function SpectatorPage() {
                         {loadError && (
                             <button
                                 onClick={loadData}
-                                className="px-6 py-3 bg-[#004225] text-white rounded-xl"
+                                className="px-6 py-3 bg-[var(--masters)] text-[var(--canvas)] rounded-xl"
                             >
                                 Retry
                             </button>
                         )}
                         <button
                             onClick={() => router.push('/')}
-                            className="px-6 py-3 bg-[#1F1F1F] text-white rounded-xl border border-[#2A2A2A]"
+                            className="px-6 py-3 bg-[var(--surface-raised)] text-[var(--ink-primary)] rounded-xl border border-[var(--rule)]"
                         >
                             Go Home
                         </button>
@@ -233,21 +233,21 @@ export default function SpectatorPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A]">
+        <div className="min-h-screen bg-[var(--surface)]">
             {/* Header Bar */}
-            <header className="sticky top-0 z-50 bg-[#141414] border-b border-[#2A2A2A]">
+            <header className="sticky top-0 z-50 bg-[var(--surface-raised)] border-b border-[var(--rule)]">
                 <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => router.back()}
-                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
+                            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-[#A0A0A0]" />
+                            <ArrowLeft className="w-5 h-5 text-[var(--ink-secondary)]" />
                         </button>
                         <div>
-                            <h1 className="text-lg font-bold text-white">{spectatorView.tripName}</h1>
-                            <p className="text-xs text-[#707070] flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full ${spectatorView.currentStatus === 'live' ? 'bg-green-500 animate-pulse' : spectatorView.currentStatus === 'completed' ? 'bg-[#707070]' : 'bg-[#FFD54F]'}`} />
+                            <h1 className="text-lg font-bold text-[var(--ink-primary)]">{spectatorView.tripName}</h1>
+                            <p className="text-xs text-[var(--ink-tertiary)] flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${spectatorView.currentStatus === 'live' ? 'bg-[var(--success)] animate-pulse' : spectatorView.currentStatus === 'completed' ? 'bg-[var(--ink-tertiary)]' : 'bg-[var(--warning)]'}`} />
                                 {spectatorView.currentStatus === 'live' ? 'LIVE' : spectatorView.currentStatus === 'completed' ? 'FINAL' : 'UPCOMING'}
                             </p>
                         </div>
@@ -262,35 +262,35 @@ export default function SpectatorPage() {
                         )}
 
                         {/* Connection Status */}
-                        <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${isOnline ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${isOnline ? 'text-[var(--success)]' : 'text-[var(--error)]'}`}>
                             {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
                         </div>
 
                         {/* Share Button */}
                         <button
                             onClick={handleShare}
-                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
+                            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
                             title="Share scoreboard"
                         >
-                            <Share2 className="w-4 h-4 text-[#A0A0A0]" />
+                            <Share2 className="w-4 h-4 text-[var(--ink-secondary)]" />
                         </button>
 
                         {/* Refresh Button */}
                         <button
                             onClick={loadData}
-                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
+                            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
                             title="Refresh"
                         >
-                            <RefreshCw className="w-4 h-4 text-[#A0A0A0]" />
+                            <RefreshCw className="w-4 h-4 text-[var(--ink-secondary)]" />
                         </button>
 
                         {/* Fullscreen Button */}
                         <button
                             onClick={toggleFullscreen}
-                            className="p-2 hover:bg-[#282828] rounded-lg transition-colors"
+                            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
                             title="Fullscreen"
                         >
-                            <Tv className="w-4 h-4 text-[#A0A0A0]" />
+                            <Tv className="w-4 h-4 text-[var(--ink-secondary)]" />
                         </button>
                     </div>
                 </div>
@@ -332,8 +332,8 @@ export default function SpectatorPage() {
                 {spectatorView.liveMatches.length > 0 && (
                     <section className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <h2 className="text-lg font-semibold text-white">Live Matches</h2>
+                            <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+                            <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Live Matches</h2>
                         </div>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {spectatorView.liveMatches.map((match) => (
@@ -347,8 +347,8 @@ export default function SpectatorPage() {
                 {spectatorView.recentResults.length > 0 && (
                     <section>
                         <div className="flex items-center gap-2 mb-4">
-                            <Flag className="w-4 h-4 text-[#A0A0A0]" />
-                            <h2 className="text-lg font-semibold text-white">Recent Results</h2>
+                            <Flag className="w-4 h-4 text-[var(--ink-secondary)]" />
+                            <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Recent Results</h2>
                         </div>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {spectatorView.recentResults.map((match) => (
@@ -361,16 +361,16 @@ export default function SpectatorPage() {
                 {/* No Matches Yet */}
                 {spectatorView.liveMatches.length === 0 && spectatorView.recentResults.length === 0 && (
                     <div className="text-center py-16">
-                        <Clock className="w-16 h-16 text-[#505050] mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-white mb-2">Tournament Hasn&apos;t Started</h3>
-                        <p className="text-[#A0A0A0]">Check back when matches begin!</p>
+                        <Clock className="w-16 h-16 text-[var(--ink-tertiary)] mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-[var(--ink-primary)] mb-2">Tournament Hasn&apos;t Started</h3>
+                        <p className="text-[var(--ink-secondary)]">Check back when matches begin!</p>
                     </div>
                 )}
             </main>
 
             {/* Footer with Last Updated */}
-            <footer className="fixed bottom-0 left-0 right-0 bg-[#141414] border-t border-[#2A2A2A] py-2 px-4">
-                <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-[#707070]">
+            <footer className="fixed bottom-0 left-0 right-0 bg-[var(--surface-raised)] border-t border-[var(--rule)] py-2 px-4">
+                <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-[var(--ink-tertiary)]">
                     <span>Spectator Mode • Read Only</span>
                     <span>
                         Last updated: {lastUpdated?.toLocaleTimeString() || 'Never'}
@@ -404,12 +404,12 @@ function TeamScoreCard({
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-2xl bg-[#141414] border border-[#2A2A2A] p-6 lg:p-8"
+            className="relative overflow-hidden rounded-2xl bg-[var(--surface-raised)] border border-[var(--rule)] p-6 lg:p-8"
         >
             {/* Leading indicator */}
             {isLeading && (
                 <div className="absolute top-4 right-4">
-                    <Trophy className="w-6 h-6 text-[#FFD54F]" />
+                    <Trophy className="w-6 h-6 text-[var(--warning)]" />
                 </div>
             )}
 
@@ -422,12 +422,12 @@ function TeamScoreCard({
             </h3>
 
             {/* Score */}
-            <div className="text-5xl lg:text-7xl font-bold text-white mb-4">
+            <div className="text-5xl lg:text-7xl font-bold text-[var(--ink-primary)] mb-4">
                 {points}
             </div>
 
             {/* Progress bar */}
-            <div className="h-2 bg-[#2A2A2A] rounded-full overflow-hidden">
+            <div className="h-2 bg-[var(--rule)] rounded-full overflow-hidden">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}
@@ -436,7 +436,7 @@ function TeamScoreCard({
                     style={{ backgroundColor: color }}
                 />
             </div>
-            <p className="text-xs text-[#707070] mt-2">
+            <p className="text-xs text-[var(--ink-tertiary)] mt-2">
                 {pointsToWin - points > 0 ? `${pointsToWin - points} to win` : 'Winner!'}
             </p>
         </motion.div>
@@ -464,9 +464,9 @@ function MagicNumberBanner({
         >
             <div className="flex items-center justify-center gap-3">
                 <Target className="w-5 h-5" style={{ color: teamColor }} />
-                <span className="text-white">
+                <span className="text-[var(--ink-primary)]">
                     <strong style={{ color: teamColor }}>{team}</strong> needs{' '}
-                    <strong className="text-[#FFD54F]">{points}</strong> points to clinch
+                    <strong className="text-[var(--warning)]">{points}</strong> points to clinch
                 </span>
             </div>
         </motion.div>
@@ -488,24 +488,24 @@ function LiveMatchCard({ match }: { match: SpectatorMatch }) {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-[#141414] rounded-xl border border-[#2A2A2A] p-4 relative overflow-hidden"
+            className="bg-[var(--surface-raised)] rounded-xl border border-[var(--rule)] p-4 relative overflow-hidden"
         >
             {/* Live badge */}
-            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 bg-[color:var(--success)]/15 text-[var(--success)] rounded text-xs font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
                 LIVE
             </div>
 
             {/* Match info */}
             <div className="mb-3">
-                <p className="text-xs text-[#707070] mb-1">{match.sessionName}</p>
-                <p className="text-sm text-[#A0A0A0]">Thru {match.thruHole}</p>
+                <p className="text-xs text-[var(--ink-tertiary)] mb-1">{match.sessionName}</p>
+                <p className="text-sm text-[var(--ink-secondary)]">Thru {match.thruHole}</p>
             </div>
 
             {/* Players */}
             <div className="space-y-2 mb-3">
                 <div className="flex items-center justify-between">
-                    <span className="text-white font-medium truncate flex-1">{match.teamAPlayers}</span>
+                    <span className="text-[var(--ink-primary)] font-medium truncate flex-1">{match.teamAPlayers}</span>
                     <span
                         className="w-8 text-center font-mono"
                         style={{ color: scoreNum > 0 ? colors.team.usa.light : colors.text.secondary }}
@@ -514,7 +514,7 @@ function LiveMatchCard({ match }: { match: SpectatorMatch }) {
                     </span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-white font-medium truncate flex-1">{match.teamBPlayers}</span>
+                    <span className="text-[var(--ink-primary)] font-medium truncate flex-1">{match.teamBPlayers}</span>
                     <span
                         className="w-8 text-center font-mono"
                         style={{ color: scoreNum < 0 ? colors.team.europe.light : colors.text.secondary }}
@@ -525,7 +525,7 @@ function LiveMatchCard({ match }: { match: SpectatorMatch }) {
             </div>
 
             {/* Match status */}
-            <div className="text-center pt-2 border-t border-[#2A2A2A]">
+            <div className="text-center pt-2 border-t border-[var(--rule)]">
                 <span className="text-lg font-bold" style={{ color: scoreColor }}>
                     {match.currentScore}
                 </span>
@@ -545,35 +545,35 @@ function CompletedMatchCard({ match }: { match: SpectatorMatch }) {
     const isTeamBWin = match.status === 'completed' && scoreNum < 0;
 
     return (
-        <div className="bg-[#141414] rounded-xl border border-[#2A2A2A] p-4 opacity-80">
+        <div className="bg-[var(--surface-raised)] rounded-xl border border-[var(--rule)] p-4 opacity-80">
             {/* Match info */}
             <div className="mb-3">
-                <p className="text-xs text-[#707070] mb-1">{match.sessionName}</p>
+                <p className="text-xs text-[var(--ink-tertiary)] mb-1">{match.sessionName}</p>
             </div>
 
             {/* Players */}
             <div className="space-y-2 mb-3">
                 <div className="flex items-center justify-between">
                     <span
-                        className={`font-medium truncate flex-1 ${isTeamAWin ? 'text-white' : 'text-[#707070]'}`}
+                        className={`font-medium truncate flex-1 ${isTeamAWin ? 'text-[var(--ink-primary)]' : 'text-[var(--ink-tertiary)]'}`}
                     >
                         {match.teamAPlayers}
                     </span>
-                    {isTeamAWin && <Trophy className="w-4 h-4 text-[#FFD54F]" />}
+                    {isTeamAWin && <Trophy className="w-4 h-4 text-[var(--warning)]" />}
                 </div>
                 <div className="flex items-center justify-between">
                     <span
-                        className={`font-medium truncate flex-1 ${isTeamBWin ? 'text-white' : 'text-[#707070]'}`}
+                        className={`font-medium truncate flex-1 ${isTeamBWin ? 'text-[var(--ink-primary)]' : 'text-[var(--ink-tertiary)]'}`}
                     >
                         {match.teamBPlayers}
                     </span>
-                    {isTeamBWin && <Trophy className="w-4 h-4 text-[#FFD54F]" />}
+                    {isTeamBWin && <Trophy className="w-4 h-4 text-[var(--warning)]" />}
                 </div>
             </div>
 
             {/* Result */}
-            <div className="text-center pt-2 border-t border-[#2A2A2A]">
-                <span className="text-sm font-medium text-[#A0A0A0]">
+            <div className="text-center pt-2 border-t border-[var(--rule)]">
+                <span className="text-sm font-medium text-[var(--ink-secondary)]">
                     {isHalved ? 'Halved' : result || 'Final'}
                 </span>
             </div>
