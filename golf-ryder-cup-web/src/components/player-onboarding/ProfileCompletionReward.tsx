@@ -309,7 +309,7 @@ export function ProfileCompletionReward({
                                 className="card overflow-hidden mb-4"
                             >
                                 <div
-                                    className="p-4 text-white"
+                                    className="p-4 text-[var(--canvas)]"
                                     style={{ backgroundColor: data.teamColor || 'var(--ink-primary)' }}
                                 >
                                     <div className="flex items-center gap-3">
@@ -383,7 +383,7 @@ export function ProfileCompletionReward({
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.6 }}
                                 onClick={onContinue}
-                                className="w-full py-4 px-6 rounded-2xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-masters/30 hover:bg-masters/90 active:scale-[0.98] transition-all"
+                                className="w-full py-4 px-6 rounded-2xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-masters/30 hover:bg-masters/90 active:scale-[0.98] transition-all"
                             >
                                 Let&apos;s Go!
                                 <ChevronRight className="w-5 h-5" />

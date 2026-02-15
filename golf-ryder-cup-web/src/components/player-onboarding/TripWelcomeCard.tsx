@@ -101,7 +101,7 @@ export function TripWelcomeCard({
             className={cn('space-y-6', className)}
         >
             {/* Hero Card */}
-            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-masters via-masters/90 to-emerald-600 text-white shadow-xl">
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-masters via-masters/90 to-emerald-600 text-[var(--canvas)] shadow-xl">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                     <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -212,13 +212,13 @@ export function TripWelcomeCard({
                             />
                         ) : (
                             <div className="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                                <span className="text-xl font-bold text-white">
+                                <span className="text-xl font-bold text-[var(--canvas)]">
                                     {trip.captainName.split(' ').filter(n => n).map(n => n[0]).join('') || '?'}
                                 </span>
                             </div>
                         )}
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center shadow-sm">
-                            <Crown className="w-3.5 h-3.5 text-white" />
+                            <Crown className="w-3.5 h-3.5 text-[var(--canvas)]" />
                         </div>
                     </div>
                     <div className="flex-1">
@@ -257,7 +257,7 @@ export function TripWelcomeCard({
                             className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
                             style={{ backgroundColor: trip.teamAColor }}
                         >
-                            <Flag className="w-6 h-6 text-white" />
+                            <Flag className="w-6 h-6 text-[var(--canvas)]" />
                         </div>
                         <div className="font-semibold text-[var(--ink-primary)]">
                             {trip.teamAName}
@@ -280,7 +280,7 @@ export function TripWelcomeCard({
                             className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
                             style={{ backgroundColor: trip.teamBColor }}
                         >
-                            <Flag className="w-6 h-6 text-white" />
+                            <Flag className="w-6 h-6 text-[var(--canvas)]" />
                         </div>
                         <div className="font-semibold text-[var(--ink-primary)]">
                             {trip.teamBName}
@@ -300,7 +300,7 @@ export function TripWelcomeCard({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.8 }}
                 onClick={onContinue}
-                className="w-full py-4 px-6 rounded-2xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-masters/30 hover:bg-masters/90 active:scale-[0.98] transition-all"
+                className="w-full py-4 px-6 rounded-2xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-masters/30 hover:bg-masters/90 active:scale-[0.98] transition-all"
             >
                 Set Up My Profile
                 <ChevronRight className="w-5 h-5" />

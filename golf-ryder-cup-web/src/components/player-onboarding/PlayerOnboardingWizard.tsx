@@ -360,7 +360,7 @@ export function PlayerOnboardingWizard({
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                                            <Zap className="w-7 h-7 text-white" />
+                                            <Zap className="w-7 h-7 text-[var(--canvas)]" />
                                         </div>
                                         <div className="flex-1">
                                             <div className="font-semibold text-[var(--ink-primary)] text-lg">
@@ -381,7 +381,7 @@ export function PlayerOnboardingWizard({
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-linear-to-br from-masters to-emerald-600 flex items-center justify-center">
-                                            <Sparkles className="w-7 h-7 text-white" />
+                                            <Sparkles className="w-7 h-7 text-[var(--canvas)]" />
                                         </div>
                                         <div className="flex-1">
                                             <div className="font-semibold text-[var(--ink-primary)] text-lg">
@@ -513,7 +513,7 @@ export function PlayerOnboardingWizard({
                                 className={cn(
                                     'w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2',
                                     data.firstName && data.lastName && data.email
-                                        ? 'bg-masters text-white'
+                                        ? 'bg-masters text-[var(--canvas)]'
                                         : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)] cursor-not-allowed'
                                 )}
                             >
@@ -570,7 +570,7 @@ export function PlayerOnboardingWizard({
                                 className={cn(
                                     'w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2',
                                     data.handicapIndex !== null
-                                        ? 'bg-masters text-white'
+                                        ? 'bg-masters text-[var(--canvas)]'
                                         : 'bg-[color:var(--ink-tertiary)]/10 text-[var(--ink-tertiary)] cursor-not-allowed'
                                 )}
                             >
@@ -597,7 +597,7 @@ export function PlayerOnboardingWizard({
 
                             <button
                                 onClick={nextStep}
-                                className="w-full mt-8 py-4 rounded-xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2"
+                                className="w-full mt-8 py-4 rounded-xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2"
                             >
                                 Continue
                                 <ChevronRight className="w-5 h-5" />
@@ -624,7 +624,7 @@ export function PlayerOnboardingWizard({
 
                             <button
                                 onClick={nextStep}
-                                className="w-full mt-6 py-4 rounded-xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2"
+                                className="w-full mt-6 py-4 rounded-xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2"
                             >
                                 Continue
                                 <ChevronRight className="w-5 h-5" />
@@ -689,7 +689,7 @@ export function PlayerOnboardingWizard({
 
                             <button
                                 onClick={nextStep}
-                                className="w-full mt-6 py-4 rounded-xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2"
+                                className="w-full mt-6 py-4 rounded-xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2"
                             >
                                 Continue
                                 <ChevronRight className="w-5 h-5" />
@@ -716,7 +716,7 @@ export function PlayerOnboardingWizard({
 
                             <button
                                 onClick={nextStep}
-                                className="w-full mt-6 py-4 rounded-xl bg-masters text-white font-semibold text-lg flex items-center justify-center gap-2"
+                                className="w-full mt-6 py-4 rounded-xl bg-masters text-[var(--canvas)] font-semibold text-lg flex items-center justify-center gap-2"
                             >
                                 Complete Setup
                                 <Check className="w-5 h-5" />
