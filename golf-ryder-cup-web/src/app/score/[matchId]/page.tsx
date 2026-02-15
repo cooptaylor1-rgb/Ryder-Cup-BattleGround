@@ -142,11 +142,18 @@ export default function EnhancedMatchScoringPage() {
     [dbSideBets]
   );
   const { currentUser, isAuthenticated } = useAuthStore();
-  const { showToast, scoringPreferences, getScoringModeForFormat, setScoringModeForFormat } =
-    useUIStore();
+  const {
+    showToast,
+    scoringPreferences,
+    getScoringModeForFormat,
+    setScoringModeForFormat,
+    isCaptainMode,
+  } = useUIStore();
   const haptic = useHaptic();
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  const [isEditingScores, setIsEditingScores] = useState(false);
 
   const confettiPieces = useMemo(() => {
     const rand = mulberry32(hashStringToSeed(matchId));
@@ -885,10 +892,6 @@ export default function EnhancedMatchScoringPage() {
   }
 
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
-
-  // Captain score correction state
-  const { isCaptainMode } = useUIStore();
-  const [isEditingScores, setIsEditingScores] = useState(false);
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
