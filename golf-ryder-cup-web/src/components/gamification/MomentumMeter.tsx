@@ -137,8 +137,8 @@ export function MomentumMeter({
                                 result === 'halved' && 'bg-[color:var(--ink-tertiary)]/15'
                             )}
                         >
-                            {result === 'teamA' && <TrendingUp className="w-4 h-4 text-white" />}
-                            {result === 'teamB' && <TrendingDown className="w-4 h-4 text-white" />}
+                            {result === 'teamA' && <TrendingUp className="w-4 h-4 text-[var(--canvas)]" />}
+                            {result === 'teamB' && <TrendingDown className="w-4 h-4 text-[var(--canvas)]" />}
                             {result === 'halved' && <Minus className="w-4 h-4 text-[var(--ink-tertiary)]" />}
                         </div>
                     ))}

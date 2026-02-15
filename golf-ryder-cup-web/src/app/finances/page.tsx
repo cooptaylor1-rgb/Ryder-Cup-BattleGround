@@ -210,7 +210,7 @@ export default function FinancesPage() {
         <PageHeader
           title="Finances"
           subtitle="No active trip"
-          icon={<DollarSign size={16} className="text-white" />}
+          icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
           onBack={() => router.back()}
         />
         <main className="container-editorial py-12">
@@ -248,7 +248,7 @@ export default function FinancesPage() {
       <PageHeader
         title="Finances"
         subtitle={currentTrip.name}
-        icon={<DollarSign size={16} className="text-white" />}
+        icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
         onBack={() => router.back()}
       />
 
@@ -370,7 +370,7 @@ function TabButton({
       onClick={onClick}
       className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
         active
-          ? 'border-0 bg-[var(--masters)] text-white font-semibold'
+          ? 'border-0 bg-[var(--masters)] text-[var(--canvas)] font-semibold'
           : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
       }`}
       aria-label={`${label} tab`}
@@ -605,7 +605,7 @@ function PlayerRow({
                     <button
                       onClick={() => onMarkPaid(item.id)}
                       disabled={isSubmitting}
-                      className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] bg-[var(--masters)] text-white border-none cursor-pointer text-xs font-semibold disabled:opacity-50"
+                      className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] bg-[var(--masters)] text-[var(--canvas)] border-none cursor-pointer text-xs font-semibold disabled:opacity-50"
                     >
                       Mark Paid
                     </button>
@@ -677,7 +677,7 @@ function AddChargeTab({
                   onClick={() => setChargeCategory(key)}
                   className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'text-white'
+                      ? 'text-[var(--canvas)]'
                       : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
                   }`}
                   style={isActive ? { background: config.color } : undefined}
@@ -733,7 +733,7 @@ function AddChargeTab({
               onClick={() => setApplyToAll(true)}
               className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-4)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
                 applyToAll
-                  ? 'bg-[var(--masters)] text-white'
+                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
               }`}
             >
@@ -744,7 +744,7 @@ function AddChargeTab({
               onClick={() => setApplyToAll(false)}
               className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-4)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
                 !applyToAll
-                  ? 'bg-[var(--masters)] text-white'
+                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
               }`}
             >
@@ -763,7 +763,7 @@ function AddChargeTab({
                     onClick={() => togglePlayerSelection(player.id)}
                     className={`press-scale py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
                       isSelected
-                        ? 'bg-[var(--masters)] text-white'
+                        ? 'bg-[var(--masters)] text-[var(--canvas)]'
                         : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
                     }`}
                   >
