@@ -11,6 +11,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `HammerGameCard`: USA/EUR team chips and Masters header titles now use `text-[var(--canvas)]` instead of `text-white`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+### 21:45 EST — Phase 2 — Tokenize remaining Masters header/CTA text (TripArchiveCard + GHINLookup)
+- `TripArchiveCard`: Masters-gradient header title/subtitle and “View Full Trip” button now use `text-[var(--canvas)]` tokens instead of `text-white`.
+- `GHINLookup`: lookup button and success/header icons now use `text-[var(--canvas)]` on Masters/success surfaces for theme-safe legibility.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f064d78`)
+
 ### 21:32 EST — Phase 2 — Error routes: remove `text-white` + hard-coded error tints
 - `/error`, `/stats/error`, `/spectator/error`: primary "Try Again" CTA now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button.
 - Tokenized error icon shells off inline `rgba(239,68,68,0.1)` / `#DC2626` and onto `bg-[color:var(--error)]/10` + `text-[var(--error)]` for theme-safe consistency.
