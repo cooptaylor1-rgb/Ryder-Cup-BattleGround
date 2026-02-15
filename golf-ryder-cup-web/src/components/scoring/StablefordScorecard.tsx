@@ -126,7 +126,7 @@ export function StablefordScorecard({
                                         className={cn(
                                             'py-3 rounded-xl font-semibold transition-all',
                                             isSelected
-                                                ? 'bg-[var(--masters)] text-white'
+                                                ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                 : 'bg-[var(--surface)] text-[var(--ink)] border border-[var(--rule)]'
                                         )}
                                     >
@@ -223,21 +223,24 @@ function HoleCell({
             <span
                 className={cn(
                     'text-[10px] font-medium',
-                    isActive ? 'text-white' : 'text-[var(--ink-tertiary)]'
+                    isActive ? 'text-[var(--canvas)]' : 'text-[var(--ink-tertiary)]'
                 )}
             >
                 {hole.holeNumber}
             </span>
             {hasScore ? (
                 <span
-                    className={cn('text-xs font-bold', isActive ? 'text-white' : undefined)}
+                    className={cn('text-xs font-bold', isActive ? 'text-[var(--canvas)]' : undefined)}
                     style={isActive ? undefined : { color: pointsDisplay.color }}
                 >
                     {hole.stablefordPoints}
                 </span>
             ) : (
                 <span
-                    className={cn('text-xs', isActive ? 'text-white/50' : 'text-[var(--ink-tertiary)]')}
+                    className={cn(
+                        'text-xs',
+                        isActive ? 'text-[color:var(--canvas)]/50' : 'text-[var(--ink-tertiary)]'
+                    )}
                 >
                     -
                 </span>

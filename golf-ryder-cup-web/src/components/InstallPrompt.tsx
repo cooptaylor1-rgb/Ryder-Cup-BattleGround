@@ -195,7 +195,7 @@ export function InstallBanner({ position = 'bottom', className = '' }: InstallBa
             <div className="px-4 pb-4">
               <button
                 onClick={handleInstall}
-                className="w-full py-3 bg-[color:var(--masters)] text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
+                className="w-full py-3 bg-[color:var(--masters)] text-[var(--canvas)] font-semibold rounded-xl active:scale-[0.98] transition-transform"
               >
                 Install App
               </button>
@@ -241,7 +241,7 @@ export function InstallButton({ className = '', variant = 'primary' }: InstallBu
   }
 
   const variantClasses = {
-    primary: 'bg-[color:var(--masters)] text-white hover:bg-[color:var(--masters-deep)]',
+    primary: 'bg-[color:var(--masters)] text-[var(--canvas)] hover:bg-[color:var(--masters-deep)]',
     secondary: 'bg-[color:var(--masters)]/10 text-[color:var(--masters)] hover:bg-[color:var(--masters)]/15',
     ghost: 'text-[color:var(--masters)] hover:bg-[color:var(--masters)]/10',
   };
@@ -290,7 +290,7 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-[color:var(--ink)]/50 z-50"
           />
 
           {/* Modal */}
@@ -317,7 +317,7 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
               {/* Steps */}
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-[var(--canvas)] rounded-lg flex items-center justify-center font-bold text-sm">
                     1
                   </div>
                   <div className="flex-1 pt-1">
@@ -344,7 +344,7 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-[var(--canvas)] rounded-lg flex items-center justify-center font-bold text-sm">
                     2
                   </div>
                   <div className="flex-1 pt-1">
@@ -366,7 +366,7 @@ export function IOSInstallInstructions({ isOpen, onClose }: IOSInstallInstructio
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                  <div className="flex-shrink-0 w-8 h-8 bg-[color:var(--info)] text-[var(--canvas)] rounded-lg flex items-center justify-center font-bold text-sm">
                     3
                   </div>
                   <div className="flex-1 pt-1">
@@ -490,7 +490,7 @@ export function SmartInstallPrompt() {
             <div className="px-4 pb-4">
               <button
                 onClick={() => setShowIOSInstructions(true)}
-                className="w-full py-3 bg-[color:var(--masters)] text-white font-semibold rounded-xl active:scale-[0.98] transition-transform"
+                className="w-full py-3 bg-[color:var(--masters)] text-[var(--canvas)] font-semibold rounded-xl active:scale-[0.98] transition-transform"
               >
                 Show Me How
               </button>
