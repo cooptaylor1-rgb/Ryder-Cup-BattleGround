@@ -11,6 +11,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `SettlementView`: mark unused `txId` argument as `_txId` (future hook for persistence).
 - `LiveJumbotron`: rename unused `sessionId` prop to `_sessionId` in destructure.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ff205b2`)
 
 ### 15:03 EST — Phase 2 — Settings + Captain carts: tokenize remaining inverse `text-white`
 - `/settings`: Current Theme palette icon now uses `text-[var(--canvas)]` on the Masters surface.
