@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 07:15 EST — Phase 2 — Finances + MomentumMeter: tokenize remaining `text-white` on Masters surfaces
+- `/finances`: PageHeader icon, active tab/button states, and captain-only actions now use `text-[var(--canvas)]` instead of `text-white` on the Masters surface.
+- `MomentumMeter`: last-5-hole trend icons now use `text-[var(--canvas)]` on team-colored pills instead of `text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`509d92b`)
+
 ### 06:48 EST — Phase 2 — SwipeScorePanel + HoleMiniMap: remove remaining `text-white` + tokenized confirmation overlay
 - `SwipeScorePanel`: zone indicators, orb labels, confirm badge icons, and completion check now use canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white`.
 - Confirmation backdrop now uses tokenized ink tint (`bg-[color:var(--ink)]/50`) instead of `bg-black/50`.
