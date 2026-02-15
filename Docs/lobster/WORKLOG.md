@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 08:55 EST — Phase 2 — SettlementView + PhotoCapture: tokenize inverse Masters surfaces
+- `SettlementView`: removed inline `color: 'white'` + gradient style wrapper; header now uses token-driven Tailwind (`bg-[linear-gradient(...)]` + `text-[var(--canvas)]`) for theme-safe inverse text.
+- `PhotoCapture`: capture button now uses `bg-[var(--masters)] text-[var(--canvas)]` instead of inline `color: 'white'`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a6acd71`)
+
 ### 08:30 EST — Phase 2 — FormError: avoid silent null return fallback
 - `FormError`: replaced the final `return null` fallback with an SR-only, stable `role="alert"` live region so callers never experience a silent gap if control flow changes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
