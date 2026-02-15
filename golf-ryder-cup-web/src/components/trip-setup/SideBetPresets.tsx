@@ -227,7 +227,7 @@ export function SideBetPresets({
                             <div className="flex items-start gap-3">
                                 {/* Icon */}
                                 <div className={cn(
-                                    'w-10 h-10 rounded-xl flex items-center justify-center text-white',
+                                    'w-10 h-10 rounded-xl flex items-center justify-center text-[var(--canvas)]',
                                     BET_TYPE_COLORS[bet.type]
                                 )}>
                                     {BET_TYPE_ICONS[bet.type]}
@@ -256,7 +256,7 @@ export function SideBetPresets({
                                                     className={cn(
                                                         'px-2 py-1 rounded text-xs font-medium transition-all',
                                                         bet.amount === amount
-                                                            ? 'bg-[var(--masters)] text-white'
+                                                            ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                             : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-secondary)]'
                                                     )}
                                                 >
@@ -315,7 +315,7 @@ export function SideBetPresets({
             {/* Tip */}
             {sideBets.length > 0 && (
                 <div className="p-3 rounded-xl bg-[var(--surface-secondary)] flex gap-3">
-                    <Lightbulb className="w-5 h-5 text-yellow-500 shrink-0" />
+                    <Lightbulb className="w-5 h-5 text-[var(--warning)] shrink-0" />
                     <p className="text-sm text-[var(--ink-secondary)]">
                         Side bets are optional and can be adjusted before each round.
                         Players can opt in or out individually.
@@ -373,7 +373,7 @@ export function SideBetPresets({
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div className={cn(
-                                                            'w-10 h-10 rounded-xl flex items-center justify-center text-white',
+                                                            'w-10 h-10 rounded-xl flex items-center justify-center text-[var(--canvas)]',
                                                             BET_TYPE_COLORS[preset.type]
                                                         )}>
                                                             {BET_TYPE_ICONS[preset.type]}
@@ -428,7 +428,7 @@ export function SideBetPresets({
                                                     className={cn(
                                                         'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                                                         customBet.amount === amount
-                                                            ? 'bg-[var(--masters)] text-white'
+                                                            ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                             : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-tertiary)] text-[var(--ink-secondary)]'
                                                     )}
                                                 >

@@ -162,7 +162,7 @@ export function PlayerCountSelector({
                                 transition={{ delay: i * 0.02 }}
                                 className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center"
                             >
-                                <Users className="w-3 h-3 text-white" />
+                                <Users className="w-3 h-3 text-[var(--canvas)]" />
                             </motion.div>
                         ))}
                     </div>
@@ -180,7 +180,7 @@ export function PlayerCountSelector({
                                 transition={{ delay: i * 0.02 }}
                                 className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center"
                             >
-                                <Users className="w-3 h-3 text-white" />
+                                <Users className="w-3 h-3 text-[var(--canvas)]" />
                             </motion.div>
                         ))}
                     </div>

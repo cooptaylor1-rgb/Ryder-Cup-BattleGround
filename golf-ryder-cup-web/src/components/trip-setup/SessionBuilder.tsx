@@ -294,7 +294,7 @@ export function SessionBuilder({
                             className={cn(
                                 'w-9 h-9 rounded-lg text-sm font-medium transition-all',
                                 totalDays === day
-                                    ? 'bg-[var(--masters)] text-white'
+                                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                     : 'bg-[var(--surface-raised)] hover:bg-[color:var(--masters)]/10'
                             )}
                         >
@@ -431,7 +431,7 @@ function SessionCard({
                     <GripVertical className="w-4 h-4" />
                 </div>
 
-                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center text-white', typeConfig.color)}>
+                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center text-[var(--canvas)]', typeConfig.color)}>
                     {typeConfig.icon}
                 </div>
 
@@ -537,7 +537,7 @@ function SessionCard({
                                                 )}
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-white', config.color)}>
+                                                    <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-[var(--canvas)]', config.color)}>
                                                         {config.icon}
                                                     </div>
                                                     <div>
@@ -583,7 +583,7 @@ function SessionCard({
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 session.pointsPerMatch === pts
-                                                    ? 'bg-[var(--masters)] text-white'
+                                                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                     : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface)]'
                                             )}
                                         >
