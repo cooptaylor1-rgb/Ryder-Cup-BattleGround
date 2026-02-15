@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 13:35 EST — Phase 2 — Error routes: tokenize remaining `text-white` on Masters CTAs
+- `/recap/error`, `/settings/error`, `/captain/error`, `/admin/error`: “Try Again” CTA text now uses `text-[var(--canvas)]` instead of `text-white` on the Masters button for theme-safe inverse typography.
+- `/recap/error`: error icon shell migrated from `bg-[rgba(239,68,68,0.1)]` to tokenized `bg-[color:var(--error)]/10`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 12:25 EST — Phase 2 — Spectator mode + SideBets: replace hard-coded dark palette + `text-white`
 - `/spectator/[tripId]`: migrated dark TV scoreboard UI off hard-coded hex (`#0A0A0A`, `#141414`, etc.) and onto premium surface/ink/rule + status tokens (`bg-[var(--surface)]`, `bg-[var(--surface-raised)]`, `text-[var(--ink-*)]`, `border-[var(--rule)]`, `var(--success)`/`var(--warning)`/`var(--error)`).
 - `SideBets`: gold selections + “Add Bet” CTA now use canvas tokens (`text-[var(--canvas)]`) instead of `text-white` for theme-safe inverse typography.

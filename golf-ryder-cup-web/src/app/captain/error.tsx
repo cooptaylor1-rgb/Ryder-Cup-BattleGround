@@ -51,7 +51,7 @@ export default function CaptainError({ error, reset }: ErrorPageProps) {
       <div className="flex gap-4">
         <button
           onClick={reset}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90 bg-[var(--masters)] text-white"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-opacity hover:opacity-90 bg-[var(--masters)] text-[var(--canvas)]"
         >
           <RefreshCw size={18} />
           Try Again
