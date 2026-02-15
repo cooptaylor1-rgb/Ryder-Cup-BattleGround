@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 23:05 EST — Phase 2 — ErrorBoundary: tokenize inverse CTA + error surfaces
+- `ErrorBoundary` / `MiniErrorFallback` / `ErrorCard`: replaced `text-white` with `text-[var(--canvas)]` on Masters CTAs so inverse copy remains theme-safe.
+- Migrated remaining inline error tint palettes (`rgba(220,38,38,…)`, `#DC2626`) to the premium error token system (`bg-[color:var(--error)]/…`, `border-[color:var(--error)]/…`, `text-[var(--error)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4ed9b18`)
+
 ### 22:40 EST — Phase 2 — Remove remaining `text-white` on Masters surfaces (TripStats awards + TripStats error + iOS install prompt)
 - `/trip-stats/awards`: winner chip now uses `text-[var(--canvas)]` on the Masters surface.
 - `/trip-stats/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]`.
