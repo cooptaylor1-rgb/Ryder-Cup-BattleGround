@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 
 // ============================================
 // TYPES
@@ -399,6 +400,23 @@ export function PointsCalculator({
     // Separate completed and ongoing matches
     const completedMatches = matches.filter(m => m.isCompleted || m.lockedOutcome);
     const ongoingMatches = matches.filter(m => !m.isCompleted && !m.lockedOutcome);
+
+    if (matches.length === 0) {
+        return (
+            <div className={cn('space-y-4', className)}>
+                <div className="flex items-center gap-2">
+                    <Calculator size={20} className="text-[var(--masters)]" />
+                    <h2 className="text-xl font-bold text-[var(--ink)]">Points Calculator</h2>
+                </div>
+                <EmptyStatePremium
+                    illustration="trophy"
+                    title="No matches yet"
+                    description="Once you create matches, you’ll be able to project points and explore win scenarios."
+                    variant="compact"
+                />
+            </div>
+        );
+    }
 
     return (
         <div className={cn('space-y-4', className)}>

@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 10:55 EST — Phase 2 — PointsCalculator: add explicit empty-state instead of silent gap
+- `PointsCalculator`: when no matches exist yet, render a compact `EmptyStatePremium` (trophy illustration) so captains understand what to do next.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 08:55 EST — Phase 2 — SettlementView + PhotoCapture: tokenize inverse Masters surfaces
 - `SettlementView`: removed inline `color: 'white'` + gradient style wrapper; header now uses token-driven Tailwind (`bg-[linear-gradient(...)]` + `text-[var(--canvas)]`) for theme-safe inverse text.
 - `PhotoCapture`: capture button now uses `bg-[var(--masters)] text-[var(--canvas)]` instead of inline `color: 'white'`.
