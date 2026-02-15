@@ -369,12 +369,10 @@ export function LineupBuilder({
           <button
             onClick={handlePublish}
             disabled={!validation.isValid}
-            className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-            style={{
-              background: validation.isValid ? 'var(--masters)' : 'var(--ink-tertiary)',
-              color: 'white',
-              opacity: validation.isValid ? 1 : 0.5,
-            }}
+            className={cn(
+              'flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors text-[var(--canvas)]',
+              validation.isValid ? 'bg-[var(--masters)]' : 'bg-[var(--ink-tertiary)] opacity-50'
+            )}
           >
             <CheckCircle2 className="w-5 h-5" />
             Publish Lineup
@@ -912,18 +910,12 @@ function ValidationPanel({ errors, warnings }: ValidationPanelProps) {
   return (
     <div className="space-y-2">
       {errors.length > 0 && (
-        <div
-          className="p-3 rounded-xl"
-          style={{
-            background: 'var(--error)',
-            color: 'white',
-          }}
-        >
+        <div className="p-3 rounded-xl bg-[var(--error)] text-[var(--canvas)]">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-sm">Cannot publish</p>
-              <ul className="mt-1 text-xs text-white/80 space-y-0.5">
+              <ul className="mt-1 text-xs text-[color:var(--canvas)]/80 space-y-0.5">
                 {errors.slice(0, 3).map((error, i) => (
                   <li key={i}>• {error}</li>
                 ))}
@@ -934,18 +926,12 @@ function ValidationPanel({ errors, warnings }: ValidationPanelProps) {
       )}
 
       {warnings.length > 0 && (
-        <div
-          className="p-3 rounded-xl"
-          style={{
-            background: 'var(--warning)',
-            color: 'white',
-          }}
-        >
+        <div className="p-3 rounded-xl bg-[var(--warning)] text-[var(--canvas)]">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-sm">Warnings</p>
-              <ul className="mt-1 text-xs text-white/80 space-y-0.5">
+              <ul className="mt-1 text-xs text-[color:var(--canvas)]/80 space-y-0.5">
                 {warnings.map((warning, i) => (
                   <li key={i}>• {warning}</li>
                 ))}

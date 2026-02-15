@@ -586,7 +586,7 @@ export function OverrideModal({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 z-50"
+                        className="fixed inset-0 bg-[color:var(--ink)]/50 z-50"
                         onClick={handleClose}
                     />
 
@@ -741,12 +741,9 @@ export function OverrideModal({
                                     </div>
 
                                     {/* Warning */}
-                                    <div
-                                        className="p-3 rounded-lg flex items-start gap-2"
-                                        style={{ background: 'rgba(245, 158, 11, 0.1)' }}
-                                    >
-                                        <AlertTriangle size={16} className="shrink-0 mt-0.5" style={{ color: '#F59E0B' }} />
-                                        <p className="text-xs" style={{ color: '#F59E0B' }}>
+                                    <div className="p-3 rounded-lg flex items-start gap-2 bg-[color:var(--warning)]/10 text-[var(--warning)]">
+                                        <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                                        <p className="text-xs">
                                             This override will be recorded in the audit log with your name ({currentUserName})
                                             and reason. This action may affect match outcomes.
                                         </p>
@@ -773,8 +770,7 @@ export function OverrideModal({
                             {step === 'edit' && (
                                 <button
                                     onClick={handleContinue}
-                                    className="px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2"
-                                    style={{ background: 'var(--masters)' }}
+                                    className="px-6 py-2 rounded-lg text-sm font-semibold text-[var(--canvas)] bg-[var(--masters)] flex items-center gap-2"
                                 >
                                     Continue
                                     <ChevronRight size={14} />
@@ -786,10 +782,10 @@ export function OverrideModal({
                                     onClick={handleSubmit}
                                     disabled={!canSubmit || isSubmitting}
                                     className={cn(
-                                        'px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2',
+                                        'px-6 py-2 rounded-lg text-sm font-semibold text-[var(--canvas)] flex items-center gap-2',
                                         (!canSubmit || isSubmitting) && 'opacity-50 cursor-not-allowed'
                                     )}
-                                    style={{ background: '#F59E0B' }}
+                                    style={{ background: 'var(--warning)' }}
                                 >
                                     {isSubmitting ? (
                                         <>

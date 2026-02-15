@@ -156,11 +156,11 @@ export function TeamColorPicker({
                     >
                         <div className="flex -space-x-1">
                             <div
-                                className="w-4 h-4 rounded-full border-2 border-white"
+                                className="w-4 h-4 rounded-full border-2 border-[color:var(--canvas)]/70"
                                 style={{ backgroundColor: preset.teamA.primary }}
                             />
                             <div
-                                className="w-4 h-4 rounded-full border-2 border-white"
+                                className="w-4 h-4 rounded-full border-2 border-[color:var(--canvas)]/70"
                                 style={{ backgroundColor: preset.teamB.primary }}
                             />
                         </div>
@@ -230,7 +230,7 @@ export function TeamColorPicker({
                                             animate={{ scale: 1 }}
                                             className="absolute inset-0 flex items-center justify-center"
                                         >
-                                            <Check className="w-4 h-4 text-white drop-shadow-md" />
+                                            <Check className="w-4 h-4 text-[var(--canvas)] drop-shadow-md" />
                                         </motion.div>
                                     )}
                                 </button>
@@ -242,7 +242,7 @@ export function TeamColorPicker({
                 {/* Current color preview */}
                 <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--rule)]">
                     <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-[var(--canvas)]"
                         style={{ backgroundColor: colors[activeTeam].primary }}
                     >
                         <Flag className="w-6 h-6" />
@@ -278,7 +278,7 @@ export function TeamColorPicker({
                                 style={{ backgroundColor: colors.teamA.secondary }}
                             >
                                 <div
-                                    className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-white"
+                                    className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-[var(--canvas)]"
                                     style={{ backgroundColor: colors.teamA.primary }}
                                 >
                                     <Users className="w-5 h-5" />
@@ -306,7 +306,7 @@ export function TeamColorPicker({
                                 style={{ backgroundColor: colors.teamB.secondary }}
                             >
                                 <div
-                                    className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-white"
+                                    className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-[var(--canvas)]"
                                     style={{ backgroundColor: colors.teamB.primary }}
                                 >
                                     <Users className="w-5 h-5" />
@@ -332,7 +332,7 @@ export function TeamColorPicker({
                         <div className="rounded-xl border border-[var(--rule)] overflow-hidden">
                             <div className="p-3 flex items-center gap-3">
                                 <div
-                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--canvas)] text-xs font-bold"
                                     style={{ backgroundColor: colors.teamA.primary }}
                                 >
                                     JD
@@ -345,7 +345,7 @@ export function TeamColorPicker({
                                     <p className="font-medium text-sm">Jane Smith</p>
                                 </div>
                                 <div
-                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--canvas)] text-xs font-bold"
                                     style={{ backgroundColor: colors.teamB.primary }}
                                 >
                                     JS

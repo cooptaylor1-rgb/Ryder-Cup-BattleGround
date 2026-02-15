@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 18:40 EST — Phase 2 — Captain tools + TeamColorPicker: remove remaining `text-white`/`bg-black` fragments
+- `FairnessScoring`: warning callouts + Auto-improve CTA now use token-driven warning/masters surfaces with inverse canvas typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `color: 'white'` / `text-white`.
+- `LineupBuilder`: publish/validation warnings/errors now use token-driven masters/error/warning surfaces with canvas typography (no hard-coded white).
+- `OverrideModal`: backdrop migrated off `bg-black/50`, warning callout + confirm CTA now use `var(--warning)` tokens, and continue/confirm buttons use canvas text tokens.
+- `TeamColorPicker`: preset chips, selection checkmark, and preview avatars now use token-driven canvas borders/typography (no `border-white`/`text-white`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 18:25 EST — Phase 2 — TripMemories + PhotoCapture: remove remaining `text-white`/`bg-black` overlays
 - `TripMemories`: winner badge + MVP hero + Share CTA now use token-driven inverse canvas typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white` so team/gold/Masters surfaces remain theme-safe.
 - `PhotoCapture`: camera/preview shells migrated off `bg-black`/`bg-black/*` and `text-white` to token-driven ink/canvas overlays (`bg-[color:var(--ink)]/…`, `text-[var(--canvas)]`) including moment-type/tag pills and the success save CTA.

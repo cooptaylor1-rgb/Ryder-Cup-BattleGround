@@ -489,14 +489,11 @@ export function FairnessCard({
 
         {/* Warnings */}
         {score.warnings.length > 0 && (
-          <div
-            className="mt-4 p-3 rounded-xl flex items-start gap-2"
-            style={{ background: 'var(--warning)', color: 'white' }}
-          >
+          <div className="mt-4 p-3 rounded-xl flex items-start gap-2 bg-[var(--warning)] text-[var(--canvas)]">
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-sm">Attention Needed</p>
-              <ul className="text-xs text-white/80 mt-1 space-y-0.5">
+              <ul className="text-xs text-[color:var(--canvas)]/80 mt-1 space-y-0.5">
                 {score.warnings.map((w, i) => (
                   <li key={i}>• {w}</li>
                 ))}
@@ -529,8 +526,7 @@ export function FairnessCard({
         {onImprove && score.overall < 80 && (
           <button
             onClick={onImprove}
-            className="w-full mt-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2"
-            style={{ background: 'var(--masters)', color: 'white' }}
+            className="w-full mt-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2 bg-[var(--masters)] text-[var(--canvas)]"
           >
             <Shuffle className="w-5 h-5" />
             Auto-improve Fairness
@@ -565,11 +561,10 @@ export function FairnessCard({
                 >
                   <div className="flex items-center gap-3">
                     <span
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                      style={{
-                        background: b.isFair ? 'var(--success)' : 'var(--warning)',
-                        color: 'white',
-                      }}
+                      className={cn(
+                        'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-[var(--canvas)]',
+                        b.isFair ? 'bg-[var(--success)]' : 'bg-[var(--warning)]'
+                      )}
                     >
                       {b.matchNumber}
                     </span>
