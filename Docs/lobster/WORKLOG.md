@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 08:30 EST — Phase 2 — FormError: avoid silent null return fallback
 - `FormError`: replaced the final `return null` fallback with an SR-only, stable `role="alert"` live region so callers never experience a silent gap if control flow changes.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`b8fed5f`)
 
 ### 07:26 EST — Phase 2 — Error boundaries: tokenized Masters inverse CTAs + error icon shells
 - `/finances/error`, `/more/error`, `/live/error`, `/trip/error`, `/bets/error`:
