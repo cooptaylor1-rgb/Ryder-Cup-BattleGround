@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 11:55 EST — Phase 2 — Live play capture: remove remaining `text-white`/`bg-black` from VoiceScoring + QuickPhotoCapture
+- `VoiceScoring`: replaced remaining `text-white` icon + button treatments with token-driven inverse canvas (`text-[var(--canvas)]`) so mic/listening/confirm/error states stay theme-safe.
+- `QuickPhotoCapture`: migrated the modal shell off `bg-black` and remaining `text-white`/`placeholder-white` utilities onto token-driven ink/canvas palettes (`bg-[color:var(--ink)]`, `text-[var(--canvas)]`, placeholder canvas tints); voice-input listening state now uses the premium error token (`bg-[var(--error)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`fdae358`)
+
 ### 11:35 EST — Phase 2 — iOS sheets + Achievements + PlayerStatsCard: remove remaining black/white palette utilities
 - `IOSBottomSheet`, `IOSActionSheet`: backdrop overlay now uses token-driven ink tint (`bg-[color:var(--ink)]/40`) instead of hard-coded `bg-black/40` so modal backdrops match theme.
 - `IOSContextMenu`: backdrop moved off `bg-black/20` and hovered menu items now use premium surfaces (`bg-[color:var(--surface-secondary)]`) with destructive actions mapped to the premium error token (`text-[color:var(--error)]`).
