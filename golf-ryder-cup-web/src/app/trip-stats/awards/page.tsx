@@ -96,7 +96,7 @@ function AwardCard({
                     px-4 py-2 rounded-full text-sm font-medium transition-all
                     ${
                       isWinner
-                        ? 'bg-masters text-white shadow-md'
+                        ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-md'
                         : isSuggested
                           ? 'bg-masters/20 text-masters border border-masters/30'
                           : 'bg-[var(--surface)] text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'

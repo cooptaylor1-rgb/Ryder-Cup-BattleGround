@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-14
 
+### 22:40 EST — Phase 2 — Remove remaining `text-white` on Masters surfaces (TripStats awards + TripStats error + iOS install prompt)
+- `/trip-stats/awards`: winner chip now uses `text-[var(--canvas)]` on the Masters surface.
+- `/trip-stats/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]`.
+- `IOSInstallPrompt`: header + subtitle + “Got It” CTA now use canvas token typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/80`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 22:20 EST — Phase 2 — Tokenize remaining `text-white` on Masters/accent UI (TripStats + OfflineIndicator + PDF export)
 - `/trip-stats`: increment (+) button now uses `text-[var(--canvas)]` on the Masters surface.
 - `OfflineIndicator`: migrated banner/pill copy and status chips off `text-white/*` onto canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) for theme-safe inverse readability.

@@ -104,7 +104,7 @@ export function IOSInstallPrompt({
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}
       >
         {/* Header */}
-        <div className="relative bg-linear-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] p-6 text-white">
+        <div className="relative bg-linear-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)] p-6 text-[var(--canvas)]">
           <button
             onClick={handleDismiss}
             className="absolute top-4 right-4 p-2 rounded-full bg-[color:var(--canvas)]/15 hover:bg-[color:var(--canvas)]/25 active:scale-95 transition-all duration-150"
@@ -127,7 +127,7 @@ export function IOSInstallPrompt({
               <h2 id="ios-install-title" className="text-xl font-bold">
                 Add to Home Screen
               </h2>
-              <p className="text-white/80 text-sm mt-1">
+              <p className="text-[color:var(--canvas)]/80 text-sm mt-1">
                 Get the full app experience
               </p>
             </div>
@@ -222,7 +222,7 @@ export function IOSInstallPrompt({
           </button>
           <button
             onClick={handleInstall}
-            className="flex-1 py-3.5 px-4 rounded-xl bg-[var(--masters)] text-white font-semibold active:scale-[0.98] transition-transform duration-100 flex items-center justify-center gap-2"
+            className="flex-1 py-3.5 px-4 rounded-xl bg-[var(--masters)] text-[var(--canvas)] font-semibold active:scale-[0.98] transition-transform duration-100 flex items-center justify-center gap-2"
           >
             <ArrowDown className="w-4 h-4" />
             Got It
