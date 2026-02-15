@@ -399,7 +399,7 @@ export function HoleMiniMap({
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-[var(--rule)]">
                 <div className="flex items-center gap-2">
                     <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-[var(--canvas)]"
                         style={{ background: teamAColor }}
                     >
                         {teamAWins}
@@ -408,7 +408,7 @@ export function HoleMiniMap({
                 </div>
 
                 <div className="flex items-center gap-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-[color:var(--ink-tertiary)] text-white">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-[color:var(--ink-tertiary)] text-[var(--canvas)]">
                         {halved}
                     </div>
                     <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Halved</span>
@@ -417,7 +417,7 @@ export function HoleMiniMap({
                 <div className="flex items-center gap-2">
                     <span className="text-xs" style={{ color: 'var(--ink-secondary)' }}>{teamBName}</span>
                     <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-[var(--canvas)]"
                         style={{ background: teamBColor }}
                     >
                         {teamBWins}

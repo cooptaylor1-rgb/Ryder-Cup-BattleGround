@@ -284,7 +284,7 @@ export function SwipeScorePanel({
           className="w-16 h-16 rounded-2xl flex items-center justify-center"
           style={{ background: teamAColor }}
         >
-          <ChevronLeft className="w-8 h-8 text-white" />
+          <ChevronLeft className="w-8 h-8 text-[var(--canvas)]" />
         </div>
       </motion.div>
 
@@ -297,7 +297,7 @@ export function SwipeScorePanel({
           className="w-16 h-16 rounded-2xl flex items-center justify-center"
           style={{ background: teamBColor }}
         >
-          <ChevronRight className="w-8 h-8 text-white" />
+          <ChevronRight className="w-8 h-8 text-[var(--canvas)]" />
         </div>
       </motion.div>
 
@@ -307,8 +307,8 @@ export function SwipeScorePanel({
         style={{ opacity: halvedOpacity }}
       >
         <div className="px-6 py-3 rounded-2xl bg-[color:var(--ink-secondary)]/80 flex items-center gap-2">
-          <Minus className="w-5 h-5 text-white" />
-          <span className="text-white font-semibold">Halved</span>
+          <Minus className="w-5 h-5 text-[var(--canvas)]" />
+          <span className="text-[var(--canvas)] font-semibold">Halved</span>
         </div>
       </motion.div>
 
@@ -367,8 +367,8 @@ export function SwipeScorePanel({
                       : 'var(--masters)',
             }}
           >
-            <span className="text-2xl font-bold text-white">{holeNumber}</span>
-            <span className="text-xs text-white/80 uppercase tracking-wider">Hole</span>
+            <span className="text-2xl font-bold text-[var(--canvas)]">{holeNumber}</span>
+            <span className="text-xs text-[color:var(--canvas)]/80 uppercase tracking-wider">Hole</span>
           </div>
 
           {/* Gesture hints */}
@@ -387,7 +387,7 @@ export function SwipeScorePanel({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0 }}
@@ -404,9 +404,9 @@ export function SwipeScorePanel({
               }}
             >
               {confirmedResult === 'halved' ? (
-                <Minus className="w-12 h-12 text-white" />
+                <Minus className="w-12 h-12 text-[var(--canvas)]" />
               ) : (
-                <Trophy className="w-12 h-12 text-white" />
+                <Trophy className="w-12 h-12 text-[var(--canvas)]" />
               )}
             </motion.div>
           </motion.div>
@@ -478,7 +478,7 @@ export function SwipeScorePanel({
                     : '#666',
             }}
           >
-            <Check className="w-4 h-4 text-white" />
+            <Check className="w-4 h-4 text-[var(--canvas)]" />
           </div>
         </div>
       )}
