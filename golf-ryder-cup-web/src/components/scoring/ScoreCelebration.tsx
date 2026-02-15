@@ -165,8 +165,8 @@ export function ScoreCelebration({
                                     boxShadow: `0 0 60px ${teamColor}60`,
                                 }}
                             >
-                                <Trophy className="w-10 h-10 text-white mb-1" />
-                                <span className="text-xs font-bold text-white/90 uppercase">
+                                <Trophy className="w-10 h-10 text-[var(--canvas)] mb-1" />
+                                <span className="text-xs font-bold text-[color:var(--canvas)]/90 uppercase">
                                     Hole {holeNumber}
                                 </span>
                             </div>
@@ -217,8 +217,8 @@ export function ScoreCelebration({
                             transition={{ type: 'spring', damping: 20 }}
                         >
                             <div className="w-20 h-20 rounded-full flex flex-col items-center justify-center bg-gray-600 shadow-lg">
-                                <Minus className="w-8 h-8 text-white" />
-                                <span className="text-xs font-medium text-white/80">Halved</span>
+                                <Minus className="w-8 h-8 text-[var(--canvas)]" />
+                                <span className="text-xs font-medium text-[color:var(--canvas)]/80">Halved</span>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -307,14 +307,14 @@ export function ScoreCelebration({
                                     transition={{ delay: 0.6 }}
                                     className="text-center"
                                 >
-                                    <p className="text-xs uppercase tracking-widest text-white/70 mb-1">
+                                    <p className="text-xs uppercase tracking-widest text-[color:var(--canvas)]/70 mb-1">
                                         Victory
                                     </p>
-                                    <h2 className="text-2xl font-bold text-white mb-1">
+                                    <h2 className="text-2xl font-bold text-[var(--canvas)] mb-1">
                                         {teamName} Wins!
                                     </h2>
                                     {finalScore && (
-                                        <p className="text-lg font-semibold text-white/90">
+                                        <p className="text-lg font-semibold text-[color:var(--canvas)]/90">
                                             {finalScore}
                                         </p>
                                     )}
@@ -366,14 +366,14 @@ export function ScoreCelebration({
                             transition={{ type: 'spring', damping: 20 }}
                             className="px-8 py-6 rounded-3xl flex flex-col items-center bg-gray-700 shadow-2xl"
                         >
-                            <Flag className="w-12 h-12 text-white mb-2" />
-                            <p className="text-xs uppercase tracking-widest text-white/70 mb-1">
+                            <Flag className="w-12 h-12 text-[var(--canvas)] mb-2" />
+                            <p className="text-xs uppercase tracking-widest text-[color:var(--canvas)]/70 mb-1">
                                 Match Result
                             </p>
-                            <h2 className="text-xl font-bold text-white">
+                            <h2 className="text-xl font-bold text-[var(--canvas)]">
                                 All Square
                             </h2>
-                            <p className="text-sm text-white/80 mt-1">
+                            <p className="text-sm text-[color:var(--canvas)]/80 mt-1">
                                 Match Halved
                             </p>
                         </motion.div>
@@ -457,7 +457,7 @@ export function ScoreToast({
                     className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50"
                 >
                     <div
-                        className="px-4 py-2 rounded-full shadow-lg text-white text-sm font-medium"
+                        className="px-4 py-2 rounded-full shadow-lg text-[var(--canvas)] text-sm font-medium"
                         style={{ background: colors[type] }}
                     >
                         {message}

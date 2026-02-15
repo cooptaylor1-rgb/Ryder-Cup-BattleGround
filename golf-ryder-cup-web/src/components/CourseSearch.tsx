@@ -242,7 +242,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                         </div>
                         <button
                             onClick={() => handleImportCourse(allTees)}
-                            className="mt-4 w-full py-3 bg-[var(--masters)] text-white font-medium rounded-lg hover:bg-[color:var(--masters)]/90"
+                            className="mt-4 w-full py-3 bg-[var(--masters)] text-[var(--canvas)] font-medium rounded-lg hover:bg-[color:var(--masters)]/90"
                         >
                             Import All Tees ({allTees.length})
                         </button>
@@ -278,7 +278,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                 <button
                     onClick={handleSearch}
                     disabled={isSearching || query.trim().length < 2}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[var(--masters)] text-white text-sm font-medium rounded-md hover:bg-[color:var(--masters)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[var(--masters)] text-[var(--canvas)] text-sm font-medium rounded-md hover:bg-[color:var(--masters)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
                 </button>

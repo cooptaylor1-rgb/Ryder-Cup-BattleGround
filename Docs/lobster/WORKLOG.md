@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 02:25 EST — Phase 2 — Error routes + CourseSearch + ScoreCelebration: tokenize remaining Masters inverse copy
+- `/achievements/error`, `/courses/error`, `/join/error`, `/score/error`: primary “Try Again” CTA now uses `text-[var(--canvas)]` (no hard-coded `text-white`) on the Masters button.
+- `CourseSearch`: Masters search/import buttons now use `text-[var(--canvas)]` instead of `text-white`.
+- `ScoreCelebration`: victory/halved/halved-toast copy and icons now use canvas tokens (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white/*`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 02:10 EST — Phase 2 — Achievements + Course Library: remove remaining `text-white` overlays
 - `/achievements`: progress hero card + trophy icon now use `text-[var(--canvas)]` (no hard-coded `text-white`) on the Masters gradient.
 - `AchievementCard`: unlocked icon shell now uses `color: var(--canvas)` instead of inline `'white'` so inverse icon treatments stay theme-safe.
