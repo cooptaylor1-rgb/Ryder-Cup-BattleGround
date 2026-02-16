@@ -23,8 +23,8 @@ export function SetupGuide({ players, teams, sessions }: SetupGuideProps) {
                 className="card border border-[rgba(0,103,71,0.2)] bg-[linear-gradient(135deg,_rgba(0,103,71,0.08)_0%,_rgba(0,103,71,0.03)_100%)] p-[var(--space-5)]"
             >
                 <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[var(--masters)] text-white">
-                        <ClipboardCheck size={20} className="text-white" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[var(--masters)] text-[var(--canvas)]">
+                        <ClipboardCheck size={20} className="text-[var(--canvas)]" />
                     </div>
                     <div>
                         <p className="type-title-sm">Get Your Trip Ready</p>
@@ -83,7 +83,7 @@ function SetupStep({ number, label, done, href, hint }: SetupStepProps) {
             <div
                 className={cn(
                     'flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold',
-                    done ? 'bg-[var(--masters)] text-white' : 'bg-[var(--rule)] text-[var(--ink-tertiary)]'
+                    done ? 'bg-[var(--masters)] text-[var(--canvas)]' : 'bg-[var(--rule)] text-[var(--ink-tertiary)]'
                 )}
             >
                 {done ? '✓' : number}

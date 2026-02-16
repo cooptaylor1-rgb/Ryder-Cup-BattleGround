@@ -175,14 +175,14 @@ export function TripRecap({
             >
                 {/* Trophy icon */}
                 <div className="absolute top-4 right-4 opacity-10">
-                    <Trophy className="w-32 h-32 text-white" />
+                    <Trophy className="w-32 h-32 text-[var(--canvas)]" />
                 </div>
 
                 <div className="relative z-10">
-                    <div className="text-white/60 text-sm">
+                    <div className="text-[color:var(--canvas)]/60 text-sm">
                         {format(new Date(startDate), 'MMM d')} - {format(new Date(endDate), 'MMM d, yyyy')}
                     </div>
-                    <h1 className="text-3xl font-bold text-white mt-1">{tripName}</h1>
+                    <h1 className="text-3xl font-bold text-[var(--canvas)] mt-1">{tripName}</h1>
 
                     {/* Final Score */}
                     <div className="flex items-center gap-8 mt-8">
@@ -191,25 +191,25 @@ export function TripRecap({
                             winner === 'usa' && 'scale-110'
                         )}>
                             <div className="text-4xl mb-2">🇺🇸</div>
-                            <div className="text-white text-5xl font-bold">{teamAScore}</div>
-                            <div className="text-white/60">USA</div>
+                            <div className="text-[var(--canvas)] text-5xl font-bold">{teamAScore}</div>
+                            <div className="text-[color:var(--canvas)]/60">USA</div>
                         </div>
 
-                        <div className="text-white/40 text-2xl">-</div>
+                        <div className="text-[color:var(--canvas)]/40 text-2xl">-</div>
 
                         <div className={cn(
                             'text-center',
                             winner === 'europe' && 'scale-110'
                         )}>
                             <div className="text-4xl mb-2">🇪🇺</div>
-                            <div className="text-white text-5xl font-bold">{teamBScore}</div>
-                            <div className="text-white/60">EUR</div>
+                            <div className="text-[var(--canvas)] text-5xl font-bold">{teamBScore}</div>
+                            <div className="text-[color:var(--canvas)]/60">EUR</div>
                         </div>
                     </div>
 
                     {/* Winner announcement */}
                     <div className="mt-8 text-center">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--canvas)]/10 text-[var(--canvas)]">
                             <Trophy className="w-5 h-5 text-secondary-gold" />
                             <span className="font-bold">
                                 {winner === 'tied'
@@ -230,7 +230,7 @@ export function TripRecap({
                         className={cn(
                             'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                             activeSection === section
-                                ? 'bg-masters-primary text-white'
+                                ? 'bg-masters-primary text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] hover:bg-[var(--surface)]'
                         )}
                     >
@@ -441,7 +441,7 @@ export function TripRecap({
             <button
                 className={cn(
                     'w-full flex items-center justify-center gap-2 py-4 rounded-xl',
-                    'bg-masters-primary text-white',
+                    'bg-masters-primary text-[var(--canvas)]',
                     'hover:bg-masters-primary-dark transition-colors'
                 )}
             >

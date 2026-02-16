@@ -185,7 +185,7 @@ export function PointSystem({
                             <div className={cn(
                                 'w-8 h-8 rounded-lg flex items-center justify-center',
                                 activePreset === preset.id
-                                    ? 'bg-[var(--masters)] text-white'
+                                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                     : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)]'
                             )}>
                                 {preset.icon}

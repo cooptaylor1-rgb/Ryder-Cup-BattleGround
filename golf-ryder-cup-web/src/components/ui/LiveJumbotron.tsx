@@ -359,8 +359,8 @@ const CompletedMatchCard = memo(function CompletedMatchCard({
             <div className="flex items-center gap-3">
                 <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
-                    winningTeam === 'usa' ? 'bg-team-usa text-white' :
-                        winningTeam === 'europe' ? 'bg-team-europe text-white' :
+                    winningTeam === 'usa' ? 'bg-team-usa text-[var(--canvas)]' :
+                        winningTeam === 'europe' ? 'bg-team-europe text-[var(--canvas)]' :
                             'bg-[color:var(--ink-tertiary)]/15 text-[var(--ink-secondary)]'
                 )}>
                     {winningTeam === 'halved' ? '=' : displayScore}
