@@ -169,7 +169,7 @@ function TemplateCard({
                         justifyContent: 'center',
                     }}
                 >
-                    <Check size={14} style={{ color: '#fff' }} />
+                    <Check size={14} className="text-[var(--canvas)]" />
                 </div>
             )}
 

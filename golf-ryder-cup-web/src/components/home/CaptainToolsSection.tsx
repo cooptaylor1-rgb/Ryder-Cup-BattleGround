@@ -32,12 +32,12 @@ export function CaptainToolsSection() {
                 />
                 <CaptainToolCard
                     href="/captain/checklist"
-                    icon={<ClipboardCheck size={20} style={{ color: '#3b82f6' }} />}
+                    icon={<ClipboardCheck size={20} style={{ color: 'var(--info)' }} />}
                     label="Pre-Flight"
                 />
                 <CaptainToolCard
                     href="/players"
-                    icon={<Users size={20} style={{ color: '#8b5cf6' }} />}
+                    icon={<Users size={20} style={{ color: 'var(--color-accent)' }} />}
                     label="Players"
                 />
             </div>

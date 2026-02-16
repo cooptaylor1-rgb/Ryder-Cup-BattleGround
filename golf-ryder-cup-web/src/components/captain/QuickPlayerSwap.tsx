@@ -239,7 +239,7 @@ export function QuickPlayerSwap({
                     {step !== 'select' && (
                         <button
                             onClick={handleBack}
-                            className="p-1 -ml-1 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-1 -ml-1 rounded-lg hover:bg-[color:var(--ink)]/10 transition-colors"
                         >
                             <ChevronRight className="w-5 h-5 rotate-180" style={{ color: 'var(--ink-muted)' }} />
                         </button>
@@ -257,7 +257,7 @@ export function QuickPlayerSwap({
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-lg hover:bg-[color:var(--ink)]/10 transition-colors"
                 >
                     <X className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                 </button>
@@ -288,7 +288,7 @@ export function QuickPlayerSwap({
                                         <button
                                             key={player.id}
                                             onClick={() => handleSelectPlayer(player)}
-                                            className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-white/5 transition-colors"
+                                            className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-[color:var(--ink)]/5 transition-colors"
                                             style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
                                         >
                                             <div className="flex items-center gap-3">
@@ -326,7 +326,7 @@ export function QuickPlayerSwap({
                                         <button
                                             key={player.id}
                                             onClick={() => handleSelectPlayer(player)}
-                                            className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-white/5 transition-colors"
+                                            className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-[color:var(--ink)]/5 transition-colors"
                                             style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
                                         >
                                             <div className="flex items-center gap-3">
@@ -423,7 +423,7 @@ export function QuickPlayerSwap({
                                                 <button
                                                     key={player.id}
                                                     onClick={() => handleSelectReplacement(player)}
-                                                    className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-white/5 transition-colors"
+                                                    className="w-full p-3 rounded-xl flex items-center justify-between hover:bg-[color:var(--ink)]/5 transition-colors"
                                                     style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
                                                 >
                                                     <div className="flex items-center gap-3">
@@ -518,7 +518,7 @@ export function QuickPlayerSwap({
                                     <div
                                         className={cn(
                                             'mt-4 p-2 rounded-lg text-center text-sm',
-                                            handicapImpact.isSignificant ? 'bg-yellow-500/10' : 'bg-white/5'
+                                            handicapImpact.isSignificant ? 'bg-[color:var(--warning)]/10' : 'bg-[color:var(--ink)]/5'
                                         )}
                                     >
                                         {handicapImpact.isSignificant && (
@@ -692,14 +692,14 @@ export function PlayerSwapModal({
                                     onClick={() => setShowHistory(!showHistory)}
                                     className={cn(
                                         'p-2 rounded-lg transition-colors',
-                                        showHistory ? 'bg-white/10' : 'hover:bg-white/5'
+                                        showHistory ? 'bg-[color:var(--ink)]/10' : 'hover:bg-[color:var(--ink)]/5'
                                     )}
                                 >
                                     <History className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                                 </button>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                    className="p-2 rounded-lg hover:bg-[color:var(--ink)]/10 transition-colors"
                                 >
                                     <X className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                                 </button>
@@ -762,7 +762,7 @@ export function PlayerSwapModal({
                                             <button
                                                 key={match.id}
                                                 onClick={() => setSelectedMatchId(match.id)}
-                                                className="w-full p-4 rounded-xl text-left hover:bg-white/5 transition-colors"
+                                                className="w-full p-4 rounded-xl text-left hover:bg-[color:var(--ink)]/5 transition-colors"
                                                 style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
                                             >
                                                 <div className="flex items-center justify-between mb-2">

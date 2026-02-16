@@ -172,7 +172,7 @@ export function OneHandedScoringPanel({
               }}
             >
               <p
-                style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: '4px' }}
+                style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--canvas)', marginBottom: '4px' }}
               >
                 {confirmingResult === 'halved'
                   ? 'Halved'
@@ -216,7 +216,7 @@ export function OneHandedScoringPanel({
                   cursor: 'pointer',
                 }}
               >
-                <Check size={32} style={{ color: '#fff' }} />
+                <Check size={32} style={{ color: 'var(--canvas)' }} />
               </motion.button>
             </div>
           </motion.div>

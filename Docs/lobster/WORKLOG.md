@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 14:20 EST — Phase 2 — Token hygiene: replace hardcoded hex/rgba with premium tokens (AttendanceCheckIn + CaptainTools)
+- `AttendanceCheckIn`: replaced `getStatusConfig` rgba/hex palettes with `var(--success)`, `var(--warning)`, `var(--ink)`, `var(--error)` tokens via Tailwind classes.
+- `CaptainToolsSection`: replaced hardcoded hex colors (`#3b82f6`, `#8b5cf6`) with semantic tokens (`var(--info)`, `var(--color-accent)`) for consistency.
+- `OneHandedScoringPanel`: replaced inline `color: '#fff'` with `var(--canvas)`.
+- `TripTemplatePicker`: replaced inline `color: '#fff'` with `text-[var(--canvas)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 14:15 EST — Phase 2 — Token hygiene: replace `bg-white/*` overlays with token-based opacity (captain widgets)
 - `EmergencyContacts`, `FormatRulesReference`, `PaceSpacing`: replaced `hover:bg-white/*` overlays with `hover:bg-[color:var(--ink)]/5` (or similar) for theme-safe interactions on light/dark surfaces.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

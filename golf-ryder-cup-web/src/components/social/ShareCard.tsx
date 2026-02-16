@@ -138,7 +138,7 @@ export function MatchResultCard({
                         {/* Team USA */}
                         <div className={cn(
                             'flex-1 p-4 rounded-xl',
-                            winnerTeam === 'usa' ? 'bg-white/20' : 'bg-white/5'
+                            winnerTeam === 'usa' ? 'bg-[color:var(--canvas)]/20' : 'bg-[color:var(--canvas)]/5'
                         )}>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-2xl">🇺🇸</span>
@@ -165,7 +165,7 @@ export function MatchResultCard({
                         {/* Team Europe */}
                         <div className={cn(
                             'flex-1 p-4 rounded-xl text-right',
-                            winnerTeam === 'europe' ? 'bg-white/20' : 'bg-white/5'
+                            winnerTeam === 'europe' ? 'bg-[color:var(--canvas)]/20' : 'bg-[color:var(--canvas)]/5'
                         )}>
                             <div className="flex items-center justify-end gap-2 mb-2">
                                 {winnerTeam === 'europe' && (

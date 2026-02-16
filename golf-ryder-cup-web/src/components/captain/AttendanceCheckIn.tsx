@@ -86,29 +86,25 @@ function getStatusConfig(status: AttendanceStatus) {
         case 'checked-in':
             return {
                 label: 'Checked In',
-                color: '#22c55e',
-                bgColor: 'rgba(34, 197, 94, 0.15)',
+                className: 'bg-[color:var(--success)]/15 text-[var(--success)] ring-[var(--success)]',
                 icon: CheckCircle2,
             };
         case 'en-route':
             return {
                 label: 'En Route',
-                color: '#eab308',
-                bgColor: 'rgba(234, 179, 8, 0.15)',
+                className: 'bg-[color:var(--warning)]/15 text-[var(--warning)] ring-[var(--warning)]',
                 icon: Car,
             };
         case 'not-arrived':
             return {
                 label: 'Not Arrived',
-                color: '#6b7280',
-                bgColor: 'rgba(107, 114, 128, 0.15)',
+                className: 'bg-[color:var(--ink)]/15 text-[var(--ink-secondary)] ring-[var(--ink-secondary)]',
                 icon: Circle,
             };
         case 'no-show':
             return {
                 label: 'No Show',
-                color: '#ef4444',
-                bgColor: 'rgba(239, 68, 68, 0.15)',
+                className: 'bg-[color:var(--error)]/15 text-[var(--error)] ring-[var(--error)]',
                 icon: AlertTriangle,
             };
     }
@@ -294,13 +290,9 @@ export function AttendanceCheckIn({
                                 onClick={() => setFilterStatus(isActive ? 'all' : status)}
                                 className={cn(
                                     'px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all',
-                                    isActive ? 'ring-2' : ''
+                                    isActive ? 'ring-2' : '',
+                                    config.className
                                 )}
-                                style={{
-                                    background: config.bgColor,
-                                    color: config.color,
-                                    ['--tw-ring-color' as string]: config.color,
-                                }}
                             >
                                 <config.icon className="w-3.5 h-3.5" />
                                 {count}
@@ -441,10 +433,12 @@ function PlayerCheckInCard({
                         e.stopPropagation();
                         onQuickCheckIn();
                     }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                    style={{ background: statusConfig.bgColor }}
+                    className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                        statusConfig.className
+                    )}
                 >
-                    <StatusIcon className="w-5 h-5" style={{ color: statusConfig.color }} />
+                    <StatusIcon className="w-5 h-5" />
                 </button>
 
                 {/* Player Info */}
@@ -453,7 +447,9 @@ function PlayerCheckInCard({
                         {player.firstName} {player.lastName}
                     </p>
                     <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ink-muted)' }}>
-                        <span style={{ color: statusConfig.color }}>{statusConfig.label}</span>
+                        <span className={statusConfig.className.split(' ').filter(c => c.startsWith('text-')).join(' ')}>
+                            {statusConfig.label}
+                        </span>
                         {player.eta && player.status === 'en-route' && (
                             <span>• ETA {player.eta}</span>
                         )}
@@ -486,8 +482,7 @@ function PlayerCheckInCard({
                             {player.status !== 'checked-in' && (
                                 <button
                                     onClick={onQuickCheckIn}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                                    style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--success)]/15 text-[var(--success)]"
                                 >
                                     <UserCheck className="w-4 h-4" />
                                     Check In
@@ -497,8 +492,7 @@ function PlayerCheckInCard({
                             {player.status === 'not-arrived' && (
                                 <button
                                     onClick={onSetETA}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                                    style={{ background: 'rgba(234, 179, 8, 0.15)', color: '#eab308' }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--warning)]/15 text-[var(--warning)]"
                                 >
                                     <Clock className="w-4 h-4" />
                                     Set ETA
@@ -508,8 +502,7 @@ function PlayerCheckInCard({
                             {player.status !== 'no-show' && player.status !== 'checked-in' && (
                                 <button
                                     onClick={onMarkNoShow}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                                    style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--error)]/15 text-[var(--error)]"
                                 >
                                     <UserX className="w-4 h-4" />
                                     No Show
