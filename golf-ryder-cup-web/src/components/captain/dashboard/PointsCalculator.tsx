@@ -154,7 +154,7 @@ function OutcomeSelector({
                         disabled={isLocked}
                         className={cn(
                             'relative px-2 py-1 rounded-md text-xs font-medium transition-all',
-                            isSelected ? 'text-white' : 'opacity-40 hover:opacity-70',
+                            isSelected ? 'text-[var(--canvas)]' : 'opacity-40 hover:opacity-70',
                             isLocked && 'cursor-not-allowed'
                         )}
                         style={{
@@ -472,8 +472,8 @@ export function PointsCalculator({
                             winner === 'teamB' ? teamBColor : 'var(--ink-tertiary)',
                     }}
                 >
-                    <Trophy size={24} color="white" />
-                    <span className="text-lg font-bold text-white">
+                    <Trophy size={24} color="var(--canvas)" />
+                    <span className="text-lg font-bold text-[var(--canvas)]">
                         {winner === 'teamA' ? teamAName :
                             winner === 'teamB' ? teamBName : 'Halved'} Projected to Win
                     </span>

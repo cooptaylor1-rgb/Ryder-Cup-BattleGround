@@ -108,7 +108,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       {/* PIN Modal */}
       {showPinModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-[var(--space-4)] bg-black/50 backdrop-blur-[4px]"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-[var(--space-4)] bg-[var(--ink)]/50 backdrop-blur-[4px]"
           onClick={() => setShowPinModal(false)}
         >
           <div
@@ -200,7 +200,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       {/* Reset PIN Confirmation Modal */}
       {showResetConfirm && (
         <div
-          className="fixed inset-0 z-[101] flex items-center justify-center p-[var(--space-4)] bg-black/60 backdrop-blur-[4px]"
+          className="fixed inset-0 z-[101] flex items-center justify-center p-[var(--space-4)] bg-[var(--ink)]/60 backdrop-blur-[4px]"
           onClick={() => setShowResetConfirm(false)}
         >
           <div
