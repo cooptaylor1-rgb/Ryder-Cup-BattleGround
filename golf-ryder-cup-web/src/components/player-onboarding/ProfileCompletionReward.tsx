@@ -7,7 +7,7 @@
  * Shows team assignment preview and next steps.
  */
 
-import { useState, useEffect, useMemo, useId } from 'react';
+import { useState, useEffect, useMemo, useId, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trophy,
@@ -309,8 +309,13 @@ export function ProfileCompletionReward({
                                 className="card overflow-hidden mb-4"
                             >
                                 <div
-                                    className="p-4 text-[var(--canvas)]"
-                                    style={{ backgroundColor: data.teamColor || 'var(--ink-primary)' }}
+                                    className="p-4 text-[var(--canvas)] bg-[color:var(--team-color)]"
+                                    style={
+                                        {
+                                            '--team-color':
+                                                data.teamColor || 'var(--ink-primary)',
+                                        } as CSSProperties
+                                    }
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 rounded-full bg-[color:var(--canvas-raised)]/20 flex items-center justify-center">

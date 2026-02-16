@@ -189,10 +189,10 @@ export function IOSActionSheet({
       <div
         className={cn(
           'fixed inset-x-0 bottom-0 z-9999 p-3',
+          'pb-[max(12px,env(safe-area-inset-bottom))]',
           'transition-transform duration-300 ease-out',
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         )}
-        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
         {/* Main actions group */}
         <div className="bg-[color:var(--surface-raised)]/95 backdrop-blur-xl rounded-2xl overflow-hidden mb-2 shadow-xl">
