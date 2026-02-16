@@ -23,6 +23,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`ea87436`)
 
+### 01:15 EST — Phase 2 — Inverse typography: replace remaining `text-white` with canvas tokens
+- `/captain/bets` and `/lineup/[sessionId]`: selected Masters buttons now use `text-[var(--canvas)]` instead of `text-white` for theme-safe inverse typography.
+- `ShareCard`, `AnnouncementSystem`, `ScoreButton`, `PollCard`: migrated remaining `text-white` and `text-white/*` fragments to token-driven canvas typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/...`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`fd946bb`)
+
 
 ## 2026-02-15
 
