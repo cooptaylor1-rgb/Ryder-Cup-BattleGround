@@ -2,9 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useRouter } from 'next/navigation';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { generateTripSettlement } from '@/lib/services/extendedSideGamesService';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import type { TripSettlementSummary, SettlementTransaction } from '@/lib/types/sideGames';
 import {
   DollarSign,
@@ -24,6 +26,7 @@ import {
  */
 
 export default function SettlementView() {
+  const router = useRouter();
   const { currentTrip, players } = useTripStore();
   const { showToast } = useUIStore();
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
@@ -110,6 +113,27 @@ export default function SettlementView() {
     showToast('success', 'Marked as settled');
     setExpandedTx(null);
   };
+
+  if (!currentTrip) {
+    return (
+      <div className="py-12">
+        <EmptyStatePremium
+          illustration="trophy"
+          title="No active trip"
+          description="Create or join a trip to see a settlement summary for side games."
+          variant="compact"
+          action={{
+            label: 'Create a trip',
+            onClick: () => router.push('/trip/new'),
+          }}
+          secondaryAction={{
+            label: 'Join a trip',
+            onClick: () => router.push('/join'),
+          }}
+        />
+      </div>
+    );
+  }
 
   if (!settlement) {
     return (
