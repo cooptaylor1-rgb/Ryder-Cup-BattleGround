@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 05:30 EST — Phase 2 — Token hygiene: remove remaining black backdrops + hard-coded white in captain bet flows
+- `/captain/bets`: create/edit modal backdrop migrated from `bg-black/70` to token-driven ink tint (`bg-[color:var(--ink)]/70`).
+- `/captain/bets`: PageHeader icon and selection states migrated off hard-coded `'white'` and onto `var(--canvas)` for theme-safe inverse typography.
+- `/score/[matchId]`: celebration loading fallback and voice scoring modal overlay migrated from `bg-black/*` to token-driven ink tints.
+- `JoinTripModal` + `AttendanceCheckIn` ETA modal: backdrops migrated off `bg-black/*`; hover tints migrated off `bg-white/*` to token-driven ink tints.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`478f40d`)
+
 ### 05:20 EST — Phase 2 — Token hygiene: tokenize remaining black modal backdrops (More, Bets, Session timeout)
 - `/more`: settings modal backdrop migrated from `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
 - `/bets`: create-side-bet sheet backdrop migrated from `bg-black/50` to token-driven ink tint; selected bet-type button inline `color: 'white'` migrated to `var(--canvas)`.
