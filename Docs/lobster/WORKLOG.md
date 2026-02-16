@@ -18,6 +18,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `PrintablePairings`, `AuditBadge`, `AnnouncementSystem`: inverse icon/badge states now use `var(--canvas)` instead of hard-coded white.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+### 07:55 EST — Phase 2 — Token hygiene: remaining inline `color: 'white'` → `var(--canvas)` + backdrop token
+- `/bets`: bet list status icon now uses `color: var(--canvas)` on Masters/success surfaces.
+- `/trip/[tripId]/awards`: PageHeader trophy icon now uses `var(--canvas)`.
+- `EmptyStatePremium` + `WhatsNew`: inverse icon chips and Masters CTAs now use `var(--canvas)` instead of hard-coded white.
+- `KeyboardShortcutsHelp`: overlay backdrop now uses token-driven ink tint (`bg-[color:var(--ink)]/60`) and the header icon uses `var(--canvas)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 06:15 EST — Phase 2 — Token hygiene: replace remaining inline `color: 'white'` with canvas tokens (Draft/Admin/Social)
 - `/captain/draft`: PageHeader Shuffle icons now use `style={{ color: 'var(--canvas)' }}` for theme-safe inverse icon color.
 - `/admin`: PageHeader Shield icon now uses `var(--canvas)` over the red gradient chip.

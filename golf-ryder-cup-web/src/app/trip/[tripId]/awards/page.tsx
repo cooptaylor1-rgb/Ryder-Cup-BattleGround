@@ -175,7 +175,7 @@ export default function AwardsPage() {
       <PageHeader
         title="Awards"
         subtitle="Awards & records"
-        icon={<Trophy size={16} style={{ color: 'white' }} />}
+        icon={<Trophy size={16} style={{ color: 'var(--canvas)' }} />}
         onBack={() => router.push(`/trip/${tripId}`)}
         rightSlot={
           <div className="flex items-center gap-2">

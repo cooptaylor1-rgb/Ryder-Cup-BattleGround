@@ -76,8 +76,7 @@ export function KeyboardShortcutsHelp() {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[color:var(--ink)]/60"
             onClick={() => setIsOpen(false)}
         >
             <div
@@ -93,7 +92,7 @@ export function KeyboardShortcutsHelp() {
                     <div className="flex items-center gap-3">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style={{ background: 'var(--masters)', color: 'white' }}
+                            style={{ background: 'var(--masters)', color: 'var(--canvas)' }}
                         >
                             <Keyboard size={20} />
                         </div>

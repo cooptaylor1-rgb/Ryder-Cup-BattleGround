@@ -191,7 +191,7 @@ export function EmptyStatePremium({
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     background: 'var(--masters)',
-                                    color: 'white',
+                                    color: 'var(--canvas)',
                                     borderRadius: 'var(--radius-full)',
                                 }}
                             >

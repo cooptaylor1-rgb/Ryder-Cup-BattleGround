@@ -221,7 +221,7 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: feature.isNew ? 'var(--masters)' : 'var(--canvas-raised)',
-                  color: feature.isNew ? 'white' : 'var(--ink-tertiary)',
+                  color: feature.isNew ? 'var(--canvas)' : 'var(--ink-tertiary)',
                   border: feature.isNew ? 'none' : '1px solid var(--rule)',
                 }}
               >
@@ -250,7 +250,7 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
                         letterSpacing: '0.05em',
                         textTransform: 'uppercase' as const,
                         background: 'var(--masters)',
-                        color: 'white',
+                        color: 'var(--canvas)',
                       }}
                     >
                       New
@@ -292,7 +292,7 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
               justifyContent: 'center',
               gap: 'var(--space-2)',
               background: 'var(--masters)',
-              color: 'white',
+              color: 'var(--canvas)',
               border: 'none',
               cursor: 'pointer',
               boxShadow: '0 4px 14px rgba(0, 77, 51, 0.25)',
@@ -368,7 +368,7 @@ export function FeatureCard({
             alignItems: 'center',
             justifyContent: 'center',
             background: 'var(--masters)',
-            color: 'white',
+            color: 'var(--canvas)',
           }}
         >
           {icon}

@@ -678,7 +678,7 @@ function BetCard({ bet, icon, getPlayer }: BetCardProps) {
             alignItems: 'center',
             justifyContent: 'center',
             background: bet.status === 'completed' ? 'var(--success)' : 'var(--masters)',
-            color: 'white',
+            color: 'var(--canvas)',
           }}
         >
           {bet.status === 'completed' ? <Check size={20} /> : icon}
