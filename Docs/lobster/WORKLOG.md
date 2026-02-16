@@ -29,6 +29,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`fd946bb`)
 
+### 02:45 EST — Phase 2 — Bets detail: tokenize modal backdrops + inverse typography
+- `/bets/[betId]`: replaced remaining `bg-black/*` modal backdrops with token-driven ink tint (`bg-[color:var(--ink)]/*`) and migrated remaining `text-white` to `text-[var(--canvas)]` for theme-safe inverse typography on team/warning/success/error surfaces.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d044a1a`)
+
 
 ## 2026-02-15
 
