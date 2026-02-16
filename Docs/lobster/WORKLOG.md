@@ -2528,3 +2528,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Trip setup `CourseSelection`: replaced the tee color swatch inline `backgroundColor` style with class-driven colors for common tee variants (`gold`, `white`) and a single CSS custom property (`--tee-color`) for any other color.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`74a96a9`)
+
+## 2026-02-16
+
+### 02:17 EST — Phase 2 — TripWelcomeCard: team color swatches tokenized
+- Player onboarding `TripWelcomeCard`: replaced the inline `backgroundColor` swatches for Team A/B with a token-friendly CSS custom property (`--team-color`) + Tailwind arbitrary-value class (`bg-[color:var(--team-color)]`).
+- Keeps dynamic team colors while avoiding direct inline color styles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8bb157c`)
