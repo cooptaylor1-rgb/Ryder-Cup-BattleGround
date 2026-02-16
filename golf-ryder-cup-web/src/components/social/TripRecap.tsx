@@ -323,7 +323,7 @@ export function TripRecap({
                                 'card'
                             )}
                         >
-                            <div className="text-xl font-bold text-[var(--ink-tertiary)]/70 w-8">
+                            <div className="text-xl font-bold text-[color:var(--ink-tertiary)]/70 w-8">
                                 #{index + 1}
                             </div>
 
@@ -430,7 +430,7 @@ export function TripRecap({
                         </div>
                     ) : (
                         <div className="text-center py-12 bg-[var(--surface-secondary)] rounded-xl border border-[var(--rule)]">
-                            <Camera className="w-12 h-12 mx-auto mb-3 text-[var(--ink-tertiary)]/60" />
+                            <Camera className="w-12 h-12 mx-auto mb-3 text-[color:var(--ink-tertiary)]/60" />
                             <p className="text-[var(--ink-tertiary)]">No photos from this trip</p>
                         </div>
                     )}

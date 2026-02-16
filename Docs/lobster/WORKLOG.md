@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 13:20 EST — Phase 2 — Fix Tailwind CSS var opacity syntax for token text (`text-[var(--token)]/…` → `text-[color:var(--token)]/…`)
+- `PlayingStyleSurvey`: disabled Back button text now uses Tailwind-safe `text-[color:var(--ink-tertiary)]/40` so opacity compiles.
+- `TeeTimePreferences`: advanced settings hover state now uses `hover:text-[color:var(--masters)]/80` so opacity compiles.
+- `TripRecap`: ranking number + empty photos icon now use Tailwind-safe `text-[color:var(--ink-tertiary)]/…` with opacity modifiers.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 11:20 EST — Phase 2 — Token hygiene: replace `hover:bg-white/*` overlays with canvas tokens (captain widgets)
 - `GoTimeCountdown`: settings + control button hover/active overlays now use `bg-[var(--canvas)]/10` instead of `bg-white/10`.
 - `CartAssignmentManager`: picker + header action hover overlays now use `bg-[var(--canvas)]/5` + `/10` instead of `bg-white/*`.

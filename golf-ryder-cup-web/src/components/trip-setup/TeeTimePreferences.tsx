@@ -326,7 +326,7 @@ export function TeeTimePreferences({
             {/* Advanced settings */}
             <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-sm text-[var(--masters)] hover:text-[var(--masters)]/80 flex items-center gap-1"
+                className="text-sm text-[var(--masters)] hover:text-[color:var(--masters)]/80 flex items-center gap-1"
             >
                 {showAdvanced ? 'Hide' : 'Show'} advanced settings
                 <ChevronDown

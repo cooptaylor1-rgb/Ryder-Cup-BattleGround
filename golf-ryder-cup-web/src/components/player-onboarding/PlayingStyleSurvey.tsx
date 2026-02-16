@@ -285,7 +285,7 @@ export function PlayingStyleSurvey({
                     className={cn(
                         'flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                         currentQuestion === 0
-                            ? 'text-[var(--ink-tertiary)]/40 cursor-not-allowed'
+                            ? 'text-[color:var(--ink-tertiary)]/40 cursor-not-allowed'
                             : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--surface-secondary)]'
                     )}
                 >
