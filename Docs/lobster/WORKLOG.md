@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 23:10 EST — Phase 2 — Tokenize remaining inverse button text (SideBetsTracker, PlayerProfileCard, TeeTimePreferences)
+- `SideBetsTracker`: selected participant chips + primary action buttons now use `text-[var(--canvas)]` on Masters/info surfaces (no `text-white`).
+- `PlayerProfileCard`: achievement badge labels and “View Full Profile” CTA migrated to token-driven inverse canvas typography; CTA now uses Tailwind token classes instead of inline `color: 'white'`.
+- `TeeTimePreferences`: quick-time, interval, format icon, and advanced settings selections now use `text-[var(--canvas)]` + `text-[color:var(--canvas)]/80` instead of `text-white` variants.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`11d938a`)
+
 ### 22:50 EST — Phase 2 — Captain route headers: canvas token icons
 - `/captain/contacts`, `/captain/pairings`, `/captain/messages`: `PageHeader` icons now use `text-[var(--canvas)]` instead of `text-white` for theme-safe inverse chips.
 - `PathToVictoryCard`: trophy marker uses `text-[var(--ink)]` instead of `text-black`.
