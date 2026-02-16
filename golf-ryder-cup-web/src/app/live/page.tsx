@@ -438,7 +438,7 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
                   className={`h-1 flex-1 rounded-full transition-all ${isCurrent
                     ? 'bg-[var(--masters)] animate-pulse'
                     : isPlayed
-                      ? 'bg-[var(--ink-tertiary)]/40'
+                      ? 'bg-[color:var(--ink-tertiary)]/40'
                       : 'bg-[var(--surface-elevated)]'
                     }`}
                 />

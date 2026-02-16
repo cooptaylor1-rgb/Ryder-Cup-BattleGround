@@ -282,7 +282,7 @@ export function BulkImportModal({
 
               <div className="overflow-hidden rounded-xl border border-[var(--rule)]/60">
                 <table className="w-full text-sm">
-                  <thead className="bg-[var(--surface-secondary)]/60 text-left">
+                  <thead className="bg-[color:var(--surface-secondary)]/60 text-left">
                     <tr>
                       <th className="px-3 py-2 text-[var(--ink-secondary)]">Name</th>
                       <th className="px-3 py-2 text-[var(--ink-secondary)]">Email</th>
@@ -382,7 +382,7 @@ export function BulkImportModal({
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
                 placeholder={`John Smith, john@email.com, 12.5\nJane Doe, jane@email.com, 18.2\nBob Wilson`}
-                className="h-48 w-full resize-none rounded-xl border border-[var(--rule)] bg-[var(--surface-secondary)]/35 p-3 text-[var(--ink-primary)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/40 focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] placeholder:text-[var(--ink-tertiary)]"
+                className="h-48 w-full resize-none rounded-xl border border-[var(--rule)] bg-[color:var(--surface-secondary)]/35 p-3 text-[var(--ink-primary)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/40 focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] placeholder:text-[var(--ink-tertiary)]"
               />
 
               <button

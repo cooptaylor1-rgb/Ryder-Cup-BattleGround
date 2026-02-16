@@ -168,7 +168,7 @@ export function PDFExportPanel({
       {/* Header */}
       <div className="p-4 border-b border-[var(--rule)]">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-[var(--accent)]/10 text-[var(--accent)]">
+          <div className="p-2 rounded-lg bg-[color:var(--accent)]/10 text-[var(--accent)]">
             <FileText size={20} />
           </div>
           <div>
@@ -202,7 +202,7 @@ export function PDFExportPanel({
               className={cn(
                 'w-full flex items-center gap-3 p-3 rounded-lg transition-all',
                 isSelected
-                  ? 'bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]'
+                  ? 'bg-[color:var(--accent)]/10 ring-2 ring-[var(--accent)]'
                   : 'bg-[var(--surface-secondary)] hover:bg-[color:var(--surface-secondary)]/70',
                 isDisabled && 'opacity-50 cursor-not-allowed'
               )}

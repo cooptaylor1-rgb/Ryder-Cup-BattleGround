@@ -461,7 +461,7 @@ export function NassauEnhancedCard({
           </div>
 
           {/* Overall */}
-          <div className="rounded-lg border-2 border-[var(--accent)] bg-[var(--accent)]/10 p-3">
+          <div className="rounded-lg border-2 border-[var(--accent)] bg-[color:var(--accent)]/10 p-3">
             <h4 className="type-caption font-semibold text-[var(--ink-primary)]">Overall</h4>
             <p className="type-caption text-[var(--ink-tertiary)]">
               {game.overall.team1Total > game.overall.team2Total

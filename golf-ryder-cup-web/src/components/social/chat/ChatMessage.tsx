@@ -135,7 +135,7 @@ export function ChatMessage({
         <span className={cn(
           'inline-block px-3 py-1 rounded-full type-caption',
           message.type === 'score_update'
-            ? 'bg-[var(--masters)]/20 text-[var(--masters)]'
+            ? 'bg-[color:var(--masters)]/20 text-[var(--masters)]'
             : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
         )}>
           {message.content}
@@ -148,7 +148,7 @@ export function ChatMessage({
     <div
       className={cn(
         'group relative px-4 py-1',
-        isMentioned && 'bg-[var(--accent)]/5',
+        isMentioned && 'bg-[color:var(--accent)]/5',
         className
       )}
       onMouseEnter={() => setShowActions(true)}
@@ -247,7 +247,7 @@ export function ChatMessage({
                   className={cn(
                     'inline-flex items-center gap-1 px-2 py-0.5 rounded-full type-caption transition-colors',
                     reaction.hasOwn
-                      ? 'bg-[var(--accent)]/20 text-[var(--accent)]'
+                      ? 'bg-[color:var(--accent)]/20 text-[var(--accent)]'
                       : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
                   )}
                 >

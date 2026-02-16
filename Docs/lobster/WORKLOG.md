@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`dbb6b88`)
 
+### 08:50 EST — Phase 2 — Fix Tailwind CSS var opacity syntax in game/status pills (`bg-[var(--token)]/…` → `bg-[color:var(--token)]/…`)
+- `VegasGameCard`, `WolfGameCard`, `NassauEnhancedCard`: fixed token-driven status/payout backgrounds using Tailwind-safe `bg-[color:var(--…)]/NN` forms.
+- `PlayerStatsCard`, `PollCard`, `ChatMessage`, `StandingsCard`: fixed `bg-[var(--…)]/NN` (and `border-[var(--…)]/NN`) to ensure opacity modifiers compile correctly.
+- `BulkImportModal`, `TeeTimeGenerator`, `WeatherAlerts`, `/live`: fixed remaining token backgrounds with `/NN` opacity modifiers.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 07:10 EST — Phase 2 — Lineup routes: remove remaining inline `color: 'white'`
 - `/lineup/new`: Quick Setup gradient card now uses `color: 'var(--canvas)'` for theme-safe inverse typography.
 - `/lineup/builder`: Fairness score badge now uses `color: 'var(--canvas)'` instead of hard-coded white.

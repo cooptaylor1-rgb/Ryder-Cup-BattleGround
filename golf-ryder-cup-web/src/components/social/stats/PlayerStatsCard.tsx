@@ -114,9 +114,9 @@ export function PlayerStatsCard({
               <span className={cn(
                 'px-2 py-0.5 rounded-full type-caption font-semibold',
                 winRate >= 60
-                  ? 'bg-[var(--masters)]/20 text-[var(--masters)]'
+                  ? 'bg-[color:var(--masters)]/20 text-[var(--masters)]'
                   : winRate >= 40
-                    ? 'bg-[var(--accent)]/20 text-[var(--accent)]'
+                    ? 'bg-[color:var(--accent)]/20 text-[var(--accent)]'
                     : 'bg-[var(--surface-tertiary)] text-[var(--ink-tertiary)]'
               )}>
                 {winRate}% Win Rate
@@ -181,7 +181,7 @@ export function PlayerStatsCard({
             <div className="px-4 py-3 border-t border-[var(--rule)] grid grid-cols-2 gap-4">
               {stats.bestPartner && (
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-[var(--masters)]/10 text-[var(--masters)]">
+                  <div className="p-1.5 rounded-lg bg-[color:var(--masters)]/10 text-[var(--masters)]">
                     <Users size={14} />
                   </div>
                   <div className="min-w-0">

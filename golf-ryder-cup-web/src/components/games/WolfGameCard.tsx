@@ -100,7 +100,9 @@ export function WolfGameCard({
 
           <div className={cn(
             'px-2 py-1 rounded-full type-caption',
-            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
+            game.status === 'active'
+              ? 'bg-[color:var(--masters)]/20 text-[var(--masters)]'
+              : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
           )}>
             {game.status === 'setup' ? 'Setup' : game.status === 'active' ? `Hole ${currentHole}` : 'Complete'}
           </div>
@@ -128,7 +130,7 @@ export function WolfGameCard({
                   className={cn(
                     'p-3 rounded-lg border-2 transition-all text-center',
                     selectedPartner === playerId
-                      ? 'border-[var(--accent)] bg-[var(--accent)]/10'
+                      ? 'border-[var(--accent)] bg-[color:var(--accent)]/10'
                       : 'border-[var(--rule)] hover:border-[var(--ink-tertiary)]'
                   )}
                 >
@@ -201,7 +203,7 @@ export function WolfGameCard({
               key={payout.playerId}
               className={cn(
                 'flex items-center justify-between p-2 rounded-lg',
-                index === 0 && payout.netAmount > 0 && 'bg-[var(--masters)]/10'
+                index === 0 && payout.netAmount > 0 && 'bg-[color:var(--masters)]/10'
               )}
             >
               <div className="flex items-center gap-2">
@@ -262,7 +264,7 @@ export function WolfGameCard({
       )}
 
       {/* Rules Info */}
-      <div className="p-4 border-t border-[var(--rule)] bg-[var(--surface-secondary)]/50">
+      <div className="p-4 border-t border-[var(--rule)] bg-[color:var(--surface-secondary)]/50">
         <div className="flex items-start gap-2">
           <Info size={14} className="text-[var(--ink-tertiary)] shrink-0 mt-0.5" />
           <p className="type-caption text-[var(--ink-tertiary)]">

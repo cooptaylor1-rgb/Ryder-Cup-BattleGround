@@ -95,7 +95,9 @@ export function VegasGameCard({
 
           <div className={cn(
             'px-2 py-1 rounded-full type-caption',
-            game.status === 'active' ? 'bg-[var(--masters)]/20 text-[var(--masters)]' : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
+            game.status === 'active'
+              ? 'bg-[color:var(--masters)]/20 text-[var(--masters)]'
+              : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
           )}>
             {game.status === 'setup' ? 'Setup' : game.status === 'active' ? `Hole ${currentHole}` : 'Complete'}
           </div>
@@ -276,7 +278,7 @@ export function VegasGameCard({
       )}
 
       {/* Rules Info */}
-      <div className="p-4 border-t border-[var(--rule)] bg-[var(--surface-secondary)]/50">
+      <div className="p-4 border-t border-[var(--rule)] bg-[color:var(--surface-secondary)]/50">
         <div className="flex items-start gap-2">
           <Info size={14} className="text-[var(--ink-tertiary)] shrink-0 mt-0.5" />
           <p className="type-caption text-[var(--ink-tertiary)]">

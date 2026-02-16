@@ -276,7 +276,7 @@ export function TeeTimeGenerator({
           </thead>
           <tbody className="divide-y divide-[var(--rule)]">
             {displayItems.map((item, idx) => (
-              <tr key={idx} className="hover:bg-[var(--surface-secondary)]/60">
+              <tr key={idx} className="hover:bg-[color:var(--surface-secondary)]/60">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[var(--ink-tertiary)]" />

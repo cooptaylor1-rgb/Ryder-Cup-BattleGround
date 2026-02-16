@@ -219,7 +219,7 @@ export function CreatePollModal({
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-[var(--accent)]/10 text-[var(--accent)]">
+                      <div className="p-2 rounded-lg bg-[color:var(--accent)]/10 text-[var(--accent)]">
                         <Icon size={20} />
                       </div>
                       <div className="flex-1 min-w-0">

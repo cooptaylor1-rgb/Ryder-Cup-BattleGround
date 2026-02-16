@@ -329,7 +329,7 @@ function PollOption({
         canVote && 'hover:bg-[var(--surface-secondary)] cursor-pointer',
         !canVote && 'cursor-default',
         isSelected && canVote && 'ring-2 ring-[var(--accent)]',
-        isSelected && !canVote && 'bg-[var(--accent)]/10'
+        isSelected && !canVote && 'bg-[color:var(--accent)]/10'
       )}
     >
       {/* Progress bar background */}
@@ -337,7 +337,7 @@ function PollOption({
         <div
           className={cn(
             'absolute inset-0 rounded-lg transition-all',
-            isLeading ? 'bg-[var(--masters)]/20' : 'bg-[var(--surface-secondary)]'
+            isLeading ? 'bg-[color:var(--masters)]/20' : 'bg-[var(--surface-secondary)]'
           )}
           style={{ width: `${percentage}%` }}
         />
@@ -407,7 +407,7 @@ function StatusBadge({ status, isExpired }: StatusBadgeProps) {
   }
 
   return (
-    <span className="px-2 py-0.5 rounded-full bg-[var(--masters)]/20 text-[var(--masters)] type-caption">
+    <span className="px-2 py-0.5 rounded-full bg-[color:var(--masters)]/20 text-[var(--masters)] type-caption">
       Active
     </span>
   );

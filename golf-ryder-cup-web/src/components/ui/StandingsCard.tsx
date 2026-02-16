@@ -211,7 +211,7 @@ export function StandingsCard({
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamAClinched
                                 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                : 'bg-[var(--team-usa)]/5 border-[var(--team-usa)]/10'
+                                : 'bg-[color:var(--team-usa)]/5 border-[color:var(--team-usa)]/10'
                         )}
                     >
                         <p
@@ -231,7 +231,7 @@ export function StandingsCard({
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamBClinched
                                 ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                                : 'bg-[var(--team-europe)]/5 border-[var(--team-europe)]/10'
+                                : 'bg-[color:var(--team-europe)]/5 border-[color:var(--team-europe)]/10'
                         )}
                     >
                         <p

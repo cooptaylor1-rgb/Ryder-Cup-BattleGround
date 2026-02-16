@@ -400,7 +400,7 @@ export function WeatherAlerts({
                         'flex items-center justify-between gap-4 px-4 py-2 rounded-xl',
                         'backdrop-blur-md',
                         'border border-[color:var(--rule)]/35',
-                        'bg-[var(--surface-elevated)]/90 text-[var(--ink)]',
+                        'bg-[color:var(--surface-elevated)]/90 text-[var(--ink)]',
                     )}
                 >
                     <div className="flex items-center gap-3">
