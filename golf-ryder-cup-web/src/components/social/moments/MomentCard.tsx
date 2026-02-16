@@ -143,14 +143,13 @@ function ReactionBar({ reactions, onReact }: ReactionBarProps) {
                     className={cn(
                         'flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-all',
                         data.hasReacted
-                            ? 'bg-blue-100 dark:bg-blue-900/30'
-                            : 'bg-gray-100 dark:bg-gray-800'
+                            ? 'bg-[color:var(--info)]/15 border border-[color:var(--info)]/20'
+                            : 'bg-[color:var(--ink)]/5 hover:bg-[color:var(--ink)]/10'
                     )}
                 >
                     <span>{emoji}</span>
                     <span
-                        className="font-medium"
-                        style={{ color: data.hasReacted ? '#3B82F6' : 'var(--ink-secondary)' }}
+                        className={cn("font-medium", data.hasReacted ? "text-[var(--info)]" : "text-[var(--ink-secondary)]")}
                     >
                         {data.count}
                     </span>
@@ -282,14 +281,14 @@ export function MomentCard({
                 {/* Author Info */}
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                        <span className="font-semibold truncate" style={{ color: 'var(--ink)' }}>
+                        <span className="font-semibold truncate text-[var(--ink)]">
                             {moment.author.name}
                         </span>
                         {moment.type === 'achievement' && (
-                            <Trophy size={14} style={{ color: '#F59E0B' }} />
+                            <Trophy size={14} className="text-[var(--warning)]" />
                         )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--ink-tertiary)' }}>
+                    <div className="flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
                         <Clock size={10} />
                         {formatTimeAgo(moment.timestamp)}
                         {moment.holeNumber && (
@@ -311,12 +310,12 @@ export function MomentCard({
                 {/* Actions */}
                 <button
                     onClick={handleSave}
-                    className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="p-2 rounded-lg transition-colors hover:bg-[color:var(--ink)]/5"
                 >
                     {moment.isSaved ? (
-                        <BookmarkCheck size={18} style={{ color: 'var(--masters)' }} />
+                        <BookmarkCheck size={18} className="text-[var(--masters)]" />
                     ) : (
-                        <Bookmark size={18} style={{ color: 'var(--ink-tertiary)' }} />
+                        <Bookmark size={18} className="text-[var(--ink-tertiary)]" />
                     )}
                 </button>
             </div>
@@ -328,7 +327,7 @@ export function MomentCard({
                     onClick={handleImageClick}
                 >
                     {!isImageLoaded && (
-                        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                        <div className="absolute inset-0 bg-[color:var(--ink)]/10 animate-pulse" />
                     )}
                     <motion.img
                         src={moment.imageUrl}
@@ -346,7 +345,7 @@ export function MomentCard({
                                 {moment.taggedPlayers.slice(0, 3).map((player) => (
                                     <div
                                         key={player.id}
-                                        className="w-6 h-6 rounded-full border-2 border-[color:var(--canvas)]/90 bg-gray-300 flex items-center justify-center text-[10px] font-bold relative overflow-hidden"
+                                        className="w-6 h-6 rounded-full border-2 border-[color:var(--canvas)]/90 bg-[color:var(--ink)]/20 flex items-center justify-center text-[10px] font-bold relative overflow-hidden"
                                         style={{
                                             background: player.avatarUrl ? undefined :
                                                 player.team === 'teamA' ? teamAColor : teamBColor,
@@ -379,13 +378,13 @@ export function MomentCard({
             {/* Content */}
             <div className="p-4 space-y-3">
                 {/* Title */}
-                <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>
+                <h3 className="font-semibold text-[var(--ink)]">
                     {moment.title}
                 </h3>
 
                 {/* Description */}
                 {moment.description && (
-                    <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
+                    <p className="text-sm text-[var(--ink-secondary)]">
                         {moment.description}
                     </p>
                 )}
@@ -394,24 +393,24 @@ export function MomentCard({
                 <ReactionBar reactions={moment.reactions} onReact={handleReact} />
 
                 {/* Actions Row */}
-                <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: 'var(--rule)' }}>
+                <div className="flex items-center justify-between pt-2 border-t border-[var(--rule)]">
                     <div className="flex items-center gap-1">
                         <button
                             onClick={handleComment}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors hover:bg-[color:var(--ink)]/5"
                         >
-                            <MessageCircle size={16} style={{ color: 'var(--ink-secondary)' }} />
-                            <span className="text-sm font-medium" style={{ color: 'var(--ink-secondary)' }}>
+                            <MessageCircle size={16} className="text-[var(--ink-secondary)]" />
+                            <span className="text-sm font-medium text-[var(--ink-secondary)]">
                                 {moment.commentCount > 0 ? moment.commentCount : 'Comment'}
                             </span>
                         </button>
 
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors hover:bg-[color:var(--ink)]/5"
                         >
-                            <Share2 size={16} style={{ color: 'var(--ink-secondary)' }} />
-                            <span className="text-sm font-medium" style={{ color: 'var(--ink-secondary)' }}>
+                            <Share2 size={16} className="text-[var(--ink-secondary)]" />
+                            <span className="text-sm font-medium text-[var(--ink-secondary)]">
                                 Share
                             </span>
                         </button>
@@ -424,8 +423,8 @@ export function MomentCard({
                         onClick={() => onViewComments?.(moment.id)}
                         className="w-full text-left"
                     >
-                        <div className="flex items-start gap-2 p-2 rounded-lg" style={{ background: 'var(--rule)' }}>
-                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-[10px] font-bold shrink-0 relative overflow-hidden">
+                        <div className="flex items-start gap-2 p-2 rounded-lg bg-[var(--rule)]">
+                            <div className="w-6 h-6 rounded-full bg-[color:var(--ink)]/20 flex items-center justify-center text-[10px] font-bold shrink-0 relative overflow-hidden">
                                 {previewComment.userAvatar ? (
                                     <Image
                                         src={previewComment.userAvatar}
@@ -440,18 +439,18 @@ export function MomentCard({
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm">
-                                    <span className="font-semibold" style={{ color: 'var(--ink)' }}>
+                                    <span className="font-semibold text-[var(--ink)]">
                                         {previewComment.userName.split(' ')[0]}
                                     </span>
                                     {' '}
-                                    <span style={{ color: 'var(--ink-secondary)' }}>
+                                    <span className="text-[var(--ink-secondary)]">
                                         {previewComment.text}
                                     </span>
                                 </p>
                             </div>
                         </div>
                         {moment.commentCount > 1 && (
-                            <p className="text-xs mt-1 flex items-center gap-1" style={{ color: 'var(--ink-tertiary)' }}>
+                            <p className="text-xs mt-1 flex items-center gap-1 text-[var(--ink-tertiary)]">
                                 View all {moment.commentCount} comments
                                 <ChevronRight size={12} />
                             </p>
