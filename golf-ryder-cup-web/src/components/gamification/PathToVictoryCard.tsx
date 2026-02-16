@@ -33,16 +33,16 @@ interface PathToVictoryCardProps {
   compact?: boolean;
 }
 
-// Brand colors (non-theme dependent)
+// Brand colors (theme-safe tokens)
 const COLORS = {
-  usa: '#1565C0',
-  europe: '#C62828',
-  gold: '#FFD54F',
-  green: '#004225',
-  success: '#4CAF50',
-  warning: '#FF9800',
-  error: '#EF5350',
-};
+  usa: 'var(--usa-primary)',
+  europe: 'var(--europe-primary)',
+  gold: 'var(--warning)',
+  green: 'var(--masters)',
+  success: 'var(--success)',
+  warning: 'var(--warning)',
+  error: 'var(--error)',
+} as const;
 
 // ============================================
 // MAIN COMPONENT
@@ -64,8 +64,8 @@ export function PathToVictoryCard({
   if (pathData.isDecided && !expanded) {
     const winner = pathData.teamA.hasClinched ? pathData.teamA : pathData.teamB;
     return (
-      <div className="rounded-2xl border-2 border-[#FFD54F] bg-[linear-gradient(135deg,#FFD54F33,#FFD54F1a)] p-6 text-center">
-        <Trophy size={40} className="mx-auto mb-3 text-[#FFD54F]" />
+      <div className="rounded-2xl border-2 border-[color:var(--warning)]/60 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--warning)_20%,transparent),color-mix(in_srgb,var(--warning)_10%,transparent))] p-6 text-center">
+        <Trophy size={40} className="mx-auto mb-3 text-[var(--warning)]" />
         <h3 className="mb-2 text-2xl font-bold text-[var(--ink)]">{winner.name} Wins!</h3>
         <p className="text-base text-[var(--ink-secondary)]">
           Final: {pathData.teamA.currentPoints} - {pathData.teamB.currentPoints}
@@ -78,10 +78,10 @@ export function PathToVictoryCard({
     <div className="rounded-2xl overflow-hidden border border-[color:var(--rule)]/30 bg-[var(--surface)]">
       {/* Dramatic Moment Banner */}
       {dramaticMoment && (
-        <div className="flex items-center gap-3 border-b border-b-[#FFD54F66] bg-[linear-gradient(90deg,#FFD54F4d,#FFD54F1a)] px-4 py-3">
-          <Zap size={20} className="text-[#FFD54F]" />
+        <div className="flex items-center gap-3 border-b border-b-[color:var(--warning)]/40 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--warning)_30%,transparent),color-mix(in_srgb,var(--warning)_10%,transparent))] px-4 py-3">
+          <Zap size={20} className="text-[var(--warning)]" />
           <div>
-            <div className="text-xs font-semibold text-[#FFD54F]">{dramaticMoment.headline}</div>
+            <div className="text-xs font-semibold text-[var(--warning)]">{dramaticMoment.headline}</div>
             <div className="text-xs text-[var(--ink-secondary)]">{dramaticMoment.subtext}</div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export function PathToVictoryCard({
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Target size={20} className="text-[#004225]" />
+            <Target size={20} className="text-[var(--masters)]" />
             <h3 className="text-sm font-semibold text-[var(--ink)]">
               Path to Victory
             </h3>
@@ -158,21 +158,21 @@ function CupProgressBar({ pathData }: { pathData: PathToVictory }) {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <div className="text-xl font-bold text-[#1565C0]">{teamA.currentPoints}</div>
+        <div className="text-xl font-bold text-[var(--usa-primary)]">{teamA.currentPoints}</div>
         <div className="text-xs text-[var(--ink-secondary)]">{pointsToWin} to win</div>
-        <div className="text-xl font-bold text-[#C62828]">{teamB.currentPoints}</div>
+        <div className="text-xl font-bold text-[var(--europe-primary)]">{teamB.currentPoints}</div>
       </div>
       <div className="relative flex h-3 overflow-hidden rounded-full bg-[color:var(--rule)]/25">
         <div
-          className="bg-[linear-gradient(90deg,#1565C0,#1565C0cc)] transition-[width] duration-300 ease-out"
+          className="bg-[linear-gradient(90deg,var(--usa-primary),color-mix(in_srgb,var(--usa-primary)_80%,transparent))] transition-[width] duration-300 ease-out"
           style={{ width: `${teamAPercent}%` }}
         />
-        <div className="absolute left-1/2 top-1/2 z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFD54F] shadow-[0_0_8px_#FFD54F66]">
+        <div className="absolute left-1/2 top-1/2 z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--warning)] shadow-[0_0_8px_color-mix(in_srgb,var(--warning)_40%,transparent)]">
           <Trophy size={12} className="text-[var(--ink)]" />
         </div>
         <div className="flex-1" />
         <div
-          className="bg-[linear-gradient(90deg,#C62828cc,#C62828)] transition-[width] duration-300 ease-out"
+          className="bg-[linear-gradient(90deg,color-mix(in_srgb,var(--europe-primary)_80%,transparent),var(--europe-primary))] transition-[width] duration-300 ease-out"
           style={{ width: `${teamBPercent}%` }}
         />
       </div>
@@ -201,7 +201,7 @@ function QuickSummaryRow({
       )}
     >
       {hasClinched ? (
-        <Trophy size={16} className="text-[#FFD54F]" />
+        <Trophy size={16} className="text-[var(--warning)]" />
       ) : (
         <TrendingUp size={16} className="text-[var(--ptv-color)]" />
       )}
@@ -220,9 +220,9 @@ function TeamScenarios({ team, color }: { team: PathToVictory['teamA']; color: s
         {team.name}
       </div>
       {team.hasClinched ? (
-        <div className="flex items-center gap-2 rounded-lg bg-[#FFD54F]/20 p-3">
-          <Trophy size={16} className="text-[#FFD54F]" />
-          <span className="text-sm text-[#FFD54F]">Cup clinched!</span>
+        <div className="flex items-center gap-2 rounded-lg bg-[color:var(--warning)]/15 p-3">
+          <Trophy size={16} className="text-[var(--warning)]" />
+          <span className="text-sm text-[var(--warning)]">Cup clinched!</span>
         </div>
       ) : team.isEliminated ? (
         <div className="rounded-lg border border-[color:var(--rule)]/30 bg-[var(--surface)] p-3 text-sm text-[var(--ink-secondary)]">
@@ -242,12 +242,12 @@ function TeamScenarios({ team, color }: { team: PathToVictory['teamA']; color: s
 function ScenarioRow({ scenario }: { scenario: VictoryScenario }) {
   const dotClassName =
     scenario.probability === 'high'
-      ? 'bg-[#4CAF50]'
+      ? 'bg-[var(--success)]'
       : scenario.probability === 'medium'
-        ? 'bg-[#FF9800]'
+        ? 'bg-[var(--warning)]'
         : scenario.probability === 'low'
-          ? 'bg-[#FF9800]'
-          : 'bg-[#EF5350]';
+          ? 'bg-[color:var(--warning)]/70'
+          : 'bg-[var(--error)]';
 
   return (
     <div className="flex items-center gap-3 rounded border border-[color:var(--rule)]/20 bg-[var(--surface)] p-2">
@@ -269,7 +269,7 @@ export function PathToVictoryInline({
   if (pathData.isDecided) {
     const winner = pathData.teamA.hasClinched ? pathData.teamA : pathData.teamB;
     return (
-      <div className="flex items-center gap-2 text-sm text-[#FFD54F]">
+      <div className="flex items-center gap-2 text-sm text-[var(--warning)]">
         <Trophy size={14} />
         {winner.name} wins the cup
       </div>

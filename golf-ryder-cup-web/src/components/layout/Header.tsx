@@ -105,7 +105,7 @@ export function Header({
       <div className="flex items-center gap-2 min-w-[40px] justify-end">
         {/* Offline indicator */}
         {!isOnline && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-[rgba(196,152,61,0.1)] text-[var(--warning)]">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-[color:var(--warning)]/10 text-[var(--warning)]">
             <WifiOff className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Offline</span>
           </div>

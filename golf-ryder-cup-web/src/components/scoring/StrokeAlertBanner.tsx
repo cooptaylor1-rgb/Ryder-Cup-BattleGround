@@ -218,12 +218,12 @@ function StrokeIndicator({
       ? {
           text: 'text-[var(--team-usa)]',
           border: 'border-[var(--team-usa)]',
-          badgeBg: 'bg-[rgba(179,39,57,0.12)]',
+          badgeBg: 'bg-[color:var(--team-usa)]/10',
         }
       : {
           text: 'text-[var(--team-europe)]',
           border: 'border-[var(--team-europe)]',
-          badgeBg: 'bg-[rgba(0,39,118,0.12)]',
+          badgeBg: 'bg-[color:var(--team-europe)]/10',
         };
 
   return (
@@ -364,12 +364,13 @@ export function StrokeHolesMiniMap({
 
           if (aStrokes > 0 && bStrokes > 0) {
             // Both teams get strokes
-            bgColor = 'linear-gradient(135deg, rgba(179, 39, 57, 0.2) 50%, rgba(0, 39, 118, 0.2) 50%)';
+            bgColor =
+              'linear-gradient(135deg, color-mix(in_srgb,var(--team-usa)_20%,transparent) 50%, color-mix(in_srgb,var(--team-europe)_20%,transparent) 50%)';
           } else if (aStrokes > 0) {
-            bgColor = 'rgba(179, 39, 57, 0.15)';
+            bgColor = 'color-mix(in_srgb,var(--team-usa)_15%,transparent)';
             textColor = 'var(--team-usa)';
           } else if (bStrokes > 0) {
-            bgColor = 'rgba(0, 39, 118, 0.15)';
+            bgColor = 'color-mix(in_srgb,var(--team-europe)_15%,transparent)';
             textColor = 'var(--team-europe)';
           }
 
@@ -404,11 +405,11 @@ export function StrokeHolesMiniMap({
       {/* Legend */}
       <div className="flex items-center gap-4 mt-3 text-xs text-[var(--ink-tertiary)]">
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-[rgba(179,39,57,0.15)]" />
+          <span className="w-3 h-3 rounded bg-[color:var(--team-usa)]/15" />
           <span>{teamAName}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-[rgba(0,39,118,0.15)]" />
+          <span className="w-3 h-3 rounded bg-[color:var(--team-europe)]/15" />
           <span>{teamBName}</span>
         </div>
       </div>
