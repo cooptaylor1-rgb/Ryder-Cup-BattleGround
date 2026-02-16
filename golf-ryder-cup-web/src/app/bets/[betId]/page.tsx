@@ -272,7 +272,7 @@ export default function BetDetailPage() {
             <main className="container-editorial pt-[var(--space-4)]">
                 {/* Pot Card */}
                 <div
-                    className="card text-center text-white p-[var(--space-6)] mb-[var(--space-4)]"
+                    className="card text-center text-[var(--canvas)] p-[var(--space-6)] mb-[var(--space-4)]"
                     style={{
                         background: bet.status === 'completed'
                             ? 'linear-gradient(135deg, var(--success) 0%, #059669 100%)'
@@ -367,7 +367,7 @@ export default function BetDetailPage() {
                         {/* Teams Display */}
                         <div className="grid grid-cols-[1fr_auto_1fr] gap-[var(--space-3)] mb-[var(--space-4)]">
                             <div className="text-center">
-                                <div className="p-3 rounded-lg bg-[var(--team-usa)] text-white">
+                                <div className="p-3 rounded-lg bg-[var(--team-usa)] text-[var(--canvas)]">
                                     <p className="type-overline mb-[var(--space-1)] opacity-90">Team A</p>
                                     {teamAPlayers.map(p => (
                                         <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
@@ -378,7 +378,7 @@ export default function BetDetailPage() {
                                 <span className="type-title-lg text-[var(--ink-tertiary)]">vs</span>
                             </div>
                             <div className="text-center">
-                                <div className="p-3 rounded-lg bg-[var(--team-europe)] text-white">
+                                <div className="p-3 rounded-lg bg-[var(--team-europe)] text-[var(--canvas)]">
                                     <p className="type-overline mb-[var(--space-1)] opacity-90">Team B</p>
                                     {teamBPlayers.map(p => (
                                         <p key={p.id} className="type-body-sm">{p.firstName} {p.lastName}</p>
@@ -406,7 +406,7 @@ export default function BetDetailPage() {
 
                                     {result ? (
                                         <div
-                                            className={`p-2 rounded text-center text-white ${
+                                            className={`p-2 rounded text-center text-[var(--canvas)] ${
                                                 result === 'push'
                                                     ? 'bg-[var(--warning)]'
                                                     : result === 'teamA'
@@ -427,19 +427,19 @@ export default function BetDetailPage() {
                                         <div className="flex gap-[var(--space-2)]">
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'teamA')}
-                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-usa)] text-white border-none cursor-pointer"
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-usa)] text-[var(--canvas)] border-none cursor-pointer"
                                             >
                                                 Team A
                                             </button>
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'push')}
-                                                className="px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--warning)] text-white border-none cursor-pointer"
+                                                className="px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--warning)] text-[var(--canvas)] border-none cursor-pointer"
                                             >
                                                 Push
                                             </button>
                                             <button
                                                 onClick={() => handleSetNassauWinner(segmentKey, 'teamB')}
-                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-europe)] text-white border-none cursor-pointer"
+                                                className="flex-1 px-3 py-2 rounded-lg transition-all hover:opacity-90 bg-[var(--team-europe)] text-[var(--canvas)] border-none cursor-pointer"
                                             >
                                                 Team B
                                             </button>
@@ -559,9 +559,9 @@ export default function BetDetailPage() {
                                         }}
                                         className={`aspect-square rounded-lg flex flex-col items-center justify-center transition-all hover:scale-105 border-none cursor-pointer ${
                                             result?.winnerId
-                                                ? 'bg-[var(--success)] text-white'
+                                                ? 'bg-[var(--success)] text-[var(--canvas)]'
                                                 : result
-                                                    ? 'bg-[var(--warning)] text-white'
+                                                    ? 'bg-[var(--warning)] text-[var(--canvas)]'
                                                     : 'bg-[var(--surface)] text-[var(--ink)]'
                                         }`}
                                     >
@@ -594,7 +594,7 @@ export default function BetDetailPage() {
                                                 <span
                                                     className={`type-body-sm font-bold size-6 rounded-full flex items-center justify-center ${
                                                         i === 0
-                                                            ? 'bg-[var(--success)] text-white'
+                                                            ? 'bg-[var(--success)] text-[var(--canvas)]'
                                                             : 'bg-[color:var(--surface-secondary)] text-[var(--ink-secondary)]'
                                                     }`}
                                                 >
@@ -651,7 +651,7 @@ export default function BetDetailPage() {
             {showRecordWinner && selectedHole && (
                 <div className="fixed inset-0 z-50 flex items-end justify-center">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-[color:var(--ink)]/50"
                         onClick={() => setShowRecordWinner(false)}
                     />
                     <div className="relative w-full max-w-lg rounded-t-3xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
@@ -673,7 +673,7 @@ export default function BetDetailPage() {
                                     className="card press-scale w-full text-left p-[var(--space-4)] border-none cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="size-10 rounded-full bg-[var(--success)] flex items-center justify-center text-white">
+                                        <div className="size-10 rounded-full bg-[var(--success)] flex items-center justify-center text-[var(--canvas)]">
                                             <Trophy size={20} />
                                         </div>
                                         <span className="type-body">{player.firstName} {player.lastName}</span>
@@ -686,7 +686,7 @@ export default function BetDetailPage() {
                                 className="card press-scale w-full text-left p-[var(--space-4)] border-none cursor-pointer"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="size-10 rounded-full bg-[var(--warning)] flex items-center justify-center text-white">
+                                    <div className="size-10 rounded-full bg-[var(--warning)] flex items-center justify-center text-[var(--canvas)]">
                                         <TrendingUp size={20} />
                                     </div>
                                     <span className="type-body">Push (Carry Over)</span>
@@ -701,7 +701,7 @@ export default function BetDetailPage() {
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-[color:var(--ink)]/50"
                         onClick={() => setShowDeleteConfirm(false)}
                     />
                     <div className="relative rounded-2xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 max-w-sm w-full">
@@ -718,7 +718,7 @@ export default function BetDetailPage() {
                             </button>
                             <button
                                 onClick={handleDeleteBet}
-                                className="btn flex-1 bg-[var(--error)] text-white"
+                                className="btn flex-1 bg-[var(--error)] text-[var(--canvas)]"
                             >
                                 Delete
                             </button>
