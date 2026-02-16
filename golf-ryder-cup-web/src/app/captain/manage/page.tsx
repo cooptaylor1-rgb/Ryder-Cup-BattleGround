@@ -250,11 +250,11 @@ export default function CaptainManagePage() {
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'completed':
-                return <CheckCircle size={16} className="text-green-500" />;
+                return <CheckCircle size={16} className="text-[var(--success)]" />;
             case 'inProgress':
-                return <Zap size={16} className="text-amber-500" />;
+                return <Zap size={16} className="text-[var(--warning)]" />;
             default:
-                return <Clock size={16} className="text-gray-400" />;
+                return <Clock size={16} className="text-[var(--ink-tertiary)]" />;
         }
     };
 
@@ -541,10 +541,14 @@ function MatchEditor({ match, players: _players, getPlayerNames, isEditing, onEd
                 <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-1)]">
                     <Hash size={14} className="text-[var(--ink-tertiary)]" />
                     <span className="type-meta font-semibold">Match {match.matchOrder}</span>
-                    <span className={`type-micro px-2 py-0.5 rounded-full ${match.status === 'completed' ? 'bg-green-500/20 text-green-600' :
-                        match.status === 'inProgress' ? 'bg-amber-500/20 text-amber-600' :
-                            'bg-gray-500/20 text-gray-500'
-                        }`}>
+                    <span
+                        className={`type-micro px-2 py-0.5 rounded-full ${match.status === 'completed'
+                            ? 'bg-[color:var(--success)]/15 text-[var(--success)]'
+                            : match.status === 'inProgress'
+                                ? 'bg-[color:var(--warning)]/15 text-[var(--warning)]'
+                                : 'bg-[color:var(--ink)]/10 text-[var(--ink-tertiary)]'
+                            }`}
+                    >
                         {match.status}
                     </span>
                 </div>

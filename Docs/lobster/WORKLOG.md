@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:25 EST — Phase 2 — Token hygiene: Captain Manage status icons + pills
+- `/captain/manage`: replaced `text-gray-*`, `text-green-*`, `text-amber-*`, and `bg-*/20` status pills with semantic premium tokens (`var(--success)`, `var(--warning)`, `var(--ink-tertiary)`) using Tailwind-safe arbitrary values (`bg-[color:var(--token)]/…`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 16:05 EST — Phase 2 — Token hygiene: eliminate remaining Tailwind gray primitives in celebration + stats UI
 - `ScoreCelebration`: replaced `bg-gray-*` surfaces and rgba black overlays with token-driven ink tints (`bg-[color:var(--ink)]/…`) for theme-safe celebration modals.
 - `PlayerStatsCard`: replaced rank badge `bg-gray-*` + `text-gray-*` and swapped `text-green-500`/`text-red-500` for semantic tokens (`var(--success)`/`var(--error)`).
