@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:55 EST — Phase 2 — Token hygiene: error pages + admin warning surfaces
+- Standardized route-level error pages (`/help`, `/join`, `/admin`, `/settings`, `/score`, `/achievements`, `/trip-stats`) to use premium semantic tokens for error/warning icon shells (`bg-[color:var(--error)]/10`, `bg-[color:var(--warning)]/10`) instead of hard-coded `rgba(...)` + `#dc2626`.
+- `/admin`: tokenized warning banner + destructive delete button surfaces off `rgba(220,38,38,…)` / `text-red-600` / `bg-[#dc2626]` and onto `var(--error)` tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`8b574db`)
+
 ### 16:35 EST — Phase 2 — Token hygiene: SideBetPresets badge colors
 - `SideBetPresets`: migrated side bet type badge colors off Tailwind primitives (`bg-green-500`, `bg-blue-500`, etc.) onto premium semantic tokens (`var(--success)`, `var(--warning)`, `var(--info)`, `var(--color-accent)`, `var(--masters)`, `var(--error)`, `var(--ink-tertiary)`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
