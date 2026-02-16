@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 22:50 EST — Phase 2 — Captain route headers: canvas token icons
+- `/captain/contacts`, `/captain/pairings`, `/captain/messages`: `PageHeader` icons now use `text-[var(--canvas)]` instead of `text-white` for theme-safe inverse chips.
+- `PathToVictoryCard`: trophy marker uses `text-[var(--ink)]` instead of `text-black`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`63fada2`)
+
 ### 21:25 EST — Phase 2 — Social photos + captain tools: tokenize remaining inverse palette fragments
 - `PhotoGallery`: tokenized the upload CTA + hole badge + full-screen viewer chrome (ink backdrop + canvas typography); removed remaining `bg-black`/`text-white` fragments.
 - `DraftBoard`: auction “Win Bid” button now uses `text-[var(--canvas)]` on the success surface (no `text-white`).
