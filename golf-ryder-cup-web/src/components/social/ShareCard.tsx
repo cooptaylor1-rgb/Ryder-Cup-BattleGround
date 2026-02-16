@@ -127,10 +127,10 @@ export function MatchResultCard({
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <div className="text-white/60 text-sm">{sessionName}</div>
-                            <div className="text-white text-lg font-bold">Match {matchNumber}</div>
+                            <div className="text-[color:var(--canvas)]/60 text-sm">{sessionName}</div>
+                            <div className="text-[var(--canvas)] text-lg font-bold">Match {matchNumber}</div>
                         </div>
-                        <div className="text-white/60 text-sm">{tripName}</div>
+                        <div className="text-[color:var(--canvas)]/60 text-sm">{tripName}</div>
                     </div>
 
                     {/* Teams and Score */}
@@ -142,12 +142,12 @@ export function MatchResultCard({
                         )}>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-2xl">🇺🇸</span>
-                                <span className="text-white font-medium">USA</span>
+                                <span className="text-[var(--canvas)] font-medium">USA</span>
                                 {winnerTeam === 'usa' && (
                                     <Trophy className="w-4 h-4 text-secondary-gold" />
                                 )}
                             </div>
-                            <div className="text-white space-y-1">
+                            <div className="text-[var(--canvas)] space-y-1">
                                 {teamAPlayers.map(p => (
                                     <div key={p.id} className="font-semibold">
                                         {formatPlayerName(p.firstName, p.lastName, 'full')}
@@ -158,8 +158,8 @@ export function MatchResultCard({
 
                         {/* Score */}
                         <div className="text-center">
-                            <div className="text-white text-3xl font-bold">{score}</div>
-                            <div className="text-white/60 text-sm">thru {holesPlayed}</div>
+                            <div className="text-[var(--canvas)] text-3xl font-bold">{score}</div>
+                            <div className="text-[color:var(--canvas)]/60 text-sm">thru {holesPlayed}</div>
                         </div>
 
                         {/* Team Europe */}
@@ -171,10 +171,10 @@ export function MatchResultCard({
                                 {winnerTeam === 'europe' && (
                                     <Trophy className="w-4 h-4 text-secondary-gold" />
                                 )}
-                                <span className="text-white font-medium">EUR</span>
+                                <span className="text-[var(--canvas)] font-medium">EUR</span>
                                 <span className="text-2xl">🇪🇺</span>
                             </div>
-                            <div className="text-white space-y-1">
+                            <div className="text-[var(--canvas)] space-y-1">
                                 {teamBPlayers.map(p => (
                                     <div key={p.id} className="font-semibold">
                                         {formatPlayerName(p.firstName, p.lastName, 'full')}
@@ -186,7 +186,7 @@ export function MatchResultCard({
 
                     {/* Result */}
                     <div className="mt-6 text-center">
-                        <div className="text-white text-xl font-bold">
+                        <div className="text-[var(--canvas)] text-xl font-bold">
                             {winnerTeam === 'halved' ? (
                                 'MATCH HALVED'
                             ) : (
@@ -198,7 +198,7 @@ export function MatchResultCard({
                     </div>
 
                     {/* Watermark */}
-                    <div className="mt-6 text-center text-white/40 text-xs">
+                    <div className="mt-6 text-center text-[color:var(--canvas)]/40 text-xs">
                         Golf Ryder Cup App
                     </div>
                 </div>
@@ -222,7 +222,7 @@ export function MatchResultCard({
                     onClick={handleShare}
                     className={cn(
                         'flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg',
-                        'bg-masters-primary text-white',
+                        'bg-masters-primary text-[var(--canvas)]',
                         'hover:bg-masters-primary-dark',
                         'transition-colors'
                     )}
@@ -309,32 +309,32 @@ export function StandingsShareCard({
                 )}
             >
                 <div className="relative z-10">
-                    <div className="text-white/60 text-sm mb-1">{sessionName || 'Current Standings'}</div>
-                    <div className="text-white text-xl font-bold mb-6">{tripName}</div>
+                    <div className="text-[color:var(--canvas)]/60 text-sm mb-1">{sessionName || 'Current Standings'}</div>
+                    <div className="text-[var(--canvas)] text-xl font-bold mb-6">{tripName}</div>
 
                     <div className="flex items-center justify-center gap-8">
                         <div className="text-center">
                             <div className="text-4xl mb-2">🇺🇸</div>
-                            <div className="text-white text-5xl font-bold">{teamAScore}</div>
-                            <div className="text-white/60 text-sm mt-1">USA</div>
+                            <div className="text-[var(--canvas)] text-5xl font-bold">{teamAScore}</div>
+                            <div className="text-[color:var(--canvas)]/60 text-sm mt-1">USA</div>
                         </div>
 
-                        <div className="text-white/40 text-2xl">-</div>
+                        <div className="text-[color:var(--canvas)]/40 text-2xl">-</div>
 
                         <div className="text-center">
                             <div className="text-4xl mb-2">🇪🇺</div>
-                            <div className="text-white text-5xl font-bold">{teamBScore}</div>
-                            <div className="text-white/60 text-sm mt-1">EUR</div>
+                            <div className="text-[var(--canvas)] text-5xl font-bold">{teamBScore}</div>
+                            <div className="text-[color:var(--canvas)]/60 text-sm mt-1">EUR</div>
                         </div>
                     </div>
 
                     {matchesRemaining > 0 && (
-                        <div className="mt-6 text-center text-white/60">
+                        <div className="mt-6 text-center text-[color:var(--canvas)]/60">
                             {matchesRemaining} match{matchesRemaining !== 1 ? 'es' : ''} remaining
                         </div>
                     )}
 
-                    <div className="mt-4 text-center text-white/40 text-xs">
+                    <div className="mt-4 text-center text-[color:var(--canvas)]/40 text-xs">
                         Golf Ryder Cup App
                     </div>
                 </div>
@@ -344,7 +344,7 @@ export function StandingsShareCard({
                 onClick={handleShare}
                 className={cn(
                     'w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg',
-                    'bg-masters-primary text-white',
+                    'bg-masters-primary text-[var(--canvas)]',
                     'hover:bg-masters-primary-dark',
                     'transition-colors'
                 )}

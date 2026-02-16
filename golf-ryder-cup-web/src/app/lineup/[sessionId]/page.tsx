@@ -365,7 +365,7 @@ export default function SessionPage() {
               <button
                 onClick={() => setViewMode('matches')}
                 className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${viewMode === 'matches'
-                  ? 'bg-masters text-white'
+                  ? 'bg-masters text-[var(--canvas)]'
                   : 'bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)] hover:border-[color:var(--rule)]/60'
                   }`}
               >
@@ -376,7 +376,7 @@ export default function SessionPage() {
                 onClick={() => setViewMode('edit')}
                 disabled={!canEdit}
                 className={`flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${viewMode === 'edit'
-                  ? 'bg-masters text-white'
+                  ? 'bg-masters text-[var(--canvas)]'
                   : 'bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)] hover:border-[color:var(--rule)]/60'
                   }`}
               >

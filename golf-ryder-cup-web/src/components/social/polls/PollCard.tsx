@@ -351,7 +351,7 @@ function PollOption({
             ? 'border-[var(--accent)] bg-[var(--accent)]'
             : 'border-[color:var(--rule)]/60'
         )}>
-          {isSelected && <Check size={12} className="text-white" />}
+          {isSelected && <Check size={12} className="text-[var(--canvas)]" />}
         </div>
 
         {/* Option content */}

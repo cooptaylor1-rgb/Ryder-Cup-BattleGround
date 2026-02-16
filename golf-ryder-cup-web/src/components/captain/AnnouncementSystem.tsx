@@ -546,16 +546,16 @@ export function AnnouncementBanner({
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center">
           {isUrgent ? (
-            <AlertCircle className="w-5 h-5 text-white" />
+            <AlertCircle className="w-5 h-5 text-[var(--canvas)]" />
           ) : (
-            <Bell className="w-5 h-5 text-white" />
+            <Bell className="w-5 h-5 text-[var(--canvas)]" />
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-white">{announcement.title}</p>
-          <p className="text-sm text-white/80 mt-1">{announcement.message}</p>
-          <p className="text-xs text-white/60 mt-2">
+          <p className="font-bold text-[var(--canvas)]">{announcement.title}</p>
+          <p className="text-sm text-[color:var(--canvas)]/80 mt-1">{announcement.message}</p>
+          <p className="text-xs text-[color:var(--canvas)]/60 mt-2">
             — {announcement.author.name} • {formatRelativeTime(announcement.createdAt)}
           </p>
         </div>
@@ -563,7 +563,7 @@ export function AnnouncementBanner({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="p-1 rounded-lg bg-[color:var(--canvas-raised)]/20 text-white transition-colors hover:bg-[color:var(--canvas-raised)]/30"
+            className="p-1 rounded-lg bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] transition-colors hover:bg-[color:var(--canvas-raised)]/30"
           >
             <X className="w-4 h-4" />
           </button>
@@ -573,7 +573,7 @@ export function AnnouncementBanner({
       {onView && (
         <button
           onClick={onView}
-          className="w-full mt-3 py-2 rounded-xl bg-[color:var(--canvas-raised)]/20 text-white text-sm font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
+          className="w-full mt-3 py-2 rounded-xl bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] text-sm font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
         >
           View Details
         </button>

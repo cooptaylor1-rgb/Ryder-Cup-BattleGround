@@ -691,7 +691,7 @@ function BetManagementCard({
                     {onComplete && !showWinnerSelect && (
                         <button
                             onClick={() => setShowWinnerSelect(true)}
-                            className="press-scale flex-1 p-[var(--space-2)] bg-success text-white border-none rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)] font-medium"
+                            className="press-scale flex-1 p-[var(--space-2)] bg-success text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)] font-medium"
                         >
                             <Check size={14} />
                             Complete
@@ -723,7 +723,7 @@ function BetManagementCard({
                                         onComplete(id);
                                         setShowWinnerSelect(false);
                                     }}
-                                    className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-masters text-white border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
+                                    className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-masters text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                                 >
                                     {player.firstName}
                                 </button>
@@ -733,7 +733,7 @@ function BetManagementCard({
                                 onComplete();
                                 setShowWinnerSelect(false);
                             }}
-                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-ink-tertiary text-white border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
+                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-ink-tertiary text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
                         >
                             No Winner
                         </button>

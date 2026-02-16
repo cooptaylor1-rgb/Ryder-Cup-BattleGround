@@ -57,13 +57,13 @@ export function ScoreButton({
 
     if (teamColor === 'usa') {
       return isSelected
-        ? 'bg-team-usa text-white border-team-usa shadow-xl shadow-team-usa/40 scale-[1.02]'
+        ? 'bg-team-usa text-[var(--canvas)] border-team-usa shadow-xl shadow-team-usa/40 scale-[1.02]'
         : 'bg-team-usa/15 text-team-usa border-team-usa/50 hover:bg-team-usa/25 hover:border-team-usa';
     }
 
     if (teamColor === 'europe') {
       return isSelected
-        ? 'bg-team-europe text-white border-team-europe shadow-xl shadow-team-europe/40 scale-[1.02]'
+        ? 'bg-team-europe text-[var(--canvas)] border-team-europe shadow-xl shadow-team-europe/40 scale-[1.02]'
         : 'bg-team-europe/15 text-team-europe border-team-europe/50 hover:bg-team-europe/25 hover:border-team-europe';
     }
 
@@ -92,7 +92,7 @@ export function ScoreButton({
       {label}
       {isSelected && (
         <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--masters)] rounded-full flex items-center justify-center">
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3 h-3 text-[var(--canvas)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </span>
