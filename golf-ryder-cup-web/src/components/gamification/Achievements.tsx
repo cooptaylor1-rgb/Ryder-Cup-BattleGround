@@ -379,10 +379,10 @@ interface AchievementCardProps {
 
 function AchievementCard({ definition, achievement, earned }: AchievementCardProps) {
     const rarityColors = {
-        common: 'from-gray-400 to-gray-500',
-        uncommon: 'from-green-400 to-green-600',
-        rare: 'from-blue-400 to-blue-600',
-        legendary: 'from-yellow-400 to-orange-500',
+        common: 'from-[color:var(--ink-tertiary)] to-[color:var(--ink-secondary)]',
+        uncommon: 'from-[color:var(--success)] to-[color:var(--success)]',
+        rare: 'from-[color:var(--info)] to-[color:var(--info)]',
+        legendary: 'from-[color:var(--warning)] to-[color:var(--warning)]',
     };
 
     return (
@@ -428,10 +428,14 @@ function AchievementCard({ definition, achievement, earned }: AchievementCardPro
                 <div
                     className={cn(
                         'px-2 py-0.5 rounded-full text-xs font-medium',
-                        definition.rarity === 'common' && 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                        definition.rarity === 'uncommon' && 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400',
-                        definition.rarity === 'rare' && 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400',
-                        definition.rarity === 'legendary' && 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400'
+                        definition.rarity === 'common' &&
+                            'bg-[color:var(--ink)]/5 text-[var(--ink-secondary)] border border-[color:var(--rule)]/60',
+                        definition.rarity === 'uncommon' &&
+                            'bg-[color:var(--success)]/12 text-[var(--success)] border border-[color:var(--success)]/25',
+                        definition.rarity === 'rare' &&
+                            'bg-[color:var(--info)]/12 text-[var(--info)] border border-[color:var(--info)]/25',
+                        definition.rarity === 'legendary' &&
+                            'bg-[color:var(--warning)]/12 text-[var(--warning)] border border-[color:var(--warning)]/25'
                     )}
                 >
                     {definition.rarity.charAt(0).toUpperCase() + definition.rarity.slice(1)}
@@ -461,10 +465,10 @@ export function AchievementBadge({ definition, earned, size = 'md' }: Achievemen
     };
 
     const rarityColors = {
-        common: 'from-gray-400 to-gray-500',
-        uncommon: 'from-green-400 to-green-600',
-        rare: 'from-blue-400 to-blue-600',
-        legendary: 'from-yellow-400 to-orange-500',
+        common: 'from-[color:var(--ink-tertiary)] to-[color:var(--ink-secondary)]',
+        uncommon: 'from-[color:var(--success)] to-[color:var(--success)]',
+        rare: 'from-[color:var(--info)] to-[color:var(--info)]',
+        legendary: 'from-[color:var(--warning)] to-[color:var(--warning)]',
     };
 
     return (

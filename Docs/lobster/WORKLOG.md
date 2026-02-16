@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:45 EST — Phase 2 — Token hygiene: Achievements rarity pills + QuickPlayerSwap status markers
+- `Achievements`: replaced Tailwind `gray/green/blue/yellow` rarity pills with premium token-driven backgrounds + text (`var(--ink)`, `var(--success)`, `var(--info)`, `var(--warning)`) and added subtle token borders for consistent contrast.
+- `Achievements`: updated rarity gradient stops to use token-based colors (`from-[color:var(--…)]`) instead of Tailwind primitives.
+- `QuickPlayerSwap`: replaced status color utilities and team dots (`bg-red-500`, `bg-blue-500`, `text-*-400/500`) with semantic tokens (`var(--success)`, `var(--warning)`, `var(--error)`, `var(--info)`) and team vars (`var(--usa-primary)`, `var(--europe-primary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 16:25 EST — Phase 2 — Token hygiene: Captain Manage status icons + pills
 - `/captain/manage`: replaced `text-gray-*`, `text-green-*`, `text-amber-*`, and `bg-*/20` status pills with semantic premium tokens (`var(--success)`, `var(--warning)`, `var(--ink-tertiary)`) using Tailwind-safe arbitrary values (`bg-[color:var(--token)]/…`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

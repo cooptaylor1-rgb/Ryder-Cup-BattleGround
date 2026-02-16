@@ -210,11 +210,16 @@ export function QuickPlayerSwap({
 
     const getPlayerStatusColor = (status?: string) => {
         switch (status) {
-            case 'checked-in': return 'text-green-500';
-            case 'en-route': return 'text-yellow-500';
-            case 'no-show': return 'text-red-500';
-            case 'playing': return 'text-blue-500';
-            default: return 'text-gray-400';
+            case 'checked-in':
+                return 'text-[var(--success)]';
+            case 'en-route':
+                return 'text-[var(--warning)]';
+            case 'no-show':
+                return 'text-[var(--error)]';
+            case 'playing':
+                return 'text-[var(--info)]';
+            default:
+                return 'text-[var(--ink-tertiary)]';
         }
     };
 
@@ -278,7 +283,7 @@ export function QuickPlayerSwap({
                             {/* Team A */}
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="w-3 h-3 rounded-full bg-red-500" />
+                                    <span className="w-3 h-3 rounded-full bg-[var(--usa-primary)]" />
                                     <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                                         Team A
                                     </span>
@@ -316,7 +321,7 @@ export function QuickPlayerSwap({
                             {/* Team B */}
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="w-3 h-3 rounded-full bg-blue-500" />
+                                    <span className="w-3 h-3 rounded-full bg-[var(--europe-primary)]" />
                                     <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                                         Team B
                                     </span>
@@ -443,7 +448,12 @@ export function QuickPlayerSwap({
                                                             <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
                                                                 HCP: {player.handicapIndex}
                                                                 {hcpDiff !== 0 && (
-                                                                    <span className={cn('ml-2', hcpDiff > 0 ? 'text-red-400' : 'text-green-400')}>
+                                                                    <span
+                                                                        className={cn(
+                                                                            'ml-2',
+                                                                            hcpDiff > 0 ? 'text-[var(--error)]' : 'text-[var(--success)]'
+                                                                        )}
+                                                                    >
                                                                         ({hcpDiff > 0 ? '+' : ''}{hcpDiff.toFixed(1)})
                                                                     </span>
                                                                 )}
@@ -522,7 +532,7 @@ export function QuickPlayerSwap({
                                         )}
                                     >
                                         {handicapImpact.isSignificant && (
-                                            <AlertTriangle className="w-4 h-4 inline-block mr-1 text-yellow-500" />
+                                            <AlertTriangle className="w-4 h-4 inline-block mr-1 text-[var(--warning)]" />
                                         )}
                                         <span style={{ color: handicapImpact.isSignificant ? '#eab308' : 'var(--ink-muted)' }}>
                                             Handicap {handicapImpact.direction === 'higher' ? 'increases' : 'decreases'} by{' '}
@@ -738,9 +748,9 @@ export function PlayerSwapModal({
                                                         </span>
                                                     </div>
                                                     <p className="text-sm" style={{ color: 'var(--ink)' }}>
-                                                        <span className="text-red-400">{original?.firstName} {original?.lastName}</span>
+                                                        <span className="text-[var(--error)]">{original?.firstName} {original?.lastName}</span>
                                                         <span className="mx-2">→</span>
-                                                        <span className="text-green-400">{replacement?.firstName} {replacement?.lastName}</span>
+                                                        <span className="text-[var(--success)]">{replacement?.firstName} {replacement?.lastName}</span>
                                                     </p>
                                                     {swap.reason && (
                                                         <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>
@@ -776,7 +786,7 @@ export function PlayerSwapModal({
                                                 <div className="flex items-center gap-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-1 mb-1">
-                                                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                                                            <span className="w-2 h-2 rounded-full bg-[var(--usa-primary)]" />
                                                             <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>Team A</span>
                                                         </div>
                                                         <p className="text-sm truncate" style={{ color: 'var(--ink)' }}>
@@ -787,7 +797,7 @@ export function PlayerSwapModal({
                                                     <div className="flex-1 text-right">
                                                         <div className="flex items-center justify-end gap-1 mb-1">
                                                             <span className="text-xs" style={{ color: 'var(--ink-muted)' }}>Team B</span>
-                                                            <span className="w-2 h-2 rounded-full bg-blue-500" />
+                                                            <span className="w-2 h-2 rounded-full bg-[var(--europe-primary)]" />
                                                         </div>
                                                         <p className="text-sm truncate" style={{ color: 'var(--ink)' }}>
                                                             {teamBPlayers.map(p => p.firstName).join(' & ')}
