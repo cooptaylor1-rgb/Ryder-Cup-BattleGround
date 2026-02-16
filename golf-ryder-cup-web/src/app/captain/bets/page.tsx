@@ -261,7 +261,7 @@ export default function CaptainBetsPage() {
             <PageHeader
                 title="Side Bets"
                 subtitle={`${activeBets.length} active`}
-                icon={<DollarSign size={16} style={{ color: 'white' }} />}
+                icon={<DollarSign size={16} style={{ color: 'var(--canvas)' }} />}
                 iconContainerStyle={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 }}
@@ -368,7 +368,7 @@ export default function CaptainBetsPage() {
             {/* Create/Edit Modal */}
             {showCreateModal && (
                 <div
-                    className="fixed inset-0 bg-black/70 z-[100] flex items-end justify-center"
+                    className="fixed inset-0 bg-[color:var(--ink)]/70 z-[100] flex items-end justify-center"
                     onClick={() => {
                         setShowCreateModal(false);
                         resetForm();
@@ -416,7 +416,7 @@ export default function CaptainBetsPage() {
                                                 className="press-scale py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-[length:var(--text-sm)] font-medium"
                                                 style={{
                                                     background: newBetType === bt.type ? bt.color : 'var(--canvas-sunken)',
-                                                    color: newBetType === bt.type ? 'white' : 'var(--ink-secondary)',
+                                                    color: newBetType === bt.type ? 'var(--canvas)' : 'var(--ink-secondary)',
                                                 }}
                                             >
                                                 {bt.label}
@@ -498,7 +498,7 @@ export default function CaptainBetsPage() {
                                             className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
                                             style={{
                                                 background: selectedParticipants.length === players.length ? 'var(--masters)' : 'var(--canvas-sunken)',
-                                                color: selectedParticipants.length === players.length ? 'white' : 'var(--ink-secondary)',
+                                                color: selectedParticipants.length === players.length ? 'var(--canvas)' : 'var(--ink-secondary)',
                                             }}
                                         >
                                             {selectedParticipants.length === players.length ? '✓ All' : 'Select All'}
@@ -514,7 +514,7 @@ export default function CaptainBetsPage() {
                                                 className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
                                                 style={{
                                                     background: selectedParticipants.includes(player.id) ? 'var(--masters)' : 'var(--canvas-sunken)',
-                                                    color: selectedParticipants.includes(player.id) ? 'white' : 'var(--ink-secondary)',
+                                                    color: selectedParticipants.includes(player.id) ? 'var(--canvas)' : 'var(--ink-secondary)',
                                                 }}
                                             >
                                                 {player.firstName}
@@ -630,7 +630,7 @@ function BetManagementCard({
                     className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center"
                     style={{
                         background: isCompleted ? 'var(--success)' : `color-mix(in srgb, ${getBetColor(bet.type)} 20%, transparent)`,
-                        color: isCompleted ? 'white' : getBetColor(bet.type),
+                        color: isCompleted ? 'var(--canvas)' : getBetColor(bet.type),
                     }}
                 >
                     {isCompleted ? <Check size={22} /> : getBetIcon(bet.type)}

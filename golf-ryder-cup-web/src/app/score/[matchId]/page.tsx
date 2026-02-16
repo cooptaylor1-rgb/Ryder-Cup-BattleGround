@@ -901,7 +901,7 @@ export default function EnhancedMatchScoringPage() {
           <Suspense
             fallback={
               <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/35"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/35"
                 role="status"
                 aria-live="polite"
                 aria-label="Loading celebration"
@@ -957,7 +957,7 @@ export default function EnhancedMatchScoringPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm"
           >
             <motion.div
               initial={prefersReducedMotion ? false : { scale: 0.95, opacity: 0 }}

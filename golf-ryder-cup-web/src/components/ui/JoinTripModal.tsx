@@ -69,7 +69,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm">
       <div className="bg-[var(--surface-raised)] rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-[color:var(--rule)]/40">
         {/* Header */}
         <div className="p-6 border-b border-[color:var(--rule)]/40">

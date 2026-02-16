@@ -247,7 +247,7 @@ export function AttendanceCheckIn({
                     {onRefresh && (
                         <button
                             onClick={onRefresh}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--ink)]/6 transition-colors"
                         >
                             <RefreshCw className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                         </button>
@@ -522,7 +522,7 @@ function PlayerCheckInCard({
                                         e.stopPropagation();
                                         onCall();
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-[color:var(--ink)]/6"
                                     style={{ background: 'var(--surface-raised)', color: 'var(--ink)' }}
                                 >
                                     <Phone className="w-4 h-4" />
@@ -536,7 +536,7 @@ function PlayerCheckInCard({
                                         e.stopPropagation();
                                         onText();
                                     }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-[color:var(--ink)]/6"
                                     style={{ background: 'var(--surface-raised)', color: 'var(--ink)' }}
                                 >
                                     <MessageSquare className="w-4 h-4" />
@@ -583,7 +583,7 @@ function ETAModal({ player, onSetETA, onClose }: ETAModalProps) {
         >
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-[color:var(--ink)]/60 backdrop-blur-sm"
                 onClick={onClose}
             />
 
@@ -606,7 +606,7 @@ function ETAModal({ player, onSetETA, onClose }: ETAModalProps) {
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--ink)]/6 transition-colors"
                         >
                             <X className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                         </button>
@@ -618,7 +618,7 @@ function ETAModal({ player, onSetETA, onClose }: ETAModalProps) {
                         <button
                             key={option.value}
                             onClick={() => onSetETA(option.value)}
-                            className="w-full p-3 rounded-xl text-left hover:bg-white/5 transition-colors"
+                            className="w-full p-3 rounded-xl text-left hover:bg-[color:var(--ink)]/3 transition-colors"
                             style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
                         >
                             <span style={{ color: 'var(--ink)' }}>{option.label}</span>
