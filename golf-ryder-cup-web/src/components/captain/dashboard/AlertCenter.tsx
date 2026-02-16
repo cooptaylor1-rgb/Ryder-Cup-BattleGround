@@ -291,7 +291,7 @@ function AlertCard({
                         {alert.primaryAction && (
                             <button
                                 onClick={handlePrimary}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--canvas)] transition-colors"
                                 style={{ background: priorityConfig.color }}
                             >
                                 {alert.primaryAction.label}
@@ -480,8 +480,8 @@ export function AlertCenter({
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                                style={{ background: '#EF4444' }}
+                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-[var(--canvas)]"
+                                style={{ background: 'var(--error)' }}
                             >
                                 {counts.critical}
                             </motion.div>
