@@ -158,7 +158,7 @@ export function CreatePollModal({
   const isValidCustom = question.trim() && options.filter(o => o.trim()).length >= 2;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[color:var(--ink)]/60 backdrop-blur-sm">
       <div className="card rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-scale-up">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--rule)]">

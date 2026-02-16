@@ -248,11 +248,7 @@ export function NotificationBell({ onClick, className }: NotificationBellProps) 
       <Bell className="w-6 h-6" />
       {unreadCount > 0 && (
         <span
-          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold"
-          style={{
-            background: 'var(--error)',
-            color: 'white',
-          }}
+          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold bg-[var(--error)] text-[var(--canvas)]"
         >
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
@@ -284,7 +280,7 @@ export function NotificationCenter({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/40"
+        className="fixed inset-0 z-40 bg-[color:var(--ink)]/40"
         onClick={onClose}
       />
 

@@ -159,7 +159,7 @@ function PlayerSwapCard({
                         />
                     ) : (
                         <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-[var(--canvas)]"
                             style={{ background: teamColor }}
                         >
                             {player.name.charAt(0)}
@@ -332,7 +332,7 @@ function PlayerPickerModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50"
+                className="fixed inset-0 bg-[color:var(--ink)]/50 z-50"
                 onClick={onClose}
             />
             <motion.div
@@ -369,7 +369,7 @@ function PlayerPickerModal({
                             style={{ background: 'var(--surface)' }}
                         >
                             <div
-                                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-[var(--canvas)]"
                                 style={{ background: teamColor }}
                             >
                                 {p.name.charAt(0)}
@@ -765,10 +765,9 @@ export function SessionCloner({
                         onClick={() => { haptic.press(); setStep('players'); }}
                         disabled={!canProceed}
                         className={cn(
-                            'px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2',
+                            'px-6 py-2 rounded-lg text-sm font-semibold text-[var(--canvas)] flex items-center gap-2 bg-[var(--masters)]',
                             !canProceed && 'opacity-50'
                         )}
-                        style={{ background: 'var(--masters)' }}
                     >
                         Next: Players
                         <ChevronRight size={14} />
@@ -778,8 +777,7 @@ export function SessionCloner({
                 {step === 'players' && (
                     <button
                         onClick={() => { haptic.press(); setStep('preview'); }}
-                        className="px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2"
-                        style={{ background: 'var(--masters)' }}
+                        className="px-6 py-2 rounded-lg text-sm font-semibold text-[var(--canvas)] flex items-center gap-2 bg-[var(--masters)]"
                     >
                         Preview
                         <ChevronRight size={14} />
@@ -791,10 +789,9 @@ export function SessionCloner({
                         onClick={handleClone}
                         disabled={isCloning}
                         className={cn(
-                            'px-6 py-2 rounded-lg text-sm font-semibold text-white flex items-center gap-2',
+                            'px-6 py-2 rounded-lg text-sm font-semibold text-[var(--canvas)] flex items-center gap-2 bg-[var(--masters)]',
                             isCloning && 'opacity-70'
                         )}
-                        style={{ background: 'var(--masters)' }}
                     >
                         {isCloning ? (
                             <>
