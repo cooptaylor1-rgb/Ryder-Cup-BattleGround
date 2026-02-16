@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:35 EST — Phase 2 — Token hygiene: SideBetPresets badge colors
+- `SideBetPresets`: migrated side bet type badge colors off Tailwind primitives (`bg-green-500`, `bg-blue-500`, etc.) onto premium semantic tokens (`var(--success)`, `var(--warning)`, `var(--info)`, `var(--color-accent)`, `var(--masters)`, `var(--error)`, `var(--ink-tertiary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`b0e18d8`)
+
 ### 16:30 EST — Phase 2 — Token hygiene: ScorecardUpload overlay + Tailwind build warning cleanup
 - `ScorecardUpload`: tokenized modal backdrop from `bg-[rgba(0,0,0,0.6)]` → `bg-[color:var(--ink)]/60` to keep overlays theme-safe and consistent with the premium ink/canvas system.
 - `ScorecardUpload`: removed inline `style={{ color: 'var(--ink-tertiary)' }}` in favor of `text-[var(--ink-tertiary)]`.
