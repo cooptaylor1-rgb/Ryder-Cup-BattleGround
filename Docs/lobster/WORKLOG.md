@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 17:10 EST — Phase 2 — Token hygiene: Path to Victory + stroke indicators + offline chip
+- `PathToVictoryCard`: replaced hard-coded hex colors with premium theme tokens (`var(--usa-primary)`, `var(--europe-primary)`, `var(--warning)`, `var(--masters)`, `var(--success)`, `var(--error)`) and migrated highlight gradients to `color-mix(...)` for theme-safe contrast.
+- `StrokeAlertBanner`: removed remaining `rgba(...)` fills for team stroke badges + mini-map/legend, using token-driven backgrounds (`bg-[color:var(--team-*)]/…`) and `color-mix(...)`.
+- `Header`: offline badge background migrated off hard-coded `rgba(...)` onto token-driven warning tint (`bg-[color:var(--warning)]/10`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`60df07e`)
+
 ### 17:05 EST — Phase 2 — Token hygiene: Stats hub cards + Login error banner
 - `/stats`: replaced remaining hard-coded `rgba(...)` / hex accent chips with premium semantic tokens (`var(--masters)`, `var(--warning)`, `var(--info)`) using Tailwind-safe opacity (`bg-[color:var(--token)]/10`).
 - `/login`: migrated error banner border/background off hard-coded `rgba(...)` onto premium error tokens (`border-[color:var(--error)]/20`, `bg-[color:var(--error)]/10`).
