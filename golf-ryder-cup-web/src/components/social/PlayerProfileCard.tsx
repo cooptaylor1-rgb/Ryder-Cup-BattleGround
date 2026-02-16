@@ -435,7 +435,7 @@ function FullProfile({
                   }}
                 >
                   <span>{badge.icon}</span>
-                  <span className="text-xs font-medium text-white">{badge.name}</span>
+                  <span className="text-xs font-medium text-[var(--canvas)]">{badge.name}</span>
                 </div>
               ))}
             </div>
@@ -445,11 +445,10 @@ function FullProfile({
         {onClick && (
           <button
             onClick={onClick}
-            className="w-full mt-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-            style={{
-              background: 'var(--masters)',
-              color: 'white',
-            }}
+            className={cn(
+              'w-full mt-4 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2',
+              'bg-[var(--masters)] text-[var(--canvas)] hover:brightness-95'
+            )}
           >
             View Full Profile
             <ChevronRight className="w-4 h-4" />

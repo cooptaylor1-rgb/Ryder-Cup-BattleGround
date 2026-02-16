@@ -225,7 +225,7 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
                         className={cn(
                           'rounded-full px-3 py-1 text-sm transition-colors',
                           isSelected
-                            ? 'bg-[var(--masters)] text-white'
+                            ? 'bg-[var(--masters)] text-[var(--canvas)]'
                             : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[color:var(--ink-tertiary)]/10 hover:text-[var(--ink-primary)]'
                         )}
                       >
@@ -253,7 +253,7 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
                   disabled={selectedPlayers.length < 2}
                   className={cn(
                     'rounded-[var(--radius-md)] px-4 py-2 font-medium transition-colors',
-                    'bg-[var(--masters)] text-white hover:brightness-95',
+                    'bg-[var(--masters)] text-[var(--canvas)] hover:brightness-95',
                     'disabled:bg-[color:var(--ink-tertiary)]/25 disabled:text-[var(--ink-tertiary)] disabled:cursor-not-allowed'
                   )}
                 >
@@ -366,7 +366,7 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
                         className={cn(
                           'rounded-full px-3 py-1 text-sm transition-colors',
                           isSelected
-                            ? 'bg-[var(--info)] text-white'
+                            ? 'bg-[var(--info)] text-[var(--canvas)]'
                             : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[color:var(--ink-tertiary)]/10 hover:text-[var(--ink-primary)]'
                         )}
                       >
@@ -401,7 +401,7 @@ export function SideBetsTracker({ tripId, players, onUpdate }: SideBetsTrackerPr
                   disabled={!newExpensePaidBy || newExpenseSplitBetween.length === 0 || newExpenseAmount <= 0}
                   className={cn(
                     'rounded-[var(--radius-md)] px-4 py-2 font-medium transition-colors',
-                    'bg-[var(--info)] text-white hover:brightness-95',
+                    'bg-[var(--info)] text-[var(--canvas)] hover:brightness-95',
                     'disabled:bg-[color:var(--ink-tertiary)]/25 disabled:text-[var(--ink-tertiary)] disabled:cursor-not-allowed'
                   )}
                 >

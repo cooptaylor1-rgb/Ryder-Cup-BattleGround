@@ -172,7 +172,7 @@ export function TeeTimePreferences({
                         className={cn(
                             'shrink-0 px-3 py-2 rounded-full transition-colors text-sm flex items-center gap-2',
                             settings.firstTeeTime === time
-                                ? 'bg-[color:var(--masters)] text-white'
+                                ? 'bg-[color:var(--masters)] text-[var(--canvas)]'
                                 : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                         )}
                     >
@@ -229,7 +229,7 @@ export function TeeTimePreferences({
                             className={cn(
                                 'flex-1 py-2 px-1 rounded-lg text-center transition-all',
                                 settings.interval === option.value
-                                    ? 'bg-[color:var(--masters)] text-white'
+                                    ? 'bg-[color:var(--masters)] text-[var(--canvas)]'
                                     : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                             )}
                         >
@@ -238,7 +238,7 @@ export function TeeTimePreferences({
                                 className={cn(
                                     'text-xs mt-0.5',
                                     settings.interval === option.value
-                                        ? 'text-white/80'
+                                        ? 'text-[color:var(--canvas)]/80'
                                         : 'text-[var(--ink-tertiary)]'
                                 )}
                             >
@@ -269,7 +269,7 @@ export function TeeTimePreferences({
                                     className={cn(
                                         'w-10 h-10 rounded-xl flex items-center justify-center',
                                         settings.format === option.format
-                                            ? 'bg-[color:var(--masters)] text-white'
+                                            ? 'bg-[color:var(--masters)] text-[var(--canvas)]'
                                             : 'bg-[var(--surface-secondary)] text-[var(--ink-tertiary)]'
                                     )}
                                 >
@@ -354,7 +354,7 @@ export function TeeTimePreferences({
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 settings.estimatedRoundTime === mins
-                                                    ? 'bg-[color:var(--masters)] text-white'
+                                                    ? 'bg-[color:var(--masters)] text-[var(--canvas)]'
                                                     : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                                             )}
                                         >
@@ -376,7 +376,7 @@ export function TeeTimePreferences({
                                             className={cn(
                                                 'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
                                                 settings.breakBetweenSessions === mins
-                                                    ? 'bg-[color:var(--masters)] text-white'
+                                                    ? 'bg-[color:var(--masters)] text-[var(--canvas)]'
                                                     : 'bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)]'
                                             )}
                                         >
