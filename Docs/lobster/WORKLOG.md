@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 05:05 EST — Phase 2 — Token hygiene: replace remaining hard-coded white + tokenize onboarding overlays
+- `BottomNav`: notification badge text now uses `color: var(--canvas)` (no hard-coded `'white'`).
+- `SidebarNav`: RC logo text now uses `color: var(--canvas)` for theme-safe inverse typography.
+- `AvailabilityCalendar`: note modal backdrop migrated from `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
+- `ProfilePhotoUpload`: option/preview/processing overlays migrated off `bg-black/*` to token-driven ink tints (`bg-[color:var(--ink)]/50` and `/80`).
+- `GrossNetScoreDisplay`: stroke dots, totals pill, and legend fallback now use `var(--canvas)` instead of hard-coded `'white'` for inverse text.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 04:40 EST — Phase 2 — Token hygiene: replace remaining `text-white` with canvas tokens (pairing + chat + join)
 - `SmartPairingSuggestions`: Masters-selected pills and apply button now use `text-[var(--canvas)]` instead of `text-white`.
 - `TrashTalkFeed`: current-user chat bubble + send button now use token-driven Masters surface (`bg-[var(--masters)]`) with canvas typography (no `bg-masters-primary`/`text-white`).

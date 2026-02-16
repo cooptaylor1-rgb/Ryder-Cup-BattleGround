@@ -81,7 +81,7 @@ export function SidebarNav({ isExpanded = false, onToggle }: SidebarNavProps) {
                     className="flex items-center justify-center h-8 w-8 rounded-lg font-bold text-sm"
                     style={{
                         background: 'linear-gradient(to bottom right, #006747, #004D35)',
-                        color: 'white',
+                        color: 'var(--canvas)',
                     }}
                 >
                     RC

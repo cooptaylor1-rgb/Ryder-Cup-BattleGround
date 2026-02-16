@@ -273,7 +273,7 @@ function StrokeDotIndicator({ strokes, size = 10, inline = false }: StrokeDotInd
         width: size * 1.5,
         height: size * 1.5,
         background: dotColor,
-        color: 'white',
+        color: 'var(--canvas)',
         fontSize: size * 0.7,
         fontWeight: 700,
       }}
@@ -449,7 +449,7 @@ export function ScorecardRow({
           )}
           style={{
             background: 'var(--masters)',
-            color: 'white',
+            color: 'var(--canvas)',
           }}
         >
           <span className="text-xs font-medium opacity-80">TOT</span>
@@ -488,7 +488,7 @@ export function ScoreLegend({ className }: { className?: string }) {
                 : 'var(--masters)',
               color: item.class
                 ? `var(--${item.class}-text, var(--ink))`
-                : 'white',
+                : 'var(--canvas)',
               border: item.class
                 ? `1px solid var(--${item.class}-border, var(--rule))`
                 : 'none',

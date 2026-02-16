@@ -145,7 +145,7 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
                     justifyContent: 'center',
                     borderRadius: 'var(--radius-full)',
                     background: 'var(--error)',
-                    color: 'white',
+                    color: 'var(--canvas)',
                     fontSize: '10px',
                     fontWeight: 700,
                     lineHeight: 1,
