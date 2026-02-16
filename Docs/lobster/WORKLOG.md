@@ -13,6 +13,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 23:30 EST — Phase 2 — Moments + Captain UI: tokenize remaining white/black overlays
+- `MomentCard`: avatar initials, team indicator rings, and tagged-player overlay badge now use token-driven canvas/ink classes (`text-[var(--canvas)]`, `border-[color:var(--canvas)]/…`, `bg-[color:var(--ink)]/50`) instead of `text-white`/`border-white`/`bg-black/50`.
+- `CaptainDashboard`: “Live Now” and warning AttentionCard copy now uses token-driven canvas typography; replaced inline `color: 'white'`/`text-white/*` with `var(--canvas)` tokens.
+- `SideBetPresets` + `InvitationManager`: modal backdrops migrated off `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
+- `EmergencyContacts`: “Call 911” CTA now uses the premium error surface + canvas text (`bg-[var(--error)] text-[var(--canvas)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`97cf369`)
+
 ### 23:25 EST — Phase 2 — Trip recap + setup guide: tokenized remaining inverse typography
 - `TripRecap`: hero banner typography + winner pill + nav tabs + share CTA now use token-driven inverse canvas text (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white`/`text-white/*`.
 - `SetupGuide`: Masters icon shell + completion badge now use `text-[var(--canvas)]` instead of `text-white`.
