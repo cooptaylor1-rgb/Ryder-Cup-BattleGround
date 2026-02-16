@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 09:15 EST — Phase 2 — Fix Tailwind CSS var opacity syntax for token borders (`border-[var(--token)]/…` → `border-[color:var(--token)]/…`)
+- `PlayerCountSelector`: fixed Masters recommendation card border class so `/20` opacity compiles.
+- `BulkImportModal`: fixed preview table border class so `/60` opacity compiles.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`cd74a30`)
+
 ### 08:26 EST — Phase 2 — Fix Tailwind CSS var opacity syntax (`bg-[var(--ink)]/…` → `bg-[color:var(--ink)]/…`)
 - `Modal`, `CaptainToggle`, `QuickStandingsOverlay`, `BulkImportModal`: replaced `bg-[var(--ink)]/NN` with `bg-[color:var(--ink)]/NN` so Tailwind opacity modifiers compile correctly (prevents silent backdrop styling failures).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
