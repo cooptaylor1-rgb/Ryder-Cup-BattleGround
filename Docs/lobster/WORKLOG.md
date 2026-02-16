@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 14:15 EST — Phase 2 — Token hygiene: replace `bg-white/*` overlays with token-based opacity (captain widgets)
+- `EmergencyContacts`, `FormatRulesReference`, `PaceSpacing`: replaced `hover:bg-white/*` overlays with `hover:bg-[color:var(--ink)]/5` (or similar) for theme-safe interactions on light/dark surfaces.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`43f1086`)
+
 ### 13:20 EST — Phase 2 — Fix Tailwind CSS var opacity syntax for token text (`text-[var(--token)]/…` → `text-[color:var(--token)]/…`)
 - `PlayingStyleSurvey`: disabled Back button text now uses Tailwind-safe `text-[color:var(--ink-tertiary)]/40` so opacity compiles.
 - `TeeTimePreferences`: advanced settings hover state now uses `hover:text-[color:var(--masters)]/80` so opacity compiles.
