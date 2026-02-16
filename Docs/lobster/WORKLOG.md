@@ -10,6 +10,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0192ef6`)
 
+### 00:35 EST — Phase 2 — Lint hygiene: remove unused catch var + document intentional confetti effect
+- `useBackgroundSyncFallback`: replaced `catch (_error)` with bare `catch {}` to satisfy `@typescript-eslint/no-unused-vars` and keep intent explicit.
+- `AchievementUnlock` (`ConfettiSystem`): added a targeted `eslint-disable-next-line react-hooks/set-state-in-effect` for the confetti generation effect (intentional one-shot state init when active).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (see git log)
+
 ### 00:55 EST — Phase 2 — Modal overlays: tokenize remaining black backdrops + inverse winner banner text
 - `Modal`: backdrop migrated from `bg-black/75` to token-driven ink tint (`bg-[var(--ink)]/75`).
 - `BulkImportModal`, `CaptainToggle`, `QuickStandingsOverlay`: backdrops migrated off `bg-black/*` to token-driven ink tints (`bg-[var(--ink)]/*`).

@@ -141,7 +141,7 @@ export function useBackgroundSyncFallback(options: UseBackgroundSyncFallbackOpti
     try {
       const count = await getPendingScoreCount();
       setSyncState((prev) => ({ ...prev, pendingCount: count }));
-    } catch (_error) {
+    } catch {
       // Ignore errors during count update
     }
   }, []);

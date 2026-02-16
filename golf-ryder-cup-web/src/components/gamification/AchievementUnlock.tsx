@@ -139,6 +139,7 @@ function ConfettiSystem({ color, isActive }: { color: string; isActive: boolean 
 
     useEffect(() => {
         if (isActive) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setParticles(generateConfetti(50, color));
         }
     }, [isActive, color]);
