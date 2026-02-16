@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 14:45 EST — Phase 2 — Fix Tailwind arbitrary shadow color var opacity (`shadow-[var(--masters)]/…` → `shadow-[color:var(--masters)]/…`)
+- `/live`: flashing match card highlight now uses Tailwind-safe shadow color syntax so opacity compiles correctly.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`143b83a`)
+
 ### 14:20 EST — Phase 2 — Token hygiene: replace hardcoded hex/rgba with premium tokens (AttendanceCheckIn + CaptainTools)
 - `AttendanceCheckIn`: replaced `getStatusConfig` rgba/hex palettes with `var(--success)`, `var(--warning)`, `var(--ink)`, `var(--error)` tokens via Tailwind classes.
 - `CaptainToolsSection`: replaced hardcoded hex colors (`#3b82f6`, `#8b5cf6`) with semantic tokens (`var(--info)`, `var(--color-accent)`) for consistency.
