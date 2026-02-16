@@ -304,7 +304,7 @@ export function TeeTimeGenerator({
         <div className="flex justify-end">
           <button
             onClick={() => onSave(teeSheet)}
-            className="px-4 py-2 bg-[var(--masters)] text-white rounded-lg hover:bg-[var(--masters-deep)] transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-[var(--masters)] text-[var(--canvas)] rounded-lg hover:bg-[var(--masters-deep)] transition-colors flex items-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             Save Tee Sheet

@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 21:25 EST — Phase 2 — Social photos + captain tools: tokenize remaining inverse palette fragments
+- `PhotoGallery`: tokenized the upload CTA + hole badge + full-screen viewer chrome (ink backdrop + canvas typography); removed remaining `bg-black`/`text-white` fragments.
+- `DraftBoard`: auction “Win Bid” button now uses `text-[var(--canvas)]` on the success surface (no `text-white`).
+- `TeeTimeGenerator`: “Save Tee Sheet” button now uses `text-[var(--canvas)]` on the Masters surface (no `text-white`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 20:55 EST — Phase 2 — Lint hygiene + WeatherBanner: avoid impure `Date.now()` during render
 - `WeatherBanner`: delay duration no longer calls `Date.now()` during render; uses a `nowMs` state that ticks on an interval when a delay is active.
 - `CaptainToggle`: replaced unused `catch (_err)` with bare `catch {}`.

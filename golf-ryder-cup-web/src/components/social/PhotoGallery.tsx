@@ -188,7 +188,7 @@ export function PhotoGallery({
                         disabled={isUploading}
                         className={cn(
                             'flex items-center gap-2 px-4 py-2.5 rounded-lg',
-                            'bg-masters-primary text-white',
+                            'bg-masters-primary text-[var(--canvas)]',
                             'hover:bg-masters-primary-dark',
                             'disabled:opacity-50 disabled:cursor-not-allowed',
                             'transition-colors'
@@ -234,7 +234,7 @@ export function PhotoGallery({
                                 sizes="33vw"
                             />
                             {photo.holeNumber && (
-                                <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-xs">
+                                <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-[color:var(--ink)]/60 text-[var(--canvas)] text-xs">
                                     #{photo.holeNumber}
                                 </div>
                             )}
@@ -280,9 +280,9 @@ interface PhotoViewerProps {
 
 function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount }: PhotoViewerProps) {
     return (
-        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[var(--ink)] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 text-white">
+            <div className="flex items-center justify-between p-4 text-[var(--canvas)]">
                 <span className="text-sm">{currentIndex} of {totalCount}</span>
                 <button
                     onClick={onClose}
@@ -309,18 +309,18 @@ function PhotoViewer({ photo, onClose, onPrev, onNext, currentIndex, totalCount 
                     onClick={onPrev}
                     className="p-3 rounded-full bg-[color:var(--canvas)]/10 hover:bg-[color:var(--canvas)]/18 transition-colors"
                 >
-                    <ChevronLeft className="w-6 h-6 text-white" />
+                    <ChevronLeft className="w-6 h-6 text-[var(--canvas)]" />
                 </button>
 
                 {photo.caption && (
-                    <p className="text-white text-center max-w-md">{photo.caption}</p>
+                    <p className="text-[var(--canvas)] text-center max-w-md">{photo.caption}</p>
                 )}
 
                 <button
                     onClick={onNext}
                     className="p-3 rounded-full bg-[color:var(--canvas)]/10 hover:bg-[color:var(--canvas)]/18 transition-colors"
                 >
-                    <ChevronRight className="w-6 h-6 text-white" />
+                    <ChevronRight className="w-6 h-6 text-[var(--canvas)]" />
                 </button>
             </div>
         </div>
