@@ -280,7 +280,7 @@ export function BulkImportModal({
                 </div>
               )}
 
-              <div className="overflow-hidden rounded-xl border border-[var(--rule)]/60">
+              <div className="overflow-hidden rounded-xl border border-[color:var(--rule)]/60">
                 <table className="w-full text-sm">
                   <thead className="bg-[color:var(--surface-secondary)]/60 text-left">
                     <tr>

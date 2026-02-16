@@ -216,7 +216,7 @@ export function PlayerCountSelector({
             {recommendation ? (
                 <button
                     onClick={() => setShowDetails(!showDetails)}
-                    className="w-full p-3 rounded-xl bg-[var(--masters-subtle)] border border-[var(--masters)]/20 text-left hover:bg-[color:var(--masters-subtle)] transition-colors"
+                    className="w-full p-3 rounded-xl bg-[var(--masters-subtle)] border border-[color:var(--masters)]/20 text-left hover:bg-[color:var(--masters-subtle)] transition-colors"
                 >
                     <div className="flex items-start gap-3">
                         <Lightbulb className="w-5 h-5 text-[var(--masters)] shrink-0 mt-0.5" />
