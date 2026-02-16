@@ -163,7 +163,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.6)] backdrop-blur-[4px] p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/60 backdrop-blur-[4px] p-4"
     >
       <div className="w-full max-w-lg rounded-2xl shadow-xl bg-[var(--surface-card)] max-h-[90vh] overflow-auto">
         {/* Header */}
@@ -200,7 +200,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
               >
                 <Upload size={48} className="mx-auto mb-4 text-[var(--ink-tertiary)]" />
                 <p className="type-body font-medium mb-2">Drop scorecard image here</p>
-                <p className="type-caption mb-4" style={{ color: 'var(--ink-tertiary)' }}>
+                <p className="type-caption mb-4 text-[var(--ink-tertiary)]">
                   or click to browse
                 </p>
                 <div className="flex items-center justify-center gap-4 text-xs text-[var(--ink-muted)]">
