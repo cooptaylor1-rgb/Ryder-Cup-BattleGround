@@ -54,7 +54,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       setShowPinModal(false);
       setPin('');
       setAttempts(0);
-    } catch (_err) {
+    } catch {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 3) {

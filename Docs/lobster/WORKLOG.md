@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 20:55 EST — Phase 2 — Lint hygiene + WeatherBanner: avoid impure `Date.now()` during render
+- `WeatherBanner`: delay duration no longer calls `Date.now()` during render; uses a `nowMs` state that ticks on an interval when a delay is active.
+- `CaptainToggle`: replaced unused `catch (_err)` with bare `catch {}`.
+- `TemplatePicker`: removed unused `Users` icon import.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 18:40 EST — Phase 2 — Captain tools + TeamColorPicker: remove remaining `text-white`/`bg-black` fragments
 - `FairnessScoring`: warning callouts + Auto-improve CTA now use token-driven warning/masters surfaces with inverse canvas typography (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `color: 'white'` / `text-white`.
 - `LineupBuilder`: publish/validation warnings/errors now use token-driven masters/error/warning surfaces with canvas typography (no hard-coded white).

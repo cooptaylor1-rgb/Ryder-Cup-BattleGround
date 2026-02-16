@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useCallback, type ReactNode } from 'react';
+import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import {
   CloudRain,
   CloudLightning,
@@ -174,6 +174,7 @@ export function WeatherBanner({
 }: WeatherBannerProps) {
   const [showControls, setShowControls] = useState(false);
   const [noteInput, setNoteInput] = useState('');
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const { isCaptainMode } = useUIStore();
 
   const canControl = showCaptainControls && isCaptainMode;
@@ -190,8 +191,16 @@ export function WeatherBanner({
     [noteInput, onDelayChange]
   );
 
+  useEffect(() => {
+    if (!delayStartedAt) return;
+
+    // Keep the banner's duration indicator fresh without calling Date.now() during render.
+    const id = window.setInterval(() => setNowMs(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, [delayStartedAt]);
+
   const delayDuration = delayStartedAt
-    ? Math.round((Date.now() - new Date(delayStartedAt).getTime()) / 60000)
+    ? Math.round((nowMs - new Date(delayStartedAt).getTime()) / 60000)
     : 0;
 
   // Don't show banner when conditions are normal and no delay.

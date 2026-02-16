@@ -14,7 +14,6 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   Trophy,
-  Users,
   Zap,
   ChevronRight,
   Layers,
