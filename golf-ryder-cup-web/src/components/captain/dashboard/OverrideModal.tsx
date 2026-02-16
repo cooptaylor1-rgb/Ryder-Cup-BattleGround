@@ -128,10 +128,10 @@ function formatTimestamp(isoString: string): string {
 
 function getActionColor(action: AuditEntry['action']): string {
     switch (action) {
-        case 'created': return '#22C55E';
-        case 'modified': return '#3B82F6';
-        case 'override': return '#F59E0B';
-        case 'reverted': return '#EF4444';
+        case 'created': return 'var(--success)';
+        case 'modified': return 'var(--info)';
+        case 'override': return 'var(--warning)';
+        case 'reverted': return 'var(--error)';
         default: return 'var(--ink-tertiary)';
     }
 }
@@ -613,7 +613,7 @@ export function OverrideModal({
                             </div>
                             <button
                                 onClick={handleClose}
-                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="p-2 rounded-lg transition-colors hover:bg-[color:var(--ink)]/5"
                             >
                                 <X size={20} style={{ color: 'var(--ink-secondary)' }} />
                             </button>

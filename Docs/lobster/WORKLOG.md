@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:30 EST — Phase 2 — Token hygiene: ScorecardUpload overlay + Tailwind build warning cleanup
+- `ScorecardUpload`: tokenized modal backdrop from `bg-[rgba(0,0,0,0.6)]` → `bg-[color:var(--ink)]/60` to keep overlays theme-safe and consistent with the premium ink/canvas system.
+- `ScorecardUpload`: removed inline `style={{ color: 'var(--ink-tertiary)' }}` in favor of `text-[var(--ink-tertiary)]`.
+- `golf-ryder-cup-web/WORKLOG.md`: removed placeholder class examples like `text-[var(--ink-*)]` and `bg-[var(...)]` that Tailwind was mistakenly compiling, eliminating CSS optimization warnings during `pnpm build`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`310e57e`, `d3d4ca4`)
+
 ### 16:45 EST — Phase 2 — Token hygiene: Achievements rarity pills + QuickPlayerSwap status markers
 - `Achievements`: replaced Tailwind `gray/green/blue/yellow` rarity pills with premium token-driven backgrounds + text (`var(--ink)`, `var(--success)`, `var(--info)`, `var(--warning)`) and added subtle token borders for consistent contrast.
 - `Achievements`: updated rarity gradient stops to use token-based colors (`from-[color:var(--…)]`) instead of Tailwind primitives.

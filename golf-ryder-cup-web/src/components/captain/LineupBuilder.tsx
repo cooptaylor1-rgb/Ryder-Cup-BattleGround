@@ -802,7 +802,7 @@ function FairnessIndicator({ score }: FairnessIndicatorProps) {
           {/* Info button */}
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-1 rounded-full transition-colors hover:bg-[color:var(--ink)]/5"
             aria-label="What is fairness score?"
           >
             <HelpCircle size={16} style={{ color: 'var(--ink-tertiary)' }} />

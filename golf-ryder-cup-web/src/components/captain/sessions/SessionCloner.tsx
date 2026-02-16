@@ -608,12 +608,12 @@ export function SessionCloner({
                             <div
                                 className={cn(
                                     'w-10 h-6 rounded-full p-1 transition-colors',
-                                    swapTeams ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
+                                    swapTeams ? 'bg-[color:var(--masters)]' : 'bg-[color:var(--ink)]/15'
                                 )}
                             >
                                 <div
                                     className={cn(
-                                        'w-4 h-4 rounded-full bg-white transition-transform',
+                                        'w-4 h-4 rounded-full bg-[color:var(--canvas)] transition-transform',
                                         swapTeams && 'translate-x-4'
                                     )}
                                 />
