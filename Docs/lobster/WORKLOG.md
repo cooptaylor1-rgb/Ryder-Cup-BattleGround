@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 11:20 EST — Phase 2 — Token hygiene: replace `hover:bg-white/*` overlays with canvas tokens (captain widgets)
+- `GoTimeCountdown`: settings + control button hover/active overlays now use `bg-[var(--canvas)]/10` instead of `bg-white/10`.
+- `CartAssignmentManager`: picker + header action hover overlays now use `bg-[var(--canvas)]/5` + `/10` instead of `bg-white/*`.
+- `CourseSetupConfirmation`: category + hole detail hover overlays now use `bg-[var(--canvas)]/5` instead of `bg-white/5`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4acfa87`)
+
 ### 09:15 EST — Phase 2 — Fix Tailwind CSS var opacity syntax for token borders (`border-[var(--token)]/…` → `border-[color:var(--token)]/…`)
 - `PlayerCountSelector`: fixed Masters recommendation card border class so `/20` opacity compiles.
 - `BulkImportModal`: fixed preview table border class so `/60` opacity compiles.
