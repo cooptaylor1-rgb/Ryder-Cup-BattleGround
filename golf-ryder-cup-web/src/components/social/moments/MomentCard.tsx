@@ -266,7 +266,7 @@ export function MomentCard({
                         />
                     ) : (
                         <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold"
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--canvas)] font-semibold"
                             style={{ background: authorTeamColor }}
                         >
                             {moment.author.name.charAt(0)}
@@ -274,7 +274,7 @@ export function MomentCard({
                     )}
                     {/* Team indicator */}
                     <div
-                        className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white dark:border-gray-900"
+                        className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-[color:var(--canvas)]/90"
                         style={{ background: authorTeamColor }}
                     />
                 </div>
@@ -346,7 +346,7 @@ export function MomentCard({
                                 {moment.taggedPlayers.slice(0, 3).map((player) => (
                                     <div
                                         key={player.id}
-                                        className="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-[10px] font-bold relative overflow-hidden"
+                                        className="w-6 h-6 rounded-full border-2 border-[color:var(--canvas)]/90 bg-gray-300 flex items-center justify-center text-[10px] font-bold relative overflow-hidden"
                                         style={{
                                             background: player.avatarUrl ? undefined :
                                                 player.team === 'teamA' ? teamAColor : teamBColor,
@@ -361,12 +361,12 @@ export function MomentCard({
                                                 sizes="24px"
                                             />
                                         ) : (
-                                            <span className="text-white">{player.name.charAt(0)}</span>
+                                            <span className="text-[var(--canvas)]">{player.name.charAt(0)}</span>
                                         )}
                                     </div>
                                 ))}
                             </div>
-                            <span className="text-xs text-white bg-black/50 px-2 py-0.5 rounded-full">
+                            <span className="text-xs text-[var(--canvas)] bg-[color:var(--ink)]/50 px-2 py-0.5 rounded-full">
                                 {moment.taggedPlayers.length === 1
                                     ? moment.taggedPlayers[0].name.split(' ')[0]
                                     : `+${moment.taggedPlayers.length}`}

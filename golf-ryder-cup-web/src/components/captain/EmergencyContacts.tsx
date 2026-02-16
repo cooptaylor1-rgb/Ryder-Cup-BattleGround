@@ -334,7 +334,7 @@ export function EmergencyContacts({
                 <div className="flex gap-2">
                     <button
                         onClick={() => window.location.href = 'tel:911'}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-red-500 text-white font-semibold"
+                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-[var(--error)] text-[var(--canvas)] font-semibold"
                     >
                         <Phone className="w-4 h-4" />
                         Call 911

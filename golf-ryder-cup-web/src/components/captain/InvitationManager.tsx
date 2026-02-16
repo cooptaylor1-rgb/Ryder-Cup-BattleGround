@@ -524,7 +524,7 @@ function NewInviteModal({ onClose, onSend, tripInfo }: NewInviteModalProps) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-[color:var(--ink)]/50"
         onClick={onClose}
       />
 

@@ -188,7 +188,7 @@ export function CaptainDashboard({
         >
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-[color:var(--canvas-raised)] animate-pulse" />
-            <span className="text-white font-medium text-sm">Live Now</span>
+            <span className="text-[var(--canvas)] font-medium text-sm">Live Now</span>
           </div>
           <div className="space-y-2">
             {activeSessions.map((session) => (
@@ -198,10 +198,10 @@ export function CaptainDashboard({
                 className="block p-3 rounded-xl bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">{session.name}</span>
-                  <ChevronRight className="w-4 h-4 text-white/70" />
+                  <span className="text-[var(--canvas)] font-medium">{session.name}</span>
+                  <ChevronRight className="w-4 h-4 text-[color:var(--canvas)]/70" />
                 </div>
-                <p className="text-white/70 text-sm mt-0.5">
+                <p className="text-[color:var(--canvas)]/70 text-sm mt-0.5">
                   {session.matchCount} matches in progress
                 </p>
               </Link>
@@ -370,7 +370,7 @@ function SetupProgressCard({ progress, tasks, showAll, onToggleShowAll }: SetupP
               <Link
                 href={task.action.href}
                 className="text-xs font-medium px-2 py-1 rounded-md"
-                style={{ background: 'var(--masters)', color: 'white' }}
+                style={{ background: 'var(--masters)', color: 'var(--canvas)' }}
               >
                 {task.action.label}
               </Link>
@@ -448,14 +448,14 @@ function AttentionCard({ title, description, sessions, tripId: _tripId }: Attent
       className="p-4 rounded-2xl"
       style={{
         background: 'var(--warning)',
-        color: 'white',
+        color: 'var(--canvas)',
       }}
     >
       <div className="flex items-start gap-3">
         <AlertCircle className="w-6 h-6 shrink-0 mt-0.5" />
         <div className="flex-1">
           <h3 className="font-bold">{title}</h3>
-          <p className="text-sm text-white/80 mt-0.5">{description}</p>
+          <p className="text-sm text-[color:var(--canvas)]/80 mt-0.5">{description}</p>
 
           <div className="mt-3 space-y-2">
             {sessions.slice(0, 3).map((session) => (
@@ -467,11 +467,11 @@ function AttentionCard({ title, description, sessions, tripId: _tripId }: Attent
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium">{session.name}</span>
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-[color:var(--canvas)]/70">
                       {session.type} • {session.matchCount} matches
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-white/70" />
+                  <ChevronRight className="w-5 h-5 text-[color:var(--canvas)]/70" />
                 </div>
               </Link>
             ))}
@@ -659,7 +659,7 @@ function SessionsOverview({ sessions, tripId: _tripId, onCreateSession }: Sessio
             <button
               onClick={onCreateSession}
               className="mt-3 px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ background: 'var(--masters)', color: 'white' }}
+              style={{ background: 'var(--masters)', color: 'var(--canvas)' }}
             >
               Create First Session
             </button>
