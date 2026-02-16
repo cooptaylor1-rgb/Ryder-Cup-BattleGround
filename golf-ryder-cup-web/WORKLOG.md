@@ -2,6 +2,9 @@
 
 All times America/New_York.
 
+## 2026-02-15
+- 22:25 — Shipped batch: `SettlementView` (Finances → Settlement) now renders an explicit premium empty state when there is **no active trip**, with CTAs to Create (`/trip/new`) or Join (`/join`) instead of showing a misleading “Loading settlement data…” placeholder. Pre-push checks (`typecheck` + `test` + `build`) ran and passed on push. (commit f10e408)
+
 ## 2026-02-13
 - 17:35 — Shipped batch: Settings pages token sweep — `/settings/backup` and `/settings/notifications` replaced remaining hard-coded Tailwind palettes (`emerald-*`, `red-*`, `blue-*`) with premium status tokens (`var(--success)`, `var(--error)`, `var(--info)`) for success/error banners, import previews, and enabled-state cards. Pre-push checks (`typecheck` + `test` + `build`) ran and passed (build emitted existing CSS optimization warnings). (commit 21dfd7e)
 - 16:25 — Shipped batch: `FourballScoreEntry` removed remaining inline `style={{ color: 'var(--…)' }}` token props and switched to token-driven Tailwind classes (`text-[var(--ink-secondary)]`, `text-[var(--ink-tertiary)]`, `text-[var(--masters)]`). Best-ball badge now uses a `--team-color` CSS var + Tailwind `bg-[color:var(--team-color)]/20` / `text-[var(--team-color)]` for consistent dynamic theming without `#RRGGBBAA` strings. (commit 3241408)
