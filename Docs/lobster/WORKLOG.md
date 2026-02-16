@@ -2718,3 +2718,9 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Keeps dynamic team colors while avoiding direct inline color styles.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`8bb157c`)
+
+### 18:49 EST — Phase 2 — ProfileCompletionReward + IOSActionSheet: remove inline styles
+- Player onboarding `ProfileCompletionReward`: replaced the team header inline `backgroundColor` with a token-friendly CSS custom property (`--team-color`) + Tailwind class (`bg-[color:var(--team-color)]`).
+- iOS `IOSActionSheet`: replaced inline safe-area `paddingBottom` with Tailwind arbitrary value class (`pb-[max(12px,env(safe-area-inset-bottom))]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`9c6c246`)
