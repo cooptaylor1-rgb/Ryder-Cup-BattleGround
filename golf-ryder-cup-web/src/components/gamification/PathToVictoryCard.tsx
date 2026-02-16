@@ -168,7 +168,7 @@ function CupProgressBar({ pathData }: { pathData: PathToVictory }) {
           style={{ width: `${teamAPercent}%` }}
         />
         <div className="absolute left-1/2 top-1/2 z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFD54F] shadow-[0_0_8px_#FFD54F66]">
-          <Trophy size={12} className="text-black" />
+          <Trophy size={12} className="text-[var(--ink)]" />
         </div>
         <div className="flex-1" />
         <div

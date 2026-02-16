@@ -93,7 +93,7 @@ export default function MessagesPage() {
         title="Messages"
         subtitle="Send announcements"
         onBack={() => router.back()}
-        icon={<MessageSquare size={16} className="text-white" />}
+        icon={<MessageSquare size={16} className="text-[var(--canvas)]" />}
         rightSlot={
           <button
             onClick={() => setShowComposer(true)}

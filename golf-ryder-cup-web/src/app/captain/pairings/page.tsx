@@ -84,7 +84,7 @@ export default function CaptainPairingsPage() {
       <PageHeader
         title="Print Pairings"
         subtitle="Match pairings sheet"
-        icon={<Printer size={16} className="text-white" />}
+        icon={<Printer size={16} className="text-[var(--canvas)]" />}
         iconContainerStyle={{
           background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)',
           boxShadow: '0 0 0 3px rgba(114, 47, 55, 0.12)',

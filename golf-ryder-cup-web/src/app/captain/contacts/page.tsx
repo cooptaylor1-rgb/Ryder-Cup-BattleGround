@@ -123,7 +123,7 @@ export default function ContactsPage() {
       <PageHeader
         title="Contacts"
         subtitle="Emergency & venue info"
-        icon={<Phone size={16} className="text-white" />}
+        icon={<Phone size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-gradient-to-br from-slate-500 to-slate-600 shadow-[0_0_16px_rgba(100,116,139,0.3)]"
         onBack={() => router.back()}
       />
