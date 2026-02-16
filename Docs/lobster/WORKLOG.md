@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 06:15 EST — Phase 2 — Token hygiene: replace remaining inline `color: 'white'` with canvas tokens (Draft/Admin/Social)
+- `/captain/draft`: PageHeader Shuffle icons now use `style={{ color: 'var(--canvas)' }}` for theme-safe inverse icon color.
+- `/admin`: PageHeader Shield icon now uses `var(--canvas)` over the red gradient chip.
+- `/social`: post avatar initials, delete-confirm CTA, and reaction/“add reaction” active states now use `var(--canvas)` instead of hard-coded `'white'`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`bbd7270`)
+
 ### 05:30 EST — Phase 2 — Token hygiene: remove remaining black backdrops + hard-coded white in captain bet flows
 - `/captain/bets`: create/edit modal backdrop migrated from `bg-black/70` to token-driven ink tint (`bg-[color:var(--ink)]/70`).
 - `/captain/bets`: PageHeader icon and selection states migrated off hard-coded `'white'` and onto `var(--canvas)` for theme-safe inverse typography.
