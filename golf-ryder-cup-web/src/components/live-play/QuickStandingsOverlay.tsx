@@ -319,7 +319,7 @@ export function QuickStandingsOverlay({
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={handleClose}
-                            className="fixed inset-0 z-50 bg-[var(--ink)]/60 backdrop-blur-sm"
+                            className="fixed inset-0 z-50 bg-[color:var(--ink)]/60 backdrop-blur-sm"
                         />
 
                         {/* Content */}

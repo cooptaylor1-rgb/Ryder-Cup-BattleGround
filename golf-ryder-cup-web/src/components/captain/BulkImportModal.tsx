@@ -141,7 +141,7 @@ export function BulkImportModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--ink)]/65 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/65 backdrop-blur-sm p-4">
       <div className="flex w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-[var(--rule)] bg-[var(--surface-raised)] shadow-[var(--shadow-card-lg)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--rule)] bg-[color:var(--surface-secondary)]/40 px-5 py-4">

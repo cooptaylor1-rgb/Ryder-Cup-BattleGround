@@ -150,7 +150,7 @@ export function Modal({
       className={cn(
         'fixed inset-0 z-50',
         'flex items-center justify-center p-4',
-        'bg-[var(--ink)]/75 backdrop-blur-sm',
+        'bg-[color:var(--ink)]/75 backdrop-blur-sm',
         isExiting ? 'animate-fade-out' : 'animate-fade-in'
       )}
       onClick={handleOverlayClick}
