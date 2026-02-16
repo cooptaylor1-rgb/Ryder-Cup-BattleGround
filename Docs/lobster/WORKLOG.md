@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 07:10 EST — Phase 2 — Lineup routes: remove remaining inline `color: 'white'`
+- `/lineup/new`: Quick Setup gradient card now uses `color: 'var(--canvas)'` for theme-safe inverse typography.
+- `/lineup/builder`: Fairness score badge now uses `color: 'var(--canvas)'` instead of hard-coded white.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 06:15 EST — Phase 2 — Token hygiene: replace remaining inline `color: 'white'` with canvas tokens (Draft/Admin/Social)
 - `/captain/draft`: PageHeader Shuffle icons now use `style={{ color: 'var(--canvas)' }}` for theme-safe inverse icon color.
 - `/admin`: PageHeader Shield icon now uses `var(--canvas)` over the red gradient chip.

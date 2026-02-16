@@ -634,7 +634,7 @@ export default function NewLineupPage() {
                   padding: 'var(--space-4)',
                   background:
                     'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-                  color: 'white',
+                  color: 'var(--canvas)',
                   marginBottom: 'var(--space-4)',
                 }}
               >

@@ -331,7 +331,7 @@ function LineupBuilderPageContent() {
                                             : fairnessScore.overall >= 60
                                                 ? colors.semantic.warning
                                                 : colors.semantic.error,
-                                    color: 'white',
+                                    color: 'var(--canvas)',
                                 }}
                             >
                                 {fairnessScore.overall}
