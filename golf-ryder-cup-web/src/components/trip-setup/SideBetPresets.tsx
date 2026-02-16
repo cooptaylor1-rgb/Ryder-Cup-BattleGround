@@ -91,13 +91,13 @@ const BET_TYPE_ICONS: Record<SideBetConfig['type'], React.ReactNode> = {
 };
 
 const BET_TYPE_COLORS: Record<SideBetConfig['type'], string> = {
-    nassau: 'bg-green-500',
-    skins: 'bg-orange-500',
-    'closest-to-pin': 'bg-blue-500',
-    'longest-drive': 'bg-purple-500',
-    birdies: 'bg-yellow-500',
-    eagles: 'bg-red-500',
-    custom: 'bg-gray-500',
+    nassau: 'bg-[color:var(--success)]',
+    skins: 'bg-[color:var(--warning)]',
+    'closest-to-pin': 'bg-[color:var(--info)]',
+    'longest-drive': 'bg-[color:var(--color-accent)]',
+    birdies: 'bg-[color:var(--masters)]',
+    eagles: 'bg-[color:var(--error)]',
+    custom: 'bg-[color:var(--ink-tertiary)]',
 };
 
 export function SideBetPresets({
