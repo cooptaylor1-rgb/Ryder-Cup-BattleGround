@@ -68,7 +68,7 @@ export default function DraftPage() {
           title="Team Draft"
           subtitle="No active trip"
           onBack={() => router.back()}
-          icon={<Shuffle size={16} style={{ color: 'white' }} />}
+          icon={<Shuffle size={16} style={{ color: 'var(--canvas)' }} />}
         />
 
         <main className="container-editorial py-12">
@@ -97,7 +97,7 @@ export default function DraftPage() {
           title="Team Draft"
           subtitle="Captain mode required"
           onBack={() => router.back()}
-          icon={<Shuffle size={16} style={{ color: 'white' }} />}
+          icon={<Shuffle size={16} style={{ color: 'var(--canvas)' }} />}
         />
 
         <main className="container-editorial py-12">
@@ -134,7 +134,7 @@ export default function DraftPage() {
         title="Team Draft"
         subtitle="Assign players to teams"
         onBack={() => router.back()}
-        icon={<Shuffle size={16} style={{ color: 'white' }} />}
+        icon={<Shuffle size={16} style={{ color: 'var(--canvas)' }} />}
       />
 
       <main className="container-editorial">

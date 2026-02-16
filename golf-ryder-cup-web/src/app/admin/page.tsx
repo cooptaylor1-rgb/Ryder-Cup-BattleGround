@@ -292,7 +292,7 @@ export default function AdminPage() {
       <PageHeader
         title="Admin Mode"
         subtitle="Data management"
-        icon={<Shield size={16} style={{ color: 'white' }} />}
+        icon={<Shield size={16} style={{ color: 'var(--canvas)' }} />}
         iconContainerStyle={{
           background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
           boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
