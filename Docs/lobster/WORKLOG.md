@@ -10,6 +10,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`0192ef6`)
 
+### 00:55 EST — Phase 2 — Modal overlays: tokenize remaining black backdrops + inverse winner banner text
+- `Modal`: backdrop migrated from `bg-black/75` to token-driven ink tint (`bg-[var(--ink)]/75`).
+- `BulkImportModal`, `CaptainToggle`, `QuickStandingsOverlay`: backdrops migrated off `bg-black/*` to token-driven ink tints (`bg-[var(--ink)]/*`).
+- `PointsCalculator`: selected outcomes + projected winner banner now use canvas token typography (`text-[var(--canvas)]`) and trophy icon uses `color="var(--canvas)"`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`ea87436`)
+
 
 ## 2026-02-15
 
