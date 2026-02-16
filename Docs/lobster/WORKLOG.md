@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 04:15 EST — Phase 2 — Captain modals + alert badges: remove remaining `text-white`/`bg-black` fragments
+- `AlertCenter`: primary action buttons and critical-count badge now use token-driven inverse canvas typography (`text-[var(--canvas)]`) and premium error token background (`var(--error)`) instead of `text-white` + hard-coded `#EF4444`.
+- `QuickPlayerSwap` + `QuickAnnouncementModal`: modal backdrops migrated off `bg-black/*` to token-driven ink tints (`bg-[color:var(--ink)]/*`) for theme-safe overlays.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`0daba98`)
+
 ### 00:20 EST — Phase 2 — SessionWeatherPanel: button semantics + a11y labels
 - `SessionWeatherPanel`: added `type="button"` on non-form buttons and aria-labels for refresh/retry to prevent accidental form submits and improve screen reader clarity.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
