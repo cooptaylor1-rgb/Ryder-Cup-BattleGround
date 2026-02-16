@@ -172,7 +172,7 @@ function SetupItemCard({ item, onToggle }: SetupItemCardProps) {
     return (
         <button
             onClick={onToggle}
-            className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-white/5"
+            className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-[var(--canvas)]/5"
             style={{
                 background: item.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' :
                     item.status === 'issue' ? 'rgba(239, 68, 68, 0.1)' : 'var(--surface)',
@@ -313,7 +313,7 @@ export function CourseSetupConfirmation({
                     </div>
                     <button
                         onClick={resetAll}
-                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg hover:bg-[var(--canvas)]/10 transition-colors"
                         title="Reset all"
                     >
                         <RefreshCw className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
@@ -377,7 +377,7 @@ export function CourseSetupConfirmation({
                         <div key={category} className="border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
                             <button
                                 onClick={() => setExpandedCategory(isExpanded ? category : null)}
-                                className="w-full flex items-center justify-between p-4 hover:bg-white/5"
+                                className="w-full flex items-center justify-between p-4 hover:bg-[var(--canvas)]/5"
                             >
                                 <div className="flex items-center gap-3">
                                     <span style={{ color: categoryConfirmed === items.length ? '#22c55e' : 'var(--masters)' }}>
@@ -426,7 +426,7 @@ export function CourseSetupConfirmation({
                 <div className="border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
                     <button
                         onClick={() => setShowHoleDetails(!showHoleDetails)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-white/5"
+                        className="w-full flex items-center justify-between p-4 hover:bg-[var(--canvas)]/5"
                     >
                         <div className="flex items-center gap-3">
                             <Flag className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
