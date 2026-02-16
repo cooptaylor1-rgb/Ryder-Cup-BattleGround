@@ -26,7 +26,7 @@ export default function TripStatsError({ error, reset }: ErrorPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-[rgba(239,68,68,0.1)]">
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-[color:var(--error)]/10">
         <BarChart3 size={40} className="text-[var(--error)]" />
       </div>
 

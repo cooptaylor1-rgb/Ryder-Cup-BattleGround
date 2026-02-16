@@ -307,13 +307,10 @@ export default function AdminPage() {
           animate={{ opacity: 1, y: 0 }}
           className="section-sm"
         >
-          <div className="bg-[rgba(220,38,38,0.1)] border border-[rgba(220,38,38,0.2)] rounded-[var(--radius-lg)] p-[var(--space-4)] flex items-start gap-[var(--space-3)]">
-            <AlertTriangle
-              size={20}
-              className="text-[#dc2626] shrink-0 mt-[2px]"
-            />
+          <div className="bg-[color:var(--error)]/10 border border-[color:var(--error)]/20 rounded-[var(--radius-lg)] p-[var(--space-4)] flex items-start gap-[var(--space-3)]">
+            <AlertTriangle size={20} className="text-[var(--error)] shrink-0 mt-[2px]" />
             <div>
-              <p className="type-body font-semibold text-[#dc2626]">
+              <p className="type-body font-semibold text-[var(--error)]">
                 Admin Mode Active
               </p>
               <p className="type-caption text-[var(--ink-secondary)] mt-[4px]">
@@ -381,7 +378,7 @@ export default function AdminPage() {
               </div>
               <div className="text-center">
                 <div
-                  className={`type-display-sm ${syncMetrics.failed > 0 ? 'text-[#dc2626]' : 'text-[var(--ink-secondary)]'}`}
+                  className={`type-display-sm ${syncMetrics.failed > 0 ? 'text-[var(--error)]' : 'text-[var(--ink-secondary)]'}`}
                 >
                   {syncMetrics.failed}
                 </div>
@@ -447,19 +444,19 @@ export default function AdminPage() {
                   <div className="flex flex-col gap-[var(--space-2)]">
                     <div className="flex justify-between">
                       <span className="type-caption">Orphaned Matches:</span>
-                      <span className={orphanStats.orphanedMatches > 0 ? 'text-red-600' : ''}>
+                      <span className={orphanStats.orphanedMatches > 0 ? 'text-[var(--error)]' : ''}>
                         {orphanStats.orphanedMatches}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="type-caption">Orphaned Hole Results:</span>
-                      <span className={orphanStats.orphanedHoleResults > 0 ? 'text-red-600' : ''}>
+                      <span className={orphanStats.orphanedHoleResults > 0 ? 'text-[var(--error)]' : ''}>
                         {orphanStats.orphanedHoleResults}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="type-caption">Orphaned Team Members:</span>
-                      <span className={orphanStats.orphanedTeamMembers > 0 ? 'text-red-600' : ''}>
+                      <span className={orphanStats.orphanedTeamMembers > 0 ? 'text-[var(--error)]' : ''}>
                         {orphanStats.orphanedTeamMembers}
                       </span>
                     </div>
@@ -469,7 +466,7 @@ export default function AdminPage() {
                       <button
                         onClick={cleanOrphanedData}
                         disabled={isCleaningOrphans}
-                        className={`btn-premium mt-2 bg-[#dc2626] py-[var(--space-2)] px-[var(--space-3)] ${isCleaningOrphans ? 'opacity-60' : ''}`}
+                        className={`btn-premium mt-2 bg-[var(--error)] text-[var(--canvas)] py-[var(--space-2)] px-[var(--space-3)] ${isCleaningOrphans ? 'opacity-60' : ''}`}
                       >
                         <Zap size={14} />
                         {isCleaningOrphans ? 'Cleaning...' : 'Clean Orphaned Data'}
@@ -537,15 +534,15 @@ export default function AdminPage() {
                     <button
                       onClick={() => handleDeleteTrip(trip)}
                       disabled={deletingTripId === trip.id}
-                      className={`press-scale bg-[rgba(220,38,38,0.1)] border-none rounded-[var(--radius-md)] p-[var(--space-2)] cursor-pointer ${deletingTripId === trip.id ? 'opacity-50' : ''}`}
+                      className={`press-scale bg-[color:var(--error)]/10 border-none rounded-[var(--radius-md)] p-[var(--space-2)] cursor-pointer ${deletingTripId === trip.id ? 'opacity-50' : ''}`}
                     >
                       {deletingTripId === trip.id ? (
                         <RefreshCcw
                           size={18}
-                          className="animate-spin text-[#dc2626]"
+                          className="animate-spin text-[var(--error)]"
                         />
                       ) : (
-                        <Trash2 size={18} className="text-[#dc2626]" />
+                        <Trash2 size={18} className="text-[var(--error)]" />
                       )}
                     </button>
                   </div>
