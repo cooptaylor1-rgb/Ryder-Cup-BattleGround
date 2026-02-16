@@ -8,6 +8,7 @@
  */
 
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import {
     Calendar,
@@ -254,8 +255,8 @@ export function TripWelcomeCard({
                         )}
                     >
                         <div
-                            className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                            style={{ backgroundColor: trip.teamAColor }}
+                            className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center bg-[color:var(--team-color)]"
+                            style={{ '--team-color': trip.teamAColor } as CSSProperties}
                         >
                             <Flag className="w-6 h-6 text-[var(--canvas)]" />
                         </div>
@@ -277,8 +278,8 @@ export function TripWelcomeCard({
                         )}
                     >
                         <div
-                            className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                            style={{ backgroundColor: trip.teamBColor }}
+                            className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center bg-[color:var(--team-color)]"
+                            style={{ '--team-color': trip.teamBColor } as CSSProperties}
                         >
                             <Flag className="w-6 h-6 text-[var(--canvas)]" />
                         </div>
