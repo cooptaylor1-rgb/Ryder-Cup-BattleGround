@@ -210,8 +210,10 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
             <span className="text-[var(--ink-secondary)]">{error}</span>
           </div>
           <button
+            type="button"
             onClick={fetchWeather}
             className="p-1 rounded hover:bg-[color:var(--warning)]/10"
+            aria-label="Retry weather fetch"
           >
             <RefreshCw className="w-4 h-4 text-[var(--warning)]" />
           </button>
@@ -226,6 +228,7 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
     <div className="card overflow-hidden">
       {/* Header */}
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
       >
@@ -359,8 +362,10 @@ export function SessionWeatherPanel({ session, course, latitude, longitude, onWe
               Updated: {weather?.lastUpdated ? new Date(weather.lastUpdated).toLocaleTimeString() : 'Unknown'}
             </span>
             <button
+              type="button"
               onClick={fetchWeather}
               className="text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)] flex items-center gap-1"
+              aria-label="Refresh weather"
             >
               <RefreshCw className="w-3 h-3" />
               Refresh

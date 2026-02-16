@@ -3,6 +3,12 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-16
+
+### 00:20 EST — Phase 2 — SessionWeatherPanel: button semantics + a11y labels
+- `SessionWeatherPanel`: added `type="button"` on non-form buttons and aria-labels for refresh/retry to prevent accidental form submits and improve screen reader clarity.
+
+
 ## 2026-02-15
 
 ### 23:25 EST — Phase 2 — Trip recap + setup guide: tokenized remaining inverse typography
