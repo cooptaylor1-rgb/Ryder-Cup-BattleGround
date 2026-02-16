@@ -20,6 +20,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 23:58 EST — Phase 2 — Awards + Trip settings: tokenize remaining inverse CTA text
+- `/trip/[tripId]/awards`: winner/runners-up rank badges and active tab buttons now use `text-[var(--canvas)]` instead of hard-coded `text-white` for theme-safe inverse typography.
+- `/trip/[tripId]/settings`: destructive delete confirmation CTA now uses token-driven error surface + canvas text (`bg-[var(--error)] text-[var(--canvas)]`) instead of `bg-red-* text-white`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`da8bbe8`)
+
 ### 23:30 EST — Phase 2 — Moments + Captain UI: tokenize remaining white/black overlays
 - `MomentCard`: avatar initials, team indicator rings, and tagged-player overlay badge now use token-driven canvas/ink classes (`text-[var(--canvas)]`, `border-[color:var(--canvas)]/…`, `bg-[color:var(--ink)]/50`) instead of `text-white`/`border-white`/`bg-black/50`.
 - `CaptainDashboard`: “Live Now” and warning AttentionCard copy now uses token-driven canvas typography; replaced inline `color: 'white'`/`text-white/*` with `var(--canvas)` tokens.
