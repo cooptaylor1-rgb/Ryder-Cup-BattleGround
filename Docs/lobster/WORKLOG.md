@@ -5,6 +5,16 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 15:45 EST — Phase 2 — Token hygiene: replace remaining `border-white` spinners with canvas tokens
+- `/lineup/builder`, `/profile`, `/profile/complete`: migrated loading spinners off `border-white/*` + `border-t-white` and onto token-driven canvas borders (`border-[color:var(--canvas)]/...`) for theme-safe inverse loading indicators.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
+### 15:25 EST — Phase 2 — Token hygiene: MomentCard
+- `MomentCard`: replaced hardcoded `bg-gray-*` and `text-*` styles with token-driven classes (`bg-[color:var(--ink)]/...`, `text-[var(--ink)]`, `text-[var(--warning)]`, etc.) to align with the premium design system.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`274f256`)
+
 ### 14:45 EST — Phase 2 — Fix Tailwind arbitrary shadow color var opacity (`shadow-[var(--masters)]/…` → `shadow-[color:var(--masters)]/…`)
 - `/live`: flashing match card highlight now uses Tailwind-safe shadow color syntax so opacity compiles correctly.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

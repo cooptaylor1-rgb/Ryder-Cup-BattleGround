@@ -289,7 +289,7 @@ function LineupBuilderPageContent() {
                     >
                         {saving ? (
                             <div
-                                className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"
+                                className="w-4 h-4 border-2 border-[color:var(--canvas)]/40 border-t-[color:var(--canvas)] rounded-full animate-spin"
                                 aria-hidden
                             />
                         ) : (

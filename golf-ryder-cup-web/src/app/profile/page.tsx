@@ -528,7 +528,7 @@ export default function ProfilePage() {
             >
               {isSaving ? (
                 <span className="flex items-center justify-center gap-[var(--space-2)]">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite]" />
+                  <span className="w-4 h-4 border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite]" />
                   Saving...
                 </span>
               ) : (
