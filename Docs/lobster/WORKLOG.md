@@ -8,7 +8,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 ### 15:45 EST — Phase 2 — Token hygiene: replace remaining `border-white` spinners with canvas tokens
 - `/lineup/builder`, `/profile`, `/profile/complete`: migrated loading spinners off `border-white/*` + `border-t-white` and onto token-driven canvas borders (`border-[color:var(--canvas)]/...`) for theme-safe inverse loading indicators.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`8a81c00`)
 
 ### 15:25 EST — Phase 2 — Token hygiene: MomentCard
 - `MomentCard`: replaced hardcoded `bg-gray-*` and `text-*` styles with token-driven classes (`bg-[color:var(--ink)]/...`, `text-[var(--ink)]`, `text-[var(--warning)]`, etc.) to align with the premium design system.
