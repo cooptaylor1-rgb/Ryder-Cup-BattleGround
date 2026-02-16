@@ -216,7 +216,7 @@ export function ScoreCelebration({
                             exit={{ scale: 0.8, opacity: 0 }}
                             transition={{ type: 'spring', damping: 20 }}
                         >
-                            <div className="w-20 h-20 rounded-full flex flex-col items-center justify-center bg-gray-600 shadow-lg">
+                            <div className="w-20 h-20 rounded-full flex flex-col items-center justify-center bg-[color:var(--ink)]/60 shadow-lg">
                                 <Minus className="w-8 h-8 text-[var(--canvas)]" />
                                 <span className="text-xs font-medium text-[color:var(--canvas)]/80">Halved</span>
                             </div>
@@ -236,8 +236,7 @@ export function ScoreCelebration({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center"
-                        style={{ background: 'rgba(0, 0, 0, 0.7)' }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/70"
                     >
                         {/* Massive confetti burst */}
                         {!prefersReducedMotion && particles.map((particle) => (
@@ -356,15 +355,14 @@ export function ScoreCelebration({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center"
-                        style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/60"
                     >
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}
                             transition={{ type: 'spring', damping: 20 }}
-                            className="px-8 py-6 rounded-3xl flex flex-col items-center bg-gray-700 shadow-2xl"
+                            className="px-8 py-6 rounded-3xl flex flex-col items-center bg-[color:var(--ink)]/80 shadow-2xl"
                         >
                             <Flag className="w-12 h-12 text-[var(--canvas)] mb-2" />
                             <p className="text-xs uppercase tracking-widest text-[color:var(--canvas)]/70 mb-1">

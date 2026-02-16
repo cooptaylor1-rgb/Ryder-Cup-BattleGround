@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 16:05 EST — Phase 2 — Token hygiene: eliminate remaining Tailwind gray primitives in celebration + stats UI
+- `ScoreCelebration`: replaced `bg-gray-*` surfaces and rgba black overlays with token-driven ink tints (`bg-[color:var(--ink)]/…`) for theme-safe celebration modals.
+- `PlayerStatsCard`: replaced rank badge `bg-gray-*` + `text-gray-*` and swapped `text-green-500`/`text-red-500` for semantic tokens (`var(--success)`/`var(--error)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 15:45 EST — Phase 2 — Token hygiene: replace remaining `border-white` spinners with canvas tokens
 - `/lineup/builder`, `/profile`, `/profile/complete`: migrated loading spinners off `border-white/*` + `border-t-white` and onto token-driven canvas borders (`border-[color:var(--canvas)]/...`) for theme-safe inverse loading indicators.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)

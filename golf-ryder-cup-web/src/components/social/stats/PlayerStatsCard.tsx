@@ -97,9 +97,9 @@ export function PlayerStatsCard({
             {rank && rank <= 3 && (
               <div className={cn(
                 'absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold',
-                rank === 1 && 'bg-yellow-500 text-yellow-900',
-                rank === 2 && 'bg-gray-300 text-gray-700',
-                rank === 3 && 'bg-amber-600 text-amber-100'
+                rank === 1 && 'bg-[color:var(--warning)] text-[var(--ink)]',
+                rank === 2 && 'bg-[var(--surface-tertiary)] text-[var(--ink-secondary)]',
+                rank === 3 && 'bg-[color:var(--accent)]/25 text-[var(--accent)]'
               )}>
                 {rank}
               </div>
@@ -164,8 +164,8 @@ export function PlayerStatsCard({
                 <div className={cn(
                   'type-h4 font-semibold',
                   item.highlight && 'text-[var(--masters)]',
-                  item.color === 'green' && 'text-green-500',
-                  item.color === 'red' && 'text-red-500'
+                  item.color === 'green' && 'text-[var(--success)]',
+                  item.color === 'red' && 'text-[var(--error)]'
                 )}>
                   {item.value}
                 </div>
