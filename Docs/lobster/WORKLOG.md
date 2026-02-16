@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 08:26 EST — Phase 2 — Fix Tailwind CSS var opacity syntax (`bg-[var(--ink)]/…` → `bg-[color:var(--ink)]/…`)
+- `Modal`, `CaptainToggle`, `QuickStandingsOverlay`, `BulkImportModal`: replaced `bg-[var(--ink)]/NN` with `bg-[color:var(--ink)]/NN` so Tailwind opacity modifiers compile correctly (prevents silent backdrop styling failures).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`dbb6b88`)
+
 ### 07:10 EST — Phase 2 — Lineup routes: remove remaining inline `color: 'white'`
 - `/lineup/new`: Quick Setup gradient card now uses `color: 'var(--canvas)'` for theme-safe inverse typography.
 - `/lineup/builder`: Fairness score badge now uses `color: 'var(--canvas)'` instead of hard-coded white.
