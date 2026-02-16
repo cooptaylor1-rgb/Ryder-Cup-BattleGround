@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-15
 
+### 23:25 EST — Phase 2 — Trip recap + setup guide: tokenized remaining inverse typography
+- `TripRecap`: hero banner typography + winner pill + nav tabs + share CTA now use token-driven inverse canvas text (`text-[var(--canvas)]`, `text-[color:var(--canvas)]/…`) instead of `text-white`/`text-white/*`.
+- `SetupGuide`: Masters icon shell + completion badge now use `text-[var(--canvas)]` instead of `text-white`.
+- `PointSystem`: active preset icon pill now uses `text-[var(--canvas)]` (no `text-white`).
+- `LiveJumbotron`: completed-match result bubble now uses `text-[var(--canvas)]` on team-colored pills (no `text-white`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`feaea6e`)
+
 ### 23:10 EST — Phase 2 — Tokenize remaining inverse button text (SideBetsTracker, PlayerProfileCard, TeeTimePreferences)
 - `SideBetsTracker`: selected participant chips + primary action buttons now use `text-[var(--canvas)]` on Masters/info surfaces (no `text-white`).
 - `PlayerProfileCard`: achievement badge labels and “View Full Profile” CTA migrated to token-driven inverse canvas typography; CTA now uses Tailwind token classes instead of inline `color: 'white'`.
