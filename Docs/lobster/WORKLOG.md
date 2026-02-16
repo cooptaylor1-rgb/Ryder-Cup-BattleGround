@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 05:20 EST — Phase 2 — Token hygiene: tokenize remaining black modal backdrops (More, Bets, Session timeout)
+- `/more`: settings modal backdrop migrated from `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
+- `/bets`: create-side-bet sheet backdrop migrated from `bg-black/50` to token-driven ink tint; selected bet-type button inline `color: 'white'` migrated to `var(--canvas)`.
+- `SessionTimeoutWarning`: backdrop migrated from `bg-black/50` to token-driven ink tint (`bg-[color:var(--ink)]/50`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d465ac4`)
+
 ### 05:05 EST — Phase 2 — Token hygiene: replace remaining hard-coded white + tokenize onboarding overlays
 - `BottomNav`: notification badge text now uses `color: var(--canvas)` (no hard-coded `'white'`).
 - `SidebarNav`: RC logo text now uses `color: var(--canvas)` for theme-safe inverse typography.
