@@ -348,7 +348,7 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
     <div
       className={`card rounded-2xl overflow-hidden border bg-[var(--surface-card)] transition-all duration-500 ${
         isFlashing
-          ? 'border-[var(--masters)] shadow-lg shadow-[var(--masters)]/20 scale-[1.02]'
+          ? 'border-[var(--masters)] shadow-lg shadow-[color:var(--masters)]/20 scale-[1.02]'
           : 'border-[var(--rule)]'
       }`}
     >
