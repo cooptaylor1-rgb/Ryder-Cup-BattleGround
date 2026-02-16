@@ -34,6 +34,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`d044a1a`)
 
+### 02:52 EST — Phase 2 — Social + Captain modals: tokenize backdrops + inverse text
+- `EngagementNotifications` (`NotificationCenter`): backdrop migrated off `bg-black/40` to token-driven ink tint (`bg-[color:var(--ink)]/40`); unread badge now uses `bg-[var(--error)] text-[var(--canvas)]` (no inline `color: 'white'`).
+- `CreatePollModal`: overlay backdrop migrated off `bg-black/60` to token-driven ink tint (`bg-[color:var(--ink)]/60`).
+- `SessionCloner`: player-picker modal backdrop migrated off `bg-black/50` to token-driven ink tint; team-color initials and Masters CTA buttons now use canvas tokens (`text-[var(--canvas)]`) on inverse surfaces.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`10b04e7`)
+
 
 ## 2026-02-15
 
