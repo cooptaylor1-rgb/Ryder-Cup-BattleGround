@@ -374,7 +374,7 @@ export default function TripSettingsPage() {
                         <button
                           onClick={handleDelete}
                           disabled={isDeleting}
-                          className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold disabled:opacity-50"
+                          className="px-4 py-2 rounded-xl bg-[var(--error)] hover:bg-[color:var(--error)]/90 text-[var(--canvas)] text-sm font-semibold disabled:opacity-50"
                         >
                           {isDeleting ? 'Deleting…' : 'Yes, delete'}
                         </button>

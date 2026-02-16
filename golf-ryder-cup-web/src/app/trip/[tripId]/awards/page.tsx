@@ -42,7 +42,7 @@ function AwardCard({ award }: { award: Award }) {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold',
+              'w-10 h-10 rounded-full flex items-center justify-center text-[var(--canvas)] font-bold',
               award.winner.teamColor === 'usa' ? 'bg-team-usa' : 'bg-team-europe'
             )}
           >
@@ -60,7 +60,7 @@ function AwardCard({ award }: { award: Award }) {
           <div className="flex items-center gap-3 opacity-75">
             <div
               className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold',
+                'w-10 h-10 rounded-full flex items-center justify-center text-[var(--canvas)] font-bold',
                 award.runnerUp.teamColor === 'usa' ? 'bg-team-usa' : 'bg-team-europe'
               )}
             >
@@ -308,7 +308,7 @@ export default function AwardsPage() {
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2',
                   activeTab === 'awards'
-                    ? 'bg-[var(--masters)] text-white'
+                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
                     : 'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
                 )}
               >
@@ -320,7 +320,7 @@ export default function AwardsPage() {
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2',
                   activeTab === 'leaderboard'
-                    ? 'bg-[var(--masters)] text-white'
+                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
                     : 'text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]'
                 )}
               >
