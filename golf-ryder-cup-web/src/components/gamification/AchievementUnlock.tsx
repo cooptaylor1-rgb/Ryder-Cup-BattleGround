@@ -458,7 +458,7 @@ export function AchievementNotification({
                     onView?.();
                 }}
                 className="p-2 rounded-lg"
-                style={{ background: config.color, color: 'white' }}
+                style={{ background: config.color, color: 'var(--canvas)' }}
             >
                 <ChevronRight size={16} />
             </button>

@@ -324,7 +324,7 @@ export function MatchScorecard({
               className="px-2 py-0.5 rounded text-xs font-bold"
               style={{
                 background: matchScore > 0 ? 'var(--team-usa)' : 'var(--team-europe)',
-                color: 'white',
+                color: 'var(--canvas)',
               }}
             >
               {matchScore > 0 ? teamAName : teamBName} {Math.abs(matchScore)} UP

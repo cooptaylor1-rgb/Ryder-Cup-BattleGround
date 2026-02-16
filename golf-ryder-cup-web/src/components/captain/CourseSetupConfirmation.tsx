@@ -495,8 +495,8 @@ export function CourseSetupConfirmation({
                         'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
                     style={{
-                        background: allRequiredConfirmed ? '#22c55e' : 'var(--masters)',
-                        color: 'white',
+                        background: allRequiredConfirmed ? 'var(--success)' : 'var(--masters)',
+                        color: 'var(--canvas)',
                     }}
                 >
                     {allRequiredConfirmed ? (

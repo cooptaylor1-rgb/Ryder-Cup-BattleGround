@@ -10,6 +10,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `/lineup/builder`: Fairness score badge now uses `color: 'var(--canvas)'` instead of hard-coded white.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+### 07:25 EST — Phase 2 — Captain/scoring widgets: replace remaining inline `color: 'white'` with canvas tokens
+- `QuickActionsGrid`: error badge copy now uses `color: var(--canvas)`.
+- `AchievementUnlock`: “View” button chevron now uses `color: var(--canvas)` on the achievement tone.
+- `MatchScorecard`: match lead badge now uses `color: var(--canvas)` on team surfaces.
+- `CourseSetupConfirmation`: confirm-all CTA uses `bg: var(--success)` and `color: var(--canvas)` (no hard-coded hex/white).
+- `PrintablePairings`, `AuditBadge`, `AnnouncementSystem`: inverse icon/badge states now use `var(--canvas)` instead of hard-coded white.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 06:15 EST — Phase 2 — Token hygiene: replace remaining inline `color: 'white'` with canvas tokens (Draft/Admin/Social)
 - `/captain/draft`: PageHeader Shuffle icons now use `style={{ color: 'var(--canvas)' }}` for theme-safe inverse icon color.
 - `/admin`: PageHeader Shield icon now uses `var(--canvas)` over the red gradient chip.

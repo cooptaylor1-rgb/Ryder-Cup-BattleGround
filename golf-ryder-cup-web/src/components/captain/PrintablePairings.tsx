@@ -249,7 +249,7 @@ export function PrintablePairings({
               alignItems: 'center',
               gap: 'var(--space-2)',
               background: 'var(--maroon)',
-              color: 'white',
+              color: 'var(--canvas)',
               fontFamily: 'var(--font-sans)',
             }}
           >

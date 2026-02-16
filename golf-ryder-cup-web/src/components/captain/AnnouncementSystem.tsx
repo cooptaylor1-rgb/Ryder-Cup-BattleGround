@@ -197,7 +197,7 @@ export function AnnouncementComposer({
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: 'var(--masters)', color: 'white' }}
+            style={{ background: 'var(--masters)', color: 'var(--canvas)' }}
           >
             <Megaphone className="w-5 h-5" />
           </div>
@@ -336,7 +336,7 @@ export function AnnouncementComposer({
             className="p-4 rounded-xl"
             style={{
               background: priority === 'urgent' ? 'var(--error)' : 'var(--masters)',
-              color: 'white',
+              color: 'var(--canvas)',
             }}
           >
             <p className="text-xs font-medium uppercase tracking-wide mb-1 opacity-80">
@@ -453,7 +453,7 @@ function AnnouncementCard({ announcement, onClick }: AnnouncementCardProps) {
           className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
           style={{
             background: isUrgent ? 'var(--error)' : 'var(--surface-raised)',
-            color: isUrgent ? 'white' : 'var(--masters)',
+            color: isUrgent ? 'var(--canvas)' : 'var(--masters)',
           }}
         >
           {categoryIcons[announcement.category]}
@@ -465,7 +465,7 @@ function AnnouncementCard({ announcement, onClick }: AnnouncementCardProps) {
               {isUrgent && (
                 <span
                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium mb-1"
-                  style={{ background: 'var(--error)', color: 'white' }}
+                  style={{ background: 'var(--error)', color: 'var(--canvas)' }}
                 >
                   <Zap className="w-3 h-3" />
                   Urgent

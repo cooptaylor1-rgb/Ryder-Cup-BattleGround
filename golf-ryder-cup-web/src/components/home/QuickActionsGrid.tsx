@@ -78,7 +78,7 @@ function QuickActionButton({ icon, label, href, badge, color }: QuickActionButto
                             fontWeight: 700,
                             borderRadius: 'var(--radius-full)',
                             background: 'var(--error)',
-                            color: 'white',
+                            color: 'var(--canvas)',
                             minWidth: '16px',
                             textAlign: 'center',
                         }}
