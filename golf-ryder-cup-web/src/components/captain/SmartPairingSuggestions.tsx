@@ -270,7 +270,7 @@ export function SmartPairingSuggestions({
               onClick={() => setSelectedFormat(format)}
               className={
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedFormat === format
-                  ? 'bg-[var(--masters)] text-white'
+                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
                   : 'bg-[var(--surface-secondary)] text-[var(--ink-secondary)] hover:bg-[var(--surface-tertiary)]'
                 }`
               }
@@ -368,7 +368,7 @@ export function SmartPairingSuggestions({
                   {onApplySuggestion && (
                     <button
                       onClick={() => onApplySuggestion(suggestion)}
-                      className="ml-4 p-2 bg-[var(--masters)] text-white rounded-lg hover:bg-[var(--masters-deep)] transition-colors"
+                      className="ml-4 p-2 bg-[var(--masters)] text-[var(--canvas)] rounded-lg hover:bg-[var(--masters-deep)] transition-colors"
                       title="Apply this pairing"
                     >
                       <ArrowRight className="w-4 h-4" />

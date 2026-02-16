@@ -192,7 +192,7 @@ export function TrashTalkFeed({
                                                 : cn(
                                                     'px-4 py-2',
                                                     isCurrentUser
-                                                        ? 'bg-masters-primary text-white'
+                                                        ? 'bg-[var(--masters)] text-[var(--canvas)]'
                                                         : 'bg-[var(--surface-secondary)] text-[var(--ink-primary)]'
                                                 )
                                         )}
@@ -273,8 +273,8 @@ export function TrashTalkFeed({
                         disabled={!message.trim() || isSubmitting}
                         className={cn(
                             'p-2 rounded-full',
-                            'bg-masters-primary text-white',
-                            'hover:bg-masters-primary-dark',
+                            'bg-[var(--masters)] text-[var(--canvas)]',
+                            'hover:bg-[var(--masters-deep)]',
                             'disabled:opacity-50 disabled:cursor-not-allowed',
                             'transition-colors'
                         )}

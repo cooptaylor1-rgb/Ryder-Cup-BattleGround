@@ -160,7 +160,7 @@ export function YourMatchCard({
             className={cn(
               'flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] rounded-full',
               'text-[12px] font-bold uppercase tracking-[0.05em]',
-              isLive ? 'bg-[var(--masters)] text-white' : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
+              isLive ? 'bg-[var(--masters)] text-[var(--canvas)]' : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
             )}
           >
             <Target size={14} />
@@ -236,7 +236,7 @@ export function YourMatchCard({
       )}
 
       {/* CTA */}
-      <div className="flex items-center justify-center gap-[var(--space-3)] p-[var(--space-4)] bg-[var(--masters)] rounded-[var(--radius-xl)] text-white font-bold text-[16px] min-h-[52px] shadow-[0_2px_8px_rgba(0,103,71,0.30)]">
+      <div className="flex items-center justify-center gap-[var(--space-3)] p-[var(--space-4)] bg-[var(--masters)] rounded-[var(--radius-xl)] text-[var(--canvas)] font-bold text-[16px] min-h-[52px] shadow-[0_2px_8px_rgba(0,103,71,0.30)]">
         <Zap size={20} />
         <span>{isLive ? 'Continue Scoring' : 'Enter Score'}</span>
         <ChevronRight size={20} />

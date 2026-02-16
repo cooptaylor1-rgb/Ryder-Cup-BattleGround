@@ -148,8 +148,8 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
               className={cn(
                 'flex-1 px-4 py-3 rounded-lg font-medium transition-colors',
                 'flex items-center justify-center gap-2',
-                'bg-masters-primary text-white',
-                'hover:bg-masters-primary-dark',
+                'bg-[var(--masters)] text-[var(--canvas)]',
+                'hover:bg-[var(--masters-deep)]',
                 'disabled:opacity-50 disabled:cursor-not-allowed'
               )}
             >

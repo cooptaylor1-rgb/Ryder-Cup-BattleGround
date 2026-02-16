@@ -45,19 +45,19 @@ export function HoleIndicator({
         switch (winner) {
             case 'teamA':
                 return cn(
-                    'text-white shadow-md',
+                    'text-[var(--canvas)] shadow-md',
                     'bg-linear-to-br from-[var(--team-usa)] to-[var(--team-usa-deep)]',
                     'shadow-[var(--team-usa-glow)]'
                 );
             case 'teamB':
                 return cn(
-                    'text-white shadow-md',
+                    'text-[var(--canvas)] shadow-md',
                     'bg-linear-to-br from-[var(--team-europe)] to-[var(--team-europe-deep)]',
                     'shadow-[var(--team-europe-glow)]'
                 );
             case 'halved':
                 return cn(
-                    'text-white',
+                    'text-[var(--canvas)]',
                     'bg-linear-to-br from-[var(--color-accent)] to-[#A38B2D]',
                     'shadow-[var(--shadow-glow-gold)]'
                 );

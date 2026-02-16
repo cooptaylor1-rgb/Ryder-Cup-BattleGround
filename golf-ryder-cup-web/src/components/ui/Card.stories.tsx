@@ -135,7 +135,7 @@ export const PlayerCard: Story = {
     <Card className="w-72" interactive>
       <CardContent>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--masters)] flex items-center justify-center text-white font-bold">
+          <div className="w-12 h-12 rounded-full bg-[var(--masters)] flex items-center justify-center text-[var(--canvas)] font-bold">
             JS
           </div>
           <div className="flex-1">
