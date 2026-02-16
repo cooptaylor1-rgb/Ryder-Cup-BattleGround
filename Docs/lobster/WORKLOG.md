@@ -12,6 +12,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `ProfilePhotoUpload`: option/preview/processing overlays migrated off `bg-black/*` to token-driven ink tints (`bg-[color:var(--ink)]/50` and `/80`).
 - `GrossNetScoreDisplay`: stroke dots, totals pill, and legend fallback now use `var(--canvas)` instead of hard-coded `'white'` for inverse text.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4d7d4fb`)
 
 ### 04:40 EST — Phase 2 — Token hygiene: replace remaining `text-white` with canvas tokens (pairing + chat + join)
 - `SmartPairingSuggestions`: Masters-selected pills and apply button now use `text-[var(--canvas)]` instead of `text-white`.
