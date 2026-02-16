@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 04:40 EST — Phase 2 — Token hygiene: replace remaining `text-white` with canvas tokens (pairing + chat + join)
+- `SmartPairingSuggestions`: Masters-selected pills and apply button now use `text-[var(--canvas)]` instead of `text-white`.
+- `TrashTalkFeed`: current-user chat bubble + send button now use token-driven Masters surface (`bg-[var(--masters)]`) with canvas typography (no `bg-masters-primary`/`text-white`).
+- `JoinTripModal`, `YourMatchCard`, `HoleIndicator`: migrated remaining inverse text to `text-[var(--canvas)]` for theme-safe contrast on Masters/team/gold gradients.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4098449`)
+
 ### 04:15 EST — Phase 2 — Captain modals + alert badges: remove remaining `text-white`/`bg-black` fragments
 - `AlertCenter`: primary action buttons and critical-count badge now use token-driven inverse canvas typography (`text-[var(--canvas)]`) and premium error token background (`var(--error)`) instead of `text-white` + hard-coded `#EF4444`.
 - `QuickPlayerSwap` + `QuickAnnouncementModal`: modal backdrops migrated off `bg-black/*` to token-driven ink tints (`bg-[color:var(--ink)]/*`) for theme-safe overlays.
