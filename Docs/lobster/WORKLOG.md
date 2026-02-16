@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 17:05 EST — Phase 2 — Token hygiene: Stats hub cards + Login error banner
+- `/stats`: replaced remaining hard-coded `rgba(...)` / hex accent chips with premium semantic tokens (`var(--masters)`, `var(--warning)`, `var(--info)`) using Tailwind-safe opacity (`bg-[color:var(--token)]/10`).
+- `/login`: migrated error banner border/background off hard-coded `rgba(...)` onto premium error tokens (`border-[color:var(--error)]/20`, `bg-[color:var(--error)]/10`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 16:55 EST — Phase 2 — Token hygiene: error pages + admin warning surfaces
 - Standardized route-level error pages (`/help`, `/join`, `/admin`, `/settings`, `/score`, `/achievements`, `/trip-stats`) to use premium semantic tokens for error/warning icon shells (`bg-[color:var(--error)]/10`, `bg-[color:var(--warning)]/10`) instead of hard-coded `rgba(...)` + `#dc2626`.
 - `/admin`: tokenized warning banner + destructive delete button surfaces off `rgba(220,38,38,…)` / `text-red-600` / `bg-[#dc2626]` and onto `var(--error)` tokens.

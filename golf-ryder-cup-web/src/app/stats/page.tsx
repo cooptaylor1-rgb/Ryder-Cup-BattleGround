@@ -57,7 +57,7 @@ export default function StatsPage() {
               <Link href="/trip-stats" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(var(--masters-rgb),0.12)] text-[var(--masters)]">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[color:var(--masters)]/10 text-[var(--masters)]">
                       <BarChart3 size={18} />
                     </div>
                     <div>
@@ -71,7 +71,7 @@ export default function StatsPage() {
               <Link href="/achievements" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(212,175,55,0.12)] text-[var(--warning)]">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[color:var(--warning)]/10 text-[var(--warning)]">
                       <Award size={18} />
                     </div>
                     <div>
@@ -85,7 +85,7 @@ export default function StatsPage() {
               <Link href="/schedule" className="card press-scale p-[var(--space-5)] no-underline">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(59,130,246,0.12)] text-[#3b82f6]">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[color:var(--info)]/10 text-[var(--info)]">
                       <CalendarDays size={18} />
                     </div>
                     <div>

@@ -3,6 +3,7 @@
 All times America/New_York.
 
 ## 2026-02-16
+- 17:05 — Shipped batch: `/stats` link cards (Trip Stats / Achievements / Schedule) now use premium semantic tokens (`var(--masters)`, `var(--warning)`, `var(--info)`) instead of hard-coded `rgba(...)` + `#3b82f6`, so the hub stays theme-safe. `/login` error banner now uses token-driven border/background (`border-[color:var(--error)]/20`, `bg-[color:var(--error)]/10`) instead of a bespoke maroon rgba. Lobster gate (`lint` + `typecheck`) approved. (commit cbb9783)
 - 02:15 — Shipped batch: Spectator Mode service now uses centralized `TEAM_COLORS` (`var(--team-usa)` / `var(--team-europe)`) instead of legacy `--ryder-*` CSS vars, preventing silent color-token drift on the spectator scoreboard payload. Lobster gate (`lint` + `typecheck`) approved; pre-push checks (`typecheck` + `test` + `build`) ran and passed (existing CSS optimization warnings only). (commit b03cf7f)
 
 ## 2026-02-15

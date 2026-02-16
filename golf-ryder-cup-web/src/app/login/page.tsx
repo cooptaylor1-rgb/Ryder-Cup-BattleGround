@@ -146,7 +146,7 @@ function LoginPageContent() {
 
           {/* Error */}
           {error && (
-            <div className="rounded-[var(--radius-md)] border border-[color:rgba(166,61,64,0.2)] bg-[color:rgba(166,61,64,0.08)] px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
+            <div className="rounded-[var(--radius-md)] border border-[color:var(--error)]/20 bg-[color:var(--error)]/10 px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
               <p className="font-sans text-[length:var(--text-sm)] text-[var(--error)]">{error}</p>
             </div>
           )}
