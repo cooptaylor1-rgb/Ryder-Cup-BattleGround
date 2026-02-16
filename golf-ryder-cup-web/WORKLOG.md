@@ -2,6 +2,9 @@
 
 All times America/New_York.
 
+## 2026-02-16
+- 02:15 — Shipped batch: Spectator Mode service now uses centralized `TEAM_COLORS` (`var(--team-usa)` / `var(--team-europe)`) instead of legacy `--ryder-*` CSS vars, preventing silent color-token drift on the spectator scoreboard payload. Lobster gate (`lint` + `typecheck`) approved; pre-push checks (`typecheck` + `test` + `build`) ran and passed (existing CSS optimization warnings only). (commit b03cf7f)
+
 ## 2026-02-15
 - 22:25 — Shipped batch: `SettlementView` (Finances → Settlement) now renders an explicit premium empty state when there is **no active trip**, with CTAs to Create (`/trip/new`) or Join (`/join`) instead of showing a misleading “Loading settlement data…” placeholder. Pre-push checks (`typecheck` + `test` + `build`) ran and passed on push. (commit f10e408)
 
