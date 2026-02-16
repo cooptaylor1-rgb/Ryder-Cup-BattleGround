@@ -317,7 +317,7 @@ export function GoTimeCountdown({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setSoundEnabled(!soundEnabled)}
-                            className="p-2 rounded-lg hover:bg-[var(--canvas)]/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--canvas)]/ transition-colors"
                         >
                             {soundEnabled ? (
                                 <Volume2 className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
@@ -329,7 +329,7 @@ export function GoTimeCountdown({
                             onClick={() => setShowSettings(!showSettings)}
                             className={cn(
                                 'p-2 rounded-lg transition-colors',
-                                showSettings ? 'bg-[var(--canvas)]/10' : ''
+                                showSettings ? 'bg-[color:var(--canvas)]/' : ''
                             )}
                         >
                             <Settings className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
@@ -413,7 +413,7 @@ export function GoTimeCountdown({
                 <div className="flex items-center justify-center gap-4">
                     <button
                         onClick={() => setIsPaused(!isPaused)}
-                        className="p-4 rounded-full hover:bg-[var(--canvas)]/10 transition-colors"
+                        className="p-4 rounded-full hover:bg-[color:var(--canvas)]/ transition-colors"
                         style={{ background: 'var(--surface)' }}
                     >
                         {isPaused ? (
@@ -424,7 +424,7 @@ export function GoTimeCountdown({
                     </button>
                     <button
                         onClick={handleReset}
-                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-[var(--canvas)]/10 transition-colors"
+                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-[color:var(--canvas)]/ transition-colors"
                     >
                         <RotateCcw className="w-6 h-6" style={{ color: 'var(--ink-muted)' }} />
                     </button>
