@@ -20,6 +20,8 @@ import type {
     Player,
 } from '@/lib/types/models';
 
+import { TEAM_COLORS } from '@/lib/constants/teamColors';
+
 /**
  * Build spectator view for a trip
  */
@@ -94,12 +96,12 @@ export function buildSpectatorView(
         teamA: {
             name: teamA?.name || 'Team USA',
             points: teamAPoints,
-            color: 'var(--ryder-usa)',
+            color: TEAM_COLORS.teamA,
         },
         teamB: {
             name: teamB?.name || 'Team Europe',
             points: teamBPoints,
-            color: 'var(--ryder-europe)',
+            color: TEAM_COLORS.teamB,
         },
         pointsToWin,
         currentStatus,
