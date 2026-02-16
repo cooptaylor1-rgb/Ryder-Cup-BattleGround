@@ -304,7 +304,7 @@ export function PaceSpacing({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleOptimize}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            className="p-2 rounded-lg hover:bg-[color:var(--ink)]/5 transition-colors"
                             title="Optimize order"
                         >
                             <Zap className="w-5 h-5" style={{ color: 'var(--masters)' }} />
@@ -313,7 +313,7 @@ export function PaceSpacing({
                             onClick={() => setShowSettings(!showSettings)}
                             className={cn(
                                 'p-2 rounded-lg transition-colors',
-                                showSettings ? 'bg-white/10' : ''
+                                showSettings ? 'bg-[color:var(--ink)]/10' : 'hover:bg-[color:var(--ink)]/5'
                             )}
                         >
                             <Settings className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />

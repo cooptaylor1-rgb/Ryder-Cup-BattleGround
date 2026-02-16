@@ -348,7 +348,7 @@ ${activeLocalRules.map(lr => `• ${lr.title}`).join('\n')}
                     </div>
                     <button
                         onClick={handleShare}
-                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg hover:bg-[color:var(--ink)]/5 transition-colors"
                     >
                         {copied ? (
                             <Check className="w-5 h-5 text-green-500" />

@@ -153,7 +153,7 @@ function ContactCard({
                     disabled={!hasPhone}
                     className={cn(
                         'p-2 rounded-lg transition-colors bg-[var(--canvas)]',
-                        hasPhone ? 'hover:bg-white/10' : 'opacity-30'
+                        hasPhone ? 'hover:bg-[color:var(--ink)]/5' : 'opacity-30'
                     )}
                 >
                     <MessageSquare className="w-5 h-5 text-[var(--masters)]" />
