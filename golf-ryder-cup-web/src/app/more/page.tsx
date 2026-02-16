@@ -851,7 +851,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-[100]"
+      className="fixed inset-0 bg-[color:var(--ink)]/50 flex items-center justify-center p-6 z-[100]"
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}

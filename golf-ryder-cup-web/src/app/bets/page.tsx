@@ -372,7 +372,7 @@ export default function BetsPage() {
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-[color:var(--ink)]/50"
             onClick={() => setShowCreateModal(false)}
           />
           <div className="relative w-full max-w-lg rounded-t-3xl border border-[var(--rule)] bg-[var(--surface-raised)] p-6 max-h-[90vh] overflow-y-auto">
@@ -401,7 +401,7 @@ export default function BetsPage() {
                     className="p-3 rounded-xl transition-all"
                     style={{
                       background: newBetType === type ? 'var(--masters)' : 'var(--surface)',
-                      color: newBetType === type ? 'white' : 'var(--ink)',
+                      color: newBetType === type ? 'var(--canvas)' : 'var(--ink)',
                       border: 'none',
                       cursor: 'pointer',
                     }}
