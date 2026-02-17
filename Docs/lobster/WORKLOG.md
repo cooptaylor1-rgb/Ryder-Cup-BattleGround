@@ -5,6 +5,15 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 05:15 EST — Phase 2 — Token hygiene: captain/spectator status colors
+- `/captain/error`: tokenized alert icon shell background (`bg-[var(--error)]/10`).
+- `/spectator/[tripId]`: tokenized load error pill surface/border/dot to premium error tokens.
+- `LiveMatchMonitor`: tokenized match alert banner colors (error → `var(--error)`, non-error → `var(--warning)`).
+- `BatchScoreGrid`: tokenized dirty/error input background highlights off Tailwind red/amber primitives to semantic warning/error tints.
+- `PhotoCapture`: offline badge now uses warning token.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a6ecaeb`)
+
 ### 04:45 EST — Phase 2 — Token hygiene: course error + score celebration + onboarding mode cards
 - `/courses` error boundary: migrated alert icon shell background off Tailwind `bg-red-500/10` to premium error tint (`bg-[color-mix(in_srgb,var(--error)_12%,transparent)]`).
 - `ScoreCelebration`: migrated remaining yellow Tailwind primitives to `gold` tokens (`text-gold`, `text-gold/50`) for palette consistency.
