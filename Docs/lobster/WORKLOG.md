@@ -3,6 +3,15 @@
 This file is the high-level, checkpointed “what shipped” log for the Lobster-driven improvement plan.
 
 
+## 2026-02-17
+
+### 01:25 EST — Phase 2 — Token hygiene: GoTimeCountdown alert toggle chips use semantic tokens
+- `GoTimeCountdown`: replaced Tailwind primitive toggle chips (`bg-green-500/20`, `bg-gray-500/20`) with premium semantic tokens (`var(--success)` + ink tints) and moved bell icon colors from inline styles to token classes.
+- Added explicit `type="button"` on toggle buttons to avoid accidental form submits.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`e2bdd24`)
+
+
 ## 2026-02-16
 
 ### 23:20 EST — Phase 2 — Token hygiene: Trip setup CourseSelection + SessionBuilder destructive/actions now use semantic tokens
