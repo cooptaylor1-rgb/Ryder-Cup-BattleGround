@@ -532,7 +532,7 @@ function TemplateDetailModal({
                             borderRadius: '12px',
                             background: COLORS.green,
                             border: 'none',
-                            color: '#fff',
+                            color: 'var(--canvas)',
                             fontWeight: 600,
                             fontSize: '0.875rem',
                             cursor: 'pointer',

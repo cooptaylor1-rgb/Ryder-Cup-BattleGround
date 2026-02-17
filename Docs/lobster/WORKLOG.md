@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 02:05 EST — Phase 2 — Token hygiene: inverse button/tab icon colors use canvas token (Social + TripTemplatePicker + OneHandedScoringPanel)
+- `/social`: send button + active tab text now use `var(--canvas)` instead of hard-coded `white` for theme-safe inverse contrast.
+- `TripTemplatePicker`: “Use This Template” CTA text now uses `var(--canvas)` instead of `#fff`.
+- `OneHandedScoringPanel`: active swipe team score buttons now use `var(--canvas)` instead of `#fff`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (TBD)
+
 ### 01:25 EST — Phase 2 — Token hygiene: GoTimeCountdown alert toggle chips use semantic tokens
 - `GoTimeCountdown`: replaced Tailwind primitive toggle chips (`bg-green-500/20`, `bg-gray-500/20`) with premium semantic tokens (`var(--success)` + ink tints) and moved bell icon colors from inline styles to token classes.
 - Added explicit `type="button"` on toggle buttons to avoid accidental form submits.
