@@ -221,7 +221,7 @@ export function PlayingStyleSurvey({
                     {/* Question Header */}
                     <div className="p-5 border-b border-[var(--rule)]">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                            <div className="w-10 h-10 rounded-xl bg-[color:var(--color-accent)]/12 flex items-center justify-center text-[var(--color-accent)]">
                                 {question.icon}
                             </div>
                             <div className="flex-1">
@@ -247,9 +247,9 @@ export function PlayingStyleSurvey({
                                 className={cn(
                                     'w-full p-4 rounded-xl border-2 text-left transition-all',
                                     'flex items-center gap-4',
-                                    'hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/10',
+                                    'hover:border-[color:var(--color-accent)]/40 hover:bg-[color:var(--color-accent)]/10',
                                     currentAnswer === option.value
-                                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                                        ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/10'
                                         : 'border-[var(--rule)]'
                                 )}
                             >
@@ -266,7 +266,7 @@ export function PlayingStyleSurvey({
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center"
+                                        className="w-6 h-6 rounded-full bg-[color:var(--color-accent)] flex items-center justify-center"
                                     >
                                         <Check className="w-4 h-4 text-[var(--canvas)]" />
                                     </motion.div>
@@ -307,7 +307,7 @@ export function PlayingStyleSurvey({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         onClick={() => onComplete(answers as PlayingStyle)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500 text-[var(--canvas)] font-medium hover:bg-purple-600 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[color:var(--color-accent)] text-[var(--canvas)] font-medium hover:opacity-90 transition-opacity"
                     >
                         Done
                         <ChevronRight className="w-4 h-4" />

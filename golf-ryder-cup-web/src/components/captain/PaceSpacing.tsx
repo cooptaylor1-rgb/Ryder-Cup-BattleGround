@@ -412,14 +412,14 @@ export function PaceSpacing({
 
             {/* Bottleneck Warnings */}
             {bottlenecks.length > 0 && (
-                <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)', background: 'rgba(251, 191, 36, 0.1)' }}>
+                <div className="p-4 border-b border-[color:var(--warning)]/20 bg-[color:var(--warning)]/10">
                     <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-500" />
-                        <span className="text-sm font-medium text-amber-600">Potential Bottlenecks</span>
+                        <AlertTriangle className="w-4 h-4 text-[var(--warning)]" />
+                        <span className="text-sm font-medium text-[var(--warning)]">Potential Bottlenecks</span>
                     </div>
                     <ul className="space-y-1">
                         {bottlenecks.map((issue, idx) => (
-                            <li key={idx} className="text-sm text-amber-600 flex items-start gap-2">
+                            <li key={idx} className="text-sm text-[var(--warning)] flex items-start gap-2">
                                 <span>•</span>
                                 {issue}
                             </li>
