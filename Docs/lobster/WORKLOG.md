@@ -10,6 +10,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Share-card background gradient now uses token surfaces (no `#050505` hard stop), and the subtle stripe overlay uses the current theme ink via `globalAlpha` instead of hard-coded `rgba(255,255,255,…)`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 
+### 20:15 EST — Phase 2 — Fix broken Tailwind token hover classes in GoTimeCountdown
+- `GoTimeCountdown`: fixed invalid Tailwind classes ending in `.../` (opacity modifier without value) that prevented hover backgrounds from compiling.
+- Added explicit `type="button"` on timer controls to avoid accidental form submissions.
+- Token hygiene: migrated played-check icon from `text-green-500` → `text-[var(--success)]`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a764012`)
+
 ### 17:10 EST — Phase 2 — Token hygiene: Path to Victory + stroke indicators + offline chip
 - `PathToVictoryCard`: replaced hard-coded hex colors with premium theme tokens (`var(--usa-primary)`, `var(--europe-primary)`, `var(--warning)`, `var(--masters)`, `var(--success)`, `var(--error)`) and migrated highlight gradients to `color-mix(...)` for theme-safe contrast.
 - `StrokeAlertBanner`: removed remaining `rgba(...)` fills for team stroke badges + mini-map/legend, using token-driven backgrounds (`bg-[color:var(--team-*)]/…`) and `color-mix(...)`.
