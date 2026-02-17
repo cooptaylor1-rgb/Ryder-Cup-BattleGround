@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 02:37 EST — Phase 2 — Token hygiene: format selection accents + complexity pills use premium tokens
+- `matchFormats` (`FORMAT_CONFIGS`): migrated format accent `color` from Tailwind primitives (`bg-blue-500`, `bg-emerald-*`, etc.) to token-driven backgrounds (`bg-[color:var(--info)]`, `bg-[color:var(--success)]`, `bg-[color:var(--warning)]`, `bg-[color:var(--error)]`, `bg-[color:var(--color-accent)]`, `bg-[color:var(--ink-tertiary)]`) for theme-safe UI.
+- `FormatSelector`: replaced complexity badges (beginner/intermediate/advanced) from Tailwind `green/yellow/red` primitives to semantic token tints + borders (`success`/`warning`/`error`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`5326dc3`)
+
 ### 02:25 EST — Phase 2 — Token hygiene: PlayerCountSelector team panels + warning banner use semantic/team tokens
 - `PlayerCountSelector`: migrated Team A/Team B panel backgrounds/borders/text off Tailwind blue/red primitives to team CSS tokens (`var(--team-usa)`, `var(--team-europe)`) using Tailwind-safe opacity (`bg-[color:var(--team-*)]/10`, `border-[color:var(--team-*)]/25`).
 - `PlayerCountSelector`: migrated odd-player warning banner off amber primitives to premium warning token + standard ink secondary copy.
