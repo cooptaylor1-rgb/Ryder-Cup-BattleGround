@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 21:00 EST — Phase 2 — Token hygiene: side game cards use semantic success/warning/error tokens
+- `VegasGameCard`: migrated emerald header/accents to `var(--success)` and replaced remaining red loss/flip states with `var(--error)`.
+- `WolfGameCard`: migrated amber “wolf” accents to `var(--warning)` and replaced pack/negative/pig states from Tailwind reds to `var(--error)`.
+- `PlayerStatsCard`: replaced remaining `text-red-500` / `bg-red-500/…` tough-matchup and losing-record states with `var(--error)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`4c2ed7a`)
+
 ### 19:30 EST — Phase 2 — Token hygiene: Share card generator uses live theme tokens
 - `shareCardService`: migrated hard-coded share-card palette (`COLORS`) to refresh from CSS variables at render time (`--surface`, `--ink`, `--rule`, `--masters`, `--warning`, `--team-*`) with safe fallbacks.
 - Share-card background gradient now uses token surfaces (no `#050505` hard stop), and the subtle stripe overlay uses the current theme ink via `globalAlpha` instead of hard-coded `rgba(255,255,255,…)`.
