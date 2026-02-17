@@ -77,10 +77,10 @@ export function VegasGameCard({
       className
     )}>
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-emerald-600/20 to-transparent">
+      <div className="p-4 bg-gradient-to-r from-[color:var(--success)]/20 to-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-emerald-600/20 text-emerald-600">
+            <div className="p-2 rounded-lg bg-[color:var(--success)]/10 text-[var(--success)]">
               🎰
             </div>
             <div>
@@ -118,7 +118,7 @@ export function VegasGameCard({
             <div className={cn(
               'type-h2 font-bold',
               game.runningScore > 0 && 'text-[var(--masters)]',
-              game.runningScore < 0 && 'text-red-500'
+              game.runningScore < 0 && 'text-[var(--error)]'
             )}>
               {game.runningScore > 0 ? '+' : ''}{game.runningScore}
             </div>
@@ -246,26 +246,26 @@ export function VegasGameCard({
                       <td className="p-1">{result.holeNumber}</td>
                       <td className={cn(
                         'text-center p-1',
-                        result.team1Flipped && 'text-red-500'
+                        result.team1Flipped && 'text-[var(--error)]'
                       )}>
                         {result.team1Vegas}
                       </td>
                       <td className={cn(
                         'text-center p-1',
-                        result.team2Flipped && 'text-red-500'
+                        result.team2Flipped && 'text-[var(--error)]'
                       )}>
                         {result.team2Vegas}
                       </td>
                       <td className={cn(
                         'text-center p-1 font-medium',
                         result.pointDiff > 0 && 'text-[var(--masters)]',
-                        result.pointDiff < 0 && 'text-red-500'
+                        result.pointDiff < 0 && 'text-[var(--error)]'
                       )}>
                         {result.pointDiff > 0 ? '+' : ''}{result.pointDiff}
                       </td>
                       <td className="text-center p-1">
                         {(result.team1Flipped || result.team2Flipped) && (
-                          <RefreshCw size={12} className="inline text-red-500" />
+                          <RefreshCw size={12} className="inline text-[var(--error)]" />
                         )}
                       </td>
                     </tr>

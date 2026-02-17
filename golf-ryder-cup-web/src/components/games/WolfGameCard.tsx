@@ -82,10 +82,10 @@ export function WolfGameCard({
       className
     )}>
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-amber-600/20 to-transparent">
+      <div className="p-4 bg-gradient-to-r from-[color:var(--warning)]/20 to-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-600/20 text-amber-600">
+            <div className="p-2 rounded-lg bg-[color:var(--warning)]/10 text-[var(--warning)]">
               🐺
             </div>
             <div>
@@ -114,7 +114,7 @@ export function WolfGameCard({
         <div className="p-4 border-t border-[var(--rule)]">
           <div className="flex items-center gap-2 mb-3">
             <span className="type-caption text-[var(--ink-tertiary)]">Current Wolf:</span>
-            <span className="type-body font-semibold text-amber-600">
+            <span className="type-body font-semibold text-[var(--warning)]">
               🐺 {getPlayerName(currentWolf)}
             </span>
           </div>
@@ -151,12 +151,12 @@ export function WolfGameCard({
                 className={cn(
                   'flex-1 p-3 rounded-lg border-2 transition-all',
                   selectedPartner === null && !isPig
-                    ? 'border-amber-600 bg-amber-600/10'
-                    : 'border-[var(--rule)] hover:border-amber-600/50'
+                    ? 'border-[color:var(--warning)] bg-[color:var(--warning)]/10'
+                    : 'border-[var(--rule)] hover:border-[color:var(--warning)]/50'
                 )}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <Zap size={16} className="text-amber-600" />
+                  <Zap size={16} className="text-[var(--warning)]" />
                   <span className="type-caption font-medium">Lone Wolf (2x)</span>
                 </div>
               </button>
@@ -170,8 +170,8 @@ export function WolfGameCard({
                   className={cn(
                     'flex-1 p-3 rounded-lg border-2 transition-all',
                     isPig
-                      ? 'border-red-500 bg-red-500/10'
-                      : 'border-[var(--rule)] hover:border-red-500/50'
+                      ? 'border-[color:var(--error)] bg-[color:var(--error)]/10'
+                      : 'border-[var(--rule)] hover:border-[color:var(--error)]/50'
                   )}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -217,7 +217,7 @@ export function WolfGameCard({
                 <span className={cn(
                   'type-body font-semibold min-w-[60px] text-right',
                   payout.netAmount > 0 && 'text-[var(--masters)]',
-                  payout.netAmount < 0 && 'text-red-500'
+                  payout.netAmount < 0 && 'text-[var(--error)]'
                 )}>
                   {payout.netAmount >= 0 ? '+' : ''}${payout.netAmount}
                 </span>
@@ -252,7 +252,7 @@ export function WolfGameCard({
                   <span className={cn(
                     'font-semibold',
                     result.winner === 'wolf' && 'text-[var(--masters)]',
-                    result.winner === 'pack' && 'text-red-500'
+                    result.winner === 'pack' && 'text-[var(--error)]'
                   )}>
                     {result.winner === 'wolf' ? 'Wolf wins' : result.winner === 'pack' ? 'Pack wins' : 'Push'}
                   </span>

@@ -194,7 +194,7 @@ export function PlayerStatsCard({
               )}
               {stats.worstMatchup && (
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-red-500/10 text-red-500">
+                  <div className="p-1.5 rounded-lg bg-[color:var(--error)]/10 text-[var(--error)]">
                     <Target size={14} />
                   </div>
                   <div className="min-w-0">
@@ -249,7 +249,7 @@ function FormatRecord({ label, record }: FormatRecordProps) {
       <div className={cn(
         'type-body font-semibold',
         winRate > 50 && 'text-[var(--masters)]',
-        winRate < 50 && total > 0 && 'text-red-500'
+        winRate < 50 && total > 0 && 'text-[var(--error)]'
       )}>
         {record.w}-{record.l}-{record.h}
       </div>
