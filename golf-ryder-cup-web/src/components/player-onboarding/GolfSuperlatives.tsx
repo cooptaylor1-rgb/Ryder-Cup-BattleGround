@@ -147,7 +147,7 @@ export function GolfSuperlatives({
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', bounce: 0.5 }}
-                    className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-400 to-yellow-500 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-amber-500/30"
+                    className="w-16 h-16 rounded-2xl bg-linear-to-br from-[color:var(--gold-light)] to-[color:var(--gold)] mx-auto mb-4 flex items-center justify-center shadow-lg ring-1 ring-[color:var(--gold)]/25"
                 >
                     <Trophy className="w-8 h-8 text-[var(--canvas)]" />
                 </motion.div>
@@ -163,7 +163,7 @@ export function GolfSuperlatives({
             <div className="relative">
                 <div className="h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
                     <motion.div
-                        className="h-full bg-linear-to-r from-amber-400 to-yellow-500 rounded-full"
+                        className="h-full bg-linear-to-r from-[color:var(--gold-light)] to-[color:var(--gold)] rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ type: 'spring', damping: 20 }}
@@ -222,7 +222,7 @@ export function GolfSuperlatives({
                                     'border-[var(--rule)]',
                                     'text-[var(--ink-primary)]',
                                     'placeholder:text-[color:var(--ink-tertiary)]/70',
-                                    'focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400',
+                                    'focus:outline-none focus:ring-2 focus:ring-[color:var(--warning)]/30 focus:border-[color:var(--warning)]',
                                     'transition-all'
                                 )}
                                 autoFocus
@@ -268,7 +268,7 @@ export function GolfSuperlatives({
                     className={cn(
                         'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
                         currentAnswer.trim()
-                            ? 'bg-amber-500 text-[var(--canvas)] shadow-lg shadow-amber-500/30'
+                            ? 'bg-[color:var(--warning)] text-[var(--canvas)] shadow-lg ring-1 ring-[color:var(--warning)]/25'
                             : 'bg-[var(--surface-secondary)] text-[color:var(--ink-tertiary)]/70'
                     )}
                 >
@@ -312,7 +312,7 @@ export function SuperlativesDisplay({
     return (
         <div className={cn('space-y-3', className)}>
             <h4 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-amber-500" />
+                <Trophy className="w-4 h-4 text-[var(--warning)]" />
                 {playerName ? `${playerName}'s Superlatives` : 'Superlatives'}
             </h4>
             <div className="space-y-2">
@@ -323,14 +323,14 @@ export function SuperlativesDisplay({
                     return [
                         <div
                             key={answer.superlativeId}
-                            className="flex items-start gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/10"
+                            className="flex items-start gap-3 p-3 rounded-xl border border-[color:var(--warning)]/20 bg-[color:var(--warning)]/10"
                         >
                             <span className="text-2xl">{superlative.emoji}</span>
                             <div>
-                                <div className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                                <div className="text-sm font-medium text-[var(--ink-primary)]">
                                     {superlative.prompt}
                                 </div>
-                                <div className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
+                                <div className="text-sm text-[var(--ink-secondary)] mt-0.5">
                                     &ldquo;{answer.answer}&rdquo;
                                 </div>
                             </div>
