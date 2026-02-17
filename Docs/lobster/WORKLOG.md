@@ -10,6 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `AttendanceCheckIn`: Team A/Team B header dots now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind red/blue.
 - `LineupBuilder`: delete match button hover surface now uses premium error token (`hover:bg-[color:var(--error)]/10`) and match number chip uses `var(--canvas)` instead of hard-coded white.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`784b7e4`)
 
 ### 04:25 EST — Phase 2 — Token hygiene: roster import, poll cancelled badge, chat delete action
 - `PlayerRosterImport`: tokenized import error banner (premium `var(--error)` surface/border/icon/text) and team avatar backgrounds now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind blue/red primitives.
