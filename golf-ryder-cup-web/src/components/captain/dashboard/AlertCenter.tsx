@@ -86,32 +86,32 @@ function getPriorityConfig(priority: AlertPriority) {
     switch (priority) {
         case 'critical':
             return {
-                color: '#EF4444',
-                bgColor: 'rgba(239, 68, 68, 0.1)',
+                color: 'var(--error)',
+                bgColor: 'color-mix(in srgb, var(--error) 10%, transparent)',
                 icon: AlertTriangle,
                 label: 'Critical',
                 weight: 4,
             };
         case 'high':
             return {
-                color: '#F59E0B',
-                bgColor: 'rgba(245, 158, 11, 0.1)',
+                color: 'var(--warning)',
+                bgColor: 'color-mix(in srgb, var(--warning) 10%, transparent)',
                 icon: AlertCircle,
                 label: 'High',
                 weight: 3,
             };
         case 'medium':
             return {
-                color: '#3B82F6',
-                bgColor: 'rgba(59, 130, 246, 0.1)',
+                color: 'var(--info)',
+                bgColor: 'color-mix(in srgb, var(--info) 10%, transparent)',
                 icon: Info,
                 label: 'Medium',
                 weight: 2,
             };
         case 'low':
             return {
-                color: '#6B7280',
-                bgColor: 'rgba(107, 114, 128, 0.1)',
+                color: 'var(--ink-tertiary)',
+                bgColor: 'color-mix(in srgb, var(--ink-tertiary) 10%, transparent)',
                 icon: Info,
                 label: 'Low',
                 weight: 1,
@@ -252,7 +252,7 @@ function AlertCard({
                     {/* Dismiss Button */}
                     <button
                         onClick={handleDismiss}
-                        className="p-1.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[var(--surface-secondary)]"
                     >
                         <X size={14} style={{ color: 'var(--ink-tertiary)' }} />
                     </button>
@@ -524,7 +524,7 @@ export function AlertCenter({
                         )}
                         style={{
                             background: filter === opt.value ? 'var(--masters)' : 'transparent',
-                            color: filter === opt.value ? 'white' : 'var(--ink-secondary)',
+                            color: filter === opt.value ? 'var(--canvas)' : 'var(--ink-secondary)',
                         }}
                     >
                         {opt.label}

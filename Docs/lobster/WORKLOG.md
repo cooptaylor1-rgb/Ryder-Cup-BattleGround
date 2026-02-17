@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 06:10 EST — Phase 2 — Token hygiene: AlertCenter uses semantic priority tokens
+- `AlertCenter`: replaced hard-coded priority palette hex/rgba (critical/high/medium/low) with semantic CSS tokens (`var(--error|warning|info|ink-tertiary)`) and token-safe `color-mix(...)` tints.
+- `AlertCenter`: replaced filter-tab selected text hard-code (`white`) with `var(--canvas)` for theme-safe inverse typography.
+- `AlertCenter`: tokenized dismiss hover surface (`hover:bg-[var(--surface-secondary)]`) to avoid Tailwind gray primitives.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 06:00 EST — Phase 2 — Fix Tailwind CSS var opacity syntax (bg/border)
 - Fixed remaining Tailwind classes using CSS variables with opacity modifiers without `color:` prefix (`bg-[var(--…)]/NN`, `border-[var(--…)]/NN`) so styles compile reliably.
   - `LiveMatchMonitor`: alert banner backgrounds now `bg-[color:var(--error|warning)]/10`.
