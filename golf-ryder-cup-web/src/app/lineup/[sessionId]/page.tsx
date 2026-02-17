@@ -297,7 +297,7 @@ export default function SessionPage() {
       <PageHeader
         title={session.name}
         subtitle={`${session.sessionType} • ${session.pointsPerMatch} pt${session.pointsPerMatch !== 1 ? 's' : ''} each`}
-        icon={<Users size={18} color="white" />}
+        icon={<Users size={18} color="var(--canvas)" />}
         onBack={() => router.back()}
         rightSlot={
           <div className="flex items-center gap-2">
@@ -308,10 +308,7 @@ export default function SessionPage() {
               </span>
             )}
             {session.status === 'completed' && (
-              <span
-                className="px-2 py-1 rounded-full text-xs font-medium"
-                style={{ background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}
-              >
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-[color:var(--success)]/10 text-[var(--success)]">
                 Complete
               </span>
             )}
