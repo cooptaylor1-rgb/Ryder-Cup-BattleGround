@@ -61,9 +61,9 @@ export function PWAUpdateToast() {
       role="alert"
       aria-live="polite"
     >
-      <div className="card-glass flex items-center gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-full)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] max-w-[360px] border border-[var(--masters)]">
+      <div className="card-glass flex items-center gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-full)] shadow-[var(--shadow-lg)] max-w-[360px] border border-[color:var(--masters)]">
         {/* Icon */}
-        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[rgba(0,103,71,0.15)] text-[var(--masters)] shrink-0">
+        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[color:var(--masters)]/15 text-[var(--masters)] shrink-0">
           <Sparkles size={18} />
         </div>
 

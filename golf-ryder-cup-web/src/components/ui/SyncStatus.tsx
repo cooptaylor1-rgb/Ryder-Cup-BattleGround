@@ -104,7 +104,7 @@ function SyncDot({ state, className }: SyncDotProps) {
   const colors: Record<SyncState, string> = {
     synced: 'var(--success, #22C55E)',
     pending: 'var(--warning, #F59E0B)',
-    syncing: 'var(--team-europe, #1D4ED8)',
+    syncing: 'var(--info)',
     offline: 'var(--ink-tertiary, #807868)',
     error: 'var(--error, #DC2626)',
   };
@@ -135,36 +135,41 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
     synced: {
       icon: <Check className="w-3.5 h-3.5" />,
       label: 'Synced',
-      color: 'var(--success, #22C55E)',
-      bg: 'rgba(34, 197, 94, 0.1)',
+      color: 'var(--success)',
+      bg: 'color-mix(in srgb, var(--success) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--success) 25%, transparent)',
     },
     pending: {
       icon: <Upload className="w-3.5 h-3.5" />,
       label: `${pendingCount} pending`,
-      color: 'var(--warning, #F59E0B)',
-      bg: 'rgba(245, 158, 11, 0.1)',
+      color: 'var(--warning)',
+      bg: 'color-mix(in srgb, var(--warning) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--warning) 25%, transparent)',
     },
     syncing: {
       icon: <RefreshCw className="w-3.5 h-3.5 animate-spin" />,
       label: 'Syncing...',
-      color: 'var(--team-europe, #1D4ED8)',
-      bg: 'rgba(29, 78, 216, 0.1)',
+      color: 'var(--info)',
+      bg: 'color-mix(in srgb, var(--info) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--info) 25%, transparent)',
     },
     offline: {
       icon: <CloudOff className="w-3.5 h-3.5" />,
       label: 'Offline',
-      color: 'var(--ink-tertiary, #807868)',
-      bg: 'var(--surface, #1A1814)',
+      color: 'var(--ink-tertiary)',
+      bg: 'var(--surface)',
+      border: 'var(--rule)',
     },
     error: {
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
       label: 'Sync failed',
-      color: 'var(--error, #DC2626)',
-      bg: 'rgba(220, 38, 38, 0.1)',
+      color: 'var(--error)',
+      bg: 'color-mix(in srgb, var(--error) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--error) 25%, transparent)',
     },
   };
 
-  const { icon, label, color, bg } = config[state];
+  const { icon, label, color, bg, border } = config[state];
   const isInteractive = state === 'pending' || state === 'error';
 
   return (
@@ -181,7 +186,7 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
       style={{
         background: bg,
         color,
-        border: `1px solid ${color}20`,
+        border: `1px solid ${border}`,
       }}
       aria-label={label}
     >
@@ -230,7 +235,7 @@ function SyncFull({ state, pendingCount, lastSynced, onTap, className }: SyncFul
       icon: <RefreshCw className="w-5 h-5 animate-spin" />,
       title: 'Syncing...',
       subtitle: 'Please wait',
-      color: 'var(--team-europe, #1D4ED8)',
+      color: 'var(--info)',
     },
     offline: {
       icon: <CloudOff className="w-5 h-5" />,
@@ -268,7 +273,7 @@ function SyncFull({ state, pendingCount, lastSynced, onTap, className }: SyncFul
       <div
         className="w-10 h-10 rounded-lg flex items-center justify-center"
         style={{
-          background: `${color}15`,
+          background: `color-mix(in srgb, ${color} 12%, transparent)`,
           color,
         }}
       >

@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 08:35 EST — Phase 2 — Token hygiene: PWAUpdateToast + SyncStatus remove inline rgba + fix invalid border alpha
+- `PWAUpdateToast`: replaced hard-coded `rgba(...)` shadow/icon-shell background with token-driven `--shadow-lg` + `bg-[color:var(--masters)]/15`.
+- `SyncStatus`: replaced hard-coded `rgba(...)` status backgrounds with semantic token tints via `color-mix(...)`; fixed previously-invalid border style that appended `20` to a `var(...)` color string.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 08:18 EST — Phase 2 — Token hygiene: SidebarNav + ErrorBoundary use semantic tokens (no inline rgba/hex)
 - `SidebarNav`: removed hard-coded rail colors and inline `rgba(...)` borders/backgrounds; now uses premium surface/ink/rule/gold/masters tokens via Tailwind-safe arbitrary values.
 - `ErrorBoundary`: tokenized error icon shell + icon color (`var(--error)`), removing hard-coded `rgba(...)` + hex.
