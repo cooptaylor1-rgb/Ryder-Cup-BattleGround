@@ -225,11 +225,11 @@ export function PlayerRosterImport({
                     className={cn(
                         'p-3 rounded-xl border-2 text-center transition-all',
                         activeTab === 'teamA'
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                            ? 'border-[color:var(--team-usa)]/30 bg-[color:var(--team-usa)]/10'
                             : 'border-[var(--rule)]'
                     )}
                 >
-                    <p className="text-2xl font-bold text-blue-600">{teamACounts}</p>
+                    <p className="text-2xl font-bold text-[var(--team-usa)]">{teamACounts}</p>
                     <p className="text-xs text-[var(--ink-tertiary)] truncate">{teamAName}</p>
                 </button>
                 <button
@@ -249,11 +249,11 @@ export function PlayerRosterImport({
                     className={cn(
                         'p-3 rounded-xl border-2 text-center transition-all',
                         activeTab === 'teamB'
-                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                            ? 'border-[color:var(--team-europe)]/30 bg-[color:var(--team-europe)]/10'
                             : 'border-[var(--rule)]'
                     )}
                 >
-                    <p className="text-2xl font-bold text-red-600">{teamBCounts}</p>
+                    <p className="text-2xl font-bold text-[var(--team-europe)]">{teamBCounts}</p>
                     <p className="text-xs text-[var(--ink-tertiary)] truncate">{teamBName}</p>
                 </button>
             </div>
@@ -271,7 +271,7 @@ export function PlayerRosterImport({
                     <span className="text-[color:var(--ink-tertiary)]/50">|</span>
                     <button
                         onClick={clearAllPlayers}
-                        className="text-sm text-red-500 hover:text-red-600 flex items-center gap-1"
+                        className="text-sm text-[var(--error)] hover:text-[color:var(--error)]/80 flex items-center gap-1"
                     >
                         <Trash2 className="w-4 h-4" />
                         Clear all

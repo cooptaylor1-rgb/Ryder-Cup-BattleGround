@@ -208,8 +208,8 @@ export function PointSystem({
                 {/* Match Win */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <Medal className="w-5 h-5 text-green-600" />
+                        <div className="w-10 h-10 rounded-xl bg-[color:var(--success)]/10 flex items-center justify-center">
+                            <Medal className="w-5 h-5 text-[var(--success)]" />
                         </div>
                         <div>
                             <p className="font-medium">Match Win</p>
@@ -228,8 +228,8 @@ export function PointSystem({
                 {/* Match Halve */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <Award className="w-5 h-5 text-blue-600" />
+                        <div className="w-10 h-10 rounded-xl bg-[color:var(--info)]/10 flex items-center justify-center">
+                            <Award className="w-5 h-5 text-[var(--info)]" />
                         </div>
                         <div>
                             <p className="font-medium">Match Halve</p>
@@ -253,7 +253,7 @@ export function PointSystem({
                     className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <Star className="w-5 h-5 text-yellow-500" />
+                        <Star className="w-5 h-5 text-[var(--warning)]" />
                         <div className="text-left">
                             <p className="font-medium">Session Multipliers</p>
                             <p className="text-xs text-[var(--ink-tertiary)]">
@@ -338,7 +338,7 @@ export function PointSystem({
                     className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <Sparkles className="w-5 h-5 text-purple-500" />
+                        <Sparkles className="w-5 h-5 text-[var(--color-accent)]" />
                         <div className="text-left">
                             <p className="font-medium">Bonus Points</p>
                             <p className="text-xs text-[var(--ink-tertiary)]">
@@ -363,8 +363,8 @@ export function PointSystem({
                                 {/* Clean Sweep */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                            <Crown className="w-4 h-4 text-purple-600" />
+                                        <div className="w-8 h-8 rounded-lg bg-[color:var(--masters)]/10 flex items-center justify-center">
+                                            <Crown className="w-4 h-4 text-[var(--masters)]" />
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Clean Sweep</p>
@@ -384,8 +384,8 @@ export function PointSystem({
                                 {/* Comeback */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                                            <Zap className="w-4 h-4 text-orange-600" />
+                                        <div className="w-8 h-8 rounded-lg bg-[color:var(--warning)]/10 flex items-center justify-center">
+                                            <Zap className="w-4 h-4 text-[var(--warning)]" />
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Comeback</p>
@@ -405,8 +405,8 @@ export function PointSystem({
                                 {/* Domination */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                            <Trophy className="w-4 h-4 text-red-600" />
+                                        <div className="w-8 h-8 rounded-lg bg-[color:var(--error)]/10 flex items-center justify-center">
+                                            <Trophy className="w-4 h-4 text-[var(--error)]" />
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">Domination</p>
