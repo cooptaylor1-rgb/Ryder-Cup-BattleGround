@@ -577,7 +577,7 @@ export function PhotoCapture({
       >
         <Camera size={18} />
         Capture Moment
-        {!isOnline && <WifiOff size={14} className="absolute -top-1 -right-1 text-amber-400" />}
+        {!isOnline && <WifiOff size={14} className="absolute -top-1 -right-1 text-[var(--warning)]" />}
       </motion.button>
 
       {/* Camera View */}

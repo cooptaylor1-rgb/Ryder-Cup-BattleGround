@@ -255,8 +255,8 @@ export default function SpectatorPage() {
 
                     <div className="flex items-center gap-2">
                         {loadError && (
-                            <div className="flex items-center gap-1 px-2 py-1 rounded text-xs text-red-300 bg-red-500/10 border border-red-500/20">
-                                <span className="w-2 h-2 rounded-full bg-red-400" />
+                            <div className="flex items-center gap-1 px-2 py-1 rounded text-xs text-[var(--error)] bg-[var(--error)]/10 border border-[var(--error)]/20">
+                                <span className="w-2 h-2 rounded-full bg-[var(--error)]" />
                                 Error
                             </div>
                         )}
