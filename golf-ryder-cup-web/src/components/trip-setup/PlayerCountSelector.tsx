@@ -149,8 +149,8 @@ export function PlayerCountSelector({
 
             {/* Visual team representation */}
             <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
+                <div className="p-3 rounded-xl bg-[color:var(--team-usa)]/10 border border-[color:var(--team-usa)]/25">
+                    <p className="text-sm font-medium text-[var(--team-usa)] mb-2">
                         Team A
                     </p>
                     <div className="flex flex-wrap gap-1">
@@ -160,15 +160,15 @@ export function PlayerCountSelector({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: i * 0.02 }}
-                                className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center"
+                                className="w-6 h-6 rounded-full bg-[var(--team-usa)] flex items-center justify-center"
                             >
                                 <Users className="w-3 h-3 text-[var(--canvas)]" />
                             </motion.div>
                         ))}
                     </div>
                 </div>
-                <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                    <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-2">
+                <div className="p-3 rounded-xl bg-[color:var(--team-europe)]/10 border border-[color:var(--team-europe)]/25">
+                    <p className="text-sm font-medium text-[var(--team-europe)] mb-2">
                         Team B
                     </p>
                     <div className="flex flex-wrap gap-1">
@@ -178,7 +178,7 @@ export function PlayerCountSelector({
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: i * 0.02 }}
-                                className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center"
+                                className="w-6 h-6 rounded-full bg-[var(--team-europe)] flex items-center justify-center"
                             >
                                 <Users className="w-3 h-3 text-[var(--canvas)]" />
                             </motion.div>
@@ -196,13 +196,13 @@ export function PlayerCountSelector({
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex gap-3">
-                            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                        <div className="p-3 rounded-lg bg-[color:var(--warning)]/10 border border-[color:var(--warning)]/25 flex gap-3">
+                            <AlertCircle className="w-5 h-5 text-[var(--warning)] shrink-0 mt-0.5" />
                             <div>
-                                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                                <p className="text-sm font-medium text-[var(--warning)]">
                                     Odd number of players
                                 </p>
-                                <p className="text-xs text-amber-700 dark:text-amber-300">
+                                <p className="text-xs text-[var(--ink-secondary)]">
                                     Foursomes and Four-Ball formats work best with even numbers.
                                     Consider using singles-only or rotating players.
                                 </p>
