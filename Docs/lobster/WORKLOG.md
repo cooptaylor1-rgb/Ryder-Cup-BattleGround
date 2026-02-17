@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `SideBetOptIn`: “Required” pill + reminder disclaimer migrated off Tailwind amber primitives to warning token + standard ink secondary copy.
 - `GHINLookup`: not-found and error callouts migrated off Tailwind amber/red primitives to semantic warning/error tokens.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`8567990`)
 
 ### 03:10 EST — Phase 2 — Token hygiene: trip setup point system + roster import use semantic/team tokens
 - `PointSystem`: migrated match win/halve + multiplier header + bonus point icon chips off Tailwind primitives (`green/blue/yellow/purple/orange/red`) to semantic tokens (`var(--success)`, `var(--info)`, `var(--warning)`, `var(--color-accent)`, `var(--masters)`, `var(--error)`) using Tailwind-safe opacity.
