@@ -224,10 +224,10 @@ export function FormatSelector({
                             </p>
                             <div className="flex flex-wrap gap-2 mt-2">
                                 <span className={cn(
-                                    'px-2 py-0.5 rounded-full text-xs font-medium',
-                                    selectedFormat.complexity === 'beginner' && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                                    selectedFormat.complexity === 'intermediate' && 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                    selectedFormat.complexity === 'advanced' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                    'px-2 py-0.5 rounded-full text-xs font-medium border',
+                                    selectedFormat.complexity === 'beginner' && 'bg-[color:var(--success)]/12 text-[var(--success)] border-[color:var(--success)]/25',
+                                    selectedFormat.complexity === 'intermediate' && 'bg-[color:var(--warning)]/12 text-[var(--warning)] border-[color:var(--warning)]/25',
+                                    selectedFormat.complexity === 'advanced' && 'bg-[color:var(--error)]/12 text-[var(--error)] border-[color:var(--error)]/25',
                                 )}>
                                     {selectedFormat.complexity}
                                 </span>
@@ -351,10 +351,10 @@ function FormatCard({ format, isSelected, onSelect, onShowDetails, getIcon }: Fo
                     <p className="text-xs text-[var(--ink-tertiary)] line-clamp-2 mt-0.5">{format.description}</p>
                     <div className="flex items-center gap-2 mt-2">
                         <span className={cn(
-                            'px-1.5 py-0.5 rounded text-[10px] font-medium',
-                            format.complexity === 'beginner' && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                            format.complexity === 'intermediate' && 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-                            format.complexity === 'advanced' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                            'px-1.5 py-0.5 rounded text-[10px] font-medium border',
+                            format.complexity === 'beginner' && 'bg-[color:var(--success)]/12 text-[var(--success)] border-[color:var(--success)]/25',
+                            format.complexity === 'intermediate' && 'bg-[color:var(--warning)]/12 text-[var(--warning)] border-[color:var(--warning)]/25',
+                            format.complexity === 'advanced' && 'bg-[color:var(--error)]/12 text-[var(--error)] border-[color:var(--error)]/25',
                         )}>
                             {format.complexity}
                         </span>
