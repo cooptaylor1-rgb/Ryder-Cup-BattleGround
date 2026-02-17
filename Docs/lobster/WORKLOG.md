@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 05:58 EST — Phase 2 — Token hygiene: onboarding + pace warnings use semantic tokens
+- `PaceSpacing`: replaced bottleneck warning section hard-coded amber + inline rgba border/background with premium `var(--warning)` tokens using Tailwind-safe arbitrary values.
+- `PlayingStyleSurvey`: replaced hard-coded purple primitives with `var(--color-accent)` tokens for icon chips, option hover/selected states, and CTA button.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`d3435f8`)
+
 ### 06:10 EST — Phase 2 — Token hygiene: AlertCenter uses semantic priority tokens
 - `AlertCenter`: replaced hard-coded priority palette hex/rgba (critical/high/medium/low) with semantic CSS tokens (`var(--error|warning|info|ink-tertiary)`) and token-safe `color-mix(...)` tints.
 - `AlertCenter`: replaced filter-tab selected text hard-code (`white`) with `var(--canvas)` for theme-safe inverse typography.
