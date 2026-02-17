@@ -2826,3 +2826,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - iOS `IOSActionSheet`: replaced inline safe-area `paddingBottom` with Tailwind arbitrary value class (`pb-[max(12px,env(safe-area-inset-bottom))]`).
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`9c6c246`)
+
+## 2026-02-17
+
+### 03:58 EST — Phase 2 — Gold tokens + pressure indicator colors
+- Player onboarding `TripWelcomeCard`: migrated remaining amber Tailwind primitives (captain avatar gradient, crown badge, trophy icon) onto brand `gold` tokens (`from-gold-light` → `to-gold-dark`, `bg-gold`, `text-gold`).
+- Gamification `PressureIndicator` (MomentumMeter): replaced high-pressure `orange-500` primitives with brand `gold` tokens (`text-gold`, `bg-gold/10`) to keep palette consistent.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`2b84353`)
