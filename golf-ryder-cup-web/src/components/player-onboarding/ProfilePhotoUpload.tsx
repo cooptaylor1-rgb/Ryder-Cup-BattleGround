@@ -341,16 +341,16 @@ export function ProfilePhotoUpload({
                                     {photo && (
                                         <button
                                             onClick={removePhoto}
-                                            className="w-full p-4 rounded-xl bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors flex items-center gap-4"
+                                            className="w-full p-4 rounded-xl bg-[color:var(--error)]/10 hover:bg-[color:var(--error)]/20 transition-colors flex items-center gap-4"
                                         >
-                                            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+                                            <div className="w-12 h-12 rounded-full bg-[color:var(--error)]/20 flex items-center justify-center">
+                                                <Trash2 className="w-6 h-6 text-[var(--error)]" />
                                             </div>
                                             <div className="text-left">
-                                                <div className="font-medium text-red-700 dark:text-red-400">
+                                                <div className="font-medium text-[var(--error)]">
                                                     Remove photo
                                                 </div>
-                                                <div className="text-sm text-red-600/70">
+                                                <div className="text-sm text-[color:var(--error)]/70">
                                                     Use initials instead
                                                 </div>
                                             </div>

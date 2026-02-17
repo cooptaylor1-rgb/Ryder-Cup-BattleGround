@@ -179,17 +179,17 @@ export function AvailabilityCalendar({
 
             {/* Stats Summary */}
             <div className="grid grid-cols-3 gap-2">
-                <div className="bg-green-50 dark:bg-green-900/10 rounded-xl p-3 text-center">
-                    <div className="text-xl font-bold text-green-600">{stats.available}</div>
-                    <div className="text-xs text-green-700 dark:text-green-400">Available</div>
+                <div className="bg-[color:var(--success)]/10 rounded-xl p-3 text-center">
+                    <div className="text-xl font-bold text-[var(--success)]">{stats.available}</div>
+                    <div className="text-xs text-[color:var(--success)]/80">Available</div>
                 </div>
-                <div className="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-3 text-center">
-                    <div className="text-xl font-bold text-amber-600">{stats.maybe}</div>
-                    <div className="text-xs text-amber-700 dark:text-amber-400">Maybe</div>
+                <div className="bg-[color:var(--warning)]/10 rounded-xl p-3 text-center">
+                    <div className="text-xl font-bold text-[var(--warning)]">{stats.maybe}</div>
+                    <div className="text-xs text-[color:var(--warning)]/80">Maybe</div>
                 </div>
-                <div className="bg-red-50 dark:bg-red-900/10 rounded-xl p-3 text-center">
-                    <div className="text-xl font-bold text-red-600">{stats.unavailable}</div>
-                    <div className="text-xs text-red-700 dark:text-red-400">Can&apos;t Play</div>
+                <div className="bg-[color:var(--error)]/10 rounded-xl p-3 text-center">
+                    <div className="text-xl font-bold text-[var(--error)]">{stats.unavailable}</div>
+                    <div className="text-xs text-[color:var(--error)]/80">Can&apos;t Play</div>
                 </div>
             </div>
 
