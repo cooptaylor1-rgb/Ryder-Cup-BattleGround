@@ -294,7 +294,7 @@ export default function PlayersPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowBulkAdd(true)}
-                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,103,71,0.3)]"
+                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-[var(--canvas)] shadow-[var(--shadow-md)]"
                 title="Add multiple players at once"
               >
                 <UsersRound size={16} />

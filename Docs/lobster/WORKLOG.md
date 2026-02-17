@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 09:15 EST — Phase 2 — Token hygiene: replace remaining inline rgba focus/shadows + warning surfaces
+- `/schedule`: “Profile not linked” warning banner now uses semantic `--warning` tints (`bg-[color:var(--warning)]/10`, `border-[color:var(--warning)]/30`) instead of hard-coded rgba.
+- `/players`: captain "Add Multiple" CTA shadow now uses `--shadow-md` token rather than hard-coded rgba.
+- `/profile` + `/profile/complete`: focus ring and emergency icon shell migrated off inline rgba to `--shadow-focus` and `--error` token tints.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 08:35 EST — Phase 2 — Token hygiene: PWAUpdateToast + SyncStatus remove inline rgba + fix invalid border alpha
 - `PWAUpdateToast`: replaced hard-coded `rgba(...)` shadow/icon-shell background with token-driven `--shadow-lg` + `bg-[color:var(--masters)]/15`.
 - `SyncStatus`: replaced hard-coded `rgba(...)` status backgrounds with semantic token tints via `color-mix(...)`; fixed previously-invalid border style that appended `20` to a `var(...)` color string.

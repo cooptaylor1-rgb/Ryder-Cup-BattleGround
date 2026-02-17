@@ -433,8 +433,8 @@ function CompleteProfilePageContent() {
                 className="press-scale w-full flex items-center justify-between py-[var(--space-5)] px-[var(--space-6)] bg-transparent border-none cursor-pointer text-left"
               >
                 <div className="flex items-center gap-[var(--space-4)]">
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-[rgba(166,61,64,0.08)] flex items-center justify-center shrink-0">
-                    <AlertTriangle className="w-[18px] h-[18px] text-error" />
+                  <div className="w-[40px] h-[40px] rounded-[var(--radius-full)] bg-[color:var(--error)]/10 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-[18px] h-[18px] text-[var(--error)]" />
                   </div>
                   <div>
                     <p className="font-serif italic text-[length:var(--text-lg)] text-ink m-0 leading-[1.3]">
@@ -560,7 +560,7 @@ function InputField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full font-sans text-[length:var(--text-base)] text-ink bg-canvas-raised border border-rule rounded-[var(--radius-md)] outline-none transition-[border-color,box-shadow] duration-200 box-border focus:border-masters focus:shadow-[0_0_0_3px_rgba(0,102,68,0.08)] ${
+          className={`w-full font-sans text-[length:var(--text-base)] text-ink bg-canvas-raised border border-rule rounded-[var(--radius-md)] outline-none transition-[border-color,box-shadow] duration-200 box-border focus:border-masters focus:shadow-[var(--shadow-focus)] ${
             icon
               ? 'py-[var(--space-3)] pr-[var(--space-4)] pl-[calc(var(--space-3)+30px)]'
               : 'py-[var(--space-3)] px-[var(--space-4)]'

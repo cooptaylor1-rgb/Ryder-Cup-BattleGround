@@ -398,7 +398,7 @@ export default function SchedulePage() {
 
         {/* No Profile Warning */}
         {!loadError && selectedTab === 'my' && !currentUserPlayer && (
-          <div className="p-4 rounded-xl mb-6 flex items-start gap-3 bg-[color:rgba(161,98,7,0.1)] border border-[color:rgba(161,98,7,0.3)]">
+          <div className="p-4 rounded-xl mb-6 flex items-start gap-3 bg-[color:var(--warning)]/10 border border-[color:var(--warning)]/30">
             <AlertCircle size={20} className="text-[var(--warning)] shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-[var(--warning)]">Profile not linked</p>

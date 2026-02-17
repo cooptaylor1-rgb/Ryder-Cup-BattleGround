@@ -588,7 +588,7 @@ function ProfileField({
           min={min}
           max={max}
           step={step}
-          className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-sans text-[length:var(--text-base)] text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[0_0_0_3px_rgba(0,102,68,0.08)]"
+          className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-sans text-[length:var(--text-base)] text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)]"
         />
       ) : (
         <p className="font-sans text-[length:var(--text-base)] text-ink m-0 leading-[1.5]">
