@@ -5,6 +5,14 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 06:00 EST — Phase 2 — Fix Tailwind CSS var opacity syntax (bg/border)
+- Fixed remaining Tailwind classes using CSS variables with opacity modifiers without `color:` prefix (`bg-[var(--…)]/NN`, `border-[var(--…)]/NN`) so styles compile reliably.
+  - `LiveMatchMonitor`: alert banner backgrounds now `bg-[color:var(--error|warning)]/10`.
+  - `BatchScoreGrid`: dirty/error cell highlights now `bg-[color:var(--warning|error)]/10`.
+  - `/captain/error` + `/spectator/[tripId]`: error surfaces now use Tailwind-safe `bg-[color:var(--error)]/10` and `border-[color:var(--error)]/20`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 05:45 EST — Phase 2 — Token hygiene: Captain tools defaults + alerts
 - `LiveMatchMonitor`: migrated alert text (`text-red-500`) to `var(--error)` and updated team color prop defaults to `var(--team-usa)` / `var(--team-europe)`.
 - `OverrideModal`: migrated required field asterisks (`text-red-500`) to `var(--error)` and replaced hard-coded amber hex/rgba (`#F59E0B`) with `var(--warning)` using `color-mix` for transparency.

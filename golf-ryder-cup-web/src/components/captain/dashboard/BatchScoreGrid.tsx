@@ -159,8 +159,8 @@ function CellInput({
             className={cn(
                 'w-10 h-8 text-center text-sm font-medium rounded transition-all',
                 'focus:outline-none focus:ring-2',
-                hasError && 'bg-[var(--error)]/10',
-                isDirty && !hasError && 'bg-[var(--warning)]/10'
+                hasError && 'bg-[color:var(--error)]/10',
+                isDirty && !hasError && 'bg-[color:var(--warning)]/10'
             )}
             style={{
                 background: hasError ? undefined : isDirty ? undefined : 'var(--surface)',

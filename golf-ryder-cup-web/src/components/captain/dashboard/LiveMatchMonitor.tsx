@@ -331,8 +331,8 @@ function LiveMatchCard({
           animate={{ opacity: 1, height: 'auto' }}
           className={cn(
             'mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs',
-            match.alertType === 'error' && 'bg-[var(--error)]/10 text-[var(--error)]',
-            match.alertType !== 'error' && 'bg-[var(--warning)]/10 text-[var(--warning)]'
+            match.alertType === 'error' && 'bg-[color:var(--error)]/10 text-[var(--error)]',
+            match.alertType !== 'error' && 'bg-[color:var(--warning)]/10 text-[var(--warning)]'
           )}
         >
           <AlertTriangle size={12} />

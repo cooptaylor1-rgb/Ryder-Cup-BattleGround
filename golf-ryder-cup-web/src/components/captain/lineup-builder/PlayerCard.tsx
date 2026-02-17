@@ -332,9 +332,9 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                         {player.isCaptain && (
                             <div
                                 className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm"
-                                style={{ background: '#FFD700' }}
+                                style={{ background: 'var(--gold)' }}
                             >
-                                <Star size={12} className="text-yellow-900" fill="currentColor" />
+                                <Star size={12} className="text-[var(--canvas)]" fill="currentColor" />
                             </div>
                         )}
 
@@ -417,13 +417,13 @@ export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
                             <p style={{ color: 'var(--ink-tertiary)' }}>Played</p>
                         </div>
                         <div className="text-center">
-                            <p className="font-semibold text-green-600">
+                            <p className="font-semibold text-[var(--success)]">
                                 {player.matchesWon || 0}
                             </p>
                             <p style={{ color: 'var(--ink-tertiary)' }}>Won</p>
                         </div>
                         <div className="text-center">
-                            <p className="font-semibold text-red-600">
+                            <p className="font-semibold text-[var(--error)]">
                                 {player.matchesLost || 0}
                             </p>
                             <p style={{ color: 'var(--ink-tertiary)' }}>Lost</p>
