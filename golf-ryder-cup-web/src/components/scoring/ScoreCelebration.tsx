@@ -180,7 +180,7 @@ export function ScoreCelebration({
                                         transition={{ duration: 0.8, delay: 0.2 }}
                                         className="absolute -top-4 -right-4"
                                     >
-                                        <Sparkles className="w-6 h-6 text-yellow-400" />
+                                        <Sparkles className="w-6 h-6 text-gold" />
                                     </motion.div>
                                     <motion.div
                                         initial={{ scale: 0, opacity: 0 }}
@@ -188,7 +188,7 @@ export function ScoreCelebration({
                                         transition={{ duration: 0.8, delay: 0.4 }}
                                         className="absolute -bottom-2 -left-4"
                                     >
-                                        <Star className="w-5 h-5 text-yellow-300" fill="currentColor" />
+                                        <Star className="w-5 h-5 text-gold" fill="currentColor" />
                                     </motion.div>
                                 </>
                             )}
@@ -296,7 +296,7 @@ export function ScoreCelebration({
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.5 }}
                                 >
-                                    <Trophy className="w-16 h-16 text-yellow-400 mb-2" />
+                                    <Trophy className="w-16 h-16 text-gold mb-2" />
                                 </motion.div>
 
                                 {/* Victory text */}
@@ -327,14 +327,14 @@ export function ScoreCelebration({
                                             animate={{ rotate: 360 }}
                                             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                                         >
-                                            <Star className="w-8 h-8 text-yellow-400/50" fill="currentColor" />
+                                            <Star className="w-8 h-8 text-gold/50" fill="currentColor" />
                                         </motion.div>
                                         <motion.div
                                             className="absolute -bottom-4 -right-4"
                                             animate={{ rotate: -360 }}
                                             transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
                                         >
-                                            <Star className="w-6 h-6 text-yellow-400/50" fill="currentColor" />
+                                            <Star className="w-6 h-6 text-gold/50" fill="currentColor" />
                                         </motion.div>
                                     </>
                                 )}

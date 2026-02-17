@@ -25,7 +25,7 @@ export default function CoursesError({ error, reset }: ErrorPageProps) {
 
   return (
     <div className="min-h-screen pb-nav page-premium-enter texture-grain flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-red-500/10">
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-[color-mix(in_srgb,var(--error)_12%,transparent)]">
         <AlertTriangle size={40} className="text-[var(--error)]" />
       </div>
 

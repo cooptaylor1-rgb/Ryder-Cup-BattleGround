@@ -356,10 +356,10 @@ export function PlayerOnboardingWizard({
                                 {/* Quick Mode */}
                                 <button
                                     onClick={() => handleModeSelect('quick')}
-                                    className="w-full p-5 rounded-2xl bg-[var(--surface)] border-2 border-[var(--rule)] hover:border-amber-400 transition-all text-left"
+                                    className="w-full p-5 rounded-2xl bg-[var(--surface)] border-2 border-[var(--rule)] hover:border-gold transition-all text-left"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-xl bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                                        <div className="w-14 h-14 rounded-xl bg-linear-to-br from-gold-light to-gold-dark flex items-center justify-center">
                                             <Zap className="w-7 h-7 text-[var(--canvas)]" />
                                         </div>
                                         <div className="flex-1">
@@ -380,7 +380,7 @@ export function PlayerOnboardingWizard({
                                     className="w-full p-5 rounded-2xl bg-[var(--surface)] border-2 border-[var(--rule)] hover:border-masters transition-all text-left"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-xl bg-linear-to-br from-masters to-emerald-600 flex items-center justify-center">
+                                        <div className="w-14 h-14 rounded-xl bg-linear-to-br from-masters-primary to-masters-primary-dark flex items-center justify-center">
                                             <Sparkles className="w-7 h-7 text-[var(--canvas)]" />
                                         </div>
                                         <div className="flex-1">
