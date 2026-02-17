@@ -400,7 +400,7 @@ function StatusBadge({ status, isExpired }: StatusBadgeProps) {
 
   if (status === 'cancelled') {
     return (
-      <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 type-caption">
+      <span className="px-2 py-0.5 rounded-full bg-[color:var(--error)]/12 text-[var(--error)] type-caption">
         Cancelled
       </span>
     );

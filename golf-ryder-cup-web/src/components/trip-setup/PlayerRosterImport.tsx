@@ -411,9 +411,9 @@ export function PlayerRosterImport({
 
                                 {/* Error */}
                                 {importError && (
-                                    <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex gap-2">
-                                        <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                                        <p className="text-sm text-red-700 dark:text-red-300">{importError}</p>
+                                    <div className="p-3 rounded-lg bg-[color:var(--error)]/10 border border-[color:var(--error)]/20 flex gap-2">
+                                        <AlertCircle className="w-5 h-5 text-[var(--error)] shrink-0" />
+                                        <p className="text-sm text-[var(--error)]">{importError}</p>
                                     </div>
                                 )}
 
@@ -493,9 +493,9 @@ function PlayerCard({
                     className={cn(
                         'w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm',
                         player.team === 'A'
-                            ? 'bg-blue-500 text-[var(--canvas)]'
+                            ? 'bg-[color:var(--team-usa)] text-[var(--canvas)]'
                             : player.team === 'B'
-                                ? 'bg-red-500 text-[var(--canvas)]'
+                                ? 'bg-[color:var(--team-europe)] text-[var(--canvas)]'
                                 : 'bg-[color:var(--ink-tertiary)]/15 text-[var(--ink-secondary)]'
                     )}
                 >

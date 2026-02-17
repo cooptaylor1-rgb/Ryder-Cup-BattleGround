@@ -308,7 +308,7 @@ export function ChatMessage({
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="p-1.5 rounded hover:bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] hover:text-red-500 transition-colors"
+                    className="p-1.5 rounded hover:bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] hover:text-[var(--error)] transition-colors"
                     title="Delete"
                   >
                     <Trash2 size={16} />
