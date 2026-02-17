@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 06:22 EST — Phase 2 — Token hygiene: GolfSuperlatives uses premium gold/warning tokens
+- `GolfSuperlatives`: removed Tailwind amber/yellow primitives; trophy chip, progress gradient, focus ring, CTA button, and result cards now use premium tokens (`var(--gold*)`, `var(--warning)`, `var(--ink-*)`) with Tailwind-safe arbitrary values.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`83d9560`)
+
 ### 05:58 EST — Phase 2 — Token hygiene: onboarding + pace warnings use semantic tokens
 - `PaceSpacing`: replaced bottleneck warning section hard-coded amber + inline rgba border/background with premium `var(--warning)` tokens using Tailwind-safe arbitrary values.
 - `PlayingStyleSurvey`: replaced hard-coded purple primitives with `var(--color-accent)` tokens for icon chips, option hover/selected states, and CTA button.
