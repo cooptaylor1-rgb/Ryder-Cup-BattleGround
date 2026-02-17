@@ -5,11 +5,18 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 04:25 EST — Phase 2 — Token hygiene: roster import, poll cancelled badge, chat delete action
+- `PlayerRosterImport`: tokenized import error banner (premium `var(--error)` surface/border/icon/text) and team avatar backgrounds now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind blue/red primitives.
+- `PollCard`: “Cancelled” status badge now uses premium error tokens.
+- `ChatMessage`: delete action hover color now uses premium error token.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`6561175`)
+
 ### 04:00 EST — Phase 2 — Token hygiene: Emergency contacts + Captain toggle use semantic tokens
 - `EmergencyContacts`: migrated team indicators, action buttons, and contact cards off inline styles/hardcoded colors to semantic tokens (`var(--team-usa/europe)`, `var(--error)`, `var(--success)`, `var(--ink)`) and Tailwind classes.
 - `CaptainToggle`: migrated reset PIN icon background off `bg-red-500/10` to `bg-[color:var(--error)]/10`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (`<commit-hash>`)
+- Commit + push ✅ (`3e43c33`)
 
 ### 03:45 EST — Phase 2 — Token hygiene: Player onboarding components use semantic tokens
 - `AvailabilityCalendar`: migrated availability status colors off Tailwind primitives (`bg-green/amber/red-*`) to semantic tokens (`var(--success)`, `var(--warning)`, `var(--error)`) using Tailwind-safe opacity.
