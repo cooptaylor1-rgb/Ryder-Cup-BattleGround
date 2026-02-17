@@ -413,8 +413,8 @@ export function GoTimeCountdown({
                 <div className="flex items-center justify-center gap-4">
                     <button
                         onClick={() => setIsPaused(!isPaused)}
-                        className="p-4 rounded-full hover:bg-[color:var(--canvas)]/ transition-colors"
-                        style={{ background: 'var(--surface)' }}
+                        type="button"
+                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-secondary)] transition-colors"
                     >
                         {isPaused ? (
                             <Play className="w-6 h-6" style={{ color: 'var(--masters)' }} />
@@ -424,7 +424,8 @@ export function GoTimeCountdown({
                     </button>
                     <button
                         onClick={handleReset}
-                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-[color:var(--canvas)]/ transition-colors"
+                        type="button"
+                        className="p-4 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-secondary)] transition-colors"
                     >
                         <RotateCcw className="w-6 h-6" style={{ color: 'var(--ink-muted)' }} />
                     </button>
@@ -452,7 +453,7 @@ export function GoTimeCountdown({
                                     >
                                         <div className="flex items-center gap-3">
                                             {alert.played ? (
-                                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                                <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />
                                             ) : alert.sound ? (
                                                 <Bell className="w-4 h-4" style={{ color: 'var(--masters)' }} />
                                             ) : (
