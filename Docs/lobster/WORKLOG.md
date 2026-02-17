@@ -17,6 +17,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
 - Commit + push ✅ (`a764012`)
 
+### 20:25 EST — Phase 2 — Token hygiene: lineup header icon + completion pill + template checkmark
+- `/lineup/[sessionId]`: PageHeader icon color migrated off hard-coded `white` to `var(--canvas)` for theme-safe inverse icon contrast.
+- `/lineup/[sessionId]`: “Complete” status pill migrated off inline `rgba(...)` background to token-driven success tint (`bg-[color:var(--success)]/10`, `text-[var(--success)]`).
+- `TemplatePicker`: selected checkmark stroke migrated off hard-coded `white` to `var(--canvas)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`eff4338`)
+
 ### 17:10 EST — Phase 2 — Token hygiene: Path to Victory + stroke indicators + offline chip
 - `PathToVictoryCard`: replaced hard-coded hex colors with premium theme tokens (`var(--usa-primary)`, `var(--europe-primary)`, `var(--warning)`, `var(--masters)`, `var(--success)`, `var(--error)`) and migrated highlight gradients to `color-mix(...)` for theme-safe contrast.
 - `StrokeAlertBanner`: removed remaining `rgba(...)` fills for team stroke badges + mini-map/legend, using token-driven backgrounds (`bg-[color:var(--team-*)]/…`) and `color-mix(...)`.
