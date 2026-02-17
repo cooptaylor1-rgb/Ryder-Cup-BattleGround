@@ -426,8 +426,8 @@ function PointsSummaryBar({
 
 export function LiveMatchMonitor({
   session,
-  teamAColor = '#0047AB',
-  teamBColor = '#8B0000',
+  teamAColor = 'var(--team-usa)',
+  teamBColor = 'var(--team-europe)',
   onMatchClick,
   onEditScore,
   onViewDetails,
@@ -509,7 +509,7 @@ export function LiveMatchMonitor({
       {/* Alerts Section */}
       {alertMatches.length > 0 && (
         <div>
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-red-500">
+          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[var(--error)]">
             <AlertTriangle size={14} />
             Needs Attention ({alertMatches.length})
           </h3>

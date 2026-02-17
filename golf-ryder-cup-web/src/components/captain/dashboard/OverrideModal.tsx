@@ -198,7 +198,7 @@ function HoleScoreEditor({
             )}
             style={{
                 background: 'var(--surface)',
-                ['--tw-ring-color' as string]: '#F59E0B',
+                ['--tw-ring-color' as string]: 'var(--warning)',
             }}
         >
             <div className="flex items-center justify-between mb-3">
@@ -207,7 +207,7 @@ function HoleScoreEditor({
                 </span>
                 {hasChanges && (
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                        style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}
+                        style={{ background: 'color-mix(in srgb, var(--warning) 10%, transparent)', color: 'var(--warning)' }}
                     >
                         Modified
                     </span>
@@ -431,13 +431,13 @@ function ImpactPreview({
         <div
             className="p-4 rounded-xl"
             style={{
-                background: hasImpact ? 'rgba(245, 158, 11, 0.1)' : 'var(--surface)',
-                border: hasImpact ? '1px solid #F59E0B' : '1px solid var(--rule)',
+                background: hasImpact ? 'color-mix(in srgb, var(--warning) 10%, transparent)' : 'var(--surface)',
+                border: hasImpact ? '1px solid var(--warning)' : '1px solid var(--rule)',
             }}
         >
             <div className="flex items-center gap-2 mb-3">
-                <Trophy size={16} style={{ color: hasImpact ? '#F59E0B' : 'var(--ink-secondary)' }} />
-                <span className="text-sm font-semibold" style={{ color: hasImpact ? '#F59E0B' : 'var(--ink-secondary)' }}>
+                <Trophy size={16} style={{ color: hasImpact ? 'var(--warning)' : 'var(--ink-secondary)' }} />
+                <span className="text-sm font-semibold" style={{ color: hasImpact ? 'var(--warning)' : 'var(--ink-secondary)' }}>
                     Match Impact
                 </span>
             </div>
@@ -694,7 +694,7 @@ export function OverrideModal({
                                     {/* Reason Selection */}
                                     <div>
                                         <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--ink)' }}>
-                                            Reason for Override <span className="text-red-500">*</span>
+                                            Reason for Override <span className="text-[var(--error)]">*</span>
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
                                             {OVERRIDE_REASONS.map((r) => (
@@ -724,7 +724,7 @@ export function OverrideModal({
                                     {/* Notes */}
                                     <div>
                                         <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--ink)' }}>
-                                            Notes {reason === 'other' && <span className="text-red-500">*</span>}
+                                            Notes {reason === 'other' && <span className="text-[var(--error)]">*</span>}
                                         </label>
                                         <textarea
                                             value={notes}

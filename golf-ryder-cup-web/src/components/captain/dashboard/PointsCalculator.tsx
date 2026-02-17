@@ -346,8 +346,8 @@ function ScenarioSummaryCard({
 export function PointsCalculator({
     teamAName,
     teamBName,
-    teamAColor = '#0047AB',
-    teamBColor = '#8B0000',
+    teamAColor = 'var(--team-usa)',
+    teamBColor = 'var(--team-europe)',
     totalMatchPoints,
     currentTeamAPoints,
     currentTeamBPoints,
