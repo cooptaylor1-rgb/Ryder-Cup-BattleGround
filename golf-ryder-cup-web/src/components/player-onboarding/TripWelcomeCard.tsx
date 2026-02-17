@@ -212,13 +212,13 @@ export function TripWelcomeCard({
                                 className="w-14 h-14 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-full bg-linear-to-br from-gold-light to-gold-dark flex items-center justify-center">
                                 <span className="text-xl font-bold text-[var(--canvas)]">
                                     {trip.captainName.split(' ').filter(n => n).map(n => n[0]).join('') || '?'}
                                 </span>
                             </div>
                         )}
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center shadow-sm">
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gold flex items-center justify-center shadow-sm">
                             <Crown className="w-3.5 h-3.5 text-[var(--canvas)]" />
                         </div>
                     </div>
@@ -242,7 +242,7 @@ export function TripWelcomeCard({
             >
                 <div className="p-4 border-b border-[var(--rule)]">
                     <h3 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-amber-500" />
+                        <Trophy className="w-4 h-4 text-gold" />
                         The Competition
                     </h3>
                 </div>

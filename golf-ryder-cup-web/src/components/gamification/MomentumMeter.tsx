@@ -362,7 +362,7 @@ export function PressureIndicator({ holesRemaining, scoreDifferential, className
     const pressureConfig = {
         low: { color: 'text-success', bg: 'bg-success/10', icon: Target },
         medium: { color: 'text-warning', bg: 'bg-warning/10', icon: Zap },
-        high: { color: 'text-orange-500', bg: 'bg-orange-500/10', icon: Flame },
+        high: { color: 'text-gold', bg: 'bg-gold/10', icon: Flame },
         critical: { color: 'text-error', bg: 'bg-error/10', icon: Flame },
     };
 
