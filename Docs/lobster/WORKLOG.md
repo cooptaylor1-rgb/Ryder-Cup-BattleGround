@@ -5,6 +5,18 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 04:00 EST — Phase 2 — Token hygiene: Emergency contacts + Captain toggle use semantic tokens
+- `EmergencyContacts`: migrated team indicators, action buttons, and contact cards off inline styles/hardcoded colors to semantic tokens (`var(--team-usa/europe)`, `var(--error)`, `var(--success)`, `var(--ink)`) and Tailwind classes.
+- `CaptainToggle`: migrated reset PIN icon background off `bg-red-500/10` to `bg-[color:var(--error)]/10`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`<commit-hash>`)
+
+### 03:45 EST — Phase 2 — Token hygiene: Player onboarding components use semantic tokens
+- `AvailabilityCalendar`: migrated availability status colors off Tailwind primitives (`bg-green/amber/red-*`) to semantic tokens (`var(--success)`, `var(--warning)`, `var(--error)`) using Tailwind-safe opacity.
+- `ProfilePhotoUpload`: migrated remove-photo action off Tailwind red primitives to premium error token (`bg-[color:var(--error)]/10`, `text-[var(--error)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`a148be7`)
+
 ### 03:20 EST — Phase 2 — Token hygiene: onboarding warnings + bet delete hover use semantic tokens
 - `/bets/[betId]`: delete button hover surface migrated off Tailwind primitive `bg-red-500/10` to premium error tint (`bg-[color:var(--error)]/10`).
 - `SideBetOptIn`: “Required” pill + reminder disclaimer migrated off Tailwind amber primitives to warning token + standard ink secondary copy.

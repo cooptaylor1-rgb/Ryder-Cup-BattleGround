@@ -207,7 +207,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
             className="w-full max-w-[300px] rounded-[var(--radius-xl)] bg-[var(--canvas)] p-[var(--space-6)] text-center shadow-[var(--shadow-xl)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-[var(--space-4)] flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10">
+            <div className="mx-auto mb-[var(--space-4)] flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--error)]/10">
               <AlertCircle size={28} className="text-[var(--error)]" />
             </div>
             <h3 className="type-title mb-[var(--space-2)]">Reset Captain PIN?</h3>
