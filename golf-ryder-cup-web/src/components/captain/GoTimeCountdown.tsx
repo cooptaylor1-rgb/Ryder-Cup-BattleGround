@@ -455,21 +455,20 @@ export function GoTimeCountdown({
                                             {alert.played ? (
                                                 <CheckCircle2 className="w-4 h-4 text-[var(--success)]" />
                                             ) : alert.sound ? (
-                                                <Bell className="w-4 h-4" style={{ color: 'var(--masters)' }} />
+                                                <Bell className="w-4 h-4 text-[var(--masters)]" />
                                             ) : (
-                                                <BellOff className="w-4 h-4" style={{ color: 'var(--ink-muted)' }} />
+                                                <BellOff className="w-4 h-4 text-[var(--ink-muted)]" />
                                             )}
-                                            <span className="text-sm text-[var(--ink)]">
-                                                {alert.label}
-                                            </span>
+                                            <span className="text-sm text-[var(--ink)]">{alert.label}</span>
                                         </div>
                                         <button
+                                            type="button"
                                             onClick={() => toggleAlert(idx)}
                                             className={cn(
-                                                'px-2 py-1 rounded text-xs',
+                                                'px-2 py-1 rounded text-xs font-semibold transition-colors',
                                                 alert.sound
-                                                    ? 'bg-green-500/20 text-green-500'
-                                                    : 'bg-gray-500/20 text-[var(--ink-muted)]'
+                                                    ? 'bg-[color:var(--success)]/15 text-[var(--success)] hover:bg-[color:var(--success)]/20'
+                                                    : 'bg-[color:var(--ink)]/10 text-[var(--ink-tertiary)] hover:bg-[color:var(--ink)]/15'
                                             )}
                                         >
                                             {alert.sound ? 'ON' : 'OFF'}
