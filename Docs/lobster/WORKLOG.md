@@ -5,6 +5,19 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 03:20 EST — Phase 2 — Token hygiene: onboarding warnings + bet delete hover use semantic tokens
+- `/bets/[betId]`: delete button hover surface migrated off Tailwind primitive `bg-red-500/10` to premium error tint (`bg-[color:var(--error)]/10`).
+- `SideBetOptIn`: “Required” pill + reminder disclaimer migrated off Tailwind amber primitives to warning token + standard ink secondary copy.
+- `GHINLookup`: not-found and error callouts migrated off Tailwind amber/red primitives to semantic warning/error tokens.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
+### 03:10 EST — Phase 2 — Token hygiene: trip setup point system + roster import use semantic/team tokens
+- `PointSystem`: migrated match win/halve + multiplier header + bonus point icon chips off Tailwind primitives (`green/blue/yellow/purple/orange/red`) to semantic tokens (`var(--success)`, `var(--info)`, `var(--warning)`, `var(--color-accent)`, `var(--masters)`, `var(--error)`) using Tailwind-safe opacity.
+- `PlayerRosterImport`: migrated Team A/Team B summary tabs off Tailwind blue/red primitives to team tokens (`var(--team-usa)`, `var(--team-europe)`); “Clear all” action now uses `var(--error)` token.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`614fde5`)
+
 ### 02:37 EST — Phase 2 — Token hygiene: format selection accents + complexity pills use premium tokens
 - `matchFormats` (`FORMAT_CONFIGS`): migrated format accent `color` from Tailwind primitives (`bg-blue-500`, `bg-emerald-*`, etc.) to token-driven backgrounds (`bg-[color:var(--info)]`, `bg-[color:var(--success)]`, `bg-[color:var(--warning)]`, `bg-[color:var(--error)]`, `bg-[color:var(--color-accent)]`, `bg-[color:var(--ink-tertiary)]`) for theme-safe UI.
 - `FormatSelector`: replaced complexity badges (beginner/intermediate/advanced) from Tailwind `green/yellow/red` primitives to semantic token tints + borders (`success`/`warning`/`error`).

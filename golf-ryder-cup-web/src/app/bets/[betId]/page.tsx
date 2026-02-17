@@ -260,7 +260,7 @@ export default function BetDetailPage() {
                         </button>
                         <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="p-2 rounded-lg hover:bg-red-500/10 transition-colors bg-transparent border-none cursor-pointer"
+                            className="p-2 rounded-lg hover:bg-[color:var(--error)]/10 transition-colors bg-transparent border-none cursor-pointer"
                             aria-label="Delete"
                         >
                             <Trash2 size={20} className="text-[var(--error)]" />

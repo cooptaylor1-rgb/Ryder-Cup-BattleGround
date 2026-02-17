@@ -398,17 +398,17 @@ export function GHINLookup({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-4 border border-amber-200 dark:border-amber-800"
+                        className="bg-[color:var(--warning)]/10 rounded-xl p-4 border border-[color:var(--warning)]/25"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/30 flex items-center justify-center">
-                                <AlertCircle className="w-5 h-5 text-amber-600" />
+                            <div className="w-10 h-10 rounded-full bg-[color:var(--warning)]/12 flex items-center justify-center">
+                                <AlertCircle className="w-5 h-5 text-[var(--warning)]" />
                             </div>
                             <div>
-                                <div className="font-medium text-amber-900 dark:text-amber-100">
+                                <div className="font-medium text-[var(--warning)]">
                                     No record found
                                 </div>
-                                <div className="text-sm text-amber-700 dark:text-amber-300">
+                                <div className="text-sm text-[var(--ink-secondary)]">
                                     Double-check your GHIN number, or enter handicap manually below
                                 </div>
                             </div>
@@ -422,17 +422,17 @@ export function GHINLookup({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-red-50 dark:bg-red-900/10 rounded-xl p-4 border border-red-200 dark:border-red-800"
+                        className="bg-[color:var(--error)]/10 rounded-xl p-4 border border-[color:var(--error)]/25"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800/30 flex items-center justify-center">
-                                <AlertCircle className="w-5 h-5 text-red-600" />
+                            <div className="w-10 h-10 rounded-full bg-[color:var(--error)]/12 flex items-center justify-center">
+                                <AlertCircle className="w-5 h-5 text-[var(--error)]" />
                             </div>
                             <div>
-                                <div className="font-medium text-red-900 dark:text-red-100">
+                                <div className="font-medium text-[var(--error)]">
                                     Lookup failed
                                 </div>
-                                <div className="text-sm text-red-700 dark:text-red-300">
+                                <div className="text-sm text-[var(--ink-secondary)]">
                                     Please try again or enter your handicap manually
                                 </div>
                             </div>
