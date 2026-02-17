@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 23:20 EST — Phase 2 — Token hygiene: Trip setup CourseSelection + SessionBuilder destructive/actions now use semantic tokens
+- `CourseSelection`: remove-course action now uses premium error token (`hover:bg-[color:var(--error)]/10`, `text-[var(--error)]`).
+- `SessionBuilder`: session-type color chips migrated off Tailwind primitives (`bg-blue/green/purple/orange-500`) to semantic tokens (`var(--info)`, `var(--success)`, `var(--masters)`, `var(--warning)`); delete/clear actions now use error token + explicit `type="button"`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`3394811`)
+
 ### 23:10 EST — Phase 2 — Token hygiene: Trip Settings export/import/share + danger zone surfaces now use semantic tokens
 - `/trip/[tripId]/settings`: migrated export/import/share icon chips off Tailwind blue/green/gold primitives to token-driven accents (`var(--info)`, `var(--success)`, `var(--masters)`).
 - `/trip/[tripId]/settings`: standardized import result success/error banner and danger zone delete flows to premium error/success tokens (no `red-200`, `red-500`, etc.).
