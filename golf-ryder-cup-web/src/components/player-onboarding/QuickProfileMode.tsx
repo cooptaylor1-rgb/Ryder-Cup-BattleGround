@@ -121,7 +121,7 @@ export function QuickProfileMode({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.5 }}
-                    className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-amber-500/30"
+                    className="w-16 h-16 rounded-2xl bg-[linear-gradient(135deg,var(--gold)_0%,var(--gold-dark)_100%)] mx-auto mb-4 flex items-center justify-center shadow-lg ring-1 ring-[color:var(--gold)]/25"
                 >
                     <Zap className="w-8 h-8 text-[var(--canvas)]" />
                 </motion.div>

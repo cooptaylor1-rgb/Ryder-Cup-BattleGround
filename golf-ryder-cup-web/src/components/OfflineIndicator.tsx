@@ -135,9 +135,9 @@ export function OfflineIndicator() {
   }
 
   const bannerGradientClass = !isOnline
-    ? 'bg-gradient-to-br from-red-600 to-red-700'
+    ? 'bg-[linear-gradient(135deg,var(--error)_0%,color-mix(in_srgb,var(--error)_70%,var(--ink)_30%)_100%)]'
     : isSyncing
-      ? 'bg-gradient-to-br from-blue-600 to-blue-700'
+      ? 'bg-[linear-gradient(135deg,var(--info)_0%,color-mix(in_srgb,var(--info)_70%,var(--ink)_30%)_100%)]'
       : 'bg-gradient-to-br from-[color:var(--masters)] to-[color:var(--masters-deep)]';
 
   return (

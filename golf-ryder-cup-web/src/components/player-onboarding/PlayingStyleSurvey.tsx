@@ -180,7 +180,7 @@ export function PlayingStyleSurvey({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', bounce: 0.5 }}
-                    className="w-14 h-14 rounded-2xl bg-linear-to-br from-purple-500 to-indigo-600 mx-auto mb-4 flex items-center justify-center shadow-lg shadow-purple-500/30"
+                    className="w-14 h-14 rounded-2xl bg-[linear-gradient(135deg,var(--color-accent)_0%,var(--masters)_100%)] mx-auto mb-4 flex items-center justify-center shadow-lg ring-1 ring-[color:var(--color-accent)]/20"
                 >
                     <Sparkles className="w-7 h-7 text-[var(--canvas)]" />
                 </motion.div>
@@ -196,7 +196,7 @@ export function PlayingStyleSurvey({
             <div className="relative">
                 <div className="h-2 bg-[color:var(--ink-tertiary)]/10 rounded-full overflow-hidden">
                     <motion.div
-                        className="h-full bg-linear-to-r from-purple-500 to-indigo-500 rounded-full"
+                        className="h-full bg-[linear-gradient(90deg,var(--color-accent)_0%,var(--masters)_100%)] rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ type: 'spring', damping: 20 }}

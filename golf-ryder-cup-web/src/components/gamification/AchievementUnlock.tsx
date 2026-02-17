@@ -67,37 +67,37 @@ const RARITY_CONFIG: Record<AchievementRarity, {
     icon: typeof Star;
 }> = {
     common: {
-        color: '#6B7280',
-        gradient: 'from-gray-400 to-gray-600',
-        particleColor: '#9CA3AF',
+        color: 'var(--ink-tertiary)',
+        gradient: 'from-[color:var(--ink-tertiary)] to-[color:var(--ink)]',
+        particleColor: 'var(--ink-tertiary)',
         label: 'Common',
         icon: Star,
     },
     uncommon: {
-        color: '#22C55E',
-        gradient: 'from-green-400 to-green-600',
-        particleColor: '#4ADE80',
+        color: 'var(--success)',
+        gradient: 'from-[color:var(--success)] to-[color:var(--masters)]',
+        particleColor: 'var(--success)',
         label: 'Uncommon',
         icon: Target,
     },
     rare: {
-        color: '#3B82F6',
-        gradient: 'from-blue-400 to-blue-600',
-        particleColor: '#60A5FA',
+        color: 'var(--info)',
+        gradient: 'from-[color:var(--info)] to-[color:var(--masters)]',
+        particleColor: 'var(--info)',
         label: 'Rare',
         icon: Medal,
     },
     epic: {
-        color: '#8B5CF6',
-        gradient: 'from-purple-400 to-purple-600',
-        particleColor: '#A78BFA',
+        color: 'var(--color-accent)',
+        gradient: 'from-[color:var(--color-accent)] to-[color:var(--masters)]',
+        particleColor: 'var(--color-accent)',
         label: 'Epic',
         icon: Trophy,
     },
     legendary: {
-        color: '#F59E0B',
-        gradient: 'from-amber-400 to-orange-500',
-        particleColor: '#FCD34D',
+        color: 'var(--gold)',
+        gradient: 'from-[color:var(--gold)] to-[color:var(--gold-dark)]',
+        particleColor: 'var(--gold)',
         label: 'Legendary',
         icon: Crown,
     },
@@ -119,7 +119,14 @@ interface ConfettiParticle {
 }
 
 function generateConfetti(count: number, color: string): ConfettiParticle[] {
-    const colors = [color, '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+    const colors = [
+        color,
+        'var(--gold)',
+        'var(--error)',
+        'var(--info)',
+        'var(--success)',
+        'var(--masters)',
+    ];
     const shapes: ConfettiParticle['shape'][] = ['circle', 'square', 'star'];
 
     return Array.from({ length: count }, (_, i) => ({
