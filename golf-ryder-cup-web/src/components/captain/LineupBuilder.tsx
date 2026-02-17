@@ -619,7 +619,7 @@ function MatchSlotCard({
             className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
             style={{
               background: isComplete ? 'var(--success)' : 'var(--surface-raised)',
-              color: isComplete ? 'white' : 'var(--ink-secondary)',
+              color: isComplete ? 'var(--canvas)' : 'var(--ink-secondary)',
             }}
           >
             {matchNumber}
@@ -645,8 +645,7 @@ function MatchSlotCard({
             <div className="relative group">
               <button
                 onClick={onDeleteMatch}
-                className="p-1.5 rounded-lg transition-colors hover:bg-red-100 dark:hover:bg-red-900/30"
-                style={{ color: 'var(--error, #ef4444)' }}
+                className="p-1.5 rounded-lg transition-colors text-[var(--error)] hover:bg-[color:var(--error)]/10"
                 aria-label={`Delete Match ${matchNumber}`}
               >
                 <Trash2 className="w-4 h-4" />

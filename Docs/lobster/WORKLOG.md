@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 04:35 EST — Phase 2 — Token hygiene: format rules + attendance headers + lineup delete affordance
+- `FormatRulesReference`: replaced Tailwind green/gray primitives with semantic success + ink-tertiary tokens for copied state + local rules “in effect” styling.
+- `AttendanceCheckIn`: Team A/Team B header dots now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind red/blue.
+- `LineupBuilder`: delete match button hover surface now uses premium error token (`hover:bg-[color:var(--error)]/10`) and match number chip uses `var(--canvas)` instead of hard-coded white.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 04:25 EST — Phase 2 — Token hygiene: roster import, poll cancelled badge, chat delete action
 - `PlayerRosterImport`: tokenized import error banner (premium `var(--error)` surface/border/icon/text) and team avatar backgrounds now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind blue/red primitives.
 - `PollCard`: “Cancelled” status badge now uses premium error tokens.

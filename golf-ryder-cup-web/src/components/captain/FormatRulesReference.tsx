@@ -351,7 +351,7 @@ ${activeLocalRules.map(lr => `• ${lr.title}`).join('\n')}
                         className="p-2 rounded-lg hover:bg-[color:var(--ink)]/5 transition-colors"
                     >
                         {copied ? (
-                            <Check className="w-5 h-5 text-green-500" />
+                            <Check className="w-5 h-5 text-[var(--success)]" />
                         ) : (
                             <Share2 className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
                         )}
@@ -530,7 +530,7 @@ ${activeLocalRules.map(lr => `• ${lr.title}`).join('\n')}
                                             key={rule.id}
                                             className={cn(
                                                 'p-3 rounded-lg',
-                                                rule.inEffect ? 'bg-green-500/10' : ''
+                                                rule.inEffect ? 'bg-[color:var(--success)]/10' : ''
                                             )}
                                             style={{ background: rule.inEffect ? undefined : 'var(--surface)' }}
                                         >
@@ -538,7 +538,7 @@ ${activeLocalRules.map(lr => `• ${lr.title}`).join('\n')}
                                                 <div
                                                     className={cn(
                                                         'w-2 h-2 rounded-full',
-                                                        rule.inEffect ? 'bg-green-500' : 'bg-gray-400'
+                                                        rule.inEffect ? 'bg-[color:var(--success)]' : 'bg-[color:var(--ink-tertiary)]'
                                                     )}
                                                 />
                                                 <span

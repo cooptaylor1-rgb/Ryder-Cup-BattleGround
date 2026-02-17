@@ -324,7 +324,7 @@ export function AttendanceCheckIn({
                 {/* Team A */}
                 <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
-                        <span className="w-3 h-3 rounded-full bg-red-500" />
+                        <span className="w-3 h-3 rounded-full bg-[color:var(--team-usa)]" />
                         <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                             Team A ({groupedByTeam.teamA.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamA.length})
                         </span>
@@ -350,7 +350,7 @@ export function AttendanceCheckIn({
                 {/* Team B */}
                 <div>
                     <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
-                        <span className="w-3 h-3 rounded-full bg-blue-500" />
+                        <span className="w-3 h-3 rounded-full bg-[color:var(--team-europe)]" />
                         <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
                             Team B ({groupedByTeam.teamB.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamB.length})
                         </span>
