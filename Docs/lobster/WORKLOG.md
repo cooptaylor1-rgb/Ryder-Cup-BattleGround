@@ -5,6 +5,10 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 23:10 EST — Phase 2 — Token hygiene: Trip Settings export/import/share + danger zone surfaces now use semantic tokens
+- `/trip/[tripId]/settings`: migrated export/import/share icon chips off Tailwind blue/green/gold primitives to token-driven accents (`var(--info)`, `var(--success)`, `var(--masters)`).
+- `/trip/[tripId]/settings`: standardized import result success/error banner and danger zone delete flows to premium error/success tokens (no `red-200`, `red-500`, etc.).
+
 ### 22:20 EST — Phase 2 — Token hygiene + safety: poll option delete uses error token, skeleton nav uses canvas overlay token, standings clinch uses success token
 - `CreatePollModal`: replaced `hover:text-red-500` with `hover:text-[var(--error)]` and added explicit `type="button"` on non-form buttons.
 - `PageLoadingSkeleton`: bottom nav backdrop migrated from hard-coded `rgba(250,248,245,0.88)` to token overlay `bg-[color:var(--canvas)]/88`.

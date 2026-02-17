@@ -275,8 +275,8 @@ export default function TripSettingsPage() {
                 disabled={isExporting}
                 className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
-                <div className="w-10 h-10 rounded-full bg-blue-500/15 flex items-center justify-center">
-                  <Download className="w-5 h-5 text-blue-300" />
+                <div className="w-10 h-10 rounded-full bg-[color:var(--info)]/15 flex items-center justify-center">
+                  <Download className="w-5 h-5 text-[var(--info)]" />
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-medium text-[var(--ink-primary)]">{isExporting ? 'Exporting…' : 'Export Trip'}</div>
@@ -290,8 +290,8 @@ export default function TripSettingsPage() {
                 disabled={isImporting}
                 className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
-                <div className="w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-green-300" />
+                <div className="w-10 h-10 rounded-full bg-[color:var(--success)]/15 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-[var(--success)]" />
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-medium text-[var(--ink-primary)]">{isImporting ? 'Importing…' : 'Import Trip'}</div>
@@ -310,7 +310,9 @@ export default function TripSettingsPage() {
               {importResult && (
                 <div
                   className={`flex items-start gap-3 p-3 rounded-xl ${
-                    importResult.success ? 'bg-green-500/10 text-green-200' : 'bg-red-500/10 text-red-200'
+                    importResult.success
+                      ? 'bg-[color:var(--success)]/10 text-[var(--success)]'
+                      : 'bg-[color:var(--error)]/10 text-[var(--error)]'
                   }`}
                 >
                   {importResult.success ? (
@@ -328,8 +330,8 @@ export default function TripSettingsPage() {
                 disabled={isSharing}
                 className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
               >
-                <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center">
-                  <Share2 className="w-5 h-5 text-gold" />
+                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
+                  <Share2 className="w-5 h-5 text-[var(--masters)]" />
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-medium text-[var(--ink-primary)]">{isSharing ? 'Sharing…' : 'Share Summary'}</div>
@@ -342,7 +344,7 @@ export default function TripSettingsPage() {
           {/* Danger Zone */}
           <section className="card-elevated overflow-hidden">
             <div className="p-4 border-b border-[var(--rule)]">
-              <h2 className="type-h3 text-red-200">Danger Zone</h2>
+              <h2 className="type-h3 text-[var(--error)]">Danger Zone</h2>
               <p className="text-sm text-[var(--ink-secondary)] mt-1">Destructive actions can’t be undone.</p>
             </div>
 
@@ -350,23 +352,23 @@ export default function TripSettingsPage() {
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full flex items-center gap-3 p-4 bg-red-500/10 hover:bg-red-500/15 rounded-xl transition-colors"
+                  className="w-full flex items-center gap-3 p-4 bg-[color:var(--error)]/10 hover:bg-[color:var(--error)]/15 rounded-xl transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center">
-                    <Trash2 className="w-5 h-5 text-red-200" />
+                  <div className="w-10 h-10 rounded-full bg-[color:var(--error)]/15 flex items-center justify-center">
+                    <Trash2 className="w-5 h-5 text-[var(--error)]" />
                   </div>
                   <div className="text-left flex-1">
-                    <div className="font-medium text-red-200">Delete Trip</div>
-                    <div className="text-sm text-red-200/70">Permanently remove this trip and all related data</div>
+                    <div className="font-medium text-[var(--error)]">Delete Trip</div>
+                    <div className="text-sm text-[color:var(--error)]/70">Permanently remove this trip and all related data</div>
                   </div>
                 </button>
               ) : (
-                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                <div className="rounded-xl border border-[color:var(--error)]/25 bg-[color:var(--error)]/10 p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-200 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-[var(--error)] mt-0.5" />
                     <div className="flex-1">
-                      <div className="font-semibold text-red-200">Confirm delete</div>
-                      <p className="text-sm text-red-200/80 mt-1">
+                      <div className="font-semibold text-[var(--error)]">Confirm delete</div>
+                      <p className="text-sm text-[color:var(--error)]/80 mt-1">
                         This will delete the trip, teams, players, sessions, matches, and scores from this device.
                       </p>
 
