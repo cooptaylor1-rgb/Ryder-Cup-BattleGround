@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 07:08 EST — Phase 2 — Token hygiene: OfflineIndicator + onboarding + achievements use semantic tokens
+- `OfflineIndicator`: replaced Tailwind red/blue gradient primitives for offline/syncing banners with semantic `var(--error)` / `var(--info)` gradients using `color-mix(...)` for theme-safe contrast.
+- `QuickProfileMode` + `PlayingStyleSurvey`: migrated purple/amber gradients + shadow accents off Tailwind primitives to premium tokens (`var(--gold*)`, `var(--color-accent)`, `var(--masters)`) with Tailwind-safe arbitrary values.
+- `AchievementUnlock`: replaced hard-coded hex rarity palette + confetti colors with semantic tokens (`var(--success|info|color-accent|gold|ink-tertiary)`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`93c76f2`)
+
 ### 06:22 EST — Phase 2 — Token hygiene: GolfSuperlatives uses premium gold/warning tokens
 - `GolfSuperlatives`: removed Tailwind amber/yellow primitives; trophy chip, progress gradient, focus ring, CTA button, and result cards now use premium tokens (`var(--gold*)`, `var(--warning)`, `var(--ink-*)`) with Tailwind-safe arbitrary values.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
