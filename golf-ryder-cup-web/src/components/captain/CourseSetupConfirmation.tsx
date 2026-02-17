@@ -172,18 +172,20 @@ function SetupItemCard({ item, onToggle }: SetupItemCardProps) {
     return (
         <button
             onClick={onToggle}
-            className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-[color:var(--canvas)]/"
+            className={cn(
+                "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-[color:var(--canvas)]/",
+                item.status === 'confirmed' ? 'bg-[color:var(--success)]/10' :
+                item.status === 'issue' ? 'bg-[color:var(--error)]/10' : 'bg-[var(--surface)]'
+            )}
             style={{
-                background: item.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' :
-                    item.status === 'issue' ? 'rgba(239, 68, 68, 0.1)' : 'var(--surface)',
                 border: '1px solid rgba(128, 120, 104, 0.2)',
             }}
         >
             <div className="shrink-0">
                 {item.status === 'confirmed' ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-[var(--success)]" />
                 ) : item.status === 'issue' ? (
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
+                    <AlertTriangle className="w-5 h-5 text-[var(--error)]" />
                 ) : (
                     <Circle className="w-5 h-5 text-[var(--ink-muted)]" />
                 )}
@@ -328,7 +330,7 @@ export function CourseSetupConfirmation({
                         </span>
                         <span
                             className="font-medium"
-                            style={{ color: allRequiredConfirmed ? '#22c55e' : 'var(--ink)' }}
+                            style={{ color: allRequiredConfirmed ? 'var(--success)' : 'var(--ink)' }}
                         >
                             {requiredConfirmed}/{requiredCount} required
                         </span>
@@ -336,7 +338,7 @@ export function CourseSetupConfirmation({
                     <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface)' }}>
                         <motion.div
                             className="h-full rounded-full"
-                            style={{ background: allRequiredConfirmed ? '#22c55e' : 'var(--masters)' }}
+                            style={{ background: allRequiredConfirmed ? 'var(--success)' : 'var(--masters)' }}
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                         />
@@ -347,21 +349,19 @@ export function CourseSetupConfirmation({
             {/* Status Banner */}
             {allRequiredConfirmed ? (
                 <div
-                    className="p-3 flex items-center gap-2"
-                    style={{ background: 'rgba(34, 197, 94, 0.1)' }}
+                    className="p-3 flex items-center gap-2 bg-[color:var(--success)]/10"
                 >
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm font-medium text-green-600">
+                    <CheckCircle2 className="w-5 h-5 text-[var(--success)]" />
+                    <span className="text-sm font-medium text-[var(--success)]">
                         All required items confirmed - Ready to go!
                     </span>
                 </div>
             ) : (
                 <div
-                    className="p-3 flex items-center gap-2"
-                    style={{ background: 'rgba(251, 191, 36, 0.1)' }}
+                    className="p-3 flex items-center gap-2 bg-[color:var(--warning)]/10"
                 >
-                    <AlertTriangle className="w-5 h-5 text-amber-500" />
-                    <span className="text-sm text-amber-600">
+                    <AlertTriangle className="w-5 h-5 text-[var(--warning)]" />
+                    <span className="text-sm text-[var(--warning)]">
                         {requiredCount - requiredConfirmed} required items still need confirmation
                     </span>
                 </div>
@@ -380,7 +380,7 @@ export function CourseSetupConfirmation({
                                 className="w-full flex items-center justify-between p-4 hover:bg-[color:var(--canvas)]/"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span style={{ color: categoryConfirmed === items.length ? '#22c55e' : 'var(--masters)' }}>
+                                    <span style={{ color: categoryConfirmed === items.length ? 'var(--success)' : 'var(--masters)' }}>
                                         {getCategoryIcon(category)}
                                     </span>
                                     <div className="text-left">

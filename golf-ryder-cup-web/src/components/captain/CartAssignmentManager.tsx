@@ -113,7 +113,7 @@ function CartCard({
                                 ? 'bg-[var(--canvas)]'
                                 : isFull
                                   ? 'bg-[var(--masters-muted)]'
-                                  : 'bg-amber-500/20'
+                                  : 'bg-[color:var(--warning)]/20'
                         )}
                     >
                         <Car
@@ -123,7 +123,7 @@ function CartCard({
                                     ? 'text-[var(--ink-muted)]'
                                     : isFull
                                       ? 'text-[var(--masters)]'
-                                      : 'text-amber-500'
+                                      : 'text-[var(--warning)]'
                             )}
                         />
                     </div>
@@ -144,9 +144,9 @@ function CartCard({
                                     key={player.id}
                                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2"
                                     style={{
-                                        background: player.teamId === 'A' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                                        background: player.teamId === 'A' ? 'var(--team-usa)' : 'var(--team-europe)',
                                         borderColor: 'var(--surface)',
-                                        color: player.teamId === 'A' ? '#ef4444' : '#3b82f6',
+                                        color: 'var(--canvas)',
                                     }}
                                 >
                                     {player.firstName[0]}{player.lastName[0]}
@@ -182,7 +182,7 @@ function CartCard({
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-3 h-3 rounded-full"
-                                                style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
+                                                style={{ background: player.teamId === 'A' ? 'var(--team-usa)' : 'var(--team-europe)' }}
                                             />
                                             <span className="text-[var(--ink)]">
                                                 {player.firstName} {player.lastName}
@@ -196,9 +196,10 @@ function CartCard({
                                                 e.stopPropagation();
                                                 onRemovePlayer(player.id);
                                             }}
-                                            className="p-1 rounded hover:bg-red-500/20 transition-colors"
+                                            className="p-1 rounded hover:bg-[color:var(--error)]/20 transition-colors"
+                                            type="button"
                                         >
-                                            <X className="w-4 h-4 text-red-500" />
+                                            <X className="w-4 h-4 text-[var(--error)]" />
                                         </button>
                                     </div>
                                 ))}
@@ -244,7 +245,7 @@ function CartCard({
                                                         >
                                                             <div
                                                                 className="w-3 h-3 rounded-full"
-                                                                style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
+                                                                style={{ background: player.teamId === 'A' ? 'var(--team-usa)' : 'var(--team-europe)' }}
                                                             />
                                                             <span className="text-[var(--ink)]">
                                                                 {player.firstName} {player.lastName}
@@ -503,18 +504,18 @@ export function CartAssignmentManager({
                 <div
                     className="flex items-center gap-2 p-2 rounded-lg"
                     style={{
-                        background: allAssigned ? 'rgba(34, 197, 94, 0.1)' : 'rgba(251, 191, 36, 0.1)',
+                        background: allAssigned ? 'var(--success-muted)' : 'var(--warning-muted)',
                     }}
                 >
                     {allAssigned ? (
                         <>
-                            <Check className="w-4 h-4 text-green-500" />
-                            <span className="text-sm text-green-600">All players assigned to carts</span>
+                            <Check className="w-4 h-4 text-[var(--success)]" />
+                            <span className="text-sm text-[var(--success)]">All players assigned to carts</span>
                         </>
                     ) : (
                         <>
-                            <AlertCircle className="w-4 h-4 text-amber-500" />
-                            <span className="text-sm text-amber-600">{unassignedPlayers.length} players still need carts</span>
+                            <AlertCircle className="w-4 h-4 text-[var(--warning)]" />
+                            <span className="text-sm text-[var(--warning)]">{unassignedPlayers.length} players still need carts</span>
                         </>
                     )}
                 </div>
@@ -534,7 +535,7 @@ export function CartAssignmentManager({
                             >
                                 <div
                                     className="w-2 h-2 rounded-full"
-                                    style={{ background: player.teamId === 'A' ? '#ef4444' : '#3b82f6' }}
+                                    style={{ background: player.teamId === 'A' ? 'var(--team-usa)' : 'var(--team-europe)' }}
                                 />
                                 <span className="text-[var(--ink)]">
                                     {player.firstName} {player.lastName}
