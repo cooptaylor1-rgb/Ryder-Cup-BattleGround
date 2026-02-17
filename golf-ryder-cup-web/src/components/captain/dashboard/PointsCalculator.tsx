@@ -89,7 +89,7 @@ function _getOutcomeColor(
 ): string {
     if (outcome === 'teamA') return teamAColor;
     if (outcome === 'teamB') return teamBColor;
-    if (outcome === 'halved') return '#6B7280';
+    if (outcome === 'halved') return 'var(--ink-tertiary)';
     return 'var(--ink-tertiary)';
 }
 
@@ -133,7 +133,7 @@ function OutcomeSelector({
 
     const options: { value: MatchOutcome; label: string; color: string; prob: number }[] = [
         { value: 'teamA', label: teamAName, color: teamAColor, prob: probability.teamA },
-        { value: 'halved', label: 'Halved', color: '#6B7280', prob: probability.halved },
+        { value: 'halved', label: 'Halved', color: 'var(--ink-tertiary)', prob: probability.halved },
         { value: 'teamB', label: teamBName, color: teamBColor, prob: probability.teamB },
     ];
 
@@ -208,7 +208,7 @@ function MatchProjectionRow({
             animate={{ opacity: 1, x: 0 }}
             className={cn(
                 'flex items-center justify-between p-3 rounded-lg',
-                isLocked ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-[var(--surface)]'
+                isLocked ? 'bg-[var(--canvas-sunken)]' : 'bg-[var(--surface)]'
             )}
         >
             {/* Match Info */}

@@ -39,13 +39,13 @@ interface ProfilePhotoUploadProps {
 // ============================================
 
 const avatarColors = [
-    { bg: 'bg-linear-to-br from-blue-400 to-blue-600', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-green-400 to-green-600', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-purple-400 to-purple-600', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-amber-400 to-orange-500', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-pink-400 to-rose-500', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-cyan-400 to-teal-500', text: 'text-[var(--canvas)]' },
-    { bg: 'bg-linear-to-br from-masters to-emerald-600', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--team-usa-light)] to-[var(--team-usa)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--masters-subtle)] to-[var(--masters)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--team-europe-light)] to-[var(--team-europe)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--gold-light)] to-[var(--gold)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--masters)] to-[var(--masters-deep)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--team-usa)] to-[var(--team-usa-deep)]', text: 'text-[var(--canvas)]' },
+    { bg: 'bg-linear-to-br from-[var(--gold)] to-[var(--warning)]', text: 'text-[var(--canvas)]' },
 ];
 
 const getAvatarColor = (name?: string) => {
@@ -306,8 +306,8 @@ export function ProfilePhotoUpload({
                                         onClick={openCamera}
                                         className="w-full p-4 rounded-xl bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors flex items-center gap-4"
                                     >
-                                        <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                            <Camera className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                        <div className="w-12 h-12 rounded-full bg-[var(--team-usa-light)] flex items-center justify-center">
+                                            <Camera className="w-6 h-6 text-[var(--team-usa)]" />
                                         </div>
                                         <div className="text-left">
                                             <div className="font-medium text-[var(--ink-primary)]">
@@ -324,8 +324,8 @@ export function ProfilePhotoUpload({
                                         onClick={openGallery}
                                         className="w-full p-4 rounded-xl bg-[var(--surface-secondary)] hover:bg-[var(--surface-raised)] transition-colors flex items-center gap-4"
                                     >
-                                        <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                            <ImageIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                                        <div className="w-12 h-12 rounded-full bg-[var(--masters-subtle)] flex items-center justify-center">
+                                            <ImageIcon className="w-6 h-6 text-[var(--masters)]" />
                                         </div>
                                         <div className="text-left">
                                             <div className="font-medium text-[var(--ink-primary)]">

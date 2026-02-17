@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 05:30 EST — Phase 2 — Token hygiene: Onboarding + Captain Calculator use semantic tokens
+- `TravelLodgingInfo`: migrated hard-coded blue (arrival) and purple (lodging) colors to team tokens (`var(--team-usa)`, `var(--team-europe)`).
+- `ProfilePhotoUpload`: migrated avatar fallback gradients and camera/gallery buttons to semantic/team tokens (`var(--team-usa)`, `var(--masters)`, `var(--gold)`, etc.).
+- `PointsCalculator`: migrated halved/projected outcome colors off hex `#6B7280` to `var(--ink-tertiary)` and background surfaces to `var(--canvas-sunken)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 05:15 EST — Phase 2 — Token hygiene: captain/spectator status colors
 - `/captain/error`: tokenized alert icon shell background (`bg-[var(--error)]/10`).
 - `/spectator/[tripId]`: tokenized load error pill surface/border/dot to premium error tokens.

@@ -120,7 +120,7 @@ export function TravelLodgingInfo({
             {/* Header */}
             <div>
                 <h3 className="font-semibold text-[var(--ink-primary)] flex items-center gap-2">
-                    <Plane className="w-5 h-5 text-blue-500" />
+                    <Plane className="w-5 h-5 text-[var(--team-usa)]" />
                     Travel & Lodging
                 </h3>
                 <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
@@ -135,8 +135,8 @@ export function TravelLodgingInfo({
                     className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <Plane className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="w-10 h-10 rounded-xl bg-[var(--team-usa-light)] flex items-center justify-center">
+                            <Plane className="w-5 h-5 text-[var(--team-usa)]" />
                         </div>
                         <div className="text-left">
                             <div className="font-medium text-[var(--ink-primary)]">
@@ -177,20 +177,20 @@ export function TravelLodgingInfo({
                                             className={cn(
                                                 'p-3 rounded-xl border-2 text-center transition-all',
                                                 info.arrivalMethod === value
-                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                    ? 'border-[var(--team-usa)] bg-[var(--team-usa-light)]'
                                                     : 'border-[var(--rule)]'
                                             )}
                                         >
                                             <Icon className={cn(
                                                 'w-5 h-5 mx-auto mb-1',
                                                 info.arrivalMethod === value
-                                                    ? 'text-blue-600'
+                                                    ? 'text-[var(--team-usa)]'
                                                     : 'text-[var(--ink-tertiary)]'
                                             )} />
                                             <span className={cn(
                                                 'text-sm font-medium',
                                                 info.arrivalMethod === value
-                                                    ? 'text-blue-700 dark:text-blue-300'
+                                                    ? 'text-[var(--team-usa-deep)]'
                                                     : 'text-[var(--ink-secondary)]'
                                             )}>
                                                 {label}
@@ -262,7 +262,7 @@ export function TravelLodgingInfo({
                                                 type="checkbox"
                                                 checked={info.needsPickup}
                                                 onChange={(e) => updateInfo({ needsPickup: e.target.checked })}
-                                                className="w-5 h-5 rounded border-[var(--rule)] text-blue-500 focus:ring-blue-500"
+                                                className="w-5 h-5 rounded border-[var(--rule)] text-[var(--team-usa)] focus:ring-[var(--team-usa)]"
                                             />
                                             <div>
                                                 <div className="font-medium text-[var(--ink-primary)]">
@@ -317,8 +317,8 @@ export function TravelLodgingInfo({
                     className="w-full p-4 flex items-center justify-between hover:bg-[var(--surface-secondary)] transition-colors"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                            <Home className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                        <div className="w-10 h-10 rounded-xl bg-[var(--team-europe-light)] flex items-center justify-center">
+                            <Home className="w-5 h-5 text-[var(--team-europe)]" />
                         </div>
                         <div className="text-left">
                             <div className="font-medium text-[var(--ink-primary)]">
@@ -358,7 +358,7 @@ export function TravelLodgingInfo({
                                             className={cn(
                                                 'p-3 rounded-xl border-2 text-center transition-all',
                                                 info.lodgingPreference === value
-                                                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                                                    ? 'border-[var(--team-europe)] bg-[var(--team-europe-light)]'
                                                     : 'border-[var(--rule)]'
                                             )}
                                         >
@@ -366,7 +366,7 @@ export function TravelLodgingInfo({
                                             <span className={cn(
                                                 'text-sm font-medium',
                                                 info.lodgingPreference === value
-                                                    ? 'text-purple-700 dark:text-purple-300'
+                                                    ? 'text-[var(--team-europe-deep)]'
                                                     : 'text-[var(--ink-secondary)]'
                                             )}>
                                                 {label}
@@ -421,20 +421,20 @@ export function TravelLodgingInfo({
                                                 className={cn(
                                                     'p-2 rounded-lg border-2 text-center transition-all text-sm',
                                                     info.sleepSchedule === value
-                                                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                                                        ? 'border-[var(--team-europe)] bg-[var(--team-europe-light)]'
                                                         : 'border-[var(--rule)]'
                                                 )}
                                             >
                                                 <Icon className={cn(
                                                     'w-4 h-4 mx-auto mb-0.5',
                                                     info.sleepSchedule === value
-                                                        ? 'text-purple-600'
+                                                        ? 'text-[var(--team-europe)]'
                                                         : 'text-[var(--ink-tertiary)]'
                                                 )} />
                                                 <span className={cn(
                                                     'font-medium',
                                                     info.sleepSchedule === value
-                                                        ? 'text-purple-700 dark:text-purple-300'
+                                                        ? 'text-[var(--team-europe-deep)]'
                                                         : 'text-[var(--ink-secondary)]'
                                                 )}>
                                                     {label}
@@ -457,7 +457,7 @@ export function TravelLodgingInfo({
                                                 className={cn(
                                                     'px-3 py-2 rounded-full border text-sm transition-all flex items-center gap-1.5',
                                                     info.roomPreferences?.includes(pref.id)
-                                                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300'
+                                                        ? 'border-[var(--team-europe)] bg-[var(--team-europe-light)] text-[var(--team-europe-deep)]'
                                                         : 'border-[var(--rule)] text-[var(--ink-secondary)]'
                                                 )}
                                             >
