@@ -84,7 +84,7 @@ export function PageLoadingSkeleton({
 
       {/* Bottom Navigation Skeleton */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-[rgba(250,248,245,0.88)] border-t border-[var(--rule)] pb-[env(safe-area-inset-bottom)]"
+        className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg bg-[color:var(--canvas)]/88 border-t border-[var(--rule)] pb-[env(safe-area-inset-bottom)]"
       >
         <div className="flex justify-around items-center h-16">
           {[Home, Target, Users, Trophy, MoreHorizontal].map((Icon, i) => (

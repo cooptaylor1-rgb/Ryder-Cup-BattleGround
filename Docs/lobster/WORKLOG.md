@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 22:20 EST — Phase 2 — Token hygiene + safety: poll option delete uses error token, skeleton nav uses canvas overlay token, standings clinch uses success token
+- `CreatePollModal`: replaced `hover:text-red-500` with `hover:text-[var(--error)]` and added explicit `type="button"` on non-form buttons.
+- `PageLoadingSkeleton`: bottom nav backdrop migrated from hard-coded `rgba(250,248,245,0.88)` to token overlay `bg-[color:var(--canvas)]/88`.
+- `StandingsCard`: replaced Tailwind green primitives + dark variants with semantic success tokens (`bg-[color:var(--success)]/12`, `border-[color:var(--success)]/25`, `text-[var(--success)]`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 21:00 EST — Phase 2 — Token hygiene: side game cards use semantic success/warning/error tokens
 - `VegasGameCard`: migrated emerald header/accents to `var(--success)` and replaced remaining red loss/flip states with `var(--error)`.
 - `WolfGameCard`: migrated amber “wolf” accents to `var(--warning)` and replaced pack/negative/pig states from Tailwind reds to `var(--error)`.

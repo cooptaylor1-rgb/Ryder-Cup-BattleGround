@@ -210,14 +210,14 @@ export function StandingsCard({
                         className={cn(
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamAClinched
-                                ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                                ? 'bg-[color:var(--success)]/12 border-[color:var(--success)]/25'
                                 : 'bg-[color:var(--team-usa)]/5 border-[color:var(--team-usa)]/10'
                         )}
                     >
                         <p
                             className={cn(
                                 'text-2xl font-bold',
-                                magicNumber.teamAClinched ? 'text-green-600 dark:text-green-400' : 'text-[var(--team-usa)]'
+                                magicNumber.teamAClinched ? 'text-[var(--success)]' : 'text-[var(--team-usa)]'
                             )}
                         >
                             {magicNumber.teamAClinched ? '✓' : magicNumber.teamANeeded.toFixed(1)}
@@ -230,14 +230,14 @@ export function StandingsCard({
                         className={cn(
                             'text-center p-3 rounded-xl border transition-all duration-300',
                             magicNumber.teamBClinched
-                                ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                                ? 'bg-[color:var(--success)]/12 border-[color:var(--success)]/25'
                                 : 'bg-[color:var(--team-europe)]/5 border-[color:var(--team-europe)]/10'
                         )}
                     >
                         <p
                             className={cn(
                                 'text-2xl font-bold',
-                                magicNumber.teamBClinched ? 'text-green-600 dark:text-green-400' : 'text-[var(--team-europe)]'
+                                magicNumber.teamBClinched ? 'text-[var(--success)]' : 'text-[var(--team-europe)]'
                             )}
                         >
                             {magicNumber.teamBClinched ? '✓' : magicNumber.teamBNeeded.toFixed(1)}

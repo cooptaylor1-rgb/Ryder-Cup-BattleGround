@@ -287,8 +287,9 @@ export function CreatePollModal({
                       />
                       {options.length > 2 && (
                         <button
+                          type="button"
                           onClick={() => handleRemoveOption(index)}
-                          className="p-2 text-[var(--ink-tertiary)] hover:text-red-500 transition-colors"
+                          className="p-2 text-[var(--ink-tertiary)] hover:text-[var(--error)] transition-colors"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -297,6 +298,7 @@ export function CreatePollModal({
                   ))}
                   {options.length < 10 && (
                     <button
+                      type="button"
                       onClick={handleAddOption}
                       className="w-full py-2 border-2 border-dashed border-[color:var(--rule)]/40 rounded-lg text-[var(--ink-tertiary)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors flex items-center justify-center gap-2 type-caption"
                     >
@@ -380,6 +382,7 @@ export function CreatePollModal({
         {mode === 'custom' && (
           <div className="p-4 border-t border-[var(--rule)]">
             <button
+              type="button"
               onClick={handleCreateCustom}
               disabled={!isValidCustom || isCreating}
               className="btn-primary w-full"
