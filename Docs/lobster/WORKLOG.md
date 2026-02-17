@@ -5,6 +5,12 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 08:18 EST — Phase 2 — Token hygiene: SidebarNav + ErrorBoundary use semantic tokens (no inline rgba/hex)
+- `SidebarNav`: removed hard-coded rail colors and inline `rgba(...)` borders/backgrounds; now uses premium surface/ink/rule/gold/masters tokens via Tailwind-safe arbitrary values.
+- `ErrorBoundary`: tokenized error icon shell + icon color (`var(--error)`), removing hard-coded `rgba(...)` + hex.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅
+
 ### 07:08 EST — Phase 2 — Token hygiene: OfflineIndicator + onboarding + achievements use semantic tokens
 - `OfflineIndicator`: replaced Tailwind red/blue gradient primitives for offline/syncing banners with semantic `var(--error)` / `var(--info)` gradients using `color-mix(...)` for theme-safe contrast.
 - `QuickProfileMode` + `PlayingStyleSurvey`: migrated purple/amber gradients + shadow accents off Tailwind primitives to premium tokens (`var(--gold*)`, `var(--color-accent)`, `var(--masters)`) with Tailwind-safe arbitrary values.

@@ -142,11 +142,11 @@ export function ErrorFallback({
       {/* Icon */}
       <div
         className={cn(
-          'flex items-center justify-center rounded-2xl mb-4 bg-[rgba(220,38,38,0.1)]',
+          'flex items-center justify-center rounded-2xl mb-4 bg-[color:var(--error)]/10',
           isCompact ? 'w-12 h-12' : 'w-16 h-16',
         )}
       >
-        <AlertTriangle className={cn(isCompact ? 'w-6 h-6' : 'w-8 h-8', 'text-[#DC2626]')} />
+        <AlertTriangle className={cn(isCompact ? 'w-6 h-6' : 'w-8 h-8', 'text-[var(--error)]')} />
       </div>
 
       {/* Title */}
