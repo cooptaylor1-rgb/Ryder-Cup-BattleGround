@@ -5,6 +5,13 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-17
 
+### 04:45 EST — Phase 2 — Token hygiene: course error + score celebration + onboarding mode cards
+- `/courses` error boundary: migrated alert icon shell background off Tailwind `bg-red-500/10` to premium error tint (`bg-[color-mix(in_srgb,var(--error)_12%,transparent)]`).
+- `ScoreCelebration`: migrated remaining yellow Tailwind primitives to `gold` tokens (`text-gold`, `text-gold/50`) for palette consistency.
+- `PlayerOnboardingWizard`: swapped amber hover border + amber/orange gradients to tokenized gold + masters gradients (`hover:border-gold`, `from-gold-light` → `to-gold-dark`, `from-masters-primary` → `to-masters-primary-dark`).
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+- Commit + push ✅ (`f6ca7fa`)
+
 ### 04:35 EST — Phase 2 — Token hygiene: format rules + attendance headers + lineup delete affordance
 - `FormatRulesReference`: replaced Tailwind green/gray primitives with semantic success + ink-tertiary tokens for copied state + local rules “in effect” styling.
 - `AttendanceCheckIn`: Team A/Team B header dots now use team tokens (`var(--team-usa)` / `var(--team-europe)`) instead of Tailwind red/blue.
