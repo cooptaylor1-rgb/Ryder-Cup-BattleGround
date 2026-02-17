@@ -5,6 +5,11 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 
 ## 2026-02-16
 
+### 19:30 EST — Phase 2 — Token hygiene: Share card generator uses live theme tokens
+- `shareCardService`: migrated hard-coded share-card palette (`COLORS`) to refresh from CSS variables at render time (`--surface`, `--ink`, `--rule`, `--masters`, `--warning`, `--team-*`) with safe fallbacks.
+- Share-card background gradient now uses token surfaces (no `#050505` hard stop), and the subtle stripe overlay uses the current theme ink via `globalAlpha` instead of hard-coded `rgba(255,255,255,…)`.
+- Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
+
 ### 17:10 EST — Phase 2 — Token hygiene: Path to Victory + stroke indicators + offline chip
 - `PathToVictoryCard`: replaced hard-coded hex colors with premium theme tokens (`var(--usa-primary)`, `var(--europe-primary)`, `var(--warning)`, `var(--masters)`, `var(--success)`, `var(--error)`) and migrated highlight gradients to `color-mix(...)` for theme-safe contrast.
 - `StrokeAlertBanner`: removed remaining `rgba(...)` fills for team stroke badges + mini-map/legend, using token-driven backgrounds (`bg-[color:var(--team-*)]/…`) and `color-mix(...)`.

@@ -67,7 +67,7 @@ export interface MatchCardData {
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 630; // 1.91:1 aspect ratio (Twitter/FB optimal)
 
-const COLORS = {
+const DEFAULT_COLORS = {
     background: '#0A0A0A',
     surface: '#141414',
     border: '#2A2A2A',
@@ -82,6 +82,37 @@ const COLORS = {
     europe: '#C62828',
     europeLight: '#EF5350',
 };
+
+let COLORS = { ...DEFAULT_COLORS };
+
+function refreshColorsFromTheme(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const root = document.documentElement;
+    const styles = getComputedStyle(root);
+
+    const getVar = (name: string, fallback: string) => {
+        const value = styles.getPropertyValue(name).trim();
+        return value || fallback;
+    };
+
+    COLORS = {
+        ...DEFAULT_COLORS,
+        background: getVar('--surface', DEFAULT_COLORS.background),
+        surface: getVar('--surface-raised', DEFAULT_COLORS.surface),
+        border: getVar('--rule', DEFAULT_COLORS.border),
+        text: getVar('--ink', DEFAULT_COLORS.text),
+        textSecondary: getVar('--ink-secondary', DEFAULT_COLORS.textSecondary),
+        textTertiary: getVar('--ink-tertiary', DEFAULT_COLORS.textTertiary),
+        gold: getVar('--warning', DEFAULT_COLORS.gold),
+        green: getVar('--masters', DEFAULT_COLORS.green),
+        greenLight: getVar('--masters-hover', DEFAULT_COLORS.greenLight),
+        usa: getVar('--team-usa', DEFAULT_COLORS.usa),
+        usaLight: getVar('--team-usa-muted', DEFAULT_COLORS.usaLight),
+        europe: getVar('--team-europe', DEFAULT_COLORS.europe),
+        europeLight: getVar('--team-europe-muted', DEFAULT_COLORS.europeLight),
+    };
+}
 
 const FONTS = {
     title: 'bold 72px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -100,6 +131,8 @@ function createCanvas(width: number = CARD_WIDTH, height: number = CARD_HEIGHT):
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
 } {
+    refreshColorsFromTheme();
+
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -132,15 +165,18 @@ function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: nu
     // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
     gradient.addColorStop(0, COLORS.background);
-    gradient.addColorStop(1, '#050505');
+    gradient.addColorStop(1, COLORS.surface);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle pattern overlay
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    // Subtle pattern overlay (uses current theme ink for light/dark safety)
+    ctx.save();
+    ctx.fillStyle = COLORS.text;
+    ctx.globalAlpha = 0.02;
     for (let i = 0; i < width; i += 40) {
         ctx.fillRect(i, 0, 1, height);
     }
+    ctx.restore();
 }
 
 function drawBranding(ctx: CanvasRenderingContext2D, width: number, height: number, tripName: string): void {
