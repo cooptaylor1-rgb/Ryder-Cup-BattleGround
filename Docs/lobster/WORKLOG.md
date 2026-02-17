@@ -9,7 +9,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `PlayerCountSelector`: migrated Team A/Team B panel backgrounds/borders/text off Tailwind blue/red primitives to team CSS tokens (`var(--team-usa)`, `var(--team-europe)`) using Tailwind-safe opacity (`bg-[color:var(--team-*)]/10`, `border-[color:var(--team-*)]/25`).
 - `PlayerCountSelector`: migrated odd-player warning banner off amber primitives to premium warning token + standard ink secondary copy.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅
+- Commit + push ✅ (`0d538df`)
 
 ### 02:05 EST — Phase 2 — Token hygiene: inverse button/tab icon colors use canvas token (Social + TripTemplatePicker + OneHandedScoringPanel)
 - `/social`: send button + active tab text now use `var(--canvas)` instead of hard-coded `white` for theme-safe inverse contrast.
