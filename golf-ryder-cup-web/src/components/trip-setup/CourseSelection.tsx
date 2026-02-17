@@ -311,9 +311,9 @@ export function CourseSelection({
 
                                     <button
                                         onClick={() => removeCourse(course.id)}
-                                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                        className="p-2 rounded-lg transition-colors hover:bg-[color:var(--error)]/10"
                                     >
-                                        <X className="w-4 h-4 text-red-500" />
+                                        <X className="w-4 h-4 text-[var(--error)]" />
                                     </button>
                                 </div>
 
@@ -486,7 +486,7 @@ export function CourseSelection({
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-12 h-12 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
-                                                            <Star className="w-6 h-6 text-yellow-500" />
+                                                            <Star className="w-6 h-6 text-[var(--masters)]" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-medium truncate">{course.name}</p>

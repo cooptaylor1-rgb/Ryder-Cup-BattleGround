@@ -53,28 +53,28 @@ const SESSION_TYPE_CONFIG: Record<SessionType, {
         icon: <Users className="w-4 h-4" />,
         description: 'Best ball of 2 players',
         playersPerMatch: 2,
-        color: 'bg-blue-500',
+        color: 'bg-[color:var(--info)]',
     },
     foursomes: {
         label: 'Foursomes',
         icon: <Handshake className="w-4 h-4" />,
         description: 'Alternate shot',
         playersPerMatch: 2,
-        color: 'bg-purple-500',
+        color: 'bg-[color:var(--masters)]',
     },
     singles: {
         label: 'Singles',
         icon: <Target className="w-4 h-4" />,
         description: '1v1 match play',
         playersPerMatch: 1,
-        color: 'bg-orange-500',
+        color: 'bg-[color:var(--warning)]',
     },
     mixed: {
         label: 'Mixed',
         icon: <Sparkles className="w-4 h-4" />,
         description: 'Combination format',
         playersPerMatch: 2,
-        color: 'bg-green-500',
+        color: 'bg-[color:var(--success)]',
     },
 };
 
@@ -249,7 +249,7 @@ export function SessionBuilder({
                     {sessions.length > 0 && (
                         <button
                             onClick={clearAllSessions}
-                            className="btn-secondary text-sm px-3 py-1.5 text-red-600"
+                            className="btn-secondary text-sm px-3 py-1.5 text-[var(--error)]"
                         >
                             <RotateCcw className="w-4 h-4" />
                         </button>
@@ -457,10 +457,11 @@ function SessionCard({
                         <Copy className="w-4 h-4 text-[var(--ink-tertiary)]" />
                     </button>
                     <button
+                        type="button"
                         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors hover:bg-[color:var(--error)]/10"
                     >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4 text-[var(--error)]" />
                     </button>
                 </div>
             </button>
