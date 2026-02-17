@@ -10,7 +10,7 @@ This file is the high-level, checkpointed “what shipped” log for the Lobster
 - `TripTemplatePicker`: “Use This Template” CTA text now uses `var(--canvas)` instead of `#fff`.
 - `OneHandedScoringPanel`: active swipe team score buttons now use `var(--canvas)` instead of `#fff`.
 - Lobster checkpoint: `lint` + `typecheck` ✅ (approval gate run)
-- Commit + push ✅ (TBD)
+- Commit + push ✅ (`7bb61d1`)
 
 ### 01:25 EST — Phase 2 — Token hygiene: GoTimeCountdown alert toggle chips use semantic tokens
 - `GoTimeCountdown`: replaced Tailwind primitive toggle chips (`bg-green-500/20`, `bg-gray-500/20`) with premium semantic tokens (`var(--success)` + ink tints) and moved bell icon colors from inline styles to token classes.
