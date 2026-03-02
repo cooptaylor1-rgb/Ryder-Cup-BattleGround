@@ -9,6 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calculateMatchState,
+  calculateMatchStateSnapshot,
   formatMatchScore,
   checkDormie,
   wouldCloseOut,
@@ -760,5 +761,24 @@ describe('Real Match Scenarios', () => {
     expect(state.teamAHolesWon).toBe(7);
     expect(state.teamBHolesWon).toBe(6);
     expect(state.winningTeam).toBe('teamA');
+  });
+});
+
+
+describe('calculateMatchStateSnapshot', () => {
+  it('should return 1 UP for an 18-hole finish when teamA wins final hole', () => {
+    const results = createHoleResults([
+      ...Array.from({ length: 17 }, (_, i) => ({
+        hole: i + 1,
+        winner: (i % 3 === 0 ? 'teamA' : i % 3 === 1 ? 'teamB' : 'halved') as HoleWinner,
+      })),
+      { hole: 18, winner: 'teamA' },
+    ]);
+
+    const snapshot = calculateMatchStateSnapshot(results);
+
+    expect(snapshot.displayScore).toBe('1 UP');
+    expect(snapshot.status).toBe('completed');
+    expect(snapshot.winningTeam).toBe('teamA');
   });
 });

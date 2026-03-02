@@ -26,7 +26,7 @@ import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { addAuditLogEntry, db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
-import { track, trackFeature, trackScoreEntry } from '@/lib/services/analyticsService';
+import { trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
 import {
   Undo2,
@@ -459,10 +459,12 @@ export default function EnhancedMatchScoringPage() {
     setUndoAction(null);
     setToast({ message: 'Score undone', type: 'info' });
 
-    track('score_undo', 'scoring', {
-      match_id: activeMatch?.id ?? null,
-      hole: holeNumber,
-    });
+    if (activeMatch?.id) {
+      trackScoreUndo({
+        matchId: activeMatch.id,
+        hole: holeNumber,
+      });
+    }
 
     await recordScoreAudit({
       action: 'scoreUndone',

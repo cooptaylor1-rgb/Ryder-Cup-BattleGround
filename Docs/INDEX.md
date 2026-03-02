@@ -61,6 +61,8 @@ This index tracks all project documentation with ownership, status, and review c
 | [TestPlan](TestPlan.md) | QA | 🟢 Final | Per Release |
 | [TechDebt](TechDebt.md) | Engineering | 🟡 Reviewed | Monthly |
 | [HardcodeAudit](HardcodeAudit.md) | Engineering | 🟡 Reviewed | Quarterly |
+| [CanonicalRiskRegister-Phase0-Step1](CanonicalRiskRegister-Phase0-Step1.md) | Engineering | 🟡 Reviewed | Weekly |
+| [PhaseCompletionStatus](PhaseCompletionStatus.md) | Engineering | 🟡 Reviewed | Weekly |
 
 ---
 
@@ -72,6 +74,7 @@ This index tracks all project documentation with ownership, status, and review c
 | [Phase1-CoreFlowExcellence](Phase1-CoreFlowExcellence.md) | Product | 🟢 Final | Per Phase |
 | [WebMigrationPlan](WebMigrationPlan.md) | Engineering | 🟢 Final | Per Release |
 | [PolishResults_v1.1.1](PolishResults_v1.1.1.md) | QA | 🟢 Final | Per Release |
+| [ProductionQualityPhasedPlan](ProductionQualityPhasedPlan.md) | Engineering | 🟡 Reviewed | Weekly |
 
 ---
 
