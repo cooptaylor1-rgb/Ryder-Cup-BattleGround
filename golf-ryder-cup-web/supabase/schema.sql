@@ -3,6 +3,7 @@
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ============================================
 -- TRIPS
@@ -616,88 +617,88 @@ ALTER TABLE scoring_events ENABLE ROW LEVEL SECURITY;
 -- Application-level access control is enforced via trip share codes.
 
 -- TRIPS policies
-CREATE POLICY "trips_select_all" ON trips FOR SELECT USING (true);
-CREATE POLICY "trips_insert_all" ON trips FOR INSERT WITH CHECK (true);
-CREATE POLICY "trips_update_all" ON trips FOR UPDATE USING (true);
-CREATE POLICY "trips_delete_all" ON trips FOR DELETE USING (true);
+CREATE POLICY "trips_select_all" ON trips FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "trips_insert_all" ON trips FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "trips_update_all" ON trips FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "trips_delete_all" ON trips FOR DELETE USING (auth.role() = 'authenticated');
 
 -- TEAMS policies
-CREATE POLICY "teams_select_all" ON teams FOR SELECT USING (true);
-CREATE POLICY "teams_insert_all" ON teams FOR INSERT WITH CHECK (true);
-CREATE POLICY "teams_update_all" ON teams FOR UPDATE USING (true);
-CREATE POLICY "teams_delete_all" ON teams FOR DELETE USING (true);
+CREATE POLICY "teams_select_all" ON teams FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "teams_insert_all" ON teams FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "teams_update_all" ON teams FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "teams_delete_all" ON teams FOR DELETE USING (auth.role() = 'authenticated');
 
 -- TEAM_MEMBERS policies
-CREATE POLICY "team_members_select_all" ON team_members FOR SELECT USING (true);
-CREATE POLICY "team_members_insert_all" ON team_members FOR INSERT WITH CHECK (true);
-CREATE POLICY "team_members_update_all" ON team_members FOR UPDATE USING (true);
-CREATE POLICY "team_members_delete_all" ON team_members FOR DELETE USING (true);
+CREATE POLICY "team_members_select_all" ON team_members FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "team_members_insert_all" ON team_members FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "team_members_update_all" ON team_members FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "team_members_delete_all" ON team_members FOR DELETE USING (auth.role() = 'authenticated');
 
 -- PLAYERS policies
-CREATE POLICY "players_select_all" ON players FOR SELECT USING (true);
-CREATE POLICY "players_insert_all" ON players FOR INSERT WITH CHECK (true);
-CREATE POLICY "players_update_all" ON players FOR UPDATE USING (true);
-CREATE POLICY "players_delete_all" ON players FOR DELETE USING (true);
+CREATE POLICY "players_select_all" ON players FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "players_insert_all" ON players FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "players_update_all" ON players FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "players_delete_all" ON players FOR DELETE USING (auth.role() = 'authenticated');
 
 -- SESSIONS policies
-CREATE POLICY "sessions_select_all" ON sessions FOR SELECT USING (true);
-CREATE POLICY "sessions_insert_all" ON sessions FOR INSERT WITH CHECK (true);
-CREATE POLICY "sessions_update_all" ON sessions FOR UPDATE USING (true);
-CREATE POLICY "sessions_delete_all" ON sessions FOR DELETE USING (true);
+CREATE POLICY "sessions_select_all" ON sessions FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "sessions_insert_all" ON sessions FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "sessions_update_all" ON sessions FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "sessions_delete_all" ON sessions FOR DELETE USING (auth.role() = 'authenticated');
 
 -- COURSES policies
-CREATE POLICY "courses_select_all" ON courses FOR SELECT USING (true);
-CREATE POLICY "courses_insert_all" ON courses FOR INSERT WITH CHECK (true);
-CREATE POLICY "courses_update_all" ON courses FOR UPDATE USING (true);
-CREATE POLICY "courses_delete_all" ON courses FOR DELETE USING (true);
+CREATE POLICY "courses_select_all" ON courses FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "courses_insert_all" ON courses FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "courses_update_all" ON courses FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "courses_delete_all" ON courses FOR DELETE USING (auth.role() = 'authenticated');
 
 -- TEE_SETS policies
-CREATE POLICY "tee_sets_select_all" ON tee_sets FOR SELECT USING (true);
-CREATE POLICY "tee_sets_insert_all" ON tee_sets FOR INSERT WITH CHECK (true);
-CREATE POLICY "tee_sets_update_all" ON tee_sets FOR UPDATE USING (true);
-CREATE POLICY "tee_sets_delete_all" ON tee_sets FOR DELETE USING (true);
+CREATE POLICY "tee_sets_select_all" ON tee_sets FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "tee_sets_insert_all" ON tee_sets FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "tee_sets_update_all" ON tee_sets FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "tee_sets_delete_all" ON tee_sets FOR DELETE USING (auth.role() = 'authenticated');
 
 -- MATCHES policies
-CREATE POLICY "matches_select_all" ON matches FOR SELECT USING (true);
-CREATE POLICY "matches_insert_all" ON matches FOR INSERT WITH CHECK (true);
-CREATE POLICY "matches_update_all" ON matches FOR UPDATE USING (true);
-CREATE POLICY "matches_delete_all" ON matches FOR DELETE USING (true);
+CREATE POLICY "matches_select_all" ON matches FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "matches_insert_all" ON matches FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "matches_update_all" ON matches FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "matches_delete_all" ON matches FOR DELETE USING (auth.role() = 'authenticated');
 
 -- HOLE_RESULTS policies
-CREATE POLICY "hole_results_select_all" ON hole_results FOR SELECT USING (true);
-CREATE POLICY "hole_results_insert_all" ON hole_results FOR INSERT WITH CHECK (true);
-CREATE POLICY "hole_results_update_all" ON hole_results FOR UPDATE USING (true);
-CREATE POLICY "hole_results_delete_all" ON hole_results FOR DELETE USING (true);
+CREATE POLICY "hole_results_select_all" ON hole_results FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "hole_results_insert_all" ON hole_results FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "hole_results_update_all" ON hole_results FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "hole_results_delete_all" ON hole_results FOR DELETE USING (auth.role() = 'authenticated');
 
 -- PHOTOS policies
-CREATE POLICY "photos_select_all" ON photos FOR SELECT USING (true);
-CREATE POLICY "photos_insert_all" ON photos FOR INSERT WITH CHECK (true);
-CREATE POLICY "photos_update_all" ON photos FOR UPDATE USING (true);
-CREATE POLICY "photos_delete_all" ON photos FOR DELETE USING (true);
+CREATE POLICY "photos_select_all" ON photos FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "photos_insert_all" ON photos FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "photos_update_all" ON photos FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "photos_delete_all" ON photos FOR DELETE USING (auth.role() = 'authenticated');
 
 -- COMMENTS policies
-CREATE POLICY "comments_select_all" ON comments FOR SELECT USING (true);
-CREATE POLICY "comments_insert_all" ON comments FOR INSERT WITH CHECK (true);
-CREATE POLICY "comments_update_all" ON comments FOR UPDATE USING (true);
-CREATE POLICY "comments_delete_all" ON comments FOR DELETE USING (true);
+CREATE POLICY "comments_select_all" ON comments FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "comments_insert_all" ON comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "comments_update_all" ON comments FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "comments_delete_all" ON comments FOR DELETE USING (auth.role() = 'authenticated');
 
 -- SIDE_BETS policies
-CREATE POLICY "side_bets_select_all" ON side_bets FOR SELECT USING (true);
-CREATE POLICY "side_bets_insert_all" ON side_bets FOR INSERT WITH CHECK (true);
-CREATE POLICY "side_bets_update_all" ON side_bets FOR UPDATE USING (true);
-CREATE POLICY "side_bets_delete_all" ON side_bets FOR DELETE USING (true);
+CREATE POLICY "side_bets_select_all" ON side_bets FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "side_bets_insert_all" ON side_bets FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "side_bets_update_all" ON side_bets FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "side_bets_delete_all" ON side_bets FOR DELETE USING (auth.role() = 'authenticated');
 
 -- ACHIEVEMENTS policies
-CREATE POLICY "achievements_select_all" ON achievements FOR SELECT USING (true);
-CREATE POLICY "achievements_insert_all" ON achievements FOR INSERT WITH CHECK (true);
-CREATE POLICY "achievements_update_all" ON achievements FOR UPDATE USING (true);
-CREATE POLICY "achievements_delete_all" ON achievements FOR DELETE USING (true);
+CREATE POLICY "achievements_select_all" ON achievements FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "achievements_insert_all" ON achievements FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "achievements_update_all" ON achievements FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "achievements_delete_all" ON achievements FOR DELETE USING (auth.role() = 'authenticated');
 
 -- AUDIT_LOG policies
-CREATE POLICY "audit_log_select_all" ON audit_log FOR SELECT USING (true);
-CREATE POLICY "audit_log_insert_all" ON audit_log FOR INSERT WITH CHECK (true);
-CREATE POLICY "audit_log_update_all" ON audit_log FOR UPDATE USING (true);
-CREATE POLICY "audit_log_delete_all" ON audit_log FOR DELETE USING (true);
+CREATE POLICY "audit_log_select_all" ON audit_log FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "audit_log_insert_all" ON audit_log FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "audit_log_update_all" ON audit_log FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "audit_log_delete_all" ON audit_log FOR DELETE USING (auth.role() = 'authenticated');
 
 -- SCORING_EVENTS policies (server-side only via service role)
 CREATE POLICY "scoring_events_select_service" ON scoring_events FOR SELECT USING (auth.role() = 'service_role');

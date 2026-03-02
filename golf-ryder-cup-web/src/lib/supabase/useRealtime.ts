@@ -56,6 +56,7 @@ export function useRealtime(
     const [activeUsers, setActiveUsers] = useState<RealtimeUser[]>([]);
     const [error, setError] = useState<string | null>(null);
     const channelRef = useRef<RealtimeChannel | null>(null);
+    const connectAttemptRef = useRef(0);
 
     const { refreshMatchState, refreshAllMatchStates } = useScoringStore();
 
@@ -129,32 +130,42 @@ export function useRealtime(
     }, []);
 
     // Connect to channel
-    const connect = useCallback(() => {
+    const connect = useCallback(async () => {
         if (!tripId || !isSupabaseConfigured || !supabase) {
             return;
         }
 
-        // Disconnect existing channel
-        if (channelRef.current) {
-            unsubscribeChannel(channelRef.current);
+        const attemptId = ++connectAttemptRef.current;
+        const previousChannel = channelRef.current;
+        channelRef.current = null;
+
+        if (previousChannel) {
+            void unsubscribeChannel(previousChannel);
         }
 
         setError(null);
         setConnectionStatus('connecting');
 
-        const channel = subscribeTripChannel(tripId, setConnectionStatus, {
+        const channel = await subscribeTripChannel(tripId, setConnectionStatus, {
             onMatchUpdate: handleMatchUpdate,
             onHoleResultUpdate: handleHoleResultUpdate,
             onSessionUpdate: handleSessionUpdate,
             onPresenceSync: handlePresenceSync,
         });
 
+        // Ignore stale async connect attempts (trip switch/reconnect races)
+        if (attemptId !== connectAttemptRef.current) {
+            if (channel) {
+                void unsubscribeChannel(channel);
+            }
+            return;
+        }
+
         if (channel) {
             channelRef.current = channel;
 
-            // Track presence if user info provided
             if (userInfo) {
-                trackPresence(channel, userInfo);
+                void trackPresence(channel, userInfo);
             }
         } else {
             setError('Failed to connect to real-time channel');
@@ -164,17 +175,21 @@ export function useRealtime(
 
     // Reconnect function
     const reconnect = useCallback(() => {
-        connect();
+        void connect();
     }, [connect]);
 
     // Subscribe on mount, cleanup on unmount
     useEffect(() => {
-        connect();
+        queueMicrotask(() => {
+            void connect();
+        });
 
         return () => {
-            if (channelRef.current) {
-                unsubscribeChannel(channelRef.current);
-                channelRef.current = null;
+            connectAttemptRef.current += 1;
+            const activeChannel = channelRef.current;
+            channelRef.current = null;
+            if (activeChannel) {
+                void unsubscribeChannel(activeChannel);
             }
         };
     }, [connect]);

@@ -9,6 +9,7 @@ import {
     formatSpectatorMatchScore,
     calculateProjectedScore,
     generateScoreboardText,
+    buildSpectatorView,
 } from '@/lib/services/spectatorService';
 import type { SpectatorView } from '@/lib/types/captain';
 
@@ -41,6 +42,95 @@ describe('Spectator Service', () => {
             const projected = calculateProjectedScore(10, 8, []);
             expect(projected.teamA).toBe(10);
             expect(projected.teamB).toBe(8);
+        });
+    });
+
+
+
+    describe('buildSpectatorView', () => {
+        it('uses shared scoring logic for completed final-hole 1 UP result', () => {
+            const trip = {
+                id: 'trip-1',
+                name: 'Trip',
+                startDate: '2026-06-01',
+                endDate: '2026-06-03',
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-01T00:00:00.000Z',
+            } as const;
+
+            const teams = [
+                { id: 't1', tripId: 'trip-1', name: 'USA', color: 'usa', createdAt: '', updatedAt: '' },
+                { id: 't2', tripId: 'trip-1', name: 'EUR', color: 'europe', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const sessions = [
+                {
+                    id: 's1',
+                    tripId: 'trip-1',
+                    name: 'Singles',
+                    sessionNumber: 1,
+                    sessionType: 'singles',
+                    isComplete: false,
+                    isSessionLocked: false,
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            ] as const;
+
+            const matches = [
+                {
+                    id: 'm1',
+                    sessionId: 's1',
+                    matchOrder: 1,
+                    status: 'completed',
+                    currentHole: 18,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 1,
+                    holesRemaining: 0,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:00:00.000Z',
+                },
+            ] as const;
+
+            const holeResults = [
+                ...Array.from({ length: 17 }, (_, i) => ({
+                    id: `h-${i + 1}`,
+                    matchId: 'm1',
+                    holeNumber: i + 1,
+                    winner: (i % 3 === 0 ? 'teamA' : i % 3 === 1 ? 'teamB' : 'halved') as
+                        | 'teamA'
+                        | 'teamB'
+                        | 'halved',
+                    timestamp: `2026-01-01T00:${String(i).padStart(2, '0')}:00.000Z`,
+                })),
+                {
+                    id: 'h-18',
+                    matchId: 'm1',
+                    holeNumber: 18,
+                    winner: 'teamA' as const,
+                    timestamp: '2026-01-01T00:18:00.000Z',
+                },
+            ];
+
+            const players = [
+                { id: 'p1', firstName: 'Ann', lastName: 'A', createdAt: '', updatedAt: '' },
+                { id: 'p2', firstName: 'Bob', lastName: 'B', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const view = buildSpectatorView(
+                trip as never,
+                teams as never,
+                sessions as never,
+                matches as never,
+                holeResults as never,
+                players as never
+            );
+
+            expect(view.recentResults[0]?.result).toBe('1 UP');
         });
     });
 

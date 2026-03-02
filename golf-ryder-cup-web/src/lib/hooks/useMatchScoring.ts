@@ -18,7 +18,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useHaptic } from './useHaptic';
 import { useOfflineQueue } from './useOfflineQueue';
-import type { HoleResult } from '../types/models';
+import { calculateMatchStateSnapshot } from '../services/scoringEngine';
+import type { HoleResult, HoleWinner } from '../types/models';
 
 // ============================================
 // TYPES
@@ -106,6 +107,13 @@ interface UseMatchScoringReturn {
 // HELPER FUNCTIONS
 // ============================================
 
+function mapWinner(winner: HoleScore['winner']): HoleWinner {
+    if (winner === 'team1') return 'teamA';
+    if (winner === 'team2') return 'teamB';
+    if (winner === 'halved') return 'halved';
+    return 'none';
+}
+
 function calculateMatchStatus(scores: HoleScore[], totalHoles: number = 18): MatchStatus {
     if (scores.length === 0) {
         return {
@@ -123,65 +131,41 @@ function calculateMatchStatus(scores: HoleScore[], totalHoles: number = 18): Mat
         };
     }
 
-    // Calculate holes up
-    let team1Up = 0;
-    let team2Up = 0;
+    const summary = calculateMatchStateSnapshot(
+        scores.map((score) => ({
+            id: `score-${score.holeNumber}`,
+            matchId: 'useMatchScoring',
+            holeNumber: score.holeNumber,
+            winner: mapWinner(score.winner),
+            timestamp: score.timestamp,
+        })) as HoleResult[]
+    );
 
-    for (const score of scores) {
-        if (score.winner === 'team1') {
-            team1Up++;
-        } else if (score.winner === 'team2') {
-            team2Up++;
-        }
-    }
-
-    const netUp = team1Up - team2Up;
-    const holesPlayed = scores.length;
-    const holesRemaining = totalHoles - holesPlayed;
-
-    // Determine lead
-    let lead: 'team1' | 'team2' | 'all_square' = 'all_square';
-    let leadAmount = 0;
-
-    if (netUp > 0) {
-        lead = 'team1';
-        leadAmount = netUp;
-    } else if (netUp < 0) {
-        lead = 'team2';
-        leadAmount = Math.abs(netUp);
-    }
-
-    // Check for dormie (lead equals holes remaining)
-    const isDormie = leadAmount > 0 && leadAmount === holesRemaining;
-
-    // Check if match is complete
-    const isComplete = holesRemaining === 0 || leadAmount > holesRemaining;
+    const leadAmount = Math.abs(summary.currentScore);
+    const lead = summary.currentScore > 0 ? 'team1' : summary.currentScore < 0 ? 'team2' : 'all_square';
 
     let matchResult: MatchStatus['matchResult'] = null;
-    if (isComplete) {
-        if (lead === 'all_square') {
+    if (summary.status === 'completed') {
+        if (summary.winningTeam === 'halved') {
             matchResult = { winner: 'halved', result: 'Halved' };
-        } else {
-            const winner = lead;
-            if (holesRemaining === 0) {
-                matchResult = { winner, result: `${leadAmount} up` };
-            } else {
-                matchResult = { winner, result: `${leadAmount}&${holesRemaining}` };
-            }
+        } else if (summary.winningTeam === 'teamA') {
+            matchResult = { winner: 'team1', result: summary.displayScore.toLowerCase() };
+        } else if (summary.winningTeam === 'teamB') {
+            matchResult = { winner: 'team2', result: summary.displayScore.toLowerCase() };
         }
     }
 
     return {
-        status: isComplete ? 'complete' : 'in_progress',
-        currentHole: Math.min(holesPlayed + 1, totalHoles),
-        holesPlayed,
-        holesRemaining,
-        team1Up,
-        team2Up,
+        status: summary.status === 'scheduled' ? 'not_started' : summary.status === 'completed' ? 'complete' : 'in_progress',
+        currentHole: Math.min(summary.holesPlayed + 1, totalHoles),
+        holesPlayed: summary.holesPlayed,
+        holesRemaining: summary.holesRemaining,
+        team1Up: summary.teamAHolesWon,
+        team2Up: summary.teamBHolesWon,
         lead,
         leadAmount,
-        isDormie,
-        isPress: false, // Would be set by press logic
+        isDormie: summary.isDormie,
+        isPress: false,
         matchResult,
     };
 }

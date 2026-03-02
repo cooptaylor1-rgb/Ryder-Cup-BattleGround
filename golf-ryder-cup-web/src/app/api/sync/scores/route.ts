@@ -105,14 +105,27 @@ export async function POST(request: NextRequest) {
         if (error) {
           results.failed++;
           results.errors.push(`Event ${event.id}: ${error.message}`);
+          apiLogger.warn('[API] Sync event failure', {
+            matchId: payload.matchId,
+            tripId: payload.tripId ?? null,
+            eventId: event.id,
+            eventType: event.type,
+            reason: error.message,
+          });
         } else {
           results.synced++;
         }
       } catch (err) {
         results.failed++;
-        results.errors.push(
-          `Event ${event.id}: ${err instanceof Error ? err.message : 'Unknown error'}`
-        );
+        const reason = err instanceof Error ? err.message : 'Unknown error';
+        results.errors.push(`Event ${event.id}: ${reason}`);
+        apiLogger.warn('[API] Sync event exception', {
+          matchId: payload.matchId,
+          tripId: payload.tripId ?? null,
+          eventId: event.id,
+          eventType: event.type,
+          reason,
+        });
       }
     }
 
@@ -124,6 +137,15 @@ export async function POST(request: NextRequest) {
         .eq('id', payload.matchId);
     }
 
+    if (results.failed > 0) {
+      apiLogger.warn('[API] Score sync completed with failures', {
+        matchId: payload.matchId,
+        tripId: payload.tripId ?? null,
+        synced: results.synced,
+        failed: results.failed,
+      });
+    }
+
     return NextResponse.json({
       success: results.failed === 0,
       synced: results.synced,
@@ -131,7 +153,9 @@ export async function POST(request: NextRequest) {
       errors: results.errors.length > 0 ? results.errors : undefined,
     });
   } catch (error) {
-    apiLogger.error('[API] Score sync error:', error);
+    apiLogger.error('[API] Score sync error', {
+      reason: error instanceof Error ? error.message : 'Unknown error',
+    });
     return NextResponse.json(
       {
         error: 'Internal server error',
