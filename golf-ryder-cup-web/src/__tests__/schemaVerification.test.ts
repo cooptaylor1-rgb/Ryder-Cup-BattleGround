@@ -102,6 +102,17 @@ describe('Database Schema Verification', () => {
         });
     });
 
+
+
+        it('should enable pgcrypto extension for secure share-code generation', () => {
+            expect(schemaContent).toMatch(/CREATE EXTENSION IF NOT EXISTS "pgcrypto"/i);
+        });
+
+        it('should not use public CRUD policies on core app tables', () => {
+            const insecurePolicyRegex = /(CREATE POLICY\s+"(?:trips|teams|team_members|players|sessions|courses|tee_sets|matches|hole_results|photos|comments|side_bets|achievements|audit_log)_[^"]+"[\s\S]*?(USING \(true\)|WITH CHECK \(true\)))/i;
+            expect(schemaContent).not.toMatch(insecurePolicyRegex);
+        });
+
     describe('RLS Configuration', () => {
         const tablesRequiringRLS = [
             'trips',
