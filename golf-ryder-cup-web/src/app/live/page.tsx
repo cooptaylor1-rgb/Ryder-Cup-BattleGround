@@ -140,6 +140,8 @@ export default function LivePage() {
   };
 
   const isLoadingMatches = matches === undefined;
+  const controlButtonClass =
+    'min-h-11 min-w-11 p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]';
 
   if (!currentTrip) {
     return (
@@ -182,7 +184,7 @@ export default function LivePage() {
               {isConnected ? (
                 <>
                   <Wifi size={14} className="text-[var(--success)]" />
-                  <span className="text-xs text-[var(--success)] font-medium hidden sm:inline">Live</span>
+                  <span className="text-xs text-[var(--success)] font-medium hidden sm:inline" aria-live="polite">Live</span>
                 </>
               ) : (
                 <>
@@ -193,15 +195,18 @@ export default function LivePage() {
             </div>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
-              aria-label={soundEnabled ? 'Mute' : 'Unmute'}
+              className={controlButtonClass}
+              aria-label={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
+              aria-pressed={soundEnabled}
+              title={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
             >
               {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
             <button
               onClick={toggleFullscreen}
-              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
+              className={controlButtonClass}
               aria-label="Toggle fullscreen"
+              title="Toggle fullscreen"
             >
               <Maximize2 size={18} />
             </button>
@@ -210,8 +215,9 @@ export default function LivePage() {
                 if (activeSession) loadSessionMatches(activeSession.id);
                 setLastUpdate(new Date());
               }}
-              className="p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)]"
-              aria-label="Refresh"
+              className={controlButtonClass}
+              aria-label="Refresh live scores"
+              title="Refresh live scores"
             >
               <RefreshCw size={18} />
             </button>
@@ -224,7 +230,7 @@ export default function LivePage() {
         {activeSession && (
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="type-caption">
+            <p className="type-caption" aria-live="polite">
               {isConnected ? (
                 <>
                   <span className="inline-block w-2 h-2 rounded-full bg-[var(--success)] mr-1.5 animate-pulse" />

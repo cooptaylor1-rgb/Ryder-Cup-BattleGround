@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -13,10 +13,12 @@ import {
 } from '@/lib/services/tournamentEngine';
 import { computeAwards, calculatePlayerStats } from '@/lib/services/awardsService';
 import { createLogger } from '@/lib/utils/logger';
+import { trackSocialAction, trackStandingsViewed, trackStandingsTabChanged } from '@/lib/services/analyticsService';
 import { STAT_DEFINITIONS, type TripStatType } from '@/lib/types/tripStats';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
 import type { Award, PlayerStats } from '@/lib/types/awards';
 import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
+import { shareStandings } from '@/lib/services/shareCardService';
 import {
   Trophy,
   Crown,
@@ -62,6 +64,7 @@ export default function StandingsPage() {
   const [awards, setAwards] = useState<Award[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSharingStandings, setIsSharingStandings] = useState(false);
 
   // Get fun stats from database
   const tripStats = useLiveQuery(
@@ -102,6 +105,52 @@ export default function StandingsPage() {
     loadStandings();
   }, [currentTrip, showToast]);
 
+  useEffect(() => {
+    if (!currentTrip || isLoading) return;
+    trackStandingsViewed({
+      tripId: currentTrip.id,
+      activeTab,
+    });
+  }, [activeTab, currentTrip, isLoading]);
+
+  useEffect(() => {
+    if (!currentTrip || isLoading) return;
+    trackStandingsTabChanged({
+      tripId: currentTrip.id,
+      tab: activeTab,
+    });
+  }, [activeTab, currentTrip, isLoading]);
+
+  const teamA = teams.find((t) => t.color === 'usa');
+  const teamB = teams.find((t) => t.color === 'europe');
+  const teamAName = teamA?.name || 'USA';
+  const teamBName = teamB?.name || 'Europe';
+
+  const handleShareStandings = useCallback(async () => {
+    if (!standings || !currentTrip) return;
+
+    try {
+      setIsSharingStandings(true);
+      const shared = await shareStandings(standings, teamAName, teamBName, currentTrip.name);
+
+      if (shared) {
+        showToast('success', 'Standings shared');
+        trackSocialAction({
+          action: 'share',
+          target_type: 'standings',
+          target_id: currentTrip.id,
+        });
+      } else {
+        showToast('info', 'Standings downloaded');
+      }
+    } catch (error) {
+      logger.error('Failed to share standings', { error });
+      showToast('error', 'Failed to share standings');
+    } finally {
+      setIsSharingStandings(false);
+    }
+  }, [standings, currentTrip, teamAName, teamBName, showToast]);
+
   if (!currentTrip) {
     return (
       <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -131,12 +180,11 @@ export default function StandingsPage() {
     return <PageLoadingSkeleton title="Standings" showBackButton={false} variant="default" />;
   }
 
-  const teamA = teams.find((t) => t.color === 'usa');
-  const teamB = teams.find((t) => t.color === 'europe');
-  const teamAName = teamA?.name || 'USA';
-  const teamBName = teamB?.name || 'Europe';
+
+
 
   // Trip summary text removed (unused) — avoids conditional hook calls after early returns.
+
 
   // Aggregate fun stats by type
   const statTotals = new Map<
@@ -244,6 +292,8 @@ export default function StandingsPage() {
             teamBName={teamBName}
             teamA={teamA}
             pointsToWin={currentTrip.settings?.pointsToWin ?? 14.5}
+            onShareStandings={handleShareStandings}
+            isSharingStandings={isSharingStandings}
           />
         ) : activeTab === 'stats' ? (
           <FunStatsTab statTotals={statTotals} highlightStats={highlightStats} />
@@ -300,6 +350,8 @@ function CompetitionTab({
   teamBName,
   teamA,
   pointsToWin,
+  onShareStandings,
+  isSharingStandings,
 }: {
   standings: TeamStandings | null;
   magicNumber: MagicNumber | null;
@@ -308,6 +360,8 @@ function CompetitionTab({
   teamBName: string;
   teamA: { id: string } | undefined;
   pointsToWin: number;
+  onShareStandings: () => Promise<void>;
+  isSharingStandings: boolean;
 }) {
   if (!standings || !magicNumber) {
     return <EmptyState />;
@@ -396,6 +450,17 @@ function CompetitionTab({
         <p className="type-micro mt-[var(--space-8)]">
           {standings.matchesCompleted} of {standings.totalMatches} matches complete
         </p>
+
+        <button
+          type="button"
+          onClick={() => void onShareStandings()}
+          disabled={isSharingStandings}
+          className="mt-[var(--space-4)] inline-flex items-center gap-[var(--space-2)] rounded-xl border border-[var(--rule)] bg-[var(--surface-card)] px-[var(--space-4)] py-[var(--space-2)] text-[length:var(--text-sm)] font-medium transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
+          aria-label="Share standings card"
+        >
+          <Share2 size={16} />
+          {isSharingStandings ? 'Sharing…' : 'Share Standings Card'}
+        </button>
 
         {/* Trip Complete — Recap CTA */}
         {standings.remainingMatches === 0 && standings.matchesCompleted > 0 && (

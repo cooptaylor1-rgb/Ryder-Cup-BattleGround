@@ -337,6 +337,50 @@ export function trackEngagement(options: {
   });
 }
 
+
+export function trackScoreUndo(options: { matchId: string; hole: number }): void {
+  track('score_undo', 'scoring', {
+    match_id: options.matchId,
+    hole: options.hole,
+  });
+}
+
+export function trackSyncFailure(options: {
+  area: 'sync_queue' | 'realtime_broadcast' | 'api_sync';
+  operation: string;
+  matchId?: string;
+  tripId?: string;
+  reason?: string;
+}): void {
+  track('sync_failure', 'error', {
+    area: options.area,
+    operation: options.operation,
+    match_id: options.matchId || null,
+    trip_id: options.tripId || null,
+    reason: options.reason || null,
+  });
+}
+
+export function trackStandingsViewed(options: {
+  tripId: string;
+  activeTab: 'competition' | 'stats' | 'awards';
+}): void {
+  track('standings_viewed', 'engagement', {
+    trip_id: options.tripId,
+    tab: options.activeTab,
+  });
+}
+
+export function trackStandingsTabChanged(options: {
+  tripId: string;
+  tab: 'competition' | 'stats' | 'awards';
+}): void {
+  track('standings_tab_changed', 'engagement', {
+    trip_id: options.tripId,
+    tab: options.tab,
+  });
+}
+
 // ============================================
 // WEB VITALS TRACKING
 // ============================================
