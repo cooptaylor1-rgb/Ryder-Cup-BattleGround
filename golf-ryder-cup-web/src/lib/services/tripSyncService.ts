@@ -181,7 +181,18 @@ async function ensureQueueHydrated(): Promise<void> {
           merged.set(item.id, item);
         }
         for (const item of storedItems) {
-          merged.set(item.id, item);
+          const hydratedItem = item.idempotencyKey
+            ? item
+            : {
+                ...item,
+                idempotencyKey: buildSyncOperationKey(
+                  item.entity,
+                  item.entityId,
+                  item.operation,
+                  item.tripId
+                ),
+              };
+          merged.set(item.id, hydratedItem);
         }
         syncQueue.length = 0;
         syncQueue.push(...merged.values());
@@ -201,6 +212,47 @@ async function ensureQueueHydrated(): Promise<void> {
 // QUEUE MANAGEMENT
 // ============================================
 
+export function buildSyncOperationKey(
+  entity: SyncEntity,
+  entityId: string,
+  operation: SyncOperation,
+  tripId: string
+): string {
+  return `${tripId}:${entity}:${entityId}:${operation}`;
+}
+
+/**
+ * Deterministic conflict policy for queued operations on the same entity.
+ * Ensures queue transitions are idempotent and converge to the correct final state.
+ */
+export function resolveSyncOperationTransition(
+  existingOperation: SyncOperation,
+  incomingOperation: SyncOperation
+): SyncOperation | 'noop' {
+  // create -> update: still a create with latest payload
+  if (existingOperation === 'create' && incomingOperation === 'update') {
+    return 'create';
+  }
+
+  // create -> delete before sync: cancel out entirely
+  if (existingOperation === 'create' && incomingOperation === 'delete') {
+    return 'noop';
+  }
+
+  // update -> delete: final intent is delete
+  if (existingOperation === 'update' && incomingOperation === 'delete') {
+    return 'delete';
+  }
+
+  // delete -> create/update: entity re-introduced; send as update/upsert
+  if (existingOperation === 'delete' && (incomingOperation === 'create' || incomingOperation === 'update')) {
+    return 'update';
+  }
+
+  // Default: last operation wins
+  return incomingOperation;
+}
+
 export function queueSyncOperation(
   entity: SyncEntity,
   entityId: string,
@@ -210,18 +262,38 @@ export function queueSyncOperation(
 ): void {
   void ensureQueueHydrated();
 
-  // Check for existing pending operation on same entity
+  const idempotencyKey = buildSyncOperationKey(entity, entityId, operation, tripId);
+
+  // Check for existing pending operation on same entity / operation key
   const existing = syncQueue.find(
     (item) =>
-      item.entityId === entityId &&
-      item.entity === entity &&
+      (item.idempotencyKey === idempotencyKey ||
+        (item.entityId === entityId && item.entity === entity && item.tripId === tripId)) &&
       (item.status === 'pending' || item.status === 'syncing')
   );
 
   if (existing) {
+    const resolvedOperation = resolveSyncOperationTransition(existing.operation, operation);
+
+    if (resolvedOperation === 'noop') {
+      const existingIndex = syncQueue.findIndex((item) => item.id === existing.id);
+      if (existingIndex >= 0) {
+        syncQueue.splice(existingIndex, 1);
+      }
+      void removeQueueItem(existing.id);
+      return;
+    }
+
     // Update existing with latest data
     existing.data = data;
-    existing.operation = operation;
+    existing.operation = resolvedOperation;
+    existing.idempotencyKey = idempotencyKey;
+
+    // Delete operations do not require entity payload
+    if (resolvedOperation === 'delete') {
+      existing.data = undefined;
+    }
+
     void persistQueueItem(existing);
     return;
   }
@@ -236,6 +308,7 @@ export function queueSyncOperation(
     status: 'pending',
     retryCount: 0,
     createdAt: new Date().toISOString(),
+    idempotencyKey,
   };
 
   syncQueue.push(item);

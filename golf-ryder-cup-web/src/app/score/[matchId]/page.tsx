@@ -22,10 +22,12 @@ import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/s
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { cn, formatPlayerName } from '@/lib/utils';
+import { deriveScoreAuditAction } from '@/lib/utils/scoringAudit';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { addAuditLogEntry, db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
+import { createCorrelationId, trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
 import { trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
 import {
@@ -463,6 +465,7 @@ export default function EnhancedMatchScoringPage() {
       trackScoreUndo({
         matchId: activeMatch.id,
         hole: holeNumber,
+        correlationId: createCorrelationId('undo'),
       });
     }
 
@@ -497,8 +500,9 @@ export default function EnhancedMatchScoringPage() {
       teamBPlayerScores?: PlayerHoleScore[],
     ) => {
       if (!matchState) return;
-      const wasUnscored = !currentHoleResult || currentHoleResult.winner === 'none';
       const scoringSource = source ?? scoringMode;
+      const scoreAuditAction = deriveScoreAuditAction(currentHoleResult);
+      const wasUnscored = scoreAuditAction === 'scoreEntered';
       const analyticsMethod: 'manual' | 'quick' | 'voice' | 'ocr' =
         scoringSource === 'voice'
           ? 'voice'
@@ -527,7 +531,7 @@ export default function EnhancedMatchScoringPage() {
       }
 
       await recordScoreAudit({
-        action: 'scoreEntered',
+        action: scoreAuditAction,
         holeNumber: currentHole,
         winner,
         teamAStrokeScore,

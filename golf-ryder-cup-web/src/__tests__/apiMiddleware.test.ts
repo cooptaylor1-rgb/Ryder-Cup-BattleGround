@@ -16,6 +16,7 @@ vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', '');
 import {
     checkRateLimit,
     applyRateLimit,
+    applyRateLimitAsync,
     addRateLimitHeaders,
     getCorsHeaders,
     handleCorsPrelight,
@@ -177,6 +178,35 @@ describe('Rate Limiting', () => {
             expect(response!.headers.get('X-RateLimit-Limit')).toBe('2');
             expect(response!.headers.get('X-RateLimit-Remaining')).toBe('0');
             expect(response!.headers.get('X-RateLimit-Reset')).toBeTruthy();
+        });
+    });
+
+
+    describe('applyRateLimitAsync', () => {
+        it('supports distributed redis-rest backend for async rate limiting', async () => {
+            vi.stubEnv('RATE_LIMIT_BACKEND', 'redis-rest');
+            vi.stubEnv('RATE_LIMIT_REDIS_REST_URL', 'https://redis.example.com');
+            vi.stubEnv('RATE_LIMIT_REDIS_REST_TOKEN', 'secret');
+
+            const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+                ok: true,
+                json: async () => [{ result: 3 }, { result: 1 }, { result: 42 }],
+            } as Response);
+
+            const req = createMockRequest('http://localhost:3000/api/test', {
+                ip: '192.168.1.9',
+            });
+
+            const response = await applyRateLimitAsync(req, { maxRequests: 2, windowMs: 60000 });
+
+            expect(response).not.toBeNull();
+            expect(response!.status).toBe(429);
+            expect(fetchSpy).toHaveBeenCalled();
+
+            fetchSpy.mockRestore();
+            vi.unstubAllEnvs();
+            vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
+            vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', '');
         });
     });
 

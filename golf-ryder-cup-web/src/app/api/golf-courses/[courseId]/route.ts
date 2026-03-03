@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 import { apiLogger } from '@/lib/utils/logger';
 
 /**
@@ -55,7 +55,7 @@ export async function GET(
     { params }: { params: Promise<{ courseId: string }> }
 ) {
     // Apply rate limiting
-    const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+    const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
     if (rateLimitError) {
         return rateLimitError;
     }

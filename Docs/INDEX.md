@@ -63,6 +63,7 @@ This index tracks all project documentation with ownership, status, and review c
 | [HardcodeAudit](HardcodeAudit.md) | Engineering | 🟡 Reviewed | Quarterly |
 | [CanonicalRiskRegister-Phase0-Step1](CanonicalRiskRegister-Phase0-Step1.md) | Engineering | 🟡 Reviewed | Weekly |
 | [PhaseCompletionStatus](PhaseCompletionStatus.md) | Engineering | 🟡 Reviewed | Weekly |
+| [SingleExecutionBoard](SingleExecutionBoard.md) | Engineering + Product | 🔴 Draft | Weekly |
 
 ---
 

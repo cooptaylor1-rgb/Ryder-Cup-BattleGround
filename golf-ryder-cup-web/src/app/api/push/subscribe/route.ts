@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { applyRateLimit, requireTripAccess, requireAuth } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, requireTripAccess, requireAuth } from '@/lib/utils/apiMiddleware';
 import { apiLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -119,7 +119,7 @@ async function removeSubscription(endpoint: string): Promise<boolean> {
  */
 export async function POST(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitResponse = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitResponse = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitResponse) {
     return rateLimitResponse;
   }

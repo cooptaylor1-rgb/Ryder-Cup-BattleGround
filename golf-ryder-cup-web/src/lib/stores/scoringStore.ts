@@ -25,6 +25,7 @@ import {
 } from '../services/scoringEngine';
 import { ScoringEventType } from '../types/events';
 import { queueSyncOperation } from '../services/tripSyncService';
+import { createCorrelationId, trackSyncFailure } from '../services/analyticsService';
 import { trackSyncFailure } from '../services/analyticsService';
 import {
     broadcastScoreUpdate,
@@ -352,6 +353,8 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                     };
                     queueSyncOperation('match', activeMatch.id, 'update', session.tripId, matchToSync);
 
+                    const scoreOperationCorrelationId = createCorrelationId('score-op');
+
                     // Broadcast to realtime subscribers (live page, spectators)
                     if (isSupabaseConfigured && supabase) {
                         const scoreUpdate = {
@@ -370,6 +373,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                                 matchId: activeMatch.id,
                                 tripId: session.tripId,
                                 reason: error instanceof Error ? error.message : 'unknown',
+                                correlationId: scoreOperationCorrelationId,
                             });
                         });
 
@@ -382,6 +386,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                                     matchId: activeMatch.id,
                                     tripId: session.tripId,
                                     reason: error instanceof Error ? error.message : 'unknown',
+                                    correlationId: scoreOperationCorrelationId,
                                 });
                             });
                         }
@@ -488,6 +493,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 operation: 'score_hole',
                 matchId: activeMatch.id,
                 reason: error instanceof Error ? error.message : 'unknown',
+                correlationId: createCorrelationId('score-op'),
             });
 
             set({

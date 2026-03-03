@@ -132,6 +132,104 @@ describe('Spectator Service', () => {
 
             expect(view.recentResults[0]?.result).toBe('1 UP');
         });
+
+        it('uses canonical snapshot winner when hole corrections create duplicate hole entries', () => {
+            const trip = {
+                id: 'trip-2',
+                name: 'Trip',
+                startDate: '2026-06-01',
+                endDate: '2026-06-03',
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-01T00:00:00.000Z',
+            } as const;
+
+            const teams = [
+                { id: 't1', tripId: 'trip-2', name: 'USA', color: 'usa', createdAt: '', updatedAt: '' },
+                { id: 't2', tripId: 'trip-2', name: 'EUR', color: 'europe', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const sessions = [
+                {
+                    id: 's1',
+                    tripId: 'trip-2',
+                    name: 'Singles',
+                    sessionNumber: 1,
+                    sessionType: 'singles',
+                    isComplete: false,
+                    isSessionLocked: false,
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            ] as const;
+
+            const matches = [
+                {
+                    id: 'm1',
+                    sessionId: 's1',
+                    matchOrder: 1,
+                    status: 'completed',
+                    currentHole: 3,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 1,
+                    holesRemaining: 15,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:00:00.000Z',
+                },
+            ] as const;
+
+            const holeResults = [
+                {
+                    id: 'h-1-old',
+                    matchId: 'm1',
+                    holeNumber: 1,
+                    winner: 'teamA' as const,
+                    timestamp: '2026-01-01T00:00:00.000Z',
+                },
+                {
+                    id: 'h-1-correction',
+                    matchId: 'm1',
+                    holeNumber: 1,
+                    winner: 'teamB' as const,
+                    timestamp: '2026-01-01T00:01:00.000Z',
+                },
+                {
+                    id: 'h-2',
+                    matchId: 'm1',
+                    holeNumber: 2,
+                    winner: 'teamB' as const,
+                    timestamp: '2026-01-01T00:02:00.000Z',
+                },
+                {
+                    id: 'h-3',
+                    matchId: 'm1',
+                    holeNumber: 3,
+                    winner: 'teamA' as const,
+                    timestamp: '2026-01-01T00:03:00.000Z',
+                },
+            ];
+
+            const players = [
+                { id: 'p1', firstName: 'Ann', lastName: 'A', createdAt: '', updatedAt: '' },
+                { id: 'p2', firstName: 'Bob', lastName: 'B', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const view = buildSpectatorView(
+                trip as never,
+                teams as never,
+                sessions as never,
+                matches as never,
+                holeResults as never,
+                players as never
+            );
+
+            expect(view.teamA.points).toBe(0);
+            expect(view.teamB.points).toBe(1);
+            expect(view.recentResults[0]?.result).toBe('1 DN');
+        });
     });
 
     describe('generateScoreboardText', () => {

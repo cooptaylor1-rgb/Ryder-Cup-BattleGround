@@ -174,21 +174,17 @@ function buildSpectatorMatch(
 function calculateMatchWinner(
     results: HoleResult[]
 ): { winner: 'teamA' | 'teamB' | 'halved'; margin: number } {
-    let teamAWins = 0;
-    let teamBWins = 0;
+    const snapshot = calculateMatchStateSnapshot(results);
+    const margin = Math.abs(snapshot.currentScore);
 
-    for (const hr of results) {
-        if (hr.winner === 'teamA') teamAWins++;
-        else if (hr.winner === 'teamB') teamBWins++;
+    if (snapshot.winningTeam === 'teamA') {
+        return { winner: 'teamA', margin };
     }
 
-    const margin = Math.abs(teamAWins - teamBWins);
-
-    if (teamAWins > teamBWins) {
-        return { winner: 'teamA', margin };
-    } else if (teamBWins > teamAWins) {
+    if (snapshot.winningTeam === 'teamB') {
         return { winner: 'teamB', margin };
     }
+
     return { winner: 'halved', margin: 0 };
 }
 

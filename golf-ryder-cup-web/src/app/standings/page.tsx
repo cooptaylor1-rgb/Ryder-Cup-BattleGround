@@ -13,6 +13,13 @@ import {
 } from '@/lib/services/tournamentEngine';
 import { computeAwards, calculatePlayerStats } from '@/lib/services/awardsService';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  createCorrelationId,
+  trackSocialAction,
+  trackStandingsPublished,
+  trackStandingsTabChanged,
+  trackStandingsViewed,
+} from '@/lib/services/analyticsService';
 import { trackSocialAction, trackStandingsViewed, trackStandingsTabChanged } from '@/lib/services/analyticsService';
 import { STAT_DEFINITIONS, type TripStatType } from '@/lib/types/tripStats';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
@@ -110,6 +117,7 @@ export default function StandingsPage() {
     trackStandingsViewed({
       tripId: currentTrip.id,
       activeTab,
+      correlationId: createCorrelationId('standings-view'),
     });
   }, [activeTab, currentTrip, isLoading]);
 
@@ -118,6 +126,7 @@ export default function StandingsPage() {
     trackStandingsTabChanged({
       tripId: currentTrip.id,
       tab: activeTab,
+      correlationId: createCorrelationId('standings-tab'),
     });
   }, [activeTab, currentTrip, isLoading]);
 
@@ -135,6 +144,12 @@ export default function StandingsPage() {
 
       if (shared) {
         showToast('success', 'Standings shared');
+        const correlationId = createCorrelationId('standings-publish');
+        trackStandingsPublished({
+          tripId: currentTrip.id,
+          method: 'share',
+          correlationId,
+        });
         trackSocialAction({
           action: 'share',
           target_type: 'standings',
@@ -142,6 +157,11 @@ export default function StandingsPage() {
         });
       } else {
         showToast('info', 'Standings downloaded');
+        trackStandingsPublished({
+          tripId: currentTrip.id,
+          method: 'download',
+          correlationId: createCorrelationId('standings-publish'),
+        });
       }
     } catch (error) {
       logger.error('Failed to share standings', { error });

@@ -105,6 +105,7 @@ export function BottomNav({ badges = {}, activeMatchId }: BottomNavProps) {
               WebkitTapHighlightColor: 'transparent',
             }}
             aria-current={active ? 'page' : undefined}
+            aria-label={item.href === '/score' && activeMatchId ? 'Score (continue active match)' : item.label}
           >
             {/* Active indicator — refined gold bar */}
             {active && (

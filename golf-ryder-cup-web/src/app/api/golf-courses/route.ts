@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
-import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 import { courseSearchParamsSchema, formatZodError } from '@/lib/validations/api';
 
 const API_BASE_URL = 'https://api.golfcourseapi.com/v1';
@@ -30,7 +30,7 @@ function getApiKey(): string | null {
 
 export async function GET(request: NextRequest) {
     // Apply rate limiting
-    const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+    const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
     if (rateLimitError) {
         return rateLimitError;
     }
