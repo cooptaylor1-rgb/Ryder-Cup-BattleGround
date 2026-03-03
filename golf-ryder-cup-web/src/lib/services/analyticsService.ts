@@ -355,6 +355,10 @@ export function trackScoreUndo(options: { matchId: string; hole: number; correla
     match_id: options.matchId,
     hole: options.hole,
     correlation_id: options.correlationId || null,
+export function trackScoreUndo(options: { matchId: string; hole: number }): void {
+  track('score_undo', 'scoring', {
+    match_id: options.matchId,
+    hole: options.hole,
   });
 }
 

@@ -20,6 +20,7 @@ import {
   trackStandingsTabChanged,
   trackStandingsViewed,
 } from '@/lib/services/analyticsService';
+import { trackSocialAction, trackStandingsViewed, trackStandingsTabChanged } from '@/lib/services/analyticsService';
 import { STAT_DEFINITIONS, type TripStatType } from '@/lib/types/tripStats';
 import type { TeamStandings, MagicNumber, PlayerLeaderboard } from '@/lib/types/computed';
 import type { Award, PlayerStats } from '@/lib/types/awards';

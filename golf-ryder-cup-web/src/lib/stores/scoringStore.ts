@@ -26,6 +26,7 @@ import {
 import { ScoringEventType } from '../types/events';
 import { queueSyncOperation } from '../services/tripSyncService';
 import { createCorrelationId, trackSyncFailure } from '../services/analyticsService';
+import { trackSyncFailure } from '../services/analyticsService';
 import {
     broadcastScoreUpdate,
     broadcastMatchUpdate,

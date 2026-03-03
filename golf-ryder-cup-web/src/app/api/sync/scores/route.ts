@@ -176,6 +176,18 @@ export async function POST(request: NextRequest) {
     apiLogger.error('[API] Score sync error', {
       reason: error instanceof Error ? error.message : 'Unknown error',
       correlationId,
+      });
+    }
+
+    return NextResponse.json({
+      success: results.failed === 0,
+      synced: results.synced,
+      failed: results.failed,
+      errors: results.errors.length > 0 ? results.errors : undefined,
+    });
+  } catch (error) {
+    apiLogger.error('[API] Score sync error', {
+      reason: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
       {

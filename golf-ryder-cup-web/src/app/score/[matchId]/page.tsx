@@ -28,6 +28,7 @@ import { addAuditLogEntry, db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
 import { createCorrelationId, trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
+import { trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
 import {
   Undo2,
