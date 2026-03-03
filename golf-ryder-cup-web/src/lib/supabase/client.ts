@@ -46,10 +46,23 @@ export function getSupabase(): SupabaseClient<Database> {
  */
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
+
+const EMPTY_FILTER_UUID = '00000000-0000-0000-0000-000000000000';
+
+export function buildUuidInFilter(column: 'session_id' | 'match_id', ids: string[]): string {
+    const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+
+    if (uniqueIds.length === 0) {
+        return `${column}=eq.${EMPTY_FILTER_UUID}`;
+    }
+
+    return `${column}=in.(${uniqueIds.join(',')})`;
+}
+
 /**
  * Subscribe to real-time changes for a specific trip
  */
-export function subscribeTripChannel(
+export async function subscribeTripChannel(
     tripId: string,
     onStatusChange: (status: ConnectionStatus) => void,
     handlers: {
@@ -60,8 +73,36 @@ export function subscribeTripChannel(
         onPresenceJoin?: (key: string, presence: unknown) => void;
         onPresenceLeave?: (key: string, presence: unknown) => void;
     }
-): RealtimeChannel | null {
+): Promise<RealtimeChannel | null> {
     if (!supabase) return null;
+
+    const { data: sessions, error: sessionsError } = await supabase
+        .from('sessions')
+        .select('id')
+        .eq('trip_id', tripId);
+
+    if (sessionsError) {
+        onStatusChange('error');
+        return null;
+    }
+
+    const sessionIds = ((sessions ?? []) as Array<{ id: string }>).map((session) => session.id);
+
+    const { data: matches, error: matchesError } = sessionIds.length
+        ? await supabase
+              .from('matches')
+              .select('id')
+              .in('session_id', sessionIds)
+        : { data: [], error: null };
+
+    if (matchesError) {
+        onStatusChange('error');
+        return null;
+    }
+
+    const matchIds = ((matches ?? []) as Array<{ id: string }>).map((match) => match.id);
+    const matchesFilter = buildUuidInFilter('session_id', sessionIds);
+    const holeResultsFilter = buildUuidInFilter('match_id', matchIds);
 
     const channel = supabase
         .channel(`trip:${tripId}`, {
@@ -87,7 +128,7 @@ export function subscribeTripChannel(
                 event: '*',
                 schema: 'public',
                 table: 'matches',
-                filter: `session_id=in.(SELECT id FROM sessions WHERE trip_id=eq.${tripId})`,
+                filter: matchesFilter,
             },
             (payload) => {
                 handlers.onMatchUpdate?.(payload);
@@ -99,6 +140,7 @@ export function subscribeTripChannel(
                 event: '*',
                 schema: 'public',
                 table: 'hole_results',
+                filter: holeResultsFilter,
             },
             (payload) => {
                 handlers.onHoleResultUpdate?.(payload);

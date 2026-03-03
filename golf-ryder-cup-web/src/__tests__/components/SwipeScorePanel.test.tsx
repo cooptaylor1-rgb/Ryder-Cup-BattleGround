@@ -15,8 +15,19 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: ({
       children,
+      drag,
+      dragConstraints,
+      dragElastic,
+      onPanEnd,
       ...props
-    }: React.PropsWithChildren<{ style?: object; className?: string }>) => (
+    }: React.PropsWithChildren<{
+      style?: object;
+      className?: string;
+      drag?: unknown;
+      dragConstraints?: unknown;
+      dragElastic?: unknown;
+      onPanEnd?: unknown;
+    }>) => (
       <div {...props}>{children}</div>
     ),
   },

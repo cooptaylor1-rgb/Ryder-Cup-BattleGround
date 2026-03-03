@@ -124,6 +124,12 @@ export default function ScorePage() {
         return calculateMatchState(match, results);
     });
 
+    const quickContinueMatchId = useMemo(() => {
+        const inProgressMatches = matchStates.filter((state) => state.status === 'inProgress');
+        if (inProgressMatches.length !== 1) return undefined;
+        return inProgressMatches[0]?.match.id;
+    }, [matchStates]);
+
     const getMatchPlayers = (playerIds: string[]) => {
         return playerIds
             .map(id => players.find(p => p.id === id))
@@ -165,7 +171,7 @@ export default function ScorePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
+                <BottomNav activeMatchId={quickContinueMatchId} />
             </div>
         );
     }
@@ -192,7 +198,7 @@ export default function ScorePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
+                <BottomNav activeMatchId={quickContinueMatchId} />
             </div>
         );
     }
@@ -226,6 +232,22 @@ export default function ScorePage() {
                 )}
 
                 <hr className="divider" />
+
+                {quickContinueMatchId && (
+                    <section className="pt-[var(--space-6)]">
+                        <button
+                            onClick={() => handleMatchSelect(quickContinueMatchId)}
+                            className="card-editorial card-interactive flex w-full items-center justify-between gap-[var(--space-4)] p-[var(--space-5)] text-left"
+                            aria-label="Continue scoring active match"
+                        >
+                            <div>
+                                <p className="type-overline text-[var(--masters)]">Quick Action</p>
+                                <p className="type-title-sm mt-[var(--space-1)] text-[var(--ink)]">Continue Scoring</p>
+                            </div>
+                            <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
+                        </button>
+                    </section>
+                )}
 
                 {/* Matches - BUG-011 FIX: Wrap with ErrorBoundary for graceful error handling */}
                 <section className="pt-[var(--space-6)] pb-[var(--space-8)]">
@@ -296,7 +318,7 @@ export default function ScorePage() {
             </main>
 
             {/* Bottom Navigation */}
-            <BottomNav />
+            <BottomNav activeMatchId={quickContinueMatchId} />
         </div>
     );
 }
@@ -328,6 +350,7 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
     return (
         <button
             onClick={onClick}
+            aria-label={`Open Match ${matchNumber}${isUserMatch ? " (Your Match)" : ""}` }
             className={cn(
                 'card-editorial card-interactive relative w-full text-left transition-shadow',
                 isActive ? 'p-[var(--space-6)]' : 'p-[var(--space-5)]',

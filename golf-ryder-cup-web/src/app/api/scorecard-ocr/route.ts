@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { applyRateLimit, addRateLimitHeaders, requireJson, validateBodySize } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, addRateLimitHeaders, requireJson, validateBodySize } from '@/lib/utils/apiMiddleware';
 import { ocrLogger } from '@/lib/utils/logger';
 import { ocrRequestSchema, formatZodError, type OcrRequest, type OcrImageData } from '@/lib/validations/api';
 
@@ -188,7 +188,7 @@ Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
   // Apply rate limiting (more restrictive due to AI API costs)
-  const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitError) {
     return rateLimitError;
   }

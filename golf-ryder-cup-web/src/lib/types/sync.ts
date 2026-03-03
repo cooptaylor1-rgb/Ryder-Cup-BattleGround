@@ -29,4 +29,5 @@ export interface SyncQueueItem {
   createdAt: string;
   lastAttemptAt?: string;
   error?: string;
+  idempotencyKey?: string;
 }

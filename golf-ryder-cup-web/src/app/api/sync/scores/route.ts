@@ -18,7 +18,7 @@ import {
   formatZodError,
   type ScoreSyncPayload,
 } from '@/lib/validations/api';
-import { applyRateLimit, requireTripAccess } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, requireTripAccess } from '@/lib/utils/apiMiddleware';
 import { apiLogger } from '@/lib/utils/logger';
 
 // Initialize Supabase client
@@ -26,14 +26,23 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Rate limit config for score sync (30 requests per minute)
+
+function resolveCorrelationId(request: NextRequest): string {
+  const existing = request.headers.get('x-correlation-id')?.trim();
+  if (existing) return existing;
+  return `sync-${crypto.randomUUID()}`;
+}
+
 const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 1000,
   maxRequests: 30,
 };
 
 export async function POST(request: NextRequest) {
+  const correlationId = resolveCorrelationId(request);
+
   // Apply rate limiting
-  const rateLimitResponse = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
@@ -66,12 +75,16 @@ export async function POST(request: NextRequest) {
 
     // If no Supabase configured, acknowledge receipt (local-only mode)
     if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json({
-        success: true,
-        mode: 'local-only',
-        synced: payload.events.length,
-        message: 'Events acknowledged (no remote database configured)',
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          mode: 'local-only',
+          synced: payload.events.length,
+          correlationId,
+          message: 'Events acknowledged (no remote database configured)',
+        },
+        { headers: { 'x-correlation-id': correlationId } }
+      );
     }
 
     // Create Supabase client with service role for server-side operations
@@ -105,14 +118,29 @@ export async function POST(request: NextRequest) {
         if (error) {
           results.failed++;
           results.errors.push(`Event ${event.id}: ${error.message}`);
+          apiLogger.warn('[API] Sync event failure', {
+            matchId: payload.matchId,
+            tripId: payload.tripId ?? null,
+            eventId: event.id,
+            eventType: event.type,
+            reason: error.message,
+            correlationId,
+          });
         } else {
           results.synced++;
         }
       } catch (err) {
         results.failed++;
-        results.errors.push(
-          `Event ${event.id}: ${err instanceof Error ? err.message : 'Unknown error'}`
-        );
+        const reason = err instanceof Error ? err.message : 'Unknown error';
+        results.errors.push(`Event ${event.id}: ${reason}`);
+        apiLogger.warn('[API] Sync event exception', {
+          matchId: payload.matchId,
+          tripId: payload.tripId ?? null,
+          eventId: event.id,
+          eventType: event.type,
+          reason,
+          correlationId,
+        });
       }
     }
 
@@ -124,20 +152,38 @@ export async function POST(request: NextRequest) {
         .eq('id', payload.matchId);
     }
 
-    return NextResponse.json({
-      success: results.failed === 0,
-      synced: results.synced,
-      failed: results.failed,
-      errors: results.errors.length > 0 ? results.errors : undefined,
-    });
+    if (results.failed > 0) {
+      apiLogger.warn('[API] Score sync completed with failures', {
+        matchId: payload.matchId,
+        tripId: payload.tripId ?? null,
+        synced: results.synced,
+        failed: results.failed,
+        correlationId,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: results.failed === 0,
+        synced: results.synced,
+        failed: results.failed,
+        correlationId,
+        errors: results.errors.length > 0 ? results.errors : undefined,
+      },
+      { headers: { 'x-correlation-id': correlationId } }
+    );
   } catch (error) {
-    apiLogger.error('[API] Score sync error:', error);
+    apiLogger.error('[API] Score sync error', {
+      reason: error instanceof Error ? error.message : 'Unknown error',
+      correlationId,
+    });
     return NextResponse.json(
       {
         error: 'Internal server error',
+        correlationId,
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500, headers: { 'x-correlation-id': correlationId } }
     );
   }
 }

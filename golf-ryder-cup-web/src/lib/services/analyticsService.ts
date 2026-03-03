@@ -337,6 +337,82 @@ export function trackEngagement(options: {
   });
 }
 
+
+export interface CorrelationEventContext {
+  correlationId?: string;
+}
+
+export function createCorrelationId(prefix = 'evt'): string {
+  const suffix = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}-${suffix}`;
+}
+
+
+export function trackScoreUndo(options: { matchId: string; hole: number; correlationId?: string }): void {
+  track('score_undo', 'scoring', {
+    match_id: options.matchId,
+    hole: options.hole,
+    correlation_id: options.correlationId || null,
+  });
+}
+
+export function trackSyncFailure(options: {
+  area: 'sync_queue' | 'realtime_broadcast' | 'api_sync';
+  operation: string;
+  matchId?: string;
+  tripId?: string;
+  reason?: string;
+  correlationId?: string;
+}): void {
+  track('sync_failure', 'error', {
+    area: options.area,
+    operation: options.operation,
+    match_id: options.matchId || null,
+    trip_id: options.tripId || null,
+    reason: options.reason || null,
+    correlation_id: options.correlationId || null,
+  });
+}
+
+export function trackStandingsViewed(options: {
+  tripId: string;
+  activeTab: 'competition' | 'stats' | 'awards';
+  correlationId?: string;
+}): void {
+  track('standings_viewed', 'engagement', {
+    trip_id: options.tripId,
+    tab: options.activeTab,
+    correlation_id: options.correlationId || null,
+  });
+}
+
+export function trackStandingsTabChanged(options: {
+  tripId: string;
+  tab: 'competition' | 'stats' | 'awards';
+  correlationId?: string;
+}): void {
+  track('standings_tab_changed', 'engagement', {
+    trip_id: options.tripId,
+    tab: options.tab,
+    correlation_id: options.correlationId || null,
+  });
+}
+
+
+export function trackStandingsPublished(options: {
+  tripId: string;
+  method: 'share' | 'download';
+  correlationId?: string;
+}): void {
+  track('standings_published', 'engagement', {
+    trip_id: options.tripId,
+    method: options.method,
+    correlation_id: options.correlationId || null,
+  });
+}
+
 // ============================================
 // WEB VITALS TRACKING
 // ============================================

@@ -69,6 +69,8 @@ import {
   type SyncOperation,
   type SyncEntity,
   type SyncQueueItem,
+  buildSyncOperationKey,
+  resolveSyncOperationTransition,
 } from '../lib/services/tripSyncService';
 
 describe('Trip Sync Service', () => {
@@ -126,6 +128,40 @@ describe('Trip Sync Service', () => {
     });
   });
 
+
+
+  describe('buildSyncOperationKey', () => {
+    it('generates deterministic key for identical operations', () => {
+      const a = buildSyncOperationKey('match', 'm-1', 'update', 'trip-1');
+      const b = buildSyncOperationKey('match', 'm-1', 'update', 'trip-1');
+      expect(a).toBe(b);
+    });
+
+    it('changes key when operation changes', () => {
+      const createKey = buildSyncOperationKey('match', 'm-1', 'create', 'trip-1');
+      const updateKey = buildSyncOperationKey('match', 'm-1', 'update', 'trip-1');
+      expect(createKey).not.toBe(updateKey);
+    });
+  });
+
+  describe('resolveSyncOperationTransition', () => {
+    it('keeps create when update follows create', () => {
+      expect(resolveSyncOperationTransition('create', 'update')).toBe('create');
+    });
+
+    it('cancels out create followed by delete', () => {
+      expect(resolveSyncOperationTransition('create', 'delete')).toBe('noop');
+    });
+
+    it('converts update followed by delete to delete', () => {
+      expect(resolveSyncOperationTransition('update', 'delete')).toBe('delete');
+    });
+
+    it('converts delete followed by create to update', () => {
+      expect(resolveSyncOperationTransition('delete', 'create')).toBe('update');
+    });
+  });
+
   describe('Sync Queue Types', () => {
     it('supports all entity types', () => {
       const entities: SyncEntity[] = [
@@ -166,6 +202,7 @@ describe('SyncQueueItem Structure', () => {
       status: 'pending',
       retryCount: 0,
       createdAt: new Date().toISOString(),
+      idempotencyKey: 'trip-1:trip:trip-1:create',
     };
 
     expect(item.id).toBe('test-id');

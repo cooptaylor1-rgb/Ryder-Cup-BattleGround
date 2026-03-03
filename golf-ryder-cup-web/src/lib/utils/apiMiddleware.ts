@@ -22,7 +22,7 @@ interface RateLimitStore {
 // In-memory rate limit store (use Redis in production for distributed systems)
 const rateLimitStore = new Map<string, RateLimitStore>();
 
-interface RateLimitConfig {
+export interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
   maxRequests: number; // Maximum requests per window
   keyGenerator?: (req: NextRequest) => string; // Custom key generator
@@ -32,6 +32,92 @@ const DEFAULT_RATE_LIMIT_CONFIG: RateLimitConfig = {
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 60, // 60 requests per minute
 };
+
+
+type RateLimitBackend = 'memory' | 'redis-rest';
+
+function getRateLimitBackend(): RateLimitBackend {
+  const configured = process.env.RATE_LIMIT_BACKEND?.trim().toLowerCase();
+  if (configured === 'redis-rest') {
+    return 'redis-rest';
+  }
+
+  if (process.env.RATE_LIMIT_REDIS_REST_URL && process.env.RATE_LIMIT_REDIS_REST_TOKEN) {
+    return 'redis-rest';
+  }
+
+  return 'memory';
+}
+
+async function checkRateLimitRedisRest(
+  req: NextRequest,
+  config: Required<Pick<RateLimitConfig, 'windowMs' | 'maxRequests'>> & Pick<RateLimitConfig, 'keyGenerator'>
+): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  const redisRestUrl = process.env.RATE_LIMIT_REDIS_REST_URL;
+  const redisRestToken = process.env.RATE_LIMIT_REDIS_REST_TOKEN;
+
+  if (!redisRestUrl || !redisRestToken) {
+    return checkRateLimit(req, config);
+  }
+
+  const key = config.keyGenerator ? config.keyGenerator(req) : getClientId(req);
+  const now = Date.now();
+  const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
+  const prefixedKey = `rate-limit:${key}`;
+
+  try {
+    const response = await fetch(`${redisRestUrl.replace(/\/$/, '')}/pipeline`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${redisRestToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([
+        ['INCR', prefixedKey],
+        ['EXPIRE', prefixedKey, String(windowSeconds), 'NX'],
+        ['TTL', prefixedKey],
+      ]),
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      return checkRateLimit(req, config);
+    }
+
+    const payload = (await response.json()) as Array<{ result?: number | string }>;
+    const count = Number(payload?.[0]?.result ?? 0);
+    const ttlSeconds = Number(payload?.[2]?.result ?? windowSeconds);
+    const safeTtl = ttlSeconds > 0 ? ttlSeconds : windowSeconds;
+
+    const remaining = Math.max(0, config.maxRequests - count);
+    const allowed = count <= config.maxRequests;
+
+    return {
+      allowed,
+      remaining,
+      resetTime: now + safeTtl * 1000,
+    };
+  } catch {
+    // Fail open to in-memory limiter if distributed backend is unavailable.
+    return checkRateLimit(req, config);
+  }
+}
+
+export async function checkRateLimitAsync(
+  req: NextRequest,
+  config: Partial<RateLimitConfig> = {}
+): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  const mergedConfig = {
+    ...DEFAULT_RATE_LIMIT_CONFIG,
+    ...config,
+  };
+
+  if (getRateLimitBackend() === 'redis-rest') {
+    return checkRateLimitRedisRest(req, mergedConfig);
+  }
+
+  return checkRateLimit(req, mergedConfig);
+}
 
 /**
  * Get client identifier for rate limiting
@@ -101,6 +187,37 @@ export function applyRateLimit(
   config?: Partial<RateLimitConfig>
 ): NextResponse | null {
   const { allowed, remaining, resetTime } = checkRateLimit(req, config);
+
+  if (!allowed) {
+    return NextResponse.json(
+      {
+        error: 'Too many requests',
+        message: 'Rate limit exceeded. Please try again later.',
+        retryAfter: Math.ceil((resetTime - Date.now()) / 1000),
+      },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.ceil((resetTime - Date.now()) / 1000)),
+          'X-RateLimit-Limit': String(config?.maxRequests || DEFAULT_RATE_LIMIT_CONFIG.maxRequests),
+          'X-RateLimit-Remaining': String(remaining),
+          'X-RateLimit-Reset': String(Math.ceil(resetTime / 1000)),
+        },
+      }
+    );
+  }
+
+  return null;
+}
+
+/**
+ * Apply rate limiting with distributed backend support.
+ */
+export async function applyRateLimitAsync(
+  req: NextRequest,
+  config?: Partial<RateLimitConfig>
+): Promise<NextResponse | null> {
+  const { allowed, remaining, resetTime } = await checkRateLimitAsync(req, config);
 
   if (!allowed) {
     return NextResponse.json(
@@ -396,7 +513,7 @@ export async function withApiMiddleware(
   // Rate limiting
   if (options.rateLimit !== false) {
     const rateLimitConfig = typeof options.rateLimit === 'object' ? options.rateLimit : undefined;
-    const rateLimitError = applyRateLimit(req, rateLimitConfig);
+    const rateLimitError = await applyRateLimitAsync(req, rateLimitConfig);
     if (rateLimitError) {
       return { error: rateLimitError };
     }

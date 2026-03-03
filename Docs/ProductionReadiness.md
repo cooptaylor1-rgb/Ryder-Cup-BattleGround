@@ -262,3 +262,52 @@ npm run build
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0.0 | 2026-01-16 | Production Readiness Audit | Initial assessment |
+
+---
+
+## Phase 5 Release Safety Controls (2026-03-03)
+
+### Scope
+This section supersedes older baseline-only checklist language for the production-quality program and defines the Phase 5 release safety operating model.
+
+### 1) Canary Strategy
+- **Canary cohort:** 5% of authenticated traffic for 30 minutes.
+- **Auto-promote gates:**
+  - error-rate delta <= +0.5%
+  - p95 score submit latency <= 300ms
+  - sync-failure event rate <= 0.5% of sync attempts
+- **Abort conditions:** any gate breach for 5 consecutive minutes.
+
+### 2) Rollback Protocol
+- **Trigger:** gate breach or incident commander declaration.
+- **Rollback SLA:** <= 10 minutes from trigger.
+- **Steps:**
+  1. Disable release feature flags.
+  2. Route traffic to previous stable build.
+  3. Verify health endpoints and scoreboard/sync smoke checks.
+  4. Annotate incident timeline with correlation IDs from failing requests.
+
+### 3) Preflight Checklist (Per Release Window)
+- [ ] Branch is green for `npm run -s typecheck` and `npm run -s test`.
+- [ ] Schema migrations reviewed and reversible.
+- [ ] Critical telemetry events observed in staging:
+  - `score_undo`
+  - `sync_failure`
+  - `standings_viewed`
+  - `standings_tab_changed`
+  - `standings_published`
+- [ ] `x-correlation-id` present in `/api/sync/scores` response and logs.
+- [ ] On-call + rollback owner assigned.
+
+### 4) Release Simulation Drill (Required)
+- Run one simulated failure during canary and execute rollback.
+- Capture evidence:
+  - incident start/stop timestamps
+  - rollback completion timestamp
+  - correlation IDs used in triage
+  - post-rollback verification output
+
+### 5) Ownership
+- **Release captain:** Platform on-call
+- **Incident commander:** Rotating engineering lead
+- **Verification buddy:** App engineer not authoring release

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
-import { applyRateLimit, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 
 /**
  * Golf Course Search API
@@ -63,7 +63,7 @@ interface _CourseDetails {
 
 export async function GET(request: NextRequest) {
     // Apply rate limiting
-    const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+    const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
     if (rateLimitError) {
         return rateLimitError;
     }

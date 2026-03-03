@@ -5,7 +5,7 @@ import {
   incrementCourseUsage,
 } from '@/lib/services/courseLibrarySyncService';
 import { apiLogger } from '@/lib/utils/logger';
-import { applyRateLimit } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync } from '@/lib/utils/apiMiddleware';
 import {
   courseLibrarySearchSchema,
   courseLibraryGetSchema,
@@ -41,7 +41,7 @@ interface SearchResult {
  */
 export async function GET(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitError) return rateLimitError;
 
   const { searchParams } = new URL(request.url);
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitError = applyRateLimit(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
   if (rateLimitError) return rateLimitError;
 
   try {

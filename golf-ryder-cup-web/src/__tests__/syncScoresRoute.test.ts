@@ -22,10 +22,10 @@ vi.mock('@supabase/supabase-js', () => ({
 }));
 
 // Helper to create mock NextRequest with JSON body
-function createMockRequest(body: unknown): NextRequest {
+function createMockRequest(body: unknown, extraHeaders?: Record<string, string>): NextRequest {
     return new NextRequest('http://localhost:3000/api/sync/scores', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...extraHeaders },
         body: JSON.stringify(body),
     });
 }
@@ -111,6 +111,22 @@ describe('Score Sync API Route', () => {
             expect(data.mode).toBe('local-only');
             expect(data.synced).toBe(2);
         });
+
+        it('returns correlation id header in local-only mode', async () => {
+            const req = createMockRequest(
+                {
+                    matchId: '550e8400-e29b-41d4-a716-446655440000',
+                    events: [],
+                },
+                { 'x-correlation-id': 'test-correlation-id' }
+            );
+
+            const response = await POST(req);
+            const data = await response.json();
+
+            expect(response.headers.get('x-correlation-id')).toBe('test-correlation-id');
+            expect(data.correlationId).toBe('test-correlation-id');
+        });
     });
 
     describe('With Supabase Configured', () => {
@@ -176,6 +192,7 @@ describe('Score Sync API Route', () => {
 
             const response = await POST(req);
             expect(response.status).toBe(500);
+            expect(response.headers.get('x-correlation-id')).toBeTruthy();
         });
     });
 });

@@ -21,6 +21,7 @@ import type {
 } from '@/lib/types/models';
 
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
+import { calculateMatchStateSnapshot } from '@/lib/services/scoringEngine';
 
 /**
  * Build spectator view for a trip
@@ -136,26 +137,19 @@ function buildSpectatorMatch(
         .map(p => `${p!.firstName[0]}. ${p!.lastName}`)
         .join(' & ');
 
-    // Calculate current score
-    const { winner, margin, thruHole } = calculateMatchScore(results);
+    // Calculate current score using shared scoring engine logic
+    const summary = calculateMatchStateSnapshot(results);
+    const margin = Math.abs(summary.currentScore);
+    const thruHole = summary.holesPlayed;
 
     let currentScore: string;
     if (match.status === 'completed') {
-        if (winner === 'halved') {
-            currentScore = 'Halved';
-        } else {
-            const holesRemaining = 18 - thruHole;
-            if (holesRemaining === 0) {
-                currentScore = `${margin} UP`;
-            } else {
-                currentScore = `${margin}&${holesRemaining}`;
-            }
-        }
+        currentScore = summary.winningTeam === 'halved' ? 'Halved' : summary.displayScore;
     } else if (match.status === 'inProgress') {
-        if (margin === 0) {
-            currentScore = 'AS'; // All Square
+        if (margin === 0 || !summary.winningTeam || summary.winningTeam === 'halved') {
+            currentScore = 'AS';
         } else {
-            const upTeam = winner === 'teamA' ? 'A' : 'B';
+            const upTeam = summary.winningTeam === 'teamA' ? 'A' : 'B';
             currentScore = `${upTeam} ${margin} UP`;
         }
     } else {
@@ -180,48 +174,18 @@ function buildSpectatorMatch(
 function calculateMatchWinner(
     results: HoleResult[]
 ): { winner: 'teamA' | 'teamB' | 'halved'; margin: number } {
-    let teamAWins = 0;
-    let teamBWins = 0;
+    const snapshot = calculateMatchStateSnapshot(results);
+    const margin = Math.abs(snapshot.currentScore);
 
-    for (const hr of results) {
-        if (hr.winner === 'teamA') teamAWins++;
-        else if (hr.winner === 'teamB') teamBWins++;
+    if (snapshot.winningTeam === 'teamA') {
+        return { winner: 'teamA', margin };
     }
 
-    const margin = Math.abs(teamAWins - teamBWins);
-
-    if (teamAWins > teamBWins) {
-        return { winner: 'teamA', margin };
-    } else if (teamBWins > teamAWins) {
+    if (snapshot.winningTeam === 'teamB') {
         return { winner: 'teamB', margin };
     }
+
     return { winner: 'halved', margin: 0 };
-}
-
-/**
- * Calculate current match score
- */
-function calculateMatchScore(
-    results: HoleResult[]
-): { winner: 'teamA' | 'teamB' | 'halved'; margin: number; thruHole: number } {
-    let teamAWins = 0;
-    let teamBWins = 0;
-    let maxHole = 0;
-
-    for (const hr of results) {
-        if (hr.winner === 'teamA') teamAWins++;
-        else if (hr.winner === 'teamB') teamBWins++;
-        maxHole = Math.max(maxHole, hr.holeNumber);
-    }
-
-    const margin = Math.abs(teamAWins - teamBWins);
-
-    if (teamAWins > teamBWins) {
-        return { winner: 'teamA', margin, thruHole: maxHole };
-    } else if (teamBWins > teamAWins) {
-        return { winner: 'teamB', margin, thruHole: maxHole };
-    }
-    return { winner: 'halved', margin: 0, thruHole: maxHole };
 }
 
 /**

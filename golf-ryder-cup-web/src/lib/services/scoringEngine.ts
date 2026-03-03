@@ -80,25 +80,27 @@ function normalizeHoleResults(holeResults: HoleResult[]): HoleResult[] {
 // MATCH STATE CALCULATION
 // ============================================
 
+
+export interface MatchStateSnapshot {
+  holeResults: HoleResult[];
+  currentScore: number;
+  teamAHolesWon: number;
+  teamBHolesWon: number;
+  holesPlayed: number;
+  holesRemaining: number;
+  isDormie: boolean;
+  isClosedOut: boolean;
+  status: MatchStatus;
+  displayScore: string;
+  winningTeam: 'teamA' | 'teamB' | 'halved' | null;
+}
+
 /**
- * Calculate the current state of a match from hole results.
- *
- * Match state includes:
- * - Score (e.g., "2 UP", "AS", "3 DN")
- * - Holes played
- * - Whether dormie (can't lose)
- * - Whether match is closed out
- * - Projected result
- *
- * @param match - The match to calculate state for
- * @param holeResults - Array of hole results for this match
- * @returns Calculated match state
+ * Shared scoring summary logic used by multiple surfaces (scoring, spectator, hooks).
  */
-export function calculateMatchState(match: Match, holeResults: HoleResult[]): MatchState {
-  // Normalize hole results by hole number (latest timestamp wins)
+export function calculateMatchStateSnapshot(holeResults: HoleResult[]): MatchStateSnapshot {
   const sortedResults = normalizeHoleResults(holeResults);
 
-  // Calculate running total
   let teamAHolesWon = 0;
   let teamBHolesWon = 0;
   let holesPlayed = 0;
@@ -116,33 +118,28 @@ export function calculateMatchState(match: Match, holeResults: HoleResult[]): Ma
     } else if (result.winner === 'halved') {
       holesPlayed++;
     }
-    // Skip 'none' (not yet recorded)
   }
 
   const currentScore = teamAHolesWon - teamBHolesWon;
   const holesRemaining = TOTAL_HOLES - holesPlayed;
 
-  // Dormie: ahead by exactly the number of holes remaining
   const isDormieTeamA = currentScore > 0 && currentScore === holesRemaining;
   const isDormieTeamB = currentScore < 0 && Math.abs(currentScore) === holesRemaining;
   const isDormie = isDormieTeamA || isDormieTeamB;
 
-  // Closed out: lead is greater than holes remaining
   const isClosedOut = Math.abs(currentScore) > holesRemaining;
 
-  // Determine status
   let status: MatchStatus = 'scheduled';
   if (holesPlayed > 0) {
     status = isClosedOut ? 'completed' : 'inProgress';
   }
-  // Only mark as completed if all holes have actual results (not 'none')
+
   const actualScoredHoles = sortedResults.filter((r) => r.winner !== 'none').length;
   if (actualScoredHoles === TOTAL_HOLES && !isClosedOut) {
     status = 'completed';
   }
 
   return {
-    match,
     holeResults: sortedResults,
     currentScore,
     teamAHolesWon,
@@ -154,6 +151,29 @@ export function calculateMatchState(match: Match, holeResults: HoleResult[]): Ma
     status,
     displayScore: formatMatchScore(currentScore, holesRemaining, isClosedOut, holesPlayed),
     winningTeam: determineWinningTeam(currentScore, holesPlayed, holesRemaining),
+  };
+}
+
+/**
+ * Calculate the current state of a match from hole results.
+ *
+ * Match state includes:
+ * - Score (e.g., "2 UP", "AS", "3 DN")
+ * - Holes played
+ * - Whether dormie (can't lose)
+ * - Whether match is closed out
+ * - Projected result
+ *
+ * @param match - The match to calculate state for
+ * @param holeResults - Array of hole results for this match
+ * @returns Calculated match state
+ */
+export function calculateMatchState(match: Match, holeResults: HoleResult[]): MatchState {
+  const snapshot = calculateMatchStateSnapshot(holeResults);
+
+  return {
+    match,
+    ...snapshot,
   };
 }
 
@@ -702,6 +722,7 @@ export async function finalizeMatch(matchId: string): Promise<void> {
 export const ScoringEngine = {
   // Match state
   calculateMatchState,
+  calculateMatchStateSnapshot,
   formatMatchScore,
 
   // Hole results

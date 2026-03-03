@@ -25,6 +25,7 @@ import {
 } from '../services/scoringEngine';
 import { ScoringEventType } from '../types/events';
 import { queueSyncOperation } from '../services/tripSyncService';
+import { createCorrelationId, trackSyncFailure } from '../services/analyticsService';
 import {
     broadcastScoreUpdate,
     broadcastMatchUpdate,
@@ -351,6 +352,8 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                     };
                     queueSyncOperation('match', activeMatch.id, 'update', session.tripId, matchToSync);
 
+                    const scoreOperationCorrelationId = createCorrelationId('score-op');
+
                     // Broadcast to realtime subscribers (live page, spectators)
                     if (isSupabaseConfigured && supabase) {
                         const scoreUpdate = {
@@ -362,11 +365,29 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                             updatedBy: '',
                             updatedByName: '',
                         };
-                        broadcastScoreUpdate(supabase, session.tripId, activeMatch.id, scoreUpdate).catch(() => {});
+                        broadcastScoreUpdate(supabase, session.tripId, activeMatch.id, scoreUpdate).catch((error) => {
+                            trackSyncFailure({
+                                area: 'realtime_broadcast',
+                                operation: 'broadcast_score_update',
+                                matchId: activeMatch.id,
+                                tripId: session.tripId,
+                                reason: error instanceof Error ? error.message : 'unknown',
+                                correlationId: scoreOperationCorrelationId,
+                            });
+                        });
 
                         // Broadcast match update if match just completed
                         if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
-                            broadcastMatchUpdate(supabase, session.tripId, matchToSync as Match).catch(() => {});
+                            broadcastMatchUpdate(supabase, session.tripId, matchToSync as Match).catch((error) => {
+                                trackSyncFailure({
+                                    area: 'realtime_broadcast',
+                                    operation: 'broadcast_match_update',
+                                    matchId: activeMatch.id,
+                                    tripId: session.tripId,
+                                    reason: error instanceof Error ? error.message : 'unknown',
+                                    correlationId: scoreOperationCorrelationId,
+                                });
+                            });
                         }
                     }
 
@@ -466,6 +487,14 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 lastSavedAt: new Date(),
             });
         } catch (error) {
+            trackSyncFailure({
+                area: 'sync_queue',
+                operation: 'score_hole',
+                matchId: activeMatch.id,
+                reason: error instanceof Error ? error.message : 'unknown',
+                correlationId: createCorrelationId('score-op'),
+            });
+
             set({
                 error: error instanceof Error ? error.message : 'Failed to save score',
                 isSaving: false,

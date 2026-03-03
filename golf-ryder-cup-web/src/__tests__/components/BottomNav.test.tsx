@@ -73,6 +73,13 @@ describe('BottomNav Component', () => {
       expect(mockPush).toHaveBeenCalledWith('/schedule');
     });
 
+
+    it('navigates to active match when Score is clicked and activeMatchId is provided', () => {
+      render(<BottomNav activeMatchId="match-123" />);
+      fireEvent.click(screen.getByText('Score'));
+      expect(mockPush).toHaveBeenCalledWith('/score/match-123');
+    });
+
     it('navigates to standings when Standings is clicked', () => {
       render(<BottomNav />);
       fireEvent.click(screen.getByText('Standings'));
@@ -221,6 +228,12 @@ describe('BottomNav Component', () => {
       render(<BottomNav />);
       const todayButton = screen.getByText('Today').closest('button');
       expect(todayButton).toHaveAttribute('aria-current', 'page');
+    });
+
+
+    it('uses continue-match aria-label on score button when active match exists', () => {
+      render(<BottomNav activeMatchId="match-123" />);
+      expect(screen.getByLabelText('Score (continue active match)')).toBeInTheDocument();
     });
   });
 });
