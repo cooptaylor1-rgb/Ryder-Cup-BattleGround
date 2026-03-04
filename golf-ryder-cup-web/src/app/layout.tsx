@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { Suspense } from 'react';
 import { PWAProvider } from '@/components/PWAProvider';
@@ -20,6 +21,21 @@ import { CourseSyncInitializer } from '@/components/CourseSyncInitializer';
 import { TripSyncInitializer } from '@/components/TripSyncInitializer';
 import { CapacitorProvider } from '@/components/CapacitorProvider';
 import { baseMetadata, viewport as baseViewport } from '@/lib/utils/metadata';
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-jakarta',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const instrument = Instrument_Serif({
+  subsets: ['latin'],
+  variable: '--font-instrument',
+  display: 'swap',
+  weight: ['400'],
+  style: ['normal', 'italic'],
+});
 
 export const metadata: Metadata = {
   ...baseMetadata,
@@ -57,7 +73,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="outdoor">
+    <html lang="en" className={`outdoor ${jakarta.variable} ${instrument.variable}`}>
       <head>
         {/* iOS App Icons */}
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
