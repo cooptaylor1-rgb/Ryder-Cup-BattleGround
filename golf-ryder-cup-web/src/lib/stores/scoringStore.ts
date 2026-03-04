@@ -8,628 +8,307 @@
  */
 
 import { create } from 'zustand';
-import type {
-    Match,
-    HoleResult,
-    HoleWinner,
-    RyderCupSession,
-    PlayerHoleScore,
-} from '../types/models';
-import type { MatchState } from '../types/computed';
-import { db } from '../db';
-import {
-    calculateMatchState,
-    recordHoleResult,
-    undoLastScore,
-    getCurrentHole,
-} from '../services/scoringEngine';
-import { ScoringEventType } from '../types/events';
-import { queueSyncOperation } from '../services/tripSyncService';
-import { createCorrelationId, trackSyncFailure } from '../services/analyticsService';
-import { trackSyncFailure } from '../services/analyticsService';
-import {
-    broadcastScoreUpdate,
-    broadcastMatchUpdate,
-    calculateCupScore,
-} from '../services/realtimeSyncService';
-import { checkForDrama } from '../services/dramaNotificationService';
-import { generateTrashTalk } from '../services/autoTrashTalkService';
-import { supabase, isSupabaseConfigured } from '../supabase/client';
+import { persist, devtools } from 'zustand/middleware';
+import { db } from '@/lib/db';
 
 // ============================================
 // TYPES
 // ============================================
 
+type ScoreValue = number | null;
+
+interface ScoreEntry {
+  playerId: string;
+  hole: number;
+  score: ScoreValue;
+  timestamp: number;
+}
+
 interface ScoringState {
-    // Active scoring context
-    activeMatch: Match | null;
-    activeMatchState: MatchState | null;
-    activeSession: RyderCupSession | null; // P0-6: Track session for lock status
-    currentHole: number;
+  // Active match
+  activeMatchId: string | null;
 
-    // All matches for current session
-    sessionMatches: Match[];
-    matchStates: Map<string, MatchState>;
+  // Scores: { [playerId]: { [hole]: score } }
+  scores: Record<string, Record<number, ScoreValue>>;
 
-    // UI state
-    isLoading: boolean;
-    isSaving: boolean;
-    error: string | null;
-    lastSavedAt: Date | null;
+  // Undo stack
+  undoStack: ScoreEntry[];
 
-    // Undo stack (for optimistic updates)
-    undoStack: Array<{
-        matchId: string;
-        holeNumber: number;
-        previousResult: HoleResult | null;
-    }>;
+  // Sync state
+  isSyncing: boolean;
+  lastSyncTime: Date | null;
+  syncError: string | null;
+  pendingSync: ScoreEntry[];
 
-    // P0-6: Session lock helpers
-    isSessionLocked: () => boolean;
-
-    // Actions
-    loadSessionMatches: (sessionId: string) => Promise<void>;
-    selectMatch: (matchId: string) => Promise<void>;
-    clearActiveMatch: () => void;
-
-    // Scoring actions
-    scoreHole: (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => Promise<void>;
-    undoLastHole: () => Promise<void>;
-    goToHole: (holeNumber: number) => void;
-    nextHole: () => void;
-    prevHole: () => void;
-
-    // Batch operations
-    refreshMatchState: (matchId: string) => Promise<void>;
-    refreshAllMatchStates: () => Promise<void>;
+  // Actions
+  initMatch: (matchId: string) => Promise<void>;
+  updateScore: (playerId: string, hole: number, score: ScoreValue) => void;
+  undoLastScore: () => void;
+  submitScores: (matchId: string) => Promise<void>;
+  resetMatch: (matchId: string) => void;
+  syncPendingScores: () => Promise<void>;
 }
 
 // ============================================
 // STORE
 // ============================================
 
-export const useScoringStore = create<ScoringState>((set, get) => ({
-    // Initial state
-    activeMatch: null,
-    activeMatchState: null,
-    activeSession: null,
-    currentHole: 1,
-    sessionMatches: [],
-    matchStates: new Map(),
-    isLoading: false,
-    isSaving: false,
-    error: null,
-    lastSavedAt: null,
-    undoStack: [],
+export const useScoringStore = create<ScoringState>()(
+  devtools(
+    persist(
+      (set, get) => ({
+        // Initial state
+        activeMatchId: null,
+        scores: {},
+        undoStack: [],
+        isSyncing: false,
+        lastSyncTime: null,
+        syncError: null,
+        pendingSync: [],
 
-    // P0-6: Check if session is locked
-    isSessionLocked: () => {
-        return get().activeSession?.isLocked ?? false;
-    },
+        // ----------------------------------------
+        // INIT MATCH
+        // ----------------------------------------
 
-    // Load all matches for a session
-    loadSessionMatches: async (sessionId: string) => {
-        set({ isLoading: true, error: null });
+        initMatch: async (matchId: string) => {
+          try {
+            // Load existing scores from DB
+            const existingScores = await db.scoreEntries
+              .where('matchId')
+              .equals(matchId)
+              .toArray();
 
-        try {
-            const matches = await db.matches
-                .where('sessionId')
-                .equals(sessionId)
-                .sortBy('matchNumber');
+            const scoresMap: Record<string, Record<number, ScoreValue>> = {};
 
-            // Load all hole results
-            const matchIds = matches.map(m => m.id);
-            const allResults = await db.holeResults
-                .where('matchId')
-                .anyOf(matchIds)
-                .toArray();
-
-            // Group by match
-            const resultsByMatch = new Map<string, HoleResult[]>();
-            for (const result of allResults) {
-                const existing = resultsByMatch.get(result.matchId) || [];
-                existing.push(result);
-                resultsByMatch.set(result.matchId, existing);
-            }
-
-            // Calculate states
-            const matchStates = new Map<string, MatchState>();
-            for (const match of matches) {
-                const results = resultsByMatch.get(match.id) || [];
-                const state = calculateMatchState(match, results);
-                matchStates.set(match.id, state);
-            }
-
-            set({
-                sessionMatches: matches,
-                matchStates,
-                isLoading: false,
-            });
-        } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to load matches',
-                isLoading: false,
-            });
-        }
-    },
-
-    // Select a match for active scoring
-    selectMatch: async (matchId: string) => {
-        set({ isLoading: true, error: null });
-
-        try {
-            const match = await db.matches.get(matchId);
-            if (!match) {
-                throw new Error('Match not found');
-            }
-
-            // P0-6: Load session for lock status
-            const session = await db.sessions.get(match.sessionId);
-
-            const holeResults = await db.holeResults
-                .where('matchId')
-                .equals(matchId)
-                .toArray();
-
-            const matchState = calculateMatchState(match, holeResults);
-            const nextHole = await getCurrentHole(matchId);
-
-            // Reconstruct undo stack from persisted scoring events
-            // BUG-001 FIX: Track state chronologically through events instead of
-            // looking up current holeResults (which have already been modified)
-            const scoringEvents = await db.scoringEvents
-                .where('matchId')
-                .equals(matchId)
-                .sortBy('timestamp');
-
-            // Build undo stack by tracking state changes through events chronologically
-            const undoStack: Array<{
-                matchId: string;
-                holeNumber: number;
-                previousResult: HoleResult | null;
-            }> = [];
-
-            // Track the state of each hole as we replay events
-            const holeStateMap = new Map<number, HoleResult | null>();
-
-            for (const event of scoringEvents) {
-                if (event.eventType === ScoringEventType.HoleScored) {
-                    const payload = event.payload as {
-                        holeNumber: number;
-                        winner: HoleWinner;
-                        teamAStrokes?: number;
-                        teamBStrokes?: number;
-                    };
-                    // For a new score, the previous state was null (no result)
-                    undoStack.push({
-                        matchId: event.matchId,
-                        holeNumber: payload.holeNumber,
-                        previousResult: holeStateMap.get(payload.holeNumber) ?? null,
-                    });
-                    // Update tracked state
-                    holeStateMap.set(payload.holeNumber, {
-                        id: '', // Not needed for undo
-                        matchId: event.matchId,
-                        holeNumber: payload.holeNumber,
-                        winner: payload.winner,
-                        teamAScore: payload.teamAStrokes,
-                        teamBScore: payload.teamBStrokes,
-                        timestamp: event.timestamp,
-                    });
-                } else if (event.eventType === ScoringEventType.HoleEdited) {
-                    const payload = event.payload as {
-                        holeNumber: number;
-                        previousWinner: HoleWinner;
-                        newWinner: HoleWinner;
-                        previousTeamAStrokes?: number;
-                        previousTeamBStrokes?: number;
-                        newTeamAStrokes?: number;
-                        newTeamBStrokes?: number;
-                    };
-                    // Store the ACTUAL previous state from the event payload
-                    undoStack.push({
-                        matchId: event.matchId,
-                        holeNumber: payload.holeNumber,
-                        previousResult: {
-                            id: '', // Not needed for undo
-                            matchId: event.matchId,
-                            holeNumber: payload.holeNumber,
-                            winner: payload.previousWinner,
-                            teamAScore: payload.previousTeamAStrokes,
-                            teamBScore: payload.previousTeamBStrokes,
-                            timestamp: event.timestamp,
-                        },
-                    });
-                    // Update tracked state with new values
-                    holeStateMap.set(payload.holeNumber, {
-                        id: '',
-                        matchId: event.matchId,
-                        holeNumber: payload.holeNumber,
-                        winner: payload.newWinner,
-                        teamAScore: payload.newTeamAStrokes,
-                        teamBScore: payload.newTeamBStrokes,
-                        timestamp: event.timestamp,
-                    });
-                } else if (event.eventType === ScoringEventType.HoleUndone) {
-                    // An undo event means we should pop from the stack and revert state
-                    const popped = undoStack.pop();
-                    if (popped) {
-                        if (popped.previousResult) {
-                            holeStateMap.set(popped.holeNumber, popped.previousResult);
-                        } else {
-                            holeStateMap.delete(popped.holeNumber);
-                        }
-                    }
-                }
-            }
-
-            set({
-                activeMatch: match,
-                activeMatchState: matchState,
-                activeSession: session || null,
-                currentHole: nextHole || 18, // Default to 18 if complete
-                isLoading: false,
-                undoStack,
-            });
-        } catch (error) {
-            set({
-                error: error instanceof Error ? error.message : 'Failed to load match',
-                isLoading: false,
-            });
-        }
-    },
-
-    clearActiveMatch: () => {
-        set({
-            activeMatch: null,
-            activeMatchState: null,
-            activeSession: null,
-            currentHole: 1,
-            undoStack: [],
-        });
-    },
-
-    // Score a hole
-    scoreHole: async (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => {
-        const { activeMatch, currentHole, isSessionLocked } = get();
-        if (!activeMatch) return;
-
-        // P0-6: Block scoring if session is locked
-        if (isSessionLocked()) {
-            set({ error: 'Session is finalized. Unlock to make changes.' });
-            return;
-        }
-
-        set({ isSaving: true, error: null });
-
-        try {
-            // Snapshot previous state for drama detection
-            const previousMatchState = get().activeMatchState;
-
-            // Get previous result for undo stack
-            const previousResult = await db.holeResults
-                .where({ matchId: activeMatch.id, holeNumber: currentHole })
-                .first() || null;
-
-            // Record the hole result (including individual player scores for fourball)
-            await recordHoleResult(
-                activeMatch.id,
-                currentHole,
-                winner,
-                teamAScore,
-                teamBScore,
-                undefined, // scoredBy
-                undefined, // editReason
-                undefined, // isCaptainOverride
-                teamAPlayerScores,
-                teamBPlayerScores,
-            );
-
-            // Refresh match state
-            const holeResults = await db.holeResults
-                .where('matchId')
-                .equals(activeMatch.id)
-                .toArray();
-
-            const newMatchState = calculateMatchState(activeMatch, holeResults);
-
-            // Get the latest hole result for cloud sync
-            const latestResult = holeResults.find(r => r.holeNumber === currentHole);
-            if (latestResult) {
-                // Get session to find trip ID
-                const session = await db.sessions.get(activeMatch.sessionId);
-                if (session) {
-                    queueSyncOperation('holeResult', latestResult.id, 'update', session.tripId, latestResult);
-                    // Calculate fields from match state for syncing
-                    const matchToSync = {
-                        ...activeMatch,
-                        currentHole: Math.min(currentHole + 1, 18),
-                        result: newMatchState.isClosedOut
-                            ? (newMatchState.winningTeam === 'teamA' ? 'teamAWin' : 'teamBWin')
-                            : 'notFinished',
-                        margin: Math.abs(newMatchState.currentScore),
-                        holesRemaining: newMatchState.holesRemaining,
-                        updatedAt: new Date().toISOString(),
-                    };
-                    queueSyncOperation('match', activeMatch.id, 'update', session.tripId, matchToSync);
-
-                    const scoreOperationCorrelationId = createCorrelationId('score-op');
-
-                    // Broadcast to realtime subscribers (live page, spectators)
-                    if (isSupabaseConfigured && supabase) {
-                        const scoreUpdate = {
-                            matchId: activeMatch.id,
-                            holeNumber: currentHole,
-                            teamAScore: teamAScore ?? 0,
-                            teamBScore: teamBScore ?? 0,
-                            timestamp: new Date().toISOString(),
-                            updatedBy: '',
-                            updatedByName: '',
-                        };
-                        broadcastScoreUpdate(supabase, session.tripId, activeMatch.id, scoreUpdate).catch((error) => {
-                            trackSyncFailure({
-                                area: 'realtime_broadcast',
-                                operation: 'broadcast_score_update',
-                                matchId: activeMatch.id,
-                                tripId: session.tripId,
-                                reason: error instanceof Error ? error.message : 'unknown',
-                                correlationId: scoreOperationCorrelationId,
-                            });
-                        });
-
-                        // Broadcast match update if match just completed
-                        if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
-                            broadcastMatchUpdate(supabase, session.tripId, matchToSync as Match).catch((error) => {
-                                trackSyncFailure({
-                                    area: 'realtime_broadcast',
-                                    operation: 'broadcast_match_update',
-                                    matchId: activeMatch.id,
-                                    tripId: session.tripId,
-                                    reason: error instanceof Error ? error.message : 'unknown',
-                                    correlationId: scoreOperationCorrelationId,
-                                });
-                            });
-                        }
-                    }
-
-                    // BUG-007 FIX: Persist match status to local database (not just sync queue)
-                    // Update local match record with new status when closeout occurs
-                    if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
-                        // Determine the proper result type for the database
-                        const dbResult: 'teamAWin' | 'teamBWin' | 'halved' =
-                            newMatchState.currentScore > 0 ? 'teamAWin' :
-                            newMatchState.currentScore < 0 ? 'teamBWin' : 'halved';
-
-                        await db.matches.update(activeMatch.id, {
-                            status: 'completed' as const,
-                            result: dbResult,
-                            margin: matchToSync.margin,
-                            holesRemaining: matchToSync.holesRemaining,
-                            updatedAt: matchToSync.updatedAt,
-                        });
-                    }
-                }
-            }
-
-            // Update undo stack
-            const undoStack = [
-                ...get().undoStack,
-                { matchId: activeMatch.id, holeNumber: currentHole, previousResult },
-            ];
-
-            // Auto-advance to next hole if not closed out
-            const nextHole = newMatchState.isClosedOut
-                ? currentHole
-                : Math.min(currentHole + 1, 18);
-
-            // Update session match states too
-            const matchStates = new Map(get().matchStates);
-            matchStates.set(activeMatch.id, newMatchState);
-
-            // Drama detection — fire push notifications for exciting moments
-            if (previousMatchState) {
-                try {
-                    const trip = await db.trips.get(
-                        (await db.sessions.get(activeMatch.sessionId))?.tripId ?? ''
-                    );
-                    const teamAPlayers = await Promise.all(
-                        activeMatch.teamAPlayerIds.map(id => db.players.get(id))
-                    );
-                    const teamBPlayers = await Promise.all(
-                        activeMatch.teamBPlayerIds.map(id => db.players.get(id))
-                    );
-                    const teamANames = teamAPlayers.filter(Boolean).map(p => p!.lastName).join(' / ') || 'Team A';
-                    const teamBNames = teamBPlayers.filter(Boolean).map(p => p!.lastName).join(' / ') || 'Team B';
-
-                    // Calculate cup scores for cup-lead-change detection
-                    const { sessionMatches: allMatches } = get();
-                    const completedBefore = allMatches.filter(m =>
-                        m.id !== activeMatch.id && m.status === 'completed'
-                    );
-                    const cupBefore = calculateCupScore(completedBefore);
-                    const completedAfter = [...completedBefore];
-                    if (newMatchState.status === 'completed') {
-                        completedAfter.push(activeMatch);
-                    }
-                    const cupAfter = calculateCupScore(completedAfter);
-
-                    const dramaCtx = {
-                        previousState: previousMatchState,
-                        newState: newMatchState,
-                        holeNumber: currentHole,
-                        teamANames,
-                        teamBNames,
-                        tripName: trip?.name ?? '',
-                        cupScoreBefore: cupBefore,
-                        cupScoreAfter: cupAfter,
-                    };
-                    checkForDrama(dramaCtx);
-
-                    // Auto-post trash talk to the social feed
-                    generateTrashTalk({
-                        previousState: previousMatchState,
-                        newState: newMatchState,
-                        holeNumber: currentHole,
-                        teamANames,
-                        teamBNames,
-                        tripId: trip?.id ?? '',
-                    }).catch(() => {});
-                } catch {
-                    // Drama + trash talk are best-effort — don't block scoring
-                }
-            }
-
-            set({
-                activeMatchState: newMatchState,
-                currentHole: nextHole,
-                undoStack,
-                matchStates,
-                isSaving: false,
-                lastSavedAt: new Date(),
-            });
-        } catch (error) {
-            trackSyncFailure({
-                area: 'sync_queue',
-                operation: 'score_hole',
-                matchId: activeMatch.id,
-                reason: error instanceof Error ? error.message : 'unknown',
-                correlationId: createCorrelationId('score-op'),
+            existingScores.forEach((entry) => {
+              if (!scoresMap[entry.playerId]) {
+                scoresMap[entry.playerId] = {};
+              }
+              scoresMap[entry.playerId][entry.hole] = entry.score;
             });
 
             set({
-                error: error instanceof Error ? error.message : 'Failed to save score',
-                isSaving: false,
+              activeMatchId: matchId,
+              scores: scoresMap,
+              undoStack: [],
+              syncError: null,
             });
-        }
-    },
+          } catch (error) {
+            console.error('Failed to init match:', error);
+            set({ activeMatchId: matchId, scores: {}, undoStack: [] });
+          }
+        },
 
-    // Undo the last scoring action
-    undoLastHole: async () => {
-        const { activeMatch, undoStack, isSessionLocked } = get();
-        if (!activeMatch || undoStack.length === 0) return;
+        // ----------------------------------------
+        // UPDATE SCORE
+        // ----------------------------------------
 
-        // P0-6: Block undo if session is locked
-        if (isSessionLocked()) {
-            set({ error: 'Session is finalized. Unlock to make changes.' });
-            return;
-        }
+        updateScore: (playerId: string, hole: number, score: ScoreValue) => {
+          const state = get();
 
-        set({ isSaving: true, error: null });
+          // Save previous score to undo stack
+          const previousScore = state.scores[playerId]?.[hole] ?? null;
+          const undoEntry: ScoreEntry = {
+            playerId,
+            hole,
+            score: previousScore,
+            timestamp: Date.now(),
+          };
 
-        try {
-            const success = await undoLastScore(activeMatch.id);
+          // Update scores optimistically
+          const newScores = {
+            ...state.scores,
+            [playerId]: {
+              ...(state.scores[playerId] || {}),
+              [hole]: score,
+            },
+          };
 
-            if (success) {
-                // Refresh match state
-                const holeResults = await db.holeResults
-                    .where('matchId')
-                    .equals(activeMatch.id)
-                    .toArray();
+          set({
+            scores: newScores,
+            undoStack: [...state.undoStack.slice(-19), undoEntry], // Keep last 20
+          });
 
-                const newMatchState = calculateMatchState(activeMatch, holeResults);
+          // Persist to local DB
+          if (state.activeMatchId) {
+            db.scoreEntries
+              .put({
+                matchId: state.activeMatchId,
+                playerId,
+                hole,
+                score,
+                timestamp: Date.now(),
+                synced: false,
+              })
+              .catch((err) => console.error('Failed to persist score:', err));
 
-                // Pop from undo stack and go back to that hole
-                const lastUndo = undoStack[undoStack.length - 1];
-                const newUndoStack = undoStack.slice(0, -1);
+            // Queue for sync
+            set((s) => ({
+              pendingSync: [
+                ...s.pendingSync,
+                { playerId, hole, score, timestamp: Date.now() },
+              ],
+            }));
+          }
+        },
 
-                const matchStates = new Map(get().matchStates);
-                matchStates.set(activeMatch.id, newMatchState);
+        // ----------------------------------------
+        // UNDO
+        // ----------------------------------------
 
-                set({
-                    activeMatchState: newMatchState,
-                    currentHole: lastUndo.holeNumber,
-                    undoStack: newUndoStack,
-                    matchStates,
-                    isSaving: false,
-                });
-            } else {
-                set({ isSaving: false });
+        undoLastScore: () => {
+          const state = get();
+          if (state.undoStack.length === 0) return;
+
+          const lastEntry = state.undoStack[state.undoStack.length - 1];
+          const newUndoStack = state.undoStack.slice(0, -1);
+
+          const newScores = {
+            ...state.scores,
+            [lastEntry.playerId]: {
+              ...(state.scores[lastEntry.playerId] || {}),
+              [lastEntry.hole]: lastEntry.score,
+            },
+          };
+
+          set({
+            scores: newScores,
+            undoStack: newUndoStack,
+          });
+
+          // Persist undo to DB
+          if (state.activeMatchId) {
+            db.scoreEntries
+              .put({
+                matchId: state.activeMatchId,
+                playerId: lastEntry.playerId,
+                hole: lastEntry.hole,
+                score: lastEntry.score,
+                timestamp: Date.now(),
+                synced: false,
+              })
+              .catch((err) => console.error('Failed to persist undo:', err));
+          }
+        },
+
+        // ----------------------------------------
+        // SUBMIT SCORES
+        // ----------------------------------------
+
+        submitScores: async (matchId: string) => {
+          set({ isSyncing: true, syncError: null });
+
+          try {
+            const state = get();
+            const payload = {
+              matchId,
+              scores: state.scores,
+              submittedAt: new Date().toISOString(),
+            };
+
+            const response = await fetch('/api/sync/scores', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.message || 'Failed to submit scores');
             }
-        } catch (error) {
+
+            // Mark all local scores as synced
+            await db.scoreEntries
+              .where('matchId')
+              .equals(matchId)
+              .modify({ synced: true });
+
+            // Update match status
+            await db.matches.update(matchId, { status: 'complete' });
+
             set({
-                error: error instanceof Error ? error.message : 'Failed to undo',
-                isSaving: false,
+              isSyncing: false,
+              lastSyncTime: new Date(),
+              pendingSync: [],
+              syncError: null,
             });
-        }
-    },
+          } catch (error) {
+            set({
+              isSyncing: false,
+              syncError: error instanceof Error ? error.message : 'Sync failed',
+            });
+            throw error;
+          }
+        },
 
-    // Hole navigation
-    goToHole: (holeNumber: number) => {
-        if (holeNumber >= 1 && holeNumber <= 18) {
-            set({ currentHole: holeNumber });
-        }
-    },
+        // ----------------------------------------
+        // RESET
+        // ----------------------------------------
 
-    nextHole: () => {
-        const { currentHole } = get();
-        if (currentHole < 18) {
-            set({ currentHole: currentHole + 1 });
-        }
-    },
-
-    prevHole: () => {
-        const { currentHole } = get();
-        if (currentHole > 1) {
-            set({ currentHole: currentHole - 1 });
-        }
-    },
-
-    // Refresh a single match state
-    refreshMatchState: async (matchId: string) => {
-        const match = await db.matches.get(matchId);
-        if (!match) return;
-
-        const holeResults = await db.holeResults
+        resetMatch: (matchId: string) => {
+          // Clear local DB
+          db.scoreEntries
             .where('matchId')
             .equals(matchId)
-            .toArray();
+            .delete()
+            .catch((err) => console.error('Failed to reset scores:', err));
 
-        const newState = calculateMatchState(match, holeResults);
+          set({
+            activeMatchId: null,
+            scores: {},
+            undoStack: [],
+            pendingSync: [],
+            syncError: null,
+          });
+        },
 
-        const matchStates = new Map(get().matchStates);
-        matchStates.set(matchId, newState);
+        // ----------------------------------------
+        // BACKGROUND SYNC
+        // ----------------------------------------
 
-        set({ matchStates });
+        syncPendingScores: async () => {
+          const state = get();
+          if (state.pendingSync.length === 0 || state.isSyncing) return;
 
-        // Update active match state if this is the active match
-        if (get().activeMatch?.id === matchId) {
-            set({ activeMatchState: newState });
-        }
-    },
+          set({ isSyncing: true, syncError: null });
 
-    // Refresh all match states
-    refreshAllMatchStates: async () => {
-        const { sessionMatches } = get();
-        if (sessionMatches.length === 0) return;
+          try {
+            const response = await fetch('/api/sync/scores', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                matchId: state.activeMatchId,
+                scores: state.scores,
+                pendingEntries: state.pendingSync,
+              }),
+            });
 
-        const matchIds = sessionMatches.map(m => m.id);
-        const allResults = await db.holeResults
-            .where('matchId')
-            .anyOf(matchIds)
-            .toArray();
+            if (!response.ok) throw new Error('Sync failed');
 
-        const resultsByMatch = new Map<string, HoleResult[]>();
-        for (const result of allResults) {
-            const existing = resultsByMatch.get(result.matchId) || [];
-            existing.push(result);
-            resultsByMatch.set(result.matchId, existing);
-        }
-
-        const matchStates = new Map<string, MatchState>();
-        for (const match of sessionMatches) {
-            const results = resultsByMatch.get(match.id) || [];
-            const state = calculateMatchState(match, results);
-            matchStates.set(match.id, state);
-        }
-
-        set({ matchStates });
-
-        // Update active match state if applicable
-        const { activeMatch } = get();
-        if (activeMatch && matchStates.has(activeMatch.id)) {
-            set({ activeMatchState: matchStates.get(activeMatch.id)! });
-        }
-    },
-}));
-
-export default useScoringStore;
+            set({
+              isSyncing: false,
+              lastSyncTime: new Date(),
+              pendingSync: [],
+              syncError: null,
+            });
+          } catch (error) {
+            set({
+              isSyncing: false,
+              syncError: error instanceof Error ? error.message : 'Sync failed',
+            });
+          }
+        },
+      }),
+      {
+        name: 'scoring-store',
+        // Only persist scores and undo stack, not sync state
+        partialize: (state) => ({
+          activeMatchId: state.activeMatchId,
+          scores: state.scores,
+          undoStack: state.undoStack,
+        }),
+      }
+    ),
+    { name: 'ScoringStore' }
+  )
+);

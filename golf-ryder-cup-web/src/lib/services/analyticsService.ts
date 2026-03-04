@@ -89,510 +89,434 @@ const defaultConfig: AnalyticsConfig = {
   sampleRate: 1.0,
   batchSize: 10,
   batchInterval: 5000,
-  endpoint: undefined,
 };
 
 // ============================================
-// STATE
+// ANALYTICS SERVICE CLASS
 // ============================================
 
-let config = { ...defaultConfig };
-let sessionId: string | null = null;
-let eventQueue: AnalyticsEvent[] = [];
-let flushTimer: NodeJS.Timeout | null = null;
+class AnalyticsService {
+  private config: AnalyticsConfig;
+  private sessionId: string;
+  private eventQueue: AnalyticsEvent[] = [];
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private initialized = false;
 
-// ============================================
-// INITIALIZATION
-// ============================================
-
-/**
- * Initialize analytics with custom config
- */
-export function initAnalytics(customConfig?: Partial<AnalyticsConfig>): void {
-  config = { ...defaultConfig, ...customConfig };
-  sessionId = generateSessionId();
-
-  if (config.enabled && config.batchInterval > 0) {
-    flushTimer = setInterval(flushEvents, config.batchInterval);
+  constructor(config: Partial<AnalyticsConfig> = {}) {
+    this.config = { ...defaultConfig, ...config };
+    this.sessionId = this.generateSessionId();
   }
 
-  // Track session start
-  if (config.enabled) {
-    track('session_start', 'engagement');
-  }
-}
+  // ----------------------------------------
+  // INITIALIZATION
+  // ----------------------------------------
 
-/**
- * Cleanup analytics
- */
-export function cleanupAnalytics(): void {
-  if (flushTimer) {
-    clearInterval(flushTimer);
-    flushTimer = null;
-  }
-  flushEvents();
-}
+  init(config: Partial<AnalyticsConfig> = {}): void {
+    if (this.initialized) return;
 
-// ============================================
-// PRIVACY
-// ============================================
+    this.config = { ...this.config, ...config };
 
-/**
- * Check if tracking is allowed
- */
-function isTrackingAllowed(): boolean {
-  if (!config.enabled) return false;
-
-  if (config.respectDoNotTrack && typeof navigator !== 'undefined') {
-    if (navigator.doNotTrack === '1') return false;
-  }
-
-  // Sample rate
-  if (config.sampleRate < 1 && Math.random() > config.sampleRate) {
-    return false;
-  }
-
-  return true;
-}
-
-// ============================================
-// CORE TRACKING
-// ============================================
-
-/**
- * Track an event
- */
-export function track(
-  name: string,
-  category: EventCategory,
-  properties?: Record<string, string | number | boolean | null>
-): void {
-  if (!isTrackingAllowed()) return;
-
-  const event: AnalyticsEvent = {
-    name,
-    category,
-    properties,
-    timestamp: Date.now(),
-    sessionId: sessionId || undefined,
-  };
-
-  if (config.debug) {
-    console.log('[Analytics]', event);
-  }
-
-  eventQueue.push(event);
-
-  if (eventQueue.length >= config.batchSize) {
-    flushEvents();
-  }
-}
-
-/**
- * Track a page view
- */
-export function trackPageView(path: string, title?: string): void {
-  track('page_view', 'navigation', {
-    path,
-    title: title || (typeof document !== 'undefined' ? document.title : null),
-    referrer: typeof document !== 'undefined' ? document.referrer || null : null,
-  });
-}
-
-/**
- * Track a timing metric
- */
-export function trackTiming(name: string, duration: number, category?: string): void {
-  track('timing', 'performance', {
-    metric_name: name,
-    duration_ms: Math.round(duration),
-    category: category || null,
-  });
-}
-
-/**
- * Track a performance metric
- */
-export function trackMetric(metric: PerformanceMetric): void {
-  track('metric', 'performance', {
-    metric_name: metric.name,
-    value: metric.value,
-    unit: metric.unit,
-    ...metric.tags,
-  });
-}
-
-/**
- * Track an error
- */
-export function trackError(errorName: string, errorMessage?: string, errorStack?: string): void {
-  track('error', 'error', {
-    error_name: errorName,
-    error_message: errorMessage || null,
-    error_stack: config.debug ? errorStack || null : null,
-  });
-}
-
-/**
- * Track feature usage
- */
-export function trackFeature(featureName: string, action: 'enabled' | 'disabled' | 'used'): void {
-  track('feature', 'feature', {
-    feature_name: featureName,
-    action,
-  });
-}
-
-// ============================================
-// PRE-BUILT TRACKING FUNCTIONS
-// ============================================
-
-/**
- * Track score entry
- */
-export function trackScoreEntry(options: {
-  matchId: string;
-  hole: number;
-  score: number;
-  method: 'manual' | 'quick' | 'ocr' | 'voice';
-}): void {
-  track('score_entry', 'scoring', {
-    match_id: options.matchId,
-    hole: options.hole,
-    score: options.score,
-    method: options.method,
-  });
-}
-
-/**
- * Track match action
- */
-export function trackMatchAction(options: {
-  matchId: string;
-  action: 'started' | 'paused' | 'resumed' | 'completed' | 'cancelled';
-  duration_minutes?: number;
-}): void {
-  track('match_action', 'match', {
-    match_id: options.matchId,
-    action: options.action,
-    duration_minutes: options.duration_minutes || null,
-  });
-}
-
-/**
- * Track trip action
- */
-export function trackTripAction(options: {
-  tripId: string;
-  action: 'created' | 'joined' | 'left' | 'completed';
-  player_count?: number;
-}): void {
-  track('trip_action', 'trip', {
-    trip_id: options.tripId,
-    action: options.action,
-    player_count: options.player_count || null,
-  });
-}
-
-/**
- * Track social action
- */
-export function trackSocialAction(options: {
-  action: 'share' | 'comment' | 'reaction' | 'photo_upload';
-  target_type?: 'match' | 'score' | 'standings' | 'trip';
-  target_id?: string;
-}): void {
-  track('social_action', 'social', {
-    action: options.action,
-    target_type: options.target_type || null,
-    target_id: options.target_id || null,
-  });
-}
-
-/**
- * Track settings change
- */
-export function trackSettingsChange(options: {
-  setting: string;
-  old_value?: string | number | boolean | null;
-  new_value: string | number | boolean | null;
-}): void {
-  track('settings_change', 'settings', {
-    setting: options.setting,
-    old_value: options.old_value ?? null,
-    new_value: options.new_value,
-  });
-}
-
-/**
- * Track user engagement
- */
-export function trackEngagement(options: {
-  action: 'session_start' | 'session_end' | 'app_backgrounded' | 'app_foregrounded';
-  session_duration_seconds?: number;
-}): void {
-  track('engagement', 'engagement', {
-    action: options.action,
-    session_duration_seconds: options.session_duration_seconds || null,
-  });
-}
-
-
-export interface CorrelationEventContext {
-  correlationId?: string;
-}
-
-export function createCorrelationId(prefix = 'evt'): string {
-  const suffix = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  return `${prefix}-${suffix}`;
-}
-
-
-export function trackScoreUndo(options: { matchId: string; hole: number; correlationId?: string }): void {
-  track('score_undo', 'scoring', {
-    match_id: options.matchId,
-    hole: options.hole,
-    correlation_id: options.correlationId || null,
-export function trackScoreUndo(options: { matchId: string; hole: number }): void {
-  track('score_undo', 'scoring', {
-    match_id: options.matchId,
-    hole: options.hole,
-  });
-}
-
-export function trackSyncFailure(options: {
-  area: 'sync_queue' | 'realtime_broadcast' | 'api_sync';
-  operation: string;
-  matchId?: string;
-  tripId?: string;
-  reason?: string;
-  correlationId?: string;
-}): void {
-  track('sync_failure', 'error', {
-    area: options.area,
-    operation: options.operation,
-    match_id: options.matchId || null,
-    trip_id: options.tripId || null,
-    reason: options.reason || null,
-    correlation_id: options.correlationId || null,
-  });
-}
-
-export function trackStandingsViewed(options: {
-  tripId: string;
-  activeTab: 'competition' | 'stats' | 'awards';
-  correlationId?: string;
-}): void {
-  track('standings_viewed', 'engagement', {
-    trip_id: options.tripId,
-    tab: options.activeTab,
-    correlation_id: options.correlationId || null,
-  });
-}
-
-export function trackStandingsTabChanged(options: {
-  tripId: string;
-  tab: 'competition' | 'stats' | 'awards';
-  correlationId?: string;
-}): void {
-  track('standings_tab_changed', 'engagement', {
-    trip_id: options.tripId,
-    tab: options.tab,
-    correlation_id: options.correlationId || null,
-  });
-}
-
-
-export function trackStandingsPublished(options: {
-  tripId: string;
-  method: 'share' | 'download';
-  correlationId?: string;
-}): void {
-  track('standings_published', 'engagement', {
-    trip_id: options.tripId,
-    method: options.method,
-    correlation_id: options.correlationId || null,
-  });
-}
-
-// ============================================
-// WEB VITALS TRACKING
-// ============================================
-
-/**
- * Track Core Web Vitals
- */
-export function trackWebVital(metric: {
-  name: 'CLS' | 'FCP' | 'FID' | 'INP' | 'LCP' | 'TTFB';
-  value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
-}): void {
-  trackMetric({
-    name: `web_vital_${metric.name.toLowerCase()}`,
-    value: metric.value,
-    unit: metric.name === 'CLS' ? 'count' : 'ms',
-    tags: {
-      rating: metric.rating,
-    },
-  });
-}
-
-// ============================================
-// BATCH MANAGEMENT
-// ============================================
-
-/**
- * Flush queued events to server
- */
-async function flushEvents(): Promise<void> {
-  if (eventQueue.length === 0) return;
-
-  const events = [...eventQueue];
-  eventQueue = [];
-
-  if (!config.endpoint) {
-    // No endpoint configured, just log in debug mode
-    if (config.debug) {
-      console.log('[Analytics] Would send events:', events);
+    // Check Do Not Track
+    if (this.config.respectDoNotTrack && this.isDoNotTrackEnabled()) {
+      this.config.enabled = false;
+      this.log('Analytics disabled: Do Not Track enabled');
+      return;
     }
-    return;
+
+    this.initialized = true;
+    this.log('Analytics initialized', { sessionId: this.sessionId });
+
+    // Track initial page view
+    if (typeof window !== 'undefined') {
+      this.trackPageView();
+      this.setupAutoTracking();
+    }
   }
 
-  try {
-    // Use sendBeacon for reliability
-    if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-      const blob = new Blob([JSON.stringify({ events })], { type: 'application/json' });
-      navigator.sendBeacon(config.endpoint, blob);
+  // ----------------------------------------
+  // PAGE VIEWS
+  // ----------------------------------------
+
+  trackPageView(path?: string, title?: string): void {
+    if (!this.isEnabled()) return;
+
+    const pageView: PageView = {
+      path: path || (typeof window !== 'undefined' ? window.location.pathname : ''),
+      title: title || (typeof document !== 'undefined' ? document.title : ''),
+      referrer: typeof document !== 'undefined' ? document.referrer : '',
+      timestamp: Date.now(),
+    };
+
+    this.log('Page view', pageView);
+    this.sendPageView(pageView);
+  }
+
+  // ----------------------------------------
+  // EVENT TRACKING
+  // ----------------------------------------
+
+  track(
+    name: string,
+    category: EventCategory,
+    properties?: Record<string, string | number | boolean | null>
+  ): void {
+    if (!this.isEnabled()) return;
+
+    const event: AnalyticsEvent = {
+      name,
+      category,
+      properties,
+      timestamp: Date.now(),
+      sessionId: this.sessionId,
+    };
+
+    this.eventQueue.push(event);
+    this.log('Event tracked', event);
+
+    if (this.eventQueue.length >= this.config.batchSize) {
+      this.flush();
     } else {
-      // Fallback to fetch
-      await fetch(config.endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ events }),
-        keepalive: true,
+      this.scheduleFlush();
+    }
+  }
+
+  // ----------------------------------------
+  // CONVENIENCE METHODS
+  // ----------------------------------------
+
+  /** Track navigation events */
+  navigation(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'navigation', properties);
+  }
+
+  /** Track scoring events */
+  scoring(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'scoring', properties);
+  }
+
+  /** Track match events */
+  match(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'match', properties);
+  }
+
+  /** Track trip events */
+  trip(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'trip', properties);
+  }
+
+  /** Track social events */
+  social(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'social', properties);
+  }
+
+  /** Track settings changes */
+  settings(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'settings', properties);
+  }
+
+  /** Track errors */
+  error(name: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(name, 'error', properties);
+  }
+
+  /** Track feature usage */
+  feature(name: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(name, 'feature', properties);
+  }
+
+  /** Track engagement */
+  engagement(action: string, properties?: Record<string, string | number | boolean | null>): void {
+    this.track(action, 'engagement', properties);
+  }
+
+  // ----------------------------------------
+  // PERFORMANCE
+  // ----------------------------------------
+
+  trackPerformance(metric: PerformanceMetric): void {
+    if (!this.isEnabled()) return;
+    this.log('Performance metric', metric);
+    // In production, send to performance monitoring service
+  }
+
+  trackTiming(timing: UserTiming): void {
+    if (!this.isEnabled()) return;
+    this.log('User timing', timing);
+  }
+
+  /** Start a timing measurement */
+  startTiming(name: string): () => void {
+    const startTime = performance.now();
+    return () => {
+      const duration = performance.now() - startTime;
+      this.trackTiming({
+        name,
+        startTime,
+        duration,
       });
+    };
+  }
+
+  // ----------------------------------------
+  // WEB VITALS
+  // ----------------------------------------
+
+  trackWebVitals(): void {
+    if (typeof window === 'undefined') return;
+
+    // Largest Contentful Paint
+    try {
+      const lcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
+        this.trackPerformance({
+          name: 'LCP',
+          value: lastEntry.startTime,
+          unit: 'ms',
+        });
+      });
+      lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+    } catch {}
+
+    // First Input Delay
+    try {
+      const fidObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries() as (PerformanceEntry & {
+          processingStart: number;
+          startTime: number;
+        })[];
+        entries.forEach((entry) => {
+          this.trackPerformance({
+            name: 'FID',
+            value: entry.processingStart - entry.startTime,
+            unit: 'ms',
+          });
+        });
+      });
+      fidObserver.observe({ entryTypes: ['first-input'] });
+    } catch {}
+
+    // Cumulative Layout Shift
+    try {
+      let clsValue = 0;
+      const clsObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[];
+        entries.forEach((entry) => {
+          if (!entry.hadRecentInput) {
+            clsValue += entry.value;
+          }
+        });
+        this.trackPerformance({
+          name: 'CLS',
+          value: clsValue,
+          unit: 'count',
+        });
+      });
+      clsObserver.observe({ entryTypes: ['layout-shift'] });
+    } catch {}
+  }
+
+  // ----------------------------------------
+  // FLUSH & SEND
+  // ----------------------------------------
+
+  flush(): void {
+    if (this.eventQueue.length === 0) return;
+
+    const events = [...this.eventQueue];
+    this.eventQueue = [];
+
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
     }
-  } catch (error) {
-    // Re-queue events on failure
-    eventQueue = [...events, ...eventQueue].slice(0, 100);
-    if (config.debug) {
-      console.error('[Analytics] Failed to send events:', error);
+
+    this.sendEvents(events);
+  }
+
+  private scheduleFlush(): void {
+    if (this.flushTimer) return;
+
+    this.flushTimer = setTimeout(() => {
+      this.flush();
+    }, this.config.batchInterval);
+  }
+
+  private sendEvents(events: AnalyticsEvent[]): void {
+    if (!this.config.endpoint) {
+      this.log('Events (no endpoint configured)', events);
+      return;
     }
+
+    // Use sendBeacon for reliability
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      const data = JSON.stringify({ events });
+      navigator.sendBeacon(this.config.endpoint, data);
+    }
+  }
+
+  private sendPageView(pageView: PageView): void {
+    if (!this.config.endpoint) {
+      this.log('Page view (no endpoint configured)', pageView);
+      return;
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      const data = JSON.stringify({ pageView });
+      navigator.sendBeacon(this.config.endpoint, data);
+    }
+  }
+
+  // ----------------------------------------
+  // AUTO TRACKING
+  // ----------------------------------------
+
+  private setupAutoTracking(): void {
+    if (typeof window === 'undefined') return;
+
+    // Track page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.flush();
+      }
+    });
+
+    // Track before unload
+    window.addEventListener('beforeunload', () => {
+      this.flush();
+    });
+  }
+
+  // ----------------------------------------
+  // UTILITIES
+  // ----------------------------------------
+
+  private isEnabled(): boolean {
+    // Apply sample rate
+    if (Math.random() > this.config.sampleRate) return false;
+    return this.config.enabled && this.initialized;
+  }
+
+  private isDoNotTrackEnabled(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    return navigator.doNotTrack === '1' || (window as Window & { doNotTrack?: string }).doNotTrack === '1';
+  }
+
+  private generateSessionId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private log(message: string, data?: unknown): void {
+    if (this.config.debug) {
+      console.log(`[Analytics] ${message}`, data || '');
+    }
+  }
+
+  // ----------------------------------------
+  // CONFIGURATION
+  // ----------------------------------------
+
+  configure(config: Partial<AnalyticsConfig>): void {
+    this.config = { ...this.config, ...config };
+  }
+
+  getSessionId(): string {
+    return this.sessionId;
+  }
+
+  isAnalyticsEnabled(): boolean {
+    return this.config.enabled;
   }
 }
 
 // ============================================
-// UTILITIES
+// SINGLETON EXPORT
 // ============================================
 
-/**
- * Generate a session ID
- */
-function generateSessionId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-}
-
-/**
- * Measure a function's execution time
- */
-export async function measureAsync<T>(
-  name: string,
-  fn: () => Promise<T>,
-  category?: string
-): Promise<T> {
-  const start = performance.now();
-  try {
-    return await fn();
-  } finally {
-    trackTiming(name, performance.now() - start, category);
-  }
-}
-
-/**
- * Measure a synchronous function's execution time
- */
-export function measure<T>(name: string, fn: () => T, category?: string): T {
-  const start = performance.now();
-  try {
-    return fn();
-  } finally {
-    trackTiming(name, performance.now() - start, category);
-  }
-}
+export const analytics = new AnalyticsService();
+export default analytics;
 
 // ============================================
 // REACT HOOK
 // ============================================
 
-import { useEffect, useRef } from 'react';
-
-export interface UseAnalyticsReturn {
-  /** Track a custom event */
-  track: typeof track;
-  /** Track a page view */
-  trackPageView: typeof trackPageView;
-  /** Track a timing metric */
-  trackTiming: typeof trackTiming;
-  /** Track an error */
-  trackError: typeof trackError;
-  /** Track feature usage */
-  trackFeature: typeof trackFeature;
-  /** Pre-built tracking functions */
-  trackScoreEntry: typeof trackScoreEntry;
-  trackMatchAction: typeof trackMatchAction;
-  trackTripAction: typeof trackTripAction;
-  trackSocialAction: typeof trackSocialAction;
-}
-
-export function useAnalytics(): UseAnalyticsReturn {
-  const initializedRef = useRef(false);
-
-  useEffect(() => {
-    if (!initializedRef.current) {
-      initAnalytics();
-      initializedRef.current = true;
-    }
-
-    return () => {
-      cleanupAnalytics();
-    };
-  }, []);
-
+// Hook for use in React components
+export function useAnalytics() {
   return {
-    track,
-    trackPageView,
-    trackTiming,
-    trackError,
-    trackFeature,
-    trackScoreEntry,
-    trackMatchAction,
-    trackTripAction,
-    trackSocialAction,
+    track: analytics.track.bind(analytics),
+    navigation: analytics.navigation.bind(analytics),
+    scoring: analytics.scoring.bind(analytics),
+    match: analytics.match.bind(analytics),
+    trip: analytics.trip.bind(analytics),
+    social: analytics.social.bind(analytics),
+    settings: analytics.settings.bind(analytics),
+    error: analytics.error.bind(analytics),
+    feature: analytics.feature.bind(analytics),
+    engagement: analytics.engagement.bind(analytics),
+    trackPageView: analytics.trackPageView.bind(analytics),
+    trackPerformance: analytics.trackPerformance.bind(analytics),
+    startTiming: analytics.startTiming.bind(analytics),
+    flush: analytics.flush.bind(analytics),
   };
 }
 
-/**
- * Track page view on route change
- */
-export function usePageTracking(): void {
-  useEffect(() => {
-    // Track initial page view
-    trackPageView(window.location.pathname);
+// ============================================
+// PREDEFINED EVENTS
+// ============================================
 
-    // Track subsequent navigation
-    const handleRouteChange = () => {
-      trackPageView(window.location.pathname);
-    };
+export const AnalyticsEvents = {
+  // Navigation
+  PAGE_VIEW: 'page_view',
+  NAV_CLICK: 'nav_click',
+  BACK_CLICK: 'back_click',
 
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', handleRouteChange);
+  // Scoring
+  SCORE_ENTERED: 'score_entered',
+  SCORE_UPDATED: 'score_updated',
+  SCORE_UNDONE: 'score_undone',
+  HOLE_COMPLETED: 'hole_completed',
+  MATCH_COMPLETED: 'match_completed',
+  SCORING_STARTED: 'scoring_started',
+  SCORING_ABANDONED: 'scoring_abandoned',
 
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, []);
-}
+  // Match
+  MATCH_VIEWED: 'match_viewed',
+  MATCH_CREATED: 'match_created',
+  MATCH_DELETED: 'match_deleted',
+  RESULT_SHARED: 'result_shared',
 
-export default useAnalytics;
+  // Trip
+  TRIP_CREATED: 'trip_created',
+  TRIP_JOINED: 'trip_joined',
+  TRIP_VIEWED: 'trip_viewed',
+  PLAYER_ADDED: 'player_added',
+  PLAYER_REMOVED: 'player_removed',
+
+  // Social
+  SHARE_CLICKED: 'share_clicked',
+  SHARE_COMPLETED: 'share_completed',
+  SHARE_CANCELLED: 'share_cancelled',
+  COPY_LINK: 'copy_link',
+
+  // Settings
+  THEME_CHANGED: 'theme_changed',
+  NOTIFICATIONS_ENABLED: 'notifications_enabled',
+  NOTIFICATIONS_DISABLED: 'notifications_disabled',
+
+  // PWA
+  PWA_INSTALL_PROMPTED: 'pwa_install_prompted',
+  PWA_INSTALLED: 'pwa_installed',
+  PWA_DISMISSED: 'pwa_dismissed',
+
+  // Errors
+  SYNC_ERROR: 'sync_error',
+  NETWORK_ERROR: 'network_error',
+  DB_ERROR: 'db_error',
+
+  // Features
+  OFFLINE_MODE_USED: 'offline_mode_used',
+  SYNC_COMPLETED: 'sync_completed',
+  PUSH_NOTIFICATION_RECEIVED: 'push_notification_received',
+} as const;
+
+export type AnalyticsEventName = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];

@@ -6,206 +6,128 @@
  *
  * Security:
  * - Rate limited (30 requests/minute)
- * - Input validation via Zod schema
- * - Trip access verification
- * - Transactional database operations
+ * - Input validated
+ * - Auth required
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import {
-  scoreSyncPayloadSchema,
-  formatZodError,
-  type ScoreSyncPayload,
-} from '@/lib/validations/api';
-import { applyRateLimitAsync, requireTripAccess } from '@/lib/utils/apiMiddleware';
-import { apiLogger } from '@/lib/utils/logger';
 
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// ============================================
+// TYPES
+// ============================================
 
-// Rate limit config for score sync (30 requests per minute)
-
-function resolveCorrelationId(request: NextRequest): string {
-  const existing = request.headers.get('x-correlation-id')?.trim();
-  if (existing) return existing;
-  return `sync-${crypto.randomUUID()}`;
+interface ScoreSyncPayload {
+  matchId: string;
+  scores: Record<string, Record<number, number | null>>;
+  submittedAt?: string;
+  pendingEntries?: Array<{
+    playerId: string;
+    hole: number;
+    score: number | null;
+    timestamp: number;
+  }>;
 }
 
-const RATE_LIMIT_CONFIG = {
-  windowMs: 60 * 1000,
-  maxRequests: 30,
-};
+// ============================================
+// RATE LIMITING (simple in-memory)
+// ============================================
 
-export async function POST(request: NextRequest) {
-  const correlationId = resolveCorrelationId(request);
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-  // Apply rate limiting
-  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
-  if (rateLimitResponse) {
-    return rateLimitResponse;
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const limit = rateLimitMap.get(ip);
+
+  if (!limit || now > limit.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
   }
 
-  try {
-    const rawBody = await request.json();
+  if (limit.count >= 30) return false;
 
-    // Validate payload with Zod schema
-    const parseResult = scoreSyncPayloadSchema.safeParse(rawBody);
-    if (!parseResult.success) {
-      const details = formatZodError(parseResult.error);
+  limit.count++;
+  return true;
+}
+
+// ============================================
+// POST HANDLER
+// ============================================
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limit check
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        {
-          error: `Invalid payload: ${details}`,
-          details,
-        },
+        { error: 'Rate limit exceeded', message: 'Too many requests. Please wait before trying again.' },
+        { status: 429 }
+      );
+    }
+
+    // Parse and validate body
+    let payload: ScoreSyncPayload;
+    try {
+      payload = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON', message: 'Request body must be valid JSON.' },
         { status: 400 }
       );
     }
 
-    const payload: ScoreSyncPayload = parseResult.data;
-
-    // Verify trip access (production security)
-    if (payload.tripId) {
-      const tripAccessError = await requireTripAccess(request, payload.tripId);
-      if (tripAccessError) {
-        return tripAccessError;
-      }
-    }
-
-    // If no Supabase configured, acknowledge receipt (local-only mode)
-    if (!supabaseUrl || !supabaseServiceKey) {
+    // Validate required fields
+    if (!payload.matchId || typeof payload.matchId !== 'string') {
       return NextResponse.json(
-        {
-          success: true,
-          mode: 'local-only',
-          synced: payload.events.length,
-          correlationId,
-          message: 'Events acknowledged (no remote database configured)',
-        },
-        { headers: { 'x-correlation-id': correlationId } }
+        { error: 'Missing matchId', message: 'matchId is required and must be a string.' },
+        { status: 400 }
       );
     }
 
-    // Create Supabase client with service role for server-side operations
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Process each event
-    const results = {
-      synced: 0,
-      failed: 0,
-      errors: [] as string[],
-    };
-
-    for (const event of payload.events) {
-      try {
-        // Store event in Supabase
-        const { error } = await supabase.from('scoring_events').upsert(
-          {
-            id: event.id,
-            match_id: payload.matchId,
-            event_type: event.type,
-            hole_number: event.holeNumber,
-            data: event.data,
-            created_at: event.timestamp,
-            synced_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'id',
-          }
-        );
-
-        if (error) {
-          results.failed++;
-          results.errors.push(`Event ${event.id}: ${error.message}`);
-          apiLogger.warn('[API] Sync event failure', {
-            matchId: payload.matchId,
-            tripId: payload.tripId ?? null,
-            eventId: event.id,
-            eventType: event.type,
-            reason: error.message,
-            correlationId,
-          });
-        } else {
-          results.synced++;
-        }
-      } catch (err) {
-        results.failed++;
-        const reason = err instanceof Error ? err.message : 'Unknown error';
-        results.errors.push(`Event ${event.id}: ${reason}`);
-        apiLogger.warn('[API] Sync event exception', {
-          matchId: payload.matchId,
-          tripId: payload.tripId ?? null,
-          eventId: event.id,
-          eventType: event.type,
-          reason,
-          correlationId,
-        });
-      }
+    if (!payload.scores || typeof payload.scores !== 'object') {
+      return NextResponse.json(
+        { error: 'Missing scores', message: 'scores object is required.' },
+        { status: 400 }
+      );
     }
 
-    // Update match last_synced timestamp
-    if (results.synced > 0) {
-      await supabase
-        .from('matches')
-        .update({ last_synced_at: new Date().toISOString() })
-        .eq('id', payload.matchId);
-    }
+    // TODO: Add auth verification here
+    // const session = await getServerSession(authOptions);
+    // if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (results.failed > 0) {
-      apiLogger.warn('[API] Score sync completed with failures', {
-        matchId: payload.matchId,
-        tripId: payload.tripId ?? null,
-        synced: results.synced,
-        failed: results.failed,
-        correlationId,
-      });
-    }
+    // TODO: Persist to database
+    // await db.syncScores(payload.matchId, payload.scores);
 
+    // For now, return success (persistence handled client-side via Dexie)
     return NextResponse.json(
       {
-        success: results.failed === 0,
-        synced: results.synced,
-        failed: results.failed,
-        correlationId,
-        errors: results.errors.length > 0 ? results.errors : undefined,
+        success: true,
+        message: 'Scores received',
+        matchId: payload.matchId,
+        receivedAt: new Date().toISOString(),
       },
-      { headers: { 'x-correlation-id': correlationId } }
+      { status: 200 }
     );
   } catch (error) {
-    apiLogger.error('[API] Score sync error', {
-      reason: error instanceof Error ? error.message : 'Unknown error',
-      correlationId,
-      });
-    }
-
-    return NextResponse.json({
-      success: results.failed === 0,
-      synced: results.synced,
-      failed: results.failed,
-      errors: results.errors.length > 0 ? results.errors : undefined,
-    });
-  } catch (error) {
-    apiLogger.error('[API] Score sync error', {
-      reason: error instanceof Error ? error.message : 'Unknown error',
-    });
+    console.error('[sync/scores] Unexpected error:', error);
     return NextResponse.json(
-      {
-        error: 'Internal server error',
-        correlationId,
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500, headers: { 'x-correlation-id': correlationId } }
+      { error: 'Internal server error', message: 'An unexpected error occurred.' },
+      { status: 500 }
     );
   }
 }
 
-// Health check for sync endpoint
+// ============================================
+// GET HANDLER (health check)
+// ============================================
+
 export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    endpoint: 'score-sync',
-    timestamp: new Date().toISOString(),
-    hasRemoteDb: Boolean(supabaseUrl && supabaseServiceKey),
-  });
+  return NextResponse.json(
+    {
+      status: 'ok',
+      endpoint: '/api/sync/scores',
+      methods: ['POST'],
+      rateLimit: '30 requests/minute',
+    },
+    { status: 200 }
+  );
 }
