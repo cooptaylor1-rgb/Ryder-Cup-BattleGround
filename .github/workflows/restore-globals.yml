@@ -1,7 +1,9 @@
 name: Restore globals.css from backup
 
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/restore-globals.yml'
 
 jobs:
   restore:
@@ -17,11 +19,9 @@ jobs:
           wget -O golf-ryder-cup-web/src/app/globals.css \
             "https://files.catbox.moe/t0a5pi.css"
           
-          # Verify size
           SIZE=$(wc -c < golf-ryder-cup-web/src/app/globals.css)
           echo "Downloaded size: ${SIZE} bytes"
           
-          # Verify SHA256
           ACTUAL=$(sha256sum golf-ryder-cup-web/src/app/globals.css | awk '{print $1}')
           EXPECTED="27c355beca6938b912739ed96fe23207f2579d9c2676176473fcb96065d9dfc6"
           echo "Expected SHA256: $EXPECTED"
@@ -32,13 +32,11 @@ jobs:
             exit 1
           fi
           
-          echo "SHA256 verified successfully"
-          echo "First line: $(head -1 golf-ryder-cup-web/src/app/globals.css)"
+          echo "SHA256 verified. First line: $(head -1 golf-ryder-cup-web/src/app/globals.css)"
 
       - name: Remove temporary part files
         run: |
           cd golf-ryder-cup-web/src/app
-          # Remove any part/chunk files from previous attempts
           git rm --ignore-unmatch globals.part1.css globals.p1.css globals.p2.css \
             globals.p3.css globals.p4.css globals.p5.css globals.p6.css \
             globals.chunk*.css 2>/dev/null || true
@@ -49,5 +47,6 @@ jobs:
           git config user.email "actions@github.com"
           git add golf-ryder-cup-web/src/app/globals.css
           git status
-          git commit -m "perf: remove render-blocking Google Fonts import, use next/font CSS variables\n\nRemoved @import url('fonts.googleapis.com/...') - fonts now loaded via next/font.\nUpdated --font-sans and --font-serif to reference next/font CSS variables\nwith graceful fallbacks.\n\nFile restored from verified backup (SHA256: 27c355be...)\nSize: 137495 bytes, 6466 lines."
+          git diff --cached --stat
+          git commit -m "perf: remove render-blocking Google Fonts import, use next/font CSS variables\n\nRemoved @import url('fonts.googleapis.com/...') - fonts now loaded via next/font.\nUpdated --font-sans and --font-serif to reference next/font CSS variables\nwith graceful fallbacks.\n\nFile restored from verified backup (SHA256: 27c355be...)\nSize: 137495 bytes, 6466 lines." || echo "Nothing to commit"
           git push
