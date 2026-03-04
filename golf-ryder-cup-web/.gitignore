@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -18,6 +19,7 @@
 *.test-results
 visual-regression-baseline/
 tests/e2e/artifacts/
+tests/e2e/visual/**/*-snapshots/
 
 # next.js
 /.next/
@@ -29,6 +31,7 @@ tests/e2e/artifacts/
 # misc
 .DS_Store
 *.pem
+.turbo
 
 # debug
 npm-debug.log*
@@ -46,4 +49,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-node_modules/
+
+# capacitor
+/android/
+/ios/
+
+# storybook
+storybook-static/
+
+# sentry
+.sentryclirc

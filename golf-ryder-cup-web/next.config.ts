@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   // Tree-shake framer-motion (76 files import it; this ensures
   // only the APIs actually used are bundled — ~30% smaller)
   experimental: {
-    optimizePackageImports: ['framer-motion'],
+    optimizePackageImports: ['framer-motion', 'date-fns', 'lucide-react'],
   },
 
   // Image optimization configuration
@@ -51,7 +51,7 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(self), geolocation=(self)',
+            value: 'camera=(self), microphone=(self), geolocation=(self)',
           },
           {
             key: 'Content-Security-Policy',
@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
                 ? "style-src 'self'"
                 : "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.supabase.co",
-              "font-src 'self' data:",
+              "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.weather.gov https://*.openweathermap.org https://api.open-meteo.com https://*.sentry.io",
               "frame-ancestors 'self'",
               "base-uri 'self'",
