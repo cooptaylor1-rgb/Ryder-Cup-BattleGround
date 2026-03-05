@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { DraftBoard } from '@/components/captain';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { draftLogger } from '@/lib/utils/logger';
@@ -63,7 +63,7 @@ export default function DraftPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Team Draft"
           subtitle="No active trip"
@@ -85,14 +85,13 @@ export default function DraftPage() {
           />
         </main>
 
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Team Draft"
           subtitle="Captain mode required"
@@ -118,7 +117,6 @@ export default function DraftPage() {
           />
         </main>
 
-        <BottomNav />
       </div>
     );
   }
@@ -129,7 +127,7 @@ export default function DraftPage() {
   );
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Team Draft"
         subtitle="Assign players to teams"
@@ -190,7 +188,6 @@ export default function DraftPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
@@ -111,7 +111,7 @@ export default function CaptainSettingsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Settings"
           subtitle="Captain controls"
@@ -136,14 +136,13 @@ export default function CaptainSettingsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Settings"
           subtitle="Captain controls"
@@ -168,13 +167,12 @@ export default function CaptainSettingsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Trip Settings"
         subtitle="Configure trip details"
@@ -342,7 +340,6 @@ export default function CaptainSettingsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
 import { shareBanterPost } from '@/lib/utils/share';
 import { EmptyStatePremium, NoMessagesEmpty } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   MessageCircle,
   Camera,
@@ -154,7 +154,7 @@ export default function SocialPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trash Talk"
           subtitle="No trip selected"
@@ -178,13 +178,12 @@ export default function SocialPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       <PageHeader
         title="Trash Talk"
         subtitle={currentTrip.name}
@@ -314,7 +313,6 @@ export default function SocialPage() {
         </div>
       </div>
 
-      <BottomNav />
     </div>
   );
 }

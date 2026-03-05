@@ -32,7 +32,7 @@ import {
   PageLoadingSkeleton,
 } from '@/components/ui';
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
-import { BottomNav, PageHeader, type NavBadges } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * HOME PAGE — The Daily Edition
@@ -48,12 +48,11 @@ import { BottomNav, PageHeader, type NavBadges } from '@/components/layout';
  */
 export default function HomePage() {
   const router = useRouter();
-  const { loadTrip, currentTrip: _currentTrip, players, teams, teamMembers, sessions } = useTripStore();
+  const { loadTrip, players, teams, teamMembers, sessions } = useTripStore();
   const { isCaptainMode } = useUIStore();
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [showJoinTrip, setShowJoinTrip] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>();
-  const [, setShowWhatsNew] = useState(false);
 
   // Check for a pending join code from /join deep link
   useEffect(() => {
@@ -158,11 +157,6 @@ export default function HomePage() {
   const hasTrips = trips && trips.length > 0;
   const pastTrips = trips?.filter((t) => t.id !== activeTrip?.id) || [];
   const liveMatchesCount = liveMatches?.length || 0;
-  const activeMatchId = liveMatchesCount === 1 ? liveMatches?.[0]?.id : undefined;
-
-  const navBadges: NavBadges = {
-    score: liveMatchesCount > 0 ? liveMatchesCount : undefined,
-  };
 
   const scoreNarrative = useMemo(() => {
     if (!standings) return undefined;
@@ -197,7 +191,7 @@ export default function HomePage() {
         />
       )}
 
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <JoinTripModal
         isOpen={showJoinTrip}
         onClose={() => {
@@ -211,7 +205,7 @@ export default function HomePage() {
         }}
         initialCode={pendingJoinCode}
       />
-      <WhatsNew onDismiss={() => setShowWhatsNew(false)} />
+      <WhatsNew />
 
       <PageHeader
         title="Ryder Cup Tracker"
@@ -572,7 +566,6 @@ export default function HomePage() {
         </section>
       </main>
 
-      <BottomNav badges={navBadges} activeMatchId={activeMatchId} />
       <FirstLaunchWalkthrough />
     </div>
     </>

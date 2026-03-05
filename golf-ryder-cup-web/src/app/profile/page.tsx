@@ -18,7 +18,7 @@ import {
   X,
   Save,
 } from 'lucide-react';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * PROFILE PAGE
@@ -77,7 +77,7 @@ export default function ProfilePage() {
 
   if (!isAuthenticated && !isLoading) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+      <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -94,14 +94,13 @@ export default function ProfilePage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+      <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
         <PageHeader
           title="Profile"
           subtitle={isAuthenticated ? 'Loading your profile\u2026' : undefined}
@@ -140,7 +139,6 @@ export default function ProfilePage() {
             ))}
           </div>
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -149,7 +147,7 @@ export default function ProfilePage() {
   const initials = `${currentUser.firstName?.[0] || '?'}${currentUser.lastName?.[0] || '?'}`;
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+    <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
       <PageHeader
         title="Profile"
         subtitle={isEditing ? 'Editing' : undefined}
@@ -542,7 +540,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <BottomNav />
     </div>
   );
 }

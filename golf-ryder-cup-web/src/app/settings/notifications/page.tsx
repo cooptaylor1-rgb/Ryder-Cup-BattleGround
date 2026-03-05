@@ -22,7 +22,7 @@ import {
   type NotificationPreferences,
 } from '@/lib/services/notificationService';
 import { useTripStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 export default function NotificationSettingsPage() {
@@ -107,7 +107,7 @@ export default function NotificationSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Notifications"
         subtitle={currentTrip?.name ? currentTrip.name : 'Preferences'}
@@ -274,7 +274,6 @@ export default function NotificationSettingsPage() {
         ) : null}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

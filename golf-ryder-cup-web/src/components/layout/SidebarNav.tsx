@@ -19,22 +19,22 @@ import {
     Home,
     ChevronLeft,
     ChevronRight,
-    BookOpen,
+    CalendarDays,
 } from 'lucide-react';
 
 interface NavItem {
     href: string;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
-    tab: 'today' | 'score' | 'standings' | 'journal' | 'more';
+    tab: 'today' | 'score' | 'standings' | 'schedule' | 'more';
 }
 
-// Phase 1 navigation spine: Today / Score / Standings / Journal / More
+// Navigation spine — matches BottomNav: Today / Score / Standings / Schedule / More
 const navItems: NavItem[] = [
     { href: '/', label: 'Today', icon: Home, tab: 'today' },
     { href: '/score', label: 'Score', icon: Target, tab: 'score' },
     { href: '/standings', label: 'Standings', icon: Trophy, tab: 'standings' },
-    { href: '/social', label: 'Journal', icon: BookOpen, tab: 'journal' },
+    { href: '/schedule', label: 'Schedule', icon: CalendarDays, tab: 'schedule' },
     { href: '/more', label: 'More', icon: Settings, tab: 'more' },
 ];
 

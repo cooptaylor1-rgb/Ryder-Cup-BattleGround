@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { captainLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import {
@@ -132,7 +132,7 @@ export default function CaptainManagePage() {
 
     if (!currentTrip) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="golf-ball"
@@ -146,14 +146,13 @@ export default function CaptainManagePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
 
     if (!isCaptainMode) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -171,7 +170,6 @@ export default function CaptainManagePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
@@ -259,7 +257,7 @@ export default function CaptainManagePage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Manage Trip"
                 subtitle="Sessions, Matches & Players"

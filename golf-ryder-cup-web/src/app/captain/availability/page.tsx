@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import {
   AttendanceCheckIn,
@@ -133,7 +132,7 @@ export default function AvailabilityPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -147,14 +146,13 @@ export default function AvailabilityPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -172,13 +170,12 @@ export default function AvailabilityPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Attendance"
         subtitle="Track player arrivals"

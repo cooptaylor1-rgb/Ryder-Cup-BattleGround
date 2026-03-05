@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { InvitationManager, QRCodeCard } from '@/components/captain';
 import { QrCode, Home, MoreHorizontal, Share2 } from 'lucide-react';
 
@@ -50,7 +50,7 @@ export default function InvitesPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -64,14 +64,13 @@ export default function InvitesPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -89,7 +88,6 @@ export default function InvitesPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -109,7 +107,7 @@ export default function InvitesPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Invitations"
         subtitle="Manage trip invites"
@@ -152,7 +150,6 @@ export default function InvitesPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

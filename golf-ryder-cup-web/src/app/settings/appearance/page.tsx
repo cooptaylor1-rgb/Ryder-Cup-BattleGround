@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Palette, Moon, Sun, Mountain, Shield, ChevronRight } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
@@ -33,7 +33,7 @@ export default function AppearanceSettingsPage() {
   const { theme, setTheme, autoTheme, setAutoTheme, accentTheme, setAccentTheme } = useUIStore();
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Appearance"
         subtitle="Theme & display"
@@ -219,7 +219,6 @@ export default function AppearanceSettingsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

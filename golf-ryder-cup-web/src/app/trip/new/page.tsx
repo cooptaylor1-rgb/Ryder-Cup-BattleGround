@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TripTemplatePicker } from '@/components/trip-setup';
 import type { LegacyTripTemplate as TripTemplate } from '@/lib/types/templates';
@@ -107,7 +106,7 @@ export default function NewTripPage() {
     step === 'select' ? 'New Trip' : step === 'configure' ? 'Configure Trip' : 'Review & Create';
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title={headerTitle}
         icon={<Plus size={16} className="text-[var(--color-accent)]" />}
@@ -297,7 +296,6 @@ export default function NewTripPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

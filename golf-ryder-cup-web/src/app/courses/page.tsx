@@ -14,7 +14,7 @@ import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import { NoCoursesPremiumEmpty, NoSearchResultsEmpty } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * COURSE LIBRARY PAGE - Masters-inspired design
@@ -251,7 +251,7 @@ export default function CourseLibraryPage() {
     // Database search modal
     if (showDatabaseSearch) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Search Courses"
                     subtitle="Course database"
@@ -264,13 +264,12 @@ export default function CourseLibraryPage() {
                         onClose={() => setShowDatabaseSearch(false)}
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Course Library"
                 subtitle="Reusable course profiles"
@@ -384,7 +383,6 @@ export default function CourseLibraryPage() {
                     <NoCoursesPremiumEmpty onSearchCourses={() => setShowDatabaseSearch(true)} />
                 )}
             </main>
-            <BottomNav />
         </div>
     );
 }

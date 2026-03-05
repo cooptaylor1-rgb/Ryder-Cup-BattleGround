@@ -6,16 +6,11 @@
 'use client';
 
 import { Trophy } from 'lucide-react';
-import { BottomNav, type NavBadges } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
-interface HomeLoadingSkeletonProps {
-    navBadges?: NavBadges;
-}
-
-export function HomeLoadingSkeleton({ navBadges = {} }: HomeLoadingSkeletonProps) {
+export function HomeLoadingSkeleton() {
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <header className="header-premium">
                 <div className="container-editorial flex items-center justify-between">
                     <div className="flex items-center gap-[var(--space-3)]">
@@ -40,7 +35,6 @@ export function HomeLoadingSkeleton({ navBadges = {} }: HomeLoadingSkeletonProps
                     <div className="h-20 rounded-xl bg-[color:var(--ink-tertiary)]/10" />
                 </div>
             </main>
-            <BottomNav badges={navBadges} />
         </div>
     );
 }

@@ -7,7 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
     DollarSign,
@@ -146,7 +146,7 @@ export default function BetDetailPage() {
 
     if (!currentTrip) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Bets"
                     subtitle="No active trip"
@@ -165,7 +165,6 @@ export default function BetDetailPage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
@@ -176,7 +175,7 @@ export default function BetDetailPage() {
 
     if (bet === undefined) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Bet Details"
                     subtitle={currentTrip.name}
@@ -191,7 +190,6 @@ export default function BetDetailPage() {
                         </button>
                     </div>
                 </main>
-                <BottomNav />
             </div>
         );
     }
@@ -237,7 +235,7 @@ export default function BetDetailPage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title={bet.name}
                 subtitle={bet.description}
@@ -727,7 +725,6 @@ export default function BetDetailPage() {
                 </div>
             )}
 
-            <BottomNav />
         </div>
     );
 }

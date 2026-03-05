@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { createLogger } from '@/lib/utils/logger';
 import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
@@ -254,7 +254,7 @@ export default function PlayersPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Players"
           subtitle="No active trip"
@@ -271,7 +271,6 @@ export default function PlayersPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -283,7 +282,7 @@ export default function PlayersPage() {
   const unassignedPlayers = players.filter((p) => !getPlayerTeam(p.id));
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Players"
         subtitle={`${players.length} player${players.length === 1 ? '' : 's'}`}
@@ -630,7 +629,6 @@ export default function PlayersPage() {
         </div>
       )}
 
-      <BottomNav />
     </div>
   );
 }

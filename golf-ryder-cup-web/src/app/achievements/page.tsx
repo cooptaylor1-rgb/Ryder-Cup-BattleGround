@@ -8,7 +8,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import type { PlayerStats } from '@/lib/types/awards';
 import {
   Users,
@@ -205,7 +205,7 @@ export default function AchievementsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -217,7 +217,6 @@ export default function AchievementsPage() {
             }}
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -227,7 +226,7 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Achievements"
         subtitle={`${unlockedCount} of ${totalCount} unlocked`}
@@ -286,7 +285,6 @@ export default function AchievementsPage() {
         </div>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

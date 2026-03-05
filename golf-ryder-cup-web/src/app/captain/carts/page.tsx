@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CartAssignmentManager, type CartPlayer } from '@/components/captain';
 import { Car, Home, MoreHorizontal } from 'lucide-react';
@@ -25,7 +24,7 @@ export default function CartsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -39,14 +38,13 @@ export default function CartsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -64,7 +62,6 @@ export default function CartsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -91,7 +88,7 @@ export default function CartsPage() {
   const teamB = teams.find(t => t.name?.toLowerCase().includes('europe') || t.name?.toLowerCase().includes('eur') || t.name === 'B');
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Cart Assignments"
         subtitle="Assign golf carts"
@@ -129,7 +126,6 @@ export default function CartsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

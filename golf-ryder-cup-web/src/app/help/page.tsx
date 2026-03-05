@@ -20,7 +20,7 @@ import {
   Gamepad2,
   HelpCircle,
 } from 'lucide-react';
-import { PageHeader, BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 // ============================================
 // DATA
@@ -237,7 +237,7 @@ export default function HelpPage() {
   }, [searchQuery]);
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Help & FAQ"
         icon={<HelpCircle size={16} className="text-[var(--masters)]" />}
@@ -304,7 +304,6 @@ export default function HelpPage() {
         </div>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

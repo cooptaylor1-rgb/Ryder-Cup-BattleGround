@@ -6,7 +6,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium, NoBetsEmpty } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
 import dynamic from 'next/dynamic';
 import {
@@ -90,7 +90,7 @@ export default function BetsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Bets"
           subtitle="No active trip"
@@ -109,7 +109,6 @@ export default function BetsPage() {
           />
         </main>
 
-        <BottomNav />
       </div>
     );
   }
@@ -260,7 +259,7 @@ export default function BetsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Side Bets"
         subtitle={`${activeBets.length} active`}
@@ -366,7 +365,6 @@ export default function BetsPage() {
         )}
       </main>
 
-      <BottomNav />
 
       {/* Create Bet Modal */}
       {showCreateModal && (

@@ -19,7 +19,6 @@ import type { ScoringMode } from '@/lib/types/scoringFormats';
 import { FORMAT_CONFIGS } from '@/lib/types/matchFormats';
 import type { MatchFormat } from '@/lib/types/matchFormats';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
@@ -565,7 +564,7 @@ export default function NewLineupPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="calendar"
@@ -578,14 +577,13 @@ export default function NewLineupPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -598,13 +596,12 @@ export default function NewLineupPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title={step === 'setup' ? 'New Session' : 'Build Lineup'}
         subtitle={step === 'setup' ? 'Configure session settings' : sessionName}
@@ -1075,7 +1072,6 @@ export default function NewLineupPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

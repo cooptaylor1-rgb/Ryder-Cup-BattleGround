@@ -12,7 +12,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { BottomNav } from '@/components/layout';
 
 export default function GlobalError({
     error,
@@ -30,7 +29,7 @@ export default function GlobalError({
     return (
         <html>
             <body>
-                <div className="min-h-screen pb-nav page-premium-enter texture-grain flex items-center justify-center bg-linear-to-b from-[var(--canvas)] to-[var(--surface-secondary)] px-4">
+                <div className="min-h-screen page-premium-enter texture-grain flex items-center justify-center bg-linear-to-b from-[var(--canvas)] to-[var(--surface-secondary)] px-4">
                     <div className="max-w-md w-full text-center">
                         {/* Error Icon */}
                         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[color:var(--error)]/12 flex items-center justify-center">
@@ -77,7 +76,6 @@ export default function GlobalError({
                         </div>
                     </div>
 
-                    <BottomNav />
                 </div>
             </body>
         </html>

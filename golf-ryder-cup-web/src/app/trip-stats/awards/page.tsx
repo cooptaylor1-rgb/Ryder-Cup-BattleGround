@@ -17,7 +17,7 @@ import type { AwardType, TripAward } from '@/lib/types/tripStats';
 import { AWARD_DEFINITIONS } from '@/lib/types/tripStats';
 import { Trophy, Sparkles } from 'lucide-react';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 function getPlayerName(player: Player): string {
   return `${player.firstName} ${player.lastName}`;
@@ -231,7 +231,7 @@ export default function TripAwardsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Awards"
           subtitle="No active trip"
@@ -252,13 +252,12 @@ export default function TripAwardsPage() {
           />
         </main>
 
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Trip Awards"
         subtitle={currentTrip.name}
@@ -315,7 +314,6 @@ export default function TripAwardsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

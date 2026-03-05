@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * SCHEDULE PAGE — Personal & Trip Schedule
@@ -269,7 +269,7 @@ export default function SchedulePage() {
   // If not signed in, render an explicit empty state (no blank redirects).
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Schedule"
           subtitle="Sign in required"
@@ -289,7 +289,6 @@ export default function SchedulePage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -301,7 +300,7 @@ export default function SchedulePage() {
     }
 
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Schedule"
           subtitle="No active trip"
@@ -321,7 +320,6 @@ export default function SchedulePage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -335,7 +333,7 @@ export default function SchedulePage() {
   const hasUserSchedule = mySchedule.length > 0;
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Schedule"
         subtitle={currentTrip.name}
@@ -493,7 +491,6 @@ export default function SchedulePage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

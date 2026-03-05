@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from 'lucide-react';
-import { BottomNav } from '@/components/layout';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
@@ -63,7 +62,7 @@ function LoginPageContent() {
     'w-full rounded-[var(--radius-md)] border bg-[var(--canvas-raised)] px-4 py-3 text-[length:var(--text-base)] text-[var(--ink)] outline-none transition-[border-color,box-shadow] placeholder:text-[var(--ink-tertiary)] focus:border-[var(--masters)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--masters)_16%,transparent)]';
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       {/* Editorial Header */}
       <header className="container-editorial pt-[max(3rem,env(safe-area-inset-top,0px))]">
         <div className="text-center mb-[var(--space-10)]">
@@ -200,7 +199,6 @@ function LoginPageContent() {
         </p>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

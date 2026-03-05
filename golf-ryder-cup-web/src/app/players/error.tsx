@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { ErrorEmpty } from '@/components/ui';
 
 interface ErrorPageProps {
@@ -30,7 +30,7 @@ export default function PlayersError({ error, reset }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Players"
         subtitle="Something went wrong"
@@ -61,7 +61,6 @@ export default function PlayersError({ error, reset }: ErrorPageProps) {
         </div>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

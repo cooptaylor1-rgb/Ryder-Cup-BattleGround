@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   Shield,
   Users,
@@ -188,7 +188,7 @@ export default function CaptainPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -202,14 +202,13 @@ export default function CaptainPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader title="Captain Command" subtitle="Enable captain mode to continue" />
         <main className="container-editorial py-12">
           <div className="card p-[var(--space-6)] text-center">
@@ -243,7 +242,6 @@ export default function CaptainPage() {
             </button>
           </div>
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -286,7 +284,7 @@ export default function CaptainPage() {
   const secondaryActions = QUICK_ACTIONS.filter((a) => !a.priority);
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Captain Command"
         subtitle={currentTrip.name}
@@ -667,7 +665,6 @@ export default function CaptainPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

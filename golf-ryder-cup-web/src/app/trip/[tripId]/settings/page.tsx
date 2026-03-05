@@ -6,7 +6,7 @@ import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreH
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 
 export default function TripSettingsPage() {
@@ -152,7 +152,7 @@ export default function TripSettingsPage() {
 
   if (tripLookupError) {
     return (
-      <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
           <PageHeader
@@ -191,14 +191,13 @@ export default function TripSettingsPage() {
             />
           </div>
         </div>
-        <BottomNav />
       </main>
     );
   }
 
   if (!tripName) {
     return (
-      <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
         <div className="relative page-container">
           <PageHeader
@@ -234,13 +233,12 @@ export default function TripSettingsPage() {
             />
           </div>
         </div>
-        <BottomNav />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
       <div className="relative page-container">
         <PageHeader
@@ -406,7 +404,6 @@ export default function TripSettingsPage() {
         </div>
       </div>
 
-      <BottomNav />
     </main>
   );
 }

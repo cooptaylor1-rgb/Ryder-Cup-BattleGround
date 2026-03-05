@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTripStore } from '@/lib/stores';
 import { Award, BarChart3, CalendarDays } from 'lucide-react';
-import { PageHeader, BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui';
 
 /**
@@ -20,7 +20,7 @@ export default function StatsPage() {
   const { currentTrip } = useTripStore();
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Stats"
         subtitle={currentTrip?.name ? currentTrip.name : 'No active trip'}
@@ -99,7 +99,6 @@ export default function StatsPage() {
           </section>
         )}
       </main>
-      <BottomNav />
     </div>
   );
 }

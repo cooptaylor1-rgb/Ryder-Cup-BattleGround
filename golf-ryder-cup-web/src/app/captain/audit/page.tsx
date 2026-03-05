@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { ShieldCheck, Filter, Search, Home, MoreHorizontal } from 'lucide-react';
 
 const ACTION_TYPES: AuditActionType[] = [
@@ -67,7 +67,7 @@ export default function CaptainAuditLogPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -81,14 +81,13 @@ export default function CaptainAuditLogPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -106,13 +105,12 @@ export default function CaptainAuditLogPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Captain Audit Log"
         subtitle="Monitor scoring and lineup changes"
