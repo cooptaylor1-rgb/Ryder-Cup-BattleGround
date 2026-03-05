@@ -7,7 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { betsLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { SideBet, SideBetType, Player } from '@/lib/types/models';
@@ -107,7 +107,7 @@ export default function CaptainBetsPage() {
 
     if (!currentTrip) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+            <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="golf-ball"
@@ -121,14 +121,13 @@ export default function CaptainBetsPage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
 
     if (!isCaptainMode) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+            <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -146,7 +145,6 @@ export default function CaptainBetsPage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
@@ -257,7 +255,7 @@ export default function CaptainBetsPage() {
     };
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+        <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
             <PageHeader
                 title="Side Bets"
                 subtitle={`${activeBets.length} active`}

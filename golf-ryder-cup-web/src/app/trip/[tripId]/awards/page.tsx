@@ -7,7 +7,7 @@ import { computeTripRecords } from '@/lib/services/awardsService';
 import type { TripRecords, Award, PlayerStats } from '@/lib/types/awards';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
-import { PageHeader, BottomNav } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
 function AwardCard({ award }: { award: Award }) {
@@ -171,7 +171,7 @@ export default function AwardsPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Awards"
         subtitle="Awards & records"
@@ -387,7 +387,6 @@ export default function AwardsPage() {
           </>
         )}
       </main>
-      <BottomNav />
     </div>
   );
 }

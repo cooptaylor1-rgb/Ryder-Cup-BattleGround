@@ -94,7 +94,6 @@ import {
 } from '@/components/live-play';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
 
 import type { SideBet as DBSideBet } from '@/lib/types/models';
 import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
@@ -828,7 +827,7 @@ export default function EnhancedMatchScoringPage() {
   // Loading / error / missing states
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
+      <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -845,7 +844,6 @@ export default function EnhancedMatchScoringPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -857,7 +855,7 @@ export default function EnhancedMatchScoringPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans"
+        className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -871,7 +869,6 @@ export default function EnhancedMatchScoringPage() {
             </button>
           </div>
         </main>
-        <BottomNav activeMatchId={matchId} />
       </div>
     );
   }
@@ -879,7 +876,7 @@ export default function EnhancedMatchScoringPage() {
   if (!activeMatch || !matchState) {
     return (
       <div
-        className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans"
+        className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans"
         role="alert"
       >
         <main className="container-editorial py-12">
@@ -891,7 +888,6 @@ export default function EnhancedMatchScoringPage() {
             variant="large"
           />
         </main>
-        <BottomNav activeMatchId={matchId} />
       </div>
     );
   }
@@ -899,7 +895,7 @@ export default function EnhancedMatchScoringPage() {
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas font-sans">
+    <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
       {/* Celebration Overlay - Lazy loaded for performance */}
       <AnimatePresence>
         {celebration && (
@@ -1840,7 +1836,6 @@ export default function EnhancedMatchScoringPage() {
       {/* Confirm Dialog */}
       {ConfirmDialogComponent}
 
-      <BottomNav activeMatchId={activeMatch.id} />
     </div>
   );
 }

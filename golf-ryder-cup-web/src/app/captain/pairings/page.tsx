@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { Match } from '@/lib/types/models';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { PrintablePairings } from '@/components/captain/PrintablePairings';
 import { Printer, Home, MoreHorizontal } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export default function CaptainPairingsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
@@ -49,14 +49,13 @@ export default function CaptainPairingsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -74,13 +73,12 @@ export default function CaptainPairingsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Print Pairings"
         subtitle="Match pairings sheet"
@@ -102,7 +100,6 @@ export default function CaptainPairingsPage() {
         />
       </main>
 
-      <BottomNav />
     </div>
   );
 }

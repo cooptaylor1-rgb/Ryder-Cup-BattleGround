@@ -13,7 +13,7 @@ import {
 import type { DuesCategory, PlayerFinancialSummary, TripFinancialSummary } from '@/lib/types/finances';
 import { DUES_CATEGORIES } from '@/lib/types/finances';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   DollarSign,
   CheckCircle2,
@@ -206,7 +206,7 @@ export default function FinancesPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Finances"
           subtitle="No active trip"
@@ -222,7 +222,6 @@ export default function FinancesPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -244,7 +243,7 @@ export default function FinancesPage() {
   const chargeTotalCents = chargeAmountCents * chargeTargetCount;
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Finances"
         subtitle={currentTrip.name}
@@ -346,7 +345,6 @@ export default function FinancesPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

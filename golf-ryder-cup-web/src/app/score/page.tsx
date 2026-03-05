@@ -17,7 +17,6 @@ import {
   ErrorBoundary,
   NoScoresPremiumEmpty,
 } from '@/components/ui';
-import { BottomNav } from '@/components/layout';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 
 /**
@@ -151,7 +150,7 @@ export default function ScorePage() {
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Score"
                     subtitle="Sign in required"
@@ -171,14 +170,13 @@ export default function ScorePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav activeMatchId={quickContinueMatchId} />
             </div>
         );
     }
 
     if (!currentTrip) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Score"
                     subtitle="No active trip"
@@ -198,13 +196,12 @@ export default function ScorePage() {
                         variant="large"
                     />
                 </main>
-                <BottomNav activeMatchId={quickContinueMatchId} />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Score"
                 subtitle={currentTrip.name}
@@ -318,7 +315,6 @@ export default function ScorePage() {
             </main>
 
             {/* Bottom Navigation */}
-            <BottomNav activeMatchId={quickContinueMatchId} />
         </div>
     );
 }

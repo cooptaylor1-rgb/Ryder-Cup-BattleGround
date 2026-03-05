@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 // import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmergencyContacts, type ContactPlayer, type VenueContact } from '@/components/captain';
 import { Phone, Home, MoreHorizontal } from 'lucide-react';
@@ -25,7 +24,7 @@ export default function ContactsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -39,14 +38,13 @@ export default function ContactsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -64,7 +62,6 @@ export default function ContactsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -119,7 +116,7 @@ export default function ContactsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Contacts"
         subtitle="Emergency & venue info"
@@ -141,7 +138,6 @@ export default function ContactsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

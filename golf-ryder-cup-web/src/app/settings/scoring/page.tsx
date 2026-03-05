@@ -14,7 +14,7 @@ import {
   Target,
 } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 function Toggle({
@@ -78,7 +78,7 @@ export default function ScoringSettingsPage() {
   const { scoringPreferences, updateScoringPreference, resetScoringPreferences } = useUIStore();
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Scoring"
         subtitle="Rules & preferences"
@@ -339,7 +339,6 @@ export default function ScoringSettingsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

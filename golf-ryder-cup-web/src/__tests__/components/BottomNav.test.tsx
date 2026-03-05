@@ -1,12 +1,14 @@
 /**
  * BottomNav Component Tests
  *
- * Tests for navigation, badge display, and active states.
+ * Tests for navigation and active states.
+ * BottomNav is now rendered once in NavigationShell (layout.tsx)
+ * and no longer accepts badges or activeMatchId props.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BottomNav, NavBadges } from '@/components/layout/BottomNav';
+import { BottomNav } from '@/components/layout/BottomNav';
 
 // Mock useUIStore
 const mockUIStore = {
@@ -73,13 +75,6 @@ describe('BottomNav Component', () => {
       expect(mockPush).toHaveBeenCalledWith('/schedule');
     });
 
-
-    it('navigates to active match when Score is clicked and activeMatchId is provided', () => {
-      render(<BottomNav activeMatchId="match-123" />);
-      fireEvent.click(screen.getByText('Score'));
-      expect(mockPush).toHaveBeenCalledWith('/score/match-123');
-    });
-
     it('navigates to standings when Standings is clicked', () => {
       render(<BottomNav />);
       fireEvent.click(screen.getByText('Standings'));
@@ -129,58 +124,11 @@ describe('BottomNav Component', () => {
     });
   });
 
-  describe('Badge Display', () => {
-    it('displays badge count for today', () => {
-      const badges: NavBadges = { today: 3 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.getByText('3')).toBeInTheDocument();
-    });
-
-    it('displays badge count for schedule', () => {
-      const badges: NavBadges = { schedule: 5 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.getByText('5')).toBeInTheDocument();
-    });
-
-    it('displays multiple badges', () => {
-      const badges: NavBadges = { today: 2, score: 1, standings: 4 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.getByText('2')).toBeInTheDocument();
-      expect(screen.getByText('1')).toBeInTheDocument();
-      expect(screen.getByText('4')).toBeInTheDocument();
-    });
-
-    it('does not display badge when count is 0', () => {
-      const badges: NavBadges = { today: 0 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.queryByText('0')).not.toBeInTheDocument();
-    });
-
-    it('caps badge display at 99+', () => {
-      const badges: NavBadges = { today: 150 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.getByText('99+')).toBeInTheDocument();
-    });
-
-    it('badge has accessible label', () => {
-      const badges: NavBadges = { today: 5 };
-      render(<BottomNav badges={badges} />);
-
-      expect(screen.getByLabelText('5 notifications')).toBeInTheDocument();
-    });
-  });
-
   describe('Captain Mode Badge', () => {
     it('shows captain badge on More when captain mode is enabled', () => {
       mockUIStore.isCaptainMode = true;
       render(<BottomNav />);
 
-      // The Shield icon should be present
       const moreButton = screen.getByText('More').closest('button');
       expect(moreButton?.querySelector('svg.w-2\\.5')).toBeInTheDocument();
     });
@@ -189,18 +137,8 @@ describe('BottomNav Component', () => {
       mockUIStore.isCaptainMode = false;
       render(<BottomNav />);
 
-      // The Shield icon should not be present (only 6 nav icons)
       const moreButton = screen.getByText('More').closest('button');
       expect(moreButton?.querySelector('svg.w-2\\.5')).not.toBeInTheDocument();
-    });
-
-    it('shows notification badge instead of captain badge when both apply', () => {
-      mockUIStore.isCaptainMode = true;
-      const badges: NavBadges = { more: 3 };
-      render(<BottomNav badges={badges} />);
-
-      // Should show the number badge, not the captain shield
-      expect(screen.getByText('3')).toBeInTheDocument();
     });
   });
 
@@ -208,7 +146,6 @@ describe('BottomNav Component', () => {
     it('all nav items are buttons', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
-      // 5 nav items
       expect(buttons).toHaveLength(5);
     });
 
@@ -216,7 +153,6 @@ describe('BottomNav Component', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
 
-      // All 5 buttons are nav buttons
       buttons.forEach((button) => {
         expect(button).toHaveClass('min-w-[56px]');
         expect(button).toHaveClass('min-h-[56px]');
@@ -230,10 +166,12 @@ describe('BottomNav Component', () => {
       expect(todayButton).toHaveAttribute('aria-current', 'page');
     });
 
-
-    it('uses continue-match aria-label on score button when active match exists', () => {
-      render(<BottomNav activeMatchId="match-123" />);
-      expect(screen.getByLabelText('Score (continue active match)')).toBeInTheDocument();
+    it('nav buttons have focus-visible ring', () => {
+      render(<BottomNav />);
+      const buttons = screen.getAllByRole('button');
+      buttons.forEach((button) => {
+        expect(button).toHaveClass('focus-visible:outline-none');
+      });
     });
   });
 });

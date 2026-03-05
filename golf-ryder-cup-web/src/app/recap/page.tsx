@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
 import { generateTripRecap, type TripRecapData, type FunStatHighlight, type TripHighlight } from '@/lib/services/recapService';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   Trophy,
   Award,
@@ -71,7 +71,7 @@ export default function RecapPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -81,14 +81,13 @@ export default function RecapPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Recap"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
@@ -105,14 +104,13 @@ export default function RecapPage() {
             </div>
           </div>
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (!recap) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Recap"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
@@ -127,7 +125,6 @@ export default function RecapPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -142,7 +139,7 @@ export default function RecapPage() {
   ];
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Trip Recap"
         subtitle={recap.tripName}
@@ -192,7 +189,6 @@ export default function RecapPage() {
         </div>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

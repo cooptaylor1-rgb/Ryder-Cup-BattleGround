@@ -28,7 +28,7 @@ import {
 import { Trophy, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 // ============================================
 // CATEGORY TABS COMPONENT
@@ -403,7 +403,7 @@ export default function TripStatsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Trip Stats"
           subtitle="Fun tracking beyond scores"
@@ -423,7 +423,6 @@ export default function TripStatsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -439,7 +438,7 @@ export default function TripStatsPage() {
     .reduce((a: number, b: PlayerTripStat) => a + b.value, 0);
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Trip Stats"
         subtitle={currentTrip.name}
@@ -528,7 +527,6 @@ export default function TripStatsPage() {
           </Link>
         </div>
       </main>
-      <BottomNav />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Settings, Target, Palette, Bell, Database, Info } from 'lucide-react';
 import { useUIStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * SETTINGS PAGE
@@ -69,7 +69,7 @@ export default function SettingsPage() {
   const { theme } = useUIStore();
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Settings"
         subtitle="App preferences"
@@ -128,7 +128,6 @@ export default function SettingsPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

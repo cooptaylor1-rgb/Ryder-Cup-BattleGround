@@ -39,7 +39,7 @@ import {
   PartyPopper,
 } from 'lucide-react';
 import { EmptyStatePremium, NoStandingsPremiumEmpty, PageLoadingSkeleton } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -172,7 +172,7 @@ export default function StandingsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Standings"
           subtitle="No active trip"
@@ -189,7 +189,6 @@ export default function StandingsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
@@ -267,7 +266,7 @@ export default function StandingsPage() {
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Standings"
         subtitle={currentTrip.name}
@@ -321,7 +320,6 @@ export default function StandingsPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }
@@ -1033,18 +1031,6 @@ function PlayerRow({ entry, rank, isTeamA, teamALabel, teamBLabel, animationDela
       >
         {entry.points}
       </span>
-    </div>
-  );
-}
-
-/* ============================================
-   Loading & Empty States
-   ============================================ */
-function _LoadingState() {
-  return (
-    <div className="section text-center py-[var(--space-20)] px-0">
-      <div className="skeleton w-[120px] h-20 mx-auto mb-[var(--space-4)]" />
-      <div className="skeleton w-[200px] h-4 mx-auto" />
     </div>
   );
 }

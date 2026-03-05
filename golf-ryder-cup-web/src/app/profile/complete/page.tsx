@@ -15,7 +15,6 @@ import {
   User,
   AlertTriangle,
 } from 'lucide-react';
-import { BottomNav } from '@/components/layout';
 import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
@@ -149,7 +148,7 @@ function CompleteProfilePageContent() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+      <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -166,14 +165,13 @@ function CompleteProfilePageContent() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   if (currentUser?.hasCompletedOnboarding) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-canvas">
+      <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
@@ -190,7 +188,6 @@ function CompleteProfilePageContent() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }

@@ -6,7 +6,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { formatPlayerName } from '@/lib/utils';
 import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsPremiumEmpty } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * MATCHUPS PAGE — Team Rosters & Sessions
@@ -39,7 +39,7 @@ export default function MatchupsPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
@@ -50,13 +50,12 @@ export default function MatchupsPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Matchups"
         subtitle={currentTrip.name}
@@ -286,7 +285,6 @@ export default function MatchupsPage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }

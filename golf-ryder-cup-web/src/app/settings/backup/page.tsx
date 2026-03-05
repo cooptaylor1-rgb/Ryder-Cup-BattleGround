@@ -30,7 +30,7 @@ import { useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/db';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import {
     exportTripToFile,
@@ -279,7 +279,7 @@ export default function BackupRestorePage() {
 
     if (loadError) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <PageHeader
                     title="Backup & Restore"
                     subtitle="Trip data management"
@@ -291,13 +291,12 @@ export default function BackupRestorePage() {
                     <ErrorEmpty message={loadError} onRetry={loadTrips} />
                 </main>
 
-                <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Backup & Restore"
                 subtitle="Export and import trip data"
@@ -509,7 +508,6 @@ export default function BackupRestorePage() {
                 </div>
             </main>
 
-            <BottomNav />
         </div>
     );
 }

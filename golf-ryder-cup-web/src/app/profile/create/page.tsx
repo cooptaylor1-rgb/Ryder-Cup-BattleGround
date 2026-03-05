@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { BottomNav } from '@/components/layout';
 import { PageLoadingSkeleton } from '@/components/ui';
 import {
   Mail,
@@ -201,7 +200,7 @@ function CreateProfilePageContent() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
       {/* ---- HEADER ---- */}
       <header
         style={{
@@ -920,7 +919,6 @@ function CreateProfilePageContent() {
         </div>
       </div>
 
-      <BottomNav />
     </div>
   );
 }

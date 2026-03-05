@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home, WifiOff } from 'lucide-react';
-import { BottomNav } from '@/components/layout';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -29,7 +28,7 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
     : 'We encountered an unexpected error. Your data is safe \u2014 please try again or return to the home screen.';
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain flex flex-col items-center justify-center p-6 bg-[var(--canvas)]">
       <div
         className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 ${
           isNetworkError ? 'bg-[color:var(--warning)]/10' : 'bg-[color:var(--error)]/10'
@@ -66,7 +65,6 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
         </Link>
       </div>
 
-      <BottomNav />
     </div>
   );
 }

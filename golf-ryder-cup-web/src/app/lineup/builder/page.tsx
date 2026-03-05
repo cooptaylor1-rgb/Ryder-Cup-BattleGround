@@ -39,7 +39,7 @@ import {
 } from '@/lib/services/lineupBuilderService';
 
 import { useTripStore } from '@/lib/stores';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 
 // Extended type for drag operations
@@ -232,7 +232,7 @@ function LineupBuilderPageContent() {
 
     if (!trip) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="trophy"
@@ -242,7 +242,6 @@ function LineupBuilderPageContent() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
@@ -253,7 +252,7 @@ function LineupBuilderPageContent() {
 
     if (!sessionId || !lineupState) {
         return (
-            <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
                 <main className="container-editorial py-12">
                     <EmptyStatePremium
                         illustration="calendar"
@@ -264,13 +263,12 @@ function LineupBuilderPageContent() {
                         variant="large"
                     />
                 </main>
-                <BottomNav />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+        <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
             <PageHeader
                 title="Lineup Builder"
                 subtitle={`${lineupState.sessionType} • ${lineupState.playersPerMatch}v${lineupState.playersPerMatch}`}
@@ -503,7 +501,6 @@ function LineupBuilderPageContent() {
                 </div>
             </div>
 
-            <BottomNav />
         </div>
     );
 }

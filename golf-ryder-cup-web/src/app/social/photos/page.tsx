@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   Camera,
   Plus,
@@ -121,7 +121,7 @@ export default function PhotosPage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="celebration"
@@ -138,13 +138,12 @@ export default function PhotosPage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Photos"
         subtitle={currentTrip.name}
@@ -284,7 +283,6 @@ export default function PhotosPage() {
         </div>
       )}
 
-      <BottomNav />
     </div>
   );
 }

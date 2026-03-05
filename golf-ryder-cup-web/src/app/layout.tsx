@@ -14,6 +14,7 @@ import { NotificationProvider } from '@/components/live-play';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { QuickScoreFABv2 } from '@/components/scoring';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { NavigationShell } from '@/components/layout/NavigationShell';
 import { TripRehydrationProvider } from '@/components/TripRehydrationProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -195,12 +196,11 @@ export default function RootLayout({
                     <TripRehydrationProvider>
                       <NotificationProvider>
                         <AppOnboardingProvider>
-                          <main
-                            id="main-content"
-                            className="pb-[calc(80px+env(safe-area-inset-bottom,0px))]"
-                          >
-                            {children}
-                          </main>
+                          <NavigationShell>
+                            <main id="main-content">
+                              {children}
+                            </main>
+                          </NavigationShell>
                         </AppOnboardingProvider>
                       </NotificationProvider>
                     </TripRehydrationProvider>

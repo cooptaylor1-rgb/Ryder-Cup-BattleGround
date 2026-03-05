@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import { createLogger } from '@/lib/utils/logger';
 import {
   ChevronLeft,
@@ -257,7 +257,7 @@ export default function AdminPage() {
   // Redirect if not in admin mode
   if (!isAdminMode) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
           title="Admin"
           subtitle="Admin Mode Required"
@@ -280,13 +280,12 @@ export default function AdminPage() {
           </div>
         </main>
 
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       {ConfirmDialogComponent}
 
       <PageHeader
@@ -594,7 +593,6 @@ export default function AdminPage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

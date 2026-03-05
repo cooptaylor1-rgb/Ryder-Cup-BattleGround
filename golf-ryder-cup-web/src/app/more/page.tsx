@@ -3,51 +3,50 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTripStore, useUIStore, useAuthStore } from '@/lib/stores';
 import { seedDemoData, clearDemoData } from '@/lib/db/seed';
 import { cn } from '@/lib/utils';
 import { createLogger } from '@/lib/utils/logger';
+import { Modal, ConfirmDialog } from '@/components/ui/Modal';
+import { PageHeader } from '@/components/layout';
 import {
   ChevronRight,
-  // Account & Auth
   User,
   LogIn,
   LogOut,
-  // Trip & Management
   Shield,
   Lock,
   Unlock,
   MapPin,
   DollarSign,
   CalendarDays,
-  // Social
   MessageSquare,
   BarChart3,
   Award,
   Coins,
   Trophy,
-  // Settings
   Palette,
   Bell,
   Target,
   HardDrive,
-  // Data
   Database,
   Trash2,
-  // Info
   Heart,
   Info,
   HelpCircle,
 } from 'lucide-react';
-import { PageHeader, BottomNav } from '@/components/layout';
 
 /**
- * MORE PAGE -- Organized Settings & Hub
+ * MORE PAGE — Organized Settings & Hub
  *
- * Clean, section-based layout with Trip Management, Social,
- * Settings, and Account groups. Uses the Fried Egg Golf
- * editorial design system.
+ * Clean, section-based layout. Uses the Fried Egg Golf
+ * editorial design system with proper Modal components.
+ *
+ * Sections:
+ * 1. Your Trip (captain, schedule, finances, courses)
+ * 2. Social & Fun (banter, bets, stats, awards, recap)
+ * 3. Settings (appearance, notifications, scoring, backup)
+ * 4. Account (profile, help, about)
  */
 
 // ============================================
@@ -157,12 +156,12 @@ export default function MorePage() {
   };
 
   // ============================================
-  // MENU SECTIONS
+  // MENU SECTIONS — reorganized IA
   // ============================================
 
-  const tripManagementSection: MenuSection = {
-    id: 'trip-management',
-    title: 'Trip Management',
+  const yourTripSection: MenuSection = {
+    id: 'your-trip',
+    title: 'Your Trip',
     items: [
       ...(isCaptainMode
         ? [
@@ -178,18 +177,18 @@ export default function MorePage() {
           ]
         : []),
       {
-        id: 'finances',
-        label: 'Finances',
-        description: 'Expenses & settling up',
-        icon: <DollarSign size={20} />,
-        href: '/finances',
-      },
-      {
         id: 'schedule',
         label: 'Schedule',
         description: 'Sessions & tee times',
         icon: <CalendarDays size={20} />,
         href: '/schedule',
+      },
+      {
+        id: 'finances',
+        label: 'Finances',
+        description: 'Expenses & settling up',
+        icon: <DollarSign size={20} />,
+        href: '/finances',
       },
       {
         id: 'courses',
@@ -202,8 +201,8 @@ export default function MorePage() {
   };
 
   const socialSection: MenuSection = {
-    id: 'social',
-    title: 'Social',
+    id: 'social-fun',
+    title: 'Social & Fun',
     items: [
       {
         id: 'banter',
@@ -211,6 +210,13 @@ export default function MorePage() {
         description: 'Trip talk & memories',
         icon: <MessageSquare size={20} />,
         href: '/social',
+      },
+      {
+        id: 'bets',
+        label: 'Bets & Side Games',
+        description: 'Fun wagers & pools',
+        icon: <Coins size={20} />,
+        href: '/bets',
       },
       {
         id: 'trip-stats',
@@ -227,25 +233,11 @@ export default function MorePage() {
         href: '/trip-stats/awards',
       },
       {
-        id: 'bets',
-        label: 'Bets & Side Games',
-        description: 'Fun wagers & pools',
-        icon: <Coins size={20} />,
-        href: '/bets',
-      },
-      {
         id: 'recap',
         label: 'Trip Recap',
         description: 'Highlight reel & year in review',
         icon: <Trophy size={20} />,
         href: '/recap',
-      },
-      {
-        id: 'help',
-        label: 'Help & FAQ',
-        description: 'How to score, captain mode & more',
-        icon: <HelpCircle size={20} />,
-        href: '/help',
       },
     ],
   };
@@ -297,11 +289,17 @@ export default function MorePage() {
         href: '/profile',
       },
       {
+        id: 'help',
+        label: 'Help & FAQ',
+        description: 'How to score, captain mode & more',
+        icon: <HelpCircle size={20} />,
+        href: '/help',
+      },
+      {
         id: 'about',
         label: 'About',
         description: 'Version 1.1.0',
         icon: <Info size={20} />,
-        // No href -- rendered inline with version info below
       },
     ],
   };
@@ -360,7 +358,7 @@ export default function MorePage() {
     : null;
 
   const allSections: MenuSection[] = [
-    tripManagementSection,
+    yourTripSection,
     socialSection,
     settingsSection,
     accountSection,
@@ -369,36 +367,26 @@ export default function MorePage() {
   ];
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
-      {/* Header */}
-      <PageHeader
-        title="More"
-        onBack={() => router.push('/')}
-      />
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+      <PageHeader title="More" onBack={() => router.push('/')} />
 
       <main className="container-editorial pt-[var(--space-6)] pb-[var(--space-6)]">
         {/* Account Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] border border-[var(--rule)]"
-        >
+        <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] border border-[var(--rule)]">
           {isAuthenticated && currentUser ? (
             <Link
               href="/profile"
               className="flex items-center gap-[var(--space-4)] no-underline text-inherit"
             >
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-[var(--canvas)] font-[var(--font-sans)] font-bold text-base bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-              >
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-[var(--canvas)] font-sans font-bold text-base bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]">
                 {currentUser.firstName?.[0] || '?'}
                 {currentUser.lastName?.[0] || '?'}
               </div>
               <div className="flex-1">
-                <p className="font-[var(--font-sans)] font-semibold text-base text-[var(--ink-primary)]">
+                <p className="font-semibold text-base text-[var(--ink)]">
                   {currentUser.firstName} {currentUser.lastName}
                 </p>
-                <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mt-[2px]">
+                <p className="text-sm text-[var(--ink-secondary)] mt-[2px]">
                   {currentUser.email}
                 </p>
               </div>
@@ -408,39 +396,34 @@ export default function MorePage() {
             <div className="flex gap-[var(--space-3)]">
               <Link
                 href="/login"
-                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--masters)] text-[var(--canvas)] rounded-[var(--radius-md)] font-[var(--font-sans)] font-semibold text-sm no-underline"
+                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--masters)] text-[var(--canvas)] rounded-[var(--radius-md)] font-semibold text-sm no-underline"
               >
                 <LogIn size={18} />
                 Sign In
               </Link>
               <Link
                 href="/profile/create"
-                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--canvas-raised)] border border-[var(--rule)] text-[var(--ink-primary)] rounded-[var(--radius-md)] font-[var(--font-sans)] font-semibold text-sm no-underline"
+                className="flex-1 flex items-center justify-center gap-2 p-3 bg-[var(--canvas-raised)] border border-[var(--rule)] text-[var(--ink)] rounded-[var(--radius-md)] font-semibold text-sm no-underline"
               >
                 <User size={18} />
                 Create Profile
               </Link>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Current Trip Card */}
         {currentTrip && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-[var(--canvas)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-          >
+          <div className="rounded-[var(--radius-lg)] p-[var(--space-5)] mb-[var(--space-6)] text-[var(--canvas)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-[var(--font-sans)] text-[0.6875rem] font-semibold tracking-[0.1em] uppercase opacity-80 mb-1">
+                <p className="text-[0.6875rem] font-semibold tracking-[0.1em] uppercase opacity-80 mb-1">
                   Current Trip
                 </p>
-                <p className="font-[var(--font-serif)] font-normal text-xl tracking-[-0.01em]">
+                <p className="font-serif font-normal text-xl tracking-[-0.01em]">
                   {currentTrip.name}
                 </p>
-                <p className="font-[var(--font-sans)] text-sm opacity-90 mt-[6px]">
+                <p className="text-sm opacity-90 mt-[6px]">
                   {new Date(currentTrip.startDate).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -455,26 +438,26 @@ export default function MorePage() {
               </div>
               <button
                 onClick={() => setShowExitTripConfirm(true)}
-                className="flex items-center gap-1.5 py-2 px-3 rounded-[var(--radius-md)] border border-[color:var(--canvas)]/25 bg-[color:var(--canvas)]/15 text-[var(--canvas)] font-[var(--font-sans)] text-xs font-semibold cursor-pointer transition-colors hover:bg-[color:var(--canvas)]/25"
+                className="flex items-center gap-1.5 py-2 px-3 rounded-[var(--radius-md)] border border-[color:var(--canvas)]/25 bg-[color:var(--canvas)]/15 text-[var(--canvas)] text-xs font-semibold cursor-pointer transition-colors hover:bg-[color:var(--canvas)]/25"
               >
                 <LogOut size={14} />
                 Exit
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Captain Mode Toggle */}
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onClick={() => (isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true))}
-          className={`w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-3)] cursor-pointer text-left ${
+        <button
+          onClick={() =>
+            isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)
+          }
+          className={cn(
+            'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-3)] cursor-pointer text-left',
             isCaptainMode
               ? 'bg-[var(--maroon-subtle)] border-2 border-[var(--maroon)]'
               : 'bg-[var(--canvas-raised)] border border-[var(--rule)]'
-          }`}
+          )}
         >
           <div
             className={cn(
@@ -488,259 +471,225 @@ export default function MorePage() {
           </div>
           <div className="flex-1">
             <p
-              className={`font-[var(--font-sans)] font-semibold ${
-                isCaptainMode ? 'text-[var(--maroon-dark)]' : 'text-[var(--ink-primary)]'
-              }`}
+              className={cn(
+                'font-semibold',
+                isCaptainMode ? 'text-[var(--maroon-dark)]' : 'text-[var(--ink)]'
+              )}
             >
               Captain Mode
             </p>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mt-[2px]">
-              {isCaptainMode ? 'Enabled -- Full editing access' : 'Tap to unlock editing'}
+            <p className="text-sm text-[var(--ink-secondary)] mt-[2px]">
+              {isCaptainMode
+                ? 'Enabled — Full editing access'
+                : 'Tap to unlock editing'}
             </p>
           </div>
-          <Toggle enabled={isCaptainMode} color={isCaptainMode ? 'var(--maroon)' : undefined} />
-        </motion.button>
+          <Toggle
+            enabled={isCaptainMode}
+            color={isCaptainMode ? 'var(--maroon)' : undefined}
+          />
+        </button>
 
         {/* Admin Mode Toggle */}
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12 }}
-          onClick={() => (isAdminMode ? disableAdminMode() : setShowAdminModal(true))}
-          className={`w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-8)] cursor-pointer text-left ${
+        <button
+          onClick={() =>
+            isAdminMode ? disableAdminMode() : setShowAdminModal(true)
+          }
+          className={cn(
+            'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-8)] cursor-pointer text-left',
             isAdminMode
               ? 'bg-[color:var(--error)]/12 border border-[color:var(--error)]/40'
               : 'bg-[var(--canvas-raised)] border border-[var(--rule)]'
-          }`}
+          )}
         >
           <div
-            className={`w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${
-              isAdminMode ? 'bg-[var(--error)] text-[var(--canvas)]' : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
-            }`}
+            className={cn(
+              'w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
+              isAdminMode
+                ? 'bg-[var(--error)] text-[var(--canvas)]'
+                : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
+            )}
           >
             <Shield size={22} />
           </div>
           <div className="flex-1">
             <p
-              className={`font-[var(--font-sans)] font-semibold ${
-                isAdminMode ? 'text-[var(--error)]' : 'text-[var(--ink-primary)]'
-              }`}
+              className={cn(
+                'font-semibold',
+                isAdminMode ? 'text-[var(--error)]' : 'text-[var(--ink)]'
+              )}
             >
               Admin Mode
             </p>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mt-[2px]">
-              {isAdminMode ? 'Enabled -- Data management access' : 'Delete trips & manage data'}
+            <p className="text-sm text-[var(--ink-secondary)] mt-[2px]">
+              {isAdminMode
+                ? 'Enabled — Data management access'
+                : 'Delete trips & manage data'}
             </p>
           </div>
-          <Toggle enabled={isAdminMode} color={isAdminMode ? 'var(--error)' : undefined} />
-        </motion.button>
+          <Toggle
+            enabled={isAdminMode}
+            color={isAdminMode ? 'var(--error)' : undefined}
+          />
+        </button>
 
-        {/* Organized Menu Sections */}
-        {allSections.map((section, sectionIndex) => (
-          <motion.section
-            key={section.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + sectionIndex * 0.05 }}
-            className="mb-[var(--space-6)]"
-          >
-            {sectionIndex > 0 && <hr className="divider-subtle mb-[var(--space-5)]" />}
-            <h2 className="type-overline font-[var(--font-sans)] mb-[var(--space-3)]">
-              {section.title}
-            </h2>
+        {/* Organized Menu Sections — CSS stagger instead of framer-motion */}
+        <div className="stagger-fast">
+          {allSections.map((section, sectionIndex) => (
+            <section key={section.id} className="mb-[var(--space-6)] stagger-item">
+              {sectionIndex > 0 && (
+                <hr className="divider-subtle mb-[var(--space-5)]" />
+              )}
+              <h2 className="type-overline mb-[var(--space-3)]">
+                {section.title}
+              </h2>
 
-            <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden">
-              {section.items.map((item, index) => (
-                <MenuItemRow
-                  key={item.id}
-                  item={item}
-                  isLast={index === section.items.length - 1}
-                  isLoading={item.id === 'demo' && isSeeding}
-                />
-              ))}
-            </div>
-          </motion.section>
-        ))}
+              <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden">
+                {section.items.map((item, index) => (
+                  <MenuItemRow
+                    key={item.id}
+                    item={item}
+                    isLast={index === section.items.length - 1}
+                    isLoading={item.id === 'demo' && isSeeding}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
 
-        {/* About Section -- inline version info */}
+        {/* About Section */}
         <hr className="divider-subtle" />
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] p-[var(--space-6)] border border-[var(--rule)] mt-[var(--space-6)] mb-[var(--space-6)]"
-        >
+        <section className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] p-[var(--space-6)] border border-[var(--rule)] mt-[var(--space-6)] mb-[var(--space-6)]">
           <div className="flex items-center gap-[var(--space-4)] mb-[var(--space-4)]">
-            <div
-              className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-[var(--canvas)] font-[var(--font-serif)] font-normal text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-            >
+            <div className="w-[52px] h-[52px] rounded-[var(--radius-lg)] flex items-center justify-center text-[var(--canvas)] font-serif text-xl tracking-[-0.02em] shadow-[0_4px_12px_rgba(0,66,37,0.25)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]">
               RC
             </div>
             <div>
-              <p className="font-[var(--font-serif)] font-normal text-lg text-[var(--ink-primary)] tracking-[-0.01em]">
+              <p className="font-serif text-lg text-[var(--ink)] tracking-[-0.01em]">
                 Golf Ryder Cup
               </p>
-              <p className="font-[var(--font-sans)] text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px]">
+              <p className="text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px]">
                 Version 1.1.0
               </p>
             </div>
           </div>
-          <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] leading-[1.6]">
-            Offline-first match play scoring for your Ryder Cup format golf trip. Track scores,
-            manage lineups, and celebrate with friends.
+          <p className="text-sm text-[var(--ink-secondary)] leading-[1.6]">
+            Offline-first match play scoring for your Ryder Cup format golf trip.
+            Track scores, manage lineups, and celebrate with friends.
           </p>
-          <div className="mt-[var(--space-4)] pt-[var(--space-4)] border-t border-t-[var(--rule)] flex items-center gap-2 text-[var(--ink-tertiary)] font-[var(--font-sans)] text-xs">
+          <div className="mt-[var(--space-4)] pt-[var(--space-4)] border-t border-t-[var(--rule)] flex items-center gap-2 text-[var(--ink-tertiary)] text-xs">
             <Heart size={14} className="text-[var(--error)]" />
             Made with love for golf
           </div>
-        </motion.section>
+        </section>
       </main>
 
-      {/* Modals */}
-      <AnimatePresence>
-        {showCaptainModal && (
-          <Modal onClose={() => setShowCaptainModal(false)}>
-            <h2 className="font-[var(--font-serif)] text-xl font-normal mb-2 text-[var(--ink-primary)]">
-              Enable Captain Mode
-            </h2>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mb-5 leading-normal">
-              Enter a PIN to unlock captain features like editing lineups and managing players.
-            </p>
-            <input
-              type="password"
-              value={captainPin}
-              onChange={(e) => setCaptainPin(e.target.value)}
-              placeholder="Enter 4+ digit PIN"
-              autoFocus
-              className="w-full py-3.5 px-4 font-[var(--font-sans)] text-base rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] mb-4"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowCaptainModal(false);
-                  setCaptainPin('');
-                }}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEnableCaptainMode}
-                disabled={captainPin.length < 4}
-                className={`flex-1 p-3.5 rounded-[var(--radius-md)] border-none font-[var(--font-sans)] font-semibold ${
-                  captainPin.length >= 4
-                    ? 'bg-[var(--maroon)] text-[var(--canvas)] cursor-pointer'
-                    : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed'
-                }`}
-              >
-                Enable
-              </button>
-            </div>
-          </Modal>
-        )}
+      {/* ============================================
+         MODALS — Using proper Modal component
+         (portal, focus trap, escape key, scroll lock)
+         ============================================ */}
 
-        {showClearConfirm && (
-          <Modal onClose={() => setShowClearConfirm(false)}>
-            <div className="w-14 h-14 rounded-full bg-[var(--error-subtle)] flex items-center justify-center mx-auto mb-4">
-              <Trash2 size={28} className="text-[var(--error)]" />
-            </div>
-            <h2 className="font-[var(--font-serif)] text-xl font-normal text-center mb-2 text-[var(--ink-primary)]">
-              Clear All Data?
-            </h2>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] text-center mb-5 leading-normal">
-              This will permanently delete all trips, players, matches, and scores. This cannot be
-              undone.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowClearConfirm(false)}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleClearData}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--error)] text-[var(--canvas)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Clear All
-              </button>
-            </div>
-          </Modal>
-        )}
+      {/* Captain PIN Modal */}
+      <Modal
+        isOpen={showCaptainModal}
+        onClose={() => {
+          setShowCaptainModal(false);
+          setCaptainPin('');
+        }}
+        title="Enable Captain Mode"
+        description="Enter a PIN to unlock captain features like editing lineups and managing players."
+        size="sm"
+      >
+        <input
+          type="password"
+          value={captainPin}
+          onChange={(e) => setCaptainPin(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleEnableCaptainMode()}
+          placeholder="Enter 4+ digit PIN"
+          autoFocus
+          className="input mb-4"
+        />
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setShowCaptainModal(false);
+              setCaptainPin('');
+            }}
+            className="btn-secondary flex-1"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleEnableCaptainMode}
+            disabled={captainPin.length < 4}
+            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Enable
+          </button>
+        </div>
+      </Modal>
 
-        {showExitTripConfirm && (
-          <Modal onClose={() => setShowExitTripConfirm(false)}>
-            <h2 className="font-[var(--font-serif)] text-xl font-normal mb-2 text-[var(--ink-primary)]">
-              Exit Trip?
-            </h2>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mb-5 leading-normal">
-              You&apos;ll return to the trip selector. Your data is saved and you can return
-              anytime.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowExitTripConfirm(false)}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleExitTrip}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border-none bg-[var(--masters)] text-[var(--canvas)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Exit Trip
-              </button>
-            </div>
-          </Modal>
-        )}
+      {/* Admin PIN Modal */}
+      <Modal
+        isOpen={showAdminModal}
+        onClose={() => {
+          setShowAdminModal(false);
+          setAdminPin('');
+        }}
+        title="Enable Admin Mode"
+        description="Admin mode allows you to delete trips, clean up data, and access advanced management features."
+        size="sm"
+      >
+        <input
+          type="password"
+          value={adminPin}
+          onChange={(e) => setAdminPin(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleEnableAdminMode()}
+          placeholder="Enter 4+ digit PIN"
+          autoFocus
+          className="input mb-4"
+        />
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setShowAdminModal(false);
+              setAdminPin('');
+            }}
+            className="btn-secondary flex-1"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleEnableAdminMode}
+            disabled={adminPin.length < 4}
+            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Enable
+          </button>
+        </div>
+      </Modal>
 
-        {showAdminModal && (
-          <Modal onClose={() => setShowAdminModal(false)}>
-            <div className="w-14 h-14 rounded-full bg-[color:var(--error)]/12 flex items-center justify-center mx-auto mb-4">
-              <Shield size={28} className="text-[var(--error)]" />
-            </div>
-            <h2 className="font-[var(--font-serif)] text-xl font-normal mb-2 text-center text-[var(--ink-primary)]">
-              Enable Admin Mode
-            </h2>
-            <p className="font-[var(--font-sans)] text-sm text-[var(--ink-secondary)] mb-5 text-center leading-normal">
-              Admin mode allows you to delete trips, clean up data, and access advanced management
-              features.
-            </p>
-            <input
-              type="password"
-              value={adminPin}
-              onChange={(e) => setAdminPin(e.target.value)}
-              placeholder="Enter 4+ digit PIN"
-              autoFocus
-              className="w-full py-3.5 px-4 font-[var(--font-sans)] text-base rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] mb-4"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowAdminModal(false);
-                  setAdminPin('');
-                }}
-                className="flex-1 p-3.5 rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-primary)] font-[var(--font-sans)] font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEnableAdminMode}
-                disabled={adminPin.length < 4}
-                className={`flex-1 p-3.5 rounded-[var(--radius-md)] border-none font-[var(--font-sans)] font-semibold ${
-                  adminPin.length >= 4
-                    ? 'bg-[var(--error)] text-[var(--canvas)] cursor-pointer'
-                    : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed'
-                }`}
-              >
-                Enable
-              </button>
-            </div>
-          </Modal>
-        )}
-      </AnimatePresence>
+      {/* Clear Data Confirmation */}
+      <ConfirmDialog
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={handleClearData}
+        title="Clear All Data?"
+        description="This will permanently delete all trips, players, matches, and scores. This cannot be undone."
+        confirmLabel="Clear All"
+        variant="danger"
+      />
 
-      <BottomNav />
+      {/* Exit Trip Confirmation */}
+      <ConfirmDialog
+        isOpen={showExitTripConfirm}
+        onClose={() => setShowExitTripConfirm(false)}
+        onConfirm={handleExitTrip}
+        title="Exit Trip?"
+        description="You'll return to the trip selector. Your data is saved and you can return anytime."
+        confirmLabel="Exit Trip"
+      />
     </div>
   );
 }
@@ -761,49 +710,52 @@ function MenuItemRow({
   const content = (
     <>
       <div
-        className={`w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${
+        className={cn(
+          'w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
           item.destructive
             ? 'bg-[var(--error-subtle)] text-[var(--error)]'
             : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
-        }`}
+        )}
       >
         {item.icon}
       </div>
       <div className="flex-1 min-w-0">
         <p
-          className={`font-[var(--font-sans)] font-medium text-[0.9375rem] ${
-            item.destructive ? 'text-[var(--error)]' : 'text-[var(--ink-primary)]'
-          }`}
+          className={cn(
+            'font-medium text-[0.9375rem]',
+            item.destructive ? 'text-[var(--error)]' : 'text-[var(--ink)]'
+          )}
         >
           {item.label}
         </p>
         {item.description && (
-          <p className="font-[var(--font-sans)] text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px] leading-[1.4]">
+          <p className="text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px] leading-[1.4]">
             {item.description}
           </p>
         )}
       </div>
       {item.badge && (
         <span
-          className="py-[3px] px-2 rounded-[6px] text-[var(--canvas)] font-[var(--font-sans)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em] bg-[var(--badge-bg)]"
-          style={{ '--badge-bg': item.badgeColor || 'var(--masters)' } as React.CSSProperties}
+          className="py-[3px] px-2 rounded-[6px] text-[var(--canvas)] text-[0.6875rem] font-semibold uppercase tracking-[0.04em] bg-[var(--badge-bg)]"
+          style={
+            { '--badge-bg': item.badgeColor || 'var(--masters)' } as React.CSSProperties
+          }
         >
           {item.badge}
         </span>
       )}
       {isLoading ? (
-        <span className="font-[var(--font-sans)] text-[0.8125rem] text-[var(--ink-tertiary)]">
-          Loading...
-        </span>
+        <span className="text-[0.8125rem] text-[var(--ink-tertiary)]">Loading...</span>
       ) : item.href ? (
         <ChevronRight size={18} className="text-[var(--ink-tertiary)] shrink-0" />
       ) : null}
     </>
   );
 
-  const itemClassName = `flex items-center gap-[var(--space-3)] py-[var(--space-4)] px-[var(--space-5)] w-full text-left no-underline text-inherit bg-transparent border-0 cursor-pointer transition-colors duration-150 ${
-    !isLast ? 'border-b border-b-[var(--rule-faint)]' : ''
-  }`;
+  const itemClassName = cn(
+    'flex items-center gap-[var(--space-3)] py-[var(--space-4)] px-[var(--space-5)] w-full text-left no-underline text-inherit bg-transparent border-0 cursor-pointer transition-colors duration-150',
+    !isLast && 'border-b border-b-[var(--rule-faint)]'
+  );
 
   if (item.href) {
     return (
@@ -821,47 +773,21 @@ function MenuItemRow({
     );
   }
 
-  // Inert row (e.g. About -- no link, no action)
-  return (
-    <div className={itemClassName}>
-      {content}
-    </div>
-  );
+  return <div className={itemClassName}>{content}</div>;
 }
 
 function Toggle({ enabled, color }: { enabled: boolean; color?: string }) {
   return (
     <div
-      className="w-12 h-7 rounded-[14px] relative transition-colors duration-200 shrink-0 bg-[var(--toggle-bg)]"
-      style={{ '--toggle-bg': enabled ? color || 'var(--masters)' : 'var(--rule)' } as React.CSSProperties}
+      className="w-12 h-7 rounded-[14px] relative transition-colors duration-200 shrink-0"
+      style={{
+        background: enabled ? color || 'var(--masters)' : 'var(--rule)',
+      }}
     >
-      <motion.div
-        animate={{ x: enabled ? 22 : 2 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className="absolute top-[2px] w-6 h-6 rounded-full bg-[var(--surface-raised)] shadow-sm"
+      <div
+        className="absolute top-[2px] w-6 h-6 rounded-full bg-[var(--surface-raised)] shadow-sm transition-transform duration-200"
+        style={{ transform: `translateX(${enabled ? 22 : 2}px)` }}
       />
     </div>
-  );
-}
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 bg-[color:var(--ink)]/50 flex items-center justify-center p-6 z-[100]"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-[var(--canvas-raised)] rounded-[var(--radius-xl)] p-[var(--space-6)] w-full max-w-[360px] shadow-[0_20px_40px_rgba(0,0,0,0.25)] border border-[var(--rule)]"
-      >
-        {children}
-      </motion.div>
-    </motion.div>
   );
 }

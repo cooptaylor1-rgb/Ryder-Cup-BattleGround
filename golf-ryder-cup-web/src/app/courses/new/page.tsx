@@ -15,7 +15,7 @@ import {
 import { createCourseProfile } from '@/lib/services/courseLibraryService';
 import { useUIStore } from '@/lib/stores';
 import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 
 /**
  * NEW COURSE PAGE
@@ -204,7 +204,7 @@ export default function NewCoursePage() {
   };
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       {/* Scorecard Upload Modal */}
       {showScorecardUpload && (
         <ScorecardUpload
@@ -444,7 +444,6 @@ export default function NewCoursePage() {
         </section>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

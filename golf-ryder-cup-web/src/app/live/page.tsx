@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import { uiLogger } from '@/lib/utils/logger';
 import { useRealtimeScoring } from '@/lib/hooks/useRealtimeScoring';
 import { EmptyStatePremium } from '@/components/ui';
-import { BottomNav, PageHeader } from '@/components/layout';
+import { PageHeader } from '@/components/layout';
 import {
   Tv,
   RefreshCw,
@@ -145,7 +145,7 @@ export default function LivePage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="scorecard"
@@ -162,13 +162,12 @@ export default function LivePage() {
             variant="large"
           />
         </main>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-nav page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Live Scores"
         subtitle={currentTrip.name}
@@ -306,7 +305,6 @@ export default function LivePage() {
         )}
       </main>
 
-      <BottomNav />
     </div>
   );
 }
