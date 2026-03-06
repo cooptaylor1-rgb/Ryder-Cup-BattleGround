@@ -16,6 +16,7 @@ import { createCourseProfile } from '@/lib/services/courseLibraryService';
 import { useUIStore } from '@/lib/stores';
 import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 
 /**
  * NEW COURSE PAGE
@@ -315,14 +316,14 @@ export default function NewCoursePage() {
         <section className="section">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
             <h2 className="type-overline">Tee Sets</h2>
-            <button
+            <Button
+              variant="secondary"
               onClick={handleAddTeeSet}
-              className="btn btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
+              leftIcon={<Plus size={16} />}
+              style={{ padding: 'var(--space-2) var(--space-3)' }}
             >
-              <Plus size={16} />
               Add Tee
-            </button>
+            </Button>
           </div>
 
           {teeSets.length === 0 ? (
@@ -330,9 +331,9 @@ export default function NewCoursePage() {
               <p className="type-caption" style={{ marginBottom: 'var(--space-3)' }}>
                 No tee sets added yet. Scan a scorecard above or add tee sets manually.
               </p>
-              <button onClick={handleAddTeeSet} className="btn btn-primary">
+              <Button variant="primary" onClick={handleAddTeeSet}>
                 Add First Tee Set
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">

@@ -7,6 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 import type { SideBet, SideBetResult, Player, NassauResults } from '@/lib/types/models';
 import {
@@ -185,9 +186,9 @@ export default function BetDetailPage() {
                 <main className="container-editorial py-12">
                     <ErrorEmpty message="We couldn't find that bet." />
                     <div className="mt-6 flex justify-center">
-                        <button onClick={() => router.push('/bets')} className="btn btn-primary">
+                        <Button variant="primary" onClick={() => router.push('/bets')}>
                             Back to Bets
-                        </button>
+                        </Button>
                     </div>
                 </main>
             </div>
@@ -516,25 +517,28 @@ export default function BetDetailPage() {
                         <h3 className="type-overline mb-[var(--space-3)]">Set Winner</h3>
                         <div className="flex flex-wrap gap-[var(--space-2)]">
                             {participants.map(player => (
-                                <button
+                                <Button
                                     key={player.id}
                                     onClick={() => handleSetOverallWinner(player.id)}
-                                    className="btn btn-secondary btn-sm"
+                                    variant="secondary"
+                                    size="sm"
                                 >
                                     {player.firstName} {player.lastName}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>
                 )}
 
                 {bet.status === 'completed' && (
-                    <button
+                    <Button
                         onClick={handleReopenBet}
-                        className="btn btn-secondary w-full mb-[var(--space-4)]"
+                        variant="secondary"
+                        fullWidth
+                        className="mb-[var(--space-4)]"
                     >
                         Reopen Bet
-                    </button>
+                    </Button>
                 )}
 
                 {/* Skins Scorecard */}
@@ -708,18 +712,20 @@ export default function BetDetailPage() {
                             This action cannot be undone.
                         </p>
                         <div className="flex gap-3">
-                            <button
+                            <Button
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="btn btn-secondary flex-1"
+                                variant="secondary"
+                                className="flex-1"
                             >
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={handleDeleteBet}
-                                className="btn flex-1 bg-[var(--error)] text-[var(--canvas)]"
+                                variant="danger"
+                                className="flex-1"
                             >
                                 Delete
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -6,6 +6,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium, NoBetsEmpty } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 import type { Player, SideBet, SideBetType, Match } from '@/lib/types/models';
 import dynamic from 'next/dynamic';
@@ -286,25 +287,28 @@ export default function BetsPage() {
 
         {/* Tabs */}
         <div className="flex gap-[var(--space-2)] mb-[var(--space-6)]">
-          <button
+          <Button
             onClick={() => setSelectedTab('active')}
-            className={`${selectedTab === 'active' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
+            variant={selectedTab === 'active' ? 'primary' : 'secondary'}
+            className="flex-1"
           >
             Active ({activeBets.length})
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setSelectedTab('completed')}
-            className={`${selectedTab === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
+            variant={selectedTab === 'completed' ? 'primary' : 'secondary'}
+            className="flex-1"
           >
             Done ({completedBets.length})
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setSelectedTab('settle')}
-            className={`${selectedTab === 'settle' ? 'btn btn-primary' : 'btn btn-secondary'} flex-1 flex items-center justify-center gap-[var(--space-1)]`}
+            variant={selectedTab === 'settle' ? 'primary' : 'secondary'}
+            className="flex-1 flex items-center justify-center gap-[var(--space-1)]"
           >
             <Calculator size={14} />
             Settle Up
-          </button>
+          </Button>
         </div>
 
         {/* Settle Up Tab */}
@@ -607,13 +611,14 @@ export default function BetsPage() {
             )}
 
             {/* Create Button */}
-            <button
+            <Button
               onClick={createCustomBet}
-              className="btn btn-primary w-full"
+              variant="primary"
+              fullWidth
               style={{ marginTop: 'var(--space-4)' }}
             >
               Create Bet
-            </button>
+            </Button>
           </div>
         </div>
       )}

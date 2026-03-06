@@ -229,6 +229,7 @@ export default function CaptainPage() {
                 value={captainPin}
                 onChange={(e) => setCaptainPin(e.target.value.replace(/\D/g, ''))}
                 placeholder="4-digit PIN"
+                aria-label="Captain PIN"
                 className="input text-center text-2xl tracking-[0.5em] font-sans"
               />
             </div>
