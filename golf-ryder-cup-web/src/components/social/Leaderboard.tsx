@@ -285,9 +285,9 @@ function PodiumSpot({ entry, rank, height, isWinner, onClick }: PodiumSpotProps)
   const teamColor = entry.team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
 
   const rankColors: Record<number, string> = {
-    1: 'var(--warning)',
-    2: '#C0C0C0',
-    3: '#CD7F32',
+    1: 'var(--gold)',
+    2: 'var(--silver)',
+    3: 'var(--bronze)',
   };
 
   return (
@@ -341,7 +341,7 @@ function PodiumSpot({ entry, rank, height, isWinner, onClick }: PodiumSpotProps)
           className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
           style={{
             background: rankColors[rank],
-            color: rank === 1 ? '#1A1814' : 'white',
+            color: rank === 1 ? 'var(--ink)' : 'white',
             border: '2px solid var(--canvas)',
           }}
         >

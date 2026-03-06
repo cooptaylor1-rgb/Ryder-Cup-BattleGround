@@ -256,7 +256,7 @@ export function AttendanceCheckIn({
                         <span style={{ color: 'var(--ink-muted)' }}>
                             {stats.checkedIn} of {stats.total} checked in
                         </span>
-                        <span className="font-medium" style={{ color: progressPercent === 100 ? '#22c55e' : 'var(--ink)' }}>
+                        <span className="font-medium" style={{ color: progressPercent === 100 ? 'var(--success)' : 'var(--ink)' }}>
                             {progressPercent.toFixed(0)}%
                         </span>
                     </div>
@@ -269,7 +269,7 @@ export function AttendanceCheckIn({
                             animate={{ width: `${progressPercent}%` }}
                             transition={{ duration: 0.5, ease: 'easeOut' }}
                             className="h-full rounded-full"
-                            style={{ background: progressPercent === 100 ? '#22c55e' : 'var(--masters)' }}
+                            style={{ background: progressPercent === 100 ? 'var(--success)' : 'var(--masters)' }}
                         />
                     </div>
                 </div>

@@ -183,7 +183,7 @@ export function CaptainDashboard({
         <div
           className="p-4 rounded-2xl"
           style={{
-            background: 'linear-gradient(135deg, var(--masters) 0%, #004D35 100%)',
+            background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
           }}
         >
           <div className="flex items-center gap-2 mb-3">

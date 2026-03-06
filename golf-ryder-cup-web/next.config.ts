@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
         hostname: '*.supabase.co',
       },
     ],
+    // Prefer AVIF (smaller) with WebP fallback
+    formats: ['image/avif', 'image/webp'],
     // Optimize for these device widths
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],

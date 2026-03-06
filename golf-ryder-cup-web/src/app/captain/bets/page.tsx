@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
@@ -14,8 +13,6 @@ import type { SideBet, SideBetType, Player } from '@/lib/types/models';
 import {
     Home,
     Target,
-    Users,
-    Trophy,
     MoreHorizontal,
     DollarSign,
     Zap,
@@ -24,7 +21,6 @@ import {
     Check,
     Clock,
     Crown,
-    CalendarDays,
     Trash2,
     Edit3,
     Save,
@@ -558,34 +554,6 @@ export default function CaptainBetsPage() {
                     </div>
                 </div>
             )}
-
-            {/* Bottom Navigation */}
-            <nav className="nav-premium bottom-nav">
-                <Link href="/" className="nav-item">
-                    <Home size={22} strokeWidth={1.75} />
-                    <span>Home</span>
-                </Link>
-                <Link href="/schedule" className="nav-item">
-                    <CalendarDays size={22} strokeWidth={1.75} />
-                    <span>Schedule</span>
-                </Link>
-                <Link href="/score" className="nav-item">
-                    <Target size={22} strokeWidth={1.75} />
-                    <span>Score</span>
-                </Link>
-                <Link href="/matchups" className="nav-item">
-                    <Users size={22} strokeWidth={1.75} />
-                    <span>Matches</span>
-                </Link>
-                <Link href="/standings" className="nav-item">
-                    <Trophy size={22} strokeWidth={1.75} />
-                    <span>Standings</span>
-                </Link>
-                <Link href="/more" className="nav-item">
-                    <MoreHorizontal size={22} strokeWidth={1.75} />
-                    <span>More</span>
-                </Link>
-            </nav>
 
             {/* Confirm Dialog */}
             {ConfirmDialogComponent}

@@ -131,8 +131,8 @@ export default function AppearanceSettingsPage() {
               {(
                 [
                   { value: 'masters', label: 'Masters', color: '#006747' },
-                  { value: 'usa', label: 'Team USA', color: '#0047AB' },
-                  { value: 'europe', label: 'Team Europe', color: '#8B0000' },
+                  { value: 'usa', label: 'Team USA', color: '#1E3A5F' },
+                  { value: 'europe', label: 'Team Europe', color: '#722F37' },
                 ] as const
               ).map((option) => {
                 const isSelected = accentTheme === option.value;

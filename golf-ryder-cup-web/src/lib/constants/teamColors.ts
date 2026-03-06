@@ -5,8 +5,8 @@
  * across the application. Import from here instead of hardcoding colors.
  *
  * Color meanings:
- * - Team A (USA): Cobalt Blue - represents traditional American blue
- * - Team B (Europe): Dark Red - represents traditional European colors
+ * - Team A (USA): Navy blue — matches --team-usa in globals.css
+ * - Team B (Europe): Burgundy — matches --team-europe in globals.css
  */
 
 /**
@@ -26,18 +26,22 @@ export const TEAM_COLORS = {
  */
 export const TEAM_COLOR_PALETTE = {
     teamA: {
-        primary: '#0047AB',    // Cobalt Blue
-        light: '#1E90FF',      // Dodger Blue
-        dark: '#00308F',       // Air Force Blue
-        background: '#E6F0FF', // Light blue tint
+        primary: '#1E3A5F',    // Navy — matches --team-usa
+        light: '#2A4A73',      // Matches --team-usa-gradient-end
+        dark: '#152B47',       // Matches --team-usa-deep
+        background: '#EBF0F5', // Matches --team-usa-light
     },
     teamB: {
-        primary: '#8B0000',    // Dark Red
-        light: '#DC143C',      // Crimson
-        dark: '#5C0000',       // Darker red
-        background: '#FFE6E6', // Light red tint
+        primary: '#722F37',    // Burgundy — matches --team-europe
+        light: '#8B3D47',      // Matches --team-europe-gradient-end
+        dark: '#5A252C',       // Matches --team-europe-deep
+        background: '#F5ECEE', // Matches --team-europe-light
     },
 } as const;
+
+/** Hex defaults for use where CSS variables can't be concatenated (e.g. opacity suffixes) */
+export const TEAM_A_HEX = TEAM_COLOR_PALETTE.teamA.primary;
+export const TEAM_B_HEX = TEAM_COLOR_PALETTE.teamB.primary;
 
 /**
  * Get team color by team identifier

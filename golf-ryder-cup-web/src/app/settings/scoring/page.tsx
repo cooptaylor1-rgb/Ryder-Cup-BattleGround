@@ -325,9 +325,9 @@ export default function ScoringSettingsPage() {
             {scoringPreferences.oneHandedMode && (
               <div className="p-[var(--space-4)] border-t border-[var(--rule)]">
                 <div className="flex gap-[var(--space-3)] p-[var(--space-4)] rounded-[var(--radius-lg)] border border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.08)]">
-                  <AlertCircle size={18} className="text-[#f59e0b] shrink-0 mt-[2px]" />
+                  <AlertCircle size={18} className="text-[var(--color-accent)] shrink-0 mt-[2px]" />
                   <div>
-                    <p className="type-body-sm font-[650] text-[#f59e0b]">Tip</p>
+                    <p className="type-body-sm font-[650] text-[var(--color-accent)]">Tip</p>
                     <p className="type-caption mt-[2px]">
                       One-handed mode works best when your preferred hand is set correctly.
                     </p>

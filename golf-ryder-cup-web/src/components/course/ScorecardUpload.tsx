@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Upload, FileImage, Loader2, Check, AlertCircle, X, Camera } from 'lucide-react';
 import { ocrLogger } from '@/lib/utils/logger';
+import { Button } from '@/components/ui/Button';
 import type { HoleData } from './HoleDataEditor';
 
 /**
@@ -258,12 +259,9 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                   {error}
                 </p>
               </div>
-              <button
-                onClick={resetUpload}
-                className="btn btn-primary w-full"
-              >
+              <Button variant="primary" fullWidth onClick={resetUpload}>
                 Try Again
-              </button>
+              </Button>
             </div>
           )}
 
@@ -412,12 +410,9 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
 
               {/* Actions */}
               <div className="flex gap-3">
-                <button
-                  onClick={resetUpload}
-                  className="btn btn-secondary flex-1"
-                >
+                <Button variant="secondary" onClick={resetUpload} className="flex-1">
                   Scan Another
-                </button>
+                </Button>
                 <button
                   onClick={handleUseData}
                   className="btn-premium flex-1"

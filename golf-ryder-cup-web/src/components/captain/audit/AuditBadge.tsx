@@ -137,8 +137,8 @@ function AuditTooltip({ auditInfo, onViewHistory, onClose }: AuditTooltipProps) 
         >
             {/* Header */}
             <div className="flex items-center gap-2 mb-2">
-                <Shield size={14} style={{ color: '#F59E0B' }} />
-                <span className="text-xs font-semibold" style={{ color: '#F59E0B' }}>
+                <Shield size={14} style={{ color: 'var(--color-accent)' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--color-accent)' }}>
                     Score Modified
                 </span>
             </div>

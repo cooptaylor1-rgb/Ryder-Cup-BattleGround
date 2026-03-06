@@ -58,8 +58,8 @@ vi.mock('@/components/trip-setup', () => ({
     DEFAULT_POINT_CONFIG: { win: 1, halve: 0.5, loss: 0 },
     DEFAULT_SCORING_SETTINGS: { defaultFormat: 'match-play' },
     DEFAULT_TEAM_COLORS: {
-        teamA: { name: 'Team USA', primary: '#0047AB', secondary: '#E8F0FE' },
-        teamB: { name: 'Team Europe', primary: '#8B0000', secondary: '#FEE8E8' },
+        teamA: { name: 'Team USA', primary: '#1E3A5F', secondary: '#EBF0F5' },
+        teamB: { name: 'Team Europe', primary: '#722F37', secondary: '#F5ECEE' },
     },
     DEFAULT_TEE_TIME_SETTINGS: { firstTeeTime: '08:00', interval: 10 },
 }));

@@ -84,7 +84,7 @@ function formatTime(totalSeconds: number): { hours: number; minutes: number; sec
 
 function getUrgencyColor(minutesLeft: number): { bg: string; text: string; glow: string } {
     if (minutesLeft <= 0) {
-        return { bg: 'rgba(239, 68, 68, 0.2)', text: '#ef4444', glow: 'rgba(239, 68, 68, 0.5)' };
+        return { bg: 'rgba(239, 68, 68, 0.2)', text: 'var(--error)', glow: 'rgba(239, 68, 68, 0.5)' };
     }
     if (minutesLeft <= 5) {
         return { bg: 'rgba(239, 68, 68, 0.15)', text: '#f87171', glow: 'rgba(239, 68, 68, 0.3)' };
@@ -93,7 +93,7 @@ function getUrgencyColor(minutesLeft: number): { bg: string; text: string; glow:
         return { bg: 'rgba(251, 191, 36, 0.15)', text: '#fbbf24', glow: 'rgba(251, 191, 36, 0.3)' };
     }
     if (minutesLeft <= 30) {
-        return { bg: 'rgba(251, 191, 36, 0.1)', text: '#f59e0b', glow: 'none' };
+        return { bg: 'rgba(251, 191, 36, 0.1)', text: 'var(--color-accent)', glow: 'none' };
     }
     return { bg: 'var(--surface)', text: 'var(--masters)', glow: 'none' };
 }
@@ -391,7 +391,7 @@ export function GoTimeCountdown({
                                 animate={{ scale: [1, 1.05, 1] }}
                                 transition={{ duration: 0.5, repeat: Infinity }}
                                 className="text-6xl font-bold mb-4"
-                                style={{ color: '#ef4444' }}
+                                style={{ color: 'var(--error)' }}
                             >
                                 GO TIME!
                             </motion.div>

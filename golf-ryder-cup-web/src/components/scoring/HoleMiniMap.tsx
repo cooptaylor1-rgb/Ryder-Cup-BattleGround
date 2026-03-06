@@ -52,8 +52,8 @@ export function HoleMiniMap({
     holeResults,
     teamAName = 'USA',
     teamBName = 'EUR',
-    teamAColor = '#0047AB',
-    teamBColor = '#8B0000',
+    teamAColor = '#1E3A5F',
+    teamBColor = '#722F37',
     onHoleSelect,
     isComplete = false,
     totalHoles = 18,
@@ -434,8 +434,8 @@ export function HoleMiniMap({
 export function HoleMiniMapInline({
     currentHole,
     holeResults,
-    teamAColor = '#0047AB',
-    teamBColor = '#8B0000',
+    teamAColor = '#1E3A5F',
+    teamBColor = '#722F37',
     onHoleSelect,
     totalHoles = 18,
 }: Omit<HoleMiniMapProps, 'teamAName' | 'teamBName' | 'isComplete' | 'className'>) {

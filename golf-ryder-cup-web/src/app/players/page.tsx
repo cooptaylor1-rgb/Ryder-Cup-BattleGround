@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react';
 import { EmptyStatePremium, NoPlayersPremiumEmpty } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 // Bulk player entry row type
 interface BulkPlayerRow {
@@ -463,20 +464,23 @@ export default function PlayersPage() {
             </div>
 
             <div className="mt-[var(--space-6)] flex gap-[var(--space-3)]">
-              <button
+              <Button
+                variant="secondary"
                 onClick={resetForm}
-                className="btn btn-secondary flex-1"
                 disabled={isSaving}
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
                 onClick={handleSave}
-                className="btn btn-primary flex-1"
                 disabled={isSaving}
+                isLoading={isSaving}
+                className="flex-1"
               >
                 {isSaving ? 'Saving...' : editingPlayer ? 'Save' : 'Add'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -492,20 +496,23 @@ export default function PlayersPage() {
               This will also remove them from any matches.
             </p>
             <div className="flex gap-[var(--space-3)]">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => setPlayerToDelete(null)}
-                className="btn btn-secondary flex-1"
                 disabled={isDeleting}
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
                 onClick={handleDelete}
-                className="btn btn-danger flex-1"
                 disabled={isDeleting}
+                isLoading={isDeleting}
+                className="flex-1"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -605,16 +612,18 @@ export default function PlayersPage() {
 
             {/* Footer */}
             <div className="flex shrink-0 gap-[var(--space-3)]">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => setShowBulkAdd(false)}
-                className="btn btn-secondary flex-1"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
                 onClick={handleBulkSave}
-                className="btn btn-primary flex-1"
                 disabled={validBulkCount === 0}
+                className="flex-1"
               >
                 <span className="inline-flex items-center justify-center gap-[var(--space-2)]">
                   <Check size={16} />
@@ -623,7 +632,7 @@ export default function PlayersPage() {
                     ? `${validBulkCount} Player${validBulkCount > 1 ? 's' : ''}`
                     : 'Players'}
                 </span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>

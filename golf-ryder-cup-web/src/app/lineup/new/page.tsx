@@ -19,6 +19,7 @@ import type { ScoringMode } from '@/lib/types/scoringFormats';
 import { FORMAT_CONFIGS } from '@/lib/types/matchFormats';
 import type { MatchFormat } from '@/lib/types/matchFormats';
 import { EmptyStatePremium } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
@@ -1023,17 +1024,14 @@ export default function NewLineupPage() {
 
                 {/* Continue Button */}
                 <section className="section">
-                  <button
+                  <Button
+                    variant="primary"
+                    fullWidth
                     onClick={() => setStep('lineup')}
                     disabled={!canProceedToLineup}
-                    className="btn btn-primary w-full"
-                    style={{
-                      padding: 'var(--space-4)',
-                      opacity: canProceedToLineup ? 1 : 0.5,
-                    }}
                   >
                     Continue to Lineup Builder
-                  </button>
+                  </Button>
                 </section>
               </>
             )}
