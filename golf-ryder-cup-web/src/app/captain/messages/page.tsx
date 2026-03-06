@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { AnnouncementComposer, AnnouncementHistory, type Announcement } from '@/components/captain';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { Home, MessageSquare, MoreHorizontal, Send } from 'lucide-react';
@@ -130,9 +131,9 @@ export default function MessagesPage() {
               <p className="type-caption mb-[var(--space-4)]">
                 Send announcements to keep everyone informed.
               </p>
-              <button onClick={() => setShowComposer(true)} className="btn btn-primary">
+              <Button onClick={() => setShowComposer(true)} variant="primary">
                 Send First Message
-              </button>
+              </Button>
             </div>
           )}
         </section>

@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, useRef } from 'react';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('SW Hardening');
 
 /**
  * Detect if running on iOS Safari
@@ -145,7 +148,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
     if (!enableIOSHardening) return;
     if (typeof window === 'undefined') return;
 
-    console.log('[SW Hardening] iOS Safari hardening enabled');
+    logger.info('iOS Safari hardening enabled');
 
     // Keep-alive ping interval
     keepAliveTimerRef.current = setInterval(() => {
@@ -181,8 +184,8 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
 
         // If hidden for more than 5 minutes, refresh cache
         if (hiddenDuration > 5 * 60 * 1000) {
-          console.log(
-            `[SW Hardening] App was hidden for ${Math.round(hiddenDuration / 1000)}s, refreshing cache`
+          logger.info(
+            `App was hidden for ${Math.round(hiddenDuration / 1000)}s, refreshing cache`
           );
           refreshCache();
         }

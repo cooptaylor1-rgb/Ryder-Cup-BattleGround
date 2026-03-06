@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 // (Link removed; BottomNav provides navigation)
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { calculatePlayerStats } from '@/lib/services/awardsService';
+import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
 import { PageHeader } from '@/components/layout';
@@ -298,12 +299,14 @@ interface CategoryButtonProps {
 
 function CategoryButton({ label, count, active, onClick }: CategoryButtonProps) {
   return (
-    <button
+    <Button
       onClick={onClick}
-      className={`${active ? 'btn btn-primary' : 'btn btn-secondary'} flex-1`}
+      variant={active ? 'primary' : 'secondary'}
+      size="sm"
+      className="flex-1"
     >
       {label} ({count})
-    </button>
+    </Button>
   );
 }
 

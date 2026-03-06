@@ -293,8 +293,8 @@ export default function AdminPage() {
         subtitle="Data management"
         icon={<Shield size={16} style={{ color: 'var(--canvas)' }} />}
         iconContainerStyle={{
-          background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-          boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+          background: 'linear-gradient(135deg, var(--error) 0%, var(--error-dark, #991b1b) 100%)',
+          boxShadow: '0 2px 8px color-mix(in srgb, var(--error) 30%, transparent)',
         }}
         onBack={() => router.back()}
       />

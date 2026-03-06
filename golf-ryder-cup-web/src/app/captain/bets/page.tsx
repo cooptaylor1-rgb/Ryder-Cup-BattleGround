@@ -39,11 +39,11 @@ import {
  */
 
 const BET_TYPES: { type: SideBetType; label: string; description: string; icon: typeof Zap; color: string }[] = [
-    { type: 'skins', label: 'Skins Game', description: 'Win holes outright for $', icon: Zap, color: '#f59e0b' },
-    { type: 'ctp', label: 'Closest to Pin', description: 'Nearest on par 3s', icon: Target, color: '#3b82f6' },
-    { type: 'longdrive', label: 'Long Drive', description: 'Longest drive wins', icon: TrendingUp, color: '#8b5cf6' },
-    { type: 'nassau', label: 'Nassau', description: 'Front, back, and overall', icon: DollarSign, color: '#10b981' },
-    { type: 'custom', label: 'Custom Bet', description: 'Create your own', icon: Plus, color: '#64748b' },
+    { type: 'skins', label: 'Skins Game', description: 'Win holes outright for $', icon: Zap, color: 'var(--color-accent)' },
+    { type: 'ctp', label: 'Closest to Pin', description: 'Nearest on par 3s', icon: Target, color: 'var(--team-europe)' },
+    { type: 'longdrive', label: 'Long Drive', description: 'Longest drive wins', icon: TrendingUp, color: 'var(--maroon)' },
+    { type: 'nassau', label: 'Nassau', description: 'Front, back, and overall', icon: DollarSign, color: 'var(--masters)' },
+    { type: 'custom', label: 'Custom Bet', description: 'Create your own', icon: Plus, color: 'var(--ink-tertiary)' },
 ];
 
 export default function CaptainBetsPage() {

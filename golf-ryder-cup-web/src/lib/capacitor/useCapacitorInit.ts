@@ -17,6 +17,9 @@
 import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { nativeBridge, isNative } from './nativeBridge';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('Capacitor');
 
 interface CapacitorInitOptions {
   /** Handle deep links */
@@ -120,7 +123,7 @@ export function useCapacitorInit(options: CapacitorInitOptions = {}) {
     // Log app info
     nativeBridge.app.getInfo().then((info) => {
       if (info) {
-        console.log(`[Capacitor] ${info.name} v${info.version} (${info.build})`);
+        logger.info(`${info.name} v${info.version} (${info.build})`);
       }
     });
 
@@ -148,17 +151,17 @@ export function useCapacitorPush(onToken?: (token: string) => void) {
         // Set up listeners
         const cleanup = nativeBridge.pushNotifications.addListeners({
           onRegistration: (token) => {
-            console.log('[Push] Registered with token:', token.value);
+            logger.info('Push registered with token:', token.value);
             onToken?.(token.value);
           },
           onRegistrationError: (error) => {
-            console.error('[Push] Registration failed:', error);
+            logger.error('Push registration failed:', error);
           },
           onPushReceived: (notification) => {
-            console.log('[Push] Received:', notification);
+            logger.info('Push received:', notification);
           },
           onPushActionPerformed: (action) => {
-            console.log('[Push] Action:', action);
+            logger.info('Push action:', action);
             // Handle notification tap - navigate to relevant screen
             const data = action.notification.data;
             if (data?.path) {
