@@ -447,91 +447,78 @@ export default function MorePage() {
           </div>
         )}
 
-        {/* Captain Mode Toggle */}
-        <button
-          onClick={() =>
-            isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)
-          }
-          className={cn(
-            'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-3)] cursor-pointer text-left',
-            isCaptainMode
-              ? 'bg-[var(--maroon-subtle)] border-2 border-[var(--maroon)]'
-              : 'bg-[var(--canvas-raised)] border border-[var(--rule)]'
-          )}
-        >
-          <div
+        {/* Access Modes */}
+        <div className="bg-[var(--canvas-raised)] rounded-[var(--radius-lg)] border border-[var(--rule)] overflow-hidden mb-[var(--space-8)]">
+          {/* Captain Mode Toggle */}
+          <button
+            onClick={() =>
+              isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)
+            }
             className={cn(
-              'w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
-              isCaptainMode
-                ? 'text-[var(--canvas)] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
-                : 'text-[var(--ink-secondary)] bg-[var(--canvas-sunken)]'
+              'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] cursor-pointer text-left border-b border-b-[var(--rule-faint)] transition-colors duration-150',
+              isCaptainMode && 'bg-[var(--maroon-subtle)]'
             )}
+            aria-label={isCaptainMode ? 'Disable captain mode' : 'Enable captain mode'}
           >
-            {isCaptainMode ? <Unlock size={22} /> : <Lock size={22} />}
-          </div>
-          <div className="flex-1">
-            <p
+            <div
               className={cn(
-                'font-semibold',
-                isCaptainMode ? 'text-[var(--maroon-dark)]' : 'text-[var(--ink)]'
+                'w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
+                isCaptainMode
+                  ? 'text-[var(--canvas)] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
+                  : 'text-[var(--ink-secondary)] bg-[var(--canvas-sunken)]'
               )}
             >
-              Captain Mode
-            </p>
-            <p className="text-sm text-[var(--ink-secondary)] mt-[2px]">
-              {isCaptainMode
-                ? 'Enabled — Full editing access'
-                : 'Tap to unlock editing'}
-            </p>
-          </div>
-          <Toggle
-            enabled={isCaptainMode}
-            color={isCaptainMode ? 'var(--maroon)' : undefined}
-          />
-        </button>
+              {isCaptainMode ? <Unlock size={20} /> : <Lock size={20} />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={cn('font-medium text-[0.9375rem]', isCaptainMode ? 'text-[var(--maroon-dark)]' : 'text-[var(--ink)]')}>
+                Captain Mode
+              </p>
+              <p className="text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px]">
+                {isCaptainMode ? 'Full editing access' : 'Unlock lineup editing'}
+              </p>
+            </div>
+            <Toggle
+              enabled={isCaptainMode}
+              color={isCaptainMode ? 'var(--maroon)' : undefined}
+            />
+          </button>
 
-        {/* Admin Mode Toggle */}
-        <button
-          onClick={() =>
-            isAdminMode ? disableAdminMode() : setShowAdminModal(true)
-          }
-          className={cn(
-            'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] rounded-[var(--radius-lg)] mb-[var(--space-8)] cursor-pointer text-left',
-            isAdminMode
-              ? 'bg-[color:var(--error)]/12 border border-[color:var(--error)]/40'
-              : 'bg-[var(--canvas-raised)] border border-[var(--rule)]'
-          )}
-        >
-          <div
+          {/* Admin Mode Toggle */}
+          <button
+            onClick={() =>
+              isAdminMode ? disableAdminMode() : setShowAdminModal(true)
+            }
             className={cn(
-              'w-11 h-11 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
-              isAdminMode
-                ? 'bg-[var(--error)] text-[var(--canvas)]'
-                : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
+              'w-full flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] cursor-pointer text-left transition-colors duration-150',
+              isAdminMode && 'bg-[color:var(--error)]/8'
             )}
+            aria-label={isAdminMode ? 'Disable admin mode' : 'Enable admin mode'}
           >
-            <Shield size={22} />
-          </div>
-          <div className="flex-1">
-            <p
+            <div
               className={cn(
-                'font-semibold',
-                isAdminMode ? 'text-[var(--error)]' : 'text-[var(--ink)]'
+                'w-9 h-9 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
+                isAdminMode
+                  ? 'bg-[var(--error)] text-[var(--canvas)]'
+                  : 'bg-[var(--canvas-sunken)] text-[var(--ink-secondary)]'
               )}
             >
-              Admin Mode
-            </p>
-            <p className="text-sm text-[var(--ink-secondary)] mt-[2px]">
-              {isAdminMode
-                ? 'Enabled — Data management access'
-                : 'Delete trips & manage data'}
-            </p>
-          </div>
-          <Toggle
-            enabled={isAdminMode}
-            color={isAdminMode ? 'var(--error)' : undefined}
-          />
-        </button>
+              <Shield size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={cn('font-medium text-[0.9375rem]', isAdminMode ? 'text-[var(--error)]' : 'text-[var(--ink)]')}>
+                Admin Mode
+              </p>
+              <p className="text-[0.8125rem] text-[var(--ink-tertiary)] mt-[2px]">
+                {isAdminMode ? 'Data management access' : 'Delete trips & manage data'}
+              </p>
+            </div>
+            <Toggle
+              enabled={isAdminMode}
+              color={isAdminMode ? 'var(--error)' : undefined}
+            />
+          </button>
+        </div>
 
         {/* Organized Menu Sections — CSS stagger instead of framer-motion */}
         <div className="stagger-fast">
