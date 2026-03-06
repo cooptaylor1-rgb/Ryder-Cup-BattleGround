@@ -299,7 +299,7 @@ export function QuickPlayerSwap({
                                             <div className="flex items-center gap-3">
                                                 <div
                                                     className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium"
-                                                    style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
+                                                    style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)' }}
                                                 >
                                                     {player.firstName[0]}{player.lastName[0]}
                                                 </div>
@@ -337,7 +337,7 @@ export function QuickPlayerSwap({
                                             <div className="flex items-center gap-3">
                                                 <div
                                                     className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium"
-                                                    style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}
+                                                    style={{ background: 'rgba(59, 130, 246, 0.2)', color: 'var(--team-europe)' }}
                                                 >
                                                     {player.firstName[0]}{player.lastName[0]}
                                                 </div>
@@ -372,13 +372,13 @@ export function QuickPlayerSwap({
                                 className="p-3 rounded-xl"
                                 style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
                             >
-                                <p className="text-xs font-medium mb-1" style={{ color: '#ef4444' }}>
+                                <p className="text-xs font-medium mb-1" style={{ color: 'var(--error)' }}>
                                     REPLACING
                                 </p>
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium"
-                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
+                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)' }}
                                     >
                                         {selectedPlayer.firstName[0]}{selectedPlayer.lastName[0]}
                                     </div>
@@ -436,7 +436,7 @@ export function QuickPlayerSwap({
                                                             className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium"
                                                             style={{
                                                                 background: selectedPlayer.teamId === 'A' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
-                                                                color: selectedPlayer.teamId === 'A' ? '#ef4444' : '#3b82f6',
+                                                                color: selectedPlayer.teamId === 'A' ? 'var(--error)' : 'var(--team-europe)',
                                                             }}
                                                         >
                                                             {player.firstName[0]}{player.lastName[0]}
@@ -489,7 +489,7 @@ export function QuickPlayerSwap({
                                     <div className="text-center">
                                         <div
                                             className="w-14 h-14 mx-auto rounded-full flex items-center justify-center text-lg font-medium mb-2"
-                                            style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
+                                            style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--error)' }}
                                         >
                                             {selectedPlayer.firstName[0]}{selectedPlayer.lastName[0]}
                                         </div>
@@ -510,7 +510,7 @@ export function QuickPlayerSwap({
                                     <div className="text-center">
                                         <div
                                             className="w-14 h-14 mx-auto rounded-full flex items-center justify-center text-lg font-medium mb-2"
-                                            style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e' }}
+                                            style={{ background: 'rgba(34, 197, 94, 0.2)', color: 'var(--success)' }}
                                         >
                                             {selectedReplacement.firstName[0]}{selectedReplacement.lastName[0]}
                                         </div>

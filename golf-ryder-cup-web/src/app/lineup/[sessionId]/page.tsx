@@ -17,6 +17,7 @@ import {
 } from '@/components/captain';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium, InlineLoadingSkeleton } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 import {
   Users,
@@ -385,14 +386,14 @@ export default function SessionPage() {
         {/* Start Session Button */}
         {canStart && viewMode === 'matches' && (
           <section className="section-sm">
-            <button
+            <Button
+              variant="primary"
+              fullWidth
               onClick={handleStartSession}
-              className="btn btn-primary w-full flex items-center justify-center gap-2"
-              style={{ padding: 'var(--space-4)' }}
+              leftIcon={<Play size={18} />}
             >
-              <Play size={18} />
               Start Session
-            </button>
+            </Button>
           </section>
         )}
 

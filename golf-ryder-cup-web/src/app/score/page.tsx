@@ -18,6 +18,7 @@ import {
   NoScoresPremiumEmpty,
 } from '@/components/ui';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
+import { Button } from '@/components/ui/Button';
 
 /**
  * SCORE PAGE — Match List
@@ -297,16 +298,15 @@ export default function ScorePage() {
                             <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)]">Sessions</h2>
                             <div className="flex gap-3 overflow-x-auto pb-2 -mx-[var(--space-5)] px-[var(--space-5)]">
                                 {sessions.map(session => (
-                                    <button
+                                    <Button
                                         key={session.id}
+                                        variant={session.id === activeSession?.id ? 'primary' : 'secondary'}
+                                        size="sm"
                                         onClick={() => setSelectedSessionId(session.id)}
-                                        className={cn(
-                                            session.id === activeSession?.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm',
-                                            'whitespace-nowrap font-sans'
-                                        )}
+                                        className="whitespace-nowrap font-sans"
                                     >
                                         Session {session.sessionNumber}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         </section>

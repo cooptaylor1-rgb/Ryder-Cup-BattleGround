@@ -9,6 +9,7 @@
 import Link from 'next/link';
 import { MapPin, Home, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
 
 export default function NotFound() {
     const router = useRouter();
@@ -37,13 +38,13 @@ export default function NotFound() {
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
-                <button
+                <Button
+                    variant="secondary"
                     onClick={() => router.back()}
-                    className="btn btn-secondary press-scale flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium"
+                    leftIcon={<ArrowLeft size={18} />}
                 >
-                    <ArrowLeft size={18} />
                     Go Back
-                </button>
+                </Button>
 
                 <Link
                     href="/"

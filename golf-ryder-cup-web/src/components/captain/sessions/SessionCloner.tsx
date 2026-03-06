@@ -249,7 +249,7 @@ function MatchPreviewCard({
             )}
             style={{
                 background: 'var(--surface)',
-                ['--tw-ring-color' as string]: '#F59E0B',
+                ['--tw-ring-color' as string]: 'var(--color-accent)',
             }}
         >
             <div className="flex items-center gap-2 mb-2">
@@ -261,7 +261,7 @@ function MatchPreviewCard({
                 </div>
                 {isModified && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-                        style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}
+                        style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--color-accent)' }}
                     >
                         Modified
                     </span>

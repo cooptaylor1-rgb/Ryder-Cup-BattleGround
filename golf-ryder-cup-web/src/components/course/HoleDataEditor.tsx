@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { ChevronDown, ChevronUp, AlertCircle, Check } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * HOLE DATA EDITOR
@@ -268,8 +269,9 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
           {/* Quick Actions */}
           {!readonly && (
             <div className="mt-4 pt-3 flex gap-2" style={{ borderTop: '1px solid var(--rule)' }}>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   // Auto-distribute handicaps 1-18
                   const newHoles = holes.map((h, i) => ({
@@ -280,13 +282,12 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
                   }));
                   onChange(newHoles);
                 }}
-                className="btn btn-secondary"
-                style={{ fontSize: '12px', padding: 'var(--space-2) var(--space-3)' }}
               >
                 Auto Handicaps
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   // Reset to standard par 72
                   const newHoles = holes.map((h, i) => ({
@@ -295,11 +296,9 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
                   }));
                   onChange(newHoles);
                 }}
-                className="btn btn-secondary"
-                style={{ fontSize: '12px', padding: 'var(--space-2) var(--space-3)' }}
               >
                 Standard Par 72
-              </button>
+              </Button>
             </div>
           )}
         </div>

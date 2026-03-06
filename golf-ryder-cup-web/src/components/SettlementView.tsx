@@ -17,6 +17,7 @@ import {
   Calculator,
   Wallet,
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * SETTLEMENT VIEW — "Who Owes Who" Calculator
@@ -331,10 +332,9 @@ function TransactionCard({
                 Pay with PayPal
               </a>
             )}
-            <button onClick={onMarkSettled} className="btn btn-primary text-sm">
-              <Check size={14} />
+            <Button variant="primary" size="sm" onClick={onMarkSettled} leftIcon={<Check size={14} />}>
               Mark as Settled
-            </button>
+            </Button>
           </div>
         </div>
       )}
