@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -128,6 +128,32 @@ export default function StandingsPage() {
       correlationId: createCorrelationId('standings-tab'),
     });
   }, [activeTab, currentTrip, isLoading]);
+
+  const tablistRef = useRef<HTMLDivElement>(null);
+
+  const tabs: TabType[] = ['competition', 'stats', 'awards'];
+  const handleTabKeyDown = (e: React.KeyboardEvent) => {
+    const currentIndex = tabs.indexOf(activeTab);
+    let nextIndex = currentIndex;
+
+    if (e.key === 'ArrowRight') {
+      nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (e.key === 'ArrowLeft') {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = tabs.length - 1;
+    } else {
+      return;
+    }
+
+    e.preventDefault();
+    setActiveTab(tabs[nextIndex]);
+    // Focus the newly active tab button
+    const tabButtons = tablistRef.current?.querySelectorAll('[role="tab"]');
+    (tabButtons?.[nextIndex] as HTMLElement)?.focus();
+  };
 
   const teamA = teams.find((t) => t.color === 'usa');
   const teamB = teams.find((t) => t.color === 'europe');
@@ -277,47 +303,79 @@ export default function StandingsPage() {
       {/* Tab Navigation */}
       <div className="sticky top-0 z-10 bg-[var(--canvas)] border-b border-[var(--rule)]">
         <div className="container-editorial">
-          <div className="flex gap-1 py-[var(--space-2)]">
+          <div className="flex gap-1 py-[var(--space-2)]" role="tablist" aria-label="Standings views" ref={tablistRef} onKeyDown={handleTabKeyDown}>
             <TabButton
+              id="tab-competition"
               active={activeTab === 'competition'}
               onClick={() => setActiveTab('competition')}
               icon={<Trophy size={16} />}
               label="Competition"
+              controls="tabpanel-competition"
             />
             <TabButton
+              id="tab-stats"
               active={activeTab === 'stats'}
               onClick={() => setActiveTab('stats')}
               icon={<Beer size={16} />}
               label="Fun Stats"
+              controls="tabpanel-stats"
             />
             <TabButton
+              id="tab-awards"
               active={activeTab === 'awards'}
               onClick={() => setActiveTab('awards')}
               icon={<AwardIcon size={16} />}
               label="Awards"
+              controls="tabpanel-awards"
             />
           </div>
         </div>
       </div>
 
       <main className="container-editorial">
-        {activeTab === 'competition' ? (
-          <CompetitionTab
-            standings={standings}
-            magicNumber={magicNumber}
-            leaderboard={leaderboard}
-            teamAName={teamAName}
-            teamBName={teamBName}
-            teamA={teamA}
-            pointsToWin={currentTrip.settings?.pointsToWin ?? 14.5}
-            onShareStandings={handleShareStandings}
-            isSharingStandings={isSharingStandings}
-          />
-        ) : activeTab === 'stats' ? (
-          <FunStatsTab statTotals={statTotals} highlightStats={highlightStats} />
-        ) : (
-          <AwardsTab awards={awards} playerStats={playerStats} />
-        )}
+        <div
+          id="tabpanel-competition"
+          role="tabpanel"
+          aria-labelledby="tab-competition"
+          tabIndex={0}
+          hidden={activeTab !== 'competition'}
+        >
+          {activeTab === 'competition' && (
+            <CompetitionTab
+              standings={standings}
+              magicNumber={magicNumber}
+              leaderboard={leaderboard}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              teamA={teamA}
+              pointsToWin={currentTrip.settings?.pointsToWin ?? 14.5}
+              onShareStandings={handleShareStandings}
+              isSharingStandings={isSharingStandings}
+            />
+          )}
+        </div>
+        <div
+          id="tabpanel-stats"
+          role="tabpanel"
+          aria-labelledby="tab-stats"
+          tabIndex={0}
+          hidden={activeTab !== 'stats'}
+        >
+          {activeTab === 'stats' && (
+            <FunStatsTab statTotals={statTotals} highlightStats={highlightStats} />
+          )}
+        </div>
+        <div
+          id="tabpanel-awards"
+          role="tabpanel"
+          aria-labelledby="tab-awards"
+          tabIndex={0}
+          hidden={activeTab !== 'awards'}
+        >
+          {activeTab === 'awards' && (
+            <AwardsTab awards={awards} playerStats={playerStats} />
+          )}
+        </div>
       </main>
 
     </div>
@@ -328,27 +386,33 @@ export default function StandingsPage() {
    Tab Button Component
    ============================================ */
 function TabButton({
+  id,
   active,
   onClick,
   icon,
   label,
+  controls,
 }: {
+  id: string;
   active: boolean;
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
+  controls: string;
 }) {
   return (
     <button
+      id={id}
       onClick={onClick}
       className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
         active
           ? 'border-0 bg-[var(--masters)] text-[var(--canvas)] font-semibold'
           : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
       }`}
-      aria-label={`${label} tab`}
       aria-selected={active}
+      aria-controls={controls}
       role="tab"
+      tabIndex={active ? 0 : -1}
     >
       {icon}
       <span>{label}</span>
