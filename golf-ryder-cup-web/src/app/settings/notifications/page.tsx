@@ -242,8 +242,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={Zap}
-                iconWrapClassName="bg-[#f59e0b]/10"
-                iconClassName="text-[#f59e0b]"
+                iconWrapClassName="bg-[var(--color-accent)]/10"
+                iconClassName="text-[var(--color-accent)]"
                 title="Score updates"
                 description="When another player posts a score"
                 checked={preferences.scoreUpdates}
@@ -252,8 +252,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={Trophy}
-                iconWrapClassName="bg-[#eab308]/10"
-                iconClassName="text-[#eab308]"
+                iconWrapClassName="bg-[var(--color-accent)]/10"
+                iconClassName="text-[var(--color-accent)]"
                 title="Match complete"
                 description="When a match finishes"
                 checked={preferences.matchComplete}

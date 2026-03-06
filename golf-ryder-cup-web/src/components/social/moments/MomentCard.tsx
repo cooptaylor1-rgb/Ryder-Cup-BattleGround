@@ -198,8 +198,8 @@ function ReactionBar({ reactions, onReact }: ReactionBarProps) {
 
 export function MomentCard({
     moment,
-    teamAColor = '#0047AB',
-    teamBColor = '#8B0000',
+    teamAColor = '#1E3A5F',
+    teamBColor = '#722F37',
     teamAName: _teamAName = 'USA',
     teamBName: _teamBName = 'Europe',
     onReact,

@@ -285,9 +285,9 @@ function PodiumSpot({ entry, rank, height, isWinner, onClick }: PodiumSpotProps)
   const teamColor = entry.team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
 
   const rankColors: Record<number, string> = {
-    1: 'var(--warning)',
-    2: '#C0C0C0',
-    3: '#CD7F32',
+    1: 'var(--gold)',
+    2: 'var(--silver)',
+    3: 'var(--bronze)',
   };
 
   return (

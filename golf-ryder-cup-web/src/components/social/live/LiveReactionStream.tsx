@@ -71,8 +71,8 @@ const REACTION_CONFIG: Record<LiveReactionType, {
 };
 
 const TEAM_COLORS = {
-    usa: '#0047AB',
-    europe: '#8B0000',
+    usa: '#1E3A5F',
+    europe: '#722F37',
 };
 
 // ============================================

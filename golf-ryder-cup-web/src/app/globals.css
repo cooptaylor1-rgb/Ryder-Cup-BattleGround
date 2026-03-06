@@ -74,6 +74,10 @@
   --gold-dark: #A88A1E;
   --gold-subtle: rgba(201, 162, 39, 0.12);
 
+  /* Medal palette — leaderboard podium */
+  --silver: #C0C0C0;
+  --bronze: #CD7F32;
+
   /* Maroon — depth, captain mode, hover states */
   --maroon: #722F37;
   --maroon-light: #8B3D47;

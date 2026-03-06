@@ -534,7 +534,7 @@ export function QuickPlayerSwap({
                                         {handicapImpact.isSignificant && (
                                             <AlertTriangle className="w-4 h-4 inline-block mr-1 text-[var(--warning)]" />
                                         )}
-                                        <span style={{ color: handicapImpact.isSignificant ? '#eab308' : 'var(--ink-muted)' }}>
+                                        <span style={{ color: handicapImpact.isSignificant ? 'var(--color-accent)' : 'var(--ink-muted)' }}>
                                             Handicap {handicapImpact.direction === 'higher' ? 'increases' : 'decreases'} by{' '}
                                             {Math.abs(handicapImpact.difference).toFixed(1)}
                                         </span>
