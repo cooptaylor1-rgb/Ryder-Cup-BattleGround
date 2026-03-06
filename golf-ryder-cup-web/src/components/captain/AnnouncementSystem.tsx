@@ -539,8 +539,8 @@ export function AnnouncementBanner({
       className={cn('p-4 rounded-2xl', className)}
       style={{
         background: isUrgent
-          ? 'linear-gradient(135deg, var(--error) 0%, #B91C1C 100%)'
-          : 'linear-gradient(135deg, var(--masters) 0%, #004D35 100%)',
+          ? 'linear-gradient(135deg, var(--error) 0%, color-mix(in srgb, var(--error) 70%, black) 100%)'
+          : 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
       }}
     >
       <div className="flex items-start gap-3">
