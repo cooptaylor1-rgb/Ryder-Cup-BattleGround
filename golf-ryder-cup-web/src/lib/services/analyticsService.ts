@@ -13,6 +13,10 @@
 
 // ============================================
 // TYPES
+import { createLogger } from '@/lib/utils/logger';
+
+const analyticsLogger = createLogger('Analytics');
+
 // ============================================
 
 export interface AnalyticsEvent {
@@ -408,7 +412,7 @@ class AnalyticsService {
 
   private log(message: string, data?: unknown): void {
     if (this.config.debug) {
-      console.log(`[Analytics] ${message}`, data || '');
+      analyticsLogger.log(message, data || '');
     }
   }
 

@@ -11,6 +11,9 @@
 
 import { ReactNode } from 'react';
 import { useCapacitorInit, isNative } from '@/lib/capacitor';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('Capacitor');
 
 interface CapacitorProviderProps {
   children: ReactNode;
@@ -21,7 +24,7 @@ export function CapacitorProvider({ children }: CapacitorProviderProps) {
   useCapacitorInit({
     onDeepLink: (url: string) => {
       // Handle deep links - can be extended for specific routes
-      console.log('[Capacitor] Deep link received:', url);
+      logger.info('Deep link received:', url);
 
       // Parse URL and navigate if needed
       if (typeof window !== 'undefined') {
@@ -33,7 +36,7 @@ export function CapacitorProvider({ children }: CapacitorProviderProps) {
     },
     onStateChange: (isActive: boolean) => {
       // Handle app state changes (foreground/background)
-      console.log('[Capacitor] App state:', isActive ? 'active' : 'background');
+      logger.info('App state:', isActive ? 'active' : 'background');
     },
   });
 
