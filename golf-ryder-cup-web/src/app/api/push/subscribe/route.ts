@@ -29,8 +29,18 @@ const subscriptionRequestSchema = z.object({
   tripId: z.string().uuid().optional(),
 });
 
+const unsubscribeRequestSchema = z.object({
+  endpoint: z.string().url('Invalid endpoint URL'),
+  userId: z.string().uuid().optional(),
+  tripId: z.string().uuid().optional(),
+});
+
 type PushSubscriptionData = z.infer<typeof pushSubscriptionDataSchema>;
 type _SubscriptionRequest = z.infer<typeof subscriptionRequestSchema>;
+type StoredSubscriptionContext = {
+  userId?: string;
+  tripId?: string;
+};
 
 // Rate limit config (10 requests per minute)
 const RATE_LIMIT_CONFIG = {
@@ -113,6 +123,43 @@ async function removeSubscription(endpoint: string): Promise<boolean> {
   return localSubscriptions.delete(endpoint);
 }
 
+async function getStoredSubscriptionContext(
+  endpoint: string
+): Promise<StoredSubscriptionContext | null> {
+  if (supabaseUrl && supabaseServiceKey) {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data, error } = await supabase
+      .from('push_subscriptions')
+      .select('user_id, trip_id')
+      .eq('endpoint', endpoint)
+      .maybeSingle();
+
+    if (error) {
+      apiLogger.error('Supabase push subscription lookup error:', error);
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      userId: data.user_id ?? undefined,
+      tripId: data.trip_id ?? undefined,
+    };
+  }
+
+  const stored = localSubscriptions.get(endpoint);
+  if (!stored) {
+    return null;
+  }
+
+  return {
+    userId: stored.userId,
+    tripId: stored.tripId,
+  };
+}
+
 /**
  * POST /api/push/subscribe
  * Register a new push subscription
@@ -191,13 +238,50 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const body: { endpoint: string } = await request.json();
-
-    if (!body.endpoint) {
-      return NextResponse.json({ error: 'Endpoint required' }, { status: 400 });
+    const body = await request.json();
+    const parseResult = unsubscribeRequestSchema.safeParse(body);
+    if (!parseResult.success) {
+      const errors = parseResult.error.issues.map((issue) => issue.message).join(', ');
+      return NextResponse.json({ error: 'Invalid unsubscribe request', details: errors }, { status: 400 });
     }
 
-    const deleted = await removeSubscription(body.endpoint);
+    const { endpoint, tripId, userId } = parseResult.data;
+    const storedContext = await getStoredSubscriptionContext(endpoint);
+    const effectiveTripId = storedContext?.tripId ?? tripId;
+    const effectiveUserId = storedContext?.userId ?? userId;
+
+    if (!effectiveTripId && !effectiveUserId && (supabaseUrl || supabaseServiceKey)) {
+      return NextResponse.json(
+        {
+          error: 'Authorization context required',
+          message: 'tripId or userId is required to unregister this subscription.',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (effectiveTripId) {
+      const tripAccessError = await requireTripAccess(request, effectiveTripId);
+      if (tripAccessError) {
+        return tripAccessError;
+      }
+    }
+
+    if (effectiveUserId) {
+      const { response, userId: authUserId } = await requireAuth(request);
+      if (response) {
+        return response;
+      }
+
+      if (authUserId !== effectiveUserId) {
+        return NextResponse.json(
+          { error: 'Forbidden', message: 'User mismatch for subscription removal' },
+          { status: 403 }
+        );
+      }
+    }
+
+    const deleted = await removeSubscription(endpoint);
 
     return NextResponse.json({
       success: deleted,

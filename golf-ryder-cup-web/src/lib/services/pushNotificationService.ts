@@ -476,12 +476,34 @@ export function usePushNotifications(): UsePushNotificationsReturn {
   }, [currentTrip]);
 
   const handleUnsubscribe = useCallback(async () => {
+    const subscription = await getPushSubscription();
+    const tripId = currentTrip?.id;
+    const shareCode = tripId ? await ensureTripShareCode(tripId) : null;
+
+    if (subscription) {
+      try {
+        await fetch('/api/push/subscribe', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
+          },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            ...(tripId ? { tripId } : {}),
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to unregister push subscription on server:', error);
+      }
+    }
+
     const success = await unsubscribeFromPush();
     if (success) {
       setIsSubscribed(false);
     }
     return success;
-  }, []);
+  }, [currentTrip]);
 
   return {
     isSupported: isPushSupported(),
