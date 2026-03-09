@@ -13,7 +13,6 @@
  */
 
 import type { MatchState } from '../types/computed';
-import type { Player } from '../types/models';
 import { sendNotification, canSendNotifications } from './notificationService';
 import { notifyLogger } from '@/lib/utils/logger';
 

@@ -295,14 +295,12 @@ function playNotificationSound(type: 'lead-change' | 'match-complete' | 'your-ma
 
 // Component to request notification permission
 export function NotificationPermissionBanner() {
-    const [permission, setPermission] = useState<NotificationPermission>('default');
+    const [permission, setPermission] = useState<NotificationPermission>(() =>
+        typeof window !== 'undefined' && 'Notification' in window
+            ? Notification.permission
+            : 'default'
+    );
     const [dismissed, setDismissed] = useState(false);
-
-    useEffect(() => {
-        if ('Notification' in window) {
-            setPermission(Notification.permission);
-        }
-    }, []);
 
     const handleEnable = async () => {
         const result = await requestNotificationPermission();

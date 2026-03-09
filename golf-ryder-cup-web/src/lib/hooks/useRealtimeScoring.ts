@@ -89,13 +89,11 @@ export function useRealtimeScoring(options: UseRealtimeScoringOptions): UseRealt
   // Subscribe to channels
   useEffect(() => {
     if (!enabled) {
-      setIsConnected(false);
       return;
     }
 
     const client = getSupabaseClient();
     if (!client) {
-      setIsConnected(false);
       return;
     }
 
@@ -152,10 +150,10 @@ export function useRealtimeScoring(options: UseRealtimeScoringOptions): UseRealt
   );
 
   return {
-    isConnected,
-    activeUsers,
+    isConnected: enabled && isConnected,
+    activeUsers: enabled ? activeUsers : [],
     broadcastScore,
-    error,
+    error: enabled ? error : null,
   };
 }
 

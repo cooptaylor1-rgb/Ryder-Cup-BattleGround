@@ -1,12 +1,14 @@
 'use client';
 
 // Note: this route is client-only; we intentionally avoid auto-redirects to show explicit empty states.
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { PageHeader } from '@/components/layout';
 import { InvitationManager, QRCodeCard } from '@/components/captain';
+import { getTripShareCode } from '@/lib/services/tripSyncService';
+import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { QrCode, Home, MoreHorizontal, Share2 } from 'lucide-react';
 
 /**
@@ -19,6 +21,8 @@ export default function InvitesPage() {
   const router = useRouter();
   const { currentTrip } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
+  const [shareCode, setShareCode] = useState<string | null>(null);
+  const [isLoadingShareCode, setIsLoadingShareCode] = useState(false);
 
   // Note: avoid auto-redirects so we can render explicit empty states.
 
@@ -47,6 +51,54 @@ export default function InvitesPage() {
       showToast('success', 'Invite copied to clipboard');
     }
   }, [showToast]);
+
+  useEffect(() => {
+    if (!currentTrip) {
+      queueMicrotask(() => {
+        setShareCode(null);
+        setIsLoadingShareCode(false);
+      });
+      return;
+    }
+
+    const cachedShareCode = getStoredTripShareCode(currentTrip.id);
+    if (cachedShareCode) {
+      queueMicrotask(() => {
+        setShareCode(cachedShareCode);
+        setIsLoadingShareCode(false);
+      });
+      return;
+    }
+
+    let isCancelled = false;
+    const resetTimer = setTimeout(() => {
+      setShareCode(null);
+      setIsLoadingShareCode(true);
+    }, 0);
+
+    void getTripShareCode(currentTrip.id)
+      .then((resolvedShareCode) => {
+        if (isCancelled) {
+          return;
+        }
+        setShareCode(resolvedShareCode);
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setShareCode(null);
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoadingShareCode(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(resetTimer);
+    };
+  }, [currentTrip]);
 
   if (!currentTrip) {
     return (
@@ -92,14 +144,14 @@ export default function InvitesPage() {
     );
   }
 
-  // Generate a share code from trip id
-  const shareCode = currentTrip.id.substring(0, 8).toUpperCase();
-  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/join?code=${shareCode}`;
+  const shareUrl = shareCode
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/join?code=${shareCode}`
+    : '';
 
   const tripInfo = {
     tripId: currentTrip.id,
     tripName: currentTrip.name,
-    shareCode,
+    shareCode: shareCode ?? '',
     shareUrl,
     captainName: 'Captain', // Would come from auth context in production
     startDate: currentTrip.startDate,
@@ -118,19 +170,33 @@ export default function InvitesPage() {
       <main className="container-editorial">
         {/* QR Code Section */}
         <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
-          <QRCodeCard
-            shareUrl={shareUrl}
-            shareCode={shareCode}
-            tripName={currentTrip.name}
-          />
+          {shareCode ? (
+            <QRCodeCard
+              shareUrl={shareUrl}
+              shareCode={shareCode}
+              tripName={currentTrip.name}
+            />
+          ) : (
+            <div className="rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--surface-raised)] p-[var(--space-5)]">
+              <p className="text-sm font-medium text-[var(--ink)]">
+                {isLoadingShareCode ? 'Loading the trip join code...' : 'Trip join code unavailable'}
+              </p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                {isLoadingShareCode
+                  ? 'Fetching the real cloud share code for this trip.'
+                  : 'Sync this trip to cloud first, then reopen Invitations to share the real join code.'}
+              </p>
+            </div>
+          )}
 
           {/* Share Invite Button */}
           <button
-            onClick={() => handleShare(shareCode, currentTrip.name)}
+            onClick={() => shareCode && handleShare(shareCode, currentTrip.name)}
+            disabled={!shareCode || isLoadingShareCode}
             className="press-scale flex w-full items-center justify-center gap-[var(--space-2)] mt-[var(--space-4)] rounded-[var(--radius-lg)] border-2 border-[var(--masters)] bg-[var(--masters)] px-[var(--space-5)] py-[var(--space-3)] text-[length:var(--text-base)] font-semibold text-[var(--canvas)]"
           >
             <Share2 size={18} />
-            Share Invite
+            {isLoadingShareCode ? 'Loading Invite' : 'Share Invite'}
           </button>
         </section>
 
@@ -138,15 +204,17 @@ export default function InvitesPage() {
 
         {/* Invitation Manager */}
         <section className="section">
-          <div className="card p-[var(--space-5)]">
-            <InvitationManager
-              tripInfo={tripInfo}
-              invitations={[]}
-              onSendInvite={() => showToast('success', 'Invite sent!')}
-              onRevokeInvite={() => showToast('info', 'Invite revoked')}
-              onCopyLink={() => showToast('success', 'Link copied!')}
-            />
-          </div>
+          {shareCode ? (
+            <div className="card p-[var(--space-5)]">
+              <InvitationManager
+                tripInfo={tripInfo}
+                invitations={[]}
+                onSendInvite={() => showToast('success', 'Invite sent!')}
+                onRevokeInvite={() => showToast('info', 'Invite revoked')}
+                onCopyLink={() => showToast('success', 'Link copied!')}
+              />
+            </div>
+          ) : null}
         </section>
       </main>
 

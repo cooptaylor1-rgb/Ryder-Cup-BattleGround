@@ -30,7 +30,7 @@ test.describe('iOS Safari Smoke Journeys', () => {
   test('Home loads with primary navigation @smoke', async ({ page }) => {
     await expectPageReady(page);
 
-    const nav = page.locator('nav[aria-label="Main navigation"]');
+    const nav = page.locator('nav[aria-label="Main navigation"]').first();
     await expect(nav).toBeVisible({ timeout: TEST_CONFIG.timeouts.fast });
   });
 

@@ -481,7 +481,7 @@ export function useMatchScoring({
         } finally {
             setIsSaving(false);
         }
-    }, [matchId, matchStatus.matchResult, haptic, queueAction]);
+    }, [matchId, matchStatus.holesRemaining, matchStatus.leadAmount, matchStatus.matchResult, haptic, queueAction]);
 
     const resetMatch = useCallback(async () => {
         setIsSaving(true);

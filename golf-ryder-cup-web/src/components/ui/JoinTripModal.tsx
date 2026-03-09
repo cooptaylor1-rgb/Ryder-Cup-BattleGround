@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { syncService } from '@/lib/supabase';
 import { useTripStore } from '@/lib/stores/tripStore';
+import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { cn } from '@/lib/utils';
 import { Users, Loader2, CheckCircle, XCircle, Share2 } from 'lucide-react';
 
@@ -49,6 +50,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
       const result = await syncService.joinTripByShareCode(shareCode.trim());
 
       if (result.success && result.synced > 0 && result.tripId) {
+        storeTripShareCode(result.tripId, shareCode.trim());
         // Load the trip from local DB (already synced by joinTripByShareCode)
         await loadTrip(result.tripId);
         setSuccess(true);
@@ -104,7 +106,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                   type="text"
                   value={shareCode}
                   onChange={(e) => setShareCode(e.target.value.toUpperCase())}
-                  placeholder="Enter 6-character code"
+                  placeholder="Enter 8-character code"
                   className={cn(
                     'w-full px-4 py-3 text-center text-2xl font-mono tracking-widest',
                     'rounded-lg border bg-[var(--surface)]',
@@ -112,7 +114,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                     'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-[color:var(--canvas)]',
                     error ? 'border-error text-error' : 'border-[color:var(--rule)]/40'
                   )}
-                  maxLength={6}
+                  maxLength={8}
                   autoFocus
                 />
                 {error && (

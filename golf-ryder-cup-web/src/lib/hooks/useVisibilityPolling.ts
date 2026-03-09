@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useSyncExternalStore } from 'react';
 
 interface UseVisibilityPollingOptions {
   /** Polling interval when tab is visible (ms) */
@@ -43,6 +43,21 @@ interface UseVisibilityPollingReturn {
   resume: () => void;
 }
 
+function subscribeToVisibility(callback: () => void): () => void {
+  if (typeof document === 'undefined') {
+    return () => {};
+  }
+
+  document.addEventListener('visibilitychange', callback);
+  return () => {
+    document.removeEventListener('visibilitychange', callback);
+  };
+}
+
+function getVisibilitySnapshot(): boolean {
+  return typeof document === 'undefined' ? true : document.visibilityState === 'visible';
+}
+
 /**
  * Hook for visibility-aware polling that saves battery
  */
@@ -59,11 +74,11 @@ export function useVisibilityPolling(
     reducedMotionInterval,
   } = options;
 
-  const [isVisible, setIsVisible] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const fetchFnRef = useRef(fetchFn);
   const lastFetchRef = useRef<number>(0);
+  const isVisible = useSyncExternalStore(subscribeToVisibility, getVisibilitySnapshot, () => true);
 
   // Keep fetchFn ref updated
   useEffect(() => {
@@ -89,7 +104,7 @@ export function useVisibilityPolling(
     try {
       lastFetchRef.current = Date.now();
       await fetchFnRef.current();
-    } catch (error) {
+    } catch {
       // Swallow — callers handle their own error states
     }
   }, []);
@@ -103,28 +118,15 @@ export function useVisibilityPolling(
 
   // Handle visibility changes
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      const visible = document.visibilityState === 'visible';
-      setIsVisible(visible);
-      onVisibilityChange?.(visible);
+    onVisibilityChange?.(isVisible);
 
-      if (visible && fetchOnVisible && enabled && !isPaused) {
-        // Fetch immediately if enough time has passed
-        const timeSinceLastFetch = Date.now() - lastFetchRef.current;
-        if (timeSinceLastFetch > effectiveInterval / 2) {
-          doFetch();
-        }
+    if (isVisible && fetchOnVisible && enabled && !isPaused) {
+      const timeSinceLastFetch = Date.now() - lastFetchRef.current;
+      if (timeSinceLastFetch > effectiveInterval / 2) {
+        doFetch();
       }
-    };
-
-    // Set initial state
-    setIsVisible(document.visibilityState === 'visible');
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [doFetch, effectiveInterval, enabled, fetchOnVisible, isPaused, onVisibilityChange]);
+    }
+  }, [doFetch, effectiveInterval, enabled, fetchOnVisible, isPaused, isVisible, onVisibilityChange]);
 
   // Start/stop polling based on visibility and enabled state
   useEffect(() => {

@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useUIStore } from '@/lib/stores';
 import { getWeather, type GolfWeather } from '@/lib/services/weatherService';
 import { sendNotification } from './liveScoreNotifications';
@@ -158,7 +158,7 @@ export function useWeatherAlerts(options: WeatherAlertOptions) {
     const previousAlertIds = useRef<Set<string>>(new Set());
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
+    const mergedOptions = useMemo(() => ({ ...DEFAULT_OPTIONS, ...options }), [options]);
 
     // Check weather and generate alerts
     const checkWeather = useCallback(async () => {

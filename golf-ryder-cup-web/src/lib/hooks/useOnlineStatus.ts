@@ -7,8 +7,32 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useUIStore } from '../stores';
+
+function subscribeToOnlineStatus(callback: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  const emit = () => {
+    useUIStore.getState().setOnlineStatus(navigator.onLine);
+    callback();
+  };
+
+  window.addEventListener('online', emit);
+  window.addEventListener('offline', emit);
+  emit();
+
+  return () => {
+    window.removeEventListener('online', emit);
+    window.removeEventListener('offline', emit);
+  };
+}
+
+function getOnlineSnapshot(): boolean {
+  return typeof navigator === 'undefined' ? true : navigator.onLine;
+}
 
 /**
  * Hook to track online/offline status
@@ -16,32 +40,7 @@ import { useUIStore } from '../stores';
  * @returns Current online status
  */
 export function useOnlineStatus(): boolean {
-    const { isOnline, setOnlineStatus } = useUIStore();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-
-        // Set initial status
-        setOnlineStatus(navigator.onLine);
-
-        // Listen for online/offline events
-        const handleOnline = () => setOnlineStatus(true);
-        const handleOffline = () => setOnlineStatus(false);
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
-    }, [setOnlineStatus]);
-
-    // Return true on server/before mount to avoid hydration mismatch
-    if (!mounted) return true;
-
-    return isOnline;
+    return useSyncExternalStore(subscribeToOnlineStatus, getOnlineSnapshot, () => true);
 }
 
 export default useOnlineStatus;

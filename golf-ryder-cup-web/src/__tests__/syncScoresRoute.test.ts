@@ -7,6 +7,20 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+const { requireTripAccessMock } = vi.hoisted(() => ({
+    requireTripAccessMock: vi.fn<() => Promise<NextResponse | null>>(async () => null),
+}));
+
+vi.mock('@/lib/utils/apiMiddleware', async () => {
+    const actual = await vi.importActual<typeof import('@/lib/utils/apiMiddleware')>('@/lib/utils/apiMiddleware');
+    return {
+        ...actual,
+        requireTripAccess: requireTripAccessMock,
+    };
+});
+
 import { POST } from '@/app/api/sync/scores/route';
 
 // Mock Supabase client
@@ -33,6 +47,7 @@ function createMockRequest(body: unknown, extraHeaders?: Record<string, string>)
 describe('Score Sync API Route', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        requireTripAccessMock.mockResolvedValue(null);
         // Reset environment variables for each test
         vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
         vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
@@ -138,6 +153,7 @@ describe('Score Sync API Route', () => {
         it('syncs events to database successfully', async () => {
             const req = createMockRequest({
                 matchId: '550e8400-e29b-41d4-a716-446655440000',
+                tripId: '550e8400-e29b-41d4-a716-446655440010',
                 events: [
                     { id: '550e8400-e29b-41d4-a716-446655440001', type: 'SCORE', holeNumber: 1, data: { winner: 'teamA' }, timestamp: new Date().toISOString() },
                 ],
@@ -153,6 +169,7 @@ describe('Score Sync API Route', () => {
         it('processes multiple events', async () => {
             const req = createMockRequest({
                 matchId: '550e8400-e29b-41d4-a716-446655440000',
+                tripId: '550e8400-e29b-41d4-a716-446655440010',
                 events: [
                     { id: '550e8400-e29b-41d4-a716-446655440001', type: 'SCORE', holeNumber: 1, data: { winner: 'teamA' }, timestamp: new Date().toISOString() },
                     { id: '550e8400-e29b-41d4-a716-446655440002', type: 'SCORE', holeNumber: 2, data: { winner: 'teamB' }, timestamp: new Date().toISOString() },
@@ -165,6 +182,42 @@ describe('Score Sync API Route', () => {
 
             expect(response.status).toBe(200);
             expect(data.success).toBe(true);
+        });
+
+        it('rejects cloud sync without tripId', async () => {
+            const req = createMockRequest({
+                matchId: '550e8400-e29b-41d4-a716-446655440000',
+                events: [],
+            });
+
+            const response = await POST(req);
+            const data = await response.json();
+
+            expect(response.status).toBe(400);
+            expect(data.error).toBe('Trip context required');
+        });
+
+        it('rejects cloud sync when trip access is denied', async () => {
+            requireTripAccessMock.mockResolvedValueOnce(
+                NextResponse.json(
+                    { error: 'Forbidden', message: 'Access denied' },
+                    { status: 403 }
+                )
+            );
+
+            const req = createMockRequest({
+                matchId: '550e8400-e29b-41d4-a716-446655440000',
+                tripId: '550e8400-e29b-41d4-a716-446655440010',
+                events: [],
+            });
+
+            const response = await POST(req);
+
+            expect(response.status).toBe(403);
+            expect(requireTripAccessMock).toHaveBeenCalledWith(
+                expect.any(NextRequest),
+                '550e8400-e29b-41d4-a716-446655440010'
+            );
         });
     });
 
@@ -183,7 +236,7 @@ describe('Score Sync API Route', () => {
             expect(data.synced).toBe(0);
         });
 
-        it('returns 500 for malformed JSON', async () => {
+        it('returns 400 for malformed JSON', async () => {
             const req = new NextRequest('http://localhost:3000/api/sync/scores', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -191,7 +244,7 @@ describe('Score Sync API Route', () => {
             });
 
             const response = await POST(req);
-            expect(response.status).toBe(500);
+            expect(response.status).toBe(400);
             expect(response.headers.get('x-correlation-id')).toBeTruthy();
         });
     });

@@ -393,6 +393,8 @@ test.describe('Participant Journey: Navigation UX', () => {
     });
 
     test('should have accessible bottom navigation @smoke', async ({ page }) => {
+        await dismissAllBlockingModals(page);
+
         // Bottom nav should be present
         const nav = page.locator('nav[aria-label*="navigation"], nav[role="navigation"]').first();
 

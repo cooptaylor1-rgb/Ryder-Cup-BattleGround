@@ -102,15 +102,14 @@ export function getConnectionQuality(): ConnectionQuality {
  */
 export function useConnectionQuality(): ConnectionQuality {
   const { isOnline } = useUIStore();
-  const [quality, setQuality] = useState<ConnectionQuality>('good');
+  const [quality, setQuality] = useState<ConnectionQuality>(() =>
+    typeof navigator === 'undefined' ? 'good' : getConnectionQuality()
+  );
 
   useEffect(() => {
     if (!isOnline) {
-      setQuality('offline');
       return;
     }
-
-    setQuality(getConnectionQuality());
 
     // Listen for connection changes
     const connection = (
@@ -126,7 +125,7 @@ export function useConnectionQuality(): ConnectionQuality {
     }
   }, [isOnline]);
 
-  return quality;
+  return isOnline ? quality : 'offline';
 }
 
 // ============================================

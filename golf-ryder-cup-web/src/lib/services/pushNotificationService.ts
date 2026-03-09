@@ -397,6 +397,9 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 // ============================================
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTripStore } from '@/lib/stores';
+import { getTripShareCode } from '@/lib/services/tripSyncService';
+import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 
 export interface UsePushNotificationsReturn {
   /** Whether push is supported */
@@ -421,6 +424,7 @@ export interface UsePushNotificationsReturn {
 }
 
 export function usePushNotifications(): UsePushNotificationsReturn {
+  const currentTrip = useTripStore((state) => state.currentTrip);
   // Initialize permission with actual value to avoid setState in useEffect
   const [permission, setPermission] = useState<PermissionState>(() => getPermission());
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -449,10 +453,21 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       const data = subscriptionToData(subscription);
       if (data) {
         try {
+          const tripId = currentTrip?.id;
+          const cachedShareCode = tripId ? getStoredTripShareCode(tripId) : null;
+          const shareCode =
+            tripId && !cachedShareCode ? await getTripShareCode(tripId) : cachedShareCode;
+
           await fetch('/api/push/subscribe', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subscription: data }),
+            headers: {
+              'Content-Type': 'application/json',
+              ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
+            },
+            body: JSON.stringify({
+              subscription: data,
+              ...(tripId ? { tripId } : {}),
+            }),
           });
         } catch (error) {
           console.error('Failed to register push subscription on server:', error);
@@ -461,7 +476,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
 
     return success;
-  }, []);
+  }, [currentTrip]);
 
   const handleUnsubscribe = useCallback(async () => {
     const success = await unsubscribeFromPush();

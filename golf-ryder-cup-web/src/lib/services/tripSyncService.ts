@@ -13,6 +13,7 @@
  */
 
 import { createLogger } from '@/lib/utils/logger';
+import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { v4 as uuidv4 } from 'uuid';
 import { calcRetryDelay, syncSleep } from './baseSyncService';
 
@@ -531,11 +532,23 @@ async function syncTripToCloud(
   };
 
   if (operation === 'create') {
-    const { error } = await getTable('trips').insert({ ...cloudData, created_at: trip.createdAt });
+    const { data: insertedTrip, error } = await getTable('trips')
+      .insert({ ...cloudData, created_at: trip.createdAt })
+      .select('share_code')
+      .single();
     if (error) throw new Error(error.message);
+    if (insertedTrip?.share_code) {
+      storeTripShareCode(trip.id, insertedTrip.share_code);
+    }
   } else {
-    const { error } = await getTable('trips').upsert(cloudData, { onConflict: 'id' });
+    const { data: upsertedTrip, error } = await getTable('trips')
+      .upsert(cloudData, { onConflict: 'id' })
+      .select('share_code')
+      .single();
     if (error) throw new Error(error.message);
+    if (upsertedTrip?.share_code) {
+      storeTripShareCode(trip.id, upsertedTrip.share_code);
+    }
   }
 }
 
@@ -1029,6 +1042,7 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
       }
     );
 
+    storeTripShareCode(trip.id, shareCode);
     logger.log(`Pulled trip ${trip.id} from cloud`);
     return { success: true, tripId: trip.id, cloudId: trip.id };
   } catch (error) {
@@ -1048,6 +1062,9 @@ export async function getTripShareCode(tripId: string): Promise<string | null> {
     const { data, error } = await getTable('trips').select('share_code').eq('id', tripId).single();
 
     if (error || !data) return null;
+    if (data.share_code) {
+      storeTripShareCode(tripId, data.share_code);
+    }
     return data.share_code;
   } catch {
     return null;

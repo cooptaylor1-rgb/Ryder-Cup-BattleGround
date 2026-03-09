@@ -215,6 +215,7 @@ export function ChatMessage({
                 : 'bg-[var(--surface-secondary)] text-[var(--ink-primary)] rounded-bl-md'
             )}>
               {message.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- chat attachments can come from arbitrary user-hosted URLs
                 <img
                   src={message.imageUrl}
                   alt="Shared image"
@@ -222,6 +223,7 @@ export function ChatMessage({
                 />
               )}
               {message.gifUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- animated GIFs should render directly without image optimization
                 <img
                   src={message.gifUrl}
                   alt="GIF"

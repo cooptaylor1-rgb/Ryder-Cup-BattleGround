@@ -6,6 +6,7 @@
  */
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface QRCodeProps {
@@ -41,11 +42,12 @@ export function QRCode({ value, size = 200, className }: QRCodeProps) {
 
   return (
     <div className={className} style={{ textAlign: 'center' }}>
-      <img
+      <Image
         src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&margin=8&format=svg`}
         alt={`QR code for ${value}`}
         width={size}
         height={size}
+        unoptimized
         style={{ borderRadius: 'var(--radius-md)' }}
         onError={() => setError(true)}
       />

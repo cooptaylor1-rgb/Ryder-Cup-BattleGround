@@ -6,7 +6,9 @@
  */
 
 import { db } from '@/lib/db';
+import { getTripShareCode } from '@/lib/services/tripSyncService';
 import { syncLogger } from '@/lib/utils/logger';
+import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import type { ScoringEvent } from '@/lib/types/events';
 
 // Sync tag for service worker
@@ -161,9 +163,19 @@ async function syncMatchEvents(
         throw new Error(`Match ${matchId} not found`);
     }
 
+    const session = await db.sessions.get(match.sessionId);
+    if (!session) {
+        throw new Error(`Session ${match.sessionId} not found`);
+    }
+
+    const tripId = session.tripId;
+    const cachedShareCode = getStoredTripShareCode(tripId);
+    const shareCode = cachedShareCode ?? await getTripShareCode(tripId);
+
     // Prepare payload for API
     const payload = {
         matchId,
+        tripId,
         events: events.map((event) => {
             const holeNumber = 'holeNumber' in event.payload ? event.payload.holeNumber : undefined;
             return {
@@ -184,6 +196,7 @@ async function syncMatchEvents(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
             },
             body: JSON.stringify(payload),
         });

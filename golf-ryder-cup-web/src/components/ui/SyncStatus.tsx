@@ -12,8 +12,6 @@
  */
 
 'use client';
-
-import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import {
@@ -41,7 +39,6 @@ export function SyncStatus({
 }: SyncStatusProps) {
   const { isOnline } = useUIStore();
   const { pendingCount, isSyncing, processQueue } = useSyncQueue();
-  const [lastSynced, setLastSynced] = useState<Date | null>(null);
 
   // Determine current sync state
   const syncState: SyncState = (() => {
@@ -50,13 +47,6 @@ export function SyncStatus({
     if (pendingCount > 0) return 'pending';
     return 'synced';
   })();
-
-  // Update last synced time when going from pending to synced
-  useEffect(() => {
-    if (syncState === 'synced' && pendingCount === 0) {
-      setLastSynced(new Date());
-    }
-  }, [syncState, pendingCount]);
 
   const handleTap = () => {
     if (syncState === 'pending') {
@@ -84,7 +74,6 @@ export function SyncStatus({
     <SyncFull
       state={syncState}
       pendingCount={pendingCount}
-      lastSynced={lastSynced}
       onTap={handleTap}
       className={className}
     />
@@ -199,30 +188,16 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
 interface SyncFullProps {
   state: SyncState;
   pendingCount: number;
-  lastSynced: Date | null;
   onTap: () => void;
   className?: string;
 }
 
-function SyncFull({ state, pendingCount, lastSynced, onTap, className }: SyncFullProps) {
-  const formatLastSynced = (date: Date | null): string => {
-    if (!date) return 'Never';
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return date.toLocaleDateString();
-  };
-
+function SyncFull({ state, pendingCount, onTap, className }: SyncFullProps) {
   const config = {
     synced: {
       icon: <Cloud className="w-5 h-5" />,
       title: 'All synced',
-      subtitle: `Last synced ${formatLastSynced(lastSynced)}`,
+      subtitle: 'No pending changes',
       color: 'var(--success, #22C55E)',
     },
     pending: {

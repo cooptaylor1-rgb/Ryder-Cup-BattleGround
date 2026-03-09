@@ -197,7 +197,7 @@ export function SideBetReminder({
         if (currentReminders.length > 0) {
             trigger('scorePoint');
         }
-    }, [currentHole, reminders.length, trigger]);
+    }, [reminders, trigger]);
 
     // Handle dismiss
     const handleDismiss = useCallback((betId: string, snooze = false) => {

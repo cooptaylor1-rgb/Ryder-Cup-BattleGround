@@ -56,11 +56,12 @@ export function PhotoGallery({
 
     // Cleanup object URLs on unmount to prevent memory leaks
     useEffect(() => {
+        const objectUrls = objectUrlsRef.current;
         return () => {
-            objectUrlsRef.current.forEach(url => {
+            objectUrls.forEach(url => {
                 URL.revokeObjectURL(url);
             });
-            objectUrlsRef.current.clear();
+            objectUrls.clear();
         };
     }, []);
 

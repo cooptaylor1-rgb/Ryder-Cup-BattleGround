@@ -77,10 +77,12 @@ export function StrokeAlertBanner({
   // Show alert when hole changes and there are strokes
   useEffect(() => {
     if (hasStrokes && currentHole !== lastAlertedHole) {
-      setIsVisible(true);
-      setIsDismissed(false);
-      setLastAlertedHole(currentHole);
-      onAlertShown?.(currentHole, currentHoleTeamAStrokes, currentHoleTeamBStrokes);
+      queueMicrotask(() => {
+        setIsVisible(true);
+        setIsDismissed(false);
+        setLastAlertedHole(currentHole);
+        onAlertShown?.(currentHole, currentHoleTeamAStrokes, currentHoleTeamBStrokes);
+      });
 
       // Auto-dismiss
       if (autoDismissMs > 0) {
@@ -90,7 +92,9 @@ export function StrokeAlertBanner({
         return () => clearTimeout(timer);
       }
     } else if (!hasStrokes) {
-      setIsVisible(false);
+      queueMicrotask(() => {
+        setIsVisible(false);
+      });
     }
   }, [currentHole, hasStrokes, lastAlertedHole, autoDismissMs, currentHoleTeamAStrokes, currentHoleTeamBStrokes, onAlertShown]);
 

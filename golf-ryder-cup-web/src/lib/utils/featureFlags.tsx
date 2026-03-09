@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { useState, useMemo, useCallback, createContext, useContext, type ReactNode } from 'react';
 
 // ============================================
 // TYPES
@@ -213,19 +213,14 @@ export function FeatureFlagProvider({
   config,
   userId,
 }: FeatureFlagProviderProps) {
-  const [overrides, setOverrides] = useState<Record<string, FeatureFlagValue>>({});
+  const [overrides, setOverrides] = useState<Record<string, FeatureFlagValue>>(getStoredOverrides);
   const environment = (process.env.NODE_ENV as 'development' | 'staging' | 'production') || 'development';
 
-  // Load overrides from localStorage on mount
-  useEffect(() => {
-    setOverrides(getStoredOverrides());
-  }, []);
-
   // Merge default flags with custom config
-  const flags: Record<string, FeatureFlag> = {
+  const flags: Record<string, FeatureFlag> = useMemo(() => ({
     ...defaultFlags,
     ...config?.flags,
-  };
+  }), [config?.flags]);
 
   /**
    * Check if a feature flag is enabled

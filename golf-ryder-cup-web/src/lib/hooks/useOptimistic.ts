@@ -327,7 +327,9 @@ export function useSyncQueue() {
   // Process queue when coming online
   useEffect(() => {
     if (isOnline && pendingCount > 0) {
-      processQueue();
+      queueMicrotask(() => {
+        void processQueue();
+      });
     }
   }, [isOnline, pendingCount, processQueue]);
 

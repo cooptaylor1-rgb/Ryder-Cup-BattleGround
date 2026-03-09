@@ -18,6 +18,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import type { Match, Player } from '../types/models';
 
+const EMPTY_MATCHES: Match[] = [];
+
 // ============================================
 // TYPES
 // ============================================
@@ -307,11 +309,11 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
         },
         [playerId],
         []
-    ) ?? [];
+    ) ?? EMPTY_MATCHES;
 
     // Filter for trip-specific matches if tripId provided
     const tripMatches = useMemo(() => {
-        if (!tripId || !allMatches) return null;
+        if (!tripId) return null;
         return allMatches.filter((m: Match) => m.sessionId && tripId);
     }, [allMatches, tripId]);
 
@@ -608,11 +610,9 @@ export function useHeadToHead(player1Id: string, player2Id: string) {
         },
         [player1Id, player2Id],
         []
-    ) ?? [];
+    ) ?? EMPTY_MATCHES;
 
     const record = useMemo(() => {
-        if (!matches) return { player1Wins: 0, player2Wins: 0, halved: 0 };
-
         let player1Wins = 0;
         let player2Wins = 0;
         let halved = 0;

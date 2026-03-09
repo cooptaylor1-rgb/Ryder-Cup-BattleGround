@@ -5,7 +5,7 @@
  * Provides shortcuts for scoring, navigation, and common actions.
  */
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface ShortcutConfig {
@@ -101,7 +101,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
     const sequenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Default navigation shortcuts (vim-style g prefix)
-    const defaultShortcuts: ShortcutConfig[] = [
+    const defaultShortcuts: ShortcutConfig[] = useMemo(() => [
         // Navigation shortcuts (g + key)
         {
             key: 'g h',
@@ -157,10 +157,13 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
             },
             when: () => !isTypingInInput(),
         },
-    ];
+    ], [router]);
 
     // Combine default and custom shortcuts
-    const allShortcuts = [...defaultShortcuts, ...shortcuts];
+    const allShortcuts = useMemo(
+        () => [...defaultShortcuts, ...shortcuts],
+        [defaultShortcuts, shortcuts]
+    );
 
     // Handle keyboard events
     const handleKeyDown = useCallback(
@@ -227,7 +230,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions = {}) 
                 sequenceRef.current = '';
             }, 1000);
         },
-        [enabled, allShortcuts, router]
+        [enabled, allShortcuts]
     );
 
     useEffect(() => {

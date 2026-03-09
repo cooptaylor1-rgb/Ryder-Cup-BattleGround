@@ -79,24 +79,26 @@ interface WhatsNewProps {
   forceShow?: boolean;
 }
 
+function hasSeenCurrentVersion(): boolean {
+  if (typeof window === 'undefined') {
+    return true;
+  }
+
+  return localStorage.getItem(STORAGE_KEY) === CURRENT_VERSION;
+}
+
 export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(forceShow);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     if (forceShow) {
-      setIsVisible(true);
       return;
     }
 
-    // Check if user has seen this version
-    if (typeof window !== 'undefined') {
-      const seenVersion = localStorage.getItem(STORAGE_KEY);
-      if (seenVersion !== CURRENT_VERSION) {
-        // Small delay for smoother UX
-        const timer = setTimeout(() => setIsVisible(true), 1000);
-        return () => clearTimeout(timer);
-      }
+    if (!hasSeenCurrentVersion()) {
+      const timer = setTimeout(() => setIsVisible(true), 1000);
+      return () => clearTimeout(timer);
     }
   }, [forceShow]);
 
@@ -425,14 +427,7 @@ export function FeatureCard({
  * Hook to manage What's New visibility
  */
 export function useWhatsNew() {
-  const [hasSeenUpdate, setHasSeenUpdate] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seenVersion = localStorage.getItem(STORAGE_KEY);
-      setHasSeenUpdate(seenVersion === CURRENT_VERSION);
-    }
-  }, []);
+  const [hasSeenUpdate, setHasSeenUpdate] = useState(hasSeenCurrentVersion);
 
   const markAsSeen = () => {
     localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);

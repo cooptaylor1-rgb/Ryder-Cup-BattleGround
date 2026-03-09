@@ -9,7 +9,6 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import type { TeamStandings, MagicNumber } from '@/lib/types/computed';
 import { Trophy, Target } from 'lucide-react';
@@ -28,35 +27,10 @@ export function StandingsCard({
     teamBName = 'Team Europe',
 }: StandingsCardProps) {
     const { teamAPoints, teamBPoints, matchesCompleted, totalMatches, leader, margin } = standings;
-    const [animatedTeamA, setAnimatedTeamA] = useState(0);
-    const [animatedTeamB, setAnimatedTeamB] = useState(0);
-    const [scoreChanged, setScoreChanged] = useState(false);
-    const prevTeamARef = useRef(teamAPoints);
-    const prevTeamBRef = useRef(teamBPoints);
 
     const pointsToWin = 14.5; // Standard Ryder Cup
-    const teamAProgress = (animatedTeamA / pointsToWin) * 100;
-    const teamBProgress = (animatedTeamB / pointsToWin) * 100;
-
-    // Animate progress bars on mount and update
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setAnimatedTeamA(teamAPoints);
-            setAnimatedTeamB(teamBPoints);
-        }, 100);
-        return () => clearTimeout(timer);
-    }, [teamAPoints, teamBPoints]);
-
-    // Trigger celebration animation on score change
-    useEffect(() => {
-        if (teamAPoints !== prevTeamARef.current || teamBPoints !== prevTeamBRef.current) {
-            setScoreChanged(true);
-            const timer = setTimeout(() => setScoreChanged(false), 600);
-            prevTeamARef.current = teamAPoints;
-            prevTeamBRef.current = teamBPoints;
-            return () => clearTimeout(timer);
-        }
-    }, [teamAPoints, teamBPoints]);
+    const teamAProgress = (teamAPoints / pointsToWin) * 100;
+    const teamBProgress = (teamBPoints / pointsToWin) * 100;
 
     // Format score for display
     const formatScore = (score: number) => {
@@ -104,10 +78,10 @@ export function StandingsCard({
                         />
                         <p className="type-overline text-[var(--ink-tertiary)] mb-2">{teamAName}</p>
                         <p
+                            key={`team-a-${teamAPoints}`}
                             className={cn(
                                 'standings-score tabular-nums',
-                                leader === 'teamA' ? 'text-[var(--team-usa)]' : 'text-[var(--ink-secondary)]',
-                                scoreChanged && leader === 'teamA' && 'animate-score-win'
+                                leader === 'teamA' ? 'text-[var(--team-usa)] animate-score-win' : 'text-[var(--ink-secondary)]'
                             )}
                         >
                             {formatScore(teamAPoints)}
@@ -145,10 +119,10 @@ export function StandingsCard({
                         />
                         <p className="type-overline text-[var(--ink-tertiary)] mb-2">{teamBName}</p>
                         <p
+                            key={`team-b-${teamBPoints}`}
                             className={cn(
                                 'standings-score tabular-nums',
-                                leader === 'teamB' ? 'text-[var(--team-europe)]' : 'text-[var(--ink-secondary)]',
-                                scoreChanged && leader === 'teamB' && 'animate-score-win'
+                                leader === 'teamB' ? 'text-[var(--team-europe)] animate-score-win' : 'text-[var(--ink-secondary)]'
                             )}
                         >
                             {formatScore(teamBPoints)}

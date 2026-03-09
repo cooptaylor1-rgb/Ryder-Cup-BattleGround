@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
+import { resolve } from 'node:path';
 
 const nextConfig: NextConfig = {
   // Output standalone for optimized container deployments
@@ -8,7 +9,7 @@ const nextConfig: NextConfig = {
   // Turbopack: explicitly set workspace root to avoid slow mis-detection
   turbopack: {
     // Point to the monorepo root where node_modules lives.
-    root: '../',
+    root: resolve(__dirname, '..'),
   },
 
   // Optimize imports for better tree-shaking
@@ -31,6 +32,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.qrserver.com',
       },
     ],
     // Prefer AVIF (smaller) with WebP fallback

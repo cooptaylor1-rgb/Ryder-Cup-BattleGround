@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { cn } from '@/lib/utils';
 import { Sun, Moon, Monitor } from 'lucide-react';
 
@@ -31,19 +31,25 @@ function applyTheme(newTheme: Theme) {
   }
 }
 
-export function ThemeToggle({ variant = 'segmented', className }: ThemeToggleProps) {
-  const [theme, setTheme] = useState<Theme>('system');
-  const [mounted, setMounted] = useState(false);
+function getStoredTheme(): Theme {
+  if (typeof window === 'undefined') {
+    return 'system';
+  }
 
-  // Load theme on mount
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored) {
-      setTheme(stored);
-      applyTheme(stored);
-    }
-  }, []);
+  const storedTheme = localStorage.getItem('theme');
+  return storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system'
+    ? storedTheme
+    : 'system';
+}
+
+function subscribeToMount(callback: () => void): () => void {
+  callback();
+  return () => {};
+}
+
+export function ThemeToggle({ variant = 'segmented', className }: ThemeToggleProps) {
+  const [theme, setTheme] = useState<Theme>(getStoredTheme);
+  const mounted = useSyncExternalStore(subscribeToMount, () => true, () => false);
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);

@@ -87,11 +87,15 @@ export function ScoreCelebration({
 
     useEffect(() => {
         if (show) {
-            setIsVisible(true);
+            queueMicrotask(() => {
+                setIsVisible(true);
+            });
 
             // Generate particles for win celebrations
             if ((type === 'holeWon' || type === 'matchWon') && !prefersReducedMotion) {
-                setParticles(generateParticles(type === 'matchWon' ? 40 : 20, teamColor));
+                queueMicrotask(() => {
+                    setParticles(generateParticles(type === 'matchWon' ? 40 : 20, teamColor));
+                });
             }
 
             // Auto-dismiss

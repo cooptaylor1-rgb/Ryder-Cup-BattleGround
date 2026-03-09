@@ -298,6 +298,7 @@ test.describe('Captain Journey: Session Configuration', () => {
         // Navigate to sessions (may redirect or show content based on app state)
         await page.goto('/schedule');
         await waitForStableDOM(page);
+        await dismissAllBlockingModals(page);
 
         // Page should load without errors
         const body = page.locator('body');
@@ -338,6 +339,7 @@ test.describe('Captain Journey: Match Creation', () => {
     test('should navigate to lineup builder @smoke', async ({ page }) => {
         await page.goto('/lineup');
         await waitForStableDOM(page);
+        await dismissAllBlockingModals(page);
 
         // Page should load successfully
         const body = page.locator('body');

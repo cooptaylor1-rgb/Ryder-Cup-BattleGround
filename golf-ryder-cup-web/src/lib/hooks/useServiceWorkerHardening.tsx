@@ -94,7 +94,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
 
         activeWorker.postMessage({ type: 'KEEP_ALIVE' }, [channel.port2]);
       });
-    } catch (error) {
+    } catch {
       // Keep-alive is best-effort; failures are expected when offline
       return false;
     }
@@ -112,7 +112,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
         registration.active.postMessage({ type: 'REFRESH_CACHE' });
         // Cache refresh requested silently
       }
-    } catch (error) {
+    } catch {
       // Cache refresh is best-effort; failures are expected when offline
     }
   }, []);
@@ -137,7 +137,7 @@ export function useServiceWorkerHardening(options: UseServiceWorkerOptions = {})
 
         activeWorker.postMessage({ type: 'GET_CACHE_STATUS' }, [channel.port2]);
       });
-    } catch (error) {
+    } catch {
       // Cache status check is best-effort
       return null;
     }

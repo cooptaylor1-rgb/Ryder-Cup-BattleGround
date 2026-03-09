@@ -7,6 +7,7 @@ import { FirstLaunchWalkthrough } from '@/components/FirstLaunchWalkthrough';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { tripLogger } from '@/lib/utils/logger';
+import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import {
   ChevronRight,
   MapPin,
@@ -34,6 +35,14 @@ import {
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { PageHeader } from '@/components/layout';
 
+function readPendingJoinCode(): string | undefined {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return sessionStorage.getItem('pendingJoinCode') ?? undefined;
+}
+
 /**
  * HOME PAGE — The Daily Edition
  *
@@ -49,20 +58,17 @@ import { PageHeader } from '@/components/layout';
 export default function HomePage() {
   const router = useRouter();
   const { loadTrip, players, teams, teamMembers, sessions } = useTripStore();
-  const { isCaptainMode } = useUIStore();
+  const { isCaptainMode, showToast } = useUIStore();
   const [showQuickStart, setShowQuickStart] = useState(false);
-  const [showJoinTrip, setShowJoinTrip] = useState(false);
-  const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>();
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>(readPendingJoinCode);
+  const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
 
   // Check for a pending join code from /join deep link
   useEffect(() => {
-    const code = sessionStorage.getItem('pendingJoinCode');
-    if (code) {
+    if (pendingJoinCode) {
       sessionStorage.removeItem('pendingJoinCode');
-      setPendingJoinCode(code);
-      setShowJoinTrip(true);
     }
-  }, []);
+  }, [pendingJoinCode]);
 
   const {
     trips,
@@ -89,14 +95,19 @@ export default function HomePage() {
 
   const handleInviteFriends = useCallback(async () => {
     if (!activeTrip) return;
-    // Derive a 6-char code from the trip ID (deterministic, shareable)
-    const code = activeTrip.id.replace(/-/g, '').slice(0, 6).toUpperCase();
-    const result = await shareTrip(activeTrip.name, code);
+    const shareCode = getStoredTripShareCode(activeTrip.id);
+    if (!shareCode) {
+      showToast('info', 'Open Invitations to fetch and share the real trip code.');
+      router.push('/captain/invites');
+      return;
+    }
+
+    const result = await shareTrip(activeTrip.name, shareCode);
     if (result.shared && result.method === 'clipboard') {
       // User will see the system share sheet for 'native', only show toast for clipboard
       // No-op: the clipboard copy is its own confirmation
     }
-  }, [activeTrip]);
+  }, [activeTrip, router, showToast]);
 
   const handleQuickStartComplete = useCallback(
     async (tripData: {

@@ -247,7 +247,9 @@ export function useLiveUpdates({
     // Connect on mount, disconnect on unmount
     useEffect(() => {
         if (enabled && isOnline) {
-            connect();
+            queueMicrotask(() => {
+                void connect();
+            });
         }
 
         return () => {
@@ -258,7 +260,9 @@ export function useLiveUpdates({
     // Reconnect when coming back online
     useEffect(() => {
         if (isOnline && enabled && !isConnected && !isReconnecting) {
-            connect();
+            queueMicrotask(() => {
+                void connect();
+            });
         }
     }, [isOnline, enabled, isConnected, isReconnecting, connect]);
 

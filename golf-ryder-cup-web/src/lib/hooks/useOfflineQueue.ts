@@ -256,7 +256,9 @@ export function useOfflineQueue(): UseOfflineQueueReturn {
   // Auto-sync when coming online
   useEffect(() => {
     if (isOnline && pendingCount > 0) {
-      processQueue();
+      queueMicrotask(() => {
+        void processQueue();
+      });
     }
   }, [isOnline, pendingCount, processQueue]);
 

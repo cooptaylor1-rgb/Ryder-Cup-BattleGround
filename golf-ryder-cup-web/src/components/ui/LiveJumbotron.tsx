@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { useLiveScores, useRealtime } from '@/lib/supabase';
 import type { Player, Match } from '@/lib/types/models';
@@ -256,26 +256,15 @@ const LiveMatchCard = memo(function LiveMatchCard({
     isLive,
     lastUpdate,
 }: LiveMatchCardProps) {
-    const [scoreChanged, setScoreChanged] = useState(false);
-
-    // Animate on score change
-    useEffect(() => {
-        if (lastUpdate) {
-            setScoreChanged(true);
-            const timer = setTimeout(() => setScoreChanged(false), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [lastUpdate]);
-
     const displayScore = matchState?.displayScore || 'AS';
     const currentScore = matchState?.currentScore || 0;
     const holesPlayed = matchState?.holesPlayed || 0;
+    const scoreAnimationKey = lastUpdate?.getTime() ?? 0;
 
     return (
         <div className={cn(
             'relative p-4 rounded-xl border-2 overflow-hidden',
             'bg-[var(--surface)] transition-all duration-300',
-            scoreChanged && 'animate-score-pop',
             currentScore > 0 ? 'border-team-usa/30' : currentScore < 0 ? 'border-team-europe/30' : 'border-[color:var(--rule)]/40'
         )}>
             {/* Live indicator */}
@@ -300,11 +289,14 @@ const LiveMatchCard = memo(function LiveMatchCard({
                     </div>
                 </div>
 
-                <div className={cn(
+                <div
+                    key={scoreAnimationKey}
+                    className={cn(
                     'text-4xl font-bold min-w-20 text-center',
-                    scoreChanged && 'scale-110',
+                    scoreAnimationKey > 0 && 'animate-score-pop',
                     currentScore > 0 ? 'text-team-usa' : currentScore < 0 ? 'text-team-europe' : 'text-[var(--ink-tertiary)]'
-                )}>
+                )}
+                >
                     {displayScore}
                 </div>
 
