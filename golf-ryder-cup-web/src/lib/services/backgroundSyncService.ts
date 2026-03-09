@@ -6,9 +6,8 @@
  */
 
 import { db } from '@/lib/db';
-import { getTripShareCode } from '@/lib/services/tripSyncService';
+import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { syncLogger } from '@/lib/utils/logger';
-import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import type { ScoringEvent } from '@/lib/types/events';
 
 // Sync tag for service worker
@@ -169,8 +168,7 @@ async function syncMatchEvents(
     }
 
     const tripId = session.tripId;
-    const cachedShareCode = getStoredTripShareCode(tripId);
-    const shareCode = cachedShareCode ?? await getTripShareCode(tripId);
+    const shareCode = await ensureTripShareCode(tripId);
 
     // Prepare payload for API
     const payload = {

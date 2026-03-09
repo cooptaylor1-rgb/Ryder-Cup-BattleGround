@@ -7,7 +7,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { PageHeader } from '@/components/layout';
 import { InvitationManager, QRCodeCard } from '@/components/captain';
-import { getTripShareCode } from '@/lib/services/tripSyncService';
+import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { QrCode, Home, MoreHorizontal, Share2 } from 'lucide-react';
 
@@ -76,7 +76,7 @@ export default function InvitesPage() {
       setIsLoadingShareCode(true);
     }, 0);
 
-    void getTripShareCode(currentTrip.id)
+    void ensureTripShareCode(currentTrip.id)
       .then((resolvedShareCode) => {
         if (isCancelled) {
           return;
@@ -179,12 +179,12 @@ export default function InvitesPage() {
           ) : (
             <div className="rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--surface-raised)] p-[var(--space-5)]">
               <p className="text-sm font-medium text-[var(--ink)]">
-                {isLoadingShareCode ? 'Loading the trip join code...' : 'Trip join code unavailable'}
+                {isLoadingShareCode ? 'Publishing trip invite...' : 'Trip join code unavailable'}
               </p>
               <p className="mt-2 text-sm text-[var(--ink-secondary)]">
                 {isLoadingShareCode
-                  ? 'Fetching the real cloud share code for this trip.'
-                  : 'Sync this trip to cloud first, then reopen Invitations to share the real join code.'}
+                  ? 'Syncing the trip and fetching the real cloud share code.'
+                  : 'Cloud sync is unavailable right now, so a shareable join code could not be created.'}
               </p>
             </div>
           )}

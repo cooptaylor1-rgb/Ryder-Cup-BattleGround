@@ -27,54 +27,47 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, currentUser } = useAuthStore();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
+  const isPublicRoute = PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname?.startsWith(route + '/')
+  );
+  const requiresAuth = !isPublicRoute;
+  const shouldRedirectToProfile = requiresAuth && isHydrated && (!isAuthenticated || !currentUser);
 
-  // Wait for Zustand hydration from localStorage
   useEffect(() => {
-    // Give Zustand a moment to hydrate from localStorage
-    const timer = setTimeout(() => {
+    const finishHydration = () => {
       setIsHydrated(true);
-    }, 50);
-    return () => clearTimeout(timer);
+    };
+
+    const startHydration = () => {
+      setIsHydrated(false);
+    };
+
+    const unsubscribeHydrate = useAuthStore.persist.onHydrate(startHydration);
+    const unsubscribeFinishHydration = useAuthStore.persist.onFinishHydration(finishHydration);
+
+    if (!useAuthStore.persist.hasHydrated()) {
+      void useAuthStore.persist.rehydrate();
+    }
+
+    return () => {
+      unsubscribeHydrate();
+      unsubscribeFinishHydration();
+    };
   }, []);
 
   useEffect(() => {
-    // Don't check until hydration is complete
-    if (!isHydrated) return;
-
-    // Allow public routes without authentication
-    const isPublicRoute = PUBLIC_ROUTES.some(
-      (route) => pathname === route || pathname?.startsWith(route + '/')
-    );
-
-    if (isPublicRoute) {
-      // Defer to avoid setState-in-effect
-      const timeoutId = setTimeout(() => setIsChecking(false), 0);
-      return () => clearTimeout(timeoutId);
-    }
-
-    // If not authenticated, redirect to profile creation
-    if (!isAuthenticated || !currentUser) {
-      const query = searchParams?.toString();
-      const nextPath = query ? `${pathname}?${query}` : pathname;
-      router.replace(`/profile/create?next=${encodeURIComponent(nextPath)}`);
+    if (!shouldRedirectToProfile) {
       return;
     }
 
-    // User is authenticated, allow access - defer to avoid setState-in-effect
-    const timeoutId = setTimeout(() => setIsChecking(false), 0);
-    return () => clearTimeout(timeoutId);
-  }, [isHydrated, isAuthenticated, currentUser, pathname, router, searchParams]);
+    const query = searchParams?.toString();
+    const nextPath = query ? `${pathname}?${query}` : pathname;
+    router.replace(`/profile/create?next=${encodeURIComponent(nextPath)}`);
+  }, [pathname, router, searchParams, shouldRedirectToProfile]);
 
-  // Show nothing while checking authentication (prevents flash)
-  if (!isHydrated || isChecking) {
-    // Check if this is a public route - if so, don't block
-    const isPublicRoute = PUBLIC_ROUTES.some(
-      (route) => pathname === route || pathname?.startsWith(route + '/')
-    );
-
-    if (!isPublicRoute) {
+  if (requiresAuth) {
+    if (!isHydrated || !isAuthenticated || !currentUser) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-[var(--canvas)]">
           <div className="text-center">

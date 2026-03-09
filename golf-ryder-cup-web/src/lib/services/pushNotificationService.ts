@@ -398,8 +398,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTripStore } from '@/lib/stores';
-import { getTripShareCode } from '@/lib/services/tripSyncService';
-import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
+import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 
 export interface UsePushNotificationsReturn {
   /** Whether push is supported */
@@ -454,9 +453,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       if (data) {
         try {
           const tripId = currentTrip?.id;
-          const cachedShareCode = tripId ? getStoredTripShareCode(tripId) : null;
-          const shareCode =
-            tripId && !cachedShareCode ? await getTripShareCode(tripId) : cachedShareCode;
+          const shareCode = tripId ? await ensureTripShareCode(tripId) : null;
 
           await fetch('/api/push/subscribe', {
             method: 'POST',

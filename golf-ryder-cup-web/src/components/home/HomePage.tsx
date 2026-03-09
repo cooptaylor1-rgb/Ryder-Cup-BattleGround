@@ -6,8 +6,8 @@ import { db } from '@/lib/db';
 import { FirstLaunchWalkthrough } from '@/components/FirstLaunchWalkthrough';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useHomeData } from '@/lib/hooks/useHomeData';
+import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { tripLogger } from '@/lib/utils/logger';
-import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import {
   ChevronRight,
   MapPin,
@@ -95,9 +95,9 @@ export default function HomePage() {
 
   const handleInviteFriends = useCallback(async () => {
     if (!activeTrip) return;
-    const shareCode = getStoredTripShareCode(activeTrip.id);
+    const shareCode = await ensureTripShareCode(activeTrip.id);
     if (!shareCode) {
-      showToast('info', 'Open Invitations to fetch and share the real trip code.');
+      showToast('info', 'Unable to publish a trip invite right now. Check cloud sync and try again.');
       router.push('/captain/invites');
       return;
     }

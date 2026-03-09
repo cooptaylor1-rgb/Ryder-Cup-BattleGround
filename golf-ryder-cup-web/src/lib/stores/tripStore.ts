@@ -24,6 +24,7 @@ import {
   queueSyncOperation,
   syncTripToCloudFull,
   getTripSyncStatus,
+  removeTripShareCode,
   type SyncStatus,
 } from '../services/tripSyncService';
 import { deleteTripCascade } from '../services/cascadeDelete';
@@ -264,6 +265,7 @@ export const useTripStore = create<TripState>()(
         // atomically, including finances, sync queue, and schedule items
         // that the previous inline logic missed.
         await deleteTripCascade(tripId, { sync: true });
+        removeTripShareCode(tripId);
 
         const { currentTrip } = get();
         if (currentTrip?.id === tripId) {

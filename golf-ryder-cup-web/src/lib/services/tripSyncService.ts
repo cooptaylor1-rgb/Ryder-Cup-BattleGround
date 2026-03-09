@@ -13,7 +13,11 @@
  */
 
 import { createLogger } from '@/lib/utils/logger';
-import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
+import {
+  clearStoredTripShareCode,
+  getStoredTripShareCode,
+  storeTripShareCode,
+} from '@/lib/utils/tripShareCodeStore';
 import { v4 as uuidv4 } from 'uuid';
 import { calcRetryDelay, syncSleep } from './baseSyncService';
 
@@ -1069,6 +1073,29 @@ export async function getTripShareCode(tripId: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+export async function ensureTripShareCode(tripId: string): Promise<string | null> {
+  const cachedShareCode = getStoredTripShareCode(tripId);
+  if (cachedShareCode) {
+    return cachedShareCode;
+  }
+
+  const fetchedShareCode = await getTripShareCode(tripId);
+  if (fetchedShareCode) {
+    return fetchedShareCode;
+  }
+
+  const syncResult = await syncTripToCloudFull(tripId);
+  if (!syncResult.success) {
+    return null;
+  }
+
+  return getTripShareCode(tripId);
+}
+
+export function removeTripShareCode(tripId: string): void {
+  clearStoredTripShareCode(tripId);
 }
 
 // ============================================
