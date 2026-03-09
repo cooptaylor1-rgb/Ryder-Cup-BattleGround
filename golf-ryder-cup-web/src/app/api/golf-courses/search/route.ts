@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
 import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { formatZodError, golfCourseDiscoverySearchSchema } from '@/lib/validations/api';
 
 /**
  * Golf Course Search API
@@ -25,6 +26,7 @@ const RATE_LIMIT_CONFIG = {
 // Cache duration: 1 hour for search results
 const CACHE_MAX_AGE = 3600;
 const CACHE_STALE_WHILE_REVALIDATE = 86400;
+const UPSTREAM_TIMEOUT_MS = 8000;
 
 interface CourseSearchResult {
     id: string;
@@ -68,17 +70,20 @@ export async function GET(request: NextRequest) {
         return rateLimitError;
     }
 
-    const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q');
-    const state = searchParams.get('state');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const parseResult = golfCourseDiscoverySearchSchema.safeParse({
+        q: request.nextUrl.searchParams.get('q') ?? undefined,
+        state: request.nextUrl.searchParams.get('state') ?? undefined,
+        limit: request.nextUrl.searchParams.get('limit') ?? undefined,
+    });
 
-    if (!query || query.length < 2) {
+    if (!parseResult.success) {
         return NextResponse.json(
-            { error: 'Search query must be at least 2 characters' },
+            { error: formatZodError(parseResult.error) },
             { status: 400 }
         );
     }
+
+    const { q: query, state, limit } = parseResult.data;
 
     try {
         const results: CourseSearchResult[] = [];
@@ -123,16 +128,30 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         logger.error('Course search error', { query, state, error });
         return NextResponse.json(
-            { error: 'Failed to search courses', details: String(error) },
+            { error: 'Failed to search courses' },
             { status: 500 }
         );
+    }
+}
+
+async function fetchWithTimeout(input: string, init: RequestInit = {}): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
+    try {
+        return await fetch(input, {
+            ...init,
+            signal: controller.signal,
+        });
+    } finally {
+        clearTimeout(timeout);
     }
 }
 
 // Search GHIN (USGA) database
 async function searchGHIN(
     query: string,
-    state: string | null,
+    state: string | undefined,
     apiKey: string
 ): Promise<CourseSearchResult[]> {
     try {
@@ -143,7 +162,7 @@ async function searchGHIN(
             max_results: '100',
         });
 
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://api.ghin.com/api/v1/courses/search?${params}`,
             {
                 headers: {
@@ -204,7 +223,7 @@ async function searchRapidAPI(
         let geocodeData: Array<{ lat: string; lon: string; display_name: string }> = [];
 
         // Strategy 1: Try to geocode the full query with "golf course" appended
-        const golfGeocodeResponse = await fetch(
+        const golfGeocodeResponse = await fetchWithTimeout(
             `https://nominatim.openstreetmap.org/search?` +
             `q=${encodeURIComponent(query + ' golf course')}&` +
             `format=json&` +
@@ -222,7 +241,7 @@ async function searchRapidAPI(
 
         // Strategy 2: Try generic geocode without "golf course"
         if (!geocodeData || geocodeData.length === 0) {
-            const genericGeocodeResponse = await fetch(
+            const genericGeocodeResponse = await fetchWithTimeout(
                 `https://nominatim.openstreetmap.org/search?` +
                 `q=${encodeURIComponent(query)}&` +
                 `format=json&` +
@@ -247,7 +266,7 @@ async function searchRapidAPI(
                 if (['golf', 'course', 'club', 'country', 'links', 'farms', 'resort'].includes(word.toLowerCase())) {
                     continue;
                 }
-                const wordGeocodeResponse = await fetch(
+                const wordGeocodeResponse = await fetchWithTimeout(
                     `https://nominatim.openstreetmap.org/search?` +
                     `q=${encodeURIComponent(word + ' golf')}&` +
                     `format=json&` +
@@ -295,7 +314,7 @@ async function searchRapidAPI(
         const { lat, lon } = geocodeData[0];
 
         // Now search RapidAPI with these coordinates (dynamic radius based on source)
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://golf-course-finder.p.rapidapi.com/api/golf-clubs/?miles=${searchRadius}&latitude=${lat}&longitude=${lon}`,
             {
                 headers: {
@@ -405,7 +424,7 @@ async function searchRapidAPI(
 // Search OpenStreetMap for golf courses (free, no API key needed)
 async function searchOpenStreetMap(
     query: string,
-    state: string | null
+    state: string | undefined
 ): Promise<CourseSearchResult[]> {
     try {
         const results: CourseSearchResult[] = [];
@@ -423,7 +442,7 @@ async function searchOpenStreetMap(
         for (const searchQuery of searchVariations) {
             if (results.length >= 20) break; // Enough results
 
-            const response = await fetch(
+            const response = await fetchWithTimeout(
                 `https://nominatim.openstreetmap.org/search?` +
                 `q=${encodeURIComponent(searchQuery)}&` +
                 `format=json&` +

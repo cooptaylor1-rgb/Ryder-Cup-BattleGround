@@ -512,12 +512,12 @@ export async function navigateViaBottomNav(
   page: Page,
   section: 'home' | 'schedule' | 'score' | 'standings' | 'more'
 ): Promise<void> {
-  const navMap: Record<string, RegExp> = {
-    home: /home/i,
-    schedule: /schedule/i,
-    score: /score/i,
-    standings: /standings|leaderboard/i,
-    more: /more|menu/i,
+  const labelMap: Record<typeof section, string> = {
+    home: 'Today',
+    schedule: 'Schedule',
+    score: 'Score',
+    standings: 'Standings',
+    more: 'More',
   };
 
   const pathMap: Record<string, string> = {
@@ -528,7 +528,10 @@ export async function navigateViaBottomNav(
     more: '/more',
   };
 
-  const navButton = page.locator('nav button').filter({ hasText: navMap[section] }).first();
+  const navButton = page
+    .locator('nav[aria-label="Main navigation"]')
+    .getByRole('button', { name: labelMap[section], exact: true })
+    .first();
 
   if (await navButton.isVisible({ timeout: TEST_CONFIG.timeouts.fast })) {
     await navButton.click();

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
 import { apiLogger } from '@/lib/utils/logger';
+import { formatZodError, golfCourseDetailsParamsSchema } from '@/lib/validations/api';
 
 /**
  * Golf Course Details API
@@ -20,6 +21,7 @@ const RATE_LIMIT_CONFIG = {
     windowMs: 60 * 1000,
     maxRequests: 30,
 };
+const UPSTREAM_TIMEOUT_MS = 8000;
 
 interface HoleData {
     par: number;
@@ -60,14 +62,15 @@ export async function GET(
         return rateLimitError;
     }
 
-    const { courseId } = await params;
-
-    if (!courseId) {
+    const parseResult = golfCourseDetailsParamsSchema.safeParse(await params);
+    if (!parseResult.success) {
         return NextResponse.json(
-            { error: 'Course ID is required' },
+            { error: formatZodError(parseResult.error) },
             { status: 400 }
         );
     }
+
+    const { courseId } = parseResult.data;
 
     try {
         let courseData: CourseDetailsResponse | null = null;
@@ -102,9 +105,23 @@ export async function GET(
     } catch (error) {
         apiLogger.error('Course details error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch course details', details: String(error) },
+            { error: 'Failed to fetch course details' },
             { status: 500 }
         );
+    }
+}
+
+async function fetchWithTimeout(input: string, init: RequestInit = {}): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
+    try {
+        return await fetch(input, {
+            ...init,
+            signal: controller.signal,
+        });
+    } finally {
+        clearTimeout(timeout);
     }
 }
 
@@ -114,7 +131,7 @@ async function fetchFromGHIN(
     apiKey: string
 ): Promise<CourseDetailsResponse | null> {
     try {
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://api.ghin.com/api/v1/courses/${courseId}`,
             {
                 headers: {

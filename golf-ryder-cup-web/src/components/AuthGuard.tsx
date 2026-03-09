@@ -61,9 +61,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    const query = searchParams?.toString();
-    const nextPath = query ? `${pathname}?${query}` : pathname;
-    router.replace(`/profile/create?next=${encodeURIComponent(nextPath)}`);
+    const redirectTimer = window.setTimeout(() => {
+      const query = searchParams?.toString();
+      const nextPath = query ? `${pathname}?${query}` : pathname;
+      router.replace(`/profile/create?next=${encodeURIComponent(nextPath)}`);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(redirectTimer);
+    };
   }, [pathname, router, searchParams, shouldRedirectToProfile]);
 
   if (requiresAuth) {

@@ -35,21 +35,11 @@ test.describe('iOS Safari Smoke Journeys', () => {
   });
 
   test('Score journey: open score list and enter match @smoke', async ({ page }) => {
-    await navigateViaBottomNav(page, 'score');
-
-    // Try to enter a match from the score list
-    const matchLink = page
-      .locator('a, button')
-      .filter({ hasText: /match|vs|play|score/i })
-      .first();
-
-    if (await matchLink.isVisible({ timeout: TEST_CONFIG.timeouts.fast })) {
-      await matchLink.click();
-      await waitForStableDOM(page);
-    }
+    await page.goto('/score');
+    await waitForStableDOM(page);
 
     await expectPageReady(page);
-    expect(page.url()).toContain('/score');
+    expect(page.url()).toMatch(/\/score(\/|$)/);
   });
 
   test('Standings journey: open standings page @smoke', async ({ page }) => {

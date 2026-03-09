@@ -83,6 +83,31 @@ export const courseSearchParamsSchema = z.object({
 
 export type CourseSearchParams = z.infer<typeof courseSearchParamsSchema>;
 
+/**
+ * Golf course discovery search parameters
+ */
+export const golfCourseDiscoverySearchSchema = z.object({
+    q: z.string().trim().min(2, 'Search query must be at least 2 characters').max(100, 'Search query is too long'),
+    state: z.string().trim().min(2, 'State filter must be at least 2 characters').max(50, 'State filter is too long').optional(),
+    limit: z.coerce.number().int('Limit must be a whole number').min(1, 'Limit must be at least 1').max(50, 'Limit must be 50 or fewer').default(20),
+});
+
+export type GolfCourseDiscoverySearch = z.infer<typeof golfCourseDiscoverySearchSchema>;
+
+/**
+ * Golf course details route parameters
+ */
+export const golfCourseDetailsParamsSchema = z.object({
+    courseId: z
+        .string()
+        .trim()
+        .min(1, 'Course ID is required')
+        .max(200, 'Course ID is too long')
+        .regex(/^[A-Za-z0-9-]+$/, 'Course ID contains invalid characters'),
+});
+
+export type GolfCourseDetailsParams = z.infer<typeof golfCourseDetailsParamsSchema>;
+
 // ============================================
 // COURSE LIBRARY SCHEMAS
 // ============================================
