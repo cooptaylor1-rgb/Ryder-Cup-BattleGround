@@ -269,6 +269,7 @@ export function addRateLimitHeaders<T>(
 export async function verifyAuth(req: NextRequest): Promise<{
   authenticated: boolean;
   userId?: string;
+  userEmail?: string;
   error?: string;
 }> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -299,7 +300,11 @@ export async function verifyAuth(req: NextRequest): Promise<{
       return { authenticated: false, error: error?.message || 'Invalid token' };
     }
 
-    return { authenticated: true, userId: data.user.id };
+    return {
+      authenticated: true,
+      userId: data.user.id,
+      userEmail: data.user.email ?? undefined,
+    };
   } catch {
     return { authenticated: false, error: 'Authentication failed' };
   }
@@ -311,8 +316,9 @@ export async function verifyAuth(req: NextRequest): Promise<{
 export async function requireAuth(req: NextRequest): Promise<{
   response: NextResponse | null;
   userId?: string;
+  userEmail?: string;
 }> {
-  const { authenticated, userId, error } = await verifyAuth(req);
+  const { authenticated, userId, userEmail, error } = await verifyAuth(req);
 
   if (!authenticated) {
     return {
@@ -320,7 +326,32 @@ export async function requireAuth(req: NextRequest): Promise<{
     };
   }
 
-  return { response: null, userId };
+  return { response: null, userId, userEmail };
+}
+
+async function hasTripMembershipForPlayerIds(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  tripId: string,
+  playerIds: string[]
+): Promise<boolean> {
+  if (playerIds.length === 0) {
+    return false;
+  }
+
+  const { data: membership, error } = await supabase
+    .from('team_members')
+    .select(
+      `
+        id,
+        teams!inner(trip_id)
+      `
+    )
+    .in('player_id', playerIds)
+    .eq('teams.trip_id', tripId)
+    .limit(1);
+
+  return !error && !!membership && membership.length > 0;
 }
 
 // ============================================
@@ -406,22 +437,27 @@ export async function verifyTripAccess(
   // Check for authenticated user with trip membership
   const authHeader = req.headers.get('Authorization');
   if (authHeader?.startsWith('Bearer ')) {
-    const { authenticated, userId } = await verifyAuth(req);
-    if (authenticated && userId) {
-      // Check if user is a participant in this trip
-      const { data: membership } = await supabase
-        .from('team_members')
-        .select(
-          `
-                    id,
-                    teams!inner(trip_id)
-                `
-        )
-        .eq('player_id', userId)
-        .eq('teams.trip_id', tripId)
-        .single();
+    const { authenticated, userId, userEmail } = await verifyAuth(req);
+    if (authenticated) {
+      const playerIds = new Set<string>();
 
-      if (membership) {
+      if (userId) {
+        playerIds.add(userId);
+      }
+
+      if (userEmail) {
+        const { data: emailMatchedPlayers } = await supabase
+          .from('players')
+          .select('id')
+          .eq('email', userEmail)
+          .limit(10);
+
+        for (const player of emailMatchedPlayers ?? []) {
+          playerIds.add(player.id);
+        }
+      }
+
+      if (await hasTripMembershipForPlayerIds(supabase, tripId, [...playerIds])) {
         return { authorized: true };
       }
     }
