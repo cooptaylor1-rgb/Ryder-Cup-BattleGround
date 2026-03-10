@@ -28,7 +28,6 @@ export {
   OfflineEmpty,
   ErrorEmpty,
   // New premium empty states
-  NoBetsEmpty,
   NoMessagesEmpty,
   NoPhotosEmpty,
   NoActivityEmpty,

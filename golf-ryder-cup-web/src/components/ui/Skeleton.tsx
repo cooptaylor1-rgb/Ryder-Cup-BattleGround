@@ -203,25 +203,6 @@ export function AchievementCardSkeleton() {
   );
 }
 
-// Side Bet Card Skeleton
-export function BetCardSkeleton() {
-  return (
-    <div className={cn('p-4 rounded-xl', 'bg-[var(--surface)] border border-[var(--rule)]')}>
-      <div className="flex items-start gap-3">
-        <Skeleton className="w-10 h-10 rounded-lg" />
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-5 w-12" />
-          </div>
-          <Skeleton className="h-3 w-40 mt-2" />
-          <Skeleton className="h-3 w-20 mt-2" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Comment/Social Card Skeleton
 export function CommentCardSkeleton() {
   return (
