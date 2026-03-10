@@ -1,167 +1,146 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, type ComponentType } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { PageHeader } from '@/components/layout';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import { Button } from '@/components/ui/Button';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { PageHeader } from '@/components/layout';
 import {
-  Shield,
-  Users,
-  Calendar,
+  AlertTriangle,
+  CalendarDays,
+  Car,
+  CheckCircle2,
+  ChevronRight,
   ClipboardCheck,
-  UserCheck,
-  Shuffle,
+  Clock3,
+  DollarSign,
+  Home,
   MessageSquare,
+  Phone,
+  Plus,
+  Printer,
   QrCode,
   Settings,
-  ChevronRight,
-  ChevronDown,
-  Plus,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Trophy,
-  Home,
-  Zap,
-  Car,
-  Phone,
+  Shield,
+  Shuffle,
   Sliders,
-  DollarSign,
-  Printer,
+  Trophy,
+  UserCheck,
+  Users,
+  Zap,
 } from 'lucide-react';
 
-/**
- * CAPTAIN COMMAND CENTER
- *
- * The hub for all captain operations. Editorial design with maroon accent
- * to visually distinguish captain mode from the rest of the app.
- *
- * Features:
- * - Trip status overview
- * - Editorial tool index with clean typography
- * - Session management
- * - Pre-round checklist access
- * - Player availability
- */
-
-interface QuickAction {
+interface CommandAction {
   id: string;
   label: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   href: string;
-  color: string;
-  badge?: number;
-  priority?: boolean; // P0-7: Top 4 priority actions shown by default
+  icon: ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  tone: 'maroon' | 'ink';
 }
 
-// P0-7: Reorganized with day-of priority actions first
-const QUICK_ACTIONS: QuickAction[] = [
-  // DAY-OF Priority Actions (always visible) - things captains need when players are arriving
+const gameDayActions: CommandAction[] = [
   {
     id: 'attendance',
     label: 'Attendance',
-    description: "Track who's here",
-    icon: UserCheck,
+    description: "Track who’s actually on property before the pairings shift under you.",
     href: '/captain/availability',
-    color: 'var(--maroon)',
-    priority: true,
+    icon: UserCheck,
+    tone: 'maroon',
   },
   {
     id: 'lineup',
     label: 'Create Lineup',
-    description: 'Build match pairings',
-    icon: Users,
+    description: 'Build or publish the next session without leaving the command room.',
     href: '/lineup/new',
-    color: 'var(--maroon)',
-    priority: true,
+    icon: Users,
+    tone: 'maroon',
   },
   {
     id: 'manage',
     label: 'Quick Swap',
-    description: 'Edit matches & players',
-    icon: Sliders,
+    description: 'Adjust sessions, player handicaps, and match allowances in one place.',
     href: '/captain/manage',
-    color: 'var(--maroon)',
-    priority: true,
+    icon: Sliders,
+    tone: 'maroon',
   },
   {
     id: 'audit',
     label: 'Audit Log',
-    description: 'Review scoring changes',
-    icon: Shield,
+    description: 'Review scoring changes when the day starts getting messy.',
     href: '/captain/audit',
-    color: 'var(--maroon)',
-    priority: true,
+    icon: Shield,
+    tone: 'maroon',
   },
+];
+
+const setupActions: CommandAction[] = [
   {
     id: 'checklist',
     label: 'Pre-Flight',
-    description: "Verify everything's ready",
-    icon: ClipboardCheck,
+    description: 'Run the readiness check before the first tee shot exposes a missing piece.',
     href: '/captain/checklist',
-    color: 'var(--maroon)',
-    priority: true,
+    icon: ClipboardCheck,
+    tone: 'ink',
   },
-  // Setup Actions (typically done before day-of)
   {
     id: 'draft',
     label: 'Team Draft',
-    description: 'Assign players to teams',
-    icon: Shuffle,
+    description: 'Sort the roster into sides when the trip still needs its shape.',
     href: '/captain/draft',
-    color: 'var(--maroon-light)',
+    icon: Shuffle,
+    tone: 'ink',
   },
   {
     id: 'messages',
     label: 'Messages',
-    description: 'Send announcements',
-    icon: MessageSquare,
+    description: 'Send a real announcement instead of a text thread that gets buried.',
     href: '/captain/messages',
-    color: 'var(--maroon-light)',
-  },
-  {
-    id: 'bets',
-    label: 'Side Bets',
-    description: 'Create & manage bets',
-    icon: DollarSign,
-    href: '/captain/bets',
-    color: 'var(--maroon-light)',
+    icon: MessageSquare,
+    tone: 'ink',
   },
   {
     id: 'invites',
     label: 'Invitations',
-    description: 'Manage trip invites',
-    icon: QrCode,
+    description: 'Manage share codes and make sure late arrivals can still get in.',
     href: '/captain/invites',
-    color: 'var(--maroon-light)',
+    icon: QrCode,
+    tone: 'ink',
+  },
+  {
+    id: 'bets',
+    label: 'Side Bets',
+    description: 'Keep the optional games from drifting into untracked folklore.',
+    href: '/captain/bets',
+    icon: DollarSign,
+    tone: 'ink',
   },
   {
     id: 'carts',
     label: 'Cart Assignments',
-    description: 'Assign golf carts',
-    icon: Car,
+    description: 'Pair the right people before the lot turns into first-tee chaos.',
     href: '/captain/carts',
-    color: 'var(--maroon-light)',
+    icon: Car,
+    tone: 'ink',
   },
   {
     id: 'contacts',
     label: 'Contacts',
-    description: 'Emergency & venue',
-    icon: Phone,
+    description: 'Keep the important numbers somewhere better than one captain’s phone.',
     href: '/captain/contacts',
-    color: 'var(--maroon-light)',
+    icon: Phone,
+    tone: 'ink',
   },
   {
     id: 'pairings',
     label: 'Print Pairings',
-    description: 'Printable match sheet',
-    icon: Printer,
+    description: 'Generate the paper backup when the course wants something tangible.',
     href: '/captain/pairings',
-    color: 'var(--maroon-light)',
+    icon: Printer,
+    tone: 'ink',
   },
 ];
 
@@ -171,29 +150,30 @@ export default function CaptainPage() {
   const { isCaptainMode, enableCaptainMode } = useUIStore();
   const [captainPin, setCaptainPin] = useState('');
 
-  // P0-7: State for expandable quick actions grid - default to showing all
-  const [showAllActions, setShowAllActions] = useState(true);
-
   const handleEnableCaptain = async () => {
     try {
       await enableCaptainMode(captainPin);
       setCaptainPin('');
     } catch {
-      // Show error via toast
       useUIStore.getState().showToast('error', 'Incorrect PIN');
     }
   };
 
-  // Note: avoid auto-redirects so we can render explicit empty states.
-
   if (!currentTrip) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Captain Command"
+          subtitle="No active trip"
+          icon={<Shield size={16} className="text-[var(--canvas)]" />}
+          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          onBack={() => router.back()}
+        />
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
             title="No active trip"
-            description="Start or select a trip to access Captain tools."
+            description="Start or select a trip to access captain tools."
             action={{
               label: 'Go Home',
               onClick: () => router.push('/'),
@@ -209,80 +189,95 @@ export default function CaptainPage() {
   if (!isCaptainMode) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader title="Captain Command" subtitle="Enable captain mode to continue" />
-        <main className="container-editorial py-12">
-          <div className="card p-[var(--space-6)] text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]">
-              <Shield size={32} className="text-[var(--canvas)]" />
-            </div>
-            <h2 className="type-title mb-[var(--space-2)]">Captain Mode</h2>
-            <p className="type-body-sm text-[var(--ink-secondary)] mb-[var(--space-6)]">
-              Enter your captain PIN to manage lineups, scores, and settings.
-            </p>
+        <PageHeader
+          title="Captain Command"
+          subtitle={currentTrip.name}
+          icon={<Shield size={16} className="text-[var(--canvas)]" />}
+          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          onBack={() => router.back()}
+        />
 
-            {/* Inline PIN entry */}
-            <div className="max-w-[200px] mx-auto">
-              <input
-                type="password"
-                inputMode="numeric"
-                maxLength={4}
-                value={captainPin}
-                onChange={(e) => setCaptainPin(e.target.value.replace(/\D/g, ''))}
-                placeholder="4-digit PIN"
-                aria-label="Captain PIN"
-                className="input text-center text-2xl tracking-[0.5em] font-sans"
-              />
+        <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+          <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,240,241,0.96))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+            <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Gate</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
+                Open the command room.
+              </h1>
+              <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                The captain side controls the structure of the trip. Enter the PIN to unlock lineups,
+                session management, and the rest of the board.
+              </p>
             </div>
 
-            <button
-              onClick={handleEnableCaptain}
-              disabled={captainPin.length < 4}
-              className="btn-premium press-scale w-full mt-6 max-w-[200px] mx-auto"
-            >
-              <Shield size={16} /> Enable Captain Mode
-            </button>
-          </div>
+            <div className="space-y-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)]">
+              <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
+                <GateFactCard label="Trip" value={currentTrip.name} valueClassName="font-sans text-[1rem] not-italic" />
+                <GateFactCard label="Sessions" value={sessions.length} />
+                <GateFactCard label="Players" value={players.length} />
+              </div>
+
+              <label className="block space-y-[var(--space-2)]">
+                <span className="type-meta font-semibold text-[var(--ink)]">Captain PIN</span>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={captainPin}
+                  onChange={(event) => setCaptainPin(event.target.value.replace(/\D/g, ''))}
+                  placeholder="4-digit PIN"
+                  aria-label="Captain PIN"
+                  className="input text-center text-[1.8rem] tracking-[0.45em]"
+                />
+              </label>
+
+              <Button
+                variant="primary"
+                onClick={handleEnableCaptain}
+                disabled={captainPin.length < 4}
+                leftIcon={<Shield size={16} />}
+                className="w-full justify-center"
+              >
+                Enable Captain Mode
+              </Button>
+            </div>
+          </section>
         </main>
       </div>
     );
   }
 
   const getTeamPlayers = (teamId: string) => {
-    const memberIds = teamMembers.filter((tm) => tm.teamId === teamId).map((tm) => tm.playerId);
-    return players.filter((p) => memberIds.includes(p.id));
+    const memberIds = teamMembers.filter((membership) => membership.teamId === teamId).map((membership) => membership.playerId);
+    return players.filter((player) => memberIds.includes(player.id));
   };
 
-  const teamA = teams.find((t) => t.color === 'usa');
-  const teamB = teams.find((t) => t.color === 'europe');
+  const teamA = teams.find((team) => team.color === 'usa');
+  const teamB = teams.find((team) => team.color === 'europe');
   const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
   const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
-  const unassignedPlayers = players.filter((p) => {
-    return !teamMembers.some((tm) => tm.playerId === p.id);
-  });
-
-  const activeSessions = sessions.filter((s) => s.status === 'inProgress');
-  const upcomingSessions = sessions.filter((s) => s.status === 'scheduled');
-  const completedSessions = sessions.filter((s) => s.status === 'completed');
-
-  // Calculate trip readiness
-  const hasPlayers = players.length >= 2;
-  const hasTeams = teamAPlayers.length > 0 && teamBPlayers.length > 0;
-  const hasSessions = sessions.length > 0;
-  const readinessItems = [
-    { label: 'Players Added', done: hasPlayers, count: players.length },
-    {
-      label: 'Teams Balanced',
-      done: hasTeams,
-      count: `${teamAPlayers.length}v${teamBPlayers.length}`,
-    },
-    { label: 'Sessions Created', done: hasSessions, count: sessions.length },
-  ];
-  const readinessPercent = Math.round(
-    (readinessItems.filter((r) => r.done).length / readinessItems.length) * 100
+  const unassignedPlayers = players.filter(
+    (player) => !teamMembers.some((membership) => membership.playerId === player.id)
   );
 
-  const priorityActions = QUICK_ACTIONS.filter((a) => a.priority);
-  const secondaryActions = QUICK_ACTIONS.filter((a) => !a.priority);
+  const activeSessions = sessions.filter((session) => session.status === 'inProgress');
+  const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');
+  const completedSessions = sessions.filter((session) => session.status === 'completed');
+
+  const readinessItems = [
+    { label: 'Roster Built', done: players.length >= 2, count: players.length },
+    {
+      label: 'Teams Ready',
+      done: teamAPlayers.length > 0 && teamBPlayers.length > 0,
+      count: `${teamAPlayers.length}v${teamBPlayers.length}`,
+    },
+    { label: 'Sessions Built', done: sessions.length > 0, count: sessions.length },
+    { label: 'Assignments Clean', done: unassignedPlayers.length === 0, count: unassignedPlayers.length },
+  ];
+  const readinessPercent = Math.round(
+    (readinessItems.filter((item) => item.done).length / readinessItems.length) * 100
+  );
+  const readinessTone = readinessPercent === 100 ? 'ready' : readinessPercent >= 50 ? 'building' : 'needs';
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -293,379 +288,390 @@ export default function CaptainPage() {
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
         onBack={() => router.back()}
         rightSlot={
-          <Link
-            href="/captain/settings"
-            className="p-2 press-scale text-[var(--ink-secondary)]"
-          >
+          <Link href="/captain/settings" className="rounded-full p-2 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]">
             <Settings size={20} strokeWidth={1.75} />
           </Link>
         }
       />
 
-      <main className="container-editorial">
-        {/* Trip Readiness */}
-        <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
-          <div
-            className={cn(
-              'card-captain',
-              readinessPercent === 100
-                ? 'bg-[linear-gradient(135deg,rgba(0,103,71,0.06)_0%,rgba(0,103,71,0.02)_100%)]'
-                : 'bg-[var(--canvas-raised)]'
-            )}
-          >
-            <div className="flex items-center justify-between mb-[var(--space-4)]">
-              <div className="flex items-center gap-[var(--space-3)]">
-                {readinessPercent === 100 ? (
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] flex items-center justify-center">
-                    <Zap size={20} className="text-[var(--canvas)]" />
-                  </div>
-                ) : (
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--warning)] opacity-90 flex items-center justify-center">
-                    <AlertTriangle size={20} className="text-[var(--canvas)]" />
-                  </div>
-                )}
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,240,241,0.97))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+          <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+            <div className="flex flex-col gap-[var(--space-5)]">
+              <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="type-title-sm font-[family-name:var(--font-sans)]">
-                    {readinessPercent === 100 ? 'Ready to Play' : 'Setup Required'}
+                  <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain&apos;s Room</p>
+                  <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
+                    Run the trip from one board.
+                  </h1>
+                  <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                    This should feel like a real command center, not a utilities folder. Keep the
+                    day moving, see what still needs work, and step into the right tool without losing the room.
                   </p>
-                  <p className="type-caption">{readinessPercent}% complete</p>
                 </div>
+
+                <ReadinessPill tone={readinessTone}>
+                  {readinessPercent === 100 ? 'Ready to Play' : `${readinessPercent}% Ready`}
+                </ReadinessPill>
               </div>
-              <Link
-                href="/captain/checklist"
-                className="type-meta text-[var(--maroon)] font-semibold"
-              >
-                Details
-              </Link>
-            </div>
 
-            {/* Progress bar */}
-            <div className="w-full h-[6px] rounded-[3px] overflow-hidden bg-[var(--rule)]">
-              <div
-                className={cn(
-                  'h-full rounded-[3px] transition-[width] duration-500 ease-in-out',
-                  readinessPercent === 100 ? 'bg-[var(--masters)]' : 'bg-[var(--maroon)]'
-                )}
-                style={{ width: `${readinessPercent}%` }}
-              />
-            </div>
-
-            {/* Readiness items */}
-            <div className="flex gap-[var(--space-4)] mt-[var(--space-4)]">
-              {readinessItems.map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-[var(--space-2)]"
+              <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+                <Link
+                  href="/lineup/new"
+                  className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
                 >
-                  {item.done ? (
-                    <CheckCircle2 size={14} className="text-[var(--success)]" />
-                  ) : (
-                    <Clock size={14} className="text-[var(--ink-tertiary)]" />
-                  )}
-                  <span className="type-micro font-[family-name:var(--font-sans)]">
-                    {item.label}: <strong>{item.count}</strong>
-                  </span>
-                </div>
-              ))}
+                  <Plus size={16} />
+                  Build Next Session
+                </Link>
+                <Link
+                  href="/captain/manage"
+                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--maroon-dark)] transition-colors hover:bg-[color:var(--maroon)]/14"
+                >
+                  <Sliders size={16} />
+                  Open Manage Board
+                </Link>
+              </div>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+            <CaptainFactCard label="Readiness" value={`${readinessPercent}%`} valueClassName="font-sans text-[1rem] not-italic" />
+            <CaptainFactCard label="Live Sessions" value={activeSessions.length} />
+            <CaptainFactCard label="Upcoming" value={upcomingSessions.length} />
+            <CaptainFactCard label="Unassigned" value={unassignedPlayers.length} />
           </div>
         </section>
 
-        {/* Captain Tools Index -- Editorial list layout */}
-        <section className="pb-[var(--space-6)]">
-          <h2 className="type-overline text-[var(--maroon)] mb-[var(--space-5)] font-[family-name:var(--font-sans)]">
-            Captain Tools
-          </h2>
-
-          {/* Priority Actions -- editorial index rows */}
-          <div className="bg-[var(--canvas-raised)] border border-[var(--maroon-subtle)] border-l-[3px] border-l-[var(--maroon)] rounded-[var(--radius-lg)] overflow-hidden">
-            {priorityActions.map((action, index) => (
-              <Link
-                key={action.id}
-                href={action.href}
-                className={cn(
-                  'flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150',
-                  index < priorityActions.length - 1 && 'border-b border-[var(--rule-faint)]'
-                )}
-              >
-                <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon)] flex items-center justify-center shrink-0">
-                  <action.icon size={18} strokeWidth={1.75} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] text-[color:var(--ink-primary)] leading-[1.3]">
-                    {action.label}
-                  </p>
-                  <p className="type-micro text-[var(--ink-tertiary)] mt-[2px] font-[family-name:var(--font-sans)]">
-                    {action.description}
-                  </p>
-                </div>
-                <ChevronRight
-                  size={16}
-                  strokeWidth={1.5}
-                  className="text-[var(--ink-tertiary)] shrink-0"
-                />
-              </Link>
+        <section className="pt-[var(--space-6)]">
+          <CaptainSectionHeading
+            eyebrow="Today"
+            title="Day-of decisions"
+            description="These are the tools you reach for when the group is on site and the schedule is no longer theoretical."
+          />
+          <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+            {gameDayActions.map((action) => (
+              <CommandActionCard key={action.id} action={action} />
             ))}
           </div>
+        </section>
 
-          {/* Expandable Secondary Actions */}
-          <div className="mt-[var(--space-4)]">
-            <button
-              onClick={() => setShowAllActions(!showAllActions)}
-              className="w-full py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-center gap-[var(--space-2)] font-[family-name:var(--font-sans)] text-[length:var(--text-sm)] font-medium text-[color:var(--maroon)] bg-transparent border border-[var(--rule)] rounded-[var(--radius-md)] cursor-pointer transition-[background] duration-150"
-            >
-              <span>{showAllActions ? 'Show Less' : 'More Tools'}</span>
-              <ChevronDown
-                size={16}
-                className={cn(
-                  'transition-transform duration-200',
-                  showAllActions ? 'rotate-180' : 'rotate-0'
-                )}
-              />
-            </button>
-
-            {/* Secondary Actions list */}
-            {showAllActions && (
-              <div className="mt-[var(--space-3)] bg-[var(--canvas-raised)] border border-[var(--rule)] rounded-[var(--radius-lg)] overflow-hidden">
-                {secondaryActions.map((action, index) => (
-                  <Link
-                    key={action.id}
-                    href={action.href}
-                    className={cn(
-                      'flex items-center gap-[var(--space-4)] py-[var(--space-4)] px-[var(--space-5)] no-underline text-inherit transition-[background] duration-150',
-                      index < secondaryActions.length - 1 && 'border-b border-[var(--rule-faint)]'
-                    )}
-                  >
-                    <div className="w-[36px] h-[36px] rounded-[var(--radius-md)] bg-[var(--maroon-subtle)] text-[var(--maroon-light)] flex items-center justify-center shrink-0">
-                      <action.icon size={18} strokeWidth={1.75} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] text-[color:var(--ink-primary)] leading-[1.3]">
-                        {action.label}
-                      </p>
-                      <p className="type-micro text-[var(--ink-tertiary)] mt-[2px] font-[family-name:var(--font-sans)]">
-                        {action.description}
-                      </p>
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      strokeWidth={1.5}
-                      className="text-[var(--ink-tertiary)] shrink-0"
-                    />
-                  </Link>
-                ))}
-              </div>
-            )}
+        <section className="pt-[var(--space-8)]">
+          <CaptainSectionHeading
+            eyebrow="Setup"
+            title="Support tools"
+            description="Everything that shapes the trip around the edges: invites, logistics, messaging, and the quieter admin work."
+          />
+          <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+            {setupActions.map((action) => (
+              <CommandActionCard key={action.id} action={action} />
+            ))}
           </div>
         </section>
 
-        <hr className="divider-subtle" />
-
-        {/* Active Sessions */}
-        {activeSessions.length > 0 && (
-          <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
-            <div className="flex items-center justify-between mb-[var(--space-4)]">
-              <h2 className="type-overline text-[var(--masters)] font-[family-name:var(--font-sans)]">
-                Live Sessions
-              </h2>
-              <span className="live-badge">
-                <span className="live-dot" />
-                {activeSessions.length} Active
-              </span>
-            </div>
-            <div className="flex flex-col gap-[var(--space-3)]">
-              {activeSessions.map((session) => (
-                <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--masters)] text-[var(--canvas)] flex items-center justify-center">
-                    <Zap size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="type-title-sm font-[family-name:var(--font-sans)]">
-                      {session.name}
-                    </p>
-                    <p className="type-micro capitalize">
-                      {session.sessionType}
-                    </p>
-                  </div>
-                  <ChevronRight size={20} className="text-[var(--ink-tertiary)]" />
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Upcoming Sessions */}
-        <section className="pt-[var(--space-4)] pb-[var(--space-6)]">
-          <div className="flex items-center justify-between mb-[var(--space-4)]">
-            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
-              Upcoming Sessions
-            </h2>
-            <Link
-              href="/lineup/new"
-              className="inline-flex items-center gap-[4px] text-[color:var(--maroon)] font-[family-name:var(--font-sans)] font-semibold text-[length:var(--text-sm)] no-underline"
-            >
-              <Plus size={16} strokeWidth={2} />
-              New
-            </Link>
+        <section className="pt-[var(--space-8)]">
+          <CaptainSectionHeading
+            eyebrow="Sessions"
+            title="Session board"
+            description="Live rooms should stand apart, upcoming ones should feel staged, and completed sessions should read like settled business."
+          />
+          <div className="space-y-[var(--space-4)]">
+            <SessionGroupCard
+              title="Live Now"
+              description="Sessions currently in progress."
+              icon={<Zap size={16} />}
+              tone="live"
+              sessions={activeSessions}
+              emptyTitle="Nothing live right now"
+              emptyDescription="When a session starts, it will move here automatically."
+            />
+            <SessionGroupCard
+              title="On Deck"
+              description="Scheduled sessions waiting on publication or the first tee."
+              icon={<CalendarDays size={16} />}
+              tone="upcoming"
+              sessions={upcomingSessions}
+              emptyTitle="No sessions on deck"
+              emptyDescription="Build the next lineup when the day has a clear shape."
+            />
+            <SessionGroupCard
+              title="Completed"
+              description="Finished sessions, useful for review and recap."
+              icon={<Trophy size={16} />}
+              tone="completed"
+              sessions={completedSessions.slice(0, 3)}
+              emptyTitle="No completed sessions yet"
+              emptyDescription="Completed sessions will settle here as the trip moves along."
+            />
           </div>
-          {upcomingSessions.length > 0 ? (
-            <div className="flex flex-col gap-[var(--space-3)]">
-              {upcomingSessions.map((session) => (
-                <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                  <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[var(--canvas-sunken)] flex items-center justify-center">
-                    <Calendar size={18} className="text-[var(--ink-secondary)]" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="type-title-sm font-[family-name:var(--font-sans)]">
-                      {session.name}
-                    </p>
-                    <p className="type-micro capitalize">
-                      {session.sessionType} &middot;{' '}
-                      {session.scheduledDate
-                        ? new Date(session.scheduledDate).toLocaleDateString()
-                        : 'No date'}
-                    </p>
-                  </div>
-                  <span
-                    className={`py-[3px] px-[8px] rounded-[6px] font-[family-name:var(--font-sans)] text-[10px] font-semibold uppercase tracking-[0.05em] ${
-                      session.isLocked
-                        ? 'bg-[var(--maroon)] text-[var(--canvas)]'
-                        : 'bg-[var(--canvas-sunken)] text-[var(--ink-tertiary)]'
-                    }`}
-                  >
-                    {session.isLocked ? 'Locked' : 'Draft'}
-                  </span>
-                  <ChevronRight size={20} className="text-[var(--ink-tertiary)]" />
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="card-captain text-center p-[var(--space-8)]">
-              <Calendar
-                size={32}
-                className="text-[var(--ink-tertiary)] mx-auto mb-[var(--space-3)]"
-              />
-              <p className="type-title-sm mb-[var(--space-2)] font-[family-name:var(--font-sans)]">
-                No Sessions Yet
-              </p>
-              <p className="type-caption mb-[var(--space-4)] font-[family-name:var(--font-sans)]">
-                Create your first session to start building lineups
-              </p>
-              <Link
-                href="/lineup/new"
-                className="btn btn-primary inline-flex items-center gap-[var(--space-2)] bg-[var(--maroon)]"
-              >
-                <Plus size={16} />
-                Create Session
-              </Link>
-            </div>
-          )}
         </section>
 
-        {/* Team Overview */}
-        <hr className="divider-subtle" />
-        <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
-          <div className="flex items-center justify-between mb-[var(--space-4)]">
-            <h2 className="type-overline text-[var(--maroon)] font-[family-name:var(--font-sans)]">
-              Team Overview
-            </h2>
-            <Link
-              href="/players"
-              className="type-meta text-[var(--maroon)] font-semibold no-underline"
-            >
-              Manage
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-[var(--space-4)]">
-            {/* Team A */}
-            <div className="card team-bg-usa p-[var(--space-4)]">
-              <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-3)]">
-                <span className="team-dot team-dot-usa" />
-                <span className="type-overline text-[var(--team-usa)] font-[family-name:var(--font-sans)]">
-                  {teamA?.name || 'Team USA'}
-                </span>
-              </div>
-              <p className="type-headline-sm font-[family-name:var(--font-serif)]">
-                {teamAPlayers.length}
-              </p>
-              <p className="type-micro font-[family-name:var(--font-sans)]">
-                players
-              </p>
-            </div>
-
-            {/* Team B */}
-            <div className="card team-bg-europe p-[var(--space-4)]">
-              <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-3)]">
-                <span className="team-dot team-dot-europe" />
-                <span className="type-overline text-[var(--team-europe)] font-[family-name:var(--font-sans)]">
-                  {teamB?.name || 'Team Europe'}
-                </span>
-              </div>
-              <p className="type-headline-sm font-[family-name:var(--font-serif)]">
-                {teamBPlayers.length}
-              </p>
-              <p className="type-micro font-[family-name:var(--font-sans)]">
-                players
-              </p>
-            </div>
+        <section className="pt-[var(--space-8)]">
+          <CaptainSectionHeading
+            eyebrow="Roster"
+            title="Team overview"
+            description="A quick read on the two sides and any players still floating outside the team structure."
+          />
+          <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+            <TeamOverviewCard
+              name={teamA?.name || 'Team USA'}
+              count={teamAPlayers.length}
+              tone="usa"
+              summary="American side"
+            />
+            <TeamOverviewCard
+              name={teamB?.name || 'Team Europe'}
+              count={teamBPlayers.length}
+              tone="europe"
+              summary="European side"
+            />
           </div>
 
-          {unassignedPlayers.length > 0 && (
-            <div className="card-captain mt-[var(--space-4)] bg-[var(--maroon-subtle)]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-[var(--space-3)]">
-                  <AlertTriangle size={20} className="text-[var(--maroon)]" />
+          {unassignedPlayers.length > 0 ? (
+            <div className="mt-[var(--space-4)] rounded-[1.4rem] border border-[color:var(--maroon)]/16 bg-[color:var(--maroon)]/10 px-[var(--space-5)] py-[var(--space-4)]">
+              <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-[var(--space-3)]">
+                  <AlertTriangle size={18} className="mt-[2px] text-[var(--maroon)]" />
                   <div>
-                    <p className="type-title-sm text-[var(--maroon-dark)] font-[family-name:var(--font-sans)]">
-                      {unassignedPlayers.length} Unassigned
+                    <p className="type-title-sm text-[var(--maroon-dark)]">
+                      {unassignedPlayers.length} player{unassignedPlayers.length === 1 ? '' : 's'} still need a side
                     </p>
-                    <p className="type-micro text-[var(--maroon-light)] font-[family-name:var(--font-sans)]">
-                      Players need team assignment
+                    <p className="mt-[var(--space-1)] type-caption text-[var(--maroon)]">
+                      Keep the roster clean before the lineup work starts compounding.
                     </p>
                   </div>
                 </div>
+
                 <Link
                   href="/captain/draft"
-                  className="btn btn-sm bg-[var(--maroon)] text-[var(--canvas)] font-[family-name:var(--font-sans)]"
+                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--canvas)] transition-opacity hover:opacity-90"
                 >
-                  Assign
+                  <Shuffle size={16} />
+                  Assign Players
                 </Link>
               </div>
             </div>
-          )}
+          ) : null}
         </section>
-
-        {/* Completed Sessions */}
-        {completedSessions.length > 0 && (
-          <>
-            <hr className="divider-subtle" />
-            <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
-              <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)] font-[family-name:var(--font-sans)]">
-                Completed Sessions
-              </h2>
-              <div className="flex flex-col gap-[var(--space-3)]">
-                {completedSessions.slice(0, 3).map((session) => (
-                  <Link key={session.id} href={`/lineup/${session.id}`} className="match-row">
-                    <div className="w-[40px] h-[40px] rounded-[var(--radius-md)] bg-[rgba(34,197,94,0.1)] flex items-center justify-center">
-                      <Trophy size={18} className="text-[var(--success)]" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="type-title-sm font-[family-name:var(--font-sans)]">
-                        {session.name}
-                      </p>
-                      <p className="type-micro capitalize">
-                        {session.sessionType}
-                      </p>
-                    </div>
-                    <CheckCircle2 size={18} className="text-[var(--success)]" />
-                  </Link>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
       </main>
+    </div>
+  );
+}
 
+function GateFactCard({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
+      <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+      <p className={cn('mt-[var(--space-2)] font-serif text-[1.5rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function CaptainFactCard({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
+      <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+      <p className={cn('mt-[var(--space-2)] font-serif text-[1.7rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ReadinessPill({
+  tone,
+  children,
+}: {
+  tone: 'ready' | 'building' | 'needs';
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center gap-[var(--space-2)] rounded-full border px-[var(--space-3)] py-[var(--space-2)]',
+        tone === 'ready' && 'border-[color:var(--success)]/18 bg-[color:var(--success)]/10 text-[var(--success)]',
+        tone === 'building' && 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10 text-[var(--warning)]',
+        tone === 'needs' && 'border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10 text-[var(--maroon)]'
+      )}
+    >
+      {tone === 'ready' ? <CheckCircle2 size={14} /> : tone === 'building' ? <Clock3 size={14} /> : <AlertTriangle size={14} />}
+      <span className="type-caption font-semibold">{children}</span>
+    </div>
+  );
+}
+
+function CaptainSectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="mb-[var(--space-4)]">
+      <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">{eyebrow}</p>
+      <h2 className="mt-[var(--space-2)] type-display-sm text-[var(--ink)]">{title}</h2>
+      <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">{description}</p>
+    </div>
+  );
+}
+
+function CommandActionCard({ action }: { action: CommandAction }) {
+  const toneClass =
+    action.tone === 'maroon'
+      ? 'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.96))]'
+      : 'border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,237,0.96))]';
+  const iconClass =
+    action.tone === 'maroon'
+      ? 'border-[color:var(--maroon)]/16 bg-[color:var(--maroon)]/10 text-[var(--maroon)]'
+      : 'border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 text-[var(--gold-dark)]';
+
+  return (
+    <Link href={action.href} className={cn('card-premium card-interactive p-[var(--space-5)]', toneClass)}>
+      <div className="flex items-start justify-between gap-[var(--space-4)]">
+        <div className={cn('flex h-11 w-11 items-center justify-center rounded-full border', iconClass)}>
+          <action.icon size={20} strokeWidth={1.8} />
+        </div>
+        <ChevronRight size={18} className="mt-[var(--space-1)] text-[var(--ink-tertiary)]" />
+      </div>
+      <h3 className="mt-[var(--space-5)] type-title-lg text-[var(--ink)]">{action.label}</h3>
+      <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">{action.description}</p>
+    </Link>
+  );
+}
+
+function SessionGroupCard({
+  title,
+  description,
+  icon,
+  tone,
+  sessions,
+  emptyTitle,
+  emptyDescription,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  tone: 'live' | 'upcoming' | 'completed';
+  sessions: Array<{
+    id: string;
+    name: string;
+    sessionType: string;
+    scheduledDate?: string;
+    isLocked?: boolean;
+  }>;
+  emptyTitle: string;
+  emptyDescription: string;
+}) {
+  const toneClass =
+    tone === 'live'
+      ? 'border-[color:var(--masters)]/16 bg-[linear-gradient(180deg,rgba(0,102,68,0.08),rgba(255,255,255,0.96))]'
+      : tone === 'completed'
+        ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.08),rgba(255,255,255,0.96))]'
+        : 'border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,244,237,0.96))]';
+
+  return (
+    <section className={cn('overflow-hidden rounded-[1.7rem] border shadow-[0_18px_36px_rgba(46,34,18,0.06)]', toneClass)}>
+      <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="flex items-start gap-[var(--space-3)]">
+          <div className="mt-[2px]">{icon}</div>
+          <div>
+            <p className="type-title text-[var(--ink)]">{title}</p>
+            <p className="mt-[var(--space-1)] type-body-sm text-[var(--ink-secondary)]">{description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-[var(--space-3)] py-[var(--space-3)]">
+        {sessions.length === 0 ? (
+          <div className="rounded-[1.2rem] border border-dashed border-[var(--rule)] bg-[rgba(255,255,255,0.6)] px-[var(--space-4)] py-[var(--space-5)] text-center">
+            <p className="type-title-sm text-[var(--ink)]">{emptyTitle}</p>
+            <p className="mt-[var(--space-2)] type-caption">{emptyDescription}</p>
+          </div>
+        ) : (
+          sessions.map((session, index) => (
+            <Link
+              key={session.id}
+              href={`/lineup/${session.id}`}
+              className={cn(
+                'flex items-center gap-[var(--space-4)] rounded-[1.2rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.8)] px-[var(--space-4)] py-[var(--space-4)] transition-colors hover:bg-[var(--canvas-raised)]',
+                index > 0 ? 'mt-[var(--space-2)]' : undefined
+              )}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="type-title-sm truncate text-[var(--ink)]">{session.name}</p>
+                <p className="mt-[var(--space-1)] type-caption capitalize">
+                  {session.sessionType}
+                  {session.scheduledDate
+                    ? ` · ${new Date(session.scheduledDate).toLocaleDateString()}`
+                    : ''}
+                </p>
+              </div>
+
+              {session.isLocked ? (
+                <div className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 px-[var(--space-2)] py-[6px]">
+                  <span className="type-micro font-semibold text-[var(--gold-dark)]">Locked</span>
+                </div>
+              ) : null}
+
+              <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
+            </Link>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+function TeamOverviewCard({
+  name,
+  count,
+  tone,
+  summary,
+}: {
+  name: string;
+  count: number;
+  tone: 'usa' | 'europe';
+  summary: string;
+}) {
+  const toneClass =
+    tone === 'usa'
+      ? 'border-[color:var(--team-usa)]/16 bg-[linear-gradient(180deg,rgba(30,58,95,0.08),rgba(255,255,255,0.96))]'
+      : 'border-[color:var(--team-europe)]/16 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.96))]';
+  const textClass = tone === 'usa' ? 'text-[var(--team-usa)]' : 'text-[var(--team-europe)]';
+
+  return (
+    <div className={cn('rounded-[1.5rem] border p-[var(--space-5)] shadow-[0_16px_32px_rgba(46,34,18,0.06)]', toneClass)}>
+      <p className={cn('type-overline tracking-[0.16em]', textClass)}>{summary}</p>
+      <h3 className="mt-[var(--space-2)] type-title-lg text-[var(--ink)]">{name}</h3>
+      <div className="mt-[var(--space-4)] flex items-end justify-between gap-[var(--space-4)]">
+        <div>
+          <p className="font-serif text-[2.4rem] italic leading-none text-[var(--ink)]">{count}</p>
+          <p className="mt-[var(--space-1)] type-caption">players</p>
+        </div>
+        <Link href="/players" className={cn('type-caption font-semibold no-underline', textClass)}>
+          Manage roster
+        </Link>
+      </div>
     </div>
   );
 }

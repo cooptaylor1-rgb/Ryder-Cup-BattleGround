@@ -9,14 +9,6 @@
  * - Announcements and communication
  */
 
-// Captain Dashboard
-export {
-  CaptainDashboard,
-  type TripSetupStatus,
-  type SessionSummary,
-  type TeamSummary,
-} from './CaptainDashboard';
-
 // Lineup Builder
 export {
   LineupBuilder,
@@ -69,13 +61,7 @@ export {
 
 // Captain Toolkit Components
 export { PreFlightChecklist } from './PreFlightChecklist';
-export { BulkImportModal } from './BulkImportModal';
-export { TeeTimeGenerator } from './TeeTimeGenerator';
 export { DraftBoard } from './DraftBoard';
-export { SmartPairingSuggestions } from './SmartPairingSuggestions';
-export { SideBetsTracker } from './SideBetsTracker';
-export { SessionWeatherPanel } from './SessionWeatherPanel';
-export { CaptainToolkit } from './CaptainToolkit';
 
 // Pre-Round Captain Tools
 export {
