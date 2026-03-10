@@ -7,8 +7,10 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { Session as SupabaseSession } from '@supabase/supabase-js';
 import type { Player } from '../types/models';
 import { db } from '../db';
+import { isSupabaseConfigured, supabase } from '../supabase/client';
 import { authLogger } from '../utils/logger';
 import { hashPin, verifyPin, isHashedPin } from '../utils/crypto';
 
@@ -40,6 +42,9 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  authUserId: string | null;
+  authEmail: string | null;
+  hasResolvedSupabaseSession: boolean;
 
   // Actions
   login: (email: string, pin: string) => Promise<boolean>;
@@ -55,6 +60,7 @@ interface AuthState {
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   checkExistingUser: (email: string) => Promise<UserProfile | null>;
+  syncSupabaseSession: (session: SupabaseSession | null) => void;
   clearError: () => void;
 }
 
@@ -65,6 +71,34 @@ interface AuthState {
 const generateId = (): string => {
   return crypto.randomUUID();
 };
+
+function readStoredUsers(): Record<string, { profile: UserProfile; pin: string }> {
+  const storedUsers = localStorage.getItem('golf-app-users');
+  if (!storedUsers) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(storedUsers) as Record<string, { profile: UserProfile; pin: string }>;
+  } catch (parseError) {
+    authLogger.error('Failed to parse stored users:', parseError);
+    return {};
+  }
+}
+
+function findStoredUserByEmail(email?: string | null): UserProfile | null {
+  if (!email) {
+    return null;
+  }
+
+  const normalizedEmail = email.toLowerCase();
+  const users = readStoredUsers();
+  const userEntry = Object.values(users).find(
+    (user) => user.profile.email?.toLowerCase() === normalizedEmail
+  );
+
+  return userEntry?.profile ?? null;
+}
 
 // ============================================
 // STORE
@@ -78,6 +112,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      authUserId: null,
+      authEmail: null,
+      hasResolvedSupabaseSession: !isSupabaseConfigured,
 
       // Login with email and PIN
       login: async (email: string, pin: string) => {
@@ -86,12 +123,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           // Look up user by email in local storage
           const storedUsers = localStorage.getItem('golf-app-users');
-          let users: Record<string, { profile: UserProfile; pin: string }> = {};
+          const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
+            ? readStoredUsers()
+            : {};
           if (storedUsers) {
-            try {
-              users = JSON.parse(storedUsers);
-            } catch (parseError) {
-              authLogger.error('Failed to parse stored users:', parseError);
+            if (Object.keys(users).length === 0) {
               set({ isLoading: false, error: 'Login data corrupted. Please contact support.' });
               return false;
             }
@@ -157,10 +193,19 @@ export const useAuthStore = create<AuthState>()(
 
       // Logout
       logout: () => {
+        if (supabase) {
+          void supabase.auth.signOut().catch((error) => {
+            authLogger.warn('Failed to sign out Supabase session:', error);
+          });
+        }
+
         set({
           currentUser: null,
           isAuthenticated: false,
           error: null,
+          authUserId: null,
+          authEmail: null,
+          hasResolvedSupabaseSession: true,
         });
       },
 
@@ -187,16 +232,7 @@ export const useAuthStore = create<AuthState>()(
           };
 
           // Save to local users storage
-          const storedUsers = localStorage.getItem('golf-app-users');
-          let users: Record<string, { profile: UserProfile; pin: string }> = {};
-          if (storedUsers) {
-            try {
-              users = JSON.parse(storedUsers);
-            } catch (parseError) {
-              authLogger.error('Failed to parse stored users:', parseError);
-              // Continue with empty users object since we're creating a new user
-            }
-          }
+          const users = readStoredUsers();
 
           // Check if email already exists
           const existingUser = Object.values(users).find(
@@ -267,16 +303,7 @@ export const useAuthStore = create<AuthState>()(
           };
 
           // Update local users storage
-          const storedUsers = localStorage.getItem('golf-app-users');
-          let users: Record<string, { profile: UserProfile; pin: string }> = {};
-          if (storedUsers) {
-            try {
-              users = JSON.parse(storedUsers);
-            } catch (parseError) {
-              authLogger.error('Failed to parse stored users:', parseError);
-              // Continue - we'll try to save anyway
-            }
-          }
+          const users = readStoredUsers();
 
           if (users[currentUser.id]) {
             users[currentUser.id].profile = updatedProfile;
@@ -318,15 +345,7 @@ export const useAuthStore = create<AuthState>()(
         };
 
         // Update local users storage
-        const storedUsers = localStorage.getItem('golf-app-users');
-        let users: Record<string, { profile: UserProfile; pin: string }> = {};
-        if (storedUsers) {
-          try {
-            users = JSON.parse(storedUsers);
-          } catch (parseError) {
-            authLogger.error('Failed to parse stored users:', parseError);
-          }
-        }
+        const users = readStoredUsers();
 
         if (users[currentUser.id]) {
           users[currentUser.id].profile = updatedProfile;
@@ -340,21 +359,39 @@ export const useAuthStore = create<AuthState>()(
       // Check if user exists by email
       checkExistingUser: async (email: string) => {
         try {
-          const storedUsers = localStorage.getItem('golf-app-users');
-          if (!storedUsers) return null;
-
-          const users: Record<string, { profile: UserProfile; pin: string }> =
-            JSON.parse(storedUsers);
-
-          const userEntry = Object.values(users).find(
-            (u) => u.profile.email?.toLowerCase() === email.toLowerCase()
-          );
-
-          return userEntry?.profile || null;
+          return findStoredUserByEmail(email);
         } catch (error) {
           authLogger.error('Failed to parse stored users:', error);
           return null;
         }
+      },
+
+      syncSupabaseSession: (session) => {
+        const authUserId = session?.user.id ?? null;
+        const authEmail = session?.user.email ?? null;
+        const { currentUser } = get();
+
+        if (!session) {
+          set({
+            authUserId: null,
+            authEmail: null,
+            hasResolvedSupabaseSession: true,
+          });
+          return;
+        }
+
+        const matchedUser =
+          currentUser?.email?.toLowerCase() === authEmail?.toLowerCase()
+            ? currentUser
+            : findStoredUserByEmail(authEmail);
+
+        set({
+          currentUser: matchedUser,
+          isAuthenticated: !!matchedUser,
+          authUserId,
+          authEmail,
+          hasResolvedSupabaseSession: true,
+        });
       },
 
       // Clear error
@@ -368,6 +405,8 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         currentUser: state.currentUser,
         isAuthenticated: state.isAuthenticated,
+        authUserId: state.authUserId,
+        authEmail: state.authEmail,
       }),
     }
   )

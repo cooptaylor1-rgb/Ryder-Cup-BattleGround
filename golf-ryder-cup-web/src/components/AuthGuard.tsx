@@ -26,13 +26,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, currentUser } = useAuthStore();
+  const { isAuthenticated, currentUser, hasResolvedSupabaseSession } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
   const isPublicRoute = PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname?.startsWith(route + '/')
   );
   const requiresAuth = !isPublicRoute;
-  const shouldRedirectToProfile = requiresAuth && isHydrated && (!isAuthenticated || !currentUser);
+  const isAuthReady = isHydrated && hasResolvedSupabaseSession;
+  const shouldRedirectToProfile = requiresAuth && isAuthReady && (!isAuthenticated || !currentUser);
 
   useEffect(() => {
     const finishHydration = () => {
@@ -73,7 +74,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, [pathname, router, searchParams, shouldRedirectToProfile]);
 
   if (requiresAuth) {
-    if (!isHydrated || !isAuthenticated || !currentUser) {
+    if (!isAuthReady || !isAuthenticated || !currentUser) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-[var(--canvas)]">
           <div className="text-center">

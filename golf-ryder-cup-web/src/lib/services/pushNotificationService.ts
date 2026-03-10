@@ -399,6 +399,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 import { useState, useEffect, useCallback } from 'react';
 import { useTripStore } from '@/lib/stores';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
+import { getSupabaseAccessToken } from '@/lib/supabase/auth';
 
 export interface UsePushNotificationsReturn {
   /** Whether push is supported */
@@ -454,11 +455,13 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         try {
           const tripId = currentTrip?.id;
           const shareCode = tripId ? await ensureTripShareCode(tripId) : null;
+          const accessToken = await getSupabaseAccessToken();
 
           await fetch('/api/push/subscribe', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
               ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
             },
             body: JSON.stringify({
@@ -479,6 +482,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     const subscription = await getPushSubscription();
     const tripId = currentTrip?.id;
     const shareCode = tripId ? await ensureTripShareCode(tripId) : null;
+    const accessToken = await getSupabaseAccessToken();
 
     if (subscription) {
       try {
@@ -486,6 +490,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
           },
           body: JSON.stringify({

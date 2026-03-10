@@ -21,6 +21,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 import { CourseSyncInitializer } from '@/components/CourseSyncInitializer';
 import { TripSyncInitializer } from '@/components/TripSyncInitializer';
 import { CapacitorProvider } from '@/components/CapacitorProvider';
+import { SupabaseAuthBridge } from '@/components/SupabaseAuthBridge';
 import { baseMetadata, viewport as baseViewport } from '@/lib/utils/metadata';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -192,6 +193,7 @@ export default function RootLayout({
                     </div>
                   }
                 >
+                  <SupabaseAuthBridge />
                   <AuthGuard>
                     <TripRehydrationProvider>
                       <NotificationProvider>

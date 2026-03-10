@@ -7,6 +7,7 @@
 
 import { db } from '@/lib/db';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
+import { getSupabaseAccessToken } from '@/lib/supabase/auth';
 import { syncLogger } from '@/lib/utils/logger';
 import type { ScoringEvent } from '@/lib/types/events';
 
@@ -189,11 +190,14 @@ async function syncMatchEvents(
     // Check if we have a Supabase connection for remote sync
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (supabaseUrl) {
+        const accessToken = await getSupabaseAccessToken();
+
         // Send to API endpoint
         const response = await fetch('/api/sync/scores', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 ...(shareCode ? { 'X-Share-Code': shareCode } : {}),
             },
             body: JSON.stringify(payload),
