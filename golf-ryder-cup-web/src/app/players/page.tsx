@@ -1,26 +1,26 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { cn, formatPlayerName } from '@/lib/utils';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
+import { EmptyStatePremium, NoPlayersPremiumEmpty } from '@/components/ui';
+import { useTripStore, useUIStore } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
-import { formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 import {
   Edit2,
+  Mail,
+  Plus,
+  Shield,
   Trash2,
   UserPlus,
   Users,
-  X,
   UsersRound,
-  Plus,
-  Check,
+  X,
 } from 'lucide-react';
-import { EmptyStatePremium, NoPlayersPremiumEmpty } from '@/components/ui';
-import { Button } from '@/components/ui/Button';
 
-// Bulk player entry row type
 interface BulkPlayerRow {
   id: string;
   firstName: string;
@@ -29,13 +29,48 @@ interface BulkPlayerRow {
   teamId: string;
 }
 
-/**
- * PLAYERS PAGE - Editorial Design
- *
- * Player management with clean typography and minimal chrome
- */
+type RosterTone = 'usa' | 'europe' | 'neutral';
 
 const logger = createLogger('players');
+
+const rosterToneStyles: Record<
+  RosterTone,
+  {
+    panel: string;
+    eyebrow: string;
+    badge: string;
+    avatar: string;
+    icon: string;
+  }
+> = {
+  usa: {
+    panel:
+      'border-[color:var(--team-usa)]/18 bg-[linear-gradient(180deg,rgba(30,58,95,0.08),rgba(255,255,255,0.96))]',
+    eyebrow: 'text-[var(--team-usa)]',
+    badge:
+      'border-[color:var(--team-usa)]/16 bg-[color:var(--team-usa)]/10 text-[var(--team-usa)]',
+    avatar: 'bg-[var(--team-usa)]',
+    icon: 'text-[var(--team-usa)]',
+  },
+  europe: {
+    panel:
+      'border-[color:var(--team-europe)]/18 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.96))]',
+    eyebrow: 'text-[var(--team-europe)]',
+    badge:
+      'border-[color:var(--team-europe)]/16 bg-[color:var(--team-europe)]/10 text-[var(--team-europe)]',
+    avatar: 'bg-[var(--team-europe)]',
+    icon: 'text-[var(--team-europe)]',
+  },
+  neutral: {
+    panel:
+      'border-[color:var(--gold)]/14 bg-[linear-gradient(180deg,rgba(201,162,39,0.08),rgba(255,255,255,0.96))]',
+    eyebrow: 'text-[var(--gold-dark)]',
+    badge:
+      'border-[color:var(--gold)]/16 bg-[color:var(--gold)]/12 text-[var(--gold-dark)]',
+    avatar: 'bg-[var(--ink-tertiary)]',
+    icon: 'text-[var(--gold-dark)]',
+  },
+};
 
 export default function PlayersPage() {
   const router = useRouter();
@@ -66,7 +101,6 @@ export default function PlayersPage() {
     teamId: '',
   });
 
-  // Bulk add state - start with 4 empty rows
   const createEmptyRow = (): BulkPlayerRow => ({
     id: crypto.randomUUID(),
     firstName: '',
@@ -74,16 +108,15 @@ export default function PlayersPage() {
     handicapIndex: '',
     teamId: '',
   });
+
   const [bulkRows, setBulkRows] = useState<BulkPlayerRow[]>(() =>
     Array(4).fill(null).map(createEmptyRow)
   );
 
-  // If no active trip, we show a premium empty state instead of redirecting.
-
   const getPlayerTeam = (playerId: string) => {
     const membership = teamMembers.find((tm) => tm.playerId === playerId);
     if (!membership) return undefined;
-    return teams.find((t) => t.id === membership.teamId);
+    return teams.find((team) => team.id === membership.teamId);
   };
 
   const resetForm = () => {
@@ -111,7 +144,6 @@ export default function PlayersPage() {
       return;
     }
 
-    // Validate handicap range (-10 to 54 per USGA rules)
     if (formData.handicapIndex) {
       const handicap = parseFloat(formData.handicapIndex);
       if (isNaN(handicap) || handicap < -10 || handicap > 54) {
@@ -120,17 +152,15 @@ export default function PlayersPage() {
       }
     }
 
-    // Validate email format if provided
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       showToast('error', 'Please enter a valid email address');
       return;
     }
 
-    // Check for duplicate email
     if (formData.email) {
       const emailLower = formData.email.toLowerCase().trim();
       const existingPlayer = players.find(
-        (p) => p.email?.toLowerCase() === emailLower && p.id !== editingPlayer?.id
+        (player) => player.email?.toLowerCase() === emailLower && player.id !== editingPlayer?.id
       );
       if (existingPlayer) {
         showToast(
@@ -147,17 +177,19 @@ export default function PlayersPage() {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         handicapIndex: formData.handicapIndex ? parseFloat(formData.handicapIndex) : undefined,
-        email: formData.email?.trim() || undefined,
+        email: formData.email.trim() || undefined,
       };
 
       if (editingPlayer) {
         await updatePlayer(editingPlayer.id, playerData);
         const currentTeam = getPlayerTeam(editingPlayer.id);
+
         if (formData.teamId && formData.teamId !== currentTeam?.id) {
           await assignPlayerToTeam(editingPlayer.id, formData.teamId);
         } else if (!formData.teamId && currentTeam) {
           await removePlayerFromTeam(editingPlayer.id, currentTeam.id);
         }
+
         showToast('success', 'Player updated');
       } else {
         const newPlayer = await addPlayer(playerData);
@@ -166,6 +198,7 @@ export default function PlayersPage() {
         }
         showToast('success', 'Player added');
       }
+
       resetForm();
     } catch (error) {
       logger.error('Failed to save player', { error });
@@ -177,6 +210,7 @@ export default function PlayersPage() {
 
   const handleDelete = async () => {
     if (!playerToDelete || isDeleting) return;
+
     try {
       setIsDeleting(true);
       await removePlayer(playerToDelete.id);
@@ -190,7 +224,6 @@ export default function PlayersPage() {
     }
   };
 
-  // Bulk add handlers
   const updateBulkRow = useCallback((id: string, field: keyof BulkPlayerRow, value: string) => {
     setBulkRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   }, []);
@@ -204,7 +237,6 @@ export default function PlayersPage() {
   }, []);
 
   const handleBulkSave = async () => {
-    // Filter rows that have at least first AND last name
     const validRows = bulkRows.filter((row) => row.firstName.trim() && row.lastName.trim());
 
     if (validRows.length === 0) {
@@ -212,7 +244,6 @@ export default function PlayersPage() {
       return;
     }
 
-    // Validate all handicaps before saving
     for (const row of validRows) {
       if (row.handicapIndex) {
         const handicap = parseFloat(row.handicapIndex);
@@ -228,19 +259,22 @@ export default function PlayersPage() {
 
     try {
       let addedCount = 0;
+
       for (const row of validRows) {
         const playerData = {
           firstName: row.firstName.trim(),
           lastName: row.lastName.trim(),
           handicapIndex: row.handicapIndex ? parseFloat(row.handicapIndex) : undefined,
         };
+
         const newPlayer = await addPlayer(playerData);
         if (row.teamId) {
           await assignPlayerToTeam(newPlayer.id, row.teamId);
         }
-        addedCount++;
+        addedCount += 1;
       }
-      showToast('success', `Added ${addedCount} player${addedCount > 1 ? 's' : ''}`);
+
+      showToast('success', `Added ${addedCount} player${addedCount === 1 ? '' : 's'}`);
       setShowBulkAdd(false);
       setBulkRows(Array(4).fill(null).map(createEmptyRow));
     } catch (error) {
@@ -249,6 +283,19 @@ export default function PlayersPage() {
     }
   };
 
+  const teamA = teams.find((team) => team.color === 'usa');
+  const teamB = teams.find((team) => team.color === 'europe');
+  const teamAPlayers = players.filter((player) => getPlayerTeam(player.id)?.id === teamA?.id);
+  const teamBPlayers = players.filter((player) => getPlayerTeam(player.id)?.id === teamB?.id);
+  const unassignedPlayers = players.filter((player) => !getPlayerTeam(player.id));
+  const playersWithHandicap = players.filter((player) => player.handicapIndex !== undefined);
+  const averageHandicap =
+    playersWithHandicap.length > 0
+      ? (
+          playersWithHandicap.reduce((sum, player) => sum + (player.handicapIndex ?? 0), 0) /
+          playersWithHandicap.length
+        ).toFixed(1)
+      : '—';
   const validBulkCount = bulkRows.filter(
     (row) => row.firstName.trim() && row.lastName.trim()
   ).length;
@@ -276,200 +323,226 @@ export default function PlayersPage() {
     );
   }
 
-  const teamA = teams.find((t) => t.color === 'usa');
-  const teamB = teams.find((t) => t.color === 'europe');
-  const teamAPlayers = players.filter((p) => getPlayerTeam(p.id)?.id === teamA?.id);
-  const teamBPlayers = players.filter((p) => getPlayerTeam(p.id)?.id === teamB?.id);
-  const unassignedPlayers = players.filter((p) => !getPlayerTeam(p.id));
-
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Players"
-        subtitle={`${players.length} player${players.length === 1 ? '' : 's'}`}
+        subtitle={currentTrip.name}
         icon={<Users size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
-        rightSlot={
-          isCaptainMode ? (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowBulkAdd(true)}
-                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--masters)] to-[var(--masters-deep)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-semibold text-[var(--canvas)] shadow-[var(--shadow-md)]"
-                title="Add multiple players at once"
-              >
-                <UsersRound size={16} />
-                Add Multiple
-              </button>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="press-scale inline-flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-[var(--rule)] bg-[var(--surface-card)] px-[var(--space-3)] py-[var(--space-2)] text-[14px] font-medium"
-              >
-                <UserPlus size={16} />
-                Add One
-              </button>
-            </div>
-          ) : null
-        }
       />
 
-      <main className="container-editorial pb-[var(--space-8)]">
-        {/* Team A */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-3)] text-[var(--team-usa)]">
-            {teamA?.name || 'USA'} ({teamAPlayers.length})
-          </h2>
-          {teamAPlayers.length > 0 ? (
-            <div>
-              {teamAPlayers.map((player) => (
-                <PlayerRow
-                  key={player.id}
-                  player={player}
-                  teamColor="usa"
-                  canEdit={isCaptainMode}
-                  onEdit={() => handleEdit(player)}
-                  onDelete={() => setPlayerToDelete(player)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="type-meta">No players on this team</p>
-          )}
-        </section>
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,244,237,0.96))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+          <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+            <div className="flex flex-col gap-[var(--space-5)]">
+              <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
+                    Roster Room
+                  </p>
+                  <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.1rem)] italic leading-[1.02] text-[var(--ink)]">
+                    Build the field.
+                  </h1>
+                  <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                    {isCaptainMode
+                      ? 'Shape the competition here. Assign each golfer, keep handicaps tidy, and make the player list feel settled before the first lineup card goes up.'
+                      : 'The roster is locked to viewing only right now. Turn on Captain Mode if you need to adjust the player list or move golfers onto teams.'}
+                  </p>
+                </div>
 
-        <hr className="divider" />
-
-        {/* Team B */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-3)] text-[var(--team-europe)]">
-            {teamB?.name || 'Europe'} ({teamBPlayers.length})
-          </h2>
-          {teamBPlayers.length > 0 ? (
-            <div>
-              {teamBPlayers.map((player) => (
-                <PlayerRow
-                  key={player.id}
-                  player={player}
-                  teamColor="europe"
-                  canEdit={isCaptainMode}
-                  onEdit={() => handleEdit(player)}
-                  onDelete={() => setPlayerToDelete(player)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="type-meta">No players on this team</p>
-          )}
-        </section>
-
-        {/* Unassigned */}
-        {unassignedPlayers.length > 0 && (
-          <>
-            <hr className="divider" />
-            <section className="section">
-              <h2 className="type-overline mb-[var(--space-3)]">
-                Unassigned ({unassignedPlayers.length})
-              </h2>
-              <div>
-                {unassignedPlayers.map((player) => (
-                  <PlayerRow
-                    key={player.id}
-                    player={player}
-                    canEdit={isCaptainMode}
-                    onEdit={() => handleEdit(player)}
-                    onDelete={() => setPlayerToDelete(player)}
-                  />
-                ))}
+                <div className="inline-flex items-center gap-[var(--space-2)] rounded-full border border-[color:var(--gold)]/16 bg-[color:var(--gold)]/10 px-[var(--space-3)] py-[var(--space-2)]">
+                  <Shield size={15} className={isCaptainMode ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'} />
+                  <span className="type-caption font-semibold text-[var(--ink)]">
+                    {isCaptainMode ? 'Captain Mode Active' : 'View Only'}
+                  </span>
+                </div>
               </div>
-            </section>
-          </>
-        )}
 
-        {/* Premium Empty State */}
-        {players.length === 0 && (
-          <NoPlayersPremiumEmpty
-            onAddPlayer={isCaptainMode ? () => setShowAddModal(true) : undefined}
-          />
+              {isCaptainMode ? (
+                <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+                  <Button
+                    variant="primary"
+                    leftIcon={<UserPlus size={16} />}
+                    onClick={() => setShowAddModal(true)}
+                    className="w-full justify-center"
+                  >
+                    Add One Player
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    leftIcon={<UsersRound size={16} />}
+                    onClick={() => setShowBulkAdd(true)}
+                    className="w-full justify-center border-[color:var(--gold)]/25 bg-[color:var(--gold)]/10 text-[var(--ink)] hover:bg-[color:var(--gold)]/14"
+                  >
+                    Add In Bulk
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+            <PlayersFactCard label="Total Players" value={players.length} />
+            <PlayersFactCard label="Assigned" value={players.length - unassignedPlayers.length} />
+            <PlayersFactCard label="Awaiting Team" value={unassignedPlayers.length} />
+            <PlayersFactCard
+              label="Average HCP"
+              value={averageHandicap}
+              valueClassName="font-sans text-[1rem] not-italic"
+            />
+          </div>
+        </section>
+
+        {players.length === 0 ? (
+          <div className="py-[var(--space-10)]">
+            <NoPlayersPremiumEmpty onAddPlayer={isCaptainMode ? () => setShowAddModal(true) : undefined} />
+          </div>
+        ) : (
+          <div className="space-y-[var(--space-4)] pt-[var(--space-6)]">
+            <RosterSectionCard
+              title={teamA?.name || 'USA'}
+              eyebrow="United States"
+              description="Keep the American side tidy and easy to scan before captain work begins."
+              players={teamAPlayers}
+              tone="usa"
+              canEdit={isCaptainMode}
+              onEdit={handleEdit}
+              onDelete={setPlayerToDelete}
+            />
+
+            <RosterSectionCard
+              title={teamB?.name || 'Europe'}
+              eyebrow="Europe"
+              description="A balanced roster starts here. Handicap clarity matters more than decoration."
+              players={teamBPlayers}
+              tone="europe"
+              canEdit={isCaptainMode}
+              onEdit={handleEdit}
+              onDelete={setPlayerToDelete}
+            />
+
+            <RosterSectionCard
+              title="Unassigned"
+              eyebrow="Still Waiting"
+              description="These players are in the trip but not yet placed on either side."
+              players={unassignedPlayers}
+              tone="neutral"
+              canEdit={isCaptainMode}
+              onEdit={handleEdit}
+              onDelete={setPlayerToDelete}
+            />
+          </div>
         )}
       </main>
 
-      {/* Add/Edit Modal */}
-      {showAddModal && (
+      {showAddModal ? (
         <div className="modal-backdrop" onClick={resetForm}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-[var(--space-4)]">
-              <h2 className="type-headline">{editingPlayer ? 'Edit Player' : 'Add Player'}</h2>
-              <button
-                onClick={resetForm}
-                className="cursor-pointer border-0 bg-transparent p-0"
-                aria-label="Close"
-              >
-                <X size={20} className="text-[var(--ink-tertiary)]" />
-              </button>
+          <div
+            className="modal max-w-[560px] overflow-hidden p-0"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,243,236,0.95))] px-[var(--space-6)] py-[var(--space-5)]">
+              <div className="flex items-start justify-between gap-[var(--space-4)]">
+                <div>
+                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                    {editingPlayer ? 'Roster Edit' : 'New Player'}
+                  </p>
+                  <h2 className="mt-[var(--space-2)] type-headline">
+                    {editingPlayer ? 'Refine player details' : 'Add a golfer to the trip'}
+                  </h2>
+                  <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                    Keep the essentials clean: name, email, handicap, and where they belong.
+                  </p>
+                </div>
+                <button
+                  onClick={resetForm}
+                  className="rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-2)] text-[var(--ink-tertiary)] transition-colors hover:bg-[var(--canvas-sunken)]"
+                  aria-label="Close player form"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-[var(--space-4)]">
-              <div className="grid grid-cols-2 gap-[var(--space-3)]">
-                <div>
-                  <label className="type-meta block mb-[var(--space-1)]">First Name *</label>
+            <div className="space-y-[var(--space-4)] px-[var(--space-6)] py-[var(--space-6)]">
+              <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+                <label className="space-y-[var(--space-2)]">
+                  <span className="type-meta font-semibold text-[var(--ink)]">First name</span>
                   <input
                     type="text"
                     className="input"
                     value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, firstName: e.target.value }))
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, firstName: event.target.value }))
                     }
                     placeholder="John"
                   />
-                </div>
-                <div>
-                  <label className="type-meta block mb-[var(--space-1)]">Last Name *</label>
+                </label>
+
+                <label className="space-y-[var(--space-2)]">
+                  <span className="type-meta font-semibold text-[var(--ink)]">Last name</span>
                   <input
                     type="text"
                     className="input"
                     value={formData.lastName}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, lastName: event.target.value }))
+                    }
                     placeholder="Doe"
                   />
-                </div>
+                </label>
               </div>
 
-              <div>
-                <label className="type-meta block mb-[var(--space-1)]">Handicap Index</label>
+              <label className="space-y-[var(--space-2)]">
+                <span className="type-meta font-semibold text-[var(--ink)]">Email</span>
                 <input
-                  type="number"
-                  min="-10"
-                  max="54"
-                  step="0.1"
+                  type="email"
                   className="input"
-                  value={formData.handicapIndex}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, handicapIndex: e.target.value }))
+                  value={formData.email}
+                  onChange={(event) =>
+                    setFormData((prev) => ({ ...prev, email: event.target.value }))
                   }
-                  placeholder="12.4"
+                  placeholder="john@example.com"
                 />
-              </div>
+              </label>
 
-              <div>
-                <label className="type-meta block mb-[var(--space-1)]">Team</label>
-                <select
-                  value={formData.teamId}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, teamId: e.target.value }))}
-                  className="input"
-                >
-                  <option value="">Unassigned</option>
-                  {teamA && <option value={teamA.id}>{teamA.name}</option>}
-                  {teamB && <option value={teamB.id}>{teamB.name}</option>}
-                </select>
+              <div className="grid gap-[var(--space-3)] sm:grid-cols-[140px_1fr]">
+                <label className="space-y-[var(--space-2)]">
+                  <span className="type-meta font-semibold text-[var(--ink)]">Handicap</span>
+                  <input
+                    type="number"
+                    min="-10"
+                    max="54"
+                    step="0.1"
+                    className="input"
+                    value={formData.handicapIndex}
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, handicapIndex: event.target.value }))
+                    }
+                    placeholder="12.4"
+                  />
+                </label>
+
+                <label className="space-y-[var(--space-2)]">
+                  <span className="type-meta font-semibold text-[var(--ink)]">Team</span>
+                  <select
+                    value={formData.teamId}
+                    onChange={(event) =>
+                      setFormData((prev) => ({ ...prev, teamId: event.target.value }))
+                    }
+                    className="input"
+                  >
+                    <option value="">Leave unassigned</option>
+                    {teamA ? <option value={teamA.id}>{teamA.name}</option> : null}
+                    {teamB ? <option value={teamB.id}>{teamB.name}</option> : null}
+                  </select>
+                </label>
               </div>
             </div>
 
-            <div className="mt-[var(--space-6)] flex gap-[var(--space-3)]">
-              <Button
-                variant="secondary"
-                onClick={resetForm}
-                disabled={isSaving}
-                className="flex-1"
-              >
+            <div className="flex flex-col gap-[var(--space-3)] border-t border-[var(--rule)] bg-[var(--canvas-sunken)] px-[var(--space-6)] py-[var(--space-5)] sm:flex-row">
+              <Button variant="secondary" onClick={resetForm} disabled={isSaving} className="flex-1">
                 Cancel
               </Button>
               <Button
@@ -477,232 +550,374 @@ export default function PlayersPage() {
                 onClick={handleSave}
                 disabled={isSaving}
                 isLoading={isSaving}
+                loadingText={editingPlayer ? 'Saving...' : 'Adding...'}
                 className="flex-1"
               >
-                {isSaving ? 'Saving...' : editingPlayer ? 'Save' : 'Add'}
+                {editingPlayer ? 'Save Player' : 'Add Player'}
               </Button>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Delete Confirmation */}
-      {playerToDelete && (
+      {playerToDelete ? (
         <div className="modal-backdrop" onClick={() => setPlayerToDelete(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="type-headline mb-[var(--space-3)]">Delete Player?</h2>
-            <p className="type-body mb-[var(--space-4)]">
-              Are you sure you want to delete {playerToDelete.firstName} {playerToDelete.lastName}?
-              This will also remove them from any matches.
-            </p>
-            <div className="flex gap-[var(--space-3)]">
+          <div
+            className="modal max-w-[480px] overflow-hidden p-0"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,243,236,0.95))] px-[var(--space-6)] py-[var(--space-5)]">
+              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                Remove Player
+              </p>
+              <h2 className="mt-[var(--space-2)] type-headline">Delete this golfer?</h2>
+              <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                {formatPlayerName(playerToDelete.firstName, playerToDelete.lastName)} will be
+                removed from the roster and any existing matches.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-[var(--space-3)] px-[var(--space-6)] py-[var(--space-5)] sm:flex-row">
               <Button
                 variant="secondary"
                 onClick={() => setPlayerToDelete(null)}
                 disabled={isDeleting}
                 className="flex-1"
               >
-                Cancel
+                Keep Player
               </Button>
               <Button
                 variant="danger"
                 onClick={handleDelete}
                 disabled={isDeleting}
                 isLoading={isDeleting}
+                loadingText="Deleting..."
                 className="flex-1"
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                Delete Player
               </Button>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Bulk Add Modal */}
-      {showBulkAdd && (
+      {showBulkAdd ? (
         <div className="modal-backdrop" onClick={() => setShowBulkAdd(false)}>
           <div
-            className="modal flex max-h-[85vh] w-[95vw] max-w-[600px] flex-col overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="modal max-h-[88vh] max-w-[680px] overflow-hidden p-0"
+            onClick={(event) => event.stopPropagation()}
           >
-            <div className="mb-[var(--space-4)] flex shrink-0 items-center justify-between">
-              <div>
-                <h2 className="type-headline">Add Multiple Players</h2>
-                <p className="type-meta mt-[var(--space-1)]">Fill in names to add players quickly</p>
+            <div className="border-b border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,243,236,0.95))] px-[var(--space-6)] py-[var(--space-5)]">
+              <div className="flex items-start justify-between gap-[var(--space-4)]">
+                <div>
+                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                    Bulk Entry
+                  </p>
+                  <h2 className="mt-[var(--space-2)] type-headline">Load the roster quickly</h2>
+                  <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                    Enter the names you know now. You can refine the finer details later.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowBulkAdd(false)}
+                  className="rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-2)] text-[var(--ink-tertiary)] transition-colors hover:bg-[var(--canvas-sunken)]"
+                  aria-label="Close bulk add"
+                >
+                  <X size={18} />
+                </button>
               </div>
-              <button
-                onClick={() => setShowBulkAdd(false)}
-                className="cursor-pointer border-0 bg-transparent p-[var(--space-2)]"
-              >
-                <X size={20} className="text-[var(--ink-tertiary)]" />
-              </button>
+
+              <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-3)] md:grid-cols-4">
+                <PlayersFactCard label="Rows" value={bulkRows.length} />
+                <PlayersFactCard label="Ready" value={validBulkCount} />
+                <PlayersFactCard label="USA" value={bulkRows.filter((row) => row.teamId === teamA?.id).length} />
+                <PlayersFactCard label="Europe" value={bulkRows.filter((row) => row.teamId === teamB?.id).length} />
+              </div>
             </div>
 
-            {/* Column headers */}
-            <div className="mb-[var(--space-2)] grid shrink-0 gap-[var(--space-2)] pr-2 [grid-template-columns:1fr_1fr_80px_100px_32px]">
-              <span className="type-meta font-semibold">First Name *</span>
-              <span className="type-meta font-semibold">Last Name *</span>
-              <span className="type-meta font-semibold">HCP</span>
-              <span className="type-meta font-semibold">Team</span>
-              <span />
-            </div>
-
-            {/* Scrollable rows container */}
-            <div className="mb-[var(--space-4)] flex-1 overflow-y-auto">
-              {bulkRows.map((row, _index) => (
+            <div className="space-y-[var(--space-3)] overflow-y-auto px-[var(--space-6)] py-[var(--space-6)]">
+              {bulkRows.map((row, index) => (
                 <div
                   key={row.id}
-                  className="mb-[var(--space-2)] grid items-center gap-[var(--space-2)] [grid-template-columns:1fr_1fr_80px_100px_32px]"
+                  className="rounded-[1.35rem] border border-[var(--rule)] bg-[var(--canvas)] p-[var(--space-4)]"
                 >
-                  <input
-                    type="text"
-                    className="input px-[var(--space-2)] text-[14px]"
-                    value={row.firstName}
-                    onChange={(e) => updateBulkRow(row.id, 'firstName', e.target.value)}
-                    placeholder="John"
-                  />
-                  <input
-                    type="text"
-                    className="input px-[var(--space-2)] text-[14px]"
-                    value={row.lastName}
-                    onChange={(e) => updateBulkRow(row.id, 'lastName', e.target.value)}
-                    placeholder="Smith"
-                  />
-                  <input
-                    type="number"
-                    min="-10"
-                    max="54"
-                    step="0.1"
-                    className="input px-[var(--space-2)] text-[14px]"
-                    value={row.handicapIndex}
-                    onChange={(e) => updateBulkRow(row.id, 'handicapIndex', e.target.value)}
-                    placeholder="12"
-                  />
-                  <select
-                    value={row.teamId}
-                    onChange={(e) => updateBulkRow(row.id, 'teamId', e.target.value)}
-                    className="input px-[var(--space-2)] text-[14px]"
-                  >
-                    <option value="">—</option>
-                    {teamA && <option value={teamA.id}>{teamA.name?.slice(0, 6) || 'USA'}</option>}
-                    {teamB && <option value={teamB.id}>{teamB.name?.slice(0, 6) || 'EUR'}</option>}
-                  </select>
-                  <button
-                    onClick={() => removeBulkRow(row.id)}
-                    disabled={bulkRows.length <= 1}
-                    className={`border-0 bg-transparent p-[var(--space-1)] ${
-                      bulkRows.length <= 1 ? 'cursor-not-allowed opacity-30' : 'cursor-pointer opacity-60'
-                    }`}
-                    title="Remove row"
-                  >
-                    <X size={16} />
-                  </button>
+                  <div className="flex items-center justify-between gap-[var(--space-4)]">
+                    <div>
+                      <p className="type-overline text-[var(--ink-tertiary)]">
+                        Player {index + 1}
+                      </p>
+                      <p className="mt-[var(--space-1)] type-caption">
+                        Add the essentials now. Team placement is optional.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => removeBulkRow(row.id)}
+                      disabled={bulkRows.length <= 1}
+                      className="rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-2)] text-[var(--ink-tertiary)] transition-colors hover:bg-[var(--canvas-sunken)] disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label={`Remove player row ${index + 1}`}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="mt-[var(--space-4)] grid gap-[var(--space-3)] sm:grid-cols-2">
+                    <label className="space-y-[var(--space-2)]">
+                      <span className="type-meta font-semibold text-[var(--ink)]">First name</span>
+                      <input
+                        type="text"
+                        className="input"
+                        value={row.firstName}
+                        onChange={(event) =>
+                          updateBulkRow(row.id, 'firstName', event.target.value)
+                        }
+                        placeholder="John"
+                      />
+                    </label>
+
+                    <label className="space-y-[var(--space-2)]">
+                      <span className="type-meta font-semibold text-[var(--ink)]">Last name</span>
+                      <input
+                        type="text"
+                        className="input"
+                        value={row.lastName}
+                        onChange={(event) =>
+                          updateBulkRow(row.id, 'lastName', event.target.value)
+                        }
+                        placeholder="Smith"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="mt-[var(--space-3)] grid gap-[var(--space-3)] sm:grid-cols-[140px_1fr]">
+                    <label className="space-y-[var(--space-2)]">
+                      <span className="type-meta font-semibold text-[var(--ink)]">Handicap</span>
+                      <input
+                        type="number"
+                        min="-10"
+                        max="54"
+                        step="0.1"
+                        className="input"
+                        value={row.handicapIndex}
+                        onChange={(event) =>
+                          updateBulkRow(row.id, 'handicapIndex', event.target.value)
+                        }
+                        placeholder="12.0"
+                      />
+                    </label>
+
+                    <label className="space-y-[var(--space-2)]">
+                      <span className="type-meta font-semibold text-[var(--ink)]">Team</span>
+                      <select
+                        value={row.teamId}
+                        onChange={(event) => updateBulkRow(row.id, 'teamId', event.target.value)}
+                        className="input"
+                      >
+                        <option value="">Leave unassigned</option>
+                        {teamA ? <option value={teamA.id}>{teamA.name}</option> : null}
+                        {teamB ? <option value={teamB.id}>{teamB.name}</option> : null}
+                      </select>
+                    </label>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* Add row button */}
-            <button
-              onClick={addBulkRow}
-              className="mb-[var(--space-4)] flex w-full shrink-0 cursor-pointer items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-md)] border border-dashed border-[color:var(--rule)]/40 bg-transparent p-[var(--space-2)]"
-            >
-              <Plus size={16} className="text-[var(--ink-tertiary)]" />
-              <span className="type-meta">Add another row</span>
-            </button>
+            <div className="border-t border-[var(--rule)] bg-[var(--canvas-sunken)] px-[var(--space-6)] py-[var(--space-5)]">
+              <button
+                onClick={addBulkRow}
+                className="mb-[var(--space-4)] flex w-full items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-dashed border-[color:var(--gold)]/28 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
+              >
+                <Plus size={16} />
+                <span className="type-caption font-semibold">Add another row</span>
+              </button>
 
-            {/* Footer */}
-            <div className="flex shrink-0 gap-[var(--space-3)]">
-              <Button
-                variant="secondary"
-                onClick={() => setShowBulkAdd(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleBulkSave}
-                disabled={validBulkCount === 0}
-                className="flex-1"
-              >
-                <span className="inline-flex items-center justify-center gap-[var(--space-2)]">
-                  <Check size={16} />
-                  Add{' '}
-                  {validBulkCount > 0
-                    ? `${validBulkCount} Player${validBulkCount > 1 ? 's' : ''}`
-                    : 'Players'}
-                </span>
-              </Button>
+              <div className="flex flex-col gap-[var(--space-3)] sm:flex-row">
+                <Button variant="secondary" onClick={() => setShowBulkAdd(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleBulkSave}
+                  disabled={validBulkCount === 0}
+                  className="flex-1"
+                >
+                  Add {validBulkCount > 0 ? validBulkCount : ''} Player
+                  {validBulkCount === 1 ? '' : 's'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      )}
-
+      ) : null}
     </div>
   );
 }
 
-/* Player Row Component */
-function PlayerRow({
-  player,
-  teamColor,
+function PlayersFactCard({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
+      <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+      <p
+        className={cn(
+          'mt-[var(--space-2)] font-serif text-[1.7rem] italic leading-none text-[var(--ink)]',
+          valueClassName
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function RosterSectionCard({
+  title,
+  eyebrow,
+  description,
+  players,
+  tone,
   canEdit,
   onEdit,
   onDelete,
 }: {
+  title: string;
+  eyebrow: string;
+  description: string;
+  players: Player[];
+  tone: RosterTone;
+  canEdit: boolean;
+  onEdit: (player: Player) => void;
+  onDelete: (player: Player) => void;
+}) {
+  const toneStyles = rosterToneStyles[tone];
+
+  return (
+    <section
+      className={cn(
+        'overflow-hidden rounded-[1.8rem] border shadow-[0_18px_36px_rgba(46,34,18,0.06)]',
+        toneStyles.panel
+      )}
+    >
+      <div className="border-b border-[color:var(--rule)]/75 px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="flex items-start justify-between gap-[var(--space-4)]">
+          <div>
+            <p className={cn('type-overline tracking-[0.16em]', toneStyles.eyebrow)}>{eyebrow}</p>
+            <h2 className="mt-[var(--space-2)] type-display-sm text-[var(--ink)]">{title}</h2>
+            <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+              {description}
+            </p>
+          </div>
+
+          <div className={cn('rounded-full border px-[var(--space-3)] py-[var(--space-2)]', toneStyles.badge)}>
+            <span className="type-caption font-semibold">{players.length}</span>
+          </div>
+        </div>
+      </div>
+
+      {players.length === 0 ? (
+        <div className="px-[var(--space-5)] py-[var(--space-6)]">
+          <div className="rounded-[1.25rem] border border-dashed border-[color:var(--rule)]/75 bg-[rgba(255,255,255,0.55)] px-[var(--space-4)] py-[var(--space-5)] text-center">
+            <p className="type-title-sm text-[var(--ink)]">No players here yet</p>
+            <p className="mt-[var(--space-2)] type-caption">
+              Once players land in this section, the roster will feel settled.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="px-[var(--space-3)] py-[var(--space-3)]">
+          {players.map((player, index) => (
+            <RosterPlayerRow
+              key={player.id}
+              player={player}
+              tone={tone}
+              canEdit={canEdit}
+              onEdit={() => onEdit(player)}
+              onDelete={() => onDelete(player)}
+              className={index > 0 ? 'mt-[var(--space-2)]' : undefined}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function RosterPlayerRow({
+  player,
+  tone,
+  canEdit,
+  onEdit,
+  onDelete,
+  className,
+}: {
   player: Player;
-  teamColor?: 'usa' | 'europe';
+  tone: RosterTone;
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  className?: string;
 }) {
   const initials = `${player.firstName?.[0] || '?'}${player.lastName?.[0] || '?'}`;
-  const bgColor =
-    teamColor === 'usa'
-      ? 'var(--team-usa)'
-      : teamColor === 'europe'
-        ? 'var(--team-europe)'
-        : 'var(--ink-tertiary)';
+  const toneStyles = rosterToneStyles[tone];
 
   return (
-    <div className="match-row">
-      {/* Avatar */}
+    <div
+      className={cn(
+        'flex items-center gap-[var(--space-4)] rounded-[1.2rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.82)] px-[var(--space-4)] py-[var(--space-4)] transition-colors hover:bg-[var(--canvas-raised)]',
+        className
+      )}
+    >
       <div
-        className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-semibold text-[var(--canvas)] ${
-          teamColor ? 'opacity-100' : 'opacity-50'
-        }`}
-        style={{ background: bgColor }}
+        className={cn(
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[0.8rem] font-semibold text-[var(--canvas)] shadow-[0_10px_20px_rgba(26,24,21,0.12)]',
+          toneStyles.avatar
+        )}
       >
         {initials}
       </div>
 
-      {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="font-medium">{formatPlayerName(player.firstName, player.lastName)}</p>
-        {player.handicapIndex !== undefined && (
-          <p className="type-meta">HCP: {player.handicapIndex.toFixed(1)}</p>
-        )}
+        <p className="type-title-sm truncate text-[var(--ink)]">
+          {formatPlayerName(player.firstName, player.lastName)}
+        </p>
+        <div className="mt-[var(--space-2)] flex flex-wrap items-center gap-[var(--space-2)]">
+          <span className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-2)] py-[5px] text-[0.74rem] font-semibold text-[var(--ink-secondary)]">
+            HCP {player.handicapIndex?.toFixed(1) ?? '—'}
+          </span>
+          {player.email ? (
+            <span className="inline-flex max-w-full items-center gap-[var(--space-1)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-2)] py-[5px] text-[0.74rem] font-semibold text-[var(--ink-secondary)]">
+              <Mail size={12} className={toneStyles.icon} />
+              <span className="truncate">{player.email}</span>
+            </span>
+          ) : null}
+        </div>
       </div>
 
-      {/* Actions */}
-      {canEdit && (
-        <div className="flex items-center gap-[var(--space-1)]">
+      {canEdit ? (
+        <div className="flex items-center gap-[var(--space-2)]">
           <button
             onClick={onEdit}
-            className="cursor-pointer border-0 bg-transparent p-[var(--space-2)] text-[var(--ink-secondary)]"
-            aria-label="Edit player"
+            className="rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-2)] text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]"
+            aria-label={`Edit ${formatPlayerName(player.firstName, player.lastName)}`}
           >
             <Edit2 size={16} />
           </button>
           <button
             onClick={onDelete}
-            className="cursor-pointer border-0 bg-transparent p-[var(--space-2)] text-[var(--error)]"
-            aria-label="Delete player"
+            className="rounded-full border border-[color:var(--error)]/20 bg-[color:var(--error)]/8 p-[var(--space-2)] text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/12"
+            aria-label={`Delete ${formatPlayerName(player.firstName, player.lastName)}`}
           >
             <Trash2 size={16} />
           </button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

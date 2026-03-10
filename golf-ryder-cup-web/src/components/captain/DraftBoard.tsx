@@ -1,26 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   autoPickPlayer,
   balanceTeamsByHandicap,
+  calculateTeamHandicapTotal,
   createDraftConfig,
-  DraftConfig,
-  DraftState,
+  getCurrentPicker,
+  type DraftConfig,
+  type DraftState,
   initializeDraftState,
   makeDraftPick,
   randomizeTeams,
 } from '@/lib/services/draftService';
+import { Button } from '@/components/ui/Button';
+import { cn, formatPlayerName } from '@/lib/utils';
 import { useTripStore } from '@/lib/stores/tripStore';
 import { Player, Team } from '@/lib/types';
 import {
+  ArrowRight,
   Gavel,
   Pause,
   Play,
   RotateCcw,
   Scale,
   Shuffle,
-  Trophy,
   User,
   Users,
 } from 'lucide-react';
@@ -33,60 +37,91 @@ interface DraftBoardProps {
 
 type DraftMode = 'snake' | 'auction' | 'random' | 'balanced';
 
+const teamToneStyles: Record<
+  Team['color'],
+  {
+    panel: string;
+    badge: string;
+    eyebrow: string;
+    icon: string;
+  }
+> = {
+  usa: {
+    panel:
+      'border-[color:var(--team-usa)]/18 bg-[linear-gradient(180deg,rgba(30,58,95,0.08),rgba(255,255,255,0.96))]',
+    badge:
+      'border-[color:var(--team-usa)]/18 bg-[color:var(--team-usa)]/10 text-[var(--team-usa)]',
+    eyebrow: 'text-[var(--team-usa)]',
+    icon: 'text-[var(--team-usa)]',
+  },
+  europe: {
+    panel:
+      'border-[color:var(--team-europe)]/18 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.96))]',
+    badge:
+      'border-[color:var(--team-europe)]/18 bg-[color:var(--team-europe)]/10 text-[var(--team-europe)]',
+    eyebrow: 'text-[var(--team-europe)]',
+    icon: 'text-[var(--team-europe)]',
+  },
+};
+
 export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps) {
   const { currentTrip } = useTripStore();
   const [mode, setMode] = useState<DraftMode | null>(null);
   const [config, setConfig] = useState<DraftConfig | null>(null);
   const [draftState, setDraftState] = useState<DraftState | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-
-  // Auction-specific state
   const [currentBid, setCurrentBid] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
-  const availablePlayers = players.filter(
-    p => !draftState?.picks.some(pick => pick.playerId === p.id)
-  );
+  const availablePlayers = draftState?.availablePlayers ?? players;
+  const currentTeam = draftState
+    ? teams.find((team) => team.id === draftState.currentCaptainId) ?? null
+    : null;
+  const currentPicker = draftState ? getCurrentPicker(draftState) : null;
+  const selectedPlayerDetails =
+    selectedPlayer ? availablePlayers.find((player) => player.id === selectedPlayer) ?? null : null;
+  const currentPickNumber = draftState?.currentPick ?? 0;
 
   const getTeamPlayers = (teamId: string) => {
-    if (!draftState) return [];
-    const teamPicks = draftState.picks.filter(p => p.teamId === teamId);
-    return teamPicks.map(pick => players.find(p => p.id === pick.playerId)!).filter(Boolean);
+    if (!draftState || !config) return [];
+    if (teamId === config.draftOrder[0]) return draftState.teamARoster;
+    if (teamId === config.draftOrder[1]) return draftState.teamBRoster;
+    return [];
   };
 
   const startDraft = (selectedMode: DraftMode) => {
     setMode(selectedMode);
 
     if (selectedMode === 'random') {
-      // Immediate random assignment
       const result = randomizeTeams(players);
       const assignments = new Map<string, string>();
-      result.teamA.forEach(p => assignments.set(p.id, teams[0]?.id || 'A'));
-      result.teamB.forEach(p => assignments.set(p.id, teams[1]?.id || 'B'));
+      result.teamA.forEach((player) => assignments.set(player.id, teams[0]?.id || 'A'));
+      result.teamB.forEach((player) => assignments.set(player.id, teams[1]?.id || 'B'));
       onDraftComplete(assignments);
       return;
     }
 
     if (selectedMode === 'balanced') {
-      // Immediate balanced assignment
       const result = balanceTeamsByHandicap(players);
       const assignments = new Map<string, string>();
-      result.teamA.forEach(p => assignments.set(p.id, teams[0]?.id || 'A'));
-      result.teamB.forEach(p => assignments.set(p.id, teams[1]?.id || 'B'));
+      result.teamA.forEach((player) => assignments.set(player.id, teams[0]?.id || 'A'));
+      result.teamB.forEach((player) => assignments.set(player.id, teams[1]?.id || 'B'));
       onDraftComplete(assignments);
       return;
     }
 
-    // Initialize draft for snake or auction
-    const captainIds = teams.map(t => t.id);
+    const captainIds = teams.map((team) => team.id);
     const tripId = currentTrip?.id || crypto.randomUUID();
-    const draftConfig = createDraftConfig(
-      tripId,
-      selectedMode === 'auction' ? 'auction' : 'snake',
-      captainIds,
-      players.length,
-      selectedMode === 'auction' ? { auctionBudget: 100 } : undefined
-    );
+    const draftConfig: DraftConfig = {
+      ...createDraftConfig(
+        tripId,
+        selectedMode === 'auction' ? 'auction' : 'snake',
+        captainIds,
+        players.length,
+        selectedMode === 'auction' ? { auctionBudget: 100 } : undefined
+      ),
+      status: 'in_progress',
+    };
 
     setConfig(draftConfig);
     setDraftState(
@@ -95,22 +130,24 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
         teamB: teams[1]?.id || 'B',
       })
     );
+    setSelectedPlayer(null);
+    setCurrentBid(0);
+    setIsPaused(false);
   };
 
   const handlePick = (playerId: string) => {
     if (!draftState || !config) return;
 
     const auctionPrice = mode === 'auction' ? currentBid : undefined;
-
     const { newState } = makeDraftPick(draftState, playerId, auctionPrice);
+
     setDraftState(newState);
     setSelectedPlayer(null);
     setCurrentBid(0);
 
-    // Check if draft is complete
     if (newState.picks.length === players.length || newState.availablePlayers.length === 0) {
       const assignments = new Map<string, string>();
-      newState.picks.forEach(pick => {
+      newState.picks.forEach((pick) => {
         assignments.set(pick.playerId, pick.teamId);
       });
       onDraftComplete(assignments);
@@ -118,12 +155,9 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
   };
 
   const handleAutoPick = () => {
-    if (!draftState || !config) return;
-
+    if (!draftState) return;
     const result = autoPickPlayer(draftState);
-    if (result) {
-      handlePick(result);
-    }
+    if (result) handlePick(result);
   };
 
   const resetDraft = () => {
@@ -135,269 +169,486 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
     setIsPaused(false);
   };
 
-  const currentTeam =
-    config && draftState
-      ? teams.find(
-          t => t.id === config.draftOrder[draftState.currentPick % config.draftOrder.length]
-        )
-      : null;
-
-  const currentPickNumber = (draftState?.currentPick ?? 0) + 1;
-
-  // Mode selection screen
   if (!mode) {
     return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <Trophy className="w-12 h-12 text-[var(--warning)] mx-auto mb-3" />
-          <h2 className="text-xl font-bold text-[var(--ink-primary)]">Team Draft</h2>
-          <p className="text-[var(--ink-secondary)] mt-1">
-            Choose how to assign {players.length} players to {teams.length} teams
-          </p>
-        </div>
+      <div className="space-y-[var(--space-5)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,244,237,0.97))] shadow-[0_18px_40px_rgba(46,34,18,0.07)]">
+          <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+            <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Draft Room</p>
+            <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,6vw,2.8rem)] italic leading-[1.04] text-[var(--ink)]">
+              Choose the room&apos;s tone.
+            </h2>
+            <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+              Some drafts should feel ceremonial. Others should simply get the trip moving. Pick
+              the method that fits the group in front of you.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <button
+          <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+            <DraftFactCard label="Players" value={players.length} />
+            <DraftFactCard label="Teams" value={teams.length} />
+            <DraftFactCard label="Fastest Start" value="Random" valueClassName="font-sans text-[1rem] not-italic" />
+            <DraftFactCard label="Most Theater" value="Snake" valueClassName="font-sans text-[1rem] not-italic" />
+          </div>
+        </section>
+
+        <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+          <DraftModeCard
+            icon={<Users size={22} />}
+            eyebrow="Classic"
+            title="Snake Draft"
+            description="Take turns selecting players and let the order reverse each round."
+            detail="Best when the captains want real tension and visible momentum."
             onClick={() => startDraft('snake')}
-            className="p-6 border border-[var(--rule)] rounded-xl hover:bg-[var(--surface-secondary)] transition-all text-center bg-[var(--surface-card)]"
-          >
-            <Users className="w-10 h-10 text-[var(--info)] mx-auto mb-3" />
-            <h3 className="font-semibold text-[var(--ink-primary)]">Snake Draft</h3>
-            <p className="text-sm text-[var(--ink-secondary)] mt-1">
-              Take turns picking, order reverses each round
-            </p>
-          </button>
-
-          <button
+          />
+          <DraftModeCard
+            icon={<Gavel size={22} />}
+            eyebrow="Loudest"
+            title="Auction Draft"
+            description="Nominate players and place bids before the roster falls into place."
+            detail="Good for bigger groups that want the draft itself to be entertainment."
             onClick={() => startDraft('auction')}
-            className="p-6 border border-[var(--rule)] rounded-xl hover:bg-[var(--surface-secondary)] transition-all text-center bg-[var(--surface-card)]"
-          >
-            <Gavel className="w-10 h-10 text-[var(--success)] mx-auto mb-3" />
-            <h3 className="font-semibold text-[var(--ink-primary)]">Auction Draft</h3>
-            <p className="text-sm text-[var(--ink-secondary)] mt-1">
-              Bid on players with limited budget
-            </p>
-          </button>
-
-          <button
+          />
+          <DraftModeCard
+            icon={<Shuffle size={22} />}
+            eyebrow="Fastest"
+            title="Random Draw"
+            description="Split the room quickly when the ceremony is less important than the start."
+            detail="One tap, two teams, and you are on to lineups."
             onClick={() => startDraft('random')}
-            className="p-6 border border-[var(--rule)] rounded-xl hover:bg-[var(--surface-secondary)] transition-all text-center bg-[var(--surface-card)]"
-          >
-            <Shuffle className="w-10 h-10 text-[var(--masters)] mx-auto mb-3" />
-            <h3 className="font-semibold text-[var(--ink-primary)]">Random</h3>
-            <p className="text-sm text-[var(--ink-secondary)] mt-1">
-              Randomly assign players to teams
-            </p>
-          </button>
-
-          <button
+          />
+          <DraftModeCard
+            icon={<Scale size={22} />}
+            eyebrow="Fairest"
+            title="Auto-Balance"
+            description="Sort golfers by handicap and spread the talent with some discipline."
+            detail="The cleanest way to avoid obvious lopsidedness."
             onClick={() => startDraft('balanced')}
-            className="p-6 border border-[var(--rule)] rounded-xl hover:bg-[var(--surface-secondary)] transition-all text-center bg-[var(--surface-card)]"
-          >
-            <Scale className="w-10 h-10 text-[var(--warning)] mx-auto mb-3" />
-            <h3 className="font-semibold text-[var(--ink-primary)]">Auto-Balance</h3>
-            <p className="text-sm text-[var(--ink-secondary)] mt-1">
-              Balance teams by total handicap
-            </p>
-          </button>
+          />
         </div>
       </div>
     );
   }
 
-  // Draft in progress
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {mode === 'snake' ? (
-            <Users className="w-6 h-6 text-[var(--info)]" />
-          ) : (
-            <Gavel className="w-6 h-6 text-[var(--success)]" />
+    <div className="space-y-[var(--space-5)]">
+      <section className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,244,237,0.97))] shadow-[0_18px_40px_rgba(46,34,18,0.07)]">
+        <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+          <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                {mode === 'auction' ? 'Auction in Progress' : 'Draft in Progress'}
+              </p>
+              <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,6vw,2.8rem)] italic leading-[1.04] text-[var(--ink)]">
+                {getModeLabel(mode)}
+              </h2>
+              <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                {currentTeam
+                  ? `${currentTeam.name} is on the clock. Keep the room moving and the board legible.`
+                  : 'The room is set. Make the next choice cleanly.'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-[var(--space-2)]">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsPaused((value) => !value)}
+                aria-label={isPaused ? 'Resume draft' : 'Pause draft'}
+                title={isPaused ? 'Resume draft' : 'Pause draft'}
+              >
+                {isPaused ? <Play size={18} /> : <Pause size={18} />}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={resetDraft}
+                aria-label="Reset draft"
+                title="Reset draft"
+              >
+                <RotateCcw size={18} />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+          <DraftFactCard label="Pick" value={`${currentPickNumber} / ${players.length}`} valueClassName="font-sans text-[1rem] not-italic" />
+          <DraftFactCard label="Round" value={draftState?.currentRound ?? '—'} />
+          <DraftFactCard label="Available" value={availablePlayers.length} />
+          <DraftFactCard
+            label="Status"
+            value={isPaused ? 'Paused' : 'Live'}
+            valueClassName="font-sans text-[1rem] not-italic"
+          />
+        </div>
+      </section>
+
+      {currentTeam ? (
+        <section
+          className={cn(
+            'overflow-hidden rounded-[1.8rem] border shadow-[0_16px_34px_rgba(46,34,18,0.06)]',
+            teamToneStyles[currentTeam.color].panel
           )}
-          <div>
-            <h3 className="font-semibold text-[var(--ink-primary)]">
-              {mode === 'snake' ? 'Snake Draft' : 'Auction Draft'}
+        >
+          <div className="px-[var(--space-5)] py-[var(--space-5)]">
+            <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className={cn('type-overline tracking-[0.16em]', teamToneStyles[currentTeam.color].eyebrow)}>
+                  On the Clock
+                </p>
+                <h3 className="mt-[var(--space-2)] type-display-sm text-[var(--ink)]">
+                  {currentTeam.name}
+                </h3>
+                <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                  {currentPicker
+                    ? `Round ${currentPicker.round}, pick ${currentPicker.pickNumber}.`
+                    : 'Make the next selection.'}
+                </p>
+              </div>
+
+              <DraftStatusPill tone={currentTeam.color}>
+                {mode === 'auction' ? 'Bidding Window' : 'Selection Window'}
+              </DraftStatusPill>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {mode === 'auction' && selectedPlayerDetails ? (
+        <section className="overflow-hidden rounded-[1.8rem] border border-[color:var(--success)]/20 bg-[linear-gradient(180deg,rgba(45,122,79,0.08),rgba(255,255,255,0.96))] shadow-[0_16px_34px_rgba(46,34,18,0.06)]">
+          <div className="border-b border-[color:var(--success)]/14 px-[var(--space-5)] py-[var(--space-5)]">
+            <p className="type-overline tracking-[0.16em] text-[var(--success)]">Auction Block</p>
+            <h3 className="mt-[var(--space-2)] type-title-lg text-[var(--ink)]">
+              {formatPlayerName(selectedPlayerDetails.firstName, selectedPlayerDetails.lastName)}
             </h3>
-            <p className="text-sm text-[var(--ink-secondary)]">
-              Pick {currentPickNumber} of {players.length}
+            <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+              Set the number, then award the player when the room settles.
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
-          >
-            {isPaused ? (
-              <Play className="w-5 h-5 text-[var(--success)]" />
-            ) : (
-              <Pause className="w-5 h-5 text-[var(--ink-secondary)]" />
-            )}
-          </button>
-          <button
-            onClick={resetDraft}
-            className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg transition-colors"
-          >
-            <RotateCcw className="w-5 h-5 text-[var(--ink-secondary)]" />
-          </button>
-        </div>
-      </div>
 
-      {/* Current Pick Banner */}
-      {currentTeam && (
-        <div
-          className={`p-4 rounded-lg border ${currentTeam.name.toLowerCase().includes('usa')
-            ? 'bg-team-usa/10 border-team-usa/30'
-            : 'bg-team-europe/10 border-team-europe/30'
-            }`}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-[var(--ink-secondary)]">On the Clock</p>
-              <p className="text-lg font-bold text-[var(--ink-primary)]">{currentTeam.name}</p>
-            </div>
-            {mode === 'auction' && config && (
-              <div className="text-right">
-                <p className="text-sm text-[var(--ink-secondary)]">Budget</p>
-                <p className="text-lg font-bold text-[var(--ink-primary)]">${config.auctionBudget}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+          <div className="grid gap-[var(--space-4)] px-[var(--space-5)] py-[var(--space-5)] sm:grid-cols-[1fr_auto] sm:items-end">
+            <label className="space-y-[var(--space-2)]">
+              <span className="type-meta font-semibold text-[var(--ink)]">Winning bid</span>
+              <input
+                type="number"
+                value={currentBid}
+                onChange={(event) => setCurrentBid(parseInt(event.target.value, 10) || 0)}
+                min={1}
+                max={config?.auctionBudget || 100}
+                className="input"
+              />
+            </label>
 
-      {/* Auction Bidding */}
-      {mode === 'auction' && selectedPlayer && (
-        <div className="p-4 bg-[color:var(--success)]/10 rounded-lg border border-[color:var(--success)]/30">
-          <p className="text-sm text-[var(--ink-secondary)] mb-2">
-            Bidding on:{' '}
-            <strong className="text-[var(--ink-primary)]">
-              {(() => {
-                const p = players.find(p => p.id === selectedPlayer);
-                return p ? `${p.firstName} ${p.lastName}` : 'Unknown';
-              })()}
-            </strong>
-          </p>
-          <div className="flex items-center gap-3">
-            <input
-              type="number"
-              value={currentBid}
-              onChange={e => setCurrentBid(parseInt(e.target.value) || 0)}
-              min={1}
-              max={config?.auctionBudget || 100}
-              className="flex-1 px-3 py-2 border border-[var(--rule)] rounded-lg bg-[var(--surface)] text-[var(--ink-primary)]"
-            />
-            <button
-              onClick={() => handlePick(selectedPlayer)}
-              disabled={currentBid < 1}
-              className="px-4 py-2 bg-[var(--success)] text-[var(--canvas)] rounded-lg hover:bg-[color:var(--success)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            <Button
+              variant="primary"
+              onClick={() => handlePick(selectedPlayerDetails.id)}
+              disabled={currentBid < 1 || isPaused}
+              className="w-full sm:w-auto"
             >
-              Win Bid (${currentBid})
-            </button>
+              Award for ${currentBid || 0}
+            </Button>
           </div>
-        </div>
-      )}
+        </section>
+      ) : null}
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* Available Players */}
-        <div className="border border-[var(--rule)] rounded-lg overflow-hidden bg-[var(--surface-card)]">
-          <div className="bg-[var(--surface-secondary)] px-4 py-3 border-b border-[var(--rule)]">
-            <h4 className="font-medium text-[var(--ink-primary)]">Available ({availablePlayers.length})</h4>
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {availablePlayers.map(player => (
-              <button
-                key={player.id}
-                onClick={() => {
-                  if (mode === 'auction') {
-                    setSelectedPlayer(player.id);
-                    setCurrentBid(1);
-                  } else {
-                    handlePick(player.id);
-                  }
-                }}
-                disabled={isPaused}
-                className={`w-full px-4 py-3 text-left hover:bg-[var(--surface-secondary)] transition-colors flex items-center justify-between ${
-                  selectedPlayer === player.id ? 'bg-[color:var(--success)]/10' : ''
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                <div className="flex items-center gap-3">
-                  <User className="w-4 h-4 text-[var(--ink-tertiary)]" />
-                  <span className="text-[var(--ink-primary)]">
-                    {player.firstName} {player.lastName}
-                  </span>
-                </div>
-                <span className="text-sm text-[var(--ink-secondary)]">
-                  {player.handicapIndex?.toFixed(1) || 'N/A'}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Teams */}
-        <div className="space-y-3">
-          {teams.map(team => {
-            const teamPlayers = getTeamPlayers(team.id);
-            const totalHandicap = teamPlayers.reduce((sum, p) => sum + (p.handicapIndex || 0), 0);
-
-            return (
-              <div
-                key={team.id}
-                className={`border rounded-lg overflow-hidden bg-[var(--surface-card)] ${
-                  currentTeam?.id === team.id
-                    ? 'border-[color:var(--warning)] ring-2 ring-[color:var(--warning)]/20'
-                    : 'border-[var(--rule)]'
-                }`}
-              >
-                <div
-                  className={`px-4 py-2 ${team.name.toLowerCase().includes('usa') ? 'bg-team-usa/10' : 'bg-team-europe/10'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-[var(--ink-primary)]">{team.name}</span>
-                    <span className="text-sm text-[var(--ink-secondary)]">
-                      {teamPlayers.length} players • {totalHandicap.toFixed(1)} total
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2">
-                  {teamPlayers.length === 0 ? (
-                    <p className="text-sm text-[var(--ink-tertiary)] text-center py-2">No players yet</p>
-                  ) : (
-                    <div className="space-y-1">
-                      {teamPlayers.map(player => (
-                        <div key={player.id} className="flex items-center justify-between px-2 py-1 text-sm">
-                          <span className="text-[var(--ink-primary)]">
-                            {player.firstName} {player.lastName}
-                          </span>
-                          <span className="text-[var(--ink-secondary)]">
-                            {player.handicapIndex?.toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+      <div className="grid gap-[var(--space-4)] lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="overflow-hidden rounded-[1.8rem] border border-[var(--rule)] bg-[var(--canvas-raised)] shadow-[0_16px_34px_rgba(46,34,18,0.06)]">
+          <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+            <div className="flex items-start justify-between gap-[var(--space-4)]">
+              <div>
+                <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                  Player Board
+                </p>
+                <h3 className="mt-[var(--space-2)] type-title-lg text-[var(--ink)]">
+                  Available golfers
+                </h3>
+                <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                  Tap a player to {mode === 'auction' ? 'put them on the block' : 'send them to the active side'}.
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Auto-pick button */}
-      <div className="flex justify-center">
-        <button
-          onClick={handleAutoPick}
-          disabled={isPaused || availablePlayers.length === 0}
-          className="px-4 py-2 text-sm text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Auto-pick (Best Available)
-        </button>
+              <DraftStatusPill tone="usa">{availablePlayers.length} Left</DraftStatusPill>
+            </div>
+          </div>
+
+          <div className="px-[var(--space-3)] py-[var(--space-3)]">
+            {availablePlayers.length === 0 ? (
+              <div className="rounded-[1.25rem] border border-dashed border-[color:var(--rule)]/75 bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-6)] text-center">
+                <p className="type-title-sm text-[var(--ink)]">The board is clear</p>
+                <p className="mt-[var(--space-2)] type-caption">
+                  Every available player has been claimed.
+                </p>
+              </div>
+            ) : (
+              availablePlayers.map((player, index) => (
+                <DraftPlayerButton
+                  key={player.id}
+                  player={player}
+                  isAuction={mode === 'auction'}
+                  isSelected={selectedPlayer === player.id}
+                  disabled={isPaused}
+                  onClick={() => {
+                    if (mode === 'auction') {
+                      setSelectedPlayer(player.id);
+                      setCurrentBid(1);
+                    } else {
+                      handlePick(player.id);
+                    }
+                  }}
+                  className={index > 0 ? 'mt-[var(--space-2)]' : undefined}
+                />
+              ))
+            )}
+          </div>
+
+          <div className="border-t border-[var(--rule)] bg-[var(--canvas-sunken)] px-[var(--space-5)] py-[var(--space-4)]">
+            <Button
+              variant="secondary"
+              onClick={handleAutoPick}
+              disabled={isPaused || availablePlayers.length === 0}
+              className="w-full justify-center"
+            >
+              Auto-pick best available
+            </Button>
+          </div>
+        </section>
+
+        <div className="space-y-[var(--space-4)]">
+          {teams.map((team) => (
+            <DraftTeamPanel
+              key={team.id}
+              team={team}
+              players={getTeamPlayers(team.id)}
+              isCurrent={currentTeam?.id === team.id}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
+}
+
+function DraftFactCard({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
+      <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+      <p
+        className={cn(
+          'mt-[var(--space-2)] font-serif text-[1.7rem] italic leading-none text-[var(--ink)]',
+          valueClassName
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function DraftModeCard({
+  icon,
+  eyebrow,
+  title,
+  description,
+  detail,
+  onClick,
+}: {
+  icon: ReactNode;
+  eyebrow: string;
+  title: string;
+  description: string;
+  detail: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="card-premium card-interactive w-full p-[var(--space-5)] text-left"
+    >
+      <div className="flex items-start justify-between gap-[var(--space-4)]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 text-[var(--gold-dark)]">
+          {icon}
+        </div>
+        <ArrowRight size={18} className="mt-[var(--space-1)] text-[var(--ink-tertiary)]" />
+      </div>
+      <p className="mt-[var(--space-5)] type-overline text-[var(--ink-tertiary)]">{eyebrow}</p>
+      <h3 className="mt-[var(--space-2)] type-title-lg text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">{description}</p>
+      <p className="mt-[var(--space-4)] type-caption">{detail}</p>
+    </button>
+  );
+}
+
+function DraftStatusPill({
+  tone,
+  children,
+}: {
+  tone: Team['color'];
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center rounded-full border px-[var(--space-3)] py-[var(--space-2)]',
+        teamToneStyles[tone].badge
+      )}
+    >
+      <span className="type-caption font-semibold">{children}</span>
+    </div>
+  );
+}
+
+function DraftPlayerButton({
+  player,
+  isAuction,
+  isSelected,
+  disabled,
+  onClick,
+  className,
+}: {
+  player: Player;
+  isAuction: boolean;
+  isSelected: boolean;
+  disabled: boolean;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'w-full rounded-[1.25rem] border px-[var(--space-4)] py-[var(--space-4)] text-left transition-all',
+        isSelected
+          ? 'border-[color:var(--success)]/30 bg-[color:var(--success)]/10'
+          : 'border-[var(--rule)] bg-[var(--canvas)] hover:border-[color:var(--gold)]/22 hover:bg-[var(--canvas-raised)]',
+        disabled && 'cursor-not-allowed opacity-50',
+        className
+      )}
+    >
+      <div className="flex items-start justify-between gap-[var(--space-3)]">
+        <div className="min-w-0">
+          <div className="flex items-center gap-[var(--space-2)]">
+            <User size={15} className="shrink-0 text-[var(--ink-tertiary)]" />
+            <p className="type-title-sm truncate text-[var(--ink)]">
+              {formatPlayerName(player.firstName, player.lastName)}
+            </p>
+          </div>
+          <p className="mt-[var(--space-2)] type-caption">
+            Handicap {player.handicapIndex?.toFixed(1) ?? '—'}
+          </p>
+        </div>
+
+        <div className="flex flex-col items-end gap-[var(--space-2)]">
+          <span className="inline-flex items-center rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-2)] py-[5px] text-[0.72rem] font-semibold text-[var(--ink-secondary)]">
+            HCP {player.handicapIndex?.toFixed(1) ?? '—'}
+          </span>
+          <span className="type-caption font-semibold text-[var(--ink-secondary)]">
+            {isAuction ? 'Bid' : 'Draft'}
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function DraftTeamPanel({
+  team,
+  players,
+  isCurrent,
+}: {
+  team: Team;
+  players: Player[];
+  isCurrent: boolean;
+}) {
+  const tone = teamToneStyles[team.color];
+  const totalHandicap = calculateTeamHandicapTotal(players);
+
+  return (
+    <section
+      className={cn(
+        'overflow-hidden rounded-[1.8rem] border shadow-[0_16px_34px_rgba(46,34,18,0.06)]',
+        tone.panel,
+        isCurrent && 'ring-2 ring-[color:var(--gold)]/22'
+      )}
+    >
+      <div className="border-b border-[color:var(--rule)]/75 px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="flex items-start justify-between gap-[var(--space-4)]">
+          <div>
+            <p className={cn('type-overline tracking-[0.16em]', tone.eyebrow)}>
+              {isCurrent ? 'Active Side' : 'Roster'}
+            </p>
+            <h3 className="mt-[var(--space-2)] type-title-lg text-[var(--ink)]">{team.name}</h3>
+          </div>
+          <DraftStatusPill tone={team.color}>{players.length} Players</DraftStatusPill>
+        </div>
+
+        <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-3)]">
+          <DraftFactCard
+            label="Roster"
+            value={players.length}
+            valueClassName="font-sans text-[1rem] not-italic"
+          />
+          <DraftFactCard
+            label="Total HCP"
+            value={players.length > 0 ? totalHandicap.toFixed(1) : '—'}
+            valueClassName="font-sans text-[1rem] not-italic"
+          />
+        </div>
+      </div>
+
+      <div className="px-[var(--space-3)] py-[var(--space-3)]">
+        {players.length === 0 ? (
+          <div className="rounded-[1.2rem] border border-dashed border-[color:var(--rule)]/75 bg-[rgba(255,255,255,0.58)] px-[var(--space-4)] py-[var(--space-5)] text-center">
+            <p className="type-title-sm text-[var(--ink)]">No players yet</p>
+            <p className="mt-[var(--space-2)] type-caption">
+              The first pick will define the look of this side.
+            </p>
+          </div>
+        ) : (
+          players.map((player, index) => (
+            <div
+              key={player.id}
+              className={cn(
+                'rounded-[1.15rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.78)] px-[var(--space-4)] py-[var(--space-3)]',
+                index > 0 ? 'mt-[var(--space-2)]' : undefined
+              )}
+            >
+              <div className="flex items-center justify-between gap-[var(--space-3)]">
+                <p className="type-title-sm truncate text-[var(--ink)]">
+                  {formatPlayerName(player.firstName, player.lastName)}
+                </p>
+                <span className="type-caption font-semibold text-[var(--ink-secondary)]">
+                  HCP {player.handicapIndex?.toFixed(1) ?? '—'}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+function getModeLabel(mode: DraftMode) {
+  switch (mode) {
+    case 'snake':
+      return 'Snake Draft';
+    case 'auction':
+      return 'Auction Draft';
+    case 'random':
+      return 'Random Draw';
+    case 'balanced':
+      return 'Auto-Balance';
+  }
 }
 
 export default DraftBoard;
