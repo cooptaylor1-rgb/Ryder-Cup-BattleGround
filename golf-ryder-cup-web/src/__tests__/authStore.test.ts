@@ -139,4 +139,99 @@ describe('authStore syncSupabaseSession', () => {
       hasResolvedSupabaseSession: true,
     });
   });
+
+  it('creates a profile using the linked Supabase email when one is present', async () => {
+    useAuthStore.setState({
+      authEmail: 'linked@example.com',
+      authUserId: 'supabase-user-1',
+    });
+
+    const profile = await useAuthStore.getState().createProfile(
+      {
+        firstName: 'Linked',
+        lastName: 'User',
+        email: 'different@example.com',
+      },
+      '1234'
+    );
+
+    expect(profile.email).toBe('linked@example.com');
+    expect(useAuthStore.getState()).toMatchObject({
+      currentUser: expect.objectContaining({ email: 'linked@example.com' }),
+      isAuthenticated: true,
+    });
+
+    const storedUsers = JSON.parse(localStorageMock.getItem('golf-app-users') ?? '{}');
+    expect(Object.values(storedUsers)).toEqual([
+      expect.objectContaining({
+        profile: expect.objectContaining({ email: 'linked@example.com' }),
+      }),
+    ]);
+  });
+
+  it('rejects profile email changes that diverge from the linked Supabase account', async () => {
+    const localProfile = createProfile();
+
+    localStorageMock.setItem(
+      'golf-app-users',
+      JSON.stringify({
+        [localProfile.id]: {
+          profile: localProfile,
+          pin: 'hashed-pin',
+        },
+      })
+    );
+
+    useAuthStore.setState({
+      currentUser: localProfile,
+      isAuthenticated: true,
+      authEmail: localProfile.email,
+      authUserId: 'supabase-user-1',
+    });
+
+    await expect(
+      useAuthStore.getState().updateProfile({ email: 'other@example.com' })
+    ).rejects.toThrow('Email is managed by your signed-in account');
+
+    expect(useAuthStore.getState()).toMatchObject({
+      currentUser: localProfile,
+      error: 'Email is managed by your signed-in account',
+    });
+  });
+
+  it('rejects duplicate email updates even without a linked Supabase session', async () => {
+    const localProfile = createProfile();
+    const existingProfile = createProfile({
+      id: 'player-2',
+      email: 'existing@example.com',
+    });
+
+    localStorageMock.setItem(
+      'golf-app-users',
+      JSON.stringify({
+        [localProfile.id]: {
+          profile: localProfile,
+          pin: 'hashed-pin',
+        },
+        [existingProfile.id]: {
+          profile: existingProfile,
+          pin: 'hashed-pin',
+        },
+      })
+    );
+
+    useAuthStore.setState({
+      currentUser: localProfile,
+      isAuthenticated: true,
+    });
+
+    await expect(
+      useAuthStore.getState().updateProfile({ email: existingProfile.email })
+    ).rejects.toThrow('An account with this email already exists');
+
+    expect(useAuthStore.getState()).toMatchObject({
+      currentUser: localProfile,
+      error: 'An account with this email already exists',
+    });
+  });
 });

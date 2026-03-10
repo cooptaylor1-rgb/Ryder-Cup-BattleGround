@@ -75,7 +75,7 @@ const initialFormData: FormData = {
 function CreateProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError } =
+  const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError, authEmail } =
     useAuthStore();
   const { showToast } = useUIStore();
 
@@ -94,6 +94,17 @@ function CreateProfilePageContent() {
       router.push(nextPath || '/');
     }
   }, [isAuthenticated, currentUser, router, searchParams]);
+
+  useEffect(() => {
+    if (!authEmail) {
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      email: authEmail,
+    }));
+  }, [authEmail]);
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -353,7 +364,12 @@ function CreateProfilePageContent() {
                   error={validationErrors.email}
                   required
                   icon={<Mail className="w-5 h-5" />}
-                  hint="Used for trip invites"
+                  hint={
+                    authEmail
+                      ? 'Locked to your signed-in account email'
+                      : 'Used for trip invites'
+                  }
+                  disabled={Boolean(authEmail)}
                 />
               </div>
 
@@ -948,6 +964,7 @@ interface InputFieldProps {
   icon?: React.ReactNode;
   inputMode?: 'text' | 'numeric' | 'tel' | 'email';
   maxLength?: number;
+  disabled?: boolean;
 }
 
 function InputField({
@@ -963,6 +980,7 @@ function InputField({
   icon,
   inputMode,
   maxLength,
+  disabled,
 }: InputFieldProps) {
   return (
     <div>
@@ -1006,25 +1024,35 @@ function InputField({
           autoFocus={autoFocus}
           inputMode={inputMode}
           maxLength={maxLength}
+          disabled={disabled}
+          readOnly={disabled}
           style={{
             width: '100%',
             padding: icon ? '14px 16px 14px 44px' : '14px 16px',
             fontFamily: 'var(--font-sans)',
             fontSize: 'var(--text-base)',
             color: 'var(--ink)',
-            background: 'var(--canvas-raised)',
+            background: disabled ? 'var(--surface)' : 'var(--canvas-raised)',
             border: error
               ? '1px solid var(--error)'
               : '1px solid var(--rule)',
             borderRadius: 'var(--radius-md)',
             outline: 'none',
             transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            opacity: disabled ? 0.8 : 1,
+            cursor: disabled ? 'not-allowed' : 'text',
           }}
           onFocus={(e) => {
+            if (disabled) {
+              return;
+            }
             e.currentTarget.style.borderColor = 'var(--masters)';
             e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,102,68,0.1)';
           }}
           onBlur={(e) => {
+            if (disabled) {
+              return;
+            }
             e.currentTarget.style.borderColor = error ? 'var(--error)' : 'var(--rule)';
             e.currentTarget.style.boxShadow = 'none';
           }}

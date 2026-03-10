@@ -31,7 +31,8 @@ const logger = createLogger('profile');
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { currentUser, isAuthenticated, updateProfile, logout, isLoading } = useAuthStore();
+  const { currentUser, isAuthenticated, updateProfile, logout, isLoading, authEmail } =
+    useAuthStore();
   const { showToast } = useUIStore();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -263,6 +264,8 @@ export default function ProfilePage() {
                 isEditing={isEditing}
                 onChange={(v) => setFormData((prev) => ({ ...prev, email: v }))}
                 type="email"
+                disabled={Boolean(authEmail)}
+                hint={authEmail ? 'Managed by your signed-in account' : undefined}
               />
               <ProfileField
                 icon={<Phone className="w-4 h-4" />}
@@ -558,6 +561,8 @@ interface ProfileFieldProps {
   min?: number;
   max?: number;
   step?: number;
+  disabled?: boolean;
+  hint?: string;
 }
 
 function ProfileField({
@@ -570,6 +575,8 @@ function ProfileField({
   min,
   max,
   step,
+  disabled = false,
+  hint,
 }: ProfileFieldProps) {
   return (
     <div>
@@ -585,11 +592,18 @@ function ProfileField({
           min={min}
           max={max}
           step={step}
-          className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-sans text-[length:var(--text-base)] text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)]"
+          disabled={disabled}
+          readOnly={disabled}
+          className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-sans text-[length:var(--text-base)] text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)] disabled:cursor-not-allowed disabled:bg-[var(--surface)] disabled:text-ink-secondary"
         />
       ) : (
         <p className="font-sans text-[length:var(--text-base)] text-ink m-0 leading-[1.5]">
           {value || '\u2014'}
+        </p>
+      )}
+      {hint && (
+        <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-1)] leading-[1.4]">
+          {hint}
         </p>
       )}
     </div>

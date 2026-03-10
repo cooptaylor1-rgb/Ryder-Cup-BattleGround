@@ -72,6 +72,11 @@ const generateId = (): string => {
   return crypto.randomUUID();
 };
 
+function normalizeEmail(email?: string | null): string | null {
+  const normalized = email?.trim().toLowerCase();
+  return normalized ? normalized : null;
+}
+
 function readStoredUsers(): Record<string, { profile: UserProfile; pin: string }> {
   const storedUsers = localStorage.getItem('golf-app-users');
   if (!storedUsers) {
@@ -87,17 +92,47 @@ function readStoredUsers(): Record<string, { profile: UserProfile; pin: string }
 }
 
 function findStoredUserByEmail(email?: string | null): UserProfile | null {
-  if (!email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) {
     return null;
   }
 
-  const normalizedEmail = email.toLowerCase();
   const users = readStoredUsers();
   const userEntry = Object.values(users).find(
-    (user) => user.profile.email?.toLowerCase() === normalizedEmail
+    (user) => normalizeEmail(user.profile.email) === normalizedEmail
   );
 
   return userEntry?.profile ?? null;
+}
+
+function ensureUniqueEmail(
+  users: Record<string, { profile: UserProfile; pin: string }>,
+  email: string,
+  excludedUserId?: string
+): void {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) {
+    throw new Error('Email is required');
+  }
+
+  const existingUser = Object.values(users).find(
+    (user) =>
+      user.profile.id !== excludedUserId && normalizeEmail(user.profile.email) === normalizedEmail
+  );
+
+  if (existingUser) {
+    throw new Error('An account with this email already exists');
+  }
+}
+
+function resolveProfileEmail(profileEmail: string | undefined, authEmail: string | null): string {
+  const normalizedEmail = normalizeEmail(authEmail) ?? normalizeEmail(profileEmail);
+
+  if (!normalizedEmail) {
+    throw new Error('Email is required');
+  }
+
+  return normalizedEmail;
 }
 
 // ============================================
@@ -214,35 +249,28 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
+          const { authEmail } = get();
           const now = new Date().toISOString();
           const id = generateId();
+          const users = readStoredUsers();
+          const resolvedEmail = resolveProfileEmail(profileData.email, authEmail);
+
+          ensureUniqueEmail(users, resolvedEmail);
 
           const profile: UserProfile = {
             ...profileData,
             id,
+            email: resolvedEmail,
             isProfileComplete: !!(
               profileData.firstName &&
               profileData.lastName &&
-              profileData.email &&
+              resolvedEmail &&
               profileData.handicapIndex !== undefined
             ),
             hasCompletedOnboarding: false,
             createdAt: now,
             updatedAt: now,
           };
-
-          // Save to local users storage
-          const users = readStoredUsers();
-
-          // Check if email already exists
-          const existingUser = Object.values(users).find(
-            (u) => u.profile.email?.toLowerCase() === profile.email?.toLowerCase()
-          );
-
-          if (existingUser) {
-            set({ isLoading: false, error: 'An account with this email already exists' });
-            throw new Error('An account with this email already exists');
-          }
 
           // Hash the PIN before storage (never store plain text)
           const hashedPin = await hashPin(pin);
@@ -281,30 +309,40 @@ export const useAuthStore = create<AuthState>()(
 
       // Update existing profile
       updateProfile: async (updates) => {
-        const { currentUser } = get();
+        const { currentUser, authEmail } = get();
         if (!currentUser) {
           set({ error: 'No user logged in' });
-          return;
+          throw new Error('No user logged in');
         }
 
         set({ isLoading: true, error: null });
 
         try {
+          const users = readStoredUsers();
+          const normalizedAuthEmail = normalizeEmail(authEmail);
+          const requestedEmail = normalizeEmail(updates.email ?? currentUser.email);
+
+          if (normalizedAuthEmail && requestedEmail !== normalizedAuthEmail) {
+            throw new Error('Email is managed by your signed-in account');
+          }
+
+          const resolvedEmail = resolveProfileEmail(updates.email ?? currentUser.email, authEmail);
+          ensureUniqueEmail(users, resolvedEmail, currentUser.id);
+
           const updatedProfile: UserProfile = {
             ...currentUser,
             ...updates,
+            email: resolvedEmail,
             updatedAt: new Date().toISOString(),
             isProfileComplete: !!(
               (updates.firstName ?? currentUser.firstName) &&
               (updates.lastName ?? currentUser.lastName) &&
-              (updates.email ?? currentUser.email) &&
+              resolvedEmail &&
               (updates.handicapIndex ?? currentUser.handicapIndex) !== undefined
             ),
           };
 
           // Update local users storage
-          const users = readStoredUsers();
-
           if (users[currentUser.id]) {
             users[currentUser.id].profile = updatedProfile;
             localStorage.setItem('golf-app-users', JSON.stringify(users));
@@ -326,10 +364,12 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
         } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to update profile';
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to update profile',
+            error: message,
           });
+          throw new Error(message);
         }
       },
 
