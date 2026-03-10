@@ -1,50 +1,44 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
-import { createLogger } from '@/lib/utils/logger';
 import {
-  createBulkDues,
-  markAsPaid,
-} from '@/lib/services/duesService';
-import type { DuesCategory, PlayerFinancialSummary, TripFinancialSummary } from '@/lib/types/finances';
-import { DUES_CATEGORIES } from '@/lib/types/finances';
-import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
-import {
-  DollarSign,
-  CheckCircle2,
   AlertCircle,
+  Car,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
-  Users,
-  Flag,
-  Car,
-  Home,
-  UtensilsCrossed,
   Coins,
-  Receipt,
+  DollarSign,
+  Flag,
+  Home,
   Plus,
+  Receipt,
+  Users,
+  UtensilsCrossed,
 } from 'lucide-react';
-
-/**
- * FINANCES PAGE -- Trip Expense Tracker
- *
- * Fried Egg Golf Editorial Design:
- * - Cream canvas, warm ink, generous whitespace
- * - Serif for monumental dollar amounts
- * - Sans for UI, captions, form labels
- * - Captain-managed charges, player-visible ledger
- */
+import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import { db } from '@/lib/db';
+import { createBulkDues, markAsPaid } from '@/lib/services/duesService';
+import { useTripStore, useUIStore } from '@/lib/stores';
+import { createLogger } from '@/lib/utils/logger';
+import type {
+  DuesCategory,
+  DuesLineItem,
+  PaymentRecord,
+  PlayerFinancialSummary,
+  TripFinancialSummary,
+} from '@/lib/types/finances';
+import { DUES_CATEGORIES } from '@/lib/types/finances';
+import { cn } from '@/lib/utils';
 
 type TabType = 'overview' | 'add_charge' | 'payments';
 
 const logger = createLogger('finances');
 
-/** Map icon string names from DUES_CATEGORIES to actual lucide components */
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   Flag,
   Car,
@@ -53,10 +47,10 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; classN
   Coins,
   DollarSign,
   Receipt,
-  Gavel: Receipt, // fallback — Gavel is not commonly available
+  Gavel: Receipt,
 };
 
-function formatCents(cents: number): string {
+function formatCents(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
@@ -66,20 +60,20 @@ export default function FinancesPage() {
   const { isCaptainMode, showToast } = useUIStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // --- Add Charge form state ---
   const [chargeCategory, setChargeCategory] = useState<DuesCategory>('green_fee');
   const [chargeDescription, setChargeDescription] = useState('');
   const [chargeAmount, setChargeAmount] = useState('');
   const [applyToAll, setApplyToAll] = useState(true);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
 
-  // Reactive queries
   const duesItems = useLiveQuery(
     async () => {
-      if (!currentTrip) return [];
+      if (!currentTrip) {
+        return [];
+      }
+
       return db.duesLineItems.where('tripId').equals(currentTrip.id).toArray();
     },
     [currentTrip?.id],
@@ -88,37 +82,40 @@ export default function FinancesPage() {
 
   const paymentRecords = useLiveQuery(
     async () => {
-      if (!currentTrip) return [];
+      if (!currentTrip) {
+        return [];
+      }
+
       return db.paymentRecords.where('tripId').equals(currentTrip.id).toArray();
     },
     [currentTrip?.id],
     []
   );
 
-  // Compute financial summary from live data
-  const summary: TripFinancialSummary | undefined = useMemo(() => {
-    if (!currentTrip || !duesItems) return undefined;
+  const summary = useMemo<TripFinancialSummary | undefined>(() => {
+    if (!currentTrip || !duesItems) {
+      return undefined;
+    }
+
     const playerSummaries: PlayerFinancialSummary[] = players.map((player) => {
-      const items = duesItems.filter((d) => d.playerId === player.id);
-      const playerPayments = (paymentRecords ?? []).filter((p) => p.fromPlayerId === player.id);
-      const totalDues = items.reduce((sum, d) => sum + d.amount, 0);
-      const totalPaid = items.reduce((sum, d) => sum + d.amountPaid, 0);
+      const lineItems = duesItems.filter((item) => item.playerId === player.id);
+      const payments = (paymentRecords ?? []).filter((payment) => payment.fromPlayerId === player.id);
+      const totalDues = lineItems.reduce((sum, item) => sum + item.amount, 0);
+      const totalPaid = lineItems.reduce((sum, item) => sum + item.amountPaid, 0);
+
       return {
         playerId: player.id,
-        playerName: `${player.firstName}${player.lastName ? ' ' + player.lastName : ''}`,
+        playerName: `${player.firstName}${player.lastName ? ` ${player.lastName}` : ''}`,
         totalDues,
         totalPaid,
         balance: totalDues - totalPaid,
-        lineItems: items,
-        payments: playerPayments,
+        lineItems,
+        payments,
       };
     });
 
-    const totalCollectable = playerSummaries.reduce((s, p) => s + p.totalDues, 0);
-    const totalCollected = playerSummaries.reduce((s, p) => s + p.totalPaid, 0);
-    const delinquent = playerSummaries
-      .filter((p) => p.balance > 0)
-      .sort((a, b) => b.balance - a.balance);
+    const totalCollectable = playerSummaries.reduce((sum, playerSummary) => sum + playerSummary.totalDues, 0);
+    const totalCollected = playerSummaries.reduce((sum, playerSummary) => sum + playerSummary.totalPaid, 0);
 
     return {
       tripId: currentTrip.id,
@@ -126,15 +123,17 @@ export default function FinancesPage() {
       totalCollected,
       outstandingBalance: totalCollectable - totalCollected,
       playerSummaries,
-      delinquent,
+      delinquent: playerSummaries.filter((playerSummary) => playerSummary.balance > 0).sort((left, right) => right.balance - left.balance),
       isFullySettled: totalCollectable > 0 && totalCollectable === totalCollected,
     };
   }, [currentTrip, duesItems, paymentRecords, players]);
 
-  // Handlers
   const handleMarkPaid = useCallback(
     async (lineItemId: string) => {
-      if (isSubmitting) return;
+      if (isSubmitting) {
+        return;
+      }
+
       setIsSubmitting(true);
       try {
         await markAsPaid(lineItemId, 'cash', 'captain');
@@ -150,19 +149,22 @@ export default function FinancesPage() {
   );
 
   const handleAddCharge = useCallback(async () => {
-    if (!currentTrip || isSubmitting) return;
+    if (!currentTrip || isSubmitting) {
+      return;
+    }
 
-    const amountDollars = parseFloat(chargeAmount);
+    const parsedAmount = parseFloat(chargeAmount);
     if (!chargeDescription.trim()) {
       showToast('error', 'Please enter a description');
       return;
     }
-    if (isNaN(amountDollars) || amountDollars <= 0) {
+
+    if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
       showToast('error', 'Please enter a valid amount');
       return;
     }
 
-    const targetPlayerIds = applyToAll ? players.map((p) => p.id) : selectedPlayerIds;
+    const targetPlayerIds = applyToAll ? players.map((player) => player.id) : selectedPlayerIds;
     if (targetPlayerIds.length === 0) {
       showToast('error', 'Please select at least one player');
       return;
@@ -170,21 +172,19 @@ export default function FinancesPage() {
 
     setIsSubmitting(true);
     try {
-      const amountCents = Math.round(amountDollars * 100);
       await createBulkDues(
         currentTrip.id,
         targetPlayerIds,
         chargeCategory,
         chargeDescription.trim(),
-        amountCents,
-        'captain', // simplified — real app uses auth context
+        Math.round(parsedAmount * 100),
+        'captain'
       );
 
-      showToast('success', `Charge added for ${targetPlayerIds.length} player${targetPlayerIds.length > 1 ? 's' : ''}`);
-      // Reset form
+      showToast('success', `Charge added for ${targetPlayerIds.length} player${targetPlayerIds.length === 1 ? '' : 's'}`);
+      setChargeCategory('green_fee');
       setChargeDescription('');
       setChargeAmount('');
-      setChargeCategory('green_fee');
       setApplyToAll(true);
       setSelectedPlayerIds([]);
       setActiveTab('overview');
@@ -194,15 +194,13 @@ export default function FinancesPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [currentTrip, isSubmitting, chargeAmount, chargeDescription, chargeCategory, applyToAll, selectedPlayerIds, players, showToast]);
+  }, [applyToAll, chargeAmount, chargeCategory, chargeDescription, currentTrip, isSubmitting, players, selectedPlayerIds, showToast]);
 
   const togglePlayerSelection = useCallback((playerId: string) => {
-    setSelectedPlayerIds((prev) =>
-      prev.includes(playerId) ? prev.filter((id) => id !== playerId) : [...prev, playerId]
+    setSelectedPlayerIds((current) =>
+      current.includes(playerId) ? current.filter((id) => id !== playerId) : [...current, playerId]
     );
   }, []);
-
-  // --- Early returns for missing states ---
 
   if (!currentTrip) {
     return (
@@ -211,14 +209,19 @@ export default function FinancesPage() {
           title="Finances"
           subtitle="No active trip"
           icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
+          iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           onBack={() => router.back()}
         />
+
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
             title="No active trip"
-            description="Start or select a trip to track finances."
-            action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            description="Start or select a trip before opening the ledger."
+            action={{
+              label: 'Back home',
+              onClick: () => router.push('/'),
+            }}
             variant="large"
           />
         </main>
@@ -227,17 +230,13 @@ export default function FinancesPage() {
   }
 
   if (!summary) {
-    return <PageLoadingSkeleton title="Finances" showBackButton variant="default" />;
+    return <PageLoadingSkeleton title="Finances" showBackButton variant="list" />;
   }
 
-  const hasDues = duesItems && duesItems.length > 0;
-  const paidCount = summary.playerSummaries.filter((p) => p.totalDues > 0 && p.balance === 0).length;
-  const owingCount = summary.playerSummaries.filter((p) => p.totalDues > 0).length;
-  const progressPct = summary.totalCollectable > 0
-    ? Math.round((summary.totalCollected / summary.totalCollectable) * 100)
-    : 0;
-
-  // Charge preview for the Add Charge form
+  const hasDues = duesItems.length > 0;
+  const owingPlayers = summary.playerSummaries.filter((playerSummary) => playerSummary.totalDues > 0).length;
+  const settledPlayers = summary.playerSummaries.filter((playerSummary) => playerSummary.totalDues > 0 && playerSummary.balance === 0).length;
+  const collectionProgress = summary.totalCollectable > 0 ? Math.round((summary.totalCollected / summary.totalCollectable) * 100) : 0;
   const chargeAmountCents = Math.round((parseFloat(chargeAmount) || 0) * 100);
   const chargeTargetCount = applyToAll ? players.length : selectedPlayerIds.length;
   const chargeTotalCents = chargeAmountCents * chargeTargetCount;
@@ -248,380 +247,369 @@ export default function FinancesPage() {
         title="Finances"
         subtitle={currentTrip.name}
         icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         onBack={() => router.back()}
+        rightSlot={
+          isCaptainMode ? (
+            <Button variant="outline" size="sm" leftIcon={<Plus size={14} />} onClick={() => setActiveTab('add_charge')}>
+              Charge
+            </Button>
+          ) : undefined
+        }
       />
 
-      {/* Tab Navigation */}
-      <div className="sticky top-0 z-10 bg-[var(--canvas)] border-b border-[var(--rule)]">
-        <div className="container-editorial">
-          <div className="flex gap-1 py-[var(--space-2)]">
-            <TabButton
-              active={activeTab === 'overview'}
-              onClick={() => setActiveTab('overview')}
-              icon={<DollarSign size={16} />}
-              label="Overview"
-            />
-            {isCaptainMode && (
-              <TabButton
-                active={activeTab === 'add_charge'}
-                onClick={() => setActiveTab('add_charge')}
-                icon={<Plus size={16} />}
-                label="Add Charge"
-              />
-            )}
-            <TabButton
-              active={activeTab === 'payments'}
-              onClick={() => setActiveTab('payments')}
-              icon={<Receipt size={16} />}
-              label="Payments"
-            />
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--masters)]/14 bg-[linear-gradient(135deg,rgba(10,80,48,0.97),rgba(4,52,30,0.98))] text-[var(--canvas)] shadow-[0_28px_64px_rgba(5,58,35,0.22)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.2fr)_18rem]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/72">Ledger Room</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--canvas)]">
+                Money should feel organized long before the settlement text starts.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[color:var(--canvas)]/80">
+                The point of this room is not complexity. It is calm. Green fees, carts, lodging, and side expenses
+                should sit in one clean ledger instead of leaking into a dozen awkward conversations.
+              </p>
+            </div>
+
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <FinanceFactCard label="Collected" value={formatCents(summary.totalCollected)} detail="Confirmed money already on the books." />
+              <FinanceFactCard label="Outstanding" value={formatCents(summary.outstandingBalance)} detail="Still sitting out in the group." />
+              <FinanceFactCard label="Settled players" value={`${settledPlayers}/${owingPlayers || players.length}`} detail="How many people are actually done." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <main className="container-editorial">
+        <section className="mt-[var(--space-6)] flex flex-wrap gap-[var(--space-3)]">
+          <FinanceTabButton active={activeTab === 'overview'} label="Overview" icon={<DollarSign size={15} />} onClick={() => setActiveTab('overview')} />
+          {isCaptainMode ? (
+            <FinanceTabButton active={activeTab === 'add_charge'} label="Add charge" icon={<Plus size={15} />} onClick={() => setActiveTab('add_charge')} />
+          ) : null}
+          <FinanceTabButton active={activeTab === 'payments'} label="Payments" icon={<Receipt size={15} />} onClick={() => setActiveTab('payments')} />
+        </section>
+
         {activeTab === 'overview' ? (
-          <>
-            {/* Summary Card */}
-            {hasDues ? (
-              <SummaryCard
-                summary={summary}
-                paidCount={paidCount}
-                owingCount={owingCount}
-                progressPct={progressPct}
-              />
-            ) : null}
-
-            {/* Per-player list or empty state */}
-            {hasDues ? (
-              <OverviewTab
-                summary={summary}
-                expandedPlayer={expandedPlayer}
-                setExpandedPlayer={setExpandedPlayer}
-                onMarkPaid={handleMarkPaid}
-                isCaptainMode={isCaptainMode}
-                isSubmitting={isSubmitting}
-              />
-            ) : (
-              <section className="section pt-[var(--space-8)]">
+          <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.14fr)_18rem]">
+            <div className="space-y-[var(--space-4)]">
+              {hasDues ? (
+                <LedgerSummaryPanel
+                  totalCollectable={summary.totalCollectable}
+                  totalCollected={summary.totalCollected}
+                  progress={collectionProgress}
+                  settledPlayers={settledPlayers}
+                  owingPlayers={owingPlayers}
+                  isFullySettled={summary.isFullySettled}
+                  outstandingBalance={summary.outstandingBalance}
+                />
+              ) : (
                 <EmptyStatePremium
                   illustration="golf-ball"
                   title="No charges yet"
-                  description="Add green fees, cart fees, and other expenses to track who owes what."
+                  description="The ledger is empty. Add the first green fee, cart bill, or lodging split when the captain is ready."
                   action={
                     isCaptainMode
                       ? {
-                          label: 'Add First Charge',
+                          label: 'Add first charge',
                           onClick: () => setActiveTab('add_charge'),
-                          icon: <Plus size={18} />,
+                          icon: <Plus size={16} />,
                         }
                       : undefined
                   }
                   variant="large"
                 />
-              </section>
-            )}
-          </>
-        ) : activeTab === 'add_charge' && isCaptainMode ? (
-          <AddChargeTab
-            chargeCategory={chargeCategory}
-            setChargeCategory={setChargeCategory}
-            chargeDescription={chargeDescription}
-            setChargeDescription={setChargeDescription}
-            chargeAmount={chargeAmount}
-            setChargeAmount={setChargeAmount}
-            applyToAll={applyToAll}
-            setApplyToAll={setApplyToAll}
-            selectedPlayerIds={selectedPlayerIds}
-            togglePlayerSelection={togglePlayerSelection}
-            players={players}
-            chargeTargetCount={chargeTargetCount}
-            chargeTotalCents={chargeTotalCents}
-            onSubmit={handleAddCharge}
-            isSubmitting={isSubmitting}
-          />
-        ) : (
-          <PaymentsTab paymentRecords={paymentRecords ?? []} players={players} />
-        )}
-      </main>
+              )}
 
+              {hasDues ? (
+                <section className="space-y-[var(--space-3)]">
+                  {summary.playerSummaries
+                    .filter((playerSummary) => playerSummary.totalDues > 0)
+                    .map((playerSummary) => (
+                      <PlayerLedgerCard
+                        key={playerSummary.playerId}
+                        playerSummary={playerSummary}
+                        expanded={expandedPlayerId === playerSummary.playerId}
+                        onToggle={() =>
+                          setExpandedPlayerId((current) => (current === playerSummary.playerId ? null : playerSummary.playerId))
+                        }
+                        onMarkPaid={handleMarkPaid}
+                        isCaptainMode={isCaptainMode}
+                        isSubmitting={isSubmitting}
+                      />
+                    ))}
+                </section>
+              ) : null}
+            </div>
+
+            <aside className="space-y-[var(--space-4)]">
+              <SidebarNote
+                title="The best ledger feels dull"
+                body="If the money room is exciting, something already went wrong. Calmness is the design goal here."
+              />
+              <SidebarNote
+                title="Captains need one charging desk"
+                body="Charges should originate from one composed place instead of popping up ad hoc around the app."
+                tone="green"
+              />
+            </aside>
+          </section>
+        ) : null}
+
+        {activeTab === 'add_charge' && isCaptainMode ? (
+          <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.08fr)_18rem]">
+            <ChargeComposer
+              chargeCategory={chargeCategory}
+              setChargeCategory={setChargeCategory}
+              chargeDescription={chargeDescription}
+              setChargeDescription={setChargeDescription}
+              chargeAmount={chargeAmount}
+              setChargeAmount={setChargeAmount}
+              applyToAll={applyToAll}
+              setApplyToAll={setApplyToAll}
+              selectedPlayerIds={selectedPlayerIds}
+              players={players}
+              togglePlayerSelection={togglePlayerSelection}
+              chargeTargetCount={chargeTargetCount}
+              chargeTotalCents={chargeTotalCents}
+              onSubmit={handleAddCharge}
+              isSubmitting={isSubmitting}
+            />
+
+            <aside className="space-y-[var(--space-4)]">
+              <SidebarNote
+                title="Charge once, explain once"
+                body="The cleaner the description is at creation time, the fewer settlement questions the captain gets later."
+              />
+              <SidebarNote
+                title="Per-player amounts only"
+                body="This room works best when the unit is always obvious: per-player, then multiplied by the selected group."
+                tone="green"
+              />
+            </aside>
+          </section>
+        ) : null}
+
+        {activeTab === 'payments' ? (
+          <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.12fr)_18rem]">
+            <PaymentsPanel paymentRecords={paymentRecords} players={players} />
+
+            <aside className="space-y-[var(--space-4)]">
+              <SidebarNote
+                title="Receipts need sequence"
+                body="Chronology beats cleverness here. People want to know who paid, when, and by what method."
+              />
+            </aside>
+          </section>
+        ) : null}
+      </main>
     </div>
   );
 }
 
-/* ============================================
-   Tab Button
-   ============================================ */
-function TabButton({
+function FinanceTabButton({
   active,
-  onClick,
-  icon,
   label,
+  icon,
+  onClick,
 }: {
   active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
   label: string;
+  icon: ReactNode;
+  onClick: () => void;
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
+      className={cn(
+        'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
         active
-          ? 'border-0 bg-[var(--masters)] text-[var(--canvas)] font-semibold'
-          : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
-      }`}
-      aria-label={`${label} tab`}
-      aria-selected={active}
-      role="tab"
+          ? 'border-[var(--masters)]/24 bg-[color:var(--masters)]/10 text-[var(--masters)]'
+          : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 text-[var(--ink-secondary)]'
+      )}
     >
       {icon}
-      <span>{label}</span>
+      {label}
     </button>
   );
 }
 
-/* ============================================
-   Summary Card
-   ============================================ */
-function SummaryCard({
-  summary,
-  paidCount,
-  owingCount,
-  progressPct,
+function LedgerSummaryPanel({
+  totalCollectable,
+  totalCollected,
+  progress,
+  settledPlayers,
+  owingPlayers,
+  isFullySettled,
+  outstandingBalance,
 }: {
-  summary: TripFinancialSummary;
-  paidCount: number;
-  owingCount: number;
-  progressPct: number;
+  totalCollectable: number;
+  totalCollected: number;
+  progress: number;
+  settledPlayers: number;
+  owingPlayers: number;
+  isFullySettled: boolean;
+  outstandingBalance: number;
 }) {
   return (
-    <section className="section pt-[var(--space-6)]">
-      <div className="card p-[var(--space-5)]">
-        {/* Collected vs Owed */}
-        <div className="flex items-baseline justify-between mb-[var(--space-3)]">
-          <div>
-            <p className="type-overline mb-[var(--space-1)]">Collected</p>
-            <p
-              className="font-[family-name:var(--font-serif)] text-3xl font-bold text-[var(--masters)]"
-            >
-              {formatCents(summary.totalCollected)}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="type-overline mb-[var(--space-1)]">Total Owed</p>
-            <p
-              className="font-[family-name:var(--font-serif)] text-3xl font-bold text-[var(--ink)]"
-            >
-              {formatCents(summary.totalCollectable)}
-            </p>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full h-3 rounded-[var(--radius-full)] bg-[var(--surface-elevated)] overflow-hidden mb-[var(--space-3)]">
-          <div
-            className={`h-full rounded-[var(--radius-full)] transition-all duration-500 ease-out ${
-              summary.isFullySettled
-                ? 'bg-[var(--success)]'
-                : 'bg-gradient-to-r from-[var(--masters)] to-[var(--masters-deep)]'
-            }`}
-            style={{
-              width: `${progressPct}%`,
-            }}
-          />
-        </div>
-
-        {/* Status line */}
-        <div className="flex items-center justify-between">
-          <p className="type-body-sm text-[var(--ink-secondary)]">
-            {paidCount} of {owingCount} players paid
+    <section className="rounded-[1.85rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+      <div className="flex flex-wrap items-end justify-between gap-[var(--space-4)]">
+        <div>
+          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Collection Progress</p>
+          <p className="mt-[var(--space-2)] font-serif text-[2.4rem] italic leading-none text-[var(--masters)]">
+            {formatCents(totalCollected)}
           </p>
-          {summary.isFullySettled ? (
-            <div className="flex items-center gap-[var(--space-1)]">
-              <CheckCircle2 size={16} className="text-[var(--success)]" />
-              <span className="type-caption font-semibold text-[var(--success)]">Settled</span>
-            </div>
-          ) : (
-            <p className="type-caption text-[var(--ink-tertiary)]">
-              {formatCents(summary.outstandingBalance)} outstanding
-            </p>
-          )}
+          <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">collected of {formatCents(totalCollectable)}</p>
+        </div>
+        <div className="text-right">
+          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Players settled</p>
+          <p className="mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]">
+            {settledPlayers}/{owingPlayers}
+          </p>
         </div>
       </div>
-    </section>
-  );
-}
 
-/* ============================================
-   Overview Tab — Per-Player List
-   ============================================ */
-function OverviewTab({
-  summary,
-  expandedPlayer,
-  setExpandedPlayer,
-  onMarkPaid,
-  isCaptainMode,
-  isSubmitting,
-}: {
-  summary: TripFinancialSummary;
-  expandedPlayer: string | null;
-  setExpandedPlayer: (id: string | null) => void;
-  onMarkPaid: (lineItemId: string) => void;
-  isCaptainMode: boolean;
-  isSubmitting: boolean;
-}) {
-  // Only show players who have dues
-  const playersWithDues = summary.playerSummaries.filter((p) => p.totalDues > 0);
-
-  if (playersWithDues.length === 0) {
-    return (
-      <section className="section-sm">
-        <EmptyStatePremium
-          illustration="golf-ball"
-          title="No player ledger yet"
-          description="Charges exist, but none are currently assigned to active players."
-          variant="compact"
+      <div className="mt-[var(--space-4)] h-3 overflow-hidden rounded-full bg-[var(--surface-raised)]">
+        <div
+          className={cn(
+            'h-full rounded-full transition-all duration-500',
+            isFullySettled ? 'bg-[var(--success)]' : 'bg-[linear-gradient(90deg,var(--masters),var(--masters-deep))]'
+          )}
+          style={{ width: `${progress}%` }}
         />
-      </section>
-    );
-  }
+      </div>
 
-  return (
-    <section className="section-sm">
-      <h2 className="type-overline mb-[var(--space-4)]">Player Ledger</h2>
-      <div className="space-y-2">
-        {playersWithDues.map((ps) => (
-          <PlayerRow
-            key={ps.playerId}
-            playerSummary={ps}
-            isExpanded={expandedPlayer === ps.playerId}
-            onToggle={() =>
-              setExpandedPlayer(expandedPlayer === ps.playerId ? null : ps.playerId)
-            }
-            onMarkPaid={onMarkPaid}
-            isCaptainMode={isCaptainMode}
-            isSubmitting={isSubmitting}
-          />
-        ))}
+      <div className="mt-[var(--space-4)] flex items-center justify-between gap-[var(--space-3)]">
+        <p className="text-sm text-[var(--ink-secondary)]">{progress}% of the ledger collected</p>
+        {isFullySettled ? (
+          <div className="inline-flex items-center gap-2 rounded-full bg-[color:var(--success)]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
+            <CheckCircle2 size={14} />
+            Settled
+          </div>
+        ) : (
+          <p className="text-sm font-medium text-[var(--ink)]">{formatCents(outstandingBalance)} outstanding</p>
+        )}
       </div>
     </section>
   );
 }
 
-/* ============================================
-   Player Row — Expandable Ledger Entry
-   ============================================ */
-function PlayerRow({
+function PlayerLedgerCard({
   playerSummary,
-  isExpanded,
+  expanded,
   onToggle,
   onMarkPaid,
   isCaptainMode,
   isSubmitting,
 }: {
   playerSummary: PlayerFinancialSummary;
-  isExpanded: boolean;
+  expanded: boolean;
   onToggle: () => void;
   onMarkPaid: (lineItemId: string) => void;
   isCaptainMode: boolean;
   isSubmitting: boolean;
 }) {
-  const { playerName, totalDues, totalPaid, balance, lineItems } = playerSummary;
-  const isPaid = balance === 0 && totalDues > 0;
-  const isPartial = totalPaid > 0 && balance > 0;
+  const isPaid = playerSummary.balance === 0 && playerSummary.totalDues > 0;
+  const isPartial = playerSummary.totalPaid > 0 && playerSummary.balance > 0;
 
   return (
-    <div className="card overflow-hidden">
-      {/* Tap row */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-[var(--space-4)] bg-transparent border-none cursor-pointer text-left"
-      >
-        <div className="flex items-center gap-[var(--space-3)] min-w-0">
-          {isExpanded ? (
-            <ChevronDown size={18} className="text-[var(--ink-tertiary)] shrink-0" />
-          ) : (
-            <ChevronRight size={18} className="text-[var(--ink-tertiary)] shrink-0" />
-          )}
-          <span className="type-body-sm font-semibold text-[var(--ink)] truncate">
-            {playerName}
-          </span>
+    <section className="rounded-[1.75rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
+      <button type="button" onClick={onToggle} className="flex w-full items-center justify-between gap-[var(--space-4)] px-[var(--space-5)] py-[var(--space-4)] text-left">
+        <div className="flex items-center gap-[var(--space-3)]">
+          {expanded ? <ChevronDown size={18} className="text-[var(--ink-tertiary)]" /> : <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />}
+          <div>
+            <p className="text-sm font-semibold text-[var(--ink)]">{playerSummary.playerName}</p>
+            <p className="mt-[2px] text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              {formatCents(playerSummary.totalPaid)} paid of {formatCents(playerSummary.totalDues)}
+            </p>
+          </div>
         </div>
 
-        {/* Status Badge */}
         {isPaid ? (
-          <span className="shrink-0 flex items-center gap-[var(--space-1)] py-[var(--space-1)] px-[var(--space-3)] rounded-[var(--radius-full)] bg-[color-mix(in_srgb,var(--success)_12%,transparent)] text-[var(--success)] type-caption font-semibold">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--success)]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
             <CheckCircle2 size={14} />
             Paid
           </span>
         ) : isPartial ? (
-          <span className="shrink-0 py-[var(--space-1)] px-[var(--space-3)] rounded-[var(--radius-full)] bg-[color-mix(in_srgb,var(--warning)_12%,transparent)] text-[var(--warning)] type-caption font-semibold">
-            Partial ({formatCents(totalPaid)}/{formatCents(totalDues)})
+          <span className="rounded-full bg-[color:var(--warning)]/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--warning)]">
+            Partial
           </span>
         ) : (
-          <span className="shrink-0 flex items-center gap-[var(--space-1)] py-[var(--space-1)] px-[var(--space-3)] rounded-[var(--radius-full)] bg-[color-mix(in_srgb,var(--error)_12%,transparent)] text-[var(--error)] type-caption font-semibold">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--error)]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--error)]">
             <AlertCircle size={14} />
-            Unpaid ({formatCents(totalDues)})
+            Unpaid
           </span>
         )}
       </button>
 
-      {/* Expanded details */}
-      {isExpanded && (
-        <div className="border-t border-[var(--rule)] px-[var(--space-4)] pb-[var(--space-4)]">
-          {/* Line items */}
-          {lineItems.map((item) => {
-            const catConfig = DUES_CATEGORIES[item.category];
-            const IconComponent = CATEGORY_ICONS[catConfig.icon] || Receipt;
-
-            return (
-              <div
-                key={item.id}
-                className="flex items-center justify-between py-[var(--space-3)] border-b border-[var(--rule)] last:border-b-0"
-              >
-                <div className="flex items-center gap-[var(--space-3)] min-w-0">
-                  <IconComponent size={16} className="text-[var(--ink-tertiary)] shrink-0" />
-                  <div className="min-w-0">
-                    <p className="type-body-sm truncate">{item.description}</p>
-                    <p className="type-caption text-[var(--ink-tertiary)]">{catConfig.label}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-[var(--space-3)] shrink-0">
-                  <span
-                    className={`type-body-sm font-semibold ${
-                      item.status === 'paid'
-                        ? 'text-[var(--success)]'
-                        : item.status === 'partial'
-                          ? 'text-[var(--warning)]'
-                          : 'text-[var(--ink)]'
-                    }`}
-                  >
-                    {formatCents(item.amount)}
-                  </span>
-                  {isCaptainMode && item.status !== 'paid' && item.status !== 'waived' && (
-                    <button
-                      onClick={() => onMarkPaid(item.id)}
-                      disabled={isSubmitting}
-                      className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] bg-[var(--masters)] text-[var(--canvas)] border-none cursor-pointer text-xs font-semibold disabled:opacity-50"
-                    >
-                      Mark Paid
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+      {expanded ? (
+        <div className="border-t border-[color:var(--rule)]/70 px-[var(--space-5)] py-[var(--space-4)]">
+          <div className="space-y-[var(--space-3)]">
+            {playerSummary.lineItems.map((lineItem) => (
+              <LineItemRow
+                key={lineItem.id}
+                lineItem={lineItem}
+                onMarkPaid={onMarkPaid}
+                isCaptainMode={isCaptainMode}
+                isSubmitting={isSubmitting}
+              />
+            ))}
+          </div>
         </div>
-      )}
+      ) : null}
+    </section>
+  );
+}
+
+function LineItemRow({
+  lineItem,
+  onMarkPaid,
+  isCaptainMode,
+  isSubmitting,
+}: {
+  lineItem: DuesLineItem;
+  onMarkPaid: (lineItemId: string) => void;
+  isCaptainMode: boolean;
+  isSubmitting: boolean;
+}) {
+  const category = DUES_CATEGORIES[lineItem.category];
+  const Icon = CATEGORY_ICONS[category.icon] || Receipt;
+
+  return (
+    <div className="flex items-center justify-between gap-[var(--space-4)] rounded-[1.15rem] bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)]">
+      <div className="flex min-w-0 items-center gap-[var(--space-3)]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-[color:var(--surface-raised)] text-[var(--ink-tertiary)]">
+          <Icon size={16} />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-[var(--ink)]">{lineItem.description}</p>
+          <p className="mt-[2px] text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">{category.label}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-[var(--space-3)]">
+        <p
+          className={cn(
+            'text-sm font-semibold',
+            lineItem.status === 'paid'
+              ? 'text-[var(--success)]'
+              : lineItem.status === 'partial'
+                ? 'text-[var(--warning)]'
+                : 'text-[var(--ink)]'
+          )}
+        >
+          {formatCents(lineItem.amount)}
+        </p>
+        {isCaptainMode && lineItem.status !== 'paid' && lineItem.status !== 'waived' ? (
+          <Button size="sm" variant="primary" disabled={isSubmitting} onClick={() => onMarkPaid(lineItem.id)}>
+            Mark paid
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }
 
-/* ============================================
-   Add Charge Tab — Captain-Only Form
-   ============================================ */
-function AddChargeTab({
+function ChargeComposer({
   chargeCategory,
   setChargeCategory,
   chargeDescription,
@@ -631,238 +619,270 @@ function AddChargeTab({
   applyToAll,
   setApplyToAll,
   selectedPlayerIds,
-  togglePlayerSelection,
   players,
+  togglePlayerSelection,
   chargeTargetCount,
   chargeTotalCents,
   onSubmit,
   isSubmitting,
 }: {
   chargeCategory: DuesCategory;
-  setChargeCategory: (c: DuesCategory) => void;
+  setChargeCategory: (value: DuesCategory) => void;
   chargeDescription: string;
-  setChargeDescription: (d: string) => void;
+  setChargeDescription: (value: string) => void;
   chargeAmount: string;
-  setChargeAmount: (a: string) => void;
+  setChargeAmount: (value: string) => void;
   applyToAll: boolean;
-  setApplyToAll: (v: boolean) => void;
+  setApplyToAll: (value: boolean) => void;
   selectedPlayerIds: string[];
-  togglePlayerSelection: (id: string) => void;
-  players: { id: string; firstName: string; lastName?: string }[];
+  players: Array<{ id: string; firstName: string; lastName?: string }>;
+  togglePlayerSelection: (playerId: string) => void;
   chargeTargetCount: number;
   chargeTotalCents: number;
   onSubmit: () => void;
   isSubmitting: boolean;
 }) {
-  const categories = Object.entries(DUES_CATEGORIES) as [DuesCategory, { label: string; icon: string; color: string }][];
+  const categories = Object.entries(DUES_CATEGORIES) as Array<[DuesCategory, { label: string; icon: string; color: string }]>;
 
   return (
-    <section className="section-sm">
-      <h2 className="type-overline mb-[var(--space-4)]">New Charge</h2>
+    <section className="rounded-[1.9rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+      <div>
+        <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Charge Composer</p>
+        <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+          Build the charge once, then let the ledger do the repeating.
+        </h2>
+      </div>
 
-      <div className="card p-[var(--space-5)] space-y-[var(--space-5)]">
-        {/* Category Selector */}
+      <div className="mt-[var(--space-5)] space-y-[var(--space-5)]">
         <div>
-          <label className="type-caption block mb-[var(--space-2)] text-[var(--ink-secondary)]">
+          <label className="mb-[var(--space-2)] block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
             Category
           </label>
           <div className="flex flex-wrap gap-[var(--space-2)]">
-            {categories.map(([key, config]) => {
-              const isActive = chargeCategory === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => setChargeCategory(key)}
-                  className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
-                    isActive
-                      ? 'text-[var(--canvas)]'
-                      : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
-                  }`}
-                  style={isActive ? { background: config.color } : undefined}
-                >
-                  {config.label}
-                </button>
-              );
-            })}
+            {categories.map(([key, config]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setChargeCategory(key)}
+                className={cn(
+                  'rounded-full px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
+                  chargeCategory === key
+                    ? 'text-[var(--canvas)]'
+                    : 'bg-[color:var(--surface)]/82 text-[var(--ink-secondary)]'
+                )}
+                style={chargeCategory === key ? { background: config.color } : undefined}
+              >
+                {config.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Description */}
-        <div>
-          <label className="type-caption block mb-[var(--space-2)] text-[var(--ink-secondary)]">
-            Description
-          </label>
+        <FormField label="Description">
           <input
             type="text"
             value={chargeDescription}
-            onChange={(e) => setChargeDescription(e.target.value)}
-            placeholder="e.g., Pinehurst No. 2 green fee"
-            className="w-full py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--surface-elevated)] text-[var(--ink)] font-[family-name:var(--font-sans)] text-sm outline-none focus:border-[var(--masters)] transition-colors"
+            onChange={(event) => setChargeDescription(event.target.value)}
+            placeholder="Pinehurst green fee"
+            className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
           />
-        </div>
+        </FormField>
 
-        {/* Amount */}
-        <div>
-          <label className="type-caption block mb-[var(--space-2)] text-[var(--ink-secondary)]">
-            Amount (per player)
-          </label>
+        <FormField label="Amount per player">
           <div className="relative">
-            <span className="absolute left-[var(--space-3)] top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)] font-semibold">
-              $
-            </span>
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[var(--ink-tertiary)]">$</span>
             <input
               type="text"
               inputMode="decimal"
               value={chargeAmount}
-              onChange={(e) => setChargeAmount(e.target.value)}
+              onChange={(event) => setChargeAmount(event.target.value)}
               placeholder="0.00"
-              className="w-full py-[var(--space-3)] pl-[var(--space-8)] pr-[var(--space-4)] rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--surface-elevated)] text-[var(--ink)] font-[family-name:var(--font-serif)] text-xl font-bold outline-none focus:border-[var(--masters)] transition-colors"
+              className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 py-3 pl-8 pr-4 text-lg font-semibold text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
             />
           </div>
-        </div>
+        </FormField>
 
-        {/* Apply To */}
         <div>
-          <label className="type-caption block mb-[var(--space-2)] text-[var(--ink-secondary)]">
+          <label className="mb-[var(--space-2)] block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
             Apply to
           </label>
-          <div className="flex gap-[var(--space-2)] mb-[var(--space-3)]">
+          <div className="flex flex-wrap gap-[var(--space-2)]">
             <button
+              type="button"
               onClick={() => setApplyToAll(true)}
-              className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-4)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
-                applyToAll
-                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
-                  : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
-              }`}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
+                applyToAll ? 'bg-[var(--masters)] text-[var(--canvas)]' : 'bg-[color:var(--surface)]/82 text-[var(--ink-secondary)]'
+              )}
             >
-              <Users size={16} />
-              All Players
+              <Users size={15} />
+              All players
             </button>
             <button
+              type="button"
               onClick={() => setApplyToAll(false)}
-              className={`press-scale flex items-center gap-[var(--space-2)] py-[var(--space-2)] px-[var(--space-4)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
-                !applyToAll
-                  ? 'bg-[var(--masters)] text-[var(--canvas)]'
-                  : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
-              }`}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
+                !applyToAll ? 'bg-[var(--masters)] text-[var(--canvas)]' : 'bg-[color:var(--surface)]/82 text-[var(--ink-secondary)]'
+              )}
             >
-              Select Players
+              Select players
             </button>
           </div>
 
-          {/* Player checkboxes when selecting specific players */}
-          {!applyToAll && (
-            <div className="flex flex-wrap gap-[var(--space-2)]">
+          {!applyToAll ? (
+            <div className="mt-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
               {players.map((player) => {
                 const isSelected = selectedPlayerIds.includes(player.id);
                 return (
                   <button
                     key={player.id}
+                    type="button"
                     onClick={() => togglePlayerSelection(player.id)}
-                    className={`press-scale py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-sm font-medium transition-all duration-150 ${
-                      isSelected
-                        ? 'bg-[var(--masters)] text-[var(--canvas)]'
-                        : 'bg-[var(--surface-elevated)] text-[var(--ink-secondary)]'
-                    }`}
+                    className={cn(
+                      'rounded-full px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
+                      isSelected ? 'bg-[var(--masters)] text-[var(--canvas)]' : 'bg-[color:var(--surface)]/82 text-[var(--ink-secondary)]'
+                    )}
                   >
-                    {isSelected && <span className="mr-[var(--space-1)]">&check;</span>}
                     {player.firstName}
                   </button>
                 );
               })}
             </div>
-          )}
+          ) : null}
         </div>
 
-        {/* Charge Preview */}
-        {chargeTargetCount > 0 && chargeTotalCents > 0 && (
-          <div className="py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--masters)_8%,transparent)] border border-[color-mix(in_srgb,var(--masters)_20%,transparent)]">
-            <p className="type-body-sm text-[var(--masters)] font-medium">
-              This will create {chargeTargetCount} charge{chargeTargetCount > 1 ? 's' : ''} totaling{' '}
-              {formatCents(chargeTotalCents)}
+        {chargeTargetCount > 0 && chargeTotalCents > 0 ? (
+          <div className="rounded-[1.2rem] border border-[var(--masters)]/18 bg-[color:var(--masters)]/8 px-[var(--space-4)] py-[var(--space-4)]">
+            <p className="text-sm font-medium text-[var(--masters)]">
+              {chargeTargetCount} charge{chargeTargetCount === 1 ? '' : 's'} for a total of {formatCents(chargeTotalCents)}
             </p>
           </div>
-        )}
+        ) : null}
 
-        {/* Submit */}
-        <button
-          onClick={onSubmit}
-          disabled={isSubmitting}
-          className="btn-premium press-scale w-full py-[var(--space-4)] flex items-center justify-center gap-[var(--space-2)] text-base font-semibold disabled:opacity-50"
-        >
-          <Plus size={18} />
-          {isSubmitting ? 'Adding...' : 'Add Charge'}
-        </button>
+        <Button variant="primary" fullWidth leftIcon={<Plus size={16} />} isLoading={isSubmitting} loadingText="Adding charge" onClick={onSubmit}>
+          Add charge
+        </Button>
       </div>
     </section>
   );
 }
 
-/* ============================================
-   Payments Tab — Chronological List
-   ============================================ */
-function PaymentsTab({
+function PaymentsPanel({
   paymentRecords,
   players,
 }: {
-  paymentRecords: { id: string; fromPlayerId: string; amount: number; method: string; createdAt: string; notes?: string }[];
-  players: { id: string; firstName: string; lastName?: string }[];
+  paymentRecords: PaymentRecord[];
+  players: Array<{ id: string; firstName: string; lastName?: string }>;
 }) {
-  const getPlayerName = (id: string) => {
-    const p = players.find((pl) => pl.id === id);
-    return p ? p.firstName : 'Unknown';
-  };
-
-  const sorted = [...paymentRecords].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const sortedPayments = [...paymentRecords].sort(
+    (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
   );
 
-  if (sorted.length === 0) {
+  const playerName = (playerId: string) => {
+    const player = players.find((candidate) => candidate.id === playerId);
+    return player ? `${player.firstName}${player.lastName ? ` ${player.lastName}` : ''}` : 'Unknown';
+  };
+
+  if (sortedPayments.length === 0) {
     return (
-      <section className="section-sm pt-[var(--space-8)]">
-        <EmptyStatePremium
-          illustration="golf-ball"
-          title="No payments recorded"
-          description="Payments will appear here as players settle their dues."
-          variant="compact"
-        />
-      </section>
+      <EmptyStatePremium
+        illustration="golf-ball"
+        title="No payments recorded"
+        description="Payments will appear here once players start settling the ledger."
+        variant="large"
+      />
     );
   }
 
   return (
-    <section className="section-sm">
-      <h2 className="type-overline mb-[var(--space-4)]">Payment History</h2>
-      <div className="space-y-2">
-        {sorted.map((payment) => (
-          <div
-            key={payment.id}
-            className="card py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-between"
-          >
-            <div className="flex items-center gap-[var(--space-3)] min-w-0">
-              <div className="w-9 h-9 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--success)_12%,transparent)] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-[var(--success)]" />
+    <section className="space-y-[var(--space-3)]">
+      {sortedPayments.map((payment) => (
+        <article
+          key={payment.id}
+          className="rounded-[1.75rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] px-[var(--space-5)] py-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]"
+        >
+          <div className="flex items-center justify-between gap-[var(--space-4)]">
+            <div className="flex items-center gap-[var(--space-3)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--success)]/10 text-[var(--success)]">
+                <CheckCircle2 size={18} />
               </div>
-              <div className="min-w-0">
-                <p className="type-body-sm font-semibold truncate">
-                  {getPlayerName(payment.fromPlayerId)}
-                </p>
-                <p className="type-caption text-[var(--ink-tertiary)]">
-                  {payment.method.charAt(0).toUpperCase() + payment.method.slice(1)}
-                  {' \u00B7 '}
-                  {new Date(payment.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+              <div>
+                <p className="text-sm font-semibold text-[var(--ink)]">{playerName(payment.fromPlayerId)}</p>
+                <p className="mt-[2px] text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+                  {payment.method} · {new Date(payment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </p>
               </div>
             </div>
-            <span className="type-body-sm font-bold text-[var(--success)] shrink-0">
-              +{formatCents(payment.amount)}
-            </span>
+
+            <p className="font-serif text-[1.5rem] italic text-[var(--success)]">+{formatCents(payment.amount)}</p>
           </div>
-        ))}
-      </div>
+        </article>
+      ))}
     </section>
+  );
+}
+
+function FinanceFactCard({
+  label,
+  value,
+  detail,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.55rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10 p-[var(--space-4)]">
+      <p className="type-overline tracking-[0.14em] text-[color:var(--canvas)]/72">{label}</p>
+      <p className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--canvas)]', valueClassName)}>
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[color:var(--canvas)]/72">{detail}</p>
+    </div>
+  );
+}
+
+function SidebarNote({
+  title,
+  body,
+  tone = 'default',
+}: {
+  title: string;
+  body: string;
+  tone?: 'default' | 'green';
+}) {
+  return (
+    <aside
+      className={cn(
+        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
+        tone === 'green'
+          ? 'border-[var(--masters)]/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(238,246,241,0.99))]'
+          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
+      )}
+    >
+      <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Ledger note</p>
+      <h3 className="mt-[var(--space-2)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
+    </aside>
+  );
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-[var(--space-2)] block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }

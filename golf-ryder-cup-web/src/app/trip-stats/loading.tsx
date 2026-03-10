@@ -1,9 +1,5 @@
-import { PageSkeleton, StatsSkeleton } from '@/components/ui';
+import { PageLoadingSkeleton } from '@/components/ui';
 
 export default function Loading() {
-  return (
-    <PageSkeleton>
-      <StatsSkeleton count={6} />
-    </PageSkeleton>
-  );
+  return <PageLoadingSkeleton title="Loading trip stats..." variant="list" />;
 }

@@ -1,5 +1,5 @@
 import { PageLoadingSkeleton } from '@/components/ui';
 
 export default function Loading() {
-  return <PageLoadingSkeleton title="Finances" variant="list" />;
+  return <PageLoadingSkeleton title="Loading finances..." variant="list" />;
 }

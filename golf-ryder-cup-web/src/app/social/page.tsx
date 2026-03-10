@@ -1,36 +1,30 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import {
+  Camera,
+  Image as ImageIcon,
+  MessageCircle,
+  Send,
+  Share2,
+  Smile,
+  Trash2,
+} from 'lucide-react';
+import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
+import { ConfirmDialog, EmptyStatePremium } from '@/components/ui';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
 import { shareBanterPost } from '@/lib/utils/share';
-import { EmptyStatePremium, NoMessagesEmpty } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
-import {
-  MessageCircle,
-  Camera,
-  Send,
-  Smile,
-  Image as ImageIcon,
-  Flame,
-  Share2,
-  Trash2,
-} from 'lucide-react';
-import type { Player, BanterPost } from '@/lib/types/models';
+import { cn } from '@/lib/utils';
+import type { BanterPost, Player } from '@/lib/types/models';
 
-/**
- * SOCIAL PAGE -- Trash Talk & Team Banter
- *
- * The social hub for your golf trip. Talk smack,
- * celebrate wins, and keep the competition fun!
- */
-
-// Golf-themed reaction emoji set used across the social feed
 const GOLF_REACTIONS = ['\u26F3', '\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\uD83C\uDFC6'];
+const QUICK_EMOJIS = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
 
 export default function SocialPage() {
   const router = useRouter();
@@ -38,44 +32,56 @@ export default function SocialPage() {
   const { showToast } = useUIStore();
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
+  const [pendingDeletePostId, setPendingDeletePostId] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
 
-  // No redirect when no trip is selected -- render a premium empty state instead.
-
-  // Get real banter posts from database
   const banterPosts = useLiveQuery(
     async () => {
-      if (!currentTrip) return [];
-      return db.banterPosts
-        .where('tripId')
-        .equals(currentTrip.id)
-        .reverse()
-        .sortBy('timestamp');
+      if (!currentTrip) {
+        return [];
+      }
+
+      return db.banterPosts.where('tripId').equals(currentTrip.id).reverse().sortBy('timestamp');
     },
     [currentTrip?.id],
     []
   );
 
-  const getPlayer = (id: string): Player | undefined => {
-    return players.find((p) => p.id === id);
-  };
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60_000);
 
-  // Get the current user ID (first player as default)
+    return () => window.clearInterval(interval);
+  }, []);
+
   const currentUserId = players[0]?.id;
+  const totalReactions = useMemo(
+    () =>
+      banterPosts.reduce(
+        (sum, post) =>
+          sum +
+          Object.values(post.reactions || {}).reduce((postSum, reactorIds) => postSum + reactorIds.length, 0),
+        0
+      ),
+    [banterPosts]
+  );
 
-  const handleSend = async () => {
-    if (!message.trim() || !currentTrip) return;
+  const handleSend = useCallback(async () => {
+    if (!message.trim() || !currentTrip) {
+      return;
+    }
 
     const author = players[0];
-
     if (!author) {
-      showToast('error', 'Unable to post: No player profile found');
+      showToast('error', 'Unable to post without a player profile');
       return;
     }
 
     const newPost: BanterPost = {
       id: crypto.randomUUID(),
       tripId: currentTrip.id,
-      content: message,
+      content: message.trim(),
       authorId: author.id,
       authorName: `${author.firstName} ${author.lastName}`,
       postType: 'message',
@@ -85,20 +91,24 @@ export default function SocialPage() {
     try {
       await db.banterPosts.add(newPost);
       setMessage('');
+      setShowEmojis(false);
     } catch (error) {
       uiLogger.error('Failed to post message:', error);
-      showToast('error', 'Failed to post message. Please try again.');
+      showToast('error', 'Failed to post message');
     }
-  };
+  }, [currentTrip, message, players, showToast]);
 
-  // Toggle a reaction on a banter post
   const handleToggleReaction = useCallback(
     async (postId: string, emoji: string) => {
-      if (!currentUserId) return;
+      if (!currentUserId) {
+        return;
+      }
 
       try {
         const post = await db.banterPosts.get(postId);
-        if (!post) return;
+        if (!post) {
+          return;
+        }
 
         const reactions = { ...(post.reactions || {}) };
         const currentReactors = reactions[emoji] ? [...reactions[emoji]] : [];
@@ -106,7 +116,6 @@ export default function SocialPage() {
 
         if (alreadyReacted) {
           reactions[emoji] = currentReactors.filter((id) => id !== currentUserId);
-          // Remove the key entirely if no reactors remain
           if (reactions[emoji].length === 0) {
             delete reactions[emoji];
           }
@@ -122,11 +131,9 @@ export default function SocialPage() {
     [currentUserId]
   );
 
-  // Share a banter post using the native share utility
   const handleSharePost = useCallback(
     async (post: BanterPost) => {
-      const authorName = post.authorName || 'Unknown';
-      const result = await shareBanterPost(authorName, post.content);
+      const result = await shareBanterPost(post.authorName || 'Unknown', post.content);
 
       if (result.shared && result.method === 'clipboard') {
         showToast('success', 'Copied to clipboard');
@@ -137,38 +144,40 @@ export default function SocialPage() {
     [showToast]
   );
 
-  const handleDeletePost = useCallback(
-    async (postId: string) => {
-      try {
-        await db.banterPosts.delete(postId);
-        showToast('success', 'Post deleted');
-      } catch (error) {
-        uiLogger.error('Failed to delete post:', error);
-        showToast('error', 'Failed to delete post');
-      }
-    },
-    [showToast]
-  );
+  const handleDeletePost = useCallback(async () => {
+    if (!pendingDeletePostId) {
+      return;
+    }
 
-  const quickEmojis = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
+    try {
+      await db.banterPosts.delete(pendingDeletePostId);
+      showToast('success', 'Post deleted');
+    } catch (error) {
+      uiLogger.error('Failed to delete post:', error);
+      showToast('error', 'Failed to delete post');
+    } finally {
+      setPendingDeletePostId(null);
+    }
+  }, [pendingDeletePostId, showToast]);
 
   if (!currentTrip) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
-          title="Trash Talk"
-          subtitle="No trip selected"
-          icon={<MessageCircle size={16} className="text-[var(--color-accent)]" />}
+          title="Clubhouse"
+          subtitle="No active trip"
+          icon={<MessageCircle size={16} className="text-[var(--canvas)]" />}
+          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
           onBack={() => router.back()}
         />
 
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golfers"
-            title="No trip selected"
-            description="Start or select a trip to jump into team banter."
+            title="No active trip"
+            description="Start or select a trip before opening the clubhouse feed."
             action={{
-              label: 'Go Home',
+              label: 'Go home',
               onClick: () => router.push('/'),
             }}
             secondaryAction={{
@@ -182,169 +191,214 @@ export default function SocialPage() {
     );
   }
 
+  if (players.length === 0) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Clubhouse"
+          subtitle={currentTrip.name}
+          icon={<MessageCircle size={16} className="text-[var(--canvas)]" />}
+          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          onBack={() => router.back()}
+        />
+
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No players yet"
+            description="Add players before opening the trip feed so posts have a proper identity."
+            action={{
+              label: 'Manage players',
+              onClick: () => router.push('/players'),
+            }}
+            variant="large"
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)] flex flex-col">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
-        title="Trash Talk"
+        title="Clubhouse"
         subtitle={currentTrip.name}
-        icon={<MessageCircle size={16} className="text-[var(--color-accent)]" />}
+        icon={<MessageCircle size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
         onBack={() => router.back()}
         rightSlot={
-          <Link href="/social/photos" className="btn-premium p-2 rounded-[var(--radius-md)]">
-            <Camera size={20} />
-          </Link>
+          <Button variant="outline" size="sm" leftIcon={<Camera size={14} />} onClick={() => router.push('/social/photos')}>
+            Photos
+          </Button>
         }
       />
 
-      {/* Quick Tabs */}
-      <div className="container-editorial py-[var(--space-3)]">
-        <div className="flex gap-[var(--space-2)]">
-          <TabButton active label="All" icon={<MessageCircle size={16} />} />
-          <TabButton label="Photos" icon={<ImageIcon size={16} />} href="/social/photos" />
-          <TabButton label="Highlights" icon={<Flame size={16} />} />
-        </div>
-      </div>
+      <main className="container-editorial py-[var(--space-6)] pb-[calc(var(--space-12)+8rem)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,240,241,0.99))] shadow-[0_26px_56px_rgba(46,34,18,0.08)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.18fr)_18rem]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Clubhouse Feed</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--ink)]">
+                Every good trip needs one room for noise, receipts, and bragging rights.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                This feed is for the chatter between matches: the hot takes, the score jokes, the photo prompts,
+                and the little bit of theater that keeps a golf trip from feeling sterile.
+              </p>
+            </div>
 
-      {/* Comments Feed */}
-      <main className="container-editorial flex-1 overflow-y-auto pb-[calc(var(--space-4)+64px)]">
-        <div className="flex flex-col gap-[var(--space-4)]">
-          {banterPosts.map((post) => {
-            const player = post.authorId ? getPlayer(post.authorId) : undefined;
-            return (
-              <PostCard
-                key={post.id}
-                post={post}
-                player={player}
-                currentUserId={currentUserId}
-                onToggleReaction={handleToggleReaction}
-                onShare={handleSharePost}
-                onDelete={handleDeletePost}
-              />
-            );
-          })}
-        </div>
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <SocialFactCard label="Posts" value={banterPosts.length} detail="Everything currently on the board." />
+              <SocialFactCard label="Reactions" value={totalReactions} detail="Lightweight applause, heat, and ridicule." />
+              <SocialFactCard label="Feed tone" value="Live" detail="The room works best when it feels present-tense." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
+            </div>
+          </div>
+        </section>
 
-        {banterPosts.length === 0 && <NoMessagesEmpty />}
+        <section className="mt-[var(--space-6)] flex flex-wrap gap-[var(--space-3)]">
+          <FeedPill active label="All posts" icon={<MessageCircle size={15} />} />
+          <FeedPill label="Photos" icon={<ImageIcon size={15} />} href="/social/photos" />
+        </section>
+
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.14fr)_18rem]">
+          <div className="space-y-[var(--space-4)]">
+            {banterPosts.length === 0 ? (
+              <section className="rounded-[1.9rem] border border-dashed border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.98))] p-[var(--space-6)] text-center shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+                  <MessageCircle size={18} />
+                </div>
+                <h2 className="mt-[var(--space-3)] text-lg font-semibold text-[var(--ink)]">
+                  The clubhouse is quiet.
+                </h2>
+                <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+                  Start with a quick post, a joke, or a photo prompt and the room will stop feeling so polite.
+                </p>
+              </section>
+            ) : (
+              banterPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  player={post.authorId ? players.find((candidate) => candidate.id === post.authorId) : undefined}
+                  currentUserId={currentUserId}
+                  currentTime={currentTime}
+                  onToggleReaction={handleToggleReaction}
+                  onShare={handleSharePost}
+                  onDelete={(postId) => setPendingDeletePostId(postId)}
+                />
+              ))
+            )}
+          </div>
+
+          <aside className="space-y-[var(--space-4)]">
+            <SidebarPanel
+              title="Keep it conversational"
+              body="The feed is strongest when it feels like the group text’s smarter cousin, not a corporate activity stream."
+            />
+            <SidebarPanel
+              title="Photos deserve daylight"
+              body="Photos are better as a dedicated room than as a token tab inside a cluttered feed. Let each surface do one thing well."
+              tone="maroon"
+            />
+          </aside>
+        </section>
       </main>
 
-      {/* Message Input */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 'var(--nav-height)',
-          left: 0,
-          right: 0,
-          background: 'rgba(var(--canvas-rgb), 0.92)',
-          borderTop: '1px solid var(--rule)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 20,
-        }}
-      >
-        {/* Quick Reactions */}
-        {showEmojis && (
-          <div style={{ display: 'flex', gap: 'var(--space-2)', padding: 'var(--space-3)', borderBottom: '1px solid var(--rule)' }}>
-            {quickEmojis.map((emoji) => (
-              <button
-                key={emoji}
-                onClick={() => {
-                  setMessage(message + emoji);
-                  setShowEmojis(false);
-                }}
-                className="press-scale"
-                style={{
-                  fontSize: '1.5rem',
-                  padding: 'var(--space-2)',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        )}
+      <div className="fixed inset-x-0 bottom-[var(--nav-height)] z-20 border-t border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/94 backdrop-blur-xl">
+        <div className="container-editorial py-[var(--space-3)]">
+          {showEmojis ? (
+            <div className="mb-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
+              {QUICK_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => {
+                    setMessage((value) => value + emoji);
+                    setShowEmojis(false);
+                  }}
+                  className="rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-3 py-2 text-xl transition-transform duration-150 hover:scale-[1.04]"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-3)' }}>
-          <button
-            onClick={() => setShowEmojis(!showEmojis)}
-            style={{
-              padding: 'var(--space-2)',
-              borderRadius: 'var(--radius-md)',
-              color: 'var(--ink-tertiary)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <Smile size={22} />
-          </button>
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Talk some trash..."
-            style={{
-              flex: 1,
-              padding: 'var(--space-2) var(--space-4)',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--canvas)',
-              border: '1px solid var(--rule)',
-              outline: 'none',
-            }}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!message.trim()}
-            style={{
-              padding: 'var(--space-2)',
-              borderRadius: 'var(--radius-full)',
-              background: message.trim() ? 'var(--masters)' : 'var(--rule)',
-              color: message.trim() ? 'var(--canvas)' : 'var(--ink-tertiary)',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <Send size={20} />
-          </button>
+          <div className="rounded-[1.4rem] border border-[color:var(--rule)]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-3)] shadow-[0_16px_32px_rgba(41,29,17,0.06)]">
+            <div className="flex items-center gap-[var(--space-3)]">
+              <button
+                type="button"
+                onClick={() => setShowEmojis((value) => !value)}
+                className={cn(
+                  'flex h-11 w-11 items-center justify-center rounded-full border transition-transform duration-150 hover:scale-[1.04]',
+                  showEmojis
+                    ? 'border-[var(--masters)]/25 bg-[color:var(--masters)]/10 text-[var(--masters)]'
+                    : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 text-[var(--ink-tertiary)]'
+                )}
+              >
+                <Smile size={18} />
+              </button>
+
+              <input
+                type="text"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    void handleSend();
+                  }
+                }}
+                placeholder="Talk some trash..."
+                className="min-h-11 flex-1 rounded-full border border-[color:var(--rule)]/70 bg-[var(--canvas)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--maroon)]"
+              />
+
+              <Button
+                variant="primary"
+                size="icon"
+                disabled={!message.trim()}
+                onClick={() => void handleSend()}
+              >
+                <Send size={18} />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
+      <ConfirmDialog
+        isOpen={Boolean(pendingDeletePostId)}
+        onClose={() => setPendingDeletePostId(null)}
+        onConfirm={handleDeletePost}
+        title="Delete post?"
+        description="This removes the post from the feed. It should feel deliberate, even in a casual room."
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </div>
   );
 }
 
-/* Tab Button Component */
-interface TabButtonProps {
+function FeedPill({
+  label,
+  icon,
+  active = false,
+  href,
+}: {
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   active?: boolean;
   href?: string;
-}
-
-function TabButton({ label, icon, active, href }: TabButtonProps) {
-  const baseStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-2)',
-    padding: 'var(--space-2) var(--space-4)',
-    borderRadius: 'var(--radius-full)',
-    fontSize: 'var(--text-sm)',
-    fontWeight: 500,
-    transition: 'all 0.2s ease',
-    background: active ? 'var(--masters)' : 'var(--canvas-raised)',
-    color: active ? 'var(--canvas)' : 'var(--ink)',
-    border: active ? 'none' : '1px solid var(--rule)',
-    cursor: 'pointer',
-    textDecoration: 'none',
-  };
+}) {
+  const className = cn(
+    'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-transform duration-150 hover:scale-[1.01]',
+    active
+      ? 'border-[var(--maroon-subtle)] bg-[color:var(--maroon)]/10 text-[var(--maroon)]'
+      : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 text-[var(--ink-secondary)]'
+  );
 
   if (href) {
     return (
-      <Link href={href} style={baseStyle}>
+      <Link href={href} className={className}>
         {icon}
         {label}
       </Link>
@@ -352,274 +406,205 @@ function TabButton({ label, icon, active, href }: TabButtonProps) {
   }
 
   return (
-    <button style={baseStyle}>
+    <div className={className}>
       {icon}
       {label}
-    </button>
+    </div>
   );
 }
 
-/* Post Card Component */
-interface PostCardProps {
+function PostCard({
+  post,
+  player,
+  currentUserId,
+  currentTime,
+  onToggleReaction,
+  onShare,
+  onDelete,
+}: {
   post: BanterPost;
   player?: Player;
   currentUserId?: string;
+  currentTime: number;
   onToggleReaction: (postId: string, emoji: string) => void;
   onShare: (post: BanterPost) => void;
   onDelete: (postId: string) => void;
-}
-
-function PostCard({ post, player, currentUserId, onToggleReaction, onShare, onDelete }: PostCardProps) {
-  const [currentTime, setCurrentTime] = useState(() => Date.now());
+}) {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const isOwnPost = currentUserId === post.authorId;
+  const displayName = player ? `${player.firstName} ${player.lastName}` : post.authorName || 'Unknown';
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 
-  // Update time periodically for "time ago" display
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const activeReactions = Object.entries(post.reactions || {}).filter(([, reactorIds]) => reactorIds.length > 0);
 
-  // Calculate time ago using stored time
   const timeAgo = useMemo(() => {
     const seconds = Math.floor((currentTime - new Date(post.timestamp).getTime()) / 1000);
-    if (seconds < 60) return 'Just now';
+    if (seconds < 60) {
+      return 'Just now';
+    }
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    }
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) {
+      return `${hours}h ago`;
+    }
     return `${Math.floor(hours / 24)}d ago`;
-  }, [post.timestamp, currentTime]);
-
-  // Get display name - prefer player name, fall back to authorName
-  const displayName = player
-    ? `${player.firstName} ${player.lastName}`
-    : post.authorName || 'Unknown';
-
-  const initials = displayName.charAt(0).toUpperCase();
-
-  // Build reaction display data from the post's reactions map
-  const reactions = post.reactions || {};
-  const activeReactions = Object.entries(reactions).filter(
-    ([, reactorIds]) => reactorIds.length > 0
-  );
+  }, [currentTime, post.timestamp]);
 
   return (
-    <div
-      className="card"
-      style={{ padding: 'var(--space-4)' }}
-    >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
-        <div
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: 'var(--radius-full)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--canvas)',
-            fontWeight: 700,
-            background: 'linear-gradient(135deg, var(--team-usa), var(--team-europe))',
-          }}
-        >
-          {initials}
+    <article className="rounded-[1.75rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.06)]">
+      <div className="flex items-start gap-[var(--space-3)]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--team-usa),var(--team-europe))] text-sm font-semibold text-[var(--canvas)] shadow-[0_10px_20px_rgba(41,29,17,0.12)]">
+          {initials || '?'}
         </div>
-        <div style={{ flex: 1 }}>
-          <p className="type-body-sm" style={{ fontWeight: 500 }}>
-            {displayName}
-          </p>
-          <p className="type-caption">{timeAgo}</p>
-        </div>
-        {post.postType !== 'message' && (
-          <span
-            className="type-micro"
-            style={{
-              padding: 'var(--space-1) var(--space-2)',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--canvas-sunken)',
-              textTransform: 'capitalize',
-            }}
-          >
-            {post.postType}
-          </span>
-        )}
-        {/* Share Button */}
-        <button
-          onClick={() => onShare(post)}
-          aria-label="Share post"
-          style={{
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-sm)',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--ink-tertiary)',
-            transition: 'color 0.15s ease',
-          }}
-        >
-          <Share2 size={16} />
-        </button>
-        {/* Delete Button — own posts only */}
-        {isOwnPost && (
-          confirmDelete ? (
-            <button
-              onClick={() => {
-                onDelete(post.id);
-                setConfirmDelete(false);
-              }}
-              aria-label="Confirm delete"
-              style={{
-                padding: 'var(--space-1) var(--space-2)',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--error)',
-                color: 'var(--canvas)',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 600,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              Delete?
-            </button>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              aria-label="Delete post"
-              style={{
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-sm)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--ink-tertiary)',
-                transition: 'color 0.15s ease',
-              }}
-            >
-              <Trash2 size={16} />
-            </button>
-          )
-        )}
-      </div>
 
-      {/* Content */}
-      <p className="type-body">{post.content}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-[var(--space-3)]">
+            <div>
+              <p className="text-sm font-semibold text-[var(--ink)]">{displayName}</p>
+              <p className="mt-[2px] text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">{timeAgo}</p>
+            </div>
 
-      {/* Emoji if present */}
-      {post.emoji && (
-        <div style={{ marginTop: 'var(--space-2)' }}>
-          <span style={{ fontSize: '1.5rem' }}>{post.emoji}</span>
-        </div>
-      )}
+            <div className="flex items-center gap-[var(--space-2)]">
+              {post.postType !== 'message' ? (
+                <span className="rounded-full bg-[color:var(--surface-raised)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                  {post.postType}
+                </span>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => onShare(post)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04]"
+              >
+                <Share2 size={15} />
+              </button>
+              {isOwnPost ? (
+                <button
+                  type="button"
+                  onClick={() => onDelete(post.id)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04]"
+                >
+                  <Trash2 size={15} />
+                </button>
+              ) : null}
+            </div>
+          </div>
 
-      {/* Reactions Display & Picker */}
-      <div
-        style={{
-          marginTop: 'var(--space-3)',
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 'var(--space-1)',
-        }}
-      >
-        {/* Existing reactions */}
-        {activeReactions.map(([emoji, reactorIds]) => {
-          const hasReacted = currentUserId ? reactorIds.includes(currentUserId) : false;
-          return (
-            <button
-              key={emoji}
-              onClick={() => onToggleReaction(post.id, emoji)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-1)',
-                padding: '2px var(--space-2)',
-                borderRadius: 'var(--radius-full)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                background: hasReacted ? 'var(--masters)' : 'var(--canvas-raised)',
-                color: hasReacted ? 'var(--canvas)' : 'var(--ink-secondary)',
-                border: hasReacted ? '1px solid var(--masters)' : '1px solid var(--rule)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span>{emoji}</span>
-              <span>{reactorIds.length}</span>
-            </button>
-          );
-        })}
+          <p className="mt-[var(--space-4)] text-sm leading-7 text-[var(--ink)]">{post.content}</p>
 
-        {/* Add reaction toggle */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setShowReactionPicker(!showReactionPicker)}
-            aria-label="Add reaction"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '28px',
-              height: '28px',
-              borderRadius: 'var(--radius-full)',
-              background: showReactionPicker ? 'var(--masters)' : 'var(--canvas-raised)',
-              color: showReactionPicker ? 'var(--canvas)' : 'var(--ink-tertiary)',
-              border: '1px solid var(--rule)',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {showReactionPicker ? '\u2715' : '+'}
-          </button>
+          {post.emoji ? <div className="mt-[var(--space-2)] text-[1.4rem]">{post.emoji}</div> : null}
 
-          {/* Inline reaction picker */}
-          {showReactionPicker && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: 0,
-                marginBottom: 'var(--space-2)',
-                display: 'flex',
-                gap: 'var(--space-1)',
-                padding: 'var(--space-2)',
-                borderRadius: 'var(--radius-lg)',
-                background: 'var(--canvas)',
-                border: '1px solid var(--rule)',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
-                zIndex: 10,
-              }}
-            >
-              {GOLF_REACTIONS.map((emoji) => (
+          <div className="mt-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-2)]">
+            {activeReactions.map(([emoji, reactorIds]) => {
+              const hasReacted = currentUserId ? reactorIds.includes(currentUserId) : false;
+
+              return (
                 <button
                   key={emoji}
-                  onClick={() => {
-                    onToggleReaction(post.id, emoji);
-                    setShowReactionPicker(false);
-                  }}
-                  style={{
-                    fontSize: '1.25rem',
-                    padding: 'var(--space-1)',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'transform 0.1s ease',
-                  }}
+                  type="button"
+                  onClick={() => onToggleReaction(post.id, emoji)}
+                  className={cn(
+                    'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-transform duration-150 hover:scale-[1.04]',
+                    hasReacted
+                      ? 'border-[var(--masters)]/20 bg-[color:var(--masters)] text-[var(--canvas)]'
+                      : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 text-[var(--ink-secondary)]'
+                  )}
                 >
-                  {emoji}
+                  <span>{emoji}</span>
+                  <span>{reactorIds.length}</span>
                 </button>
-              ))}
+              );
+            })}
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowReactionPicker((value) => !value)}
+                className={cn(
+                  'flex h-8 w-8 items-center justify-center rounded-full border text-sm transition-transform duration-150 hover:scale-[1.04]',
+                  showReactionPicker
+                    ? 'border-[var(--masters)]/20 bg-[color:var(--masters)] text-[var(--canvas)]'
+                    : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 text-[var(--ink-tertiary)]'
+                )}
+              >
+                {showReactionPicker ? 'x' : '+'}
+              </button>
+
+              {showReactionPicker ? (
+                <div className="absolute bottom-full left-0 mb-[var(--space-2)] flex gap-[var(--space-1)] rounded-[1rem] border border-[color:var(--rule)]/75 bg-[var(--canvas)] p-[var(--space-2)] shadow-[0_12px_28px_rgba(41,29,17,0.12)]">
+                  {GOLF_REACTIONS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => {
+                        onToggleReaction(post.id, emoji);
+                        setShowReactionPicker(false);
+                      }}
+                      className="rounded-full p-2 text-[1.2rem] transition-transform duration-150 hover:scale-[1.08]"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          )}
+          </div>
         </div>
       </div>
+    </article>
+  );
+}
+
+function SocialFactCard({
+  label,
+  value,
+  detail,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.55rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 p-[var(--space-4)] shadow-[0_14px_28px_rgba(41,29,17,0.05)]">
+      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <p className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[var(--ink-secondary)]">{detail}</p>
     </div>
+  );
+}
+
+function SidebarPanel({
+  title,
+  body,
+  tone = 'default',
+}: {
+  title: string;
+  body: string;
+  tone?: 'default' | 'maroon';
+}) {
+  return (
+    <aside
+      className={cn(
+        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
+        tone === 'maroon'
+          ? 'border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,240,241,0.99))]'
+          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
+      )}
+    >
+      <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Clubhouse note</p>
+      <h3 className="mt-[var(--space-2)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
+    </aside>
   );
 }
