@@ -169,6 +169,82 @@ describe('authStore syncSupabaseSession', () => {
     ]);
   });
 
+  it('creates a cloud-linked profile without requiring an offline PIN', async () => {
+    useAuthStore.setState({
+      authEmail: 'nolocalpin@example.com',
+      authUserId: 'supabase-user-1',
+    });
+
+    const profile = await useAuthStore.getState().createProfile(
+      {
+        firstName: 'No',
+        lastName: 'Pin',
+        email: 'nolocalpin@example.com',
+      },
+      undefined
+    );
+
+    const storedUsers = JSON.parse(localStorageMock.getItem('golf-app-users') ?? '{}');
+    expect(storedUsers[profile.id]).toEqual(
+      expect.objectContaining({
+        profile: expect.objectContaining({ email: 'nolocalpin@example.com' }),
+        pin: null,
+      })
+    );
+  });
+
+  it('rejects offline PIN login when the account has no local PIN on this device', async () => {
+    const localProfile = createProfile({
+      email: 'magic@example.com',
+    });
+
+    localStorageMock.setItem(
+      'golf-app-users',
+      JSON.stringify({
+        [localProfile.id]: {
+          profile: localProfile,
+          pin: null,
+        },
+      })
+    );
+
+    await expect(useAuthStore.getState().login(localProfile.email!, '1234')).resolves.toBe(false);
+
+    expect(useAuthStore.getState()).toMatchObject({
+      currentUser: null,
+      isAuthenticated: false,
+      error: 'Offline PIN is not set for this account on this device. Use the email sign-in link.',
+    });
+  });
+
+  it('saves an offline PIN for an existing signed-in profile', async () => {
+    const localProfile = createProfile({
+      email: 'saved@example.com',
+    });
+
+    localStorageMock.setItem(
+      'golf-app-users',
+      JSON.stringify({
+        [localProfile.id]: {
+          profile: localProfile,
+          pin: null,
+        },
+      })
+    );
+
+    useAuthStore.setState({
+      currentUser: localProfile,
+      isAuthenticated: true,
+      authEmail: localProfile.email,
+      authUserId: 'supabase-user-1',
+    });
+
+    await useAuthStore.getState().setOfflinePin('4321');
+
+    const storedUsers = JSON.parse(localStorageMock.getItem('golf-app-users') ?? '{}');
+    expect(storedUsers[localProfile.id].pin).toMatch(/^pbkdf2\$/);
+  });
+
   it('rejects profile email changes that diverge from the linked Supabase account', async () => {
     const localProfile = createProfile();
 

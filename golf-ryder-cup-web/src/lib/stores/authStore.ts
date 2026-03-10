@@ -36,6 +36,11 @@ export interface UserProfile extends Omit<Player, 'createdAt' | 'updatedAt'> {
   updatedAt: string;
 }
 
+interface StoredUserRecord {
+  profile: UserProfile;
+  pin?: string | null;
+}
+
 interface AuthState {
   // State
   currentUser: UserProfile | null;
@@ -55,8 +60,9 @@ interface AuthState {
       UserProfile,
       'id' | 'createdAt' | 'updatedAt' | 'isProfileComplete' | 'hasCompletedOnboarding'
     >,
-    pin: string
+    pin?: string | null
   ) => Promise<UserProfile>;
+  setOfflinePin: (pin: string) => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   checkExistingUser: (email: string) => Promise<UserProfile | null>;
@@ -77,14 +83,14 @@ function normalizeEmail(email?: string | null): string | null {
   return normalized ? normalized : null;
 }
 
-function readStoredUsers(): Record<string, { profile: UserProfile; pin: string }> {
+function readStoredUsers(): Record<string, StoredUserRecord> {
   const storedUsers = localStorage.getItem('golf-app-users');
   if (!storedUsers) {
     return {};
   }
 
   try {
-    return JSON.parse(storedUsers) as Record<string, { profile: UserProfile; pin: string }>;
+    return JSON.parse(storedUsers) as Record<string, StoredUserRecord>;
   } catch (parseError) {
     authLogger.error('Failed to parse stored users:', parseError);
     return {};
@@ -106,7 +112,7 @@ function findStoredUserByEmail(email?: string | null): UserProfile | null {
 }
 
 function ensureUniqueEmail(
-  users: Record<string, { profile: UserProfile; pin: string }>,
+  users: Record<string, StoredUserRecord>,
   email: string,
   excludedUserId?: string
 ): void {
@@ -135,6 +141,10 @@ function resolveProfileEmail(profileEmail: string | undefined, authEmail: string
   return normalizedEmail;
 }
 
+function hasOfflinePin(record?: StoredUserRecord | null): boolean {
+  return Boolean(record?.pin?.trim());
+}
+
 // ============================================
 // STORE
 // ============================================
@@ -158,9 +168,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           // Look up user by email in local storage
           const storedUsers = localStorage.getItem('golf-app-users');
-          const users: Record<string, { profile: UserProfile; pin: string }> = storedUsers
-            ? readStoredUsers()
-            : {};
+          const users = storedUsers ? readStoredUsers() : {};
           if (storedUsers) {
             if (Object.keys(users).length === 0) {
               set({ isLoading: false, error: 'Login data corrupted. Please contact support.' });
@@ -177,11 +185,19 @@ export const useAuthStore = create<AuthState>()(
             return false;
           }
 
+          if (!hasOfflinePin(userEntry)) {
+            set({
+              isLoading: false,
+              error: 'Offline PIN is not set for this account on this device. Use the email sign-in link.',
+            });
+            return false;
+          }
+
           // Verify PIN (supports both hashed and legacy plain text)
           let pinValid = false;
-          if (isHashedPin(userEntry.pin)) {
+          if (isHashedPin(userEntry.pin!)) {
             // PIN is already hashed - verify against hash
-            pinValid = await verifyPin(pin, userEntry.pin);
+            pinValid = await verifyPin(pin, userEntry.pin!);
           } else {
             // Legacy plain text PIN - verify and migrate to hash
             pinValid = userEntry.pin === pin;
@@ -245,7 +261,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // Create new profile
-      createProfile: async (profileData, pin: string) => {
+      createProfile: async (profileData, pin) => {
         set({ isLoading: true, error: null });
 
         try {
@@ -272,8 +288,8 @@ export const useAuthStore = create<AuthState>()(
             updatedAt: now,
           };
 
-          // Hash the PIN before storage (never store plain text)
-          const hashedPin = await hashPin(pin);
+          const normalizedPin = pin?.trim();
+          const hashedPin = normalizedPin ? await hashPin(normalizedPin) : null;
           users[id] = { profile, pin: hashedPin };
           localStorage.setItem('golf-app-users', JSON.stringify(users));
 
@@ -304,6 +320,44 @@ export const useAuthStore = create<AuthState>()(
             error: error instanceof Error ? error.message : 'Failed to create profile',
           });
           throw error;
+        }
+      },
+
+      setOfflinePin: async (pin: string) => {
+        const { currentUser } = get();
+        if (!currentUser) {
+          set({ error: 'No user logged in' });
+          throw new Error('No user logged in');
+        }
+
+        const normalizedPin = pin.trim();
+        if (!/^\d{4}$/.test(normalizedPin)) {
+          set({ error: 'PIN must be exactly 4 digits' });
+          throw new Error('PIN must be exactly 4 digits');
+        }
+
+        set({ isLoading: true, error: null });
+
+        try {
+          const users = readStoredUsers();
+          const existingRecord = users[currentUser.id];
+
+          if (!existingRecord) {
+            throw new Error('This account is not available for offline access on this device yet');
+          }
+
+          existingRecord.pin = await hashPin(normalizedPin);
+          users[currentUser.id] = existingRecord;
+          localStorage.setItem('golf-app-users', JSON.stringify(users));
+
+          set({ isLoading: false });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to save offline PIN';
+          set({
+            isLoading: false,
+            error: message,
+          });
+          throw new Error(message);
         }
       },
 

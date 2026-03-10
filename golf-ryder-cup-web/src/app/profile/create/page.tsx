@@ -25,7 +25,7 @@ import {
  * generous whitespace, and confident restraint.
  *
  * Two steps:
- *  - essential: First name, last name, email, PIN (4-digit)
+ *  - essential: First name, last name, email, optional offline PIN
  *  - optional: Handicap, GHIN, home course, preferred tees, trip prefs
  */
 
@@ -88,6 +88,7 @@ function CreateProfilePageContent() {
     {}
   );
   const [showOptionalExpanded, setShowOptionalExpanded] = useState(false);
+  const [enableOfflinePin, setEnableOfflinePin] = useState(!isSupabaseConfigured);
 
   // Redirect if already logged in and completed onboarding
   useEffect(() => {
@@ -121,6 +122,7 @@ function CreateProfilePageContent() {
 
   const validateEssential = (): boolean => {
     const errors: Partial<Record<keyof FormData, string>> = {};
+    const requiresOfflinePin = !isSupabaseConfigured || enableOfflinePin;
 
     if (!formData.firstName.trim()) {
       errors.firstName = 'First name is required';
@@ -133,13 +135,22 @@ function CreateProfilePageContent() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Please enter a valid email';
     }
-    if (!formData.pin.trim()) {
-      errors.pin = 'PIN is required';
-    } else if (!/^\d{4}$/.test(formData.pin)) {
-      errors.pin = 'PIN must be exactly 4 digits';
-    }
-    if (formData.pin !== formData.confirmPin) {
-      errors.confirmPin = 'PINs do not match';
+    if (requiresOfflinePin) {
+      if (!formData.pin.trim()) {
+        errors.pin = 'PIN is required';
+      } else if (!/^\d{4}$/.test(formData.pin)) {
+        errors.pin = 'PIN must be exactly 4 digits';
+      }
+      if (formData.pin !== formData.confirmPin) {
+        errors.confirmPin = 'PINs do not match';
+      }
+    } else if (formData.pin || formData.confirmPin) {
+      if (!/^\d{4}$/.test(formData.pin)) {
+        errors.pin = 'PIN must be exactly 4 digits';
+      }
+      if (formData.pin !== formData.confirmPin) {
+        errors.confirmPin = 'PINs do not match';
+      }
     }
 
     setValidationErrors(errors);
@@ -198,7 +209,7 @@ function CreateProfilePageContent() {
           : undefined,
       };
 
-      const profile = await createProfile(profileData, formData.pin);
+      const profile = await createProfile(profileData, enableOfflinePin ? formData.pin : undefined);
       let successMessage = "Welcome! Let's complete your profile.";
 
       if (isSupabaseConfigured && !authEmail) {
@@ -207,13 +218,19 @@ function CreateProfilePageContent() {
             profile.email ?? '',
             buildMagicLinkRedirectPath(searchParams?.get('next'))
           );
-          successMessage = 'Profile created. Check your email to finish secure sign-in.';
+          successMessage = enableOfflinePin
+            ? 'Profile created. Check your email to finish secure sign-in.'
+            : 'Profile created. Check your email to finish secure sign-in. You can add offline access later from Profile.';
         } catch (signInLinkError) {
           logger.warn('Failed to send Supabase sign-in link after profile creation', {
             error: signInLinkError,
           });
-          successMessage = 'Profile created. Use your PIN now and link email sign-in later.';
+          successMessage = enableOfflinePin
+            ? 'Profile created. Use your PIN now and link email sign-in later.'
+            : 'Profile created. Email sign-in was unavailable, but you can still add offline access later from Profile.';
         }
+      } else if (isSupabaseConfigured && !enableOfflinePin) {
+        successMessage = "Welcome! Let's complete your profile. You can add offline access later from Profile.";
       }
 
       showToast('success', successMessage);
@@ -392,7 +409,7 @@ function CreateProfilePageContent() {
                 />
               </div>
 
-              {/* PIN Section — separated by a rule */}
+              {/* Offline access section */}
               <div
                 style={{
                   borderTop: '1px solid var(--rule)',
@@ -422,7 +439,9 @@ function CreateProfilePageContent() {
                       color: 'var(--ink)',
                     }}
                   >
-                    Create Your PIN
+                    {isSupabaseConfigured
+                      ? 'Offline Access on This Device'
+                      : 'Create Your PIN'}
                   </h3>
                 </div>
 
@@ -435,37 +454,98 @@ function CreateProfilePageContent() {
                     lineHeight: 1.5,
                   }}
                 >
-                  You&apos;ll use this 4-digit PIN for offline sign-in on this device
+                  {isSupabaseConfigured
+                    ? 'Add a 4-digit PIN only if you want this device to keep working when email or network access is unavailable.'
+                    : "You'll use this 4-digit PIN for offline sign-in on this device"}
                 </p>
 
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--space-4)',
-                  }}
-                >
-                  <InputField
-                    label="4-Digit PIN"
-                    value={formData.pin}
-                    onChange={(v) => updateField('pin', v.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="••••"
-                    error={validationErrors.pin}
-                    required
-                    inputMode="numeric"
-                    maxLength={4}
-                  />
-                  <InputField
-                    label="Confirm PIN"
-                    value={formData.confirmPin}
-                    onChange={(v) => updateField('confirmPin', v.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="••••"
-                    error={validationErrors.confirmPin}
-                    required
-                    inputMode="numeric"
-                    maxLength={4}
-                  />
-                </div>
+                {isSupabaseConfigured && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEnableOfflinePin((prev) => !prev);
+                      if (enableOfflinePin) {
+                        setValidationErrors((prev) => ({
+                          ...prev,
+                          pin: undefined,
+                          confirmPin: undefined,
+                        }));
+                      }
+                    }}
+                    className="press-scale"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-2)',
+                      marginBottom: 'var(--space-5)',
+                      padding: '0.625rem 0.875rem',
+                      borderRadius: 'var(--radius-full)',
+                      border: '1px solid var(--rule)',
+                      background: enableOfflinePin ? 'var(--masters-subtle)' : 'var(--canvas-raised)',
+                      color: enableOfflinePin ? 'var(--masters)' : 'var(--ink-secondary)',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Check className="w-4 h-4" />
+                    {enableOfflinePin ? 'Offline PIN will be saved' : 'Add offline PIN now'}
+                  </button>
+                )}
+
+                {enableOfflinePin ? (
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 'var(--space-4)',
+                    }}
+                  >
+                    <InputField
+                      label="4-Digit PIN"
+                      value={formData.pin}
+                      onChange={(v) => updateField('pin', v.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="••••"
+                      error={validationErrors.pin}
+                      required={!isSupabaseConfigured || enableOfflinePin}
+                      inputMode="numeric"
+                      maxLength={4}
+                    />
+                    <InputField
+                      label="Confirm PIN"
+                      value={formData.confirmPin}
+                      onChange={(v) => updateField('confirmPin', v.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="••••"
+                      error={validationErrors.confirmPin}
+                      required={!isSupabaseConfigured || enableOfflinePin}
+                      inputMode="numeric"
+                      maxLength={4}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      padding: 'var(--space-4)',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--canvas-raised)',
+                      border: '1px solid var(--rule)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--text-sm)',
+                        color: 'var(--ink-secondary)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Skip this for now if secure email sign-in is enough. You can add an offline
+                      PIN later from Profile on this device.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
