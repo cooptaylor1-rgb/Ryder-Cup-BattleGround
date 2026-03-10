@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { PageLoadingSkeleton } from '@/components/ui';
+import { requestEmailSignInLink } from '@/lib/supabase/auth';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
 import {
   Mail,
   Hash,
@@ -196,8 +198,24 @@ function CreateProfilePageContent() {
           : undefined,
       };
 
-      await createProfile(profileData, formData.pin);
-      showToast('success', "Welcome! Let's complete your profile.");
+      const profile = await createProfile(profileData, formData.pin);
+      let successMessage = "Welcome! Let's complete your profile.";
+
+      if (isSupabaseConfigured && !authEmail) {
+        try {
+          const nextPath = searchParams?.get('next');
+          const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+          await requestEmailSignInLink(profile.email ?? '', `/login${nextParam}`);
+          successMessage = 'Profile created. Check your email to finish secure sign-in.';
+        } catch (signInLinkError) {
+          logger.warn('Failed to send Supabase sign-in link after profile creation', {
+            error: signInLinkError,
+          });
+          successMessage = 'Profile created. Use your PIN now and link email sign-in later.';
+        }
+      }
+
+      showToast('success', successMessage);
       // Redirect to complete profile page to add optional details
       const nextPath = searchParams?.get('next');
       const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
@@ -416,7 +434,7 @@ function CreateProfilePageContent() {
                     lineHeight: 1.5,
                   }}
                 >
-                  You&apos;ll use this 4-digit PIN to log in
+                  You&apos;ll use this 4-digit PIN for offline sign-in on this device
                 </p>
 
                 <div

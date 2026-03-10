@@ -1,13 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getSessionMock } = vi.hoisted(() => ({
+const { getSessionMock, signInWithOtpMock } = vi.hoisted(() => ({
   getSessionMock: vi.fn(),
+  signInWithOtpMock: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase/client', () => ({
   supabase: {
     auth: {
       getSession: getSessionMock,
+      signInWithOtp: signInWithOtpMock,
     },
   },
 }));
@@ -52,5 +54,24 @@ describe('supabase auth helpers', () => {
     const { getSupabaseAccessToken } = await import('@/lib/supabase/auth');
 
     await expect(getSupabaseAccessToken()).resolves.toBeNull();
+  });
+
+  it('requests a Supabase email sign-in link with redirect metadata', async () => {
+    signInWithOtpMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    const { requestEmailSignInLink } = await import('@/lib/supabase/auth');
+
+    await requestEmailSignInLink('  CoOp@Example.com ', '/login?next=%2Fscore');
+
+    expect(signInWithOtpMock).toHaveBeenCalledWith({
+      email: 'coop@example.com',
+      options: {
+        emailRedirectTo: 'http://localhost:3000/login?next=%2Fscore',
+        shouldCreateUser: true,
+      },
+    });
   });
 });

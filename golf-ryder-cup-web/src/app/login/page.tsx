@@ -3,9 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, Link as LinkIcon } from 'lucide-react';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
+import { requestEmailSignInLink } from '@/lib/supabase/auth';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 /**
  * LOGIN PAGE — Fried Egg Editorial
@@ -17,12 +19,23 @@ import { cn } from '@/lib/utils';
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, isAuthenticated, currentUser, isLoading, error, clearError } = useAuthStore();
+  const {
+    login,
+    isAuthenticated,
+    currentUser,
+    isLoading,
+    error,
+    clearError,
+    authEmail,
+    hasResolvedSupabaseSession,
+  } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingMagicLink, setIsSendingMagicLink] = useState(false);
+  const [magicLinkSentTo, setMagicLinkSentTo] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && currentUser) {
@@ -37,8 +50,26 @@ function LoginPageContent() {
   }, [isAuthenticated, currentUser, router, searchParams]);
 
   useEffect(() => {
-    if (error) clearError();
-  }, [email, pin, error, clearError]);
+    if (!hasResolvedSupabaseSession || !authEmail || currentUser) {
+      return;
+    }
+
+    const nextPath = searchParams?.get('next');
+    const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+    router.replace(`/profile/create${nextParam}`);
+  }, [authEmail, currentUser, hasResolvedSupabaseSession, router, searchParams]);
+
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+    if (magicLinkSentTo) {
+      setMagicLinkSentTo(null);
+    }
+  }, [email, pin, error, clearError, magicLinkSentTo]);
+
+  const nextPath = searchParams?.get('next');
+  const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,9 +81,27 @@ function LoginPageContent() {
     // Redirect handled by useEffect.
   };
 
+  const handleMagicLink = async () => {
+    if (!email || !isSupabaseConfigured) {
+      return;
+    }
+
+    setIsSendingMagicLink(true);
+
+    try {
+      await requestEmailSignInLink(email, `/login${nextParam}`);
+      setMagicLinkSentTo(email.trim().toLowerCase());
+      clearError();
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error ? requestError.message : 'Failed to send sign-in link';
+      useAuthStore.setState({ error: message });
+    } finally {
+      setIsSendingMagicLink(false);
+    }
+  };
+
   const handleCreateAccount = () => {
-    const nextPath = searchParams?.get('next');
-    const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
     router.push(`/profile/create${nextParam}`);
   };
 
@@ -105,6 +154,51 @@ function LoginPageContent() {
               />
             </div>
           </div>
+
+          {isSupabaseConfigured && (
+            <>
+              <button
+                type="button"
+                onClick={handleMagicLink}
+                disabled={!email || isSendingMagicLink}
+                className={cn(
+                  'btn-premium press-scale mb-[var(--space-4)] w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity] border border-transparent',
+                  email && !isSendingMagicLink
+                    ? 'bg-[var(--masters)] text-[var(--canvas)]'
+                    : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed opacity-90'
+                )}
+              >
+                {isSendingMagicLink ? (
+                  <>
+                    <span className="h-4 w-4 rounded-full border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] animate-spin" />
+                    Sending Link...
+                  </>
+                ) : (
+                  <>
+                    Email Me a Sign-In Link
+                    <LinkIcon className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+
+              {magicLinkSentTo && (
+                <div className="rounded-[var(--radius-md)] border border-[var(--masters)]/20 bg-[var(--masters)]/10 px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
+                  <p className="font-sans text-[length:var(--text-sm)] text-[var(--ink)]">
+                    Sign-in link sent to {magicLinkSentTo}. Open it on this device to finish secure
+                    sign-in.
+                  </p>
+                </div>
+              )}
+
+              <div className="mx-auto my-[var(--space-6)] flex items-center gap-[var(--space-4)]">
+                <div className="h-px flex-1 bg-[var(--rule)]" />
+                <span className="font-sans text-sm text-[var(--ink-tertiary)]">
+                  Or use your PIN offline
+                </span>
+                <div className="h-px flex-1 bg-[var(--rule)]" />
+              </div>
+            </>
+          )}
 
           {/* PIN */}
           <div className="mb-[var(--space-6)]">
@@ -168,7 +262,7 @@ function LoginPageContent() {
               </>
             ) : (
               <>
-                Sign In
+                Sign In with PIN
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -193,9 +287,9 @@ function LoginPageContent() {
 
         {/* Footer note */}
         <p className="text-center font-sans text-[length:var(--text-xs)] text-[var(--ink-tertiary)] mt-[var(--space-8)] leading-relaxed">
-          Your data stays on your device.
+          Email links enable cloud sync when available.
           <br />
-          No account required to browse trips.
+          Your PIN still works for local, offline sign-in.
         </p>
       </main>
 

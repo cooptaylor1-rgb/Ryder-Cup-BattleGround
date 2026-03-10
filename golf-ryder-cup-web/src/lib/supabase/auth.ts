@@ -35,3 +35,35 @@ export async function getSupabaseAccessToken(): Promise<string | null> {
   const session = await getSupabaseSessionIdentity();
   return session?.accessToken ?? null;
 }
+
+export async function requestEmailSignInLink(
+  email: string,
+  redirectPath: string = '/login'
+): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase is not configured');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) {
+    throw new Error('Email is required');
+  }
+
+  const emailRedirectTo =
+    typeof window === 'undefined'
+      ? undefined
+      : new URL(redirectPath, window.location.origin).toString();
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: normalizedEmail,
+    options: {
+      emailRedirectTo,
+      shouldCreateUser: true,
+    },
+  });
+
+  if (error) {
+    authLogger.warn('Failed to request Supabase email sign-in link:', error);
+    throw new Error(error.message || 'Failed to send sign-in link');
+  }
+}
