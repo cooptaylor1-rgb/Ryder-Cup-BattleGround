@@ -1,56 +1,59 @@
 'use client';
 
-// Note: this route is client-only; we intentionally avoid auto-redirects to show explicit empty states.
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import {
+  CloudOff,
+  Home,
+  Link2,
+  MoreHorizontal,
+  QrCode,
+  Send,
+  Share2,
+  Users,
+} from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { InvitationManager, QRCodeCard } from '@/components/captain';
+import { Button } from '@/components/ui/Button';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
+import { useTripStore, useUIStore } from '@/lib/stores';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
-import { QrCode, Home, MoreHorizontal, Share2 } from 'lucide-react';
-
-/**
- * INVITATIONS PAGE
- *
- * Manage trip invitations via QR codes and invite links.
- */
+import { cn } from '@/lib/utils';
 
 export default function InvitesPage() {
   const router = useRouter();
-  const { currentTrip } = useTripStore();
+  const { currentTrip, players } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isLoadingShareCode, setIsLoadingShareCode] = useState(false);
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
-  // Note: avoid auto-redirects so we can render explicit empty states.
+  const handleShare = useCallback(
+    async (resolvedShareCode: string, tripName: string) => {
+      const shareUrl = `${window.location.origin}/join?code=${resolvedShareCode}`;
+      const payload = {
+        title: `Join ${tripName}`,
+        text: `Join our golf trip with code ${resolvedShareCode}.`,
+        url: shareUrl,
+      };
 
-  // Share via native Share API with clipboard fallback
-  const handleShare = useCallback(async (shareCode: string, tripName: string) => {
-    const shareUrl = `${window.location.origin}/join?code=${shareCode}`;
-    const shareData = {
-      title: `Join ${tripName}`,
-      text: `Join our golf trip! Use code: ${shareCode}`,
-      url: shareUrl,
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or share failed -- fall back to clipboard
-        if ((err as Error).name !== 'AbortError') {
-          await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-          showToast('success', 'Invite copied to clipboard');
+      if (navigator.share) {
+        try {
+          await navigator.share(payload);
+          return;
+        } catch (error) {
+          if ((error as Error).name === 'AbortError') {
+            return;
+          }
         }
       }
-    } else {
-      // Desktop fallback: copy to clipboard
-      await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+
+      await navigator.clipboard.writeText(`${payload.text}\n${payload.url}`);
       showToast('success', 'Invite copied to clipboard');
-    }
-  }, [showToast]);
+    },
+    [showToast]
+  );
 
   useEffect(() => {
     if (!currentTrip) {
@@ -70,33 +73,33 @@ export default function InvitesPage() {
       return;
     }
 
-    let isCancelled = false;
-    const resetTimer = setTimeout(() => {
-      setShareCode(null);
-      setIsLoadingShareCode(true);
-    }, 0);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setIsLoadingShareCode(true);
+        setShareCode(null);
+      }
+    });
 
     void ensureTripShareCode(currentTrip.id)
       .then((resolvedShareCode) => {
-        if (isCancelled) {
-          return;
+        if (!cancelled) {
+          setShareCode(resolvedShareCode);
         }
-        setShareCode(resolvedShareCode);
       })
       .catch(() => {
-        if (!isCancelled) {
+        if (!cancelled) {
           setShareCode(null);
         }
       })
       .finally(() => {
-        if (!isCancelled) {
+        if (!cancelled) {
           setIsLoadingShareCode(false);
         }
       });
 
     return () => {
-      isCancelled = true;
-      clearTimeout(resetTimer);
+      cancelled = true;
     };
   }, [currentTrip]);
 
@@ -144,16 +147,13 @@ export default function InvitesPage() {
     );
   }
 
-  const shareUrl = shareCode
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/join?code=${shareCode}`
-    : '';
-
+  const shareUrl = shareCode && origin ? `${origin}/join?code=${shareCode}` : '';
   const tripInfo = {
     tripId: currentTrip.id,
     tripName: currentTrip.name,
-    shareCode: shareCode ?? '',
+    shareCode: shareCode ?? '--------',
     shareUrl,
-    captainName: 'Captain', // Would come from auth context in production
+    captainName: currentTrip.captainName || 'Captain',
     startDate: currentTrip.startDate,
     location: currentTrip.location,
   };
@@ -162,62 +162,205 @@ export default function InvitesPage() {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Invitations"
-        subtitle="Manage trip invites"
-        icon={<QrCode size={16} className="text-[var(--color-accent)]" />}
+        subtitle={currentTrip.name}
+        icon={<QrCode size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         onBack={() => router.back()}
+        rightSlot={
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Share2 size={14} />}
+            disabled={!shareCode || isLoadingShareCode}
+            onClick={() => {
+              if (shareCode) {
+                void handleShare(shareCode, currentTrip.name);
+              }
+            }}
+          >
+            Share
+          </Button>
+        }
       />
 
-      <main className="container-editorial">
-        {/* QR Code Section */}
-        <section className="pt-[var(--space-6)] pb-[var(--space-4)]">
-          {shareCode ? (
-            <QRCodeCard
-              shareUrl={shareUrl}
-              shareCode={shareCode}
-              tripName={currentTrip.name}
-            />
-          ) : (
-            <div className="rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--surface-raised)] p-[var(--space-5)]">
-              <p className="text-sm font-medium text-[var(--ink)]">
-                {isLoadingShareCode ? 'Publishing trip invite...' : 'Trip join code unavailable'}
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--masters)]/14 bg-[linear-gradient(135deg,rgba(10,80,48,0.97),rgba(4,52,30,0.98))] text-[var(--canvas)] shadow-[0_28px_64px_rgba(5,58,35,0.24)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.95fr)]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/70">
+                Captain Invite Desk
               </p>
-              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                {isLoadingShareCode
-                  ? 'Syncing the trip and fetching the real cloud share code.'
-                  : 'Cloud sync is unavailable right now, so a shareable join code could not be created.'}
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.3rem)] italic leading-[1.02] text-[var(--canvas)]">
+                Make joining the trip feel inevitable.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[color:var(--canvas)]/80">
+                A good trip invite should look like it belongs to a serious weekend, not like something
+                pasted together in the parking lot. Put the code where everyone can see it, then let
+                the app do the housekeeping.
               </p>
+
+              <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
+                <Button
+                  variant="secondary"
+                  className="border-[color:var(--canvas)]/16 bg-[var(--canvas)] text-[var(--masters)] hover:bg-[color:var(--canvas)]/92"
+                  leftIcon={<Share2 size={16} />}
+                  disabled={!shareCode || isLoadingShareCode}
+                  onClick={() => {
+                    if (shareCode) {
+                      void handleShare(shareCode, currentTrip.name);
+                    }
+                  }}
+                >
+                  {isLoadingShareCode ? 'Preparing invite' : 'Share invite'}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-[color:var(--canvas)]/22 bg-transparent text-[var(--canvas)] hover:bg-[color:var(--canvas)]/10"
+                  leftIcon={<Users size={16} />}
+                  onClick={() => router.push('/players')}
+                >
+                  Review roster
+                </Button>
+              </div>
             </div>
-          )}
 
-          {/* Share Invite Button */}
-          <button
-            onClick={() => shareCode && handleShare(shareCode, currentTrip.name)}
-            disabled={!shareCode || isLoadingShareCode}
-            className="press-scale flex w-full items-center justify-center gap-[var(--space-2)] mt-[var(--space-4)] rounded-[var(--radius-lg)] border-2 border-[var(--masters)] bg-[var(--masters)] px-[var(--space-5)] py-[var(--space-3)] text-[length:var(--text-base)] font-semibold text-[var(--canvas)]"
-          >
-            <Share2 size={18} />
-            {isLoadingShareCode ? 'Loading Invite' : 'Share Invite'}
-          </button>
-        </section>
-
-        <hr className="divider-subtle" />
-
-        {/* Invitation Manager */}
-        <section className="section">
-          {shareCode ? (
-            <div className="card p-[var(--space-5)]">
-              <InvitationManager
-                tripInfo={tripInfo}
-                invitations={[]}
-                onSendInvite={() => showToast('success', 'Invite sent!')}
-                onRevokeInvite={() => showToast('info', 'Invite revoked')}
-                onCopyLink={() => showToast('success', 'Link copied!')}
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <InviteFactCard icon={<Link2 size={18} />} label="Join code" value={shareCode || 'Waiting'} detail="The same code belongs everywhere players might look." />
+              <InviteFactCard icon={<Users size={18} />} label="Roster" value={players.length} detail="The invite should lead into a trip that already feels organized." />
+              <InviteFactCard
+                icon={<Send size={18} />}
+                label="Cloud sync"
+                value={isLoadingShareCode ? 'Publishing' : shareCode ? 'Ready' : 'Offline'}
+                detail={shareCode ? 'The trip can be shared from the captain desk.' : 'No real share code is available right now.'}
+                valueClassName="font-sans text-[1rem] not-italic leading-[1.25]"
               />
             </div>
-          ) : null}
+          </div>
+        </section>
+
+        {shareCode ? (
+          <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+            <QRCodeCard shareUrl={shareUrl} shareCode={shareCode} tripName={currentTrip.name} />
+            <InvitationManager
+              tripInfo={tripInfo}
+              invitations={[]}
+              onSendInvite={() => showToast('success', 'Invite drafted')}
+              onRevokeInvite={() => showToast('info', 'Invite revoked')}
+              onCopyLink={() => showToast('success', 'Invite copied')}
+            />
+          </section>
+        ) : (
+          <section className="mt-[var(--space-6)] rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.98))] p-[var(--space-6)] shadow-[0_20px_44px_rgba(41,29,17,0.08)]">
+            <div className="grid gap-[var(--space-5)] lg:grid-cols-[minmax(0,1.1fr)_18rem]">
+              <div>
+                <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Invite Status</p>
+                <h2 className="mt-[var(--space-2)] font-serif text-[2rem] italic text-[var(--ink)]">
+                  The captain board is ready. The cloud invite is not.
+                </h2>
+                <p className="mt-[var(--space-3)] max-w-[35rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                  The trip could not publish a real join code. That usually means the device is offline
+                  or cloud sync is unavailable, so the invite desk has to wait for the connection to come back.
+                </p>
+                <div className="mt-[var(--space-5)]">
+                  <Button
+                    variant="primary"
+                    leftIcon={<Share2 size={16} />}
+                    isLoading={isLoadingShareCode}
+                    loadingText="Publishing"
+                    onClick={() => {
+                      if (currentTrip) {
+                        setIsLoadingShareCode(true);
+                        void ensureTripShareCode(currentTrip.id)
+                          .then((resolvedShareCode) => setShareCode(resolvedShareCode))
+                          .catch(() => showToast('error', 'Could not publish a trip invite'))
+                          .finally(() => setIsLoadingShareCode(false));
+                      }
+                    }}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/76 p-[var(--space-4)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[color:var(--error)]/10 text-[var(--error)]">
+                  <CloudOff size={20} />
+                </div>
+                <h3 className="mt-[var(--space-3)] text-lg font-semibold text-[var(--ink)]">
+                  Share code unavailable
+                </h3>
+                <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+                  The invite desk still has its design language, but it should not pretend the trip is shareable until the real cloud code exists.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] lg:grid-cols-2">
+          <InviteSidebarCard
+            title="Put the code where the day begins"
+            body="The best spot for the QR is usually wherever the group stands still for 30 seconds: breakfast table, rental-house counter, or the first tee before anyone has settled down."
+          />
+          <InviteSidebarCard
+            title="Keep the fallback human"
+            body="If cloud sync drops, do not improvise a fake code. Wait for the real one, then send the link once. It is better to look composed ten minutes later than confused right now."
+            tone="green"
+          />
         </section>
       </main>
-
     </div>
+  );
+}
+
+function InviteFactCard({
+  icon,
+  label,
+  value,
+  detail,
+  valueClassName,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.55rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10 p-[var(--space-4)]">
+      <div className="flex items-center gap-[var(--space-2)] text-[color:var(--canvas)]/72">
+        {icon}
+        <span className="type-overline tracking-[0.14em]">{label}</span>
+      </div>
+      <div className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--canvas)]', valueClassName)}>
+        {value}
+      </div>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[color:var(--canvas)]/72">{detail}</p>
+    </div>
+  );
+}
+
+function InviteSidebarCard({
+  title,
+  body,
+  tone = 'ink',
+}: {
+  title: string;
+  body: string;
+  tone?: 'ink' | 'green';
+}) {
+  return (
+    <aside
+      className={cn(
+        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
+        tone === 'green'
+          ? 'border-[var(--masters)]/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(239,246,242,0.99))]'
+          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.98))]'
+      )}
+    >
+      <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Captain note</p>
+      <h3 className="mt-[var(--space-2)] font-serif text-[1.75rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
+    </aside>
   );
 }

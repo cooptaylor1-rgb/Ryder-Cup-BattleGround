@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/utils/metadata';
 import { ErrorBoundary, PageLoadingSkeleton } from '@/components/ui';
@@ -6,23 +6,23 @@ import { ErrorBoundary, PageLoadingSkeleton } from '@/components/ui';
 export const metadata: Metadata = pageMetadata.captain;
 
 export default function CaptainLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: ReactNode;
 }) {
-    return (
-        <ErrorBoundary variant="compact">
-            <Suspense
-                fallback={
-                    <PageLoadingSkeleton
-                        title="Loading captain tools…"
-                        showBackButton={false}
-                        variant="list"
-                    />
-                }
-            >
-                {children}
-            </Suspense>
-        </ErrorBoundary>
-    );
+  return (
+    <ErrorBoundary variant="compact">
+      <Suspense
+        fallback={
+          <PageLoadingSkeleton
+            title="Loading captain tools..."
+            showBackButton={false}
+            variant="list"
+          />
+        }
+      >
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
 }

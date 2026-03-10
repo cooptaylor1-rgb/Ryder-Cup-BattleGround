@@ -1,43 +1,27 @@
-/**
- * Invitation Manager Component
- *
- * Player invitation and onboarding system:
- * - Generate shareable invite links
- * - Track invitation status
- * - Manage pending invites
- * - Resend/revoke invitations
- *
- * Features:
- * - One-tap sharing via native share API
- * - QR code generation
- * - Status tracking (pending/accepted/declined)
- * - Bulk invite management
- */
-
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { cn } from '@/lib/utils';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import {
-  UserPlus,
+  BadgeCheck,
+  Clock3,
   Copy,
-  Check,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Share2,
-  MoreHorizontal,
+  Link2,
+  Mail,
+  MapPin,
+  QrCode,
   RefreshCw,
-  Trash2,
-  Users,
   Send,
-  ExternalLink,
+  Share2,
+  type LucideIcon,
+  Trash2,
+  UserPlus,
+  Users,
+  XCircle,
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { QRCode } from '@/components/ui/QRCode';
-
-// ============================================
-// TYPES
-// ============================================
+import { cn } from '@/lib/utils';
 
 export type InvitationStatus = 'pending' | 'sent' | 'opened' | 'accepted' | 'declined' | 'expired';
 
@@ -76,9 +60,52 @@ interface InvitationManagerProps {
   className?: string;
 }
 
-// ============================================
-// INVITATION MANAGER
-// ============================================
+const STATUS_META: Record<
+  InvitationStatus,
+  {
+    label: string;
+    icon: LucideIcon;
+    accent: string;
+    surfaceClassName: string;
+  }
+> = {
+  pending: {
+    label: 'Pending',
+    icon: Clock3,
+    accent: 'var(--warning)',
+    surfaceClassName: 'bg-[color:var(--warning)]/10 text-[var(--warning)]',
+  },
+  sent: {
+    label: 'Sent',
+    icon: Send,
+    accent: 'var(--team-europe)',
+    surfaceClassName: 'bg-[color:var(--team-europe)]/10 text-[var(--team-europe)]',
+  },
+  opened: {
+    label: 'Opened',
+    icon: Link2,
+    accent: 'var(--team-usa)',
+    surfaceClassName: 'bg-[color:var(--team-usa)]/10 text-[var(--team-usa)]',
+  },
+  accepted: {
+    label: 'Accepted',
+    icon: BadgeCheck,
+    accent: 'var(--success)',
+    surfaceClassName: 'bg-[color:var(--success)]/10 text-[var(--success)]',
+  },
+  declined: {
+    label: 'Declined',
+    icon: XCircle,
+    accent: 'var(--error)',
+    surfaceClassName: 'bg-[color:var(--error)]/10 text-[var(--error)]',
+  },
+  expired: {
+    label: 'Expired',
+    icon: Clock3,
+    accent: 'var(--ink-tertiary)',
+    surfaceClassName: 'bg-[color:var(--ink-tertiary)]/12 text-[var(--ink-tertiary)]',
+  },
+};
 
 export function InvitationManager({
   tripInfo,
@@ -89,590 +116,491 @@ export function InvitationManager({
   onCopyLink,
   className,
 }: InvitationManagerProps) {
-  const [showNewInvite, setShowNewInvite] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
 
-  const stats = useMemo(() => ({
-    total: invitations.length,
-    pending: invitations.filter((i) => ['pending', 'sent', 'opened'].includes(i.status)).length,
-    accepted: invitations.filter((i) => i.status === 'accepted').length,
-    declined: invitations.filter((i) => i.status === 'declined').length,
-  }), [invitations]);
+  const stats = useMemo(
+    () => ({
+      total: invitations.length,
+      pending: invitations.filter((invite) =>
+        ['pending', 'sent', 'opened'].includes(invite.status)
+      ).length,
+      accepted: invitations.filter((invite) => invite.status === 'accepted').length,
+      declined: invitations.filter((invite) => invite.status === 'declined').length,
+    }),
+    [invitations]
+  );
 
   const handleCopyLink = useCallback(async () => {
+    if (!tripInfo.shareUrl) {
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(tripInfo.shareUrl);
-      setCopiedLink(true);
       onCopyLink?.(tripInfo.shareUrl);
-      setTimeout(() => setCopiedLink(false), 2000);
+      setCopiedLink(true);
+      window.setTimeout(() => setCopiedLink(false), 1800);
     } catch {
-      // Fallback for older browsers
       onCopyLink?.(tripInfo.shareUrl);
     }
-  }, [tripInfo.shareUrl, onCopyLink]);
+  }, [onCopyLink, tripInfo.shareUrl]);
 
   const handleNativeShare = useCallback(async () => {
-    const shareData = {
+    if (!tripInfo.shareUrl) {
+      return;
+    }
+
+    const payload = {
       title: `Join ${tripInfo.tripName}`,
-      text: `Join our golf trip! Use code: ${tripInfo.shareCode}`,
+      text: `${tripInfo.captainName} invited you to the trip. Use code ${tripInfo.shareCode}.`,
       url: tripInfo.shareUrl,
     };
 
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or share failed -- fall back to clipboard
-        if ((err as Error).name !== 'AbortError') {
-          try {
-            await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-            setCopiedLink(true);
-            setTimeout(() => setCopiedLink(false), 2000);
-          } catch {
-            // Clipboard also failed
-          }
-        }
-      }
-    } else {
-      handleCopyLink();
+    if (!navigator.share) {
+      await handleCopyLink();
+      return;
     }
-  }, [tripInfo, handleCopyLink]);
+
+    try {
+      await navigator.share(payload);
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        await handleCopyLink();
+      }
+    }
+  }, [handleCopyLink, tripInfo.captainName, tripInfo.shareCode, tripInfo.shareUrl, tripInfo.tripName]);
 
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Quick Share Card */}
-      <div
-        className="p-4 rounded-2xl bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-      >
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="font-bold text-[var(--canvas)] text-lg">Invite Players</h3>
-            <p className="text-[color:var(--canvas)]/70 text-sm mt-0.5">
-              Share this link to let players join your trip
-            </p>
-          </div>
-          <div
-            className="w-12 h-12 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center"
-          >
-            <UserPlus className="w-6 h-6 text-[var(--canvas)]" />
-          </div>
-        </div>
-
-        {/* Share Code */}
-        <div
-          className="p-3 rounded-xl bg-[color:var(--canvas-raised)]/12 backdrop-blur-sm mb-3"
-        >
-          <p className="text-[color:var(--canvas)]/60 text-xs mb-1">Join Code</p>
-          <p className="text-[var(--canvas)] font-mono text-2xl tracking-wider">
-            {tripInfo.shareCode}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={handleCopyLink}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
-          >
-            {copiedLink ? (
-              <>
-                <Check className="w-5 h-5" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="w-5 h-5" />
-                Copy Link
-              </>
-            )}
-          </button>
-          <button
-            onClick={handleNativeShare}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--canvas)] text-[var(--masters)] font-medium transition-colors hover:bg-[color:var(--canvas)]/90"
-          >
-            <Share2 className="w-5 h-5" />
-            Share
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatBadge
-          label="Pending"
-          value={stats.pending}
-          icon={<Clock className="w-4 h-4" />}
-          color="var(--warning)"
-        />
-        <StatBadge
-          label="Accepted"
-          value={stats.accepted}
-          icon={<CheckCircle2 className="w-4 h-4" />}
-          color="var(--success)"
-        />
-        <StatBadge
-          label="Declined"
-          value={stats.declined}
-          icon={<XCircle className="w-4 h-4" />}
-          color="var(--error)"
-        />
-      </div>
-
-      {/* New Invite Button */}
-      {onSendInvite && (
-        <button
-          onClick={() => setShowNewInvite(true)}
-          className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-          style={{
-            background: 'var(--surface)',
-            color: 'var(--masters)',
-            border: '1px solid var(--rule)',
-          }}
-        >
-          <UserPlus className="w-5 h-5" />
-          Send Personal Invite
-        </button>
-      )}
-
-      {/* Invitations List */}
-      {invitations.length > 0 && (
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--rule)',
-          }}
-        >
-          <div
-            className="p-4"
-            style={{ borderBottom: '1px solid var(--rule)' }}
-          >
-            <h3
-              className="font-semibold"
-              style={{ color: 'var(--ink)' }}
-            >
-              Sent Invitations
-            </h3>
-          </div>
-          <div className="divide-y" style={{ borderColor: 'var(--rule)' }}>
-            {invitations.map((invitation) => (
-              <InvitationRow
-                key={invitation.id}
-                invitation={invitation}
-                onResend={onResendInvite}
-                onRevoke={onRevokeInvite}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {invitations.length === 0 && (
-        <div
-          className="p-8 rounded-2xl text-center"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--rule)',
-          }}
-        >
-          <Users
-            className="w-12 h-12 mx-auto mb-3"
-            style={{ color: 'var(--ink-tertiary)' }}
-          />
-          <p style={{ color: 'var(--ink-secondary)' }}>
-            No invitations sent yet
-          </p>
-          <p
-            className="text-sm mt-1"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
-            Share your join code or send personal invites
-          </p>
-        </div>
-      )}
-
-      {/* New Invite Modal */}
-      {showNewInvite && onSendInvite && (
-        <NewInviteModal
-          onClose={() => setShowNewInvite(false)}
-          onSend={(invite) => {
-            onSendInvite(invite);
-            setShowNewInvite(false);
-          }}
-          tripInfo={tripInfo}
-        />
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// STAT BADGE
-// ============================================
-
-interface StatBadgeProps {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  color: string;
-}
-
-function StatBadge({ label, value, icon, color }: StatBadgeProps) {
-  return (
-    <div
-      className="p-3 rounded-xl text-center"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
-    >
-      <div
-        className="w-8 h-8 mx-auto mb-2 rounded-lg flex items-center justify-center"
-        style={{
-          background: `${color}15`,
-          color,
-        }}
-      >
-        {icon}
-      </div>
-      <p
-        className="text-xl font-bold"
-        style={{ color }}
-      >
-        {value}
-      </p>
-      <p
-        className="text-xs"
-        style={{ color: 'var(--ink-tertiary)' }}
-      >
-        {label}
-      </p>
-    </div>
-  );
-}
-
-// ============================================
-// INVITATION ROW
-// ============================================
-
-interface InvitationRowProps {
-  invitation: Invitation;
-  onResend?: (id: string) => void;
-  onRevoke?: (id: string) => void;
-}
-
-function InvitationRow({ invitation, onResend, onRevoke }: InvitationRowProps) {
-  const [showActions, setShowActions] = useState(false);
-
-  const statusConfig: Record<InvitationStatus, { label: string; color: string; icon: React.ReactNode }> = {
-    pending: { label: 'Pending', color: 'var(--ink-tertiary)', icon: <Clock className="w-4 h-4" /> },
-    sent: { label: 'Sent', color: 'var(--warning)', icon: <Send className="w-4 h-4" /> },
-    opened: { label: 'Opened', color: 'var(--team-europe)', icon: <ExternalLink className="w-4 h-4" /> },
-    accepted: { label: 'Joined', color: 'var(--success)', icon: <CheckCircle2 className="w-4 h-4" /> },
-    declined: { label: 'Declined', color: 'var(--error)', icon: <XCircle className="w-4 h-4" /> },
-    expired: { label: 'Expired', color: 'var(--ink-tertiary)', icon: <Clock className="w-4 h-4" /> },
-  };
-
-  const config = statusConfig[invitation.status];
-  const displayName = invitation.recipientName || invitation.recipientEmail || 'Anonymous';
-
-  return (
-    <div className="p-4">
-      <div className="flex items-center gap-3">
-        {/* Avatar */}
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-          style={{
-            background: 'var(--surface-raised)',
-            color: 'var(--ink-secondary)',
-          }}
-        >
-          {displayName[0].toUpperCase()}
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <p
-            className="font-medium truncate"
-            style={{ color: 'var(--ink)' }}
-          >
-            {displayName}
-          </p>
-          <div className="flex items-center gap-2">
-            {invitation.assignedTeam && (
-              <span
-                className="text-xs font-medium"
-                style={{
-                  color: invitation.assignedTeam === 'A' ? 'var(--team-usa)' : 'var(--team-europe)',
-                }}
-              >
-                Team {invitation.assignedTeam === 'A' ? 'USA' : 'EUR'}
-              </span>
-            )}
-            <span
-              className="text-xs"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
-              {formatRelativeTime(invitation.createdAt)}
-            </span>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div
-          className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
-          style={{
-            background: `${config.color}15`,
-            color: config.color,
-          }}
-        >
-          {config.icon}
-          {config.label}
-        </div>
-
-        {/* Actions */}
-        {(onResend || onRevoke) && invitation.status !== 'accepted' && (
-          <div className="relative">
-            <button
-              onClick={() => setShowActions(!showActions)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
-              <MoreHorizontal className="w-5 h-5" />
-            </button>
-
-            {showActions && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowActions(false)}
-                />
-                <div
-                  className="absolute right-0 mt-1 py-1 rounded-xl shadow-lg z-20 min-w-35"
-                  style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--rule)',
-                  }}
-                >
-                  {onResend && (
-                    <button
-                      onClick={() => {
-                        onResend(invitation.id);
-                        setShowActions(false);
-                      }}
-                      className="w-full px-4 py-2 flex items-center gap-2 text-sm transition-colors"
-                      style={{ color: 'var(--ink)' }}
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      Resend
-                    </button>
-                  )}
-                  {onRevoke && (
-                    <button
-                      onClick={() => {
-                        onRevoke(invitation.id);
-                        setShowActions(false);
-                      }}
-                      className="w-full px-4 py-2 flex items-center gap-2 text-sm transition-colors"
-                      style={{ color: 'var(--error)' }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Revoke
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// NEW INVITE MODAL
-// ============================================
-
-interface NewInviteModalProps {
-  onClose: () => void;
-  onSend: (invite: Partial<Invitation>) => void;
-  tripInfo: TripInviteInfo;
-}
-
-function NewInviteModal({ onClose, onSend, tripInfo }: NewInviteModalProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [team, setTeam] = useState<'A' | 'B' | undefined>();
-  const [_sendMethod, _setSendMethod] = useState<'email' | 'sms' | 'copy'>('copy');
-
-  const canSend = name.trim().length > 0;
-
-  const handleSend = () => {
-    if (!canSend) return;
-
-    onSend({
-      recipientName: name.trim(),
-      recipientEmail: email.trim() || undefined,
-      assignedTeam: team,
-      status: 'pending',
-    });
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[color:var(--ink)]/50"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div
-        className="relative w-full max-w-md rounded-2xl overflow-hidden"
-        style={{
-          background: 'var(--canvas)',
-        }}
-      >
-        {/* Header */}
-        <div
-          className="p-4 flex items-center justify-between"
-          style={{ borderBottom: '1px solid var(--rule)' }}
-        >
-          <h3
-            className="font-bold text-lg"
-            style={{ color: 'var(--ink)' }}
-          >
-            Send Invitation
-          </h3>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
-            <XCircle className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <div className="p-4 space-y-4">
-          {/* Name */}
-          <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              style={{ color: 'var(--ink)' }}
-            >
-              Player Name *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter player name"
-              className="w-full px-4 py-3 rounded-xl text-sm"
-              style={{
-                background: 'var(--surface)',
-                color: 'var(--ink)',
-                border: '1px solid var(--rule)',
-              }}
-            />
-          </div>
-
-          {/* Email (optional) */}
-          <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              style={{ color: 'var(--ink)' }}
-            >
-              Email (optional)
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="player@email.com"
-              className="w-full px-4 py-3 rounded-xl text-sm"
-              style={{
-                background: 'var(--surface)',
-                color: 'var(--ink)',
-                border: '1px solid var(--rule)',
-              }}
-            />
-          </div>
-
-          {/* Team Assignment */}
-          <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              style={{ color: 'var(--ink)' }}
-            >
-              Pre-assign to Team
-            </label>
-            <div className="flex gap-2">
-              {(['A', 'B'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTeam(team === t ? undefined : t)}
-                  className={cn('flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors')}
-                  style={{
-                    background: team === t
-                      ? (t === 'A' ? 'var(--team-usa)' : 'var(--team-europe)')
-                      : 'var(--surface)',
-                    color: team === t ? 'white' : 'var(--ink-secondary)',
-                    border: `1px solid ${team === t ? 'transparent' : 'var(--rule)'}`,
-                  }}
-                >
-                  Team {t === 'A' ? 'USA' : 'EUR'}
-                </button>
-              ))}
+    <div className={cn('space-y-[var(--space-4)]', className)}>
+      <section className="grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.12fr)_18rem]">
+        <div className="rounded-[1.9rem] border border-[var(--masters)]/20 bg-[linear-gradient(145deg,rgba(11,94,55,0.95),rgba(5,58,35,0.98))] p-[var(--space-5)] text-[var(--canvas)] shadow-[0_26px_54px_rgba(5,58,35,0.24)]">
+          <div className="flex items-start justify-between gap-[var(--space-4)]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/72">
+                Share The Trip
+              </p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic leading-[1.02] text-[var(--canvas)]">
+                Give the group one clean way in.
+              </h3>
+              <p className="mt-[var(--space-3)] max-w-[32rem] text-sm leading-6 text-[color:var(--canvas)]/78">
+                The best invite is the one that is unmistakable. Send the link, post the code,
+                and let the captain desk look organized instead of improvised.
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10">
+              <UserPlus size={20} />
             </div>
           </div>
 
-          {/* Preview */}
-          <div
-            className="p-4 rounded-xl"
-            style={{ background: 'var(--surface-raised)' }}
-          >
-            <p
-              className="text-xs font-medium uppercase tracking-wide mb-2"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
-              Invite Preview
-            </p>
-            <p style={{ color: 'var(--ink)' }}>
-              <strong>{tripInfo.captainName}</strong> has invited you to join <strong>{tripInfo.tripName}</strong>!
-            </p>
-            <p
-              className="text-sm mt-2"
-              style={{ color: 'var(--ink-secondary)' }}
-            >
-              Use code: <span className="font-mono font-bold">{tripInfo.shareCode}</span>
-            </p>
+          <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div className="rounded-[1.4rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10 p-[var(--space-4)]">
+              <p className="type-overline tracking-[0.15em] text-[color:var(--canvas)]/68">Join Code</p>
+              <p className="mt-[var(--space-2)] font-mono text-[2rem] tracking-[0.28em] text-[var(--canvas)]">
+                {tripInfo.shareCode}
+              </p>
+            </div>
+
+            <div className="rounded-[1.4rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10 p-[var(--space-4)]">
+              <div className="flex items-center gap-[var(--space-2)] text-[color:var(--canvas)]/72">
+                <Link2 size={16} />
+                <span className="type-overline tracking-[0.14em]">Trip Link</span>
+              </div>
+              <p className="mt-[var(--space-2)] break-all text-sm leading-6 text-[var(--canvas)]">
+                {tripInfo.shareUrl}
+              </p>
+            </div>
           </div>
 
-          {/* Send Button */}
-          <button
-            onClick={handleSend}
-            disabled={!canSend}
-            className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-            style={{
-              background: canSend ? 'var(--masters)' : 'var(--surface)',
-              color: canSend ? 'white' : 'var(--ink-tertiary)',
-            }}
-          >
-            <Send className="w-5 h-5" />
-            Create Invitation
-          </button>
+          <div className="mt-[var(--space-4)] flex flex-wrap gap-[var(--space-3)]">
+            <Button
+              variant="secondary"
+              className="border-[color:var(--canvas)]/18 bg-[color:var(--canvas)] text-[var(--masters)] hover:bg-[color:var(--canvas)]/92"
+              leftIcon={copiedLink ? <BadgeCheck size={16} /> : <Copy size={16} />}
+              onClick={() => {
+                void handleCopyLink();
+              }}
+            >
+              {copiedLink ? 'Copied' : 'Copy link'}
+            </Button>
+            <Button
+              variant="outline"
+              className="border-[color:var(--canvas)]/22 bg-transparent text-[var(--canvas)] hover:bg-[color:var(--canvas)]/10"
+              leftIcon={<Share2 size={16} />}
+              onClick={() => {
+                void handleNativeShare();
+              }}
+            >
+              Share invite
+            </Button>
+            {onSendInvite ? (
+              <Button
+                variant="ghost"
+                className="bg-[color:var(--canvas)]/8 text-[var(--canvas)] hover:bg-[color:var(--canvas)]/16 hover:text-[var(--canvas)]"
+                leftIcon={<Mail size={16} />}
+                onClick={() => setShowComposer(true)}
+              >
+                Personal invite
+              </Button>
+            ) : null}
+          </div>
         </div>
-      </div>
+
+        <div className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.98))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.08)]">
+          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Player Path</p>
+          <h3 className="mt-[var(--space-2)] font-serif text-[1.7rem] italic text-[var(--ink)]">
+            Keep the next steps obvious.
+          </h3>
+          <div className="mt-[var(--space-4)] space-y-[var(--space-3)]">
+            <InviteStep
+              icon={<Share2 size={16} />}
+              title="Share one link"
+              detail="Drop the link in the thread, then leave the code somewhere visible for the slow responders."
+            />
+            <InviteStep
+              icon={<QrCode size={16} />}
+              title="Use the QR card at check-in"
+              detail="The printed code works best when bags are down and everybody is still pretending to be organized."
+            />
+            <InviteStep
+              icon={<Users size={16} />}
+              title="Let players self-join"
+              detail="The less manual roster wrangling a captain does on arrival morning, the better the day starts."
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-[var(--space-3)] sm:grid-cols-4">
+        <InviteStatCard label="Total invites" value={stats.total} detail="Tracked personal sends" />
+        <InviteStatCard label="Pending" value={stats.pending} detail="Still waiting on a response" />
+        <InviteStatCard label="Accepted" value={stats.accepted} detail="Ready to join the trip" />
+        <InviteStatCard label="Declined" value={stats.declined} detail="Needs a replacement plan" />
+      </section>
+
+      <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.98))] p-[var(--space-5)] shadow-[0_20px_44px_rgba(41,29,17,0.08)]">
+        <div className="flex flex-wrap items-start justify-between gap-[var(--space-3)]">
+          <div>
+            <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Invite Ledger</p>
+            <h3 className="mt-[var(--space-2)] font-serif text-[1.8rem] italic text-[var(--ink)]">
+              Keep the paper trail calm.
+            </h3>
+            <p className="mt-[var(--space-2)] max-w-[32rem] text-sm leading-6 text-[var(--ink-secondary)]">
+              This is the board for personal nudges and follow-ups. The join link does most of the
+              work, but the captain still needs a place to see who is lingering.
+            </p>
+          </div>
+          {onSendInvite ? (
+            <Button variant="secondary" leftIcon={<UserPlus size={16} />} onClick={() => setShowComposer(true)}>
+              New personal invite
+            </Button>
+          ) : null}
+        </div>
+
+        {invitations.length === 0 ? (
+          <div className="mt-[var(--space-4)] rounded-[1.5rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--surface)]/72 p-[var(--space-5)] text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+              <Mail size={18} />
+            </div>
+            <h4 className="mt-[var(--space-3)] text-base font-semibold text-[var(--ink)]">
+              No personal invites on the books yet.
+            </h4>
+            <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+              That is fine if the share link is doing the job. Use personal invites only when the
+              captain needs a direct nudge for one player.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-[var(--space-4)] space-y-[var(--space-3)]">
+            {invitations.map((invitation) => (
+              <InvitationCard
+                key={invitation.id}
+                invitation={invitation}
+                onResendInvite={onResendInvite}
+                onRevokeInvite={onRevokeInvite}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {onSendInvite ? (
+        <InviteComposerModal
+          isOpen={showComposer}
+          tripInfo={tripInfo}
+          onClose={() => setShowComposer(false)}
+          onSend={(invite) => {
+            onSendInvite(invite);
+            setShowComposer(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
 
-// ============================================
-// QR CODE CARD
-// ============================================
+function InviteStatCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: number;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 p-[var(--space-4)] shadow-[0_14px_30px_rgba(41,29,17,0.05)]">
+      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <p className="mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]">
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function InviteStep({
+  icon,
+  title,
+  detail,
+}: {
+  icon: ReactNode;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/72 p-[var(--space-4)]">
+      <div className="flex items-center gap-[var(--space-2)] text-[var(--masters)]">
+        {icon}
+        <span className="text-sm font-semibold text-[var(--ink)]">{title}</span>
+      </div>
+      <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function InvitationCard({
+  invitation,
+  onResendInvite,
+  onRevokeInvite,
+}: {
+  invitation: Invitation;
+  onResendInvite?: (inviteId: string) => void;
+  onRevokeInvite?: (inviteId: string) => void;
+}) {
+  const meta = STATUS_META[invitation.status];
+  const StatusIcon = meta.icon;
+  const contactLine =
+    invitation.recipientEmail || invitation.recipientPhone || 'No contact method recorded';
+
+  return (
+    <article className="rounded-[1.45rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/80 p-[var(--space-4)] shadow-[0_14px_28px_rgba(41,29,17,0.05)]">
+      <div className="flex flex-wrap items-start justify-between gap-[var(--space-3)]">
+        <div>
+          <div className="flex flex-wrap items-center gap-[var(--space-2)]">
+            <h4 className="text-base font-semibold text-[var(--ink)]">
+              {invitation.recipientName || 'Unnamed invite'}
+            </h4>
+            <span className={cn('inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]', meta.surfaceClassName)}>
+              <StatusIcon size={12} />
+              {meta.label}
+            </span>
+            {invitation.assignedTeam ? (
+              <span className="rounded-full bg-[color:var(--surface-raised)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                Team {invitation.assignedTeam}
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+            {contactLine}
+          </p>
+        </div>
+
+        <div className="text-right text-xs leading-5 text-[var(--ink-tertiary)]">
+          <p>Created {formatDate(invitation.createdAt)}</p>
+          {invitation.acceptedAt ? <p>Accepted {formatDate(invitation.acceptedAt)}</p> : null}
+          {!invitation.acceptedAt && invitation.expiresAt ? (
+            <p>Expires {formatDate(invitation.expiresAt)}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-[var(--space-4)] flex flex-wrap gap-[var(--space-3)]">
+        {onResendInvite ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            leftIcon={<RefreshCw size={14} />}
+            onClick={() => onResendInvite(invitation.id)}
+          >
+            Resend
+          </Button>
+        ) : null}
+        {onRevokeInvite ? (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Trash2 size={14} />}
+            onClick={() => onRevokeInvite(invitation.id)}
+          >
+            Revoke
+          </Button>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function InviteComposerModal({
+  isOpen,
+  onClose,
+  onSend,
+  tripInfo,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSend: (invite: Partial<Invitation>) => void;
+  tripInfo: TripInviteInfo;
+}) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [team, setTeam] = useState<'A' | 'B' | ''>('');
+
+  const reset = useCallback(() => {
+    setName('');
+    setEmail('');
+    setPhone('');
+    setTeam('');
+  }, []);
+
+  const handleClose = useCallback(() => {
+    reset();
+    onClose();
+  }, [onClose, reset]);
+
+  const handleSend = useCallback(() => {
+    if (!name.trim() && !email.trim() && !phone.trim()) {
+      return;
+    }
+
+    onSend({
+      id: crypto.randomUUID(),
+      recipientName: name.trim() || undefined,
+      recipientEmail: email.trim() || undefined,
+      recipientPhone: phone.trim() || undefined,
+      assignedTeam: team || undefined,
+      status: 'sent',
+      createdAt: new Date().toISOString(),
+      sentAt: new Date().toISOString(),
+      inviteCode: tripInfo.shareCode,
+      inviteUrl: tripInfo.shareUrl,
+    });
+
+    handleClose();
+  }, [email, handleClose, name, onSend, phone, team, tripInfo.shareCode, tripInfo.shareUrl]);
+
+  const canSubmit = Boolean(name.trim() || email.trim() || phone.trim());
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Send a personal invite"
+      description="Keep the shared link as the default, then use this for the one player who needs a directed nudge."
+      size="lg"
+    >
+      <div className="space-y-[var(--space-4)] p-[var(--space-5)] pt-0">
+        <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/70 p-[var(--space-4)]">
+          <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Trip Invite</p>
+          <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-[var(--space-3)] text-sm text-[var(--ink-secondary)]">
+            <span className="inline-flex items-center gap-2">
+              <Users size={14} />
+              {tripInfo.tripName}
+            </span>
+            {tripInfo.location ? (
+              <span className="inline-flex items-center gap-2">
+                <MapPin size={14} />
+                {tripInfo.location}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
+          <InviteField label="Player name">
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Name"
+              className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
+            />
+          </InviteField>
+
+          <InviteField label="Preferred team">
+            <select
+              value={team}
+              onChange={(event) => setTeam(event.target.value as 'A' | 'B' | '')}
+              className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
+            >
+              <option value="">No team preference</option>
+              <option value="A">Team A</option>
+              <option value="B">Team B</option>
+            </select>
+          </InviteField>
+        </div>
+
+        <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
+          <InviteField label="Email">
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="name@example.com"
+              className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
+            />
+          </InviteField>
+
+          <InviteField label="Phone">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder="555-555-5555"
+              className="w-full rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-4 py-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--masters)]"
+            />
+          </InviteField>
+        </div>
+
+        <div className="flex flex-wrap justify-end gap-[var(--space-3)]">
+          <Button variant="ghost" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" leftIcon={<Send size={16} />} disabled={!canSubmit} onClick={handleSend}>
+            Create invite
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function InviteField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-[var(--space-2)] block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
 
 interface QRCodeCardProps {
   shareUrl: string;
@@ -683,54 +611,64 @@ interface QRCodeCardProps {
 
 export function QRCodeCard({ shareUrl, shareCode, tripName, className }: QRCodeCardProps) {
   return (
-    <div
-      className={cn('p-6 rounded-2xl text-center', className)}
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
+    <section
+      className={cn(
+        'rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(246,240,232,0.99))] p-[var(--space-5)] shadow-[0_24px_48px_rgba(41,29,17,0.08)]',
+        className
+      )}
     >
-      <QRCode value={shareUrl} size={192} className="mx-auto mb-4" />
-      <p
-        className="font-semibold"
-        style={{ color: 'var(--ink)' }}
-      >
-        {tripName}
-      </p>
-      <p
-        className="font-mono text-2xl mt-2"
-        style={{ color: 'var(--masters)' }}
-      >
-        {shareCode}
-      </p>
-      <p
-        className="text-sm mt-2"
-        style={{ color: 'var(--ink-tertiary)' }}
-      >
-        Scan or enter code to join
-      </p>
-    </div>
+      <div className="flex items-start justify-between gap-[var(--space-4)]">
+        <div>
+          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Scan To Join</p>
+          <h3 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+            Put the invite in plain sight.
+          </h3>
+          <p className="mt-[var(--space-2)] max-w-[28rem] text-sm leading-6 text-[var(--ink-secondary)]">
+            This works best on a table, taped near the first tee, or anywhere the group naturally
+            gathers before the day gets noisy.
+          </p>
+        </div>
+        <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] border border-[var(--masters)]/18 bg-[var(--surface-raised)] text-[var(--masters)]">
+          <QrCode size={20} />
+        </div>
+      </div>
+
+      <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-4)] text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+          <div className="mx-auto flex justify-center rounded-[1.2rem] bg-white p-[var(--space-3)] shadow-[0_12px_24px_rgba(41,29,17,0.08)]">
+            <QRCode value={shareUrl} size={208} />
+          </div>
+        </div>
+
+        <div className="grid gap-[var(--space-3)]">
+          <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/72 p-[var(--space-4)]">
+            <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Trip</p>
+            <p className="mt-[var(--space-2)] text-lg font-semibold text-[var(--ink)]">{tripName}</p>
+          </div>
+          <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/72 p-[var(--space-4)]">
+            <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Join code</p>
+            <p className="mt-[var(--space-2)] font-mono text-[1.8rem] tracking-[0.28em] text-[var(--ink)]">
+              {shareCode}
+            </p>
+          </div>
+          <div className="rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/72 p-[var(--space-4)]">
+            <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Camera note</p>
+            <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+              If the camera misses, the player can still type the code in by hand. The QR helps, but
+              the join code is the real backbone.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-// ============================================
-// HELPERS
-// ============================================
-
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export default InvitationManager;
