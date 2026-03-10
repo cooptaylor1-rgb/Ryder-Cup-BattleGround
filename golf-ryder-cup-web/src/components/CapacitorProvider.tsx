@@ -28,9 +28,12 @@ export function CapacitorProvider({ children }: CapacitorProviderProps) {
 
       // Parse URL and navigate if needed
       if (typeof window !== 'undefined') {
-        const path = new URL(url).pathname;
-        if (path && path !== '/') {
-          window.location.href = path;
+        const parsedUrl = new URL(url);
+        const routePrefix =
+          parsedUrl.protocol.startsWith('http') || !parsedUrl.host ? '' : `/${parsedUrl.host}`;
+        const target = `${routePrefix}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+        if (target && target !== '/') {
+          window.location.href = target;
         }
       }
     },

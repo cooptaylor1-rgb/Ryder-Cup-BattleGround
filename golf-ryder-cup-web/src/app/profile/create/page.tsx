@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
 import { createLogger } from '@/lib/utils/logger';
 import { PageLoadingSkeleton } from '@/components/ui';
-import { requestEmailSignInLink } from '@/lib/supabase/auth';
+import { buildMagicLinkRedirectPath, requestEmailSignInLink } from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import {
   Mail,
@@ -203,9 +203,10 @@ function CreateProfilePageContent() {
 
       if (isSupabaseConfigured && !authEmail) {
         try {
-          const nextPath = searchParams?.get('next');
-          const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
-          await requestEmailSignInLink(profile.email ?? '', `/login${nextParam}`);
+          await requestEmailSignInLink(
+            profile.email ?? '',
+            buildMagicLinkRedirectPath(searchParams?.get('next'))
+          );
           successMessage = 'Profile created. Check your email to finish secure sign-in.';
         } catch (signInLinkError) {
           logger.warn('Failed to send Supabase sign-in link after profile creation', {

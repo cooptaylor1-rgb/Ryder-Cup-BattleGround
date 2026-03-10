@@ -16,7 +16,7 @@ import { useAuthStore } from '@/lib/stores';
  * - /join/* (trip invitations)
  */
 
-const PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator'];
+const PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator', '/auth/callback'];
 
 interface AuthGuardProps {
   children: React.ReactNode;

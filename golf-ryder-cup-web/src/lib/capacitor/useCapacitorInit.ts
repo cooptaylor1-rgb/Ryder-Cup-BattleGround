@@ -63,7 +63,9 @@ export function useCapacitorInit(options: CapacitorInitOptions = {}) {
     // Default deep link handling
     try {
       const parsedUrl = new URL(url);
-      const path = parsedUrl.pathname + parsedUrl.search;
+      const routePrefix =
+        parsedUrl.protocol.startsWith('http') || !parsedUrl.host ? '' : `/${parsedUrl.host}`;
+      const path = `${routePrefix}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
 
       // Navigate to the path
       if (path && path !== '/') {

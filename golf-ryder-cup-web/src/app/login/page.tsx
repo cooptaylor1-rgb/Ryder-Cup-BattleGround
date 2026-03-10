@@ -6,7 +6,7 @@ import { useAuthStore } from '@/lib/stores';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, Link as LinkIcon } from 'lucide-react';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { requestEmailSignInLink } from '@/lib/supabase/auth';
+import { buildMagicLinkRedirectPath, requestEmailSignInLink } from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 /**
@@ -89,7 +89,7 @@ function LoginPageContent() {
     setIsSendingMagicLink(true);
 
     try {
-      await requestEmailSignInLink(email, `/login${nextParam}`);
+      await requestEmailSignInLink(email, buildMagicLinkRedirectPath(nextPath));
       setMagicLinkSentTo(email.trim().toLowerCase());
       clearError();
     } catch (requestError) {
@@ -175,7 +175,7 @@ function LoginPageContent() {
                   </>
                 ) : (
                   <>
-                    Email Me a Sign-In Link
+                    Email Me a Secure Sign-In Link
                     <LinkIcon className="h-4 w-4" />
                   </>
                 )}
@@ -193,7 +193,7 @@ function LoginPageContent() {
               <div className="mx-auto my-[var(--space-6)] flex items-center gap-[var(--space-4)]">
                 <div className="h-px flex-1 bg-[var(--rule)]" />
                 <span className="font-sans text-sm text-[var(--ink-tertiary)]">
-                  Or use your PIN offline
+                  Offline fallback only
                 </span>
                 <div className="h-px flex-1 bg-[var(--rule)]" />
               </div>
@@ -208,6 +208,9 @@ function LoginPageContent() {
             >
               4-Digit PIN
             </label>
+            <p className="mb-[var(--space-2)] font-sans text-[length:var(--text-xs)] text-[var(--ink-tertiary)]">
+              Use this only when you are offline or cannot access email on this device.
+            </p>
             <div className="relative">
               <Lock className="absolute left-[14px] top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--ink-tertiary)]" />
               <input
@@ -249,10 +252,10 @@ function LoginPageContent() {
             type="submit"
             disabled={!canSubmit}
             className={cn(
-              'btn-premium press-scale w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity] border border-transparent',
+              'press-scale w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity,border-color] border',
               canSubmit
-                ? 'bg-[var(--masters)] text-[var(--canvas)]'
-                : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed opacity-90'
+                ? 'bg-transparent text-[var(--ink)] border-[var(--rule)]'
+                : 'bg-[var(--surface)] text-[var(--ink-tertiary)] border-[var(--rule)] cursor-not-allowed opacity-90'
             )}
           >
             {isSubmitting || isLoading ? (
@@ -262,7 +265,7 @@ function LoginPageContent() {
               </>
             ) : (
               <>
-                Sign In with PIN
+                Use Offline PIN
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -287,7 +290,7 @@ function LoginPageContent() {
 
         {/* Footer note */}
         <p className="text-center font-sans text-[length:var(--text-xs)] text-[var(--ink-tertiary)] mt-[var(--space-8)] leading-relaxed">
-          Email links enable cloud sync when available.
+          Secure sign-in works best with the email link.
           <br />
           Your PIN still works for local, offline sign-in.
         </p>
