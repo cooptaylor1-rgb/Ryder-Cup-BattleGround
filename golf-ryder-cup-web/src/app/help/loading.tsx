@@ -1,5 +1,5 @@
 import { PageLoadingSkeleton } from '@/components/ui';
 
 export default function HelpLoading() {
-  return <PageLoadingSkeleton title="Help & FAQ" />;
+  return <PageLoadingSkeleton title="Loading help..." variant="list" />;
 }

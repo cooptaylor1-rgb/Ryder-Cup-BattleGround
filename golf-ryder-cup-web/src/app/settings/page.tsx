@@ -2,65 +2,53 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Settings, Target, Palette, Bell, Database, Info } from 'lucide-react';
-import { useUIStore } from '@/lib/stores';
+import { Bell, Database, HelpCircle, Palette, Settings, Target, type LucideIcon } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-
-/**
- * SETTINGS PAGE
- *
- * Central hub for all app settings and preferences.
- */
+import { Button } from '@/components/ui/Button';
+import { useUIStore } from '@/lib/stores';
+import { cn } from '@/lib/utils';
 
 interface SettingItem {
   id: string;
   label: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>;
   href: string;
-  color: string;
+  icon: LucideIcon;
+  tone: 'green' | 'maroon' | 'gold' | 'ink';
 }
 
-const SETTINGS_ITEMS: SettingItem[] = [
+const SETTING_ITEMS: SettingItem[] = [
   {
     id: 'scoring',
-    label: 'Scoring Rules',
-    description: 'Match play point values',
-    icon: Target,
+    label: 'Scoring rules',
+    description: 'Point values, behavior, and round logic for the cup.',
     href: '/settings/scoring',
-    color: 'var(--masters)',
+    icon: Target,
+    tone: 'green',
   },
   {
-    id: 'theme',
-    label: 'Theme & Display',
-    description: 'Light, dark, or outdoor mode',
-    icon: Palette,
+    id: 'appearance',
+    label: 'Appearance',
+    description: 'Theme, outdoor readability, and display polish.',
     href: '/settings/appearance',
-    color: '#8b5cf6',
+    icon: Palette,
+    tone: 'maroon',
   },
   {
     id: 'notifications',
     label: 'Notifications',
-    description: 'Tee time reminders and score alerts',
-    icon: Bell,
+    description: 'Reminders, score alerts, and subtle interruption control.',
     href: '/settings/notifications',
-    color: '#f59e0b',
+    icon: Bell,
+    tone: 'gold',
   },
   {
     id: 'backup',
-    label: 'Backup & Restore',
-    description: 'Export and import trips',
-    icon: Database,
+    label: 'Backup and restore',
+    description: 'Export trip data and protect the weekend from one bad device.',
     href: '/settings/backup',
-    color: '#06b6d4',
-  },
-  {
-    id: 'about',
-    label: 'About',
-    description: 'App version and info',
-    icon: Info,
-    href: '/more',
-    color: '#64748b',
+    icon: Database,
+    tone: 'ink',
   },
 ];
 
@@ -72,62 +60,181 @@ export default function SettingsPage() {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
         title="Settings"
-        subtitle="App preferences"
-        icon={<Settings size={16} className="text-[var(--color-accent)]" />}
+        subtitle="Device and app preferences"
+        icon={<Settings size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         onBack={() => router.push('/more')}
+        rightSlot={
+          <Button variant="outline" size="sm" leftIcon={<HelpCircle size={14} />} onClick={() => router.push('/help')}>
+            Help
+          </Button>
+        }
       />
 
-      <main className="container-editorial">
-        {/* Current Theme Info */}
-        <section className="section-sm">
-          <div className="card p-[var(--space-4)]">
-            <div className="flex items-center gap-[var(--space-3)]">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--masters)]">
-                <Palette size={20} className="text-[var(--canvas)]" />
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--masters)]/14 bg-[linear-gradient(135deg,rgba(10,80,48,0.97),rgba(4,52,30,0.98))] text-[var(--canvas)] shadow-[0_28px_64px_rgba(5,58,35,0.22)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.95fr)]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/72">
+                Utility Room
+              </p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--canvas)]">
+                Tune the app like it actually matters on the course.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[35rem] text-sm leading-7 text-[color:var(--canvas)]/80">
+                These are the controls that decide whether the app feels calm in a pocket, clear in
+                bright sun, and trustworthy when the trip starts moving quickly.
+              </p>
+
+              <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
+                <Button
+                  variant="secondary"
+                  className="border-[color:var(--canvas)]/16 bg-[var(--canvas)] text-[var(--masters)] hover:bg-[color:var(--canvas)]/92"
+                  leftIcon={<Palette size={16} />}
+                  onClick={() => router.push('/settings/appearance')}
+                >
+                  Adjust appearance
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-[color:var(--canvas)]/20 bg-transparent text-[var(--canvas)] hover:bg-[color:var(--canvas)]/10"
+                  leftIcon={<Database size={16} />}
+                  onClick={() => router.push('/settings/backup')}
+                >
+                  Open backups
+                </Button>
               </div>
-              <div className="flex-1">
-                <p className="type-title-sm">Current Theme</p>
-                <p className="type-caption capitalize">{theme || 'outdoor'} mode</p>
-              </div>
+            </div>
+
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <SettingsFactCard label="Current theme" value={(theme || 'outdoor').replace(/^\w/, (char) => char.toUpperCase())} detail="The visual mode your device is using now." />
+              <SettingsFactCard label="Core controls" value={SETTING_ITEMS.length} detail="The four rooms that matter most on a golf trip." />
+              <SettingsFactCard label="Support path" value="Help" detail="When a player gets stuck, there should be one obvious place to go." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
             </div>
           </div>
         </section>
 
-        {/* Settings List */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-4)]">Preferences</h2>
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.12fr)_18rem]">
+          <div className="rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_20px_44px_rgba(41,29,17,0.08)]">
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Preference Boards</p>
+              <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+                Put every important toggle behind a door that feels intentional.
+              </h2>
+              <p className="mt-[var(--space-2)] max-w-[34rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                Settings should feel less like a junk drawer and more like a small suite of serious rooms.
+                The trip only needs a few of them, but those few should be easy to find and worth opening.
+              </p>
+            </div>
 
-          <div className="space-y-3">
-            {SETTINGS_ITEMS.map((item) => (
-              <Link key={item.id} href={item.href} className="match-row">
-                <div
-                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]"
-                  style={{ background: `${item.color}20` }}
+            <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2">
+              {SETTING_ITEMS.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="group rounded-[1.6rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-4)] shadow-[0_14px_32px_rgba(41,29,17,0.05)] transition-transform duration-150 hover:scale-[1.01] hover:border-[var(--masters)]/24 hover:bg-[var(--surface)]"
                 >
-                  <item.icon size={18} style={{ color: item.color }} />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">{item.label}</p>
-                  <p className="type-meta">{item.description}</p>
-                </div>
-                <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
-              </Link>
-            ))}
+                  <div className={cn('flex h-11 w-11 items-center justify-center rounded-[1rem]', getToneClassName(item.tone))}>
+                    <item.icon size={18} />
+                  </div>
+                  <h3 className="mt-[var(--space-3)] text-base font-semibold text-[var(--ink)]">
+                    {item.label}
+                  </h3>
+                  <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+                    {item.description}
+                  </p>
+                  <p className="mt-[var(--space-4)] text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)] transition-colors group-hover:text-[var(--masters)]">
+                    Open setting
+                  </p>
+                </Link>
+              ))}
+            </div>
           </div>
-        </section>
 
-        {/* App Info */}
-        <section className="section-sm">
-          <div className="card p-[var(--space-4)] text-center">
-            <p className="type-overline mb-[var(--space-2)] text-[var(--masters)]">
-              Ryder Cup Tracker
-            </p>
-            <p className="type-caption">Version 1.0.0</p>
-            <p className="type-micro mt-[var(--space-2)]">Made with care for golf trip enthusiasts</p>
-          </div>
+          <aside className="space-y-[var(--space-4)]">
+            <SettingsSidebarCard
+              title="Theme should earn its keep"
+              body="The palette matters less than legibility in noon sun and pace in motion. Outdoor mode should feel like a tool, not a novelty."
+              icon={<Palette size={18} />}
+            />
+            <SettingsSidebarCard
+              title="Backups are trust"
+              body="Nothing says amateur hour like a trip disappearing because one phone died. Backup belongs near the top of the utility hierarchy."
+              icon={<Database size={18} />}
+              tone="green"
+            />
+            <SettingsSidebarCard
+              title="Support lives nearby"
+              body="Help should sit one step away from settings, not buried three menus deep under whatever marketing called 'more.'"
+              icon={<HelpCircle size={18} />}
+            />
+          </aside>
         </section>
       </main>
-
     </div>
   );
+}
+
+function SettingsFactCard({
+  label,
+  value,
+  detail,
+  valueClassName,
+}: {
+  label: string;
+  value: string | number;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.55rem] border border-[color:var(--canvas)]/16 bg-[color:var(--canvas)]/10 p-[var(--space-4)]">
+      <p className="type-overline tracking-[0.14em] text-[color:var(--canvas)]/72">{label}</p>
+      <p className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--canvas)]', valueClassName)}>
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[color:var(--canvas)]/72">{detail}</p>
+    </div>
+  );
+}
+
+function SettingsSidebarCard({
+  title,
+  body,
+  icon,
+  tone = 'ink',
+}: {
+  title: string;
+  body: string;
+  icon: React.ReactNode;
+  tone?: 'ink' | 'green';
+}) {
+  return (
+    <aside
+      className={cn(
+        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
+        tone === 'green'
+          ? 'border-[var(--masters)]/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(238,246,241,0.99))]'
+          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
+      )}
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+        {icon}
+      </div>
+      <h3 className="mt-[var(--space-3)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
+    </aside>
+  );
+}
+
+function getToneClassName(tone: SettingItem['tone']) {
+  switch (tone) {
+    case 'green':
+      return 'bg-[color:var(--masters)]/12 text-[var(--masters)]';
+    case 'maroon':
+      return 'bg-[color:var(--maroon)]/10 text-[var(--maroon)]';
+    case 'gold':
+      return 'bg-[color:var(--warning)]/12 text-[var(--warning)]';
+    default:
+      return 'bg-[color:var(--surface-raised)] text-[var(--ink-secondary)]';
+  }
 }

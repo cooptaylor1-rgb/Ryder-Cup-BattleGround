@@ -1,30 +1,22 @@
 'use client';
 
-/**
- * Help & FAQ Page
- *
- * Searchable, collapsible FAQ covering: trip setup, scoring,
- * captain mode, side games, offline use, and troubleshooting.
- */
-
-import { useState, useMemo } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ChevronDown,
+  Gamepad2,
+  HelpCircle,
   Search,
   Shield,
   Target,
   Trophy,
-  WifiOff,
   Users,
-  Gamepad2,
-  HelpCircle,
+  WifiOff,
+  type LucideIcon,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-
-// ============================================
-// DATA
-// ============================================
+import { Button } from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
 
 interface FAQItem {
   q: string;
@@ -34,276 +26,394 @@ interface FAQItem {
 interface FAQSection {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   items: FAQItem[];
 }
 
 const FAQ_SECTIONS: FAQSection[] = [
   {
     id: 'getting-started',
-    title: 'Getting Started',
-    icon: <HelpCircle size={18} />,
+    title: 'Getting started',
+    icon: HelpCircle,
     items: [
       {
         q: 'How do I create a trip?',
-        a: 'Tap the "+" button on the home screen and pick a template (Classic Ryder Cup, Mini Ryder Cup, etc.). Fill in your trip name, date, and team names, then tap "Create Trip." You\'ll land on the home page where you can start adding players.',
+        a: 'Tap the plus button on the home screen and choose a template. Add your trip name, dates, and team names, then create the trip and start building the roster.',
       },
       {
         q: 'How do I invite friends to join?',
-        a: 'After creating a trip, use the "Share invite link" button in the setup card on your home screen. This copies a join link you can paste into your group text. Friends open the link and they\'re in.',
+        a: 'Open the captain invite desk and share the join link or QR code. Players can use the link or type the join code manually.',
       },
       {
         q: 'How many players do I need?',
-        a: 'A minimum of 4 (2 per team) is needed to create a session. A full Ryder Cup uses 12 per team (24 total), but any even number works. The Mini Ryder Cup template works well with 6–8 per team.',
+        a: 'You need at least four players to build a session, but the templates scale. A full Ryder Cup can run all the way up to 12 per side.',
       },
       {
-        q: 'What\'s the difference between templates?',
-        a: 'Classic Ryder Cup is 3 days with foursomes, fourball, and singles (28 points). Mini Ryder Cup is a 2-day weekend format (12 points). Buddies Cup is a single day (6 points). Tap "Details" on any template to see the full session breakdown.',
+        q: 'What do the templates change?',
+        a: 'They define the session mix, match count, and expected trip length. Classic is the full three-day shape, while mini and single-day templates compress it.',
       },
     ],
   },
   {
     id: 'captain-mode',
-    title: 'Captain Mode',
-    icon: <Shield size={18} />,
+    title: 'Captain mode',
+    icon: Shield,
     items: [
       {
         q: 'What is captain mode?',
-        a: 'Captain mode gives one person (the trip organizer) control over lineup creation, session management, and match setup. The captain sets a PIN so only they can make structural changes. Everyone else can still score matches normally.',
+        a: 'Captain mode unlocks structural controls: sessions, lineups, roster management, match setup, and corrections. Regular players can still score matches without it.',
       },
       {
         q: 'How do I set my captain PIN?',
-        a: 'Go to More → Captain Mode and set a 4-digit PIN. This PIN is securely hashed on your device — we never store it in plain text. Share it only with people you trust to manage the trip.',
+        a: 'Open More and enable captain mode with a four-digit PIN. The PIN is stored locally and only the people with it can enter captain controls on that device.',
       },
       {
         q: 'What can only the captain do?',
-        a: 'Create and edit sessions, build lineups, assign players to matches, lock/unlock sessions, correct scores on completed holes, and manage the overall trip structure. Regular players can score their own matches.',
+        a: 'Captains manage sessions, lineups, player assignments, match setup, and corrections to completed cards. That keeps the competition structure from drifting.',
       },
       {
-        q: 'Can I have co-captains?',
-        a: 'Anyone with the captain PIN can enter captain mode, so you can share the PIN with one or two trusted co-captains. Just share the PIN directly — anyone who enters it gets captain access.',
+        q: 'Can we have co-captains?',
+        a: 'Yes. Anyone with the captain PIN can enter captain mode, so the app supports shared control as long as the group shares the code intentionally.',
       },
     ],
   },
   {
     id: 'scoring',
     title: 'Scoring',
-    icon: <Target size={18} />,
+    icon: Target,
     items: [
       {
         q: 'How do I score a match?',
-        a: 'Go to the Score tab, find your match, and tap it. You\'ll see 5 scoring modes: Swipe (flick left/right for each team), Buttons (tap the winner), Strokes (enter actual scores), Best Ball (for fourball), and One-Hand (extra large buttons for use on the course).',
+        a: 'Open Score, choose the match, and use the mode that fits the moment: swipe, buttons, strokes, best ball, or one-hand mode.',
       },
       {
         q: 'Can I change a score after entering it?',
-        a: 'Yes! Use the Undo button in the top-right of the scoring screen to undo the last entry. Captains can also correct any hole on a completed match by tapping "Edit Scores" on the match complete screen.',
+        a: 'Yes. Players can undo the latest action, and captains can correct completed cards from the captain controls when the round needs an official fix.',
       },
       {
-        q: 'What does "Dormie" mean?',
-        a: 'A match is dormie when one team is up by exactly the number of holes remaining. For example, 2 UP with 2 to play. The trailing team must win every remaining hole to halve the match.',
+        q: 'What does dormie mean?',
+        a: 'Dormie means the trailing side has exactly the same number of holes left as the deficit. If you are 2 down with 2 to play, you are dormie.',
       },
       {
         q: 'How are handicap strokes applied?',
-        a: 'The app follows USGA handicap allowance: 100% of the difference in singles, 90% in fourball, 50% in foursomes. Strokes are applied to holes based on the course handicap ranking (hardest holes get strokes first).',
+        a: 'The app uses match-play handicap allowances and applies strokes to the hardest holes first based on the selected format and course data.',
       },
       {
-        q: 'What is match play scoring?',
-        a: 'In match play, you win individual holes rather than counting total strokes. The team that wins a hole goes "1 UP." The match ends when one team is up by more holes than remain (e.g., "3&2" means 3 up with 2 to play). If tied after 18, it\'s "halved" and each team gets ½ point.',
+        q: 'How does match play scoring work?',
+        a: 'You win holes, not the total stroke count. The match ends once a side leads by more holes than remain, or it is halved after 18 if nobody finishes ahead.',
       },
     ],
   },
   {
     id: 'side-games',
-    title: 'Side Games',
-    icon: <Gamepad2 size={18} />,
+    title: 'Side games',
+    icon: Gamepad2,
     items: [
       {
         q: 'What side games are available?',
-        a: 'Skins (win a hole outright to collect the pot), Nassau (front 9 + back 9 + overall), Wolf (rotating team selection), Vegas (digit-based team scoring), and Hammer (double-or-nothing press format).',
+        a: 'The app supports common trip games like skins, Nassau, closest to the pin, long drive, and custom side bets the group wants to track.',
       },
       {
-        q: 'How do side game payouts work?',
-        a: 'The Settle Up tab under Bets & Side Games calculates who owes what based on game results. You can track payments and mark them as settled. The app is a calculator — no real money moves through it.',
+        q: 'How do payouts work?',
+        a: 'The app tracks the ledger and helps settle who owes what. It is a calculator and trip record, not a money-transfer platform.',
       },
     ],
   },
   {
     id: 'standings',
-    title: 'Standings & Awards',
-    icon: <Trophy size={18} />,
+    title: 'Standings and awards',
+    icon: Trophy,
     items: [
       {
         q: 'How are team points calculated?',
-        a: 'Each match is worth 1 point. The winning team gets 1, the losing team gets 0. A halved match gives ½ point to each team. Total points across all sessions determine the overall winner.',
+        a: 'Each match is worth one point. Wins earn one, losses earn zero, and halved matches award a half-point to each side.',
       },
       {
-        q: 'What is the "Magic Number"?',
-        a: 'The magic number shows how many more points the leading team needs to clinch the cup. When it reaches 0, that team has won and a victory banner appears.',
+        q: 'What is the magic number?',
+        a: 'It is how many more points the leading team needs to clinch the cup. Once it reaches zero, the result is no longer catchable.',
       },
       {
-        q: 'What awards are given?',
-        a: 'MVP (best overall impact), Best Record (highest win percentage), Most Wins (total match wins), Biggest Win (largest margin), Iron Man (most matches played), and more. Awards are calculated automatically from match results.',
+        q: 'What awards are available?',
+        a: 'The app tracks common end-of-trip awards like best record, most wins, MVP, biggest margin, and a few trip-stat style superlatives.',
       },
     ],
   },
   {
     id: 'offline',
-    title: 'Offline & Sync',
-    icon: <WifiOff size={18} />,
+    title: 'Offline and sync',
+    icon: WifiOff,
     items: [
       {
         q: 'Does the app work without internet?',
-        a: 'Yes! The app is fully offline-capable. All your scores save to your device immediately. When you reconnect, they sync automatically. You\'ll see a sync indicator in the score page header showing the current state.',
+        a: 'Yes. The app is offline-first. Scoring and local trip actions keep working, then sync resumes when the device reconnects.',
       },
       {
-        q: 'What if I lose signal during a round?',
-        a: 'Keep scoring normally. Everything saves locally. When signal returns, the app syncs in the background. You\'ll see "Syncing..." then "Synced" in the header. If sync fails, a retry button appears.',
+        q: 'What happens if I lose signal during a round?',
+        a: 'Keep scoring. The app stores the work locally and syncs later. That is exactly the kind of day the architecture is supposed to survive.',
       },
       {
         q: 'How do I back up my data?',
-        a: 'Go to More → Backup & Data. You can export your trip as a JSON file and import it on another device. Your data also syncs to the cloud when online.',
+        a: 'Use the backup settings to export the trip. In cloud mode, synced trip data also has a server-side home once the device reconnects.',
       },
     ],
   },
   {
     id: 'teams',
-    title: 'Teams & Players',
-    icon: <Users size={18} />,
+    title: 'Teams and players',
+    icon: Users,
     items: [
       {
         q: 'How do I assign players to teams?',
-        a: 'Use the captain draft tool (Captain → Draft) to drag players onto each team. You can also assign teams in bulk when adding players. Teams need balanced rosters before you can create sessions.',
+        a: 'Use the draft room or roster management screens to assign players before building sessions and lineups.',
       },
       {
-        q: 'Can I change a player\'s handicap mid-trip?',
-        a: 'Yes. Go to More → Captain → Manage and edit any player\'s handicap. Changes apply to future matches only — completed match handicap calculations are preserved.',
+        q: 'Can I change a player handicap mid-trip?',
+        a: 'Yes, but those changes should affect future cards. Completed matches should stay tied to the context they were played under.',
       },
     ],
   },
 ];
-
-// ============================================
-// COMPONENTS
-// ============================================
-
-function FAQAccordion({ item }: { item: FAQItem }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="border-b border-[var(--rule)]">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-start justify-between gap-3 py-4 text-left"
-        aria-expanded={open}
-      >
-        <span className="text-[length:var(--text-sm)] font-medium text-[var(--ink)]">{item.q}</span>
-        <ChevronDown
-          size={16}
-          className={`shrink-0 mt-0.5 text-[var(--ink-tertiary)] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        />
-      </button>
-      {open && (
-        <div className="pb-4 -mt-1">
-          <p className="text-[length:var(--text-sm)] leading-relaxed text-[var(--ink-secondary)]">
-            {item.a}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// MAIN PAGE
-// ============================================
 
 export default function HelpPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredSections = useMemo(() => {
-    if (!searchQuery.trim()) return FAQ_SECTIONS;
+    if (!searchQuery.trim()) {
+      return FAQ_SECTIONS;
+    }
 
-    const q = searchQuery.toLowerCase();
-    return FAQ_SECTIONS
-      .map((section) => ({
-        ...section,
-        items: section.items.filter(
-          (item) =>
-            item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)
-        ),
-      }))
-      .filter((section) => section.items.length > 0);
+    const query = searchQuery.toLowerCase();
+    return FAQ_SECTIONS.map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => item.q.toLowerCase().includes(query) || item.a.toLowerCase().includes(query)
+      ),
+    })).filter((section) => section.items.length > 0);
   }, [searchQuery]);
+
+  const totalMatches = filteredSections.reduce((sum, section) => sum + section.items.length, 0);
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
-        title="Help & FAQ"
-        icon={<HelpCircle size={16} className="text-[var(--masters)]" />}
+        title="Help"
+        subtitle="Guidebook and support"
+        icon={<HelpCircle size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
         onBack={() => router.back()}
       />
 
-      <main className="container-editorial pt-6 pb-12">
-        {/* Search */}
-        <div className="relative mb-8">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)]"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search help topics..."
-            className="input w-full pl-10"
-          />
-        </div>
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,240,241,0.99))] shadow-[0_26px_56px_rgba(46,34,18,0.08)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.95fr)]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Support Deck</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--ink)]">
+                The guidebook should read like a caddie book, not a shrug.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                Golf trips move too fast for scavenger-hunt support. This room is for the common questions,
+                the scoring edge cases, and the small bits of captain logic that players always need five
+                minutes before the round.
+              </p>
 
-        {/* FAQ Sections */}
-        {filteredSections.length > 0 ? (
-          <div className="space-y-8">
-            {filteredSections.map((section) => (
-              <section key={section.id}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-[var(--masters)]">{section.icon}</span>
-                  <h2 className="type-overline">{section.title}</h2>
+              <div className="relative mt-[var(--space-5)]">
+                <Search
+                  size={18}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-tertiary)]"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search help topics..."
+                  className="w-full rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/86 py-[0.95rem] pl-11 pr-4 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--maroon)]"
+                />
+              </div>
+
+              {searchQuery ? (
+                <div className="mt-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-3)]">
+                  <p className="text-sm text-[var(--ink-secondary)]">
+                    {totalMatches} answer{totalMatches === 1 ? '' : 's'} across {filteredSections.length} section{filteredSections.length === 1 ? '' : 's'}
+                  </p>
+                  <Button variant="ghost" size="sm" onClick={() => setSearchQuery('')}>
+                    Clear search
+                  </Button>
                 </div>
-                <div className="card-editorial" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div className="px-4">
-                    {section.items.map((item, i) => (
-                      <FAQAccordion key={i} item={item} />
+              ) : null}
+            </div>
+
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <HelpFactCard label="Topics" value={FAQ_SECTIONS.length} detail="The core rooms players actually need." />
+              <HelpFactCard label="Answers" value={FAQ_SECTIONS.reduce((sum, section) => sum + section.items.length, 0)} detail="Questions already settled before the first tee." />
+              <HelpFactCard label="Best starting point" value="Search" detail="When the group is in a hurry, start there." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.1fr)_18rem]">
+          <div className="space-y-[var(--space-4)]">
+            <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+              <div className="flex flex-wrap gap-[var(--space-3)]">
+                {FAQ_SECTIONS.map((section) => (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => {
+                      const node = document.getElementById(section.id);
+                      node?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 px-4 py-2 text-sm font-medium text-[var(--ink)] transition-transform duration-150 hover:scale-[1.01] hover:border-[var(--maroon-subtle)]"
+                  >
+                    <section.icon size={15} className="text-[var(--maroon)]" />
+                    {section.title}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {filteredSections.length > 0 ? (
+              filteredSections.map((section) => (
+                <section
+                  key={section.id}
+                  id={section.id}
+                  className="rounded-[1.85rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
+                >
+                  <div className="flex items-center gap-[var(--space-3)]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+                      <section.icon size={18} />
+                    </div>
+                    <div>
+                      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">FAQ Section</p>
+                      <h2 className="mt-[2px] font-serif text-[1.75rem] italic text-[var(--ink)]">
+                        {section.title}
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="mt-[var(--space-4)] divide-y divide-[color:var(--rule)]/65 rounded-[1.4rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-[var(--space-4)]">
+                    {section.items.map((item) => (
+                      <FAQAccordion key={item.q} item={item} />
                     ))}
                   </div>
+                </section>
+              ))
+            ) : (
+              <section className="rounded-[1.85rem] border border-dashed border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.98))] p-[var(--space-6)] text-center shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+                  <Search size={18} />
+                </div>
+                <h2 className="mt-[var(--space-3)] text-lg font-semibold text-[var(--ink)]">
+                  No help topics match that search.
+                </h2>
+                <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+                  Try a simpler keyword or clear the search and browse the guidebook sections above.
+                </p>
+                <div className="mt-[var(--space-4)]">
+                  <Button variant="secondary" onClick={() => setSearchQuery('')}>
+                    Clear search
+                  </Button>
                 </div>
               </section>
-            ))}
+            )}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <Search size={40} className="mx-auto mb-4 text-[var(--ink-tertiary)] opacity-40" />
-            <p className="type-title-sm text-[var(--ink-secondary)]">No results found</p>
-            <p className="type-caption text-[var(--ink-tertiary)] mt-1">
-              Try different keywords or browse all topics above.
-            </p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="mt-4 px-4 py-2 rounded-xl text-sm font-medium bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)]"
-            >
-              Clear search
-            </button>
-          </div>
-        )}
 
-        {/* Contact */}
-        <div className="mt-12 text-center">
-          <p className="type-caption text-[var(--ink-tertiary)]">
-            Still need help? Reach out to your trip captain or visit the
-            project repository for technical support.
-          </p>
-        </div>
+          <aside className="space-y-[var(--space-4)]">
+            <HelpSidebarCard
+              title="Start with search"
+              body="The right support pattern on a golf trip is speed. Players should be able to type one term, get one answer, and get back to the round."
+              icon={<Search size={18} />}
+            />
+            <HelpSidebarCard
+              title="Captain questions deserve plain language"
+              body="A rules explanation can be precise without sounding like a committee memo. The best support copy settles the issue and moves on."
+              icon={<Shield size={18} />}
+              tone="maroon"
+            />
+          </aside>
+        </section>
       </main>
-
     </div>
+  );
+}
+
+function FAQAccordion({ item }: { item: FAQItem }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full items-start justify-between gap-[var(--space-3)] py-[var(--space-4)] text-left"
+        aria-expanded={open}
+      >
+        <span className="text-sm font-semibold leading-6 text-[var(--ink)]">{item.q}</span>
+        <ChevronDown
+          size={16}
+          className={cn(
+            'mt-[2px] shrink-0 text-[var(--ink-tertiary)] transition-transform duration-200',
+            open && 'rotate-180'
+          )}
+        />
+      </button>
+      {open ? (
+        <div className="pb-[var(--space-4)]">
+          <p className="text-sm leading-7 text-[var(--ink-secondary)]">{item.a}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function HelpFactCard({
+  label,
+  value,
+  detail,
+  valueClassName,
+}: {
+  label: string;
+  value: ReactNode;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.55rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 p-[var(--space-4)] shadow-[0_14px_28px_rgba(41,29,17,0.05)]">
+      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <div className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+        {value}
+      </div>
+      <p className="mt-[var(--space-2)] text-xs leading-5 text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function HelpSidebarCard({
+  title,
+  body,
+  icon,
+  tone = 'ink',
+}: {
+  title: string;
+  body: string;
+  icon: ReactNode;
+  tone?: 'ink' | 'maroon';
+}) {
+  return (
+    <aside
+      className={cn(
+        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
+        tone === 'maroon'
+          ? 'border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,240,241,0.99))]'
+          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
+      )}
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+        {icon}
+      </div>
+      <h3 className="mt-[var(--space-3)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
+    </aside>
   );
 }
