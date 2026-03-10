@@ -17,6 +17,8 @@ import {
   VolumeX,
   Wifi,
   WifiOff,
+  Clock3,
+  Flag,
 } from 'lucide-react';
 
 import type { Match, Player } from '@/lib/types/models';
@@ -33,7 +35,7 @@ export default function LivePage() {
   const router = useRouter();
   const { currentTrip, players, getActiveSession } = useTripStore();
   const { matchStates, loadSessionMatches, refreshMatchState } = useScoringStore();
-  const [, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
   // Track which match just received an update for flash animation
@@ -117,6 +119,15 @@ export default function LivePage() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
@@ -141,7 +152,7 @@ export default function LivePage() {
 
   const isLoadingMatches = matches === undefined;
   const controlButtonClass =
-    'min-h-11 min-w-11 p-2 rounded-lg transition-colors bg-[var(--surface-card)] border border-[var(--rule)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]';
+    'min-h-11 min-w-11 p-2.5 rounded-[1rem] transition-all bg-[rgba(255,255,255,0.74)] border border-[var(--rule)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]';
 
   if (!currentTrip) {
     return (
@@ -173,73 +184,73 @@ export default function LivePage() {
         subtitle={currentTrip.name}
         icon={<Tv size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
-        rightSlot={
-          <div className="flex items-center gap-2">
-            {/* Connection status indicator */}
-            <div
-              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--surface-card)] border border-[var(--rule)]"
-              title={isConnected ? 'Live — connected' : 'Offline — using cached data'}
-            >
-              {isConnected ? (
-                <>
-                  <Wifi size={14} className="text-[var(--success)]" />
-                  <span className="text-xs text-[var(--success)] font-medium hidden sm:inline" aria-live="polite">Live</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff size={14} className="text-[var(--ink-tertiary)]" />
-                  <span className="text-xs text-[var(--ink-tertiary)] hidden sm:inline">Offline</span>
-                </>
-              )}
-            </div>
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={controlButtonClass}
-              aria-label={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
-              aria-pressed={soundEnabled}
-              title={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
-            >
-              {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-            </button>
-            <button
-              onClick={toggleFullscreen}
-              className={controlButtonClass}
-              aria-label="Toggle fullscreen"
-              title="Toggle fullscreen"
-            >
-              <Maximize2 size={18} />
-            </button>
-            <button
-              onClick={() => {
-                if (activeSession) loadSessionMatches(activeSession.id);
-                setLastUpdate(new Date());
-              }}
-              className={controlButtonClass}
-              aria-label="Refresh live scores"
-              title="Refresh live scores"
-            >
-              <RefreshCw size={18} />
-            </button>
-          </div>
-        }
       />
 
       <main className="container-editorial py-6">
         {/* Session Info */}
         {activeSession && (
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">{activeSession.name}</h1>
-            <p className="type-caption" aria-live="polite">
-              {isConnected ? (
-                <>
-                  <span className="inline-block w-2 h-2 rounded-full bg-[var(--success)] mr-1.5 animate-pulse" />
-                  Live — last update {lastUpdate.toLocaleTimeString()}
-                </>
-              ) : (
-                <>Last updated: {lastUpdate.toLocaleTimeString()}</>
-              )}
-            </p>
-          </div>
+          <section className="mb-[var(--space-6)] overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,244,237,0.94))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+            <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+              <div className="flex items-start justify-between gap-[var(--space-4)]">
+                <div className="min-w-0">
+                  <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
+                    Live Jumbotron
+                  </p>
+                  <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
+                    {activeSession.name}
+                  </h1>
+                  <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]" aria-live="polite">
+                    {isConnected
+                      ? `Connected and listening. Last update ${lastUpdate.toLocaleTimeString()}.`
+                      : `Using cached data. Last update ${lastUpdate.toLocaleTimeString()}.`}
+                  </p>
+                </div>
+
+                <LiveStatusPill
+                  connected={isConnected}
+                  label={isConnected ? 'Live Feed' : 'Offline View'}
+                />
+              </div>
+
+              <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-3)] md:grid-cols-4">
+                <LiveFactCard icon={<Flag size={14} strokeWidth={1.7} />} label="Matches" value={matches?.length ?? 0} />
+                <LiveFactCard icon={<Clock3 size={14} strokeWidth={1.7} />} label="Updated" value={lastUpdate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} valueClassName="font-sans text-[0.95rem] not-italic" />
+                <LiveFactCard icon={soundEnabled ? <Volume2 size={14} strokeWidth={1.7} /> : <VolumeX size={14} strokeWidth={1.7} />} label="Sound" value={soundEnabled ? 'On' : 'Off'} valueClassName="font-sans text-[0.95rem] not-italic" />
+                <LiveFactCard icon={<Maximize2 size={14} strokeWidth={1.7} />} label="View" value={isFullscreen ? 'Fullscreen' : 'Windowed'} valueClassName="font-sans text-[0.95rem] not-italic" />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-4)]">
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={controlButtonClass}
+                aria-label={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
+                aria-pressed={soundEnabled}
+                title={soundEnabled ? 'Mute live update sounds' : 'Enable live update sounds'}
+              >
+                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+              </button>
+              <button
+                onClick={toggleFullscreen}
+                className={controlButtonClass}
+                aria-label="Toggle fullscreen"
+                title="Toggle fullscreen"
+              >
+                <Maximize2 size={18} />
+              </button>
+              <button
+                onClick={() => {
+                  if (activeSession) loadSessionMatches(activeSession.id);
+                  setLastUpdate(new Date());
+                }}
+                className={controlButtonClass}
+                aria-label="Refresh live scores"
+                title="Refresh live scores"
+              >
+                <RefreshCw size={18} />
+              </button>
+            </div>
+          </section>
         )}
 
         {!activeSession ? (
@@ -265,7 +276,7 @@ export default function LivePage() {
             {isLoadingMatches ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-40 rounded-xl bg-[var(--surface-elevated)] border border-[var(--rule)]" />
+                  <div key={i} className="h-56 rounded-[1.5rem] bg-[var(--surface-elevated)] border border-[var(--rule)]" />
                 ))}
               </div>
             ) : matches && matches.length > 0 ? (
@@ -318,8 +329,8 @@ interface LiveMatchCardProps {
 }
 
 function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardProps) {
-  const teamAPlayers = match.teamAPlayerIds.map(id => getPlayer(id)).filter(Boolean) as Player[];
-  const teamBPlayers = match.teamBPlayerIds.map(id => getPlayer(id)).filter(Boolean) as Player[];
+  const teamAPlayers = match.teamAPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
+  const teamBPlayers = match.teamBPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
 
   const formatPlayerNames = (players: Player[]) => {
     if (players.length === 0) return 'TBD';
@@ -348,39 +359,66 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
     return `${absScore} UP`;
   };
 
+  const statusText = getStatusText();
+  const scoreDisplay = getScoreDisplay();
+
   return (
     <div
-      className={`card rounded-2xl overflow-hidden border bg-[var(--surface-card)] transition-all duration-500 ${
+      className={`overflow-hidden rounded-[1.75rem] border bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,244,237,0.94))] transition-all duration-500 ${
         isFlashing
-          ? 'border-[var(--masters)] shadow-lg shadow-[color:var(--masters)]/20 scale-[1.02]'
-          : 'border-[var(--rule)]'
+          ? 'border-[var(--masters)] shadow-[0_18px_36px_rgba(22,101,52,0.2)] scale-[1.02]'
+          : 'border-[var(--rule)] shadow-[0_12px_30px_rgba(46,34,18,0.06)]'
       }`}
     >
       {/* Match Header */}
-      <div className="px-4 py-2 flex items-center justify-between bg-[var(--surface)] border-b border-[var(--rule)]">
-        <span className="text-sm text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
+      <div className="px-4 py-3 flex items-center justify-between border-b border-[var(--rule)] bg-[rgba(255,255,255,0.7)]">
+        <span className="type-overline text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
         <span
           className={
-            `text-xs px-2 py-1 rounded-full border ` +
+            `text-xs px-2.5 py-1 rounded-full border font-medium ` +
             (state?.status === 'inProgress'
               ? 'bg-[color:var(--error)]/10 text-[var(--error)] border-[color:var(--error)]/25'
               : state?.status === 'completed'
                 ? 'bg-[color:var(--success)]/10 text-[var(--success)] border-[color:var(--success)]/25'
-                : 'bg-[var(--surface-card)] text-[var(--ink-tertiary)] border-[var(--rule)]')
+                : 'bg-[var(--canvas)] text-[var(--ink-tertiary)] border-[var(--rule)]')
           }
         >
           {state?.status === 'inProgress' && (
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--error)] mr-1 animate-pulse" />
           )}
-          {getStatusText()}
+          {statusText}
         </span>
+      </div>
+
+      <div className="px-4 pt-4">
+        <div className="rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] text-center">
+          <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+            {state?.status === 'completed' ? 'Final Margin' : 'Current Margin'}
+          </p>
+          <p className="mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]">
+            {scoreDisplay}
+          </p>
+          <p className="mt-[var(--space-2)] type-caption text-[var(--ink-secondary)]">
+            {state?.status === 'completed'
+              ? state?.winningTeam === 'halved'
+                ? 'Both sides finished level.'
+                : 'Result confirmed.'
+              : state?.holesPlayed
+                ? `Through ${state.holesPlayed} hole${state.holesPlayed === 1 ? '' : 's'}`
+                : 'Awaiting the opening hole.'}
+          </p>
+        </div>
       </div>
 
       {/* Teams */}
       <div className="p-4">
         {/* Team A */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg mb-2 transition-all ${isTeamAWinning ? 'bg-[color:var(--team-usa)]/15' : ''}`}
+          className={`flex items-center justify-between py-3 px-4 rounded-[1rem] mb-3 transition-all border ${
+            isTeamAWinning
+              ? 'bg-[color:var(--team-usa)]/12 border-[color:var(--team-usa)]/18'
+              : 'bg-[rgba(255,255,255,0.62)] border-[var(--rule)]'
+          }`}
         >
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[var(--team-usa)]" />
@@ -394,14 +432,18 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
           </div>
           {isTeamAWinning && (
             <span className={`text-lg font-bold text-[var(--team-usa)] ${isFlashing ? 'animate-bounce' : ''}`}>
-              {getScoreDisplay()}
+              {scoreDisplay}
             </span>
           )}
         </div>
 
         {/* Team B */}
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-lg transition-all ${isTeamBWinning ? 'bg-[color:var(--team-europe)]/15' : ''}`}
+          className={`flex items-center justify-between py-3 px-4 rounded-[1rem] transition-all border ${
+            isTeamBWinning
+              ? 'bg-[color:var(--team-europe)]/12 border-[color:var(--team-europe)]/18'
+              : 'bg-[rgba(255,255,255,0.62)] border-[var(--rule)]'
+          }`}
         >
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[var(--team-europe)]" />
@@ -415,7 +457,7 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
           </div>
           {isTeamBWinning && (
             <span className={`text-lg font-bold text-[var(--team-europe)] ${isFlashing ? 'animate-bounce' : ''}`}>
-              {getScoreDisplay()}
+              {scoreDisplay}
             </span>
           )}
         </div>
@@ -431,6 +473,14 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
       {/* Hole Progress */}
       {state && state.status === 'inProgress' && (
         <div className="px-4 pb-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              Hole Progress
+            </p>
+            <p className="type-caption text-[var(--ink-secondary)]">
+              Hole {state.holesPlayed + 1} of 18
+            </p>
+          </div>
           <div className="flex gap-1">
             {Array.from({ length: 18 }, (_, i) => {
               const holeNum = i + 1;
@@ -449,11 +499,64 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
               );
             })}
           </div>
-          <p className="text-xs text-center mt-2 text-[var(--ink-tertiary)]">
-            Hole {state.holesPlayed + 1} of 18
-          </p>
         </div>
       )}
+    </div>
+  );
+}
+
+function LiveStatusPill({ connected, label }: { connected: boolean; label: string }) {
+  return (
+    <div
+      className="inline-flex items-center gap-[var(--space-2)] rounded-full border px-[var(--space-3)] py-[var(--space-2)]"
+      style={{
+        borderColor: connected ? 'rgba(22,163,74,0.2)' : 'var(--rule)',
+        background: connected ? 'rgba(22,163,74,0.08)' : 'rgba(255,255,255,0.68)',
+      }}
+      title={connected ? 'Live — connected' : 'Offline — using cached data'}
+    >
+      {connected ? (
+        <Wifi size={14} className="text-[var(--success)]" />
+      ) : (
+        <WifiOff size={14} className="text-[var(--ink-tertiary)]" />
+      )}
+      <span
+        className={`text-xs font-medium uppercase tracking-[0.14em] ${
+          connected ? 'text-[var(--success)]' : 'text-[var(--ink-tertiary)]'
+        }`}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function LiveFactCard({
+  icon,
+  label,
+  value,
+  valueClassName,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] px-[var(--space-4)] py-[var(--space-3)]">
+      <div className="flex items-center gap-[var(--space-2)] text-[var(--masters)]">
+        {icon}
+        <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+          {label}
+        </p>
+      </div>
+      <p
+        className={`mt-[4px] font-serif text-[1.2rem] italic leading-[1.2] text-[var(--ink)] ${
+          valueClassName ?? ''
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }

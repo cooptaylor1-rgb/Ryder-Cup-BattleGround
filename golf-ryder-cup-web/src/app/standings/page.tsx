@@ -300,10 +300,28 @@ export default function StandingsPage() {
         onBack={() => router.back()}
       />
 
+      <section className="container-editorial pt-[var(--space-6)]">
+        <StandingsMasthead
+          standings={standings}
+          magicNumber={magicNumber}
+          teamAName={teamAName}
+          teamBName={teamBName}
+          currentTripName={currentTrip.name}
+          matchesCompleted={standings?.matchesCompleted ?? 0}
+          totalMatches={standings?.totalMatches ?? 0}
+        />
+      </section>
+
       {/* Tab Navigation */}
-      <div className="sticky top-0 z-10 bg-[var(--canvas)] border-b border-[var(--rule)]">
+      <div className="sticky top-0 z-10 bg-[color:var(--canvas)]/92 backdrop-blur-md border-b border-[var(--rule)]">
         <div className="container-editorial">
-          <div className="flex gap-1 py-[var(--space-2)]" role="tablist" aria-label="Standings views" ref={tablistRef} onKeyDown={handleTabKeyDown}>
+          <div
+            className="flex gap-2 py-[var(--space-3)]"
+            role="tablist"
+            aria-label="Standings views"
+            ref={tablistRef}
+            onKeyDown={handleTabKeyDown}
+          >
             <TabButton
               id="tab-competition"
               active={activeTab === 'competition'}
@@ -382,6 +400,147 @@ export default function StandingsPage() {
   );
 }
 
+function StandingsMasthead({
+  standings,
+  magicNumber,
+  teamAName,
+  teamBName,
+  currentTripName,
+  matchesCompleted,
+  totalMatches,
+}: {
+  standings: TeamStandings | null;
+  magicNumber: MagicNumber | null;
+  teamAName: string;
+  teamBName: string;
+  currentTripName: string;
+  matchesCompleted: number;
+  totalMatches: number;
+}) {
+  const summary = !standings
+    ? 'The board will take shape once matches are underway.'
+    : standings.leader === 'teamA'
+      ? `${teamAName} holds the edge.`
+      : standings.leader === 'teamB'
+        ? `${teamBName} has the upper hand.`
+        : 'Everything is level.';
+
+  const progress =
+    totalMatches > 0 ? `${matchesCompleted} of ${totalMatches} matches complete` : 'Awaiting scores';
+
+  return (
+    <div className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(248,244,237,0.94))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+      <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+        <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">Leaderboard</p>
+        <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,8vw,3.3rem)] italic leading-[1.02] text-[var(--ink)]">
+          {currentTripName}
+        </h1>
+        <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">{summary}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+        <StandingsFactCard label={teamAName} value={standings?.teamAPoints ?? '—'} />
+        <StandingsFactCard label={teamBName} value={standings?.teamBPoints ?? '—'} />
+        <StandingsFactCard
+          label="Progress"
+          value={progress}
+          valueClassName="font-sans text-[0.95rem] not-italic"
+        />
+        <StandingsFactCard
+          label="To Win"
+          value={magicNumber?.pointsToWin ?? '—'}
+        />
+      </div>
+    </div>
+  );
+}
+
+function StandingsSectionHeading({
+  eyebrow,
+  title,
+  action,
+}: {
+  eyebrow: React.ReactNode;
+  title: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-[var(--space-4)]">
+      <div className="min-w-0">
+        <p className="type-overline text-[var(--ink-tertiary)]">{eyebrow}</p>
+        <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.45rem,5vw,2rem)] italic leading-[1.08] text-[var(--ink)]">
+          {title}
+        </h2>
+      </div>
+      {action && <div className="shrink-0 pt-[2px]">{action}</div>}
+    </div>
+  );
+}
+
+function StandingsScoreBlock({
+  teamName,
+  score,
+  color,
+  isLeading,
+  animate,
+}: {
+  teamName: string;
+  score: number;
+  color: 'usa' | 'europe';
+  isLeading: boolean;
+  animate: boolean;
+}) {
+  const teamColor = color === 'usa' ? 'var(--team-usa)' : 'var(--team-europe)';
+  const gradient =
+    color === 'usa'
+      ? 'linear-gradient(180deg,rgba(27,59,119,0.08),rgba(255,255,255,0.62))'
+      : 'linear-gradient(180deg,rgba(160,42,63,0.08),rgba(255,255,255,0.62))';
+
+  return (
+    <div
+      className="rounded-[1.5rem] border px-[var(--space-4)] py-[var(--space-5)] text-center"
+      style={{
+        borderColor: `color-mix(in srgb, ${teamColor} 16%, white)`,
+        background: gradient,
+      }}
+    >
+      <span
+        className={`team-dot team-dot-xl team-dot-${color} inline-block mb-[var(--space-4)] ${animate ? 'team-dot-pulse' : ''}`}
+      />
+      <p
+        className="score-monumental"
+        style={{ color: isLeading ? teamColor : 'var(--ink-tertiary)' }}
+      >
+        {score}
+      </p>
+      <p className="type-overline mt-[var(--space-3)]" style={{ color: teamColor }}>
+        {teamName}
+      </p>
+    </div>
+  );
+}
+
+function StandingsFactCard({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: React.ReactNode;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] px-[var(--space-4)] py-[var(--space-3)]">
+      <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <p
+        className={`mt-[2px] font-serif text-[1.25rem] italic leading-[1.2] text-[var(--ink)] ${valueClassName ?? ''}`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
 /* ============================================
    Tab Button Component
    ============================================ */
@@ -404,10 +563,10 @@ function TabButton({
     <button
       id={id}
       onClick={onClick}
-      className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[var(--radius-full)] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
+      className={`press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-[1rem] font-[family-name:var(--font-sans)] text-sm cursor-pointer transition-all duration-200 ${
         active
-          ? 'border-0 bg-[var(--masters)] text-[var(--canvas)] font-semibold'
-          : 'border border-[var(--rule)] bg-transparent text-[var(--ink-secondary)] font-medium'
+          ? 'border border-[color:var(--masters-deep)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] text-[var(--canvas)] font-semibold shadow-[0_10px_24px_rgba(22,101,52,0.24)]'
+          : 'border border-[var(--rule)] bg-[rgba(255,255,255,0.58)] text-[var(--ink-secondary)] font-medium'
       }`}
       aria-selected={active}
       aria-controls={controls}
@@ -450,112 +609,128 @@ function CompetitionTab({
 
   return (
     <>
-      {/* HERO — Team Score Display */}
-      <section className="section text-center pt-[var(--space-12)] pb-[var(--space-12)]">
-        {/* Points to Win Context */}
-        <p className="type-caption mb-[var(--space-8)]">
-          {magicNumber.pointsToWin} points to win
-        </p>
+      <section className="section pt-[var(--space-7)]">
+        <div className="rounded-[1.75rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(248,244,237,0.92))] p-[var(--space-5)] shadow-[0_20px_40px_rgba(46,34,18,0.08)]">
+          <StandingsSectionHeading
+            eyebrow="Competition"
+            title="The board, in full."
+            action={
+              <button
+                type="button"
+                onClick={() => void onShareStandings()}
+                disabled={isSharingStandings}
+                className="inline-flex items-center gap-[var(--space-2)] rounded-xl border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-2)] text-[length:var(--text-sm)] font-medium transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
+                aria-label="Share standings card"
+              >
+                <Share2 size={16} />
+                {isSharingStandings ? 'Sharing…' : 'Share Card'}
+              </button>
+            }
+          />
 
-        {/* Score Comparison Blocks */}
-        <div className="score-vs">
-          {/* Team USA */}
-          <div
-            className={`score-vs-team score-vs-usa ${standings.teamAPoints >= standings.teamBPoints ? 'leading' : ''}`}
-          >
-            <span
-              className={`team-dot team-dot-xl team-dot-usa inline-block mb-[var(--space-4)] ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
+          <div className="mt-[var(--space-5)] grid grid-cols-[1fr_auto_1fr] items-end gap-[var(--space-4)]">
+            <StandingsScoreBlock
+              teamName={teamAName}
+              score={standings.teamAPoints}
+              color="usa"
+              isLeading={standings.teamAPoints >= standings.teamBPoints}
+              animate={standings.leader !== null}
             />
-            <p
-              className={`score-monumental ${
-                standings.teamAPoints >= standings.teamBPoints
-                  ? 'text-[var(--team-usa)]'
-                  : 'text-[var(--ink-tertiary)]'
-              }`}
-            >
-              {standings.teamAPoints}
-            </p>
-            <p className="type-overline mt-[var(--space-3)] text-[var(--team-usa)]">
-              {teamAName}
-            </p>
-          </div>
 
-          {/* Separator */}
-          <div className="score-vs-divider">–</div>
-
-          {/* Team Europe */}
-          <div
-            className={`score-vs-team score-vs-europe ${standings.teamBPoints > standings.teamAPoints ? 'leading' : ''}`}
-          >
-            <span
-              className={`team-dot team-dot-xl team-dot-europe inline-block mb-[var(--space-4)] ${standings.leader !== null ? 'team-dot-pulse' : ''}`}
-            />
-            <p
-              className={`score-monumental ${
-                standings.teamBPoints > standings.teamAPoints
-                  ? 'text-[var(--team-europe)]'
-                  : 'text-[var(--ink-tertiary)]'
-              }`}
-            >
-              {standings.teamBPoints}
-            </p>
-            <p className="type-overline mt-[var(--space-3)] text-[var(--team-europe)]">
-              {teamBName}
-            </p>
-          </div>
-        </div>
-
-        {/* Victory Banner or Magic Number */}
-        {magicNumber.hasClinched ? (
-          <div
-            className={`victory-banner mt-[var(--space-10)] inline-block ${magicNumber.clinchingTeam === 'A' ? 'victory-usa' : 'victory-europe'}`}
-          >
-            <div className="victory-icon">
-              <Trophy size={18} strokeWidth={1.75} />
+            <div className="pb-[var(--space-5)] text-center">
+              <p className="type-overline text-[var(--ink-faint)]">To Win</p>
+              <p className="mt-[var(--space-2)] font-serif text-[1.8rem] italic text-[var(--ink-faint)]">
+                {magicNumber.pointsToWin}
+              </p>
             </div>
-            <p className="font-semibold text-base">
-              {magicNumber.clinchingTeam === 'A' ? teamAName : teamBName} Wins
-            </p>
+
+            <StandingsScoreBlock
+              teamName={teamBName}
+              score={standings.teamBPoints}
+              color="europe"
+              isLeading={standings.teamBPoints > standings.teamAPoints}
+              animate={standings.leader !== null}
+            />
           </div>
-        ) : (
-          (magicNumber.teamANeeded <= 3 || magicNumber.teamBNeeded <= 3) &&
-          standings.leader && (
-            <p className="type-caption mt-[var(--space-8)] text-[var(--masters)] font-medium">
-              Magic Number:{' '}
-              {standings.leader === 'teamA' ? magicNumber.teamANeeded : magicNumber.teamBNeeded}
-            </p>
-          )
-        )}
 
-        {/* Progress */}
-        <p className="type-micro mt-[var(--space-8)]">
-          {standings.matchesCompleted} of {standings.totalMatches} matches complete
-        </p>
-
-        <button
-          type="button"
-          onClick={() => void onShareStandings()}
-          disabled={isSharingStandings}
-          className="mt-[var(--space-4)] inline-flex items-center gap-[var(--space-2)] rounded-xl border border-[var(--rule)] bg-[var(--surface-card)] px-[var(--space-4)] py-[var(--space-2)] text-[length:var(--text-sm)] font-medium transition-colors hover:bg-[var(--surface-hover)] disabled:opacity-60"
-          aria-label="Share standings card"
-        >
-          <Share2 size={16} />
-          {isSharingStandings ? 'Sharing…' : 'Share Standings Card'}
-        </button>
-
-        {/* Trip Complete — Recap CTA */}
-        {standings.remainingMatches === 0 && standings.matchesCompleted > 0 && (
-          <div className="mt-[var(--space-6)] mx-auto max-w-sm">
-            <Link
-              href="/recap"
-              className="flex items-center justify-center gap-[var(--space-2)] w-full py-[var(--space-3)] px-[var(--space-5)] rounded-xl font-semibold text-[length:var(--text-sm)] bg-[var(--masters)] text-[var(--canvas)] press-scale"
-            >
-              <PartyPopper size={18} />
-              View Trip Recap & Share
-              <Share2 size={16} />
-            </Link>
+          <div className="mt-[var(--space-5)] grid grid-cols-2 gap-[var(--space-3)] md:grid-cols-4">
+            <StandingsFactCard
+              label="Matches Complete"
+              value={`${standings.matchesCompleted}/${standings.totalMatches}`}
+            />
+            <StandingsFactCard label="Remaining" value={standings.remainingMatches} />
+            <StandingsFactCard
+              label="Leader"
+              value={
+                magicNumber.hasClinched
+                  ? magicNumber.clinchingTeam === 'A'
+                    ? teamAName
+                    : teamBName
+                  : standings.leader === 'teamA'
+                    ? teamAName
+                    : standings.leader === 'teamB'
+                      ? teamBName
+                      : 'All Square'
+              }
+            />
+            <StandingsFactCard
+              label="Magic Number"
+              value={
+                magicNumber.hasClinched
+                  ? '0'
+                  : standings.leader === 'teamA'
+                    ? magicNumber.teamANeeded
+                    : standings.leader === 'teamB'
+                      ? magicNumber.teamBNeeded
+                      : Math.min(magicNumber.teamANeeded, magicNumber.teamBNeeded)
+              }
+            />
           </div>
-        )}
+
+          <div className="mt-[var(--space-5)] rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.7)] px-[var(--space-4)] py-[var(--space-4)]">
+            {magicNumber.hasClinched ? (
+              <div
+                className={`victory-banner inline-flex ${magicNumber.clinchingTeam === 'A' ? 'victory-usa' : 'victory-europe'}`}
+              >
+                <div className="victory-icon">
+                  <Trophy size={18} strokeWidth={1.75} />
+                </div>
+                <p className="font-semibold text-base">
+                  {magicNumber.clinchingTeam === 'A' ? teamAName : teamBName} Wins
+                </p>
+              </div>
+            ) : (
+              <p className="font-serif text-[1.35rem] italic text-[var(--ink)]">
+                {standings.leader === null
+                  ? 'The match is all square.'
+                  : `${standings.leader === 'teamA' ? teamAName : teamBName} controls the board.`}
+              </p>
+            )}
+
+            {!magicNumber.hasClinched && (
+              <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                {standings.leader === 'teamA'
+                  ? `${teamAName} needs ${magicNumber.teamANeeded} more point${magicNumber.teamANeeded === 1 ? '' : 's'} to close the door.`
+                  : standings.leader === 'teamB'
+                    ? `${teamBName} needs ${magicNumber.teamBNeeded} more point${magicNumber.teamBNeeded === 1 ? '' : 's'} to close the door.`
+                    : 'Every remaining match still matters.'}
+              </p>
+            )}
+          </div>
+
+          {standings.remainingMatches === 0 && standings.matchesCompleted > 0 && (
+            <div className="mt-[var(--space-5)]">
+              <Link
+                href="/recap"
+                className="flex items-center justify-center gap-[var(--space-2)] w-full py-[var(--space-3)] px-[var(--space-5)] rounded-xl font-semibold text-[length:var(--text-sm)] bg-[var(--masters)] text-[var(--canvas)] press-scale"
+              >
+                <PartyPopper size={18} />
+                View Trip Recap & Share
+                <Share2 size={16} />
+              </Link>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Path to Victory */}
@@ -573,13 +748,14 @@ function CompetitionTab({
       <hr className="divider-lg" />
 
       {/* LEADERBOARD — Individual Leaders */}
-      <section className="section-sm">
-        <h2 className="type-overline mb-[var(--space-6)]">
-          Individual Leaders
-        </h2>
+      <section className="section-sm rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+        <StandingsSectionHeading
+          eyebrow="Individual Leaders"
+          title="Who is carrying the points."
+        />
 
         {leaderboard.length > 0 ? (
-          <div className="stagger-fast">
+          <div className="stagger-fast mt-[var(--space-5)]">
             {leaderboard.map((entry, index) => (
               <PlayerRow
                 key={entry.playerId}
@@ -694,9 +870,13 @@ function FunStatsTab({
     .filter((entry) => entry.stats.length > 0);
 
   return (
-    <section className="section-sm">
+    <section className="section-sm rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+      <StandingsSectionHeading
+        eyebrow="Fun Stats"
+        title="The side stories worth remembering."
+      />
       {!hasAnyStats || (!hasDisplayableStats && highlightStats.length === 0) ? (
-        <div className="mb-[var(--space-8)]">
+        <div className="mt-[var(--space-5)]">
           <EmptyStatePremium
             illustration="podium"
             title="No trip stats yet"
@@ -716,14 +896,13 @@ function FunStatsTab({
       {/* Quick Highlights */}
       {highlightStats.length > 0 && (
         <>
-          <h2 className="type-overline mb-[var(--space-4)]">
-            Trip Highlights
-          </h2>
-          <div className="grid grid-cols-3 gap-[var(--space-3)] mb-[var(--space-8)]">
+          <div className="mt-[var(--space-5)] mb-[var(--space-6)]">
+            <p className="type-overline mb-[var(--space-3)]">Trip Highlights</p>
+            <div className="grid grid-cols-2 gap-[var(--space-3)] sm:grid-cols-3">
             {highlightStats.slice(0, 6).map((stat) => (
               <div
                 key={stat.type}
-                className="card p-[var(--space-3)] text-center"
+                className="rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)] text-center"
               >
                 <span className="text-2xl">{stat.emoji}</span>
                 <p className="type-title-lg mt-[var(--space-1)]">
@@ -739,6 +918,7 @@ function FunStatsTab({
                 )}
               </div>
             ))}
+            </div>
           </div>
           <hr className="divider-lg" />
         </>
@@ -752,11 +932,11 @@ function FunStatsTab({
               <span>{category.emoji}</span>
               <span>{category.label}</span>
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {stats.map((stat) => (
                 <div
                   key={stat.statType}
-                  className="card py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-between"
+                  className="rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] py-[var(--space-3)] px-[var(--space-4)] flex items-center justify-between"
                 >
                   <div className="flex items-center gap-[var(--space-3)]">
                     <span className="text-xl">{stat.emoji}</span>
@@ -806,7 +986,7 @@ function FunStatsTab({
       {hasDisplayableStats && (
         <Link
           href="/trip-stats"
-          className="card press-scale flex items-center justify-between p-[var(--space-4)] mt-[var(--space-4)] no-underline text-inherit"
+          className="press-scale flex items-center justify-between rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)] mt-[var(--space-4)] no-underline text-inherit"
         >
           <div className="flex items-center gap-[var(--space-3)]">
             <Star size={20} className="text-[var(--masters)]" />
@@ -847,12 +1027,13 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
   const hasAwards = awards.some((a) => a.winner);
 
   return (
-    <section className="section-sm">
-      <h2 className="type-overline mb-[var(--space-6)]">
-        Trip Superlatives
-      </h2>
+    <section className="section-sm rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] p-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+      <StandingsSectionHeading
+        eyebrow="Trip Superlatives"
+        title="The honors board."
+      />
 
-      <div className="card p-[var(--space-4)] mb-[var(--space-5)] flex flex-col gap-[var(--space-3)]">
+      <div className="rounded-[1.25rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,244,237,0.88))] p-[var(--space-4)] mt-[var(--space-5)] mb-[var(--space-5)] flex flex-col gap-[var(--space-3)]">
         <div className="flex items-center gap-[var(--space-3)]">
           <Crown size={24} className="text-[var(--color-accent)]" />
           <div>
@@ -875,7 +1056,7 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
           {awards.map((award) => (
             <div
               key={award.type}
-              className={`card p-[var(--space-4)] ${award.winner ? '' : 'opacity-50'}`}
+              className={`rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)] ${award.winner ? '' : 'opacity-50'}`}
             >
               <div className="flex items-start gap-[var(--space-4)]">
                 <div
@@ -982,7 +1163,7 @@ function AwardsTab({ awards, playerStats }: { awards: Award[]; playerStats: Play
       {/* Link to achievements */}
       <Link
         href="/achievements"
-        className="card press-scale flex items-center justify-between p-[var(--space-4)] mt-[var(--space-6)] no-underline text-inherit"
+        className="press-scale flex items-center justify-between rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)] mt-[var(--space-6)] no-underline text-inherit"
       >
         <div className="flex items-center gap-[var(--space-3)]">
           <Medal size={20} className="text-[var(--color-accent)]" />
@@ -1015,7 +1196,7 @@ function RecordCard({
 
   if (!leader || getValue(leader) === 0) {
     return (
-      <div className="card p-[var(--space-3)] text-center opacity-50">
+      <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] p-[var(--space-3)] text-center opacity-50">
         <span className="text-xl">{emoji}</span>
         <p className="type-micro mt-[var(--space-1)] text-[var(--ink-tertiary)]">
           {label}
@@ -1026,7 +1207,7 @@ function RecordCard({
   }
 
   return (
-    <div className="card p-[var(--space-3)] text-center">
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] p-[var(--space-3)] text-center">
       <span className="text-xl">{emoji}</span>
       <p className="type-micro mt-[var(--space-1)] text-[var(--ink-tertiary)]">
         {label}
@@ -1058,14 +1239,16 @@ interface PlayerRowProps {
 
 function PlayerRow({ entry, rank, isTeamA, teamALabel, teamBLabel, animationDelay = 0 }: PlayerRowProps) {
   const isTopThree = rank <= 3;
-  const teamClass = isTeamA
-    ? 'team-row-usa team-row-accent-usa'
-    : 'team-row-europe team-row-accent-europe';
+  const accent = isTeamA ? 'var(--team-usa)' : 'var(--team-europe)';
 
   return (
     <div
-      className={`player-row team-row team-row-accent row-interactive stagger-item gap-[var(--space-4)] px-[var(--space-3)] -mx-[var(--space-3)] rounded-[var(--radius-md)] ${teamClass}`}
-      style={{ animationDelay: `${animationDelay}ms` }}
+      className="player-row stagger-item flex items-center gap-[var(--space-4)] rounded-[1.1rem] border px-[var(--space-4)] py-[var(--space-3)]"
+      style={{
+        animationDelay: `${animationDelay}ms`,
+        borderColor: `color-mix(in srgb, ${accent} 14%, white)`,
+        background: `linear-gradient(90deg, color-mix(in srgb, ${accent} 7%, white) 0%, rgba(255,255,255,0.82) 30%, rgba(255,255,255,0.82) 100%)`,
+      }}
     >
       {/* Rank */}
       <span
