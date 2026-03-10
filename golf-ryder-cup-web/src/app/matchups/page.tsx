@@ -3,20 +3,11 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { formatPlayerName } from '@/lib/utils';
+import { cn, formatPlayerName } from '@/lib/utils';
+import type { Player } from '@/lib/types/models';
 import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsPremiumEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-
-/**
- * MATCHUPS PAGE — Team Rosters & Sessions
- *
- * Design Philosophy:
- * - Team columns with clear color identity
- * - Player names with handicaps for context
- * - Sessions as navigable rows
- * - Captain mode hints are subtle, not intrusive
- */
 
 export default function MatchupsPage() {
   const router = useRouter();
@@ -36,6 +27,7 @@ export default function MatchupsPage() {
   const teamB = teams.find(t => t.color === 'europe');
   const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
   const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
+  const liveSessions = sessions.filter((session) => session.status === 'inProgress').length;
 
   if (!currentTrip) {
     return (
@@ -76,114 +68,75 @@ export default function MatchupsPage() {
       />
 
       <main className="container-editorial">
-        {/* Team Rosters */}
-        <section className="section">
-          <h2 className="type-overline" style={{ marginBottom: 'var(--space-6)' }}>
-            Team Rosters
-          </h2>
-
-          <div className="grid grid-cols-2 gap-6">
-            {/* Team USA */}
-            <div className="team-bg-usa" style={{ padding: 'var(--space-4)', margin: 'calc(-1 * var(--space-4))', borderRadius: 'var(--radius-lg)' }}>
-              <div
-                className="flex items-center gap-2"
-                style={{ marginBottom: 'var(--space-4)' }}
-              >
-                <span className="team-dot-xl team-dot-usa" />
-                <span className="team-badge team-badge-solid-usa">
-                  {teamA?.name || 'USA'}
-                </span>
+        <section className="pt-[var(--space-8)]">
+          <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+            <div className="flex items-start justify-between gap-[var(--space-4)]">
+              <div>
+                <p className="type-overline text-[var(--masters)]">Staging Room</p>
+                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
+                  Matchups and session routing
+                </h1>
+                <p className="mt-[var(--space-2)] max-w-2xl text-sm text-[var(--ink-secondary)]">
+                  See both sides of the cup, confirm the roster depth, and jump into the right
+                  session without hunting through utilitarian lists.
+                </p>
               </div>
-              {teamAPlayers.length > 0 ? (
-                <div>
-                  {teamAPlayers.map(player => (
-                    <div
-                      key={player.id}
-                      className="team-row team-row-usa"
-                      style={{
-                        padding: 'var(--space-3) var(--space-2)',
-                        marginLeft: 'calc(-1 * var(--space-2))',
-                        marginRight: 'calc(-1 * var(--space-2))',
-                        borderRadius: 'var(--radius-sm)',
-                        borderBottom: '1px solid var(--rule-faint)'
-                      }}
-                    >
-                      <p className="type-title-sm">
-                        {formatPlayerName(player.firstName, player.lastName, 'short')}
-                      </p>
-                      {player.handicapIndex !== undefined && (
-                        <p className="type-micro" style={{ marginTop: '2px' }}>
-                          {player.handicapIndex.toFixed(1)} HCP
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="type-caption" style={{ color: 'var(--team-usa-muted)' }}>No players</p>
+              {isCaptainMode && (
+                <Link
+                  href="/players"
+                  className="inline-flex items-center gap-2 rounded-full bg-[var(--masters)] px-4 py-2 text-sm font-semibold text-[var(--canvas)]"
+                >
+                  <Plus size={16} strokeWidth={2} />
+                  Manage Players
+                </Link>
               )}
             </div>
 
-            {/* Team Europe */}
-            <div className="team-bg-europe" style={{ padding: 'var(--space-4)', margin: 'calc(-1 * var(--space-4))', borderRadius: 'var(--radius-lg)' }}>
-              <div
-                className="flex items-center gap-2"
-                style={{ marginBottom: 'var(--space-4)' }}
-              >
-                <span className="team-dot-xl team-dot-europe" />
-                <span className="team-badge team-badge-solid-europe">
-                  {teamB?.name || 'Europe'}
-                </span>
-              </div>
-              {teamBPlayers.length > 0 ? (
-                <div>
-                  {teamBPlayers.map(player => (
-                    <div
-                      key={player.id}
-                      className="team-row team-row-europe"
-                      style={{
-                        padding: 'var(--space-3) var(--space-2)',
-                        marginLeft: 'calc(-1 * var(--space-2))',
-                        marginRight: 'calc(-1 * var(--space-2))',
-                        borderRadius: 'var(--radius-sm)',
-                        borderBottom: '1px solid var(--rule-faint)'
-                      }}
-                    >
-                      <p className="type-title-sm">
-                        {formatPlayerName(player.firstName, player.lastName, 'short')}
-                      </p>
-                      {player.handicapIndex !== undefined && (
-                        <p className="type-micro" style={{ marginTop: '2px' }}>
-                          {player.handicapIndex.toFixed(1)} HCP
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="type-caption" style={{ color: 'var(--team-europe-muted)' }}>No players</p>
-              )}
+            <div className="mt-[var(--space-6)] grid grid-cols-3 gap-3">
+              <MatchupsFact label={teamA?.name || 'USA'} value={teamAPlayers.length} />
+              <MatchupsFact label="Sessions" value={sessions.length} />
+              <MatchupsFact label="Live" value={liveSessions} />
             </div>
           </div>
         </section>
 
-        <hr className="divider-lg" />
+        <section className="section">
+          <div className="mb-[var(--space-5)]">
+            <p className="type-overline text-[var(--ink-secondary)]">Team Rosters</p>
+            <h2 className="mt-[var(--space-2)] font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+              Two sides of the card
+            </h2>
+          </div>
 
-        {/* Sessions */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <RosterCard
+              tone="usa"
+              teamName={teamA?.name || 'USA'}
+              players={teamAPlayers}
+            />
+            <RosterCard
+              tone="europe"
+              teamName={teamB?.name || 'Europe'}
+              players={teamBPlayers}
+            />
+          </div>
+        </section>
+
         <section className="section-sm">
-          <div
-            className="flex items-center justify-between"
-            style={{ marginBottom: 'var(--space-6)' }}
-          >
-            <h2 className="type-overline">Sessions</h2>
+          <div className="mb-[var(--space-5)] flex items-end justify-between gap-4">
+            <div>
+              <p className="type-overline text-[var(--ink-secondary)]">Sessions</p>
+              <h2 className="mt-[var(--space-2)] font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+                Today’s order of play
+              </h2>
+            </div>
             {isCaptainMode && (
               <button
                 onClick={() => router.push('/lineup/new')}
-                className="flex items-center gap-1"
-                style={{ color: 'var(--masters)', fontWeight: 500, fontSize: 'var(--text-sm)' }}
+                className="inline-flex items-center gap-2 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-4 py-2 text-sm font-semibold text-[var(--masters)]"
               >
                 <Plus size={16} strokeWidth={2} />
-                Add
+                Add Session
               </button>
             )}
           </div>
@@ -219,32 +172,30 @@ export default function MatchupsPage() {
           )}
 
           {sessions.length > 0 ? (
-            <div>
+            <div className="space-y-3">
               {sessions.map(session => (
                 <button
                   key={session.id}
                   onClick={() => router.push(`/lineup/${session.id}`)}
-                  className="match-row w-full text-left"
+                  className="card-editorial card-interactive w-full overflow-hidden p-[var(--space-4)] text-left"
                 >
-                  <Calendar size={20} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
-                  <div className="flex-1">
-                    <p className="type-title-sm">{session.name}</p>
-                    <p className="type-micro capitalize" style={{ marginTop: '2px' }}>
-                      {session.sessionType}
-                    </p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 gap-3">
+                      <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)]/78">
+                        <Calendar size={18} strokeWidth={1.6} className="text-[var(--ink-tertiary)]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="type-title-sm">{session.name}</p>
+                        <p className="mt-1 text-sm capitalize text-[var(--ink-secondary)]">
+                          {session.sessionType}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <SessionStatePill status={session.status} />
+                      <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-tertiary)]" />
+                    </div>
                   </div>
-                  <span
-                    className="type-caption"
-                    style={{
-                      fontWeight: 500,
-                      color: session.status === 'inProgress' ? 'var(--masters)' :
-                        session.status === 'completed' ? 'var(--success)' : 'var(--ink-tertiary)'
-                    }}
-                  >
-                    {session.status === 'inProgress' ? 'Live' :
-                      session.status === 'completed' ? 'Complete' : 'Upcoming'}
-                  </span>
-                  <ChevronRight size={20} strokeWidth={1.5} style={{ color: 'var(--ink-tertiary)' }} />
                 </button>
               ))}
             </div>
@@ -259,17 +210,8 @@ export default function MatchupsPage() {
         {/* Captain Mode Hint */}
         {!isCaptainMode && sessions.length > 0 && (
           <>
-            <hr className="divider" />
             <section className="section-sm">
-              <div
-                className="card"
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 'var(--space-4)',
-                  padding: 'var(--space-5)'
-                }}
-              >
+              <div className="card-editorial flex items-start gap-[var(--space-4)] p-[var(--space-5)]">
                 <Shield size={20} strokeWidth={1.5} style={{ color: 'var(--masters)', flexShrink: 0 }} />
                 <div>
                   <p className="type-title-sm" style={{ marginBottom: 'var(--space-1)' }}>
@@ -286,5 +228,107 @@ export default function MatchupsPage() {
       </main>
 
     </div>
+  );
+}
+
+function MatchupsFact({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </p>
+      <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+    </div>
+  );
+}
+
+function RosterCard({
+  tone,
+  teamName,
+  players,
+}: {
+  tone: 'usa' | 'europe';
+  teamName: string;
+  players: Player[];
+}) {
+  const accent = tone === 'usa' ? 'var(--team-usa)' : 'var(--team-europe)';
+  const background =
+    tone === 'usa'
+      ? 'linear-gradient(180deg, rgba(20,92,163,0.10) 0%, rgba(255,255,255,0.78) 100%)'
+      : 'linear-gradient(180deg, rgba(114,47,55,0.10) 0%, rgba(255,255,255,0.78) 100%)';
+
+  return (
+    <div
+      className="overflow-hidden rounded-[28px] border p-[var(--space-5)] shadow-card"
+      style={{ borderColor: `${accent}26`, background }}
+    >
+      <div className="flex items-center gap-3">
+        <span
+          className={cn(
+            'inline-flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-semibold text-[var(--canvas)]',
+            tone === 'usa' ? 'bg-[color:var(--team-usa)]' : 'bg-[color:var(--team-europe)]'
+          )}
+        >
+          {players.length}
+        </span>
+        <div>
+          <p className="type-overline" style={{ color: accent }}>
+            {teamName}
+          </p>
+          <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+            {players.length > 0 ? 'Ready for pairings' : 'No players assigned yet'}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-[var(--space-5)] space-y-2">
+        {players.length > 0 ? (
+          players.map((player) => (
+            <div
+              key={player.id}
+              className="flex items-center justify-between rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-4 py-3"
+            >
+              <div>
+                <p className="type-title-sm">
+                  {formatPlayerName(player.firstName, player.lastName, 'short')}
+                </p>
+                <p className="mt-1 text-xs text-[var(--ink-tertiary)]">
+                  {player.handicapIndex !== undefined
+                    ? `${player.handicapIndex.toFixed(1)} handicap`
+                    : 'Handicap pending'}
+                </p>
+              </div>
+              <span
+                className="rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
+                style={{ background: `${accent}15`, color: accent }}
+              >
+                {player.handicapIndex !== undefined ? `${player.handicapIndex.toFixed(1)} HCP` : 'TBD'}
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className="rounded-[20px] border border-dashed border-[color:var(--rule)] bg-[color:var(--canvas)]/55 px-4 py-6 text-center text-sm text-[var(--ink-secondary)]">
+            No players yet
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SessionStatePill({ status }: { status: 'scheduled' | 'inProgress' | 'completed' }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
+        status === 'inProgress'
+          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+          : status === 'completed'
+            ? 'bg-[color:rgba(76,175,80,0.12)] text-[var(--success)]'
+            : 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+      )}
+    >
+      {status === 'inProgress' ? 'Live' : status === 'completed' ? 'Complete' : 'Upcoming'}
+    </span>
   );
 }

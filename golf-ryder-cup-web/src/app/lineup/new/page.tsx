@@ -621,6 +621,44 @@ export default function NewLineupPage() {
       />
 
       <main className="container-editorial">
+        <section className="pt-[var(--space-8)]">
+          <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="type-overline text-[var(--masters)]">
+                  {step === 'setup' ? 'Session setup' : 'Lineup studio'}
+                </p>
+                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
+                  {sessionName || 'New session'}
+                </h1>
+                <p className="mt-[var(--space-2)] max-w-2xl text-sm text-[var(--ink-secondary)]">
+                  Build the session the way a captain would actually think about it: choose the
+                  format, confirm the roster depth, then shape the card.
+                </p>
+              </div>
+              <span
+                className={`inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] ${
+                  step === 'setup'
+                    ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+                    : 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+                }`}
+              >
+                {step === 'setup' ? 'Step 1 of 2' : 'Step 2 of 2'}
+              </span>
+            </div>
+
+            <div className="mt-[var(--space-6)] grid grid-cols-3 gap-3">
+              <LineupSetupFact label="Format" value={selectedType.label.split('(')[0]!.trim()} />
+              <LineupSetupFact label="Matches" value={matchCount} />
+              <LineupSetupFact
+                label="Roster"
+                value={hasEnoughPlayers ? 'Ready' : 'Short'}
+                note={`${teamAPlayers.length}-${teamBPlayers.length} players`}
+              />
+            </div>
+          </div>
+        </section>
+
         {step === 'setup' ? (
           /* STEP 1: Session Setup */
           <>
@@ -1039,10 +1077,19 @@ export default function NewLineupPage() {
         ) : (
           /* STEP 2: Lineup Builder */
           <section className="section">
+            <div className="mb-[var(--space-5)]">
+              <p className="type-overline text-[var(--ink-secondary)]">Build the card</p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                Drag players into place, keep an eye on fairness, and publish when the session feels
+                right.
+              </p>
+            </div>
             <LineupBuilder
               session={sessionConfig}
               teamAPlayers={lineupTeamA}
               teamBPlayers={lineupTeamB}
+              teamALabel={teamA?.name || 'USA'}
+              teamBLabel={teamB?.name || 'Europe'}
               onSave={handleSave}
               onPublish={handlePublish}
               onAutoFill={handleAutoFill}
@@ -1070,6 +1117,26 @@ export default function NewLineupPage() {
         )}
       </main>
 
+    </div>
+  );
+}
+
+function LineupSetupFact({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: string | number;
+  note?: string;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </p>
+      <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+      {note && <p className="mt-1 text-[11px] text-[var(--ink-secondary)]">{note}</p>}
     </div>
   );
 }

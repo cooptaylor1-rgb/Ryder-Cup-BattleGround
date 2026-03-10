@@ -148,25 +148,6 @@ export {
   type CourseSetupItem,
 } from './CourseSetupConfirmation';
 
-// ============================================
-// Phase 2: Captain Empowerment Components
-// ============================================
-
-// Lineup Builder v2 (Drag-and-Drop)
-export {
-  PlayerCard,
-  DraggablePlayerCard,
-} from './lineup-builder';
-export { MatchSlot as MatchSlotDropZone } from './lineup-builder';
-export { LineupCanvas } from './lineup-builder';
-export {
-  autoBalanceLineup,
-  calculateLineupFairness,
-  calculateMatchFairness,
-  suggestSwaps as suggestLineupSwaps,
-  type BalanceConfig,
-} from './lineup-builder';
-
 // Captain Dashboard v2
 export {
   LiveMatchMonitor,
@@ -213,4 +194,3 @@ export {
   AuditHistoryList,
   type AuditInfo,
 } from './audit';
-

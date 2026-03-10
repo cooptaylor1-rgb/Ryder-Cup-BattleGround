@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
@@ -78,6 +78,8 @@ interface LineupBuilderProps {
   session: SessionConfig;
   teamAPlayers: Player[];
   teamBPlayers: Player[];
+  teamALabel?: string;
+  teamBLabel?: string;
   initialMatches?: MatchSlot[];
   onSave?: (matches: MatchSlot[]) => void;
   onPublish?: (matches: MatchSlot[]) => void;
@@ -96,6 +98,8 @@ export function LineupBuilder({
   session,
   teamAPlayers,
   teamBPlayers,
+  teamALabel = 'Team A',
+  teamBLabel = 'Team B',
   initialMatches = [],
   onSave,
   onPublish,
@@ -130,6 +134,8 @@ export function LineupBuilder({
 
   const availableTeamA = teamAPlayers.filter((p) => !assignedPlayerIds.has(p.id));
   const availableTeamB = teamBPlayers.filter((p) => !assignedPlayerIds.has(p.id));
+  const totalAssigned = assignedPlayerIds.size;
+  const totalPlayers = teamAPlayers.length + teamBPlayers.length;
 
   // Calculate fairness
   const fairness = useMemo(() => {
@@ -262,102 +268,127 @@ export function LineupBuilder({
 
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold" style={{ color: 'var(--ink)' }}>
-            {session.name}
-          </h2>
-          <p className="text-sm" style={{ color: 'var(--ink-secondary)' }}>
-            {session.type} • {session.matchCount} matches • {session.pointsPerMatch} pts each
-          </p>
-        </div>
-        {isLocked ? (
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium"
-            style={{ background: 'var(--surface)', color: 'var(--ink-secondary)' }}
-          >
-            <Lock className="w-4 h-4" />
-            Locked
+      <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="type-overline text-[var(--masters)]">Lineup Studio</p>
+            <h2 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
+              {session.name}
+            </h2>
+            <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+              {session.type} • {session.matchCount} matches • {session.pointsPerMatch} point
+              {session.pointsPerMatch === 1 ? '' : 's'} each
+            </p>
           </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            {onAutoFill && (
-              <button
-                onClick={handleAutoFill}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                style={{ background: 'var(--surface)', color: 'var(--masters)' }}
-              >
-                <Shuffle className="w-4 h-4" />
-                Auto-fill
-              </button>
+          {isLocked ? (
+            <BuilderStatusPill label="Locked" icon={<Lock className="h-4 w-4" />} />
+          ) : onAutoFill ? (
+            <button
+              onClick={handleAutoFill}
+              className="inline-flex items-center gap-2 rounded-full border border-[color:rgba(0,102,68,0.15)] bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.72)_100%)] px-4 py-2 text-sm font-semibold text-[var(--masters)]"
+            >
+              <Shuffle className="h-4 w-4" />
+              Auto-fill
+            </button>
+          ) : null}
+        </div>
+
+        <div className="mt-[var(--space-6)] grid grid-cols-3 gap-3">
+          <BuilderFact label="Assigned" value={`${totalAssigned}/${totalPlayers}`} />
+          <BuilderFact label={teamALabel} value={availableTeamA.length} note="available" />
+          <BuilderFact label={teamBLabel} value={availableTeamB.length} note="available" />
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
+        <div className="space-y-4">
+          {fairness && <FairnessIndicator score={fairness} />}
+
+          {(validation.errors.length > 0 || validation.warnings.length > 0) && (
+            <ValidationPanel errors={validation.errors} warnings={validation.warnings} />
+          )}
+
+          <div className="card-editorial p-[var(--space-4)]">
+            <div className="mb-[var(--space-4)]">
+              <p className="type-overline text-[var(--ink-secondary)]">Available players</p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                Open one roster at a time to keep the drag targets clear.
+              </p>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              <RosterToggle
+                team="A"
+                label={`${teamALabel} (${availableTeamA.length})`}
+                isActive={showRoster === 'A'}
+                onClick={() => setShowRoster(showRoster === 'A' ? null : 'A')}
+              />
+              <RosterToggle
+                team="B"
+                label={`${teamBLabel} (${availableTeamB.length})`}
+                isActive={showRoster === 'B'}
+                onClick={() => setShowRoster(showRoster === 'B' ? null : 'B')}
+              />
+            </div>
+
+            {showRoster && (
+              <div className="mt-[var(--space-4)]">
+                <AvailablePlayersPanel
+                  team={showRoster}
+                  teamLabel={showRoster === 'A' ? teamALabel : teamBLabel}
+                  players={showRoster === 'A' ? availableTeamA : availableTeamB}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  isLocked={isLocked}
+                />
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Fairness Score */}
-      {fairness && <FairnessIndicator score={fairness} />}
+        <div className="space-y-4">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="type-overline text-[var(--ink-secondary)]">Matches</p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                Build the card one pairing at a time.
+              </p>
+            </div>
+            {hasChanges && !isLocked && (
+              <BuilderStatusPill label="Unsaved" icon={<Save className="h-4 w-4" />} tone="masters" />
+            )}
+          </div>
 
-      {/* Validation */}
-      {(validation.errors.length > 0 || validation.warnings.length > 0) && (
-        <ValidationPanel errors={validation.errors} warnings={validation.warnings} />
-      )}
-
-      {/* Roster Panels */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar">
-        <RosterToggle
-          team="A"
-          label={`Team A (${availableTeamA.length} available)`}
-          isActive={showRoster === 'A'}
-          onClick={() => setShowRoster(showRoster === 'A' ? null : 'A')}
-        />
-        <RosterToggle
-          team="B"
-          label={`Team B (${availableTeamB.length} available)`}
-          isActive={showRoster === 'B'}
-          onClick={() => setShowRoster(showRoster === 'B' ? null : 'B')}
-        />
-      </div>
-
-      {/* Available Players */}
-      {showRoster && (
-        <AvailablePlayersPanel
-          team={showRoster}
-          players={showRoster === 'A' ? availableTeamA : availableTeamB}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          isLocked={isLocked}
-        />
-      )}
-
-      {/* Match Slots */}
-      <div className="space-y-3">
-        {matches.map((match, index) => (
-          <MatchSlotCard
-            key={match.id}
-            match={match}
-            matchNumber={index + 1}
-            playersPerTeam={session.playersPerTeam}
-            onDrop={(team) => handleDropOnMatch(match.id, team)}
-            onRemovePlayer={(playerId) => handleRemovePlayer(match.id, playerId)}
-            onDeleteMatch={() => handleDeleteMatch(match.id)}
-            isDragging={!!draggedPlayer}
-            draggedPlayerTeam={draggedPlayer?.team}
-            isLocked={isLocked}
-          />
-        ))}
+          <div className="space-y-3">
+            {matches.map((match, index) => (
+              <MatchSlotCard
+                key={match.id}
+                match={match}
+                matchNumber={index + 1}
+                playersPerTeam={session.playersPerTeam}
+                teamALabel={teamALabel}
+                teamBLabel={teamBLabel}
+                onDrop={(team) => handleDropOnMatch(match.id, team)}
+                onRemovePlayer={(playerId) => handleRemovePlayer(match.id, playerId)}
+                onDeleteMatch={() => handleDeleteMatch(match.id)}
+                isDragging={!!draggedPlayer}
+                draggedPlayerTeam={draggedPlayer?.team}
+                isLocked={isLocked}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Actions */}
       {!isLocked && (
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           <button
             onClick={handleSave}
             disabled={!hasChanges}
-            className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 rounded-[22px] border px-4 py-3 font-medium flex items-center justify-center gap-2 transition-colors"
             style={{
-              background: hasChanges ? 'var(--surface)' : 'var(--surface)',
+              background: 'var(--surface)',
               color: hasChanges ? 'var(--masters)' : 'var(--ink-tertiary)',
               border: '1px solid var(--rule)',
               opacity: hasChanges ? 1 : 0.5,
@@ -370,7 +401,7 @@ export function LineupBuilder({
             onClick={handlePublish}
             disabled={!validation.isValid}
             className={cn(
-              'flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors text-[var(--canvas)]',
+              'flex-1 rounded-[22px] py-3 font-medium flex items-center justify-center gap-2 transition-colors text-[var(--canvas)]',
               validation.isValid ? 'bg-[var(--masters)]' : 'bg-[var(--ink-tertiary)] opacity-50'
             )}
           >
@@ -422,6 +453,7 @@ function RosterToggle({ team, label, isActive, onClick }: RosterToggleProps) {
 
 interface AvailablePlayersPanelProps {
   team: 'A' | 'B';
+  teamLabel: string;
   players: Player[];
   onDragStart: (player: Player) => void;
   onDragEnd: () => void;
@@ -430,6 +462,7 @@ interface AvailablePlayersPanelProps {
 
 function AvailablePlayersPanel({
   team,
+  teamLabel,
   players,
   onDragStart,
   onDragEnd,
@@ -440,22 +473,28 @@ function AvailablePlayersPanel({
   if (players.length === 0) {
     return (
       <div
-        className="p-4 rounded-xl text-center"
+        className="rounded-[22px] border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 p-4 text-center"
         style={{ background: 'var(--surface)', border: '1px solid var(--rule)' }}
       >
-        <p style={{ color: 'var(--ink-secondary)' }}>All players assigned</p>
+        <p className="text-sm text-[var(--ink-secondary)]">All {teamLabel} players assigned</p>
       </div>
     );
   }
 
   return (
     <div
-      className="p-3 rounded-xl"
+      className="rounded-[24px] border p-3"
       style={{
         background: `${color}10`,
         border: `1px solid ${color}30`,
       }}
     >
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color }}>
+          {teamLabel}
+        </p>
+        <span className="text-xs text-[var(--ink-tertiary)]">{players.length} available</span>
+      </div>
       <div className="flex flex-wrap gap-2">
         {players.map((player) => (
           <PlayerChip
@@ -574,6 +613,8 @@ interface MatchSlotCardProps {
   match: MatchSlot;
   matchNumber: number;
   playersPerTeam: number;
+  teamALabel: string;
+  teamBLabel: string;
   onDrop: (team: 'A' | 'B') => void;
   onRemovePlayer: (playerId: string) => void;
   onDeleteMatch: () => void;
@@ -586,6 +627,8 @@ function MatchSlotCard({
   match,
   matchNumber,
   playersPerTeam,
+  teamALabel,
+  teamBLabel,
   onDrop,
   onRemovePlayer,
   onDeleteMatch,
@@ -604,11 +647,11 @@ function MatchSlotCard({
   return (
     <div
       className={cn(
-        'p-4 rounded-2xl transition-all',
+        'rounded-[28px] border p-4 transition-all sm:p-5',
         isComplete && 'ring-2 ring-success ring-offset-2 ring-offset-canvas'
       )}
       style={{
-        background: 'var(--surface)',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(245,240,233,0.96) 100%)',
         border: '1px solid var(--rule)',
       }}
     >
@@ -671,6 +714,7 @@ function MatchSlotCard({
         {/* Team A */}
         <DropZone
           team="A"
+          teamLabel={teamALabel}
           players={match.teamAPlayers}
           playersNeeded={playersPerTeam}
           onDrop={() => onDrop('A')}
@@ -682,6 +726,7 @@ function MatchSlotCard({
         {/* Team B */}
         <DropZone
           team="B"
+          teamLabel={teamBLabel}
           players={match.teamBPlayers}
           playersNeeded={playersPerTeam}
           onDrop={() => onDrop('B')}
@@ -700,6 +745,7 @@ function MatchSlotCard({
 
 interface DropZoneProps {
   team: 'A' | 'B';
+  teamLabel: string;
   players: Player[];
   playersNeeded: number;
   onDrop: () => void;
@@ -710,6 +756,7 @@ interface DropZoneProps {
 
 function DropZone({
   team,
+  teamLabel,
   players,
   playersNeeded,
   onDrop,
@@ -736,6 +783,9 @@ function DropZone({
         border: `1px solid ${color}30`,
       }}
     >
+      <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color }}>
+        {teamLabel}
+      </div>
       <div className="space-y-2">
         {players.map((player) => (
           <PlayerChip
@@ -773,6 +823,50 @@ function DropZone({
 
 interface FairnessIndicatorProps {
   score: FairnessScore;
+}
+
+function BuilderFact({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: number | string;
+  note?: string;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </p>
+      <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+      {note && <p className="mt-1 text-[11px] text-[var(--ink-secondary)]">{note}</p>}
+    </div>
+  );
+}
+
+function BuilderStatusPill({
+  label,
+  icon,
+  tone = 'muted',
+}: {
+  label: string;
+  icon: ReactNode;
+  tone?: 'muted' | 'masters';
+}) {
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium',
+        tone === 'masters'
+          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+          : 'bg-[color:var(--surface)] text-[var(--ink-secondary)]'
+      )}
+    >
+      {icon}
+      {label}
+    </div>
+  );
 }
 
 function FairnessIndicator({ score }: FairnessIndicatorProps) {

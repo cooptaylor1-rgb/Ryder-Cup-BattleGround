@@ -21,8 +21,6 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 import {
   Users,
-  Calendar,
-  Clock,
   Play,
   Lock,
   Unlock,
@@ -326,30 +324,33 @@ export default function SessionPage() {
       />
 
       <main className="container-editorial">
-        {/* Session Info */}
-        <section className="section">
-          <div className="card" style={{ padding: 'var(--space-4)' }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {session.scheduledDate && (
-                  <div className="flex items-center gap-2">
-                    <Calendar size={16} style={{ color: 'var(--ink-tertiary)' }} />
-                    <span className="type-meta">
-                      {new Date(session.scheduledDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-                {session.timeSlot && (
-                  <div className="flex items-center gap-2">
-                    <Clock size={16} style={{ color: 'var(--ink-tertiary)' }} />
-                    <span className="type-meta">{session.timeSlot}</span>
-                  </div>
-                )}
+        <section className="pt-[var(--space-8)]">
+          <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="type-overline text-[var(--masters)]">Session room</p>
+                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
+                  {session.name}
+                </h1>
+                <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                  {session.sessionType} • {session.pointsPerMatch} point
+                  {session.pointsPerMatch === 1 ? '' : 's'} per match
+                </p>
               </div>
+              <SessionPageStatus status={session.status} />
+            </div>
 
-              <div className="flex items-center gap-2">
-                <span className="type-meta">{matches.length} matches</span>
-              </div>
+            <div className="mt-[var(--space-6)] grid grid-cols-3 gap-3">
+              <SessionInfoFact
+                label="Date"
+                value={
+                  session.scheduledDate
+                    ? new Date(session.scheduledDate).toLocaleDateString()
+                    : 'Unscheduled'
+                }
+              />
+              <SessionInfoFact label="Time" value={session.timeSlot || 'TBD'} />
+              <SessionInfoFact label="Matches" value={matches.length} />
             </div>
           </div>
         </section>
@@ -435,12 +436,11 @@ export default function SessionPage() {
                     <Link
                       key={match.id}
                       href={canScore ? `/score/${match.id}` : '#'}
-                      className={`card block ${canScore ? 'press-scale' : ''}`}
-                      style={{ padding: 'var(--space-4)' }}
+                      className={`card-editorial block overflow-hidden p-[var(--space-4)] ${canScore ? 'press-scale' : ''}`}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <span
-                          className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
+                          className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm"
                           style={{
                             background:
                               match.status === 'completed'
@@ -454,8 +454,14 @@ export default function SessionPage() {
                           {idx + 1}
                         </span>
                         <span
-                          className="type-caption font-medium"
+                          className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
                           style={{
+                            background:
+                              match.status === 'completed'
+                                ? 'rgba(76, 175, 80, 0.12)'
+                                : match.status === 'inProgress'
+                                  ? 'rgba(0, 102, 68, 0.12)'
+                                  : 'rgba(26, 24, 21, 0.08)',
                             color:
                               match.status === 'completed'
                                 ? 'var(--success)'
@@ -470,7 +476,7 @@ export default function SessionPage() {
 
                       <div className="grid grid-cols-2 gap-4">
                         {/* Team A */}
-                        <div className="team-bg-usa rounded-lg p-3">
+                        <div className="rounded-[20px] border border-[color:rgba(20,92,163,0.16)] bg-[linear-gradient(180deg,rgba(20,92,163,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
                           <p className="type-micro mb-1" style={{ color: 'var(--team-usa)' }}>
                             {teamA?.name || 'Team A'}
                           </p>
@@ -478,7 +484,7 @@ export default function SessionPage() {
                         </div>
 
                         {/* Team B */}
-                        <div className="team-bg-europe rounded-lg p-3">
+                        <div className="rounded-[20px] border border-[color:rgba(114,47,55,0.16)] bg-[linear-gradient(180deg,rgba(114,47,55,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
                           <p className="type-micro mb-1" style={{ color: 'var(--team-europe)' }}>
                             {teamB?.name || 'Team B'}
                           </p>
@@ -511,6 +517,8 @@ export default function SessionPage() {
                 session={sessionConfig}
                 teamAPlayers={lineupTeamA}
                 teamBPlayers={lineupTeamB}
+                teamALabel={teamA?.name || 'USA'}
+                teamBLabel={teamB?.name || 'Europe'}
                 initialMatches={initialMatches}
                 onSave={() => {
                   showToast('info', 'Lineup saved as draft');
@@ -532,5 +540,32 @@ export default function SessionPage() {
       {/* Confirm Dialog */}
       {ConfirmDialogComponent}
     </div>
+  );
+}
+
+function SessionInfoFact({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {label}
+      </p>
+      <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+    </div>
+  );
+}
+
+function SessionPageStatus({ status }: { status: Match['status'] | 'scheduled' }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] ${
+        status === 'inProgress'
+          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+          : status === 'completed'
+            ? 'bg-[color:rgba(76,175,80,0.12)] text-[var(--success)]'
+            : 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+      }`}
+    >
+      {status === 'inProgress' ? 'Live' : status === 'completed' ? 'Complete' : 'Scheduled'}
+    </span>
   );
 }
