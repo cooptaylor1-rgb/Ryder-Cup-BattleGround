@@ -178,15 +178,6 @@ export {
   type BatchScoreEntry,
 } from './dashboard';
 
-// Session Management
-export {
-  SessionCloner,
-  type SessionPlayer as ClonerSessionPlayer,
-  type SessionMatch as ClonerSessionMatch,
-  type SessionTemplate,
-  type CloneOptions,
-} from './sessions';
-
 // Audit Trail UI
 export {
   AuditBadge,
