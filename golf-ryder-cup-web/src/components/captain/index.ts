@@ -42,8 +42,6 @@ export {
 export {
   AnnouncementComposer,
   AnnouncementHistory,
-  AnnouncementBanner,
-  QuickAnnouncementModal,
   type Announcement,
   type AnnouncementPriority,
   type AnnouncementCategory,
@@ -84,15 +82,6 @@ export {
   type MatchCardPlayer,
   type MatchCardData,
 } from './MatchCardGenerator';
-
-export {
-  DirectMessage,
-  type MessageRecipientType,
-  type MessageRecipient,
-  type QuickMessageTemplate,
-  type MessagePlayer,
-  type SentMessage,
-} from './DirectMessage';
 
 export {
   GoTimeCountdown,

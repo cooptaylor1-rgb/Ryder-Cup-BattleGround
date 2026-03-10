@@ -1,44 +1,24 @@
 /**
- * Announcement System Component
- *
- * Captain-to-players broadcast messaging system:
- * - Create and send announcements
- * - View announcement history
- * - Quick templates for common announcements
- * - Delivery status tracking
- *
- * Features:
- * - Rich text announcements
- * - Priority levels (normal/urgent)
- * - Template shortcuts
- * - Read receipts (conceptual)
+ * Captain announcement surfaces used by the messaging room.
  */
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  Megaphone,
-  Send,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  X,
-  ChevronRight,
-  Users,
   Calendar,
-  Trophy,
+  CheckCircle2,
+  ChevronRight,
   Cloud,
-  MapPin,
-  Zap,
-  Bell,
+  Megaphone,
   MessageCircle,
+  Send,
+  Trophy,
+  Users,
+  X,
+  Zap,
 } from 'lucide-react';
-
-// ============================================
-// TYPES
-// ============================================
 
 export type AnnouncementPriority = 'normal' | 'urgent';
 export type AnnouncementCategory = 'general' | 'schedule' | 'lineup' | 'weather' | 'results';
@@ -65,7 +45,7 @@ export interface AnnouncementTemplate {
   title: string;
   message: string;
   category: AnnouncementCategory;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 interface AnnouncementComposerProps {
@@ -82,10 +62,6 @@ interface AnnouncementHistoryProps {
   className?: string;
 }
 
-// ============================================
-// TEMPLATES
-// ============================================
-
 const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
   {
     id: 'lineup-posted',
@@ -93,7 +69,7 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Lineups Are Posted!',
     message: "Check the app to see tomorrow's pairings. Good luck everyone!",
     category: 'lineup',
-    icon: <Users className="w-5 h-5" />,
+    icon: <Users className="h-4 w-4" />,
   },
   {
     id: 'tee-times',
@@ -101,7 +77,7 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Tee Times Reminder',
     message: 'First group tees off at [TIME]. Please arrive 30 minutes early for warm-up.',
     category: 'schedule',
-    icon: <Clock className="w-5 h-5" />,
+    icon: <Calendar className="h-4 w-4" />,
   },
   {
     id: 'weather-update',
@@ -109,7 +85,7 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Weather Advisory',
     message: 'Weather conditions may affect play today. Stay tuned for updates.',
     category: 'weather',
-    icon: <Cloud className="w-5 h-5" />,
+    icon: <Cloud className="h-4 w-4" />,
   },
   {
     id: 'session-complete',
@@ -117,7 +93,7 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Session Complete!',
     message: 'All matches are in. Check standings for the latest scores.',
     category: 'results',
-    icon: <Trophy className="w-5 h-5" />,
+    icon: <Trophy className="h-4 w-4" />,
   },
   {
     id: 'location-change',
@@ -125,7 +101,7 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Location Update',
     message: 'There has been a change to our meeting location. Please check the details.',
     category: 'general',
-    icon: <MapPin className="w-5 h-5" />,
+    icon: <MessageCircle className="h-4 w-4" />,
   },
   {
     id: 'urgent',
@@ -133,13 +109,25 @@ const ANNOUNCEMENT_TEMPLATES: AnnouncementTemplate[] = [
     title: 'Urgent: Please Read',
     message: '[Your urgent message here]',
     category: 'general',
-    icon: <AlertCircle className="w-5 h-5" />,
+    icon: <Zap className="h-4 w-4" />,
   },
 ];
 
-// ============================================
-// ANNOUNCEMENT COMPOSER
-// ============================================
+const CATEGORY_LABELS: Record<AnnouncementCategory, string> = {
+  general: 'General',
+  schedule: 'Schedule',
+  lineup: 'Lineup',
+  weather: 'Weather',
+  results: 'Results',
+};
+
+const CATEGORY_ICONS: Record<AnnouncementCategory, ReactNode> = {
+  general: <MessageCircle className="h-5 w-5" />,
+  schedule: <Calendar className="h-5 w-5" />,
+  lineup: <Users className="h-5 w-5" />,
+  weather: <Cloud className="h-5 w-5" />,
+  results: <Trophy className="h-5 w-5" />,
+};
 
 export function AnnouncementComposer({
   onSend,
@@ -160,6 +148,7 @@ export function AnnouncementComposer({
     setTitle(template.title);
     setMessage(template.message);
     setCategory(template.category);
+    setPriority(template.id === 'urgent' ? 'urgent' : 'normal');
     setShowTemplates(false);
   }, []);
 
@@ -173,204 +162,224 @@ export function AnnouncementComposer({
       category,
     });
 
-    // Reset form
     setTitle('');
     setMessage('');
     setPriority('normal');
     setCategory('general');
     setShowTemplates(true);
-  }, [title, message, priority, category, canSend, onSend]);
+  }, [canSend, category, message, onSend, priority, title]);
 
   return (
     <div
-      className={cn('rounded-2xl overflow-hidden', className)}
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--rule)',
-      }}
+      className={cn(
+        'overflow-hidden rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,240,233,1))] shadow-[0_16px_34px_rgba(41,29,17,0.06)]',
+        className
+      )}
     >
-      {/* Header */}
-      <div
-        className="p-4 flex items-center justify-between"
-        style={{ borderBottom: '1px solid var(--rule)' }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: 'var(--masters)', color: 'var(--canvas)' }}
-          >
-            <Megaphone className="w-5 h-5" />
+      <div className="border-b border-[color:var(--rule)]/70 px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="flex items-start justify-between gap-[var(--space-3)]">
+          <div className="flex gap-[var(--space-4)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.1rem] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] text-[var(--canvas)] shadow-[0_14px_30px_rgba(104,35,48,0.18)]">
+              <Megaphone className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Broadcast Desk</p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic leading-none text-[var(--ink)]">
+                Write the note once.
+              </h3>
+              <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                {recipientCount} player{recipientCount === 1 ? '' : 's'} will receive this bulletin.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3
-              className="font-semibold"
-              style={{ color: 'var(--ink)' }}
+
+          {onCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface)] text-[var(--ink-tertiary)] transition-colors hover:text-[var(--ink)]"
+              aria-label="Close composer"
             >
-              New Announcement
-            </h3>
-            <p
-              className="text-sm"
-              style={{ color: 'var(--ink-secondary)' }}
-            >
-              {recipientCount} player{recipientCount !== 1 ? 's' : ''} will receive this
-            </p>
-          </div>
+              <X className="h-5 w-5" />
+            </button>
+          ) : null}
         </div>
-        {onCancel && (
-          <button
-            onClick={onCancel}
-            className="p-2 rounded-lg"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
       </div>
 
-      {/* Templates */}
-      {showTemplates && (
-        <div className="p-4" style={{ borderBottom: '1px solid var(--rule)' }}>
-          <p
-            className="text-xs font-medium uppercase tracking-wide mb-3"
-            style={{ color: 'var(--ink-tertiary)' }}
-          >
-            Quick Templates
-          </p>
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar">
+      {showTemplates ? (
+        <div className="border-b border-[color:var(--rule)]/70 px-[var(--space-5)] py-[var(--space-4)]">
+          <div className="flex items-end justify-between gap-[var(--space-3)]">
+            <div>
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Starts</p>
+              <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">
+                Use a template when the moment matters more than the prose.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTemplates(false)}
+              className="text-sm font-semibold text-[var(--maroon)]"
+            >
+              Hide
+            </button>
+          </div>
+
+          <div className="mt-[var(--space-4)] grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {ANNOUNCEMENT_TEMPLATES.map((template) => (
               <button
                 key={template.id}
+                type="button"
                 onClick={() => handleSelectTemplate(template)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors"
-                style={{
-                  background: 'var(--surface-raised)',
-                  color: 'var(--ink-secondary)',
-                }}
+                className="flex items-center gap-3 rounded-[1.1rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 px-[var(--space-3)] py-[var(--space-3)] text-left transition-all hover:border-[var(--maroon-subtle)] hover:bg-[color:var(--surface)]"
               >
-                {template.icon}
-                <span className="text-sm font-medium">{template.name}</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[0.95rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+                  {template.icon}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-[var(--ink)]">{template.name}</span>
+                  <span className="block truncate text-xs text-[var(--ink-secondary)]">{template.title}</span>
+                </span>
               </button>
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Form */}
-      <div className="p-4 space-y-4">
-        {/* Priority Toggle */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setPriority('normal')}
-            className={cn(
-              'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors',
-            )}
-            style={{
-              background: priority === 'normal' ? 'var(--masters)' : 'var(--surface-raised)',
-              color: priority === 'normal' ? 'white' : 'var(--ink-secondary)',
-            }}
-          >
-            Normal
-          </button>
-          <button
-            onClick={() => setPriority('urgent')}
-            className={cn(
-              'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2',
-            )}
-            style={{
-              background: priority === 'urgent' ? 'var(--error)' : 'var(--surface-raised)',
-              color: priority === 'urgent' ? 'white' : 'var(--ink-secondary)',
-            }}
-          >
-            <Zap className="w-4 h-4" />
-            Urgent
-          </button>
+      <div className="space-y-[var(--space-4)] px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(12rem,0.9fr)]">
+          <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Tone</p>
+            <div className="mt-[var(--space-3)] flex gap-2">
+              <PriorityButton
+                active={priority === 'normal'}
+                label="Standard"
+                onClick={() => setPriority('normal')}
+              />
+              <PriorityButton
+                active={priority === 'urgent'}
+                label="Urgent"
+                icon={<Zap className="h-4 w-4" />}
+                urgent
+                onClick={() => setPriority('urgent')}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Category</p>
+            <div className="mt-[var(--space-3)] flex flex-wrap gap-2">
+              {(Object.keys(CATEGORY_LABELS) as AnnouncementCategory[]).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setCategory(option)}
+                  className={cn(
+                    'rounded-full border px-3 py-2 text-sm font-semibold transition-all',
+                    category === option
+                      ? 'border-[var(--maroon)] bg-[var(--maroon)] text-[var(--canvas)]'
+                      : 'border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 text-[var(--ink-secondary)] hover:text-[var(--ink)]'
+                  )}
+                >
+                  {CATEGORY_LABELS[option]}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Title */}
-        <div>
-          <label
-            className="block text-sm font-medium mb-2"
-            style={{ color: 'var(--ink)' }}
-          >
-            Title
-          </label>
+        <label className="block">
+          <span className="block text-sm font-semibold text-[var(--ink)]">Title</span>
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Announcement title..."
-            className="w-full px-4 py-3 rounded-xl text-sm"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--ink)',
-              border: '1px solid var(--rule)',
-            }}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Announcement title"
+            className="mt-2 w-full rounded-[1.15rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/90 px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-tertiary)] focus:border-[var(--maroon-subtle)]"
           />
-        </div>
+        </label>
 
-        {/* Message */}
-        <div>
-          <label
-            className="block text-sm font-medium mb-2"
-            style={{ color: 'var(--ink)' }}
-          >
-            Message
-          </label>
+        <label className="block">
+          <span className="block text-sm font-semibold text-[var(--ink)]">Message</span>
           <textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write your announcement..."
-            rows={4}
-            className="w-full px-4 py-3 rounded-xl text-sm resize-none"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--ink)',
-              border: '1px solid var(--rule)',
-            }}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="Write the one thing everyone needs to know."
+            rows={5}
+            className="mt-2 w-full resize-none rounded-[1.15rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/90 px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-tertiary)] focus:border-[var(--maroon-subtle)]"
           />
-        </div>
+        </label>
 
-        {/* Preview */}
-        {canSend && (
+        {canSend ? (
           <div
-            className="p-4 rounded-xl"
-            style={{
-              background: priority === 'urgent' ? 'var(--error)' : 'var(--masters)',
-              color: 'var(--canvas)',
-            }}
+            className={cn(
+              'rounded-[1.35rem] border p-[var(--space-4)]',
+              priority === 'urgent'
+                ? 'border-[color:var(--error)]/18 bg-[linear-gradient(180deg,rgba(202,82,71,0.12),rgba(255,255,255,0.98))]'
+                : 'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]'
+            )}
           >
-            <p className="text-xs font-medium uppercase tracking-wide mb-1 opacity-80">
-              Preview
-            </p>
-            <p className="font-bold">{title}</p>
-            <p className="text-sm mt-1 opacity-90">{message}</p>
-            <p className="text-xs mt-2 opacity-70">
-              — {captainName}
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-[color:var(--canvas)]/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                Preview
+              </span>
+              <span className="text-xs text-[var(--ink-tertiary)]">{CATEGORY_LABELS[category]}</span>
+            </div>
+            <p className="mt-[var(--space-3)] font-serif text-[1.55rem] italic text-[var(--ink)]">{title}</p>
+            <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{message}</p>
+            <p className="mt-[var(--space-3)] text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              {priority === 'urgent' ? 'Urgent bulletin' : 'Standard bulletin'} by {captainName}
             </p>
           </div>
-        )}
+        ) : null}
 
-        {/* Send Button */}
         <button
+          type="button"
           onClick={handleSend}
           disabled={!canSend}
-          className="w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-          style={{
-            background: canSend ? 'var(--masters)' : 'var(--surface-raised)',
-            color: canSend ? 'white' : 'var(--ink-tertiary)',
-          }}
+          className={cn(
+            'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold transition-transform duration-150',
+            canSend
+              ? 'bg-[var(--maroon)] text-[var(--canvas)] shadow-[0_14px_30px_rgba(104,35,48,0.20)] hover:scale-[1.01]'
+              : 'bg-[color:var(--surface)] text-[var(--ink-tertiary)]'
+          )}
         >
-          <Send className="w-5 h-5" />
-          Send Announcement
+          <Send className="h-4 w-4" />
+          Send Bulletin
         </button>
       </div>
     </div>
   );
 }
 
-// ============================================
-// ANNOUNCEMENT HISTORY
-// ============================================
+function PriorityButton({
+  active,
+  label,
+  icon,
+  urgent = false,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  icon?: ReactNode;
+  urgent?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all',
+        active && !urgent && 'bg-[var(--maroon)] text-[var(--canvas)] shadow-[0_12px_24px_rgba(104,35,48,0.16)]',
+        active && urgent && 'bg-[var(--error)] text-[var(--canvas)] shadow-[0_12px_24px_rgba(202,82,71,0.16)]',
+        !active && 'bg-[color:var(--canvas)]/72 text-[var(--ink-secondary)]'
+      )}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
 
 export function AnnouncementHistory({
   announcements,
@@ -380,24 +389,17 @@ export function AnnouncementHistory({
   if (announcements.length === 0) {
     return (
       <div
-        className={cn('p-8 rounded-2xl text-center', className)}
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--rule)',
-        }}
+        className={cn(
+          'rounded-[1.5rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--surface)]/72 p-[var(--space-7)] text-center',
+          className
+        )}
       >
-        <Megaphone
-          className="w-12 h-12 mx-auto mb-3"
-          style={{ color: 'var(--ink-tertiary)' }}
-        />
-        <p style={{ color: 'var(--ink-secondary)' }}>
+        <Megaphone className="mx-auto h-12 w-12 text-[var(--ink-tertiary)]" />
+        <p className="mt-[var(--space-4)] font-serif text-[1.6rem] italic text-[var(--ink)]">
           No announcements yet
         </p>
-        <p
-          className="text-sm mt-1"
-          style={{ color: 'var(--ink-tertiary)' }}
-        >
-          Send your first announcement to keep everyone informed
+        <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+          Send the first bulletin to establish the tone of the trip.
         </p>
       </div>
     );
@@ -416,227 +418,85 @@ export function AnnouncementHistory({
   );
 }
 
-// ============================================
-// ANNOUNCEMENT CARD
-// ============================================
-
-interface AnnouncementCardProps {
+function AnnouncementCard({
+  announcement,
+  onClick,
+}: {
   announcement: Announcement;
   onClick?: () => void;
-}
-
-function AnnouncementCard({ announcement, onClick }: AnnouncementCardProps) {
-  const categoryIcons: Record<AnnouncementCategory, React.ReactNode> = {
-    general: <MessageCircle className="w-5 h-5" />,
-    schedule: <Calendar className="w-5 h-5" />,
-    lineup: <Users className="w-5 h-5" />,
-    weather: <Cloud className="w-5 h-5" />,
-    results: <Trophy className="w-5 h-5" />,
-  };
-
-  const isUrgent = announcement.priority === 'urgent';
-  const timeSent = announcement.sentAt
-    ? formatRelativeTime(announcement.sentAt)
-    : 'Draft';
+}) {
+  const urgent = announcement.priority === 'urgent';
+  const timeSent = announcement.sentAt ? formatRelativeTime(announcement.sentAt) : 'Draft';
 
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="w-full p-4 rounded-xl text-left transition-all active:scale-[0.98]"
-      style={{
-        background: 'var(--surface)',
-        border: `1px solid ${isUrgent ? 'var(--error)' : 'var(--rule)'}`,
-      }}
+      className={cn(
+        'w-full rounded-[1.45rem] border p-[var(--space-4)] text-left transition-transform duration-150 hover:scale-[1.01]',
+        urgent
+          ? 'border-[color:var(--error)]/18 bg-[linear-gradient(180deg,rgba(202,82,71,0.10),rgba(255,255,255,0.98))]'
+          : 'border-[color:var(--rule)]/75 bg-[color:var(--surface)]/88'
+      )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-[var(--space-3)]">
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-          style={{
-            background: isUrgent ? 'var(--error)' : 'var(--surface-raised)',
-            color: isUrgent ? 'var(--canvas)' : 'var(--masters)',
-          }}
+          className={cn(
+            'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem]',
+            urgent ? 'bg-[color:var(--error)] text-[var(--canvas)]' : 'bg-[color:var(--maroon)]/10 text-[var(--maroon)]'
+          )}
         >
-          {categoryIcons[announcement.category]}
+          {CATEGORY_ICONS[announcement.category]}
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[color:var(--canvas)]/74 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+              {CATEGORY_LABELS[announcement.category]}
+            </span>
+            {urgent ? (
+              <span className="rounded-full bg-[color:var(--error)]/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--error)]">
+                Urgent
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-[var(--space-3)] flex items-start justify-between gap-[var(--space-3)]">
             <div>
-              {isUrgent && (
-                <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium mb-1"
-                  style={{ background: 'var(--error)', color: 'var(--canvas)' }}
-                >
-                  <Zap className="w-3 h-3" />
-                  Urgent
-                </span>
-              )}
-              <p
-                className="font-semibold"
-                style={{ color: 'var(--ink)' }}
-              >
+              <p className="font-serif text-[1.45rem] italic leading-tight text-[var(--ink)]">
                 {announcement.title}
               </p>
+              <p className="mt-[var(--space-2)] line-clamp-3 text-sm leading-6 text-[var(--ink-secondary)]">
+                {announcement.message}
+              </p>
             </div>
-            <span
-              className="text-xs whitespace-nowrap"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
+            <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
               {timeSent}
             </span>
           </div>
 
-          <p
-            className="text-sm mt-1 line-clamp-2"
-            style={{ color: 'var(--ink-secondary)' }}
-          >
-            {announcement.message}
-          </p>
-
-          {announcement.readCount !== undefined && announcement.totalRecipients !== undefined && (
-            <div
-              className="flex items-center gap-2 mt-2 text-xs"
-              style={{ color: 'var(--ink-tertiary)' }}
-            >
-              <CheckCircle2 className="w-3 h-3" />
+          {announcement.readCount !== undefined && announcement.totalRecipients !== undefined ? (
+            <div className="mt-[var(--space-3)] flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
+              <CheckCircle2 className="h-3.5 w-3.5" />
               <span>
                 {announcement.readCount}/{announcement.totalRecipients} read
               </span>
             </div>
-          )}
+          ) : null}
         </div>
 
-        <ChevronRight
-          className="w-5 h-5 shrink-0"
-          style={{ color: 'var(--ink-tertiary)' }}
-        />
+        <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-[var(--ink-tertiary)]" />
       </div>
     </button>
   );
 }
 
-// ============================================
-// ANNOUNCEMENT BANNER (for players)
-// ============================================
-
-interface AnnouncementBannerProps {
-  announcement: Announcement;
-  onDismiss?: () => void;
-  onView?: () => void;
-  className?: string;
-}
-
-export function AnnouncementBanner({
-  announcement,
-  onDismiss,
-  onView,
-  className,
-}: AnnouncementBannerProps) {
-  const isUrgent = announcement.priority === 'urgent';
-
-  return (
-    <div
-      className={cn('p-4 rounded-2xl', className)}
-      style={{
-        background: isUrgent
-          ? 'linear-gradient(135deg, var(--error) 0%, color-mix(in srgb, var(--error) 70%, black) 100%)'
-          : 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-      }}
-    >
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[color:var(--canvas-raised)]/20 backdrop-blur-sm flex items-center justify-center">
-          {isUrgent ? (
-            <AlertCircle className="w-5 h-5 text-[var(--canvas)]" />
-          ) : (
-            <Bell className="w-5 h-5 text-[var(--canvas)]" />
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-[var(--canvas)]">{announcement.title}</p>
-          <p className="text-sm text-[color:var(--canvas)]/80 mt-1">{announcement.message}</p>
-          <p className="text-xs text-[color:var(--canvas)]/60 mt-2">
-            — {announcement.author.name} • {formatRelativeTime(announcement.createdAt)}
-          </p>
-        </div>
-
-        {onDismiss && (
-          <button
-            onClick={onDismiss}
-            className="p-1 rounded-lg bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] transition-colors hover:bg-[color:var(--canvas-raised)]/30"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-
-      {onView && (
-        <button
-          onClick={onView}
-          className="w-full mt-3 py-2 rounded-xl bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)] text-sm font-medium transition-colors hover:bg-[color:var(--canvas-raised)]/30"
-        >
-          View Details
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// QUICK ANNOUNCEMENT MODAL
-// ============================================
-
-interface QuickAnnouncementModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSend: (announcement: Omit<Announcement, 'id' | 'createdAt' | 'sentAt' | 'author'>) => void;
-  recipientCount?: number;
-  captainName?: string;
-}
-
-export function QuickAnnouncementModal({
-  isOpen,
-  onClose,
-  onSend,
-  recipientCount,
-  captainName,
-}: QuickAnnouncementModalProps) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[color:var(--ink)]/50"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <AnnouncementComposer
-          onSend={(announcement) => {
-            onSend(announcement);
-            onClose();
-          }}
-          onCancel={onClose}
-          recipientCount={recipientCount}
-          captainName={captainName}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// HELPERS
-// ============================================
-
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
-  const diff = now.getTime() - date.getTime();
+  const diffMs = now.getTime() - date.getTime();
 
-  const minutes = Math.floor(diff / 60000);
+  const minutes = Math.floor(diffMs / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
@@ -644,7 +504,11 @@ function formatRelativeTime(dateString: string): string {
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export default AnnouncementComposer;

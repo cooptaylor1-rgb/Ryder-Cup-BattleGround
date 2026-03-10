@@ -1,655 +1,766 @@
 /**
- * Attendance Check-In Component
- *
- * Roll call system for tracking player arrivals before a round.
- * Captains need to know who's at the course and who's missing.
- *
- * Features:
- * - Quick tap to mark arrived
- * - Visual status indicators
- * - ETA for players en route
- * - Auto-alert for no-shows
- * - Last seen/check-in time
- * - One-tap call/text missing players
- * - Group by team or tee time
+ * Captain roll-call board for pre-round attendance.
  */
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    CheckCircle2,
-    Circle,
-    Clock,
-    AlertTriangle,
-    Phone,
-    MessageSquare,
-    RefreshCw,
-    Search,
-    ChevronDown,
-    X,
-    UserCheck,
-    UserX,
-    Car,
-} from 'lucide-react';
+import { useMemo, useState, type ReactNode } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-
-// ============================================
-// TYPES
-// ============================================
+import {
+  AlertTriangle,
+  Car,
+  CheckCircle2,
+  ChevronDown,
+  Circle,
+  Clock,
+  MessageSquare,
+  Phone,
+  RefreshCw,
+  Search,
+  UserCheck,
+  UserX,
+  X,
+} from 'lucide-react';
 
 export type AttendanceStatus = 'checked-in' | 'en-route' | 'not-arrived' | 'no-show';
 
 export interface AttendeePlayer {
-    id: string;
-    firstName: string;
-    lastName: string;
-    teamId: 'A' | 'B';
-    handicapIndex: number;
-    phone?: string;
-    email?: string;
-    avatarUrl?: string;
-    status: AttendanceStatus;
-    checkInTime?: string;
-    eta?: string; // Estimated arrival time
-    lastLocation?: string; // "5 min away", "At parking lot", etc.
-    matchId?: string;
-    teeTime?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  teamId: 'A' | 'B';
+  handicapIndex: number;
+  phone?: string;
+  email?: string;
+  avatarUrl?: string;
+  status: AttendanceStatus;
+  checkInTime?: string;
+  eta?: string;
+  lastLocation?: string;
+  matchId?: string;
+  teeTime?: string;
 }
 
 export interface AttendanceStats {
-    total: number;
-    checkedIn: number;
-    enRoute: number;
-    notArrived: number;
-    noShow: number;
+  total: number;
+  checkedIn: number;
+  enRoute: number;
+  notArrived: number;
+  noShow: number;
 }
 
 interface AttendanceCheckInProps {
-    players: AttendeePlayer[];
-    onUpdateStatus: (playerId: string, status: AttendanceStatus, eta?: string) => void;
-    onCall?: (playerId: string) => void;
-    onText?: (playerId: string) => void;
-    onRefresh?: () => void;
-    sessionName?: string;
-    firstTeeTime?: string;
-    className?: string;
+  players: AttendeePlayer[];
+  onUpdateStatus: (playerId: string, status: AttendanceStatus, eta?: string) => void;
+  onCall?: (playerId: string) => void;
+  onText?: (playerId: string) => void;
+  onRefresh?: () => void;
+  sessionName?: string;
+  firstTeeTime?: string;
+  className?: string;
+  teamLabels?: {
+    A: string;
+    B: string;
+  };
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
+const STATUS_ORDER: Record<AttendanceStatus, number> = {
+  'no-show': 0,
+  'not-arrived': 1,
+  'en-route': 2,
+  'checked-in': 3,
+};
+
+const TEAM_TONE = {
+  A: {
+    dot: 'bg-[color:var(--team-usa)]',
+    panel:
+      'border-[color:var(--team-usa)]/14 bg-[linear-gradient(180deg,rgba(30,58,95,0.07),rgba(255,255,255,0.98))]',
+  },
+  B: {
+    dot: 'bg-[color:var(--team-europe)]',
+    panel:
+      'border-[color:var(--team-europe)]/14 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.98))]',
+  },
+} as const;
+
+const ETA_OPTIONS = [
+  { value: '5 min', label: '5 minutes' },
+  { value: '10 min', label: '10 minutes' },
+  { value: '15 min', label: '15 minutes' },
+  { value: '20 min', label: '20 minutes' },
+  { value: '30 min', label: '30 minutes' },
+  { value: '45 min', label: '45 minutes' },
+  { value: '1 hour', label: '1 hour' },
+];
 
 function getStatusConfig(status: AttendanceStatus) {
-    switch (status) {
-        case 'checked-in':
-            return {
-                label: 'Checked In',
-                className: 'bg-[color:var(--success)]/15 text-[var(--success)] ring-[var(--success)]',
-                icon: CheckCircle2,
-            };
-        case 'en-route':
-            return {
-                label: 'En Route',
-                className: 'bg-[color:var(--warning)]/15 text-[var(--warning)] ring-[var(--warning)]',
-                icon: Car,
-            };
-        case 'not-arrived':
-            return {
-                label: 'Not Arrived',
-                className: 'bg-[color:var(--ink)]/15 text-[var(--ink-secondary)] ring-[var(--ink-secondary)]',
-                icon: Circle,
-            };
-        case 'no-show':
-            return {
-                label: 'No Show',
-                className: 'bg-[color:var(--error)]/15 text-[var(--error)] ring-[var(--error)]',
-                icon: AlertTriangle,
-            };
-    }
+  switch (status) {
+    case 'checked-in':
+      return {
+        label: 'Checked In',
+        icon: CheckCircle2,
+        chipClassName:
+          'border-[color:var(--success)]/20 bg-[color:var(--success)]/12 text-[var(--success)]',
+        actionClassName: 'bg-[color:var(--success)]/12 text-[var(--success)]',
+      };
+    case 'en-route':
+      return {
+        label: 'En Route',
+        icon: Car,
+        chipClassName:
+          'border-[color:var(--warning)]/20 bg-[color:var(--warning)]/12 text-[var(--warning)]',
+        actionClassName: 'bg-[color:var(--warning)]/12 text-[var(--warning)]',
+      };
+    case 'not-arrived':
+      return {
+        label: 'Not Arrived',
+        icon: Circle,
+        chipClassName:
+          'border-[color:var(--rule)]/75 bg-[color:var(--surface)] text-[var(--ink-secondary)]',
+        actionClassName: 'bg-[color:var(--surface-raised)] text-[var(--ink-secondary)]',
+      };
+    case 'no-show':
+      return {
+        label: 'No Show',
+        icon: AlertTriangle,
+        chipClassName:
+          'border-[color:var(--error)]/18 bg-[color:var(--error)]/10 text-[var(--error)]',
+        actionClassName: 'bg-[color:var(--error)]/12 text-[var(--error)]',
+      };
+  }
 }
 
 function getTimeUntil(targetTime: string): string {
-    const now = new Date();
-    const target = new Date();
-    const [hours, minutes] = targetTime.split(':').map(Number);
-    target.setHours(hours, minutes, 0, 0);
+  const now = new Date();
+  const target = new Date();
+  const [hours, minutes] = targetTime.split(':').map(Number);
+  target.setHours(hours, minutes, 0, 0);
 
-    const diff = target.getTime() - now.getTime();
-    if (diff <= 0) return 'Now';
+  const diff = target.getTime() - now.getTime();
+  if (diff <= 0) return 'Now';
 
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}m`;
-    const hrs = Math.floor(mins / 60);
-    return `${hrs}h ${mins % 60}m`;
+  const totalMinutes = Math.floor(diff / 60000);
+  if (totalMinutes < 60) return `${totalMinutes}m`;
+
+  const totalHours = Math.floor(totalMinutes / 60);
+  return `${totalHours}h ${totalMinutes % 60}m`;
 }
-
-// ============================================
-// ATTENDANCE CHECK-IN
-// ============================================
 
 export function AttendanceCheckIn({
-    players,
-    onUpdateStatus,
-    onCall,
-    onText,
-    onRefresh,
-    sessionName = 'Today\'s Session',
-    firstTeeTime,
-    className,
+  players,
+  onUpdateStatus,
+  onCall,
+  onText,
+  onRefresh,
+  sessionName = "Today's Session",
+  firstTeeTime,
+  className,
+  teamLabels = { A: 'Team A', B: 'Team B' },
 }: AttendanceCheckInProps) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filterStatus, setFilterStatus] = useState<AttendanceStatus | 'all'>('all');
-    const [sortBy, _setSortBy] = useState<'name' | 'team' | 'teeTime' | 'status'>('status');
-    const [selectedPlayer, setSelectedPlayer] = useState<AttendeePlayer | null>(null);
-    const [showETAModal, setShowETAModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<AttendanceStatus | 'all'>('all');
+  const [selectedPlayer, setSelectedPlayer] = useState<AttendeePlayer | null>(null);
+  const [showETAModal, setShowETAModal] = useState(false);
 
-    // Calculate stats
-    const stats: AttendanceStats = useMemo(() => {
-        return {
-            total: players.length,
-            checkedIn: players.filter(p => p.status === 'checked-in').length,
-            enRoute: players.filter(p => p.status === 'en-route').length,
-            notArrived: players.filter(p => p.status === 'not-arrived').length,
-            noShow: players.filter(p => p.status === 'no-show').length,
-        };
-    }, [players]);
-
-    // Filter and sort players
-    const filteredPlayers = useMemo(() => {
-        let result = [...players];
-
-        // Search filter
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            result = result.filter(p =>
-                `${p.firstName} ${p.lastName}`.toLowerCase().includes(query)
-            );
+  const stats = useMemo<AttendanceStats>(
+    () =>
+      players.reduce(
+        (result, player) => {
+          result.total += 1;
+          if (player.status === 'checked-in') result.checkedIn += 1;
+          if (player.status === 'en-route') result.enRoute += 1;
+          if (player.status === 'not-arrived') result.notArrived += 1;
+          if (player.status === 'no-show') result.noShow += 1;
+          return result;
+        },
+        {
+          total: 0,
+          checkedIn: 0,
+          enRoute: 0,
+          notArrived: 0,
+          noShow: 0,
         }
+      ),
+    [players]
+  );
 
-        // Status filter
-        if (filterStatus !== 'all') {
-            result = result.filter(p => p.status === filterStatus);
-        }
+  const filteredPlayers = useMemo(() => {
+    let result = [...players];
 
-        // Sort
-        result.sort((a, b) => {
-            switch (sortBy) {
-                case 'name':
-                    return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-                case 'team':
-                    return a.teamId.localeCompare(b.teamId);
-                case 'teeTime':
-                    return (a.teeTime || 'ZZZ').localeCompare(b.teeTime || 'ZZZ');
-                case 'status':
-                    const statusOrder = { 'no-show': 0, 'not-arrived': 1, 'en-route': 2, 'checked-in': 3 };
-                    return statusOrder[a.status] - statusOrder[b.status];
-                default:
-                    return 0;
-            }
-        });
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((player) =>
+        `${player.firstName} ${player.lastName}`.toLowerCase().includes(query)
+      );
+    }
 
-        return result;
-    }, [players, searchQuery, filterStatus, sortBy]);
+    if (filterStatus !== 'all') {
+      result = result.filter((player) => player.status === filterStatus);
+    }
 
-    // Group by team
-    const groupedByTeam = useMemo(() => {
-        const teamA = filteredPlayers.filter(p => p.teamId === 'A');
-        const teamB = filteredPlayers.filter(p => p.teamId === 'B');
-        return { teamA, teamB };
-    }, [filteredPlayers]);
+    result.sort((left, right) => {
+      const statusDifference = STATUS_ORDER[left.status] - STATUS_ORDER[right.status];
+      if (statusDifference !== 0) {
+        return statusDifference;
+      }
 
-    const handleQuickCheckIn = (player: AttendeePlayer) => {
-        if (player.status === 'checked-in') {
-            // Toggle back to not arrived
-            onUpdateStatus(player.id, 'not-arrived');
-        } else {
-            onUpdateStatus(player.id, 'checked-in');
-        }
-    };
+      return `${left.firstName} ${left.lastName}`.localeCompare(
+        `${right.firstName} ${right.lastName}`
+      );
+    });
 
-    const handleSetETA = (playerId: string, eta: string) => {
-        onUpdateStatus(playerId, 'en-route', eta);
-        setShowETAModal(false);
-        setSelectedPlayer(null);
-    };
+    return result;
+  }, [filterStatus, players, searchQuery]);
 
-    const handleMarkNoShow = (playerId: string) => {
-        onUpdateStatus(playerId, 'no-show');
-    };
+  const groupedPlayers = useMemo(
+    () => ({
+      A: filteredPlayers.filter((player) => player.teamId === 'A'),
+      B: filteredPlayers.filter((player) => player.teamId === 'B'),
+    }),
+    [filteredPlayers]
+  );
 
-    // Progress percentage
-    const progressPercent = (stats.checkedIn / stats.total) * 100;
+  const progressPercent = stats.total > 0 ? (stats.checkedIn / stats.total) * 100 : 0;
+  const accountedFor = stats.checkedIn + stats.enRoute;
 
-    return (
-        <div className={cn('flex flex-col', className)}>
-            {/* Header */}
-            <div className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
-                            Attendance Check-In
-                        </h2>
-                        <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
-                            {sessionName}
-                            {firstTeeTime && (
-                                <span className="ml-2">
-                                    • First tee in <span className="font-medium" style={{ color: 'var(--masters)' }}>{getTimeUntil(firstTeeTime)}</span>
-                                </span>
-                            )}
-                        </p>
-                    </div>
-                    {onRefresh && (
-                        <button
-                            onClick={onRefresh}
-                            className="p-2 rounded-lg hover:bg-[color:var(--ink)]/6 transition-colors"
-                        >
-                            <RefreshCw className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
-                        </button>
-                    )}
-                </div>
+  const handleQuickCheckIn = (player: AttendeePlayer) => {
+    if (player.status === 'checked-in') {
+      onUpdateStatus(player.id, 'not-arrived');
+      return;
+    }
 
-                {/* Progress Bar */}
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                        <span style={{ color: 'var(--ink-muted)' }}>
-                            {stats.checkedIn} of {stats.total} checked in
-                        </span>
-                        <span className="font-medium" style={{ color: progressPercent === 100 ? 'var(--success)' : 'var(--ink)' }}>
-                            {progressPercent.toFixed(0)}%
-                        </span>
-                    </div>
-                    <div
-                        className="h-2 rounded-full overflow-hidden"
-                        style={{ background: 'var(--surface)' }}
-                    >
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercent}%` }}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="h-full rounded-full"
-                            style={{ background: progressPercent === 100 ? 'var(--success)' : 'var(--masters)' }}
-                        />
-                    </div>
-                </div>
+    onUpdateStatus(player.id, 'checked-in');
+  };
 
-                {/* Stats Pills */}
-                <div className="flex flex-wrap gap-2">
-                    {[
-                        { status: 'checked-in' as const, count: stats.checkedIn },
-                        { status: 'en-route' as const, count: stats.enRoute },
-                        { status: 'not-arrived' as const, count: stats.notArrived },
-                        { status: 'no-show' as const, count: stats.noShow },
-                    ].map(({ status, count }) => {
-                        const config = getStatusConfig(status);
-                        const isActive = filterStatus === status;
-                        return (
-                            <button
-                                key={status}
-                                onClick={() => setFilterStatus(isActive ? 'all' : status)}
-                                className={cn(
-                                    'px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 transition-all',
-                                    isActive ? 'ring-2' : '',
-                                    config.className
-                                )}
-                            >
-                                <config.icon className="w-3.5 h-3.5" />
-                                {count}
-                            </button>
-                        );
-                    })}
-                </div>
+  const handleSetETA = (playerId: string, eta: string) => {
+    onUpdateStatus(playerId, 'en-route', eta);
+    setShowETAModal(false);
+    setSelectedPlayer(null);
+  };
 
-                {/* Search */}
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ink-muted)' }} />
-                    <input
-                        type="text"
-                        placeholder="Search players..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm"
-                        style={{
-                            background: 'var(--surface)',
-                            border: '1px solid rgba(128, 120, 104, 0.2)',
-                            color: 'var(--ink)',
-                        }}
-                    />
-                </div>
+  return (
+    <div
+      className={cn(
+        'overflow-hidden rounded-[2rem] border border-[color:var(--rule)]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] shadow-[0_24px_52px_rgba(41,29,17,0.08)]',
+        className
+      )}
+    >
+      <div className="border-b border-[color:var(--rule)]/75 px-[var(--space-5)] py-[var(--space-5)]">
+        <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex gap-[var(--space-4)]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.1rem] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] text-[var(--canvas)] shadow-[0_14px_30px_rgba(104,35,48,0.18)]">
+              <UserCheck size={22} />
             </div>
-
-            {/* Player List */}
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
-                {/* Team A */}
-                <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
-                        <span className="w-3 h-3 rounded-full bg-[color:var(--team-usa)]" />
-                        <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
-                            Team A ({groupedByTeam.teamA.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamA.length})
-                        </span>
-                    </div>
-                    <div className="space-y-2">
-                        {groupedByTeam.teamA.map(player => (
-                            <PlayerCheckInCard
-                                key={player.id}
-                                player={player}
-                                onQuickCheckIn={() => handleQuickCheckIn(player)}
-                                onSetETA={() => {
-                                    setSelectedPlayer(player);
-                                    setShowETAModal(true);
-                                }}
-                                onMarkNoShow={() => handleMarkNoShow(player.id)}
-                                onCall={onCall ? () => onCall(player.id) : undefined}
-                                onText={onText ? () => onText(player.id) : undefined}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Team B */}
-                <div>
-                    <div className="flex items-center gap-2 mb-2 sticky top-0 py-1 bg-[var(--canvas)]">
-                        <span className="w-3 h-3 rounded-full bg-[color:var(--team-europe)]" />
-                        <span className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
-                            Team B ({groupedByTeam.teamB.filter(p => p.status === 'checked-in').length}/{groupedByTeam.teamB.length})
-                        </span>
-                    </div>
-                    <div className="space-y-2">
-                        {groupedByTeam.teamB.map(player => (
-                            <PlayerCheckInCard
-                                key={player.id}
-                                player={player}
-                                onQuickCheckIn={() => handleQuickCheckIn(player)}
-                                onSetETA={() => {
-                                    setSelectedPlayer(player);
-                                    setShowETAModal(true);
-                                }}
-                                onMarkNoShow={() => handleMarkNoShow(player.id)}
-                                onCall={onCall ? () => onCall(player.id) : undefined}
-                                onText={onText ? () => onText(player.id) : undefined}
-                            />
-                        ))}
-                    </div>
-                </div>
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Roll Call</p>
+              <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.8rem,6vw,2.7rem)] italic leading-[1.04] text-[var(--ink)]">
+                Keep the first tee orderly.
+              </h2>
+              <p className="mt-[var(--space-2)] max-w-[36rem] type-body-sm text-[var(--ink-secondary)]">
+                {sessionName}
+                {firstTeeTime ? (
+                  <span className="ml-2 inline-flex items-center gap-2">
+                    <span className="hidden h-1 w-1 rounded-full bg-[var(--ink-tertiary)] sm:inline-flex" />
+                    First tee in{' '}
+                    <span className="font-semibold text-[var(--maroon)]">{getTimeUntil(firstTeeTime)}</span>
+                  </span>
+                ) : null}
+              </p>
             </div>
+          </div>
 
-            {/* ETA Modal */}
-            <AnimatePresence>
-                {showETAModal && selectedPlayer && (
-                    <ETAModal
-                        player={selectedPlayer}
-                        onSetETA={(eta) => handleSetETA(selectedPlayer.id, eta)}
-                        onClose={() => {
-                            setShowETAModal(false);
-                            setSelectedPlayer(null);
-                        }}
-                    />
-                )}
-            </AnimatePresence>
+          {onRefresh ? (
+            <button
+              type="button"
+              onClick={onRefresh}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] text-sm font-semibold text-[var(--ink-secondary)] transition-all hover:border-[var(--maroon-subtle)] hover:text-[var(--ink)]"
+            >
+              <RefreshCw size={16} />
+              Refresh
+            </button>
+          ) : null}
         </div>
-    );
+
+        <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] sm:grid-cols-2 xl:grid-cols-4">
+          <AttendanceMetricCard label="Accounted For" value={`${accountedFor}/${stats.total}`} detail="Checked in or headed in" tone="maroon" />
+          <AttendanceMetricCard label="Checked In" value={stats.checkedIn} detail={`${progressPercent.toFixed(0)}% confirmed on site`} tone="green" />
+          <AttendanceMetricCard label="En Route" value={stats.enRoute} detail="Still rolling toward the lot" tone="gold" />
+          <AttendanceMetricCard label="Missing" value={stats.notArrived + stats.noShow} detail="Still needs captain attention" tone="ink" />
+        </div>
+
+        <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+          <label className="relative block">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--ink-tertiary)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search the roster"
+              className="w-full rounded-[1.15rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/90 py-[0.9rem] pl-11 pr-4 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-tertiary)] focus:border-[var(--maroon-subtle)]"
+            />
+          </label>
+
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={filterStatus === 'all'}
+              label="All"
+              onClick={() => setFilterStatus('all')}
+            />
+            {(['checked-in', 'en-route', 'not-arrived', 'no-show'] as const).map((status) => {
+              const config = getStatusConfig(status);
+              return (
+                <FilterChip
+                  key={status}
+                  active={filterStatus === status}
+                  label={config.label}
+                  className={config.chipClassName}
+                  onClick={() => setFilterStatus(filterStatus === status ? 'all' : status)}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-[var(--space-4)] p-[var(--space-4)] xl:grid-cols-2">
+        <TeamAttendancePanel
+          players={groupedPlayers.A}
+          teamLabel={teamLabels.A}
+          teamId="A"
+          onQuickCheckIn={handleQuickCheckIn}
+          onSetETA={(player) => {
+            setSelectedPlayer(player);
+            setShowETAModal(true);
+          }}
+          onMarkNoShow={(player) => onUpdateStatus(player.id, 'no-show')}
+          onCall={onCall}
+          onText={onText}
+        />
+        <TeamAttendancePanel
+          players={groupedPlayers.B}
+          teamLabel={teamLabels.B}
+          teamId="B"
+          onQuickCheckIn={handleQuickCheckIn}
+          onSetETA={(player) => {
+            setSelectedPlayer(player);
+            setShowETAModal(true);
+          }}
+          onMarkNoShow={(player) => onUpdateStatus(player.id, 'no-show')}
+          onCall={onCall}
+          onText={onText}
+        />
+      </div>
+
+      <AnimatePresence>
+        {showETAModal && selectedPlayer ? (
+          <ETAModal
+            player={selectedPlayer}
+            onSetETA={(eta) => handleSetETA(selectedPlayer.id, eta)}
+            onClose={() => {
+              setShowETAModal(false);
+              setSelectedPlayer(null);
+            }}
+          />
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
 }
 
-// ============================================
-// PLAYER CARD
-// ============================================
+function AttendanceMetricCard({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  detail: string;
+  tone: 'ink' | 'gold' | 'green' | 'maroon';
+}) {
+  const toneClassNames = {
+    ink: 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80',
+    gold:
+      'border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.10),rgba(255,255,255,0.98))]',
+    green:
+      'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]',
+    maroon:
+      'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]',
+  } satisfies Record<'ink' | 'gold' | 'green' | 'maroon', string>;
+
+  return (
+    <div className={cn('rounded-[1.35rem] border p-[var(--space-4)]', toneClassNames[tone])}>
+      <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">{label}</p>
+      <p className="mt-[var(--space-3)] font-serif text-[1.9rem] italic leading-none text-[var(--ink)]">
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function FilterChip({
+  active,
+  label,
+  onClick,
+  className,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'rounded-full border px-[var(--space-3)] py-[var(--space-2)] text-sm font-semibold transition-all',
+        active
+          ? 'border-[var(--maroon)] bg-[var(--maroon)] text-[var(--canvas)] shadow-[0_10px_24px_rgba(104,35,48,0.16)]'
+          : 'border-[color:var(--rule)]/75 bg-[color:var(--surface)]/78 text-[var(--ink-secondary)] hover:border-[var(--maroon-subtle)] hover:text-[var(--ink)]',
+        !active && className
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+function TeamAttendancePanel({
+  players,
+  teamLabel,
+  teamId,
+  onQuickCheckIn,
+  onSetETA,
+  onMarkNoShow,
+  onCall,
+  onText,
+}: {
+  players: AttendeePlayer[];
+  teamLabel: string;
+  teamId: 'A' | 'B';
+  onQuickCheckIn: (player: AttendeePlayer) => void;
+  onSetETA: (player: AttendeePlayer) => void;
+  onMarkNoShow: (player: AttendeePlayer) => void;
+  onCall?: (playerId: string) => void;
+  onText?: (playerId: string) => void;
+}) {
+  const checkedInCount = players.filter((player) => player.status === 'checked-in').length;
+
+  return (
+    <section className={cn('rounded-[1.6rem] border p-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]', TEAM_TONE[teamId].panel)}>
+      <div className="flex items-end justify-between gap-[var(--space-3)]">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className={cn('h-2.5 w-2.5 rounded-full', TEAM_TONE[teamId].dot)} />
+            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">{teamLabel}</p>
+          </div>
+          <h3 className="mt-[var(--space-2)] font-serif text-[1.65rem] italic text-[var(--ink)]">
+            {checkedInCount}/{players.length} on site
+          </h3>
+        </div>
+        <p className="text-sm text-[var(--ink-secondary)]">
+          {players.length === 1 ? '1 player' : `${players.length} players`}
+        </p>
+      </div>
+
+      {players.length > 0 ? (
+        <div className="mt-[var(--space-4)] space-y-3">
+          {players.map((player) => (
+            <PlayerCheckInCard
+              key={player.id}
+              player={player}
+              onQuickCheckIn={() => onQuickCheckIn(player)}
+              onSetETA={() => onSetETA(player)}
+              onMarkNoShow={() => onMarkNoShow(player)}
+              onCall={onCall ? () => onCall(player.id) : undefined}
+              onText={onText ? () => onText(player.id) : undefined}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-[var(--space-4)] rounded-[1.25rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--surface)]/72 px-[var(--space-4)] py-[var(--space-6)] text-center text-sm text-[var(--ink-secondary)]">
+          No one on this side matches the current filter.
+        </div>
+      )}
+    </section>
+  );
+}
 
 interface PlayerCheckInCardProps {
-    player: AttendeePlayer;
-    onQuickCheckIn: () => void;
-    onSetETA: () => void;
-    onMarkNoShow: () => void;
-    onCall?: () => void;
-    onText?: () => void;
+  player: AttendeePlayer;
+  onQuickCheckIn: () => void;
+  onSetETA: () => void;
+  onMarkNoShow: () => void;
+  onCall?: () => void;
+  onText?: () => void;
 }
 
 function PlayerCheckInCard({
-    player,
-    onQuickCheckIn,
-    onSetETA,
-    onMarkNoShow,
-    onCall,
-    onText,
+  player,
+  onQuickCheckIn,
+  onSetETA,
+  onMarkNoShow,
+  onCall,
+  onText,
 }: PlayerCheckInCardProps) {
-    const [expanded, setExpanded] = useState(false);
-    const statusConfig = getStatusConfig(player.status);
-    const StatusIcon = statusConfig.icon;
+  const [expanded, setExpanded] = useState(false);
+  const statusConfig = getStatusConfig(player.status);
+  const StatusIcon = statusConfig.icon;
+  const contactDetail = player.phone || player.email || `Handicap ${player.handicapIndex.toFixed(1)}`;
 
-    return (
-        <motion.div
-            layout
-            className="rounded-xl overflow-hidden"
-            style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
+  return (
+    <motion.div
+      layout
+      className="overflow-hidden rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/90 shadow-[0_14px_26px_rgba(41,29,17,0.05)]"
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        className="flex w-full items-start gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-4)] text-left"
+        onClick={() => setExpanded((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setExpanded((current) => !current);
+          }
+        }}
+      >
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onQuickCheckIn();
+          }}
+          className={cn(
+            'mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] border transition-transform hover:scale-[1.03]',
+            statusConfig.chipClassName
+          )}
+          aria-label={`Update ${player.firstName} ${player.lastName}`}
         >
-            {/* Main Row */}
-            <div
-                className="p-3 flex items-center gap-3 cursor-pointer"
-                onClick={() => setExpanded(!expanded)}
-            >
-                {/* Quick Check-In Button */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onQuickCheckIn();
-                    }}
-                    className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                        statusConfig.className
-                    )}
-                >
-                    <StatusIcon className="w-5 h-5" />
-                </button>
+          <StatusIcon className="h-5 w-5" />
+        </button>
 
-                {/* Player Info */}
-                <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate" style={{ color: 'var(--ink)' }}>
-                        {player.firstName} {player.lastName}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ink-muted)' }}>
-                        <span className={statusConfig.className.split(' ').filter(c => c.startsWith('text-')).join(' ')}>
-                            {statusConfig.label}
-                        </span>
-                        {player.eta && player.status === 'en-route' && (
-                            <span>• ETA {player.eta}</span>
-                        )}
-                        {player.teeTime && (
-                            <span>• Tee {player.teeTime}</span>
-                        )}
-                    </div>
-                </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-base font-semibold text-[var(--ink)]">
+              {player.firstName} {player.lastName}
+            </p>
+            <span className={cn('rounded-full border px-2.5 py-1 text-xs font-semibold', statusConfig.chipClassName)}>
+              {statusConfig.label}
+            </span>
+          </div>
 
-                {/* Expand Indicator */}
-                <ChevronDown
-                    className={cn('w-5 h-5 transition-transform', expanded && 'rotate-180')}
-                    style={{ color: 'var(--ink-muted)' }}
-                />
+          <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+            Handicap {player.handicapIndex.toFixed(1)}
+            {player.eta && player.status === 'en-route' ? ` • ETA ${player.eta}` : ''}
+            {player.teeTime ? ` • Tee ${player.teeTime}` : ''}
+          </p>
+          <p className="mt-1 truncate text-sm text-[var(--ink-tertiary)]">{contactDetail}</p>
+        </div>
+
+        <ChevronDown
+          className={cn('mt-1 h-5 w-5 shrink-0 text-[var(--ink-tertiary)] transition-transform', expanded && 'rotate-180')}
+        />
+      </div>
+
+      <AnimatePresence initial={false}>
+        {expanded ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-[color:var(--rule)]/65 bg-[color:var(--surface-raised)]/55 px-[var(--space-4)] py-[var(--space-3)]">
+              <div className="flex flex-wrap gap-2">
+                {player.status !== 'checked-in' ? (
+                  <ActionChip
+                    label="Check In"
+                    icon={<UserCheck className="h-4 w-4" />}
+                    className="bg-[color:var(--success)]/12 text-[var(--success)]"
+                    onClick={onQuickCheckIn}
+                  />
+                ) : (
+                  <ActionChip
+                    label="Mark Missing"
+                    icon={<Circle className="h-4 w-4" />}
+                    className="bg-[color:var(--surface)] text-[var(--ink-secondary)]"
+                    onClick={onQuickCheckIn}
+                  />
+                )}
+
+                {player.status === 'not-arrived' ? (
+                  <ActionChip
+                    label="Set ETA"
+                    icon={<Clock className="h-4 w-4" />}
+                    className="bg-[color:var(--warning)]/12 text-[var(--warning)]"
+                    onClick={onSetETA}
+                  />
+                ) : null}
+
+                {player.status !== 'checked-in' && player.status !== 'no-show' ? (
+                  <ActionChip
+                    label="No Show"
+                    icon={<UserX className="h-4 w-4" />}
+                    className="bg-[color:var(--error)]/12 text-[var(--error)]"
+                    onClick={onMarkNoShow}
+                  />
+                ) : null}
+
+                {onCall && player.phone ? (
+                  <ActionChip
+                    label="Call"
+                    icon={<Phone className="h-4 w-4" />}
+                    className="bg-[color:var(--surface)] text-[var(--ink)]"
+                    onClick={onCall}
+                  />
+                ) : null}
+
+                {onText && player.phone ? (
+                  <ActionChip
+                    label="Text"
+                    icon={<MessageSquare className="h-4 w-4" />}
+                    className="bg-[color:var(--surface)] text-[var(--ink)]"
+                    onClick={onText}
+                  />
+                ) : null}
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+function ActionChip({
+  label,
+  icon,
+  className,
+  onClick,
+}: {
+  label: string;
+  icon: ReactNode;
+  className: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-xl px-[var(--space-3)] py-[0.7rem] text-sm font-semibold transition-transform hover:scale-[1.02]',
+        className
+      )}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function ETAModal({
+  player,
+  onSetETA,
+  onClose,
+}: {
+  player: AttendeePlayer;
+  onSetETA: (eta: string) => void;
+  onClose: () => void;
+}) {
+  const [customETA, setCustomETA] = useState('');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default bg-[color:var(--ink)]/55 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="Close ETA picker"
+      />
+
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        className="relative w-full max-w-md overflow-hidden rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] shadow-[0_26px_60px_rgba(17,15,10,0.28)]"
+      >
+        <div className="border-b border-[color:var(--rule)]/70 px-[var(--space-5)] py-[var(--space-4)]">
+          <div className="flex items-start justify-between gap-[var(--space-3)]">
+            <div className="flex gap-[var(--space-3)]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] text-[var(--canvas)]">
+                <Clock className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Arrival Window</p>
+                <h3 className="mt-[var(--space-2)] font-serif text-[1.8rem] italic leading-none text-[var(--ink)]">
+                  {player.firstName} {player.lastName}
+                </h3>
+                <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                  Pick the cleanest estimate instead of writing a captain’s note to yourself.
+                </p>
+              </div>
             </div>
 
-            {/* Expanded Actions */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                    >
-                        <div
-                            className="px-3 pb-3 pt-1 flex flex-wrap gap-2 border-t"
-                            style={{ borderColor: 'rgba(128, 120, 104, 0.1)' }}
-                        >
-                            {player.status !== 'checked-in' && (
-                                <button
-                                    onClick={onQuickCheckIn}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--success)]/15 text-[var(--success)]"
-                                >
-                                    <UserCheck className="w-4 h-4" />
-                                    Check In
-                                </button>
-                            )}
-
-                            {player.status === 'not-arrived' && (
-                                <button
-                                    onClick={onSetETA}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--warning)]/15 text-[var(--warning)]"
-                                >
-                                    <Clock className="w-4 h-4" />
-                                    Set ETA
-                                </button>
-                            )}
-
-                            {player.status !== 'no-show' && player.status !== 'checked-in' && (
-                                <button
-                                    onClick={onMarkNoShow}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-[color:var(--error)]/15 text-[var(--error)]"
-                                >
-                                    <UserX className="w-4 h-4" />
-                                    No Show
-                                </button>
-                            )}
-
-                            {onCall && player.phone && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onCall();
-                                    }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-[color:var(--ink)]/6"
-                                    style={{ background: 'var(--surface-raised)', color: 'var(--ink)' }}
-                                >
-                                    <Phone className="w-4 h-4" />
-                                    Call
-                                </button>
-                            )}
-
-                            {onText && player.phone && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onText();
-                                    }}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-[color:var(--ink)]/6"
-                                    style={{ background: 'var(--surface-raised)', color: 'var(--ink)' }}
-                                >
-                                    <MessageSquare className="w-4 h-4" />
-                                    Text
-                                </button>
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
-    );
-}
-
-// ============================================
-// ETA MODAL
-// ============================================
-
-interface ETAModalProps {
-    player: AttendeePlayer;
-    onSetETA: (eta: string) => void;
-    onClose: () => void;
-}
-
-const ETA_OPTIONS = [
-    { value: '5 min', label: '5 minutes' },
-    { value: '10 min', label: '10 minutes' },
-    { value: '15 min', label: '15 minutes' },
-    { value: '20 min', label: '20 minutes' },
-    { value: '30 min', label: '30 minutes' },
-    { value: '45 min', label: '45 minutes' },
-    { value: '1 hour', label: '1 hour' },
-];
-
-function ETAModal({ player, onSetETA, onClose }: ETAModalProps) {
-    const [customETA, setCustomETA] = useState('');
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        >
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-[color:var(--ink)]/60 backdrop-blur-sm"
-                onClick={onClose}
-            />
-
-            {/* Modal */}
-            <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="relative w-full max-w-sm rounded-2xl overflow-hidden bg-[var(--canvas)]"
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface)] text-[var(--ink-tertiary)] transition-colors hover:text-[var(--ink)]"
             >
-                <div className="p-4 border-b" style={{ borderColor: 'rgba(128, 120, 104, 0.2)' }}>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>
-                                Set Arrival Time
-                            </h3>
-                            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>
-                                {player.firstName} {player.lastName}
-                            </p>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="p-2 rounded-lg hover:bg-[color:var(--ink)]/6 transition-colors"
-                        >
-                            <X className="w-5 h-5" style={{ color: 'var(--ink-muted)' }} />
-                        </button>
-                    </div>
-                </div>
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
 
-                <div className="p-4 space-y-3">
-                    {ETA_OPTIONS.map(option => (
-                        <button
-                            key={option.value}
-                            onClick={() => onSetETA(option.value)}
-                            className="w-full p-3 rounded-xl text-left hover:bg-[color:var(--ink)]/3 transition-colors"
-                            style={{ background: 'var(--surface)', border: '1px solid rgba(128, 120, 104, 0.2)' }}
-                        >
-                            <span style={{ color: 'var(--ink)' }}>{option.label}</span>
-                        </button>
-                    ))}
+        <div className="space-y-[var(--space-4)] px-[var(--space-5)] py-[var(--space-5)]">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {ETA_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onSetETA(option.value)}
+                className="rounded-[1.15rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/90 px-[var(--space-4)] py-[var(--space-3)] text-left text-sm font-semibold text-[var(--ink)] transition-all hover:border-[var(--maroon-subtle)] hover:bg-[color:var(--surface)]"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
 
-                    {/* Custom ETA */}
-                    <div className="pt-2">
-                        <label className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
-                            Custom time
-                        </label>
-                        <div className="flex gap-2 mt-1">
-                            <input
-                                type="text"
-                                placeholder="e.g., 8:45 AM"
-                                value={customETA}
-                                onChange={(e) => setCustomETA(e.target.value)}
-                                className="flex-1 px-3 py-2 rounded-lg text-sm"
-                                style={{
-                                    background: 'var(--surface)',
-                                    border: '1px solid rgba(128, 120, 104, 0.2)',
-                                    color: 'var(--ink)',
-                                }}
-                            />
-                            <button
-                                onClick={() => customETA && onSetETA(customETA)}
-                                disabled={!customETA}
-                                className="px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50 transition-colors"
-                                style={{ background: 'var(--masters)', color: '#000' }}
-                            >
-                                Set
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-        </motion.div>
-    );
+          <div className="rounded-[1.25rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-4)]">
+            <label className="block text-sm font-semibold text-[var(--ink)]">Custom arrival note</label>
+            <div className="mt-2 flex gap-2">
+              <input
+                type="text"
+                value={customETA}
+                onChange={(event) => setCustomETA(event.target.value)}
+                placeholder="e.g. 8:45 AM at the lot"
+                className="flex-1 rounded-xl border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/88 px-4 py-3 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--ink-tertiary)] focus:border-[var(--maroon-subtle)]"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (customETA.trim()) onSetETA(customETA.trim());
+                }}
+                disabled={!customETA.trim()}
+                className="rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-3 text-sm font-semibold text-[var(--canvas)] transition-all disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                Set
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
 }
 
 export default AttendanceCheckIn;
