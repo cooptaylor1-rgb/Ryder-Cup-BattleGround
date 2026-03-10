@@ -4,3 +4,4 @@
  */
 
 export * from './teamColors';
+export * from './sideBets';

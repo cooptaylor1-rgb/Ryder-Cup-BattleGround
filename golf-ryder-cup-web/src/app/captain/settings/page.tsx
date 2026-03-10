@@ -16,7 +16,6 @@ import {
   Calendar,
   ChevronRight,
   Home,
-  Lock,
   MapPin,
   MoreHorizontal,
   Palette,
@@ -61,9 +60,25 @@ export default function CaptainSettingsPage() {
   }, [currentTrip]);
 
   useEffect(() => {
-    if (teamA) setTeamAName(teamA.name);
-    if (teamB) setTeamBName(teamB.name);
+    setTeamAName(teamA?.name || '');
+    setTeamBName(teamB?.name || '');
   }, [teamA, teamB]);
+
+  const normalizedStartDate = normalizeDateValue(startDate);
+  const normalizedEndDate = normalizeDateValue(endDate);
+  const savedStartDate = normalizeDateValue(currentTrip?.startDate);
+  const savedEndDate = normalizeDateValue(currentTrip?.endDate);
+  const hasUnsavedChanges = currentTrip
+    ? tripName.trim() !== currentTrip.name ||
+      normalizedStartDate !== savedStartDate ||
+      normalizedEndDate !== savedEndDate ||
+      location !== (currentTrip.location || '') ||
+      teamAName !== (teamA?.name || '') ||
+      teamBName !== (teamB?.name || '')
+    : false;
+  const isReadyToPublish = Boolean(
+    tripName.trim() && normalizedStartDate && normalizedEndDate && teamAName.trim() && teamBName.trim()
+  );
 
   const handleSave = async () => {
     if (!currentTrip || isSaving) return;
@@ -166,10 +181,10 @@ export default function CaptainSettingsPage() {
             variant="primary"
             size="sm"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || !hasUnsavedChanges}
             leftIcon={<Save size={16} />}
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
           </Button>
         }
       />
@@ -187,10 +202,11 @@ export default function CaptainSettingsPage() {
               </p>
             </div>
 
-            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
-              <SettingsFactCard icon={<Calendar size={18} />} label="Dates" value={startDate ? 2 : 0} detail="Trip range fields set" tone={startDate && endDate ? 'green' : 'ink'} />
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-2 lg:grid-cols-2">
+              <SettingsFactCard icon={<Calendar size={18} />} label="Dates" value={normalizedStartDate && normalizedEndDate ? 'Set' : 'Open'} detail="Trip range for schedules and recaps" valueClassName="font-sans text-[1rem] not-italic" tone={normalizedStartDate && normalizedEndDate ? 'green' : 'ink'} />
               <SettingsFactCard icon={<MapPin size={18} />} label="Location" value={location ? 'Set' : 'Open'} detail="Trip home base" valueClassName="font-sans text-[1rem] not-italic" tone={location ? 'green' : 'ink'} />
               <SettingsFactCard icon={<Shield size={18} />} label="Teams" value={`${teamAName || 'A'} / ${teamBName || 'B'}`} detail="Displayed across the app" valueClassName="font-sans text-[1rem] not-italic leading-[1.2]" />
+              <SettingsFactCard icon={<Save size={18} />} label="Status" value={hasUnsavedChanges ? 'Draft' : 'Saved'} detail={isReadyToPublish ? 'Ready for the rest of the app' : 'Still missing a few basics'} valueClassName="font-sans text-[1rem] not-italic" tone={!hasUnsavedChanges && isReadyToPublish ? 'green' : 'ink'} />
             </div>
           </div>
         </section>
@@ -225,21 +241,21 @@ export default function CaptainSettingsPage() {
 
                 <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
                   <FormField label="Start Date">
-                    <input
-                      type="date"
-                      value={startDate.split('T')[0]}
-                      onChange={(event) => setStartDate(event.target.value)}
-                      className="input"
-                    />
-                  </FormField>
-                  <FormField label="End Date">
-                    <input
-                      type="date"
-                      value={endDate.split('T')[0]}
-                      onChange={(event) => setEndDate(event.target.value)}
-                      className="input"
-                    />
-                  </FormField>
+                  <input
+                    type="date"
+                    value={normalizedStartDate}
+                    onChange={(event) => setStartDate(event.target.value)}
+                    className="input"
+                  />
+                </FormField>
+                <FormField label="End Date">
+                  <input
+                    type="date"
+                    value={normalizedEndDate}
+                    onChange={(event) => setEndDate(event.target.value)}
+                    className="input"
+                  />
+                </FormField>
                 </div>
               </div>
             </SettingsPanel>
@@ -277,20 +293,36 @@ export default function CaptainSettingsPage() {
 
           <aside className="space-y-[var(--space-4)]">
             <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Configuration Status</p>
+              <div className="mt-[var(--space-4)] space-y-3">
+                <StatusRow
+                  icon={<Calendar size={16} />}
+                  label="Schedule window"
+                  value={normalizedStartDate && normalizedEndDate ? 'Ready' : 'Open'}
+                />
+                <StatusRow
+                  icon={<MapPin size={16} />}
+                  label="Trip identity"
+                  value={tripName.trim() && location ? 'Ready' : 'Open'}
+                />
+                <StatusRow
+                  icon={<Palette size={16} />}
+                  label="Team presentation"
+                  value={teamAName.trim() && teamBName.trim() ? 'Ready' : 'Open'}
+                />
+              </div>
+              <p className="mt-[var(--space-4)] text-sm leading-6 text-[var(--ink-secondary)]">
+                This page should settle the names and timing that the rest of the app repeats. Once those are clean, the other captain rooms inherit the order.
+              </p>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Captain Tools</p>
               <div className="mt-[var(--space-4)] space-y-3">
                 <CaptainToolLink href="/captain/checklist" icon={<Shield size={18} />} title="Pre-Flight Checklist" body="Review trip readiness." />
                 <CaptainToolLink href="/captain/availability" icon={<Users size={18} />} title="Player Attendance" body="Track arrivals." />
                 <CaptainToolLink href="/captain/messages" icon={<Bell size={18} />} title="Announcements" body="Broadcast to the trip." />
-                <div className="flex items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/75 px-[var(--space-4)] py-[var(--space-4)] opacity-70">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--surface)] text-[var(--ink-tertiary)]">
-                    <Lock size={18} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[var(--ink)]">Lock Trip</p>
-                    <p className="text-sm text-[var(--ink-secondary)]">Still parked for a future pass.</p>
-                  </div>
-                </div>
+                <CaptainToolLink href="/captain/manage" icon={<Settings size={18} />} title="Session Management" body="Adjust rounds and scoring structure." />
               </div>
             </div>
           </aside>
@@ -404,4 +436,39 @@ function CaptainToolLink({
       <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
     </Link>
   );
+}
+
+function StatusRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/75 px-[var(--space-4)] py-[var(--space-4)]">
+      <div className="flex h-10 w-10 items-center justify-center rounded-[0.95rem] bg-[color:var(--surface)] text-[var(--maroon)]">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-[var(--ink)]">{label}</p>
+      </div>
+      <span
+        className={cn(
+          'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]',
+          value === 'Ready'
+            ? 'bg-[color:var(--success)]/12 text-[var(--success)]'
+            : 'bg-[color:var(--warning)]/12 text-[var(--warning)]'
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function normalizeDateValue(value?: string) {
+  return value ? value.split('T')[0] : '';
 }

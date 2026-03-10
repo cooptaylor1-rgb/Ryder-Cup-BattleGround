@@ -1,11 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
+import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { betsLogger } from '@/lib/utils/logger';
@@ -19,31 +21,13 @@ import {
   DollarSign,
   Edit3,
   Home,
-  LucideIcon,
   MoreHorizontal,
   Plus,
   Save,
-  Target,
   Trash2,
-  TrendingUp,
   Users,
   X,
-  Zap,
 } from 'lucide-react';
-
-const BET_TYPES: {
-  type: SideBetType;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-  color: string;
-}[] = [
-  { type: 'skins', label: 'Skins Game', description: 'Win holes outright for $', icon: Zap, color: 'var(--maroon)' },
-  { type: 'ctp', label: 'Closest to Pin', description: 'Nearest on par 3s', icon: Target, color: 'var(--team-europe)' },
-  { type: 'longdrive', label: 'Long Drive', description: 'Longest drive wins', icon: TrendingUp, color: 'var(--team-usa)' },
-  { type: 'nassau', label: 'Nassau', description: 'Front, back, and overall', icon: DollarSign, color: 'var(--masters)' },
-  { type: 'custom', label: 'Custom Bet', description: 'Create your own', icon: Plus, color: 'var(--ink-tertiary)' },
-];
 
 export default function CaptainBetsPage() {
   const router = useRouter();
@@ -71,10 +55,11 @@ export default function CaptainBetsPage() {
   );
 
   const resetForm = useCallback(() => {
-    setNewBetType('skins');
-    setNewBetName('');
-    setNewBetDescription('');
-    setNewBetPot(20);
+    const defaultBet = getSideBetDefinition('skins');
+    setNewBetType(defaultBet.type);
+    setNewBetName(defaultBet.label);
+    setNewBetDescription(defaultBet.description);
+    setNewBetPot(defaultBet.defaultPot);
     setNewBetHole(undefined);
     setSelectedParticipants(players.map((player) => player.id));
     setEditingBet(null);
@@ -82,11 +67,11 @@ export default function CaptainBetsPage() {
 
   const openCreateModal = useCallback(
     (type: SideBetType) => {
-      const betType = BET_TYPES.find((candidate) => candidate.type === type);
+      const betType = getSideBetDefinition(type);
       setNewBetType(type);
-      setNewBetName(betType?.label || '');
-      setNewBetDescription(betType?.description || '');
-      setNewBetPot(20);
+      setNewBetName(betType.label);
+      setNewBetDescription(betType.description);
+      setNewBetPot(betType.defaultPot);
       setNewBetHole(undefined);
       setSelectedParticipants(players.map((player) => player.id));
       setEditingBet(null);
@@ -190,6 +175,7 @@ export default function CaptainBetsPage() {
 
   const activeBets = sideBets.filter((bet) => bet.status === 'active' || bet.status === 'pending');
   const completedBets = sideBets.filter((bet) => bet.status === 'completed');
+  const totalPot = activeBets.reduce((sum, bet) => sum + (bet.pot || 0), 0);
 
   const handleCreateBet = async () => {
     if (!currentTrip || isSubmitting) return;
@@ -261,7 +247,8 @@ export default function CaptainBetsPage() {
 
   const getPlayer = (id: string) => players.find((player) => player.id === id);
 
-  const getBetMeta = (type: SideBetType) => BET_TYPES.find((candidate) => candidate.type === type);
+  const getBetMeta = (type: SideBetType) =>
+    SIDE_BET_DEFINITIONS.find((candidate) => candidate.type === type);
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -294,11 +281,24 @@ export default function CaptainBetsPage() {
               <p className="mt-[var(--space-3)] max-w-[35rem] type-body-sm text-[var(--ink-secondary)]">
                 The best side bets feel intentional, not improvised. Put them on one board, track the pot cleanly, and make the winner obvious when the day is done.
               </p>
+
+              <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
+                <Button variant="primary" onClick={() => openCreateModal('custom')} leftIcon={<Plus size={16} />}>
+                  Create custom bet
+                </Button>
+                <Link
+                  href="/bets"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--rule)]/65 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-transform duration-150 hover:scale-[1.02] hover:border-[var(--maroon-subtle)] hover:bg-[var(--surface)]"
+                >
+                  Open public board
+                </Link>
+              </div>
             </div>
 
-            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-2 lg:grid-cols-2">
               <BetsFactCard icon={<DollarSign size={18} />} label="Active" value={activeBets.length} detail="Open games in motion" tone={activeBets.length > 0 ? 'maroon' : 'ink'} />
               <BetsFactCard icon={<Check size={18} />} label="Completed" value={completedBets.length} detail="Bets already settled" tone={completedBets.length > 0 ? 'green' : 'ink'} />
+              <BetsFactCard icon={<DollarSign size={18} />} label="Pot" value={`$${totalPot}`} detail="Money still in play" tone={totalPot > 0 ? 'green' : 'ink'} />
               <BetsFactCard icon={<Users size={18} />} label="Participants" value={players.length} detail="Eligible players in the trip" />
             </div>
           </div>
@@ -315,7 +315,7 @@ export default function CaptainBetsPage() {
               </div>
 
               <div className="grid gap-[var(--space-3)] md:grid-cols-2">
-                {BET_TYPES.map((betType) => (
+                {SIDE_BET_DEFINITIONS.map((betType) => (
                   <button
                     key={betType.type}
                     type="button"
@@ -325,8 +325,8 @@ export default function CaptainBetsPage() {
                     <div
                       className="flex h-11 w-11 items-center justify-center rounded-[1rem]"
                       style={{
-                        background: `color-mix(in srgb, ${betType.color} 14%, white)`,
-                        color: betType.color,
+                        background: `color-mix(in srgb, ${betType.accent} 14%, white)`,
+                        color: betType.accent,
                       }}
                     >
                       <betType.icon size={20} />
@@ -396,9 +396,9 @@ export default function CaptainBetsPage() {
               icon={<DollarSign size={18} />}
             />
             <CaptainNote
-              title="Do not overcreate"
-              body="Two or three live games are usually enough. Beyond that, the side action starts competing with the trip itself."
-              icon={<Zap size={18} />}
+              title="Hand the players one clean board"
+              body="If the captain room is tidy, the public bets page can stay simple. That is the point: one desk to set the wagers, one board for everyone else to read."
+              icon={<Users size={18} />}
               tone="maroon"
             />
           </aside>
@@ -407,7 +407,7 @@ export default function CaptainBetsPage() {
 
       {showComposer ? (
         <BetComposerModal
-          betTypes={BET_TYPES}
+          betTypes={SIDE_BET_DEFINITIONS}
           editingBet={editingBet}
           players={players}
           newBetType={newBetType}
@@ -419,11 +419,12 @@ export default function CaptainBetsPage() {
           isSubmitting={isSubmitting}
           onClose={closeComposer}
           onTypeChange={(type) => {
-            const betType = BET_TYPES.find((candidate) => candidate.type === type);
+            const betType = getSideBetDefinition(type);
             setNewBetType(type);
             if (!editingBet) {
-              setNewBetName(betType?.label || '');
-              setNewBetDescription(betType?.description || '');
+              setNewBetName(betType.label);
+              setNewBetDescription(betType.description);
+              setNewBetPot(betType.defaultPot);
             }
           }}
           onNameChange={setNewBetName}
@@ -550,7 +551,7 @@ function BetComposerModal({
   onParticipantsChange,
   onSubmit,
 }: {
-  betTypes: typeof BET_TYPES;
+  betTypes: typeof SIDE_BET_DEFINITIONS;
   editingBet: SideBet | null;
   players: Player[];
   newBetType: SideBetType;
@@ -743,7 +744,7 @@ function BetManagementCard({
 }: {
   bet: SideBet;
   getPlayer: (id: string) => Player | undefined;
-  getBetMeta: (type: SideBetType) => (typeof BET_TYPES)[number] | undefined;
+  getBetMeta: (type: SideBetType) => (typeof SIDE_BET_DEFINITIONS)[number] | undefined;
   onEdit?: () => void;
   onDelete: () => void;
   onComplete?: (winnerId?: string) => void;
@@ -752,7 +753,7 @@ function BetManagementCard({
   const [showWinnerSelect, setShowWinnerSelect] = useState(false);
   const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
   const meta = getBetMeta(bet.type);
-  const accent = meta?.color || 'var(--maroon)';
+  const accent = meta?.accent || 'var(--maroon)';
   const Icon = meta?.icon || DollarSign;
 
   return (
