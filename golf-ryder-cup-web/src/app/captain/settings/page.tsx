@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
-
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { captainLogger } from '@/lib/utils/logger';
+import { cn } from '@/lib/utils';
 import {
   Bell,
   Calendar,
-  ChevronLeft,
-  Edit3,
+  ChevronRight,
   Home,
   Lock,
   MapPin,
@@ -25,12 +25,6 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
-
-/**
- * CAPTAIN SETTINGS PAGE
- *
- * Configure trip settings and captain preferences.
- */
 
 export default function CaptainSettingsPage() {
   const router = useRouter();
@@ -45,7 +39,6 @@ export default function CaptainSettingsPage() {
   const [teamBName, setTeamBName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Fetch teams for this trip
   const teams = useLiveQuery(
     async () => {
       if (!currentTrip) return [];
@@ -55,10 +48,8 @@ export default function CaptainSettingsPage() {
     []
   );
 
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
-
-  // Note: avoid auto-redirects so we can render explicit empty states.
+  const teamA = teams.find((team) => team.color === 'usa');
+  const teamB = teams.find((team) => team.color === 'europe');
 
   useEffect(() => {
     if (currentTrip) {
@@ -76,7 +67,6 @@ export default function CaptainSettingsPage() {
 
   const handleSave = async () => {
     if (!currentTrip || isSaving) return;
-
     if (!tripName.trim()) {
       showToast('error', 'Trip name is required');
       return;
@@ -92,12 +82,18 @@ export default function CaptainSettingsPage() {
         location,
       });
 
-      // Update team names if changed
       if (teamA && teamAName !== teamA.name) {
-        await db.teams.update(teamA.id, { name: teamAName, updatedAt: new Date().toISOString() });
+        await db.teams.update(teamA.id, {
+          name: teamAName,
+          updatedAt: new Date().toISOString(),
+        });
       }
+
       if (teamB && teamBName !== teamB.name) {
-        await db.teams.update(teamB.id, { name: teamBName, updatedAt: new Date().toISOString() });
+        await db.teams.update(teamB.id, {
+          name: teamBName,
+          updatedAt: new Date().toISOString(),
+        });
       }
 
       showToast('success', 'Trip settings saved');
@@ -112,18 +108,11 @@ export default function CaptainSettingsPage() {
   if (!currentTrip) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Trip Settings"
-          subtitle="Captain controls"
-          onBack={() => router.push('/more')}
-          icon={<Settings size={16} className="text-[var(--color-accent)]" />}
-        />
-
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="golf-ball"
             title="No active trip"
-            description="Start or select a trip to configure Captain Settings."
+            description="Start or select a trip to configure captain settings."
             action={{
               label: 'Go Home',
               onClick: () => router.push('/'),
@@ -143,18 +132,11 @@ export default function CaptainSettingsPage() {
   if (!isCaptainMode) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Trip Settings"
-          subtitle="Captain controls"
-          onBack={() => router.push('/more')}
-          icon={<Settings size={16} className="text-[var(--color-accent)]" />}
-        />
-
         <main className="container-editorial py-12">
           <EmptyStatePremium
             illustration="trophy"
             title="Captain mode required"
-            description="Turn on Captain Mode to access Captain Settings."
+            description="Turn on Captain Mode to access captain settings."
             action={{
               label: 'Open More',
               onClick: () => router.push('/more'),
@@ -174,172 +156,252 @@ export default function CaptainSettingsPage() {
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
-        title="Trip Settings"
-        subtitle="Configure trip details"
+        title="Captain Settings"
+        subtitle={currentTrip.name}
         onBack={() => router.back()}
-        icon={<Settings size={16} className="text-[var(--color-accent)]" />}
+        icon={<Settings size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
         rightSlot={
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={handleSave}
             disabled={isSaving}
-            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] disabled:opacity-60 disabled:cursor-not-allowed"
+            leftIcon={<Save size={16} />}
           >
-            <Save size={16} />
             {isSaving ? 'Saving...' : 'Save'}
-          </button>
+          </Button>
         }
       />
 
-      <main className="container-editorial">
-        {/* Trip Details */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-4)]">Trip Details</h2>
-
-          <div className="space-y-4">
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,240,241,0.98))] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.95fr)]">
             <div>
-              <label className="type-meta block mb-[var(--space-2)]">
-                <Edit3 size={14} className="inline mr-1.5 align-middle" />
-                Trip Name
-              </label>
-              <input
-                type="text"
-                value={tripName}
-                onChange={(e) => setTripName(e.target.value)}
-                className="input"
-                placeholder="e.g., Ryder Cup 2024"
-              />
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Control</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.15rem)] italic leading-[1.02] text-[var(--ink)]">
+                Set the trip once, let the rest of the board behave.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[35rem] type-body-sm text-[var(--ink-secondary)]">
+                The settings room should be quiet: trip identity, dates, location, and team names. If this foundation is sound, the rest of the captain tools inherit order instead of chaos.
+              </p>
             </div>
 
-            <div>
-              <label className="type-meta block mb-[var(--space-2)]">
-                <MapPin size={14} className="inline mr-1.5 align-middle" />
-                Location
-              </label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="input"
-                placeholder="e.g., Pebble Beach, CA"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="type-meta block mb-[var(--space-2)]">
-                  <Calendar size={14} className="inline mr-1.5 align-middle" />
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  value={startDate.split('T')[0]}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="input"
-                />
-              </div>
-              <div>
-                <label className="type-meta block mb-[var(--space-2)]">
-                  <Calendar size={14} className="inline mr-1.5 align-middle" />
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={endDate.split('T')[0]}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="input"
-                />
-              </div>
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <SettingsFactCard icon={<Calendar size={18} />} label="Dates" value={startDate ? 2 : 0} detail="Trip range fields set" tone={startDate && endDate ? 'green' : 'ink'} />
+              <SettingsFactCard icon={<MapPin size={18} />} label="Location" value={location ? 'Set' : 'Open'} detail="Trip home base" valueClassName="font-sans text-[1rem] not-italic" tone={location ? 'green' : 'ink'} />
+              <SettingsFactCard icon={<Shield size={18} />} label="Teams" value={`${teamAName || 'A'} / ${teamBName || 'B'}`} detail="Displayed across the app" valueClassName="font-sans text-[1rem] not-italic leading-[1.2]" />
             </div>
           </div>
         </section>
 
-        <hr className="divider" />
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
+          <div className="space-y-[var(--space-4)]">
+            <SettingsPanel
+              title="Trip Details"
+              subtitle="Keep the trip identity clean and current."
+              icon={<MapPin size={18} />}
+            >
+              <div className="grid gap-[var(--space-4)]">
+                <FormField label="Trip Name">
+                  <input
+                    type="text"
+                    value={tripName}
+                    onChange={(event) => setTripName(event.target.value)}
+                    className="input"
+                    placeholder="Ryder Cup 2026"
+                  />
+                </FormField>
 
-        {/* Team Names */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-4)]">Team Names</h2>
+                <FormField label="Location">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(event) => setLocation(event.target.value)}
+                    className="input"
+                    placeholder="Pinehurst, NC"
+                  />
+                </FormField>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="type-meta block mb-[var(--space-2)]">
-                  <Palette size={14} className="inline mr-1.5 align-middle text-[var(--team-usa)]" />
-                  Team A
-                </label>
-                <input
-                  type="text"
-                  value={teamAName}
-                  onChange={(e) => setTeamAName(e.target.value)}
-                  className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
-                  placeholder="e.g., Team USA"
-                />
+                <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
+                  <FormField label="Start Date">
+                    <input
+                      type="date"
+                      value={startDate.split('T')[0]}
+                      onChange={(event) => setStartDate(event.target.value)}
+                      className="input"
+                    />
+                  </FormField>
+                  <FormField label="End Date">
+                    <input
+                      type="date"
+                      value={endDate.split('T')[0]}
+                      onChange={(event) => setEndDate(event.target.value)}
+                      className="input"
+                    />
+                  </FormField>
+                </div>
               </div>
-              <div>
-                <label className="type-meta block mb-[var(--space-2)]">
-                  <Palette size={14} className="inline mr-1.5 align-middle text-[var(--team-europe)]" />
-                  Team B
-                </label>
-                <input
-                  type="text"
-                  value={teamBName}
-                  onChange={(e) => setTeamBName(e.target.value)}
-                  className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
-                  placeholder="e.g., Team Europe"
-                />
+            </SettingsPanel>
+
+            <SettingsPanel
+              title="Team Names"
+              subtitle="These names flow through standings, lineups, and live boards."
+              icon={<Palette size={18} />}
+            >
+              <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
+                <FormField label="Team A">
+                  <input
+                    type="text"
+                    value={teamAName}
+                    onChange={(event) => setTeamAName(event.target.value)}
+                    className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
+                    placeholder="Team USA"
+                  />
+                </FormField>
+                <FormField label="Team B">
+                  <input
+                    type="text"
+                    value={teamBName}
+                    onChange={(event) => setTeamBName(event.target.value)}
+                    className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
+                    placeholder="Team Europe"
+                  />
+                </FormField>
+              </div>
+              <p className="mt-[var(--space-3)] text-sm text-[var(--ink-secondary)]">
+                Name them well once and the rest of the app feels more intentional immediately.
+              </p>
+            </SettingsPanel>
+          </div>
+
+          <aside className="space-y-[var(--space-4)]">
+            <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Captain Tools</p>
+              <div className="mt-[var(--space-4)] space-y-3">
+                <CaptainToolLink href="/captain/checklist" icon={<Shield size={18} />} title="Pre-Flight Checklist" body="Review trip readiness." />
+                <CaptainToolLink href="/captain/availability" icon={<Users size={18} />} title="Player Attendance" body="Track arrivals." />
+                <CaptainToolLink href="/captain/messages" icon={<Bell size={18} />} title="Announcements" body="Broadcast to the trip." />
+                <div className="flex items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/75 px-[var(--space-4)] py-[var(--space-4)] opacity-70">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--surface)] text-[var(--ink-tertiary)]">
+                    <Lock size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[var(--ink)]">Lock Trip</p>
+                    <p className="text-sm text-[var(--ink-secondary)]">Still parked for a future pass.</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <p className="type-micro text-[var(--ink-tertiary)]">
-              Customize your team names. Changes will appear throughout the app.
-            </p>
-          </div>
-        </section>
-
-        <hr className="divider" />
-
-        {/* Captain Tools */}
-        <section className="section">
-          <h2 className="type-overline mb-[var(--space-4)]">Captain Tools</h2>
-
-          <div className="space-y-3">
-            <Link href="/captain/checklist" className="match-row">
-              <Shield size={18} className="text-[var(--masters)]" />
-              <div className="flex-1">
-                <p className="font-medium">Pre-Flight Checklist</p>
-                <p className="type-meta">Review trip readiness</p>
-              </div>
-              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
-            </Link>
-
-            <Link href="/captain/availability" className="match-row">
-              <Users size={18} className="text-[var(--masters)]" />
-              <div className="flex-1">
-                <p className="font-medium">Player Attendance</p>
-                <p className="type-meta">Track arrivals</p>
-              </div>
-              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
-            </Link>
-
-            <Link href="/captain/messages" className="match-row">
-              <Bell size={18} className="text-[var(--ink-tertiary)]" />
-              <div className="flex-1">
-                <p className="font-medium">Announcements</p>
-                <p className="type-meta">Send messages to players</p>
-              </div>
-              <ChevronLeft size={18} className="text-[var(--ink-tertiary)] rotate-180" />
-            </Link>
-
-            <div className="match-row opacity-60">
-              <Lock size={18} className="text-[var(--ink-tertiary)]" />
-              <div className="flex-1">
-                <p className="font-medium">Lock Trip</p>
-                <p className="type-meta">Prevent further changes</p>
-              </div>
-              <span className="type-micro text-[var(--ink-tertiary)]">Coming Soon</span>
-            </div>
-          </div>
+          </aside>
         </section>
       </main>
-
     </div>
+  );
+}
+
+function SettingsFactCard({
+  icon,
+  label,
+  value,
+  detail,
+  valueClassName,
+  tone = 'ink',
+}: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  detail: string;
+  valueClassName?: string;
+  tone?: 'ink' | 'green';
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-[1.5rem] border p-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
+        tone === 'green'
+          ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]'
+          : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78'
+      )}
+    >
+      <div className="flex items-center gap-[var(--space-2)] text-[var(--ink-tertiary)]">
+        {icon}
+        <span className="type-overline tracking-[0.14em]">{label}</span>
+      </div>
+      <p className={cn('mt-[var(--space-3)] font-serif text-[1.95rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+        {value}
+      </p>
+      <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function SettingsPanel({
+  title,
+  subtitle,
+  icon,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+      <div className="flex items-center gap-[var(--space-3)]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+          {icon}
+        </div>
+        <div>
+          <p className="type-overline tracking-[0.15em] text-[var(--maroon)]">{title}</p>
+          <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">{subtitle}</p>
+        </div>
+      </div>
+      <div className="mt-[var(--space-5)]">{children}</div>
+    </section>
+  );
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-[var(--space-2)] block text-sm font-semibold text-[var(--ink)]">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function CaptainToolLink({
+  href,
+  icon,
+  title,
+  body,
+}: {
+  href: string;
+  icon: ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/75 px-[var(--space-4)] py-[var(--space-4)] transition-transform duration-150 hover:scale-[1.01] hover:border-[var(--maroon-subtle)]"
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-[var(--ink)]">{title}</p>
+        <p className="text-sm text-[var(--ink-secondary)]">{body}</p>
+      </div>
+      <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
+    </Link>
   );
 }

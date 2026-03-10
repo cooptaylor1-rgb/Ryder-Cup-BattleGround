@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { CartAssignmentManager, type CartPlayer } from '@/components/captain';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -203,9 +204,9 @@ function CartFactCard({
   detail,
   valueClassName,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
   detail: string;
   valueClassName?: string;
 }) {
@@ -231,7 +232,7 @@ function CartSidebarCard({
 }: {
   title: string;
   body: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   tone?: 'ink' | 'maroon';
 }) {
   return (

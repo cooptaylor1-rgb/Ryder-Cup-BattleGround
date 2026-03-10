@@ -1,717 +1,912 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
+import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { PageHeader } from '@/components/layout';
 import { betsLogger } from '@/lib/utils/logger';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { cn } from '@/lib/utils';
 import type { SideBet, SideBetType, Player } from '@/lib/types/models';
 import {
-    Home,
-    Target,
-    MoreHorizontal,
-    DollarSign,
-    Zap,
-    TrendingUp,
-    Plus,
-    Check,
-    Clock,
-    Crown,
-    Trash2,
-    Edit3,
-    Save,
-    X,
+  Check,
+  Clock,
+  Crown,
+  DollarSign,
+  Edit3,
+  Home,
+  LucideIcon,
+  MoreHorizontal,
+  Plus,
+  Save,
+  Target,
+  Trash2,
+  TrendingUp,
+  Users,
+  X,
+  Zap,
 } from 'lucide-react';
 
-/**
- * CAPTAIN SIDE BETS PAGE
- *
- * Easy creation and management of side bets for captains.
- * Create skins, closest to pin, long drive, nassau, and custom bets.
- */
-
-const BET_TYPES: { type: SideBetType; label: string; description: string; icon: typeof Zap; color: string }[] = [
-    { type: 'skins', label: 'Skins Game', description: 'Win holes outright for $', icon: Zap, color: 'var(--color-accent)' },
-    { type: 'ctp', label: 'Closest to Pin', description: 'Nearest on par 3s', icon: Target, color: 'var(--team-europe)' },
-    { type: 'longdrive', label: 'Long Drive', description: 'Longest drive wins', icon: TrendingUp, color: 'var(--maroon)' },
-    { type: 'nassau', label: 'Nassau', description: 'Front, back, and overall', icon: DollarSign, color: 'var(--masters)' },
-    { type: 'custom', label: 'Custom Bet', description: 'Create your own', icon: Plus, color: 'var(--ink-tertiary)' },
+const BET_TYPES: {
+  type: SideBetType;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+}[] = [
+  { type: 'skins', label: 'Skins Game', description: 'Win holes outright for $', icon: Zap, color: 'var(--maroon)' },
+  { type: 'ctp', label: 'Closest to Pin', description: 'Nearest on par 3s', icon: Target, color: 'var(--team-europe)' },
+  { type: 'longdrive', label: 'Long Drive', description: 'Longest drive wins', icon: TrendingUp, color: 'var(--team-usa)' },
+  { type: 'nassau', label: 'Nassau', description: 'Front, back, and overall', icon: DollarSign, color: 'var(--masters)' },
+  { type: 'custom', label: 'Custom Bet', description: 'Create your own', icon: Plus, color: 'var(--ink-tertiary)' },
 ];
 
 export default function CaptainBetsPage() {
-    const router = useRouter();
-    const { currentTrip, players } = useTripStore();
-    const { isCaptainMode, showToast } = useUIStore();
-    const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
+  const router = useRouter();
+  const { currentTrip, players } = useTripStore();
+  const { isCaptainMode, showToast } = useUIStore();
+  const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [editingBet, setEditingBet] = useState<SideBet | null>(null);
-    const [newBetType, setNewBetType] = useState<SideBetType>('skins');
-    const [newBetName, setNewBetName] = useState('');
-    const [newBetDescription, setNewBetDescription] = useState('');
-    const [newBetPot, setNewBetPot] = useState(20);
-    const [newBetHole, setNewBetHole] = useState<number | undefined>();
-    const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
+  const [editingBet, setEditingBet] = useState<SideBet | null>(null);
+  const [newBetType, setNewBetType] = useState<SideBetType>('skins');
+  const [newBetName, setNewBetName] = useState('');
+  const [newBetDescription, setNewBetDescription] = useState('');
+  const [newBetPot, setNewBetPot] = useState(20);
+  const [newBetHole, setNewBetHole] = useState<number | undefined>();
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Note: avoid auto-redirects so we can render explicit empty states.
+  const sideBets = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      return db.sideBets.where('tripId').equals(currentTrip.id).toArray();
+    },
+    [currentTrip?.id],
+    []
+  );
 
-    // Get side bets for current trip
-    const sideBets = useLiveQuery(
-        async () => {
-            if (!currentTrip) return [];
-            return db.sideBets
-                .where('tripId')
-                .equals(currentTrip.id)
-                .toArray();
+  const resetForm = useCallback(() => {
+    setNewBetType('skins');
+    setNewBetName('');
+    setNewBetDescription('');
+    setNewBetPot(20);
+    setNewBetHole(undefined);
+    setSelectedParticipants(players.map((player) => player.id));
+    setEditingBet(null);
+  }, [players]);
+
+  const openCreateModal = useCallback(
+    (type: SideBetType) => {
+      const betType = BET_TYPES.find((candidate) => candidate.type === type);
+      setNewBetType(type);
+      setNewBetName(betType?.label || '');
+      setNewBetDescription(betType?.description || '');
+      setNewBetPot(20);
+      setNewBetHole(undefined);
+      setSelectedParticipants(players.map((player) => player.id));
+      setEditingBet(null);
+      setShowComposer(true);
+    },
+    [players]
+  );
+
+  const openEditModal = useCallback((bet: SideBet) => {
+    setEditingBet(bet);
+    setNewBetType(bet.type);
+    setNewBetName(bet.name);
+    setNewBetDescription(bet.description || '');
+    setNewBetPot(bet.pot || 0);
+    setNewBetHole(bet.hole);
+    setSelectedParticipants(bet.participantIds);
+    setShowComposer(true);
+  }, []);
+
+  const closeComposer = useCallback(() => {
+    setShowComposer(false);
+    resetForm();
+  }, [resetForm]);
+
+  const executeDeleteBet = useCallback(
+    async (betId: string) => {
+      if (!currentTrip) return;
+      setIsSubmitting(true);
+      try {
+        await db.sideBets.delete(betId);
+        showToast('success', 'Bet deleted');
+      } catch (error) {
+        betsLogger.error('Failed to delete bet:', error);
+        showToast('error', 'Failed to delete bet. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [currentTrip, showToast]
+  );
+
+  const handleDeleteBet = useCallback(
+    (betId: string) => {
+      showConfirm({
+        title: 'Delete Bet',
+        message: 'Are you sure you want to delete this bet? This action cannot be undone.',
+        confirmLabel: 'Delete',
+        cancelLabel: 'Cancel',
+        variant: 'danger',
+        onConfirm: async () => {
+          await executeDeleteBet(betId);
         },
-        [currentTrip?.id],
-        []
+      });
+    },
+    [executeDeleteBet, showConfirm]
+  );
+
+  if (!currentTrip) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="golf-ball"
+            title="No active trip"
+            description="Start or select a trip to manage side bets."
+            action={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+              icon: <Home size={16} />,
+            }}
+            variant="large"
+          />
+        </main>
+      </div>
     );
+  }
 
-    // Define all hooks BEFORE any early return (React Rules of Hooks)
-    const executeDeleteBet = useCallback(async (betId: string) => {
-        if (!currentTrip) return;
-        setIsSubmitting(true);
-        try {
-            await db.sideBets.delete(betId);
-            showToast('success', 'Bet deleted');
-        } catch (error) {
-            betsLogger.error('Failed to delete bet:', error);
-            showToast('error', 'Failed to delete bet. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [currentTrip, showToast]);
+  if (!isCaptainMode) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="Captain mode required"
+            description="Turn on Captain Mode to access Side Bets."
+            action={{
+              label: 'Open More',
+              onClick: () => router.push('/more'),
+              icon: <MoreHorizontal size={16} />,
+            }}
+            secondaryAction={{
+              label: 'Go Home',
+              onClick: () => router.push('/'),
+            }}
+            variant="large"
+          />
+        </main>
+      </div>
+    );
+  }
 
-    const handleDeleteBet = useCallback((betId: string) => {
-        showConfirm({
-            title: 'Delete Bet',
-            message: 'Are you sure you want to delete this bet? This action cannot be undone.',
-            confirmLabel: 'Delete',
-            cancelLabel: 'Cancel',
-            variant: 'danger',
-            onConfirm: async () => {
-                await executeDeleteBet(betId);
-            },
-        });
-    }, [showConfirm, executeDeleteBet]);
+  const activeBets = sideBets.filter((bet) => bet.status === 'active' || bet.status === 'pending');
+  const completedBets = sideBets.filter((bet) => bet.status === 'completed');
 
-    if (!currentTrip) {
-        return (
-            <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
-                <main className="container-editorial py-12">
-                    <EmptyStatePremium
-                        illustration="golf-ball"
-                        title="No active trip"
-                        description="Start or select a trip to manage side bets."
-                        action={{
-                            label: 'Go Home',
-                            onClick: () => router.push('/'),
-                            icon: <Home size={16} />,
-                        }}
-                        variant="large"
-                    />
-                </main>
-            </div>
-        );
+  const handleCreateBet = async () => {
+    if (!currentTrip || isSubmitting) return;
+    if (!newBetName.trim()) {
+      showToast('error', 'Please enter a bet name');
+      return;
     }
 
-    if (!isCaptainMode) {
-        return (
-            <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
-                <main className="container-editorial py-12">
-                    <EmptyStatePremium
-                        illustration="trophy"
-                        title="Captain mode required"
-                        description="Turn on Captain Mode to access Side Bets."
-                        action={{
-                            label: 'Open More',
-                            onClick: () => router.push('/more'),
-                            icon: <MoreHorizontal size={16} />,
-                        }}
-                        secondaryAction={{
-                            label: 'Go Home',
-                            onClick: () => router.push('/'),
-                        }}
-                        variant="large"
-                    />
-                </main>
-            </div>
-        );
+    setIsSubmitting(true);
+
+    try {
+      const newBet: SideBet = {
+        id: crypto.randomUUID(),
+        tripId: currentTrip.id,
+        type: newBetType,
+        name: newBetName,
+        description: newBetDescription,
+        status: 'active',
+        pot: newBetPot,
+        participantIds: selectedParticipants,
+        hole: newBetHole,
+        createdAt: new Date().toISOString(),
+      };
+
+      await db.sideBets.add(newBet);
+      showToast('success', `${newBetName} created!`);
+      closeComposer();
+    } catch (error) {
+      betsLogger.error('Failed to create bet:', error);
+      showToast('error', 'Failed to create bet. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    const activeBets = sideBets.filter(b => b.status === 'active' || b.status === 'pending');
-    const completedBets = sideBets.filter(b => b.status === 'completed');
+  const handleUpdateBet = async (betId: string, updates: Partial<SideBet>) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const resetForm = () => {
-        setNewBetType('skins');
-        setNewBetName('');
-        setNewBetDescription('');
-        setNewBetPot(20);
-        setNewBetHole(undefined);
-        setSelectedParticipants(players.map(p => p.id));
-        setEditingBet(null);
-    };
+    try {
+      await db.sideBets.update(betId, updates);
+      showToast('success', 'Bet updated');
+      closeComposer();
+    } catch (error) {
+      betsLogger.error('Failed to update bet:', error);
+      showToast('error', 'Failed to update bet. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    const openCreateModal = (type: SideBetType) => {
-        const betInfo = BET_TYPES.find(b => b.type === type);
-        setNewBetType(type);
-        setNewBetName(betInfo?.label || '');
-        setNewBetDescription(betInfo?.description || '');
-        setNewBetPot(20);
-        setNewBetHole(undefined);
-        setSelectedParticipants(players.map(p => p.id));
-        setShowCreateModal(true);
-    };
+  const handleCompleteBet = async (betId: string, winnerId?: string) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const handleCreateBet = async () => {
-        if (!currentTrip || isSubmitting) return;
-        if (!newBetName.trim()) {
-            showToast('error', 'Please enter a bet name');
-            return;
+    try {
+      await db.sideBets.update(betId, {
+        status: 'completed',
+        winnerId,
+      });
+      showToast('success', 'Bet completed!');
+    } catch (error) {
+      betsLogger.error('Failed to complete bet:', error);
+      showToast('error', 'Failed to complete bet. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getPlayer = (id: string) => players.find((player) => player.id === id);
+
+  const getBetMeta = (type: SideBetType) => BET_TYPES.find((candidate) => candidate.type === type);
+
+  return (
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+      <PageHeader
+        title="Side Bets"
+        subtitle={currentTrip.name}
+        icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
+        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        onBack={() => router.back()}
+        rightSlot={
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => openCreateModal('custom')}
+            leftIcon={<Plus size={16} />}
+          >
+            New Bet
+          </Button>
         }
+      />
 
-        setIsSubmitting(true);
+      <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,240,241,0.98))] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
+          <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.95fr)]">
+            <div>
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Games Room</p>
+              <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.15rem)] italic leading-[1.02] text-[var(--ink)]">
+                Keep the side action organized before it turns into folklore.
+              </h1>
+              <p className="mt-[var(--space-3)] max-w-[35rem] type-body-sm text-[var(--ink-secondary)]">
+                The best side bets feel intentional, not improvised. Put them on one board, track the pot cleanly, and make the winner obvious when the day is done.
+              </p>
+            </div>
 
-        try {
-            const newBet: SideBet = {
-                id: crypto.randomUUID(),
-                tripId: currentTrip.id,
-                type: newBetType,
+            <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
+              <BetsFactCard icon={<DollarSign size={18} />} label="Active" value={activeBets.length} detail="Open games in motion" tone={activeBets.length > 0 ? 'maroon' : 'ink'} />
+              <BetsFactCard icon={<Check size={18} />} label="Completed" value={completedBets.length} detail="Bets already settled" tone={completedBets.length > 0 ? 'green' : 'ink'} />
+              <BetsFactCard icon={<Users size={18} />} label="Participants" value={players.length} detail="Eligible players in the trip" />
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
+          <div className="space-y-[var(--space-4)]">
+            <div className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+              <div className="mb-[var(--space-4)]">
+                <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Quick Create</p>
+                <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
+                  Start with the games people already understand.
+                </h2>
+              </div>
+
+              <div className="grid gap-[var(--space-3)] md:grid-cols-2">
+                {BET_TYPES.map((betType) => (
+                  <button
+                    key={betType.type}
+                    type="button"
+                    onClick={() => openCreateModal(betType.type)}
+                    className="flex items-center gap-[var(--space-3)] rounded-[1.35rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/78 p-[var(--space-4)] text-left transition-transform duration-150 hover:scale-[1.01] hover:border-[var(--maroon-subtle)]"
+                  >
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-[1rem]"
+                      style={{
+                        background: `color-mix(in srgb, ${betType.color} 14%, white)`,
+                        color: betType.color,
+                      }}
+                    >
+                      <betType.icon size={20} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--ink)]">{betType.label}</p>
+                      <p className="text-sm text-[var(--ink-secondary)]">{betType.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <BetSection
+              title={`Active Bets (${activeBets.length})`}
+              subtitle="The games still in play."
+            >
+              {activeBets.length > 0 ? (
+                <div className="space-y-3">
+                  {activeBets.map((bet) => (
+                    <BetManagementCard
+                      key={bet.id}
+                      bet={bet}
+                      getPlayer={getPlayer}
+                      getBetMeta={getBetMeta}
+                      onEdit={() => openEditModal(bet)}
+                      onDelete={() => handleDeleteBet(bet.id)}
+                      onComplete={(winnerId) => handleCompleteBet(bet.id, winnerId)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <EmptyPanel
+                  title="No bets are on the board."
+                  body="Start with skins, closest to the pin, or one custom wager the group will actually track."
+                  actionLabel="Create a bet"
+                  onAction={() => openCreateModal('skins')}
+                />
+              )}
+            </BetSection>
+
+            {completedBets.length > 0 ? (
+              <BetSection
+                title={`Completed (${completedBets.length})`}
+                subtitle="Settled and logged."
+              >
+                <div className="space-y-3">
+                  {completedBets.map((bet) => (
+                    <BetManagementCard
+                      key={bet.id}
+                      bet={bet}
+                      getPlayer={getPlayer}
+                      getBetMeta={getBetMeta}
+                      onDelete={() => handleDeleteBet(bet.id)}
+                      isCompleted
+                    />
+                  ))}
+                </div>
+              </BetSection>
+            ) : null}
+          </div>
+
+          <aside className="space-y-[var(--space-4)]">
+            <CaptainNote
+              title="Keep the games legible"
+              body="The right bet board feels more like a rules sheet than a gambling story. Make the format obvious and the winner undeniable."
+              icon={<DollarSign size={18} />}
+            />
+            <CaptainNote
+              title="Do not overcreate"
+              body="Two or three live games are usually enough. Beyond that, the side action starts competing with the trip itself."
+              icon={<Zap size={18} />}
+              tone="maroon"
+            />
+          </aside>
+        </section>
+      </main>
+
+      {showComposer ? (
+        <BetComposerModal
+          betTypes={BET_TYPES}
+          editingBet={editingBet}
+          players={players}
+          newBetType={newBetType}
+          newBetName={newBetName}
+          newBetDescription={newBetDescription}
+          newBetPot={newBetPot}
+          newBetHole={newBetHole}
+          selectedParticipants={selectedParticipants}
+          isSubmitting={isSubmitting}
+          onClose={closeComposer}
+          onTypeChange={(type) => {
+            const betType = BET_TYPES.find((candidate) => candidate.type === type);
+            setNewBetType(type);
+            if (!editingBet) {
+              setNewBetName(betType?.label || '');
+              setNewBetDescription(betType?.description || '');
+            }
+          }}
+          onNameChange={setNewBetName}
+          onDescriptionChange={setNewBetDescription}
+          onPotChange={setNewBetPot}
+          onHoleChange={setNewBetHole}
+          onParticipantsChange={setSelectedParticipants}
+          onSubmit={() => {
+            if (editingBet) {
+              void handleUpdateBet(editingBet.id, {
                 name: newBetName,
                 description: newBetDescription,
-                status: 'active',
                 pot: newBetPot,
-                participantIds: selectedParticipants,
                 hole: newBetHole,
-                createdAt: new Date().toISOString(),
-            };
+              });
+              return;
+            }
+            void handleCreateBet();
+          }}
+        />
+      ) : null}
 
-            await db.sideBets.add(newBet);
-            showToast('success', `${newBetName} created!`);
-            setShowCreateModal(false);
-            resetForm();
-        } catch (error) {
-            betsLogger.error('Failed to create bet:', error);
-            showToast('error', 'Failed to create bet. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleUpdateBet = async (betId: string, updates: Partial<SideBet>) => {
-        if (isSubmitting) return;
-        setIsSubmitting(true);
-
-        try {
-            await db.sideBets.update(betId, updates);
-            showToast('success', 'Bet updated');
-            setEditingBet(null);
-        } catch (error) {
-            betsLogger.error('Failed to update bet:', error);
-            showToast('error', 'Failed to update bet. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleCompleteBet = async (betId: string, winnerId?: string) => {
-        if (isSubmitting) return;
-        setIsSubmitting(true);
-
-        try {
-            await db.sideBets.update(betId, {
-                status: 'completed',
-                winnerId,
-            });
-            showToast('success', 'Bet completed!');
-        } catch (error) {
-            betsLogger.error('Failed to complete bet:', error);
-            showToast('error', 'Failed to complete bet. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const getPlayer = (id: string) => players.find(p => p.id === id);
-
-    const getBetIcon = (type: SideBetType) => {
-        const betType = BET_TYPES.find(b => b.type === type);
-        const Icon = betType?.icon || DollarSign;
-        return <Icon size={20} />;
-    };
-
-    const getBetColor = (type: SideBetType) => {
-        return BET_TYPES.find(b => b.type === type)?.color || '#64748b';
-    };
-
-    return (
-        <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
-            <PageHeader
-                title="Side Bets"
-                subtitle={`${activeBets.length} active`}
-                icon={<DollarSign size={16} style={{ color: 'var(--canvas)' }} />}
-                iconContainerStyle={{
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                }}
-                onBack={() => router.back()}
-            />
-
-            <main className="container-editorial pt-[var(--space-4)]">
-                {/* Quick Create Section */}
-                <section className="section">
-                    <h2 className="type-overline mb-[var(--space-4)]">Quick Create</h2>
-                    <div className="grid grid-cols-2 gap-[var(--space-3)]">
-                        {BET_TYPES.map((betType) => (
-                            <button
-                                key={betType.type}
-                                onClick={() => openCreateModal(betType.type)}
-                                className="card-premium press-scale p-[var(--space-4)] flex items-center gap-[var(--space-3)] text-left cursor-pointer border-none"
-                            >
-                                <div
-                                    className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center"
-                                    style={{
-                                        background: `color-mix(in srgb, ${betType.color} 15%, transparent)`,
-                                        color: betType.color,
-                                    }}
-                                >
-                                    <betType.icon size={22} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-ink">{betType.label}</p>
-                                    <p className="type-micro text-ink-tertiary">{betType.description}</p>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                </section>
-
-                <hr className="divider" />
-
-                {/* Active Bets */}
-                <section className="section">
-                    <h2 className="type-overline mb-[var(--space-4)]">
-                        Active Bets ({activeBets.length})
-                    </h2>
-                    {activeBets.length === 0 ? (
-                        <div className="card-premium p-[var(--space-6)] text-center">
-                            <DollarSign size={32} className="text-ink-tertiary mx-auto mb-[var(--space-3)]" />
-                            <p className="text-ink-secondary">No active bets</p>
-                            <p className="type-meta mt-[var(--space-2)]">
-                                Create a bet above to get started
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {activeBets.map((bet) => (
-                                <BetManagementCard
-                                    key={bet.id}
-                                    bet={bet}
-                                    players={players}
-                                    getPlayer={getPlayer}
-                                    getBetIcon={getBetIcon}
-                                    getBetColor={getBetColor}
-                                    onEdit={() => {
-                                        setEditingBet(bet);
-                                        setNewBetName(bet.name);
-                                        setNewBetDescription(bet.description || '');
-                                        setNewBetPot(bet.pot || 0);
-                                        setNewBetHole(bet.hole);
-                                        setShowCreateModal(true);
-                                    }}
-                                    onDelete={() => handleDeleteBet(bet.id)}
-                                    onComplete={(winnerId) => handleCompleteBet(bet.id, winnerId)}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                {/* Completed Bets */}
-                {completedBets.length > 0 && (
-                    <>
-                        <hr className="divider" />
-                        <section className="section">
-                            <h2 className="type-overline mb-[var(--space-4)]">
-                                Completed ({completedBets.length})
-                            </h2>
-                            <div className="space-y-3">
-                                {completedBets.map((bet) => (
-                                    <BetManagementCard
-                                        key={bet.id}
-                                        bet={bet}
-                                        players={players}
-                                        getPlayer={getPlayer}
-                                        getBetIcon={getBetIcon}
-                                        getBetColor={getBetColor}
-                                        onDelete={() => handleDeleteBet(bet.id)}
-                                        isCompleted
-                                    />
-                                ))}
-                            </div>
-                        </section>
-                    </>
-                )}
-            </main>
-
-            {/* Create/Edit Modal */}
-            {showCreateModal && (
-                <div
-                    className="fixed inset-0 bg-[color:var(--ink)]/70 z-[100] flex items-end justify-center"
-                    onClick={() => {
-                        setShowCreateModal(false);
-                        resetForm();
-                    }}
-                >
-                    <div
-                        className="card-premium w-full max-w-[500px] max-h-[85vh] overflow-auto rounded-t-[var(--radius-xl)] rounded-b-none p-[var(--space-5)]"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex justify-between items-center mb-[var(--space-4)]">
-                            <h2 className="font-bold text-xl">
-                                {editingBet ? 'Edit Bet' : 'Create Bet'}
-                            </h2>
-                            <button
-                                onClick={() => {
-                                    setShowCreateModal(false);
-                                    resetForm();
-                                }}
-                                className="p-[var(--space-2)] bg-transparent border-none cursor-pointer"
-                            >
-                                <X size={24} className="text-ink-tertiary" />
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {/* Bet Type (only for new bets) */}
-                            {!editingBet && (
-                                <div>
-                                    <label className="type-meta block mb-[var(--space-2)]">
-                                        Bet Type
-                                    </label>
-                                    <div className="flex flex-wrap gap-[var(--space-2)]">
-                                        {BET_TYPES.map((bt) => (
-                                            <button
-                                                key={bt.type}
-                                                onClick={() => {
-                                                    setNewBetType(bt.type);
-                                                    if (!newBetName || BET_TYPES.some(b => b.label === newBetName)) {
-                                                        setNewBetName(bt.label);
-                                                    }
-                                                    if (!newBetDescription || BET_TYPES.some(b => b.description === newBetDescription)) {
-                                                        setNewBetDescription(bt.description);
-                                                    }
-                                                }}
-                                                className="press-scale py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-full)] border-none cursor-pointer text-[length:var(--text-sm)] font-medium"
-                                                style={{
-                                                    background: newBetType === bt.type ? bt.color : 'var(--canvas-sunken)',
-                                                    color: newBetType === bt.type ? 'var(--canvas)' : 'var(--ink-secondary)',
-                                                }}
-                                            >
-                                                {bt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Name */}
-                            <div>
-                                <label className="type-meta block mb-[var(--space-2)]">
-                                    Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newBetName}
-                                    onChange={(e) => setNewBetName(e.target.value)}
-                                    className="input w-full"
-                                    placeholder="e.g., Skins Game"
-                                />
-                            </div>
-
-                            {/* Description */}
-                            <div>
-                                <label className="type-meta block mb-[var(--space-2)]">
-                                    Description
-                                </label>
-                                <input
-                                    type="text"
-                                    value={newBetDescription}
-                                    onChange={(e) => setNewBetDescription(e.target.value)}
-                                    className="input w-full"
-                                    placeholder="e.g., $5 per hole, carry-overs"
-                                />
-                            </div>
-
-                            {/* Amount / Pot */}
-                            <div className="grid grid-cols-2 gap-[var(--space-3)]">
-                                <div>
-                                    <label className="type-meta block mb-[var(--space-2)]">
-                                        Pot Amount ($)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={newBetPot}
-                                        onChange={(e) => setNewBetPot(Number(e.target.value))}
-                                        className="input w-full"
-                                        min={0}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="type-meta block mb-[var(--space-2)]">
-                                        Hole # (optional)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={newBetHole || ''}
-                                        onChange={(e) => setNewBetHole(e.target.value ? Number(e.target.value) : undefined)}
-                                        className="input w-full"
-                                        min={1}
-                                        max={18}
-                                        placeholder="Any"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Participants */}
-                            {!editingBet && (
-                                <div>
-                                    <label className="type-meta block mb-[var(--space-2)]">
-                                        Participants
-                                    </label>
-                                    <div className="flex flex-wrap gap-[var(--space-2)]">
-                                        <button
-                                            onClick={() => setSelectedParticipants(
-                                                selectedParticipants.length === players.length ? [] : players.map(p => p.id)
-                                            )}
-                                            className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
-                                            style={{
-                                                background: selectedParticipants.length === players.length ? 'var(--masters)' : 'var(--canvas-sunken)',
-                                                color: selectedParticipants.length === players.length ? 'var(--canvas)' : 'var(--ink-secondary)',
-                                            }}
-                                        >
-                                            {selectedParticipants.length === players.length ? '✓ All' : 'Select All'}
-                                        </button>
-                                        {players.map((player) => (
-                                            <button
-                                                key={player.id}
-                                                onClick={() => setSelectedParticipants(prev =>
-                                                    prev.includes(player.id)
-                                                        ? prev.filter(id => id !== player.id)
-                                                        : [...prev, player.id]
-                                                )}
-                                                className="press-scale py-[var(--space-1)] px-[var(--space-2)] rounded-[var(--radius-md)] border-none cursor-pointer text-[length:var(--text-xs)]"
-                                                style={{
-                                                    background: selectedParticipants.includes(player.id) ? 'var(--masters)' : 'var(--canvas-sunken)',
-                                                    color: selectedParticipants.includes(player.id) ? 'var(--canvas)' : 'var(--ink-secondary)',
-                                                }}
-                                            >
-                                                {player.firstName}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Actions */}
-                            <div className="flex gap-[var(--space-3)] mt-[var(--space-4)]">
-                                <button
-                                    onClick={() => {
-                                        setShowCreateModal(false);
-                                        resetForm();
-                                    }}
-                                    className="press-scale flex-1 p-[var(--space-3)] bg-canvas-sunken border border-rule rounded-[var(--radius-lg)] cursor-pointer font-medium"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (editingBet) {
-                                            handleUpdateBet(editingBet.id, {
-                                                name: newBetName,
-                                                description: newBetDescription,
-                                                pot: newBetPot,
-                                                hole: newBetHole,
-                                            });
-                                            setShowCreateModal(false);
-                                            resetForm();
-                                        } else {
-                                            handleCreateBet();
-                                        }
-                                    }}
-                                    className="btn-premium press-scale flex-1 p-[var(--space-3)] flex items-center justify-center gap-[var(--space-2)]"
-                                >
-                                    <Save size={18} />
-                                    {editingBet ? 'Save Changes' : 'Create Bet'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Confirm Dialog */}
-            {ConfirmDialogComponent}
-        </div>
-    );
+      {ConfirmDialogComponent}
+    </div>
+  );
 }
 
-/* Bet Management Card */
-interface BetManagementCardProps {
-    bet: SideBet;
-    players: Player[];
-    getPlayer: (id: string) => Player | undefined;
-    getBetIcon: (type: SideBetType) => React.ReactNode;
-    getBetColor: (type: SideBetType) => string;
-    onEdit?: () => void;
-    onDelete: () => void;
-    onComplete?: (winnerId?: string) => void;
-    isCompleted?: boolean;
+function BetsFactCard({
+  icon,
+  label,
+  value,
+  detail,
+  tone = 'ink',
+}: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  detail: string;
+  tone?: 'ink' | 'green' | 'maroon';
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-[1.5rem] border p-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
+        tone === 'green'
+          ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]'
+          : tone === 'maroon'
+            ? 'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]'
+            : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78'
+      )}
+    >
+      <div className="flex items-center gap-[var(--space-2)] text-[var(--ink-tertiary)]">
+        {icon}
+        <span className="type-overline tracking-[0.14em]">{label}</span>
+      </div>
+      <p className="mt-[var(--space-3)] font-serif text-[1.95rem] italic leading-none text-[var(--ink)]">{value}</p>
+      <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function BetSection({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+      <div className="mb-[var(--space-4)]">
+        <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">{title}</p>
+        <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">{subtitle}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EmptyPanel({
+  title,
+  body,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  body: string;
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="rounded-[1.5rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--surface)]/74 p-[var(--space-7)] text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
+        <DollarSign size={26} />
+      </div>
+      <h3 className="mt-[var(--space-4)] font-serif text-[1.7rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mx-auto mt-[var(--space-2)] max-w-[30rem] type-body-sm text-[var(--ink-secondary)]">{body}</p>
+      <Button variant="primary" onClick={onAction} leftIcon={<Plus size={16} />} className="mt-[var(--space-5)]">
+        {actionLabel}
+      </Button>
+    </div>
+  );
+}
+
+function BetComposerModal({
+  betTypes,
+  editingBet,
+  players,
+  newBetType,
+  newBetName,
+  newBetDescription,
+  newBetPot,
+  newBetHole,
+  selectedParticipants,
+  isSubmitting,
+  onClose,
+  onTypeChange,
+  onNameChange,
+  onDescriptionChange,
+  onPotChange,
+  onHoleChange,
+  onParticipantsChange,
+  onSubmit,
+}: {
+  betTypes: typeof BET_TYPES;
+  editingBet: SideBet | null;
+  players: Player[];
+  newBetType: SideBetType;
+  newBetName: string;
+  newBetDescription: string;
+  newBetPot: number;
+  newBetHole: number | undefined;
+  selectedParticipants: string[];
+  isSubmitting: boolean;
+  onClose: () => void;
+  onTypeChange: (type: SideBetType) => void;
+  onNameChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  onPotChange: (value: number) => void;
+  onHoleChange: (value: number | undefined) => void;
+  onParticipantsChange: (value: string[]) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-[color:var(--ink)]/70 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[560px] overflow-auto rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] p-[var(--space-5)] shadow-[0_26px_60px_rgba(17,15,10,0.28)]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-[var(--space-3)]">
+          <div>
+            <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">
+              {editingBet ? 'Edit Bet' : 'Create Bet'}
+            </p>
+            <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
+              Keep the wager readable.
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--surface)] text-[var(--ink-tertiary)]"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="mt-[var(--space-5)] space-y-[var(--space-4)]">
+          {!editingBet ? (
+            <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Bet Type</p>
+              <div className="mt-[var(--space-3)] flex flex-wrap gap-2">
+                {betTypes.map((betType) => (
+                  <button
+                    key={betType.type}
+                    type="button"
+                    onClick={() => onTypeChange(betType.type)}
+                    className={cn(
+                      'rounded-full px-3 py-2 text-sm font-semibold transition-colors',
+                      newBetType === betType.type
+                        ? 'bg-[var(--maroon)] text-[var(--canvas)]'
+                        : 'bg-[color:var(--canvas)]/74 text-[var(--ink-secondary)]'
+                    )}
+                  >
+                    {betType.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <label className="block">
+            <span className="mb-[var(--space-2)] block text-sm font-semibold text-[var(--ink)]">Name</span>
+            <input
+              type="text"
+              value={newBetName}
+              onChange={(event) => onNameChange(event.target.value)}
+              className="input w-full"
+              placeholder="Skins Game"
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-[var(--space-2)] block text-sm font-semibold text-[var(--ink)]">Description</span>
+            <input
+              type="text"
+              value={newBetDescription}
+              onChange={(event) => onDescriptionChange(event.target.value)}
+              className="input w-full"
+              placeholder="$5 per hole, carryovers, par-3 only..."
+            />
+          </label>
+
+          <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-[var(--space-2)] block text-sm font-semibold text-[var(--ink)]">Pot Amount</span>
+              <input
+                type="number"
+                value={newBetPot}
+                onChange={(event) => onPotChange(Number(event.target.value))}
+                className="input w-full"
+                min={0}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-[var(--space-2)] block text-sm font-semibold text-[var(--ink)]">Hole</span>
+              <input
+                type="number"
+                value={newBetHole || ''}
+                onChange={(event) => onHoleChange(event.target.value ? Number(event.target.value) : undefined)}
+                className="input w-full"
+                min={1}
+                max={18}
+                placeholder="Any"
+              />
+            </label>
+          </div>
+
+          {!editingBet ? (
+            <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Participants</p>
+              <div className="mt-[var(--space-3)] flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    onParticipantsChange(
+                      selectedParticipants.length === players.length ? [] : players.map((player) => player.id)
+                    )
+                  }
+                  className={cn(
+                    'rounded-full px-3 py-2 text-sm font-semibold transition-colors',
+                    selectedParticipants.length === players.length
+                      ? 'bg-[var(--maroon)] text-[var(--canvas)]'
+                      : 'bg-[color:var(--canvas)]/74 text-[var(--ink-secondary)]'
+                  )}
+                >
+                  {selectedParticipants.length === players.length ? 'All In' : 'Select All'}
+                </button>
+                {players.map((player) => (
+                  <button
+                    key={player.id}
+                    type="button"
+                    onClick={() =>
+                      onParticipantsChange(
+                        selectedParticipants.includes(player.id)
+                          ? selectedParticipants.filter((id) => id !== player.id)
+                          : [...selectedParticipants, player.id]
+                      )
+                    }
+                    className={cn(
+                      'rounded-full px-3 py-2 text-sm font-semibold transition-colors',
+                      selectedParticipants.includes(player.id)
+                        ? 'bg-[var(--maroon)] text-[var(--canvas)]'
+                        : 'bg-[color:var(--canvas)]/74 text-[var(--ink-secondary)]'
+                    )}
+                  >
+                    {player.firstName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex gap-[var(--space-3)]">
+            <Button variant="secondary" onClick={onClose} className="flex-1 justify-center">
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onSubmit}
+              isLoading={isSubmitting}
+              leftIcon={<Save size={16} />}
+              className="flex-1 justify-center"
+            >
+              {editingBet ? 'Save Changes' : 'Create Bet'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function BetManagementCard({
-    bet,
-    players: _players,
-    getPlayer,
-    getBetIcon,
-    getBetColor,
-    onEdit,
-    onDelete,
-    onComplete,
-    isCompleted,
-}: BetManagementCardProps) {
-    const [showWinnerSelect, setShowWinnerSelect] = useState(false);
-    const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
+  bet,
+  getPlayer,
+  getBetMeta,
+  onEdit,
+  onDelete,
+  onComplete,
+  isCompleted,
+}: {
+  bet: SideBet;
+  getPlayer: (id: string) => Player | undefined;
+  getBetMeta: (type: SideBetType) => (typeof BET_TYPES)[number] | undefined;
+  onEdit?: () => void;
+  onDelete: () => void;
+  onComplete?: (winnerId?: string) => void;
+  isCompleted?: boolean;
+}) {
+  const [showWinnerSelect, setShowWinnerSelect] = useState(false);
+  const winner = bet.winnerId ? getPlayer(bet.winnerId) : null;
+  const meta = getBetMeta(bet.type);
+  const accent = meta?.color || 'var(--maroon)';
+  const Icon = meta?.icon || DollarSign;
 
-    return (
-        <div className="card-premium p-[var(--space-4)]">
-            <div className="flex items-start gap-[var(--space-3)]">
-                {/* Icon */}
-                <div
-                    className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center"
-                    style={{
-                        background: isCompleted ? 'var(--success)' : `color-mix(in srgb, ${getBetColor(bet.type)} 20%, transparent)`,
-                        color: isCompleted ? 'var(--canvas)' : getBetColor(bet.type),
-                    }}
-                >
-                    {isCompleted ? <Check size={22} /> : getBetIcon(bet.type)}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">{bet.name}</h3>
-                        {bet.pot && (
-                            <span className="font-bold text-success">
-                                ${bet.pot}
-                            </span>
-                        )}
-                    </div>
-                    {bet.description && (
-                        <p className="type-caption mt-[var(--space-1)]">{bet.description}</p>
-                    )}
-                    {bet.hole && (
-                        <p className="type-micro mt-[var(--space-1)] text-ink-tertiary">
-                            Hole #{bet.hole}
-                        </p>
-                    )}
-
-                    {/* Status */}
-                    <div className="flex items-center gap-[var(--space-2)] mt-[var(--space-2)]">
-                        {isCompleted && winner ? (
-                            <>
-                                <Crown size={14} className="text-success" />
-                                <span className="type-micro text-success">
-                                    Won by {winner.firstName}
-                                </span>
-                            </>
-                        ) : (
-                            <>
-                                <Clock size={14} className="text-warning" />
-                                <span className="type-micro text-warning">
-                                    In Progress • {bet.participantIds.length} players
-                                </span>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Actions */}
-            {!isCompleted && (
-                <div className="flex gap-[var(--space-2)] mt-[var(--space-3)] pt-[var(--space-3)] border-t border-t-rule-faint">
-                    {onEdit && (
-                        <button
-                            onClick={onEdit}
-                            className="press-scale flex-1 p-[var(--space-2)] bg-canvas-sunken border border-rule rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)]"
-                        >
-                            <Edit3 size={14} />
-                            Edit
-                        </button>
-                    )}
-                    {onComplete && !showWinnerSelect && (
-                        <button
-                            onClick={() => setShowWinnerSelect(true)}
-                            className="press-scale flex-1 p-[var(--space-2)] bg-success text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer flex items-center justify-center gap-[var(--space-1)] text-[length:var(--text-sm)] font-medium"
-                        >
-                            <Check size={14} />
-                            Complete
-                        </button>
-                    )}
-                    <button
-                        onClick={onDelete}
-                        className="press-scale p-[var(--space-2)] bg-transparent border border-error text-error rounded-[var(--radius-md)] cursor-pointer"
-                    >
-                        <Trash2 size={14} />
-                    </button>
-                </div>
-            )}
-
-            {/* Winner Selection */}
-            {showWinnerSelect && onComplete && (
-                <div className="mt-[var(--space-3)] pt-[var(--space-3)] border-t border-t-rule-faint">
-                    <p className="type-meta mb-[var(--space-2)]">Select Winner:</p>
-                    <div className="flex flex-wrap gap-[var(--space-2)]">
-                        {bet.participantIds
-                            .flatMap((id) => {
-                                const player = getPlayer(id);
-                                return player ? [{ id, player }] : [];
-                            })
-                            .map(({ id, player }) => (
-                                <button
-                                    key={id}
-                                    onClick={() => {
-                                        onComplete(id);
-                                        setShowWinnerSelect(false);
-                                    }}
-                                    className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-masters text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
-                                >
-                                    {player.firstName}
-                                </button>
-                            ))}
-                        <button
-                            onClick={() => {
-                                onComplete();
-                                setShowWinnerSelect(false);
-                            }}
-                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-ink-tertiary text-[var(--canvas)] border-none rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
-                        >
-                            No Winner
-                        </button>
-                        <button
-                            onClick={() => setShowWinnerSelect(false)}
-                            className="press-scale py-[var(--space-2)] px-[var(--space-3)] bg-transparent border border-rule rounded-[var(--radius-md)] cursor-pointer text-[length:var(--text-sm)]"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
+  return (
+    <div className="rounded-[1.45rem] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/80 p-[var(--space-4)] shadow-[0_14px_28px_rgba(41,29,17,0.04)]">
+      <div className="flex items-start gap-[var(--space-3)]">
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem]"
+          style={{
+            background: isCompleted ? 'var(--success)' : `color-mix(in srgb, ${accent} 14%, white)`,
+            color: isCompleted ? 'var(--canvas)' : accent,
+          }}
+        >
+          {isCompleted ? <Check size={20} /> : <Icon size={20} />}
         </div>
-    );
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-[var(--space-3)]">
+            <div>
+              <p className="font-serif text-[1.5rem] italic text-[var(--ink)]">{bet.name}</p>
+              {bet.description ? (
+                <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{bet.description}</p>
+              ) : null}
+            </div>
+            {bet.pot ? (
+              <span className="rounded-full bg-[color:var(--success)]/12 px-3 py-1 text-sm font-semibold text-[var(--success)]">
+                ${bet.pot}
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-3 text-sm text-[var(--ink-secondary)]">
+            {bet.hole ? <span>Hole {bet.hole}</span> : null}
+            {isCompleted && winner ? (
+              <span className="inline-flex items-center gap-1 text-[var(--success)]">
+                <Crown size={14} />
+                Won by {winner.firstName}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[var(--warning)]">
+                <Clock size={14} />
+                {bet.participantIds.length} players live
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {!isCompleted ? (
+        <div className="mt-[var(--space-4)] border-t border-[color:var(--rule)]/65 pt-[var(--space-4)]">
+          <div className="flex flex-wrap gap-2">
+            {onEdit ? (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-2)] text-sm font-semibold text-[var(--ink-secondary)]"
+              >
+                <Edit3 size={14} />
+                Edit
+              </button>
+            ) : null}
+            {onComplete && !showWinnerSelect ? (
+              <button
+                type="button"
+                onClick={() => setShowWinnerSelect(true)}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-2)] text-sm font-semibold text-[var(--canvas)]"
+              >
+                <Check size={14} />
+                Complete
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={onDelete}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[color:var(--error)]/18 bg-[color:var(--error)]/10 px-[var(--space-3)] py-[var(--space-2)] text-sm font-semibold text-[var(--error)]"
+            >
+              <Trash2 size={14} />
+              Delete
+            </button>
+          </div>
+
+          {showWinnerSelect && onComplete ? (
+            <div className="mt-[var(--space-4)] rounded-[1.2rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+              <p className="text-sm font-semibold text-[var(--ink)]">Select winner</p>
+              <div className="mt-[var(--space-3)] flex flex-wrap gap-2">
+                {bet.participantIds
+                  .flatMap((id) => {
+                    const player = getPlayer(id);
+                    return player ? [{ id, player }] : [];
+                  })
+                  .map(({ id, player }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => {
+                        onComplete(id);
+                        setShowWinnerSelect(false);
+                      }}
+                      className="rounded-full bg-[var(--maroon)] px-3 py-2 text-sm font-semibold text-[var(--canvas)]"
+                    >
+                      {player.firstName}
+                    </button>
+                  ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    onComplete();
+                    setShowWinnerSelect(false);
+                  }}
+                  className="rounded-full bg-[color:var(--surface)] px-3 py-2 text-sm font-semibold text-[var(--ink-secondary)]"
+                >
+                  No winner
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowWinnerSelect(false)}
+                  className="rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/74 px-3 py-2 text-sm font-semibold text-[var(--ink-secondary)]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function CaptainNote({
+  title,
+  body,
+  icon,
+  tone = 'ink',
+}: {
+  title: string;
+  body: string;
+  icon: ReactNode;
+  tone?: 'ink' | 'maroon';
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-[1.6rem] border p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
+        tone === 'maroon'
+          ? 'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]'
+          : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82'
+      )}
+    >
+      <div className="flex items-center gap-[var(--space-2)] text-[var(--ink-tertiary)]">
+        {icon}
+        <span className="type-overline tracking-[0.14em]">Captain Note</span>
+      </div>
+      <h3 className="mt-[var(--space-3)] font-serif text-[1.55rem] italic text-[var(--ink)]">{title}</h3>
+      <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{body}</p>
+    </div>
+  );
 }

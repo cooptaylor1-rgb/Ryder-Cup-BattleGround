@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { PreFlightChecklist } from '@/components/captain';
 import { PageHeader } from '@/components/layout';
@@ -179,9 +180,9 @@ function ChecklistFactCard({
   detail,
   tone = 'ink',
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
   detail: string;
   tone?: 'ink' | 'green';
 }) {
@@ -214,7 +215,7 @@ function ChecklistSidebarCard({
 }: {
   title: string;
   body: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   tone?: 'ink' | 'maroon';
 }) {
   return (
@@ -243,7 +244,7 @@ function QuickFixLink({
   body,
 }: {
   href: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   body: string;
 }) {

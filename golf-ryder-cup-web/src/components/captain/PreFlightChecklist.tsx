@@ -1,33 +1,40 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react';
 import {
-  runPreFlightCheck,
   getPreFlightSummary,
+  groupValidationsByCategory,
+  runPreFlightCheck,
   type PreFlightCheckResult,
+  type ValidationCategory,
+  type ValidationItem,
 } from '@/lib/services/preFlightValidationService';
 import type {
-  Trip,
+  Course,
+  Match,
   Player,
+  RyderCupSession,
   Team,
   TeamMember,
-  RyderCupSession,
-  Match,
-  Course,
   TeeSet,
+  Trip,
 } from '@/lib/types';
-import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  RefreshCw,
-  Rocket,
-} from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
+import {
+  AlertTriangle,
+  CalendarDays,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
+  Map,
+  RefreshCw,
+  Rocket,
+  Shield,
+  Users,
+} from 'lucide-react';
 
 const logger = createLogger('PreFlight');
 
@@ -44,6 +51,22 @@ interface PreFlightChecklistProps {
   onAllClear?: () => void;
 }
 
+const CATEGORY_META: Record<
+  ValidationCategory,
+  {
+    label: string;
+    icon: ComponentType<{ size?: number; className?: string }>;
+  }
+> = {
+  players: { label: 'Players', icon: Users },
+  teams: { label: 'Teams', icon: Shield },
+  sessions: { label: 'Sessions', icon: CalendarDays },
+  lineups: { label: 'Lineups', icon: Users },
+  courses: { label: 'Courses', icon: Map },
+  schedule: { label: 'Schedule', icon: Clock3 },
+  handicaps: { label: 'Handicaps', icon: CheckCircle2 },
+};
+
 export function PreFlightChecklist({
   tripId,
   trip,
@@ -58,12 +81,12 @@ export function PreFlightChecklist({
 }: PreFlightChecklistProps) {
   const [result, setResult] = useState<PreFlightCheckResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [showPassedChecks, setShowPassedChecks] = useState(false);
 
-  const runCheck = async () => {
+  const runCheck = useCallback(() => {
     setLoading(true);
+
     try {
-      // Create a minimal trip object if not provided
       const now = new Date().toISOString();
       const tripData: Trip = trip || {
         id: tripId,
@@ -85,233 +108,317 @@ export function PreFlightChecklist({
         courses,
         teeSets
       );
+
       setResult(checkResult);
-
-      // Auto-expand sections with issues
-      const sectionsWithIssues = new Set<string>();
-      [...checkResult.errors, ...checkResult.warnings].forEach((item) => {
-        sectionsWithIssues.add(item.category);
-      });
-      setExpandedSections(sectionsWithIssues);
-
       if (checkResult.isReady && onAllClear) {
         onAllClear();
       }
     } catch (error) {
       logger.error('Pre-flight check failed:', error);
+      setResult(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [courses, matches, onAllClear, players, sessions, teamMembers, teams, teeSets, trip, tripId]);
 
   useEffect(() => {
     runCheck();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentional: runCheck is stable, only re-run on tripId change
-  }, [tripId]);
+  }, [runCheck]);
 
-  const toggleSection = (category: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
-  };
+  const summary = useMemo(() => (result ? getPreFlightSummary(result) : null), [result]);
+  const groupedIssues = useMemo(
+    () => (result ? groupValidationsByCategory([...result.errors, ...result.warnings]) : null),
+    [result]
+  );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin text-[var(--info)]" />
-        <span className="ml-3 text-[var(--ink-secondary)]">Running pre-flight checks...</span>
+      <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+        <div className="flex items-center gap-[var(--space-4)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+            <RefreshCw size={20} className="animate-spin" />
+          </div>
+          <div>
+            <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Captain Check</p>
+            <h3 className="mt-[var(--space-2)] font-serif text-[1.7rem] italic text-[var(--ink)]">
+              Running the board.
+            </h3>
+            <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+              Validating roster, teams, sessions, lineups, and course setup.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (!result) {
-    return <div className="text-center p-8 text-[var(--error)]">Failed to run pre-flight checks</div>;
-  }
-
-  const summary = getPreFlightSummary(result);
-  return (
-    <div className="space-y-4">
-      {/* Summary Header */}
-      <div
-        className={cn(
-          'rounded-xl p-6 border-2 transition-colors',
-          result.isReady
-            ? 'bg-[color:var(--success)]/15 border-[color:var(--success)]/40'
-            : 'bg-[color:var(--warning)]/15 border-[color:var(--warning)]/40'
-        )}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {result.isReady ? (
-              <Rocket className="w-10 h-10 text-[var(--success)]" />
-            ) : (
-              <AlertTriangle className="w-10 h-10 text-[var(--warning)]" />
-            )}
-            <div>
-              <h3 className="text-xl font-bold text-[var(--ink-primary)]">
-                {result.isReady ? 'All Systems Go!' : 'Pre-Flight Review Needed'}
-              </h3>
-              <p className="text-sm text-[var(--ink-secondary)]">
-                {summary.icon} {summary.message}
-              </p>
-            </div>
+  if (!result || !summary || !groupedIssues) {
+    return (
+      <div className="rounded-[1.7rem] border border-[color:var(--error)]/18 bg-[linear-gradient(180deg,rgba(202,82,71,0.08),rgba(255,255,255,0.98))] p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+        <div className="flex items-start gap-[var(--space-4)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--error)]/12 text-[var(--error)]">
+            <AlertTriangle size={20} />
           </div>
-          <button
-            onClick={runCheck}
-            className="p-2 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
-            title="Re-run checks"
-          >
-            <RefreshCw className="w-5 h-5 text-[var(--ink-tertiary)]" />
-          </button>
-        </div>
-
-        {/* Completion Percentage */}
-        <div className="mt-4 pt-4 border-t border-[var(--rule)]">
-          <div className="flex justify-between text-sm text-[var(--ink-secondary)] mb-2">
-            <span>Completion</span>
-            <span>{result.completionPercentage}%</span>
-          </div>
-          <div className="w-full bg-[var(--surface-secondary)] rounded-full h-2">
-            <div
-              className={cn(
-                'h-2 rounded-full transition-all',
-                result.isReady ? 'bg-[color:var(--success)]/80' : 'bg-[color:var(--warning)]/80'
-              )}
-              style={{ width: `${result.completionPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="flex gap-6 mt-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-[var(--success)]" />
-            <span className="text-sm text-[var(--ink-secondary)]">
-              {result.info.length} Info
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-[var(--warning)]" />
-            <span className="text-sm text-[var(--ink-secondary)]">
-              {result.warnings.length} Warnings
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-[var(--error)]" />
-            <span className="text-sm text-[var(--ink-secondary)]">
-              {result.errors.length} Errors
-            </span>
+          <div>
+            <h3 className="font-serif text-[1.7rem] italic text-[var(--ink)]">The check failed to run.</h3>
+            <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+              Re-run the board. If this keeps happening, the validation service needs attention.
+            </p>
+            <button
+              type="button"
+              onClick={runCheck}
+              className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)]"
+            >
+              <RefreshCw size={16} />
+              Run again
+            </button>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Errors Section */}
-      {result.errors.length > 0 && (
-        <div className="border border-[color:var(--error)]/30 rounded-lg overflow-hidden">
-          <div className="bg-[color:var(--error)]/15 px-4 py-3 flex items-center gap-2">
-            <XCircle className="w-5 h-5 text-[var(--error)]" />
-            <span className="font-semibold text-[var(--error)]">
-              Errors ({result.errors.length})
-            </span>
-          </div>
-          <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
-            {result.errors.map((item, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-lg bg-[color:var(--error)]/15 border border-[color:var(--error)]/30"
-              >
-                <p className="font-medium text-[var(--error)]">{item.title}</p>
-                {item.description && (
-                  <p className="text-sm text-[color:var(--error)]/80 mt-1">{item.description}</p>
-                )}
-                {item.actionLabel && item.actionHref && (
-                  <a
-                    href={item.actionHref}
-                    className="text-sm text-[var(--info)] mt-2 inline-block"
-                  >
-                    {item.actionLabel} →
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+  const allIssues = [...result.errors, ...result.warnings];
 
-      {/* Warnings Section */}
-      {result.warnings.length > 0 && (
-        <div className="border border-[color:var(--warning)]/30 rounded-lg overflow-hidden">
-          <div className="bg-[color:var(--warning)]/15 px-4 py-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-[var(--warning)]" />
-            <span className="font-semibold text-[var(--warning)]">
-              Warnings ({result.warnings.length})
-            </span>
+  return (
+    <div className="space-y-[var(--space-4)]">
+      <section
+        className={cn(
+          'overflow-hidden rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]',
+          result.isReady
+            ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.12),rgba(255,255,255,0.98))]'
+            : 'border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.12),rgba(255,255,255,0.98))]'
+        )}
+      >
+        <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex gap-[var(--space-4)]">
+            <div
+              className={cn(
+                'flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem]',
+                result.isReady ? 'bg-[color:var(--success)]/12 text-[var(--success)]' : 'bg-[color:var(--warning)]/12 text-[var(--warning)]'
+              )}
+            >
+              {result.isReady ? <Rocket size={22} /> : <AlertTriangle size={22} />}
+            </div>
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Launch Status</p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+                {result.isReady ? 'All systems look playable.' : 'The board still needs work.'}
+              </h3>
+              <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                {summary.message}
+              </p>
+            </div>
           </div>
-          <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
-            {result.warnings.map((item, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-lg bg-[color:var(--warning)]/15 border border-[color:var(--warning)]/30"
-              >
-                <p className="font-medium text-[var(--warning)]">{item.title}</p>
-                {item.description && (
-                  <p className="text-sm text-[color:var(--warning)]/80 mt-1">
-                    {item.description}
-                  </p>
-                )}
-                {item.actionLabel && item.actionHref && (
-                  <a
-                    href={item.actionHref}
-                    className="text-sm text-[var(--info)] mt-2 inline-block"
-                  >
-                    {item.actionLabel} →
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Info Section */}
-      {result.info.length > 0 && (
-        <div className="border border-[var(--rule)] rounded-lg overflow-hidden">
           <button
-            onClick={() => toggleSection('info')}
-            className="w-full bg-[var(--surface-secondary)] px-4 py-3 flex items-center justify-between"
+            type="button"
+            onClick={runCheck}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
           >
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-[var(--success)]" />
-              <span className="font-semibold text-[var(--ink-primary)]">
-                Passed Checks ({result.info.length})
-              </span>
-            </div>
-            {expandedSections.has('info') ? (
-              <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />
-            )}
+            <RefreshCw size={16} />
+            Re-run
           </button>
-          {expandedSections.has('info') && (
-            <div className="p-4 space-y-2 bg-[var(--surface-secondary)]">
-              {result.info.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-lg bg-[color:var(--success)]/10 border border-[color:var(--success)]/30"
-                >
-                  <p className="text-[var(--success)]">{item.title}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
+
+        <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] sm:grid-cols-2 xl:grid-cols-4">
+          <ChecklistMetric label="Completion" value={`${result.completionPercentage}%`} detail="Overall readiness" tone={result.isReady ? 'green' : 'gold'} />
+          <ChecklistMetric label="Errors" value={result.errors.length} detail="Must be resolved" tone={result.errors.length > 0 ? 'maroon' : 'ink'} />
+          <ChecklistMetric label="Warnings" value={result.warnings.length} detail="Worth a review" tone={result.warnings.length > 0 ? 'gold' : 'ink'} />
+          <ChecklistMetric label="Passed" value={result.info.length} detail="Checks already cleared" tone="green" />
+        </div>
+      </section>
+
+      {allIssues.length > 0 ? (
+        <section className="grid gap-[var(--space-4)] xl:grid-cols-2">
+          {Object.entries(groupedIssues)
+            .filter(([, items]) => items.length > 0)
+            .map(([category, items]) => {
+              const meta = CATEGORY_META[category as ValidationCategory];
+              const blockingCount = items.filter((item) => item.severity === 'error').length;
+
+              return (
+                <IssueBoard
+                  key={category}
+                  title={meta.label}
+                  icon={<meta.icon size={18} />}
+                  items={items}
+                  blockingCount={blockingCount}
+                />
+              );
+            })}
+        </section>
+      ) : (
+        <section className="rounded-[1.7rem] border border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))] p-[var(--space-6)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+          <div className="flex items-start gap-[var(--space-4)]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--success)]/12 text-[var(--success)]">
+              <CheckCircle2 size={22} />
+            </div>
+            <div>
+              <p className="type-overline tracking-[0.16em] text-[var(--success)]">Clear Board</p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.8rem] italic text-[var(--ink)]">
+                Nothing is standing in the way.
+              </h3>
+              <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                Roster, teams, schedule, and course setup all passed the current checks.
+              </p>
+            </div>
+          </div>
+        </section>
       )}
+
+      <section className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/84 shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+        <button
+          type="button"
+          onClick={() => setShowPassedChecks((current) => !current)}
+          className="flex w-full items-center justify-between px-[var(--space-5)] py-[var(--space-4)] text-left"
+        >
+          <div>
+            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Passed Checks</p>
+            <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">
+              See the parts of the trip that already look sound.
+            </p>
+          </div>
+          {showPassedChecks ? (
+            <ChevronUp size={18} className="text-[var(--ink-tertiary)]" />
+          ) : (
+            <ChevronDown size={18} className="text-[var(--ink-tertiary)]" />
+          )}
+        </button>
+
+        {showPassedChecks ? (
+          <div className="grid gap-3 border-t border-[color:var(--rule)]/70 px-[var(--space-5)] py-[var(--space-4)] md:grid-cols-2">
+            {result.info.length > 0 ? (
+              result.info.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-[1.2rem] border border-[color:var(--success)]/18 bg-[color:var(--success)]/10 p-[var(--space-4)]"
+                >
+                  <p className="text-sm font-semibold text-[var(--success)]">{item.title}</p>
+                  {item.description ? (
+                    <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{item.description}</p>
+                  ) : null}
+                </div>
+              ))
+            ) : (
+              <div className="rounded-[1.2rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/74 p-[var(--space-5)] text-sm text-[var(--ink-secondary)]">
+                No informational pass items were returned by the current validation service.
+              </div>
+            )}
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
+}
+
+function ChecklistMetric({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  detail: string;
+  tone: 'ink' | 'gold' | 'green' | 'maroon';
+}) {
+  const toneClassNames = {
+    ink: 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80',
+    gold:
+      'border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.10),rgba(255,255,255,0.98))]',
+    green:
+      'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]',
+    maroon:
+      'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]',
+  } satisfies Record<'ink' | 'gold' | 'green' | 'maroon', string>;
+
+  return (
+    <div className={cn('rounded-[1.3rem] border p-[var(--space-4)]', toneClassNames[tone])}>
+      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <p className="mt-[var(--space-3)] font-serif text-[1.8rem] italic leading-none text-[var(--ink)]">{value}</p>
+      <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{detail}</p>
+    </div>
+  );
+}
+
+function IssueBoard({
+  title,
+  icon,
+  items,
+  blockingCount,
+}: {
+  title: string;
+  icon: ReactNode;
+  items: ValidationItem[];
+  blockingCount: number;
+}) {
+  return (
+    <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+      <div className="flex items-start justify-between gap-[var(--space-3)]">
+        <div className="flex items-center gap-[var(--space-3)]">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
+            {icon}
+          </div>
+          <div>
+            <p className="type-overline tracking-[0.15em] text-[var(--maroon)]">{title}</p>
+            <h4 className="mt-[var(--space-2)] font-serif text-[1.55rem] italic text-[var(--ink)]">
+              {items.length} item{items.length === 1 ? '' : 's'} to review
+            </h4>
+          </div>
+        </div>
+        {blockingCount > 0 ? (
+          <span className="rounded-full bg-[color:var(--error)]/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--error)]">
+            {blockingCount} blocking
+          </span>
+        ) : (
+          <span className="rounded-full bg-[color:var(--warning)]/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--warning)]">
+            review
+          </span>
+        )}
+      </div>
+
+      <div className="mt-[var(--space-4)] space-y-3">
+        {items.map((item) => (
+          <IssueCard key={item.id} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function IssueCard({ item }: { item: ValidationItem }) {
+  return (
+    <div
+      className={cn(
+        'rounded-[1.2rem] border p-[var(--space-4)]',
+        item.severity === 'error'
+          ? 'border-[color:var(--error)]/18 bg-[color:var(--error)]/10'
+          : 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/08'
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={cn(
+            'rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
+            item.severity === 'error'
+              ? 'bg-[color:var(--error)]/12 text-[var(--error)]'
+              : 'bg-[color:var(--warning)]/12 text-[var(--warning)]'
+          )}
+        >
+          {item.severity}
+        </span>
+        <p className="text-sm font-semibold text-[var(--ink)]">{item.title}</p>
+      </div>
+      <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{item.description}</p>
+      {item.actionLabel && item.actionHref ? (
+        <Link
+          href={item.actionHref}
+          className="mt-[var(--space-3)] inline-flex text-sm font-semibold text-[var(--maroon)]"
+        >
+          {item.actionLabel}
+        </Link>
+      ) : null}
     </div>
   );
 }
