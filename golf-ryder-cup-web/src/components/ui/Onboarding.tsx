@@ -24,6 +24,7 @@ import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
 interface OnboardingStep {
     illustration: React.ReactNode;
+    eyebrow: string;
     title: string;
     subtitle: string;
     features?: string[];
@@ -42,11 +43,13 @@ interface OnboardingProps {
 const steps: OnboardingStep[] = [
     {
         illustration: <RyderCupTrophyIllustration size="xl" animated />,
+        eyebrow: 'The Clubhouse',
         title: "Welcome to Ryder Cup Tracker",
         subtitle: "The best way to track your golf buddies trip. Compete, score, and crown champions.",
     },
     {
         illustration: <GolfersIllustration size="xl" />,
+        eyebrow: 'The Sides',
         title: "Ryder Cup Format",
         subtitle: "Split into two teams and compete in classic Ryder Cup style matches.",
         features: [
@@ -57,6 +60,7 @@ const steps: OnboardingStep[] = [
     },
     {
         illustration: <ScorecardIllustration size="xl" animated />,
+        eyebrow: 'The Scorecard',
         title: "Score Hole by Hole",
         subtitle: "Simple, beautiful scoring that updates standings in real-time.",
         features: [
@@ -67,6 +71,7 @@ const steps: OnboardingStep[] = [
     },
     {
         illustration: <TrophyIllustration size="xl" animated />,
+        eyebrow: 'The Story',
         title: "Track Every Stat",
         subtitle: "See who's clutch, who's consistent, and who takes home the glory.",
         features: [
@@ -77,6 +82,7 @@ const steps: OnboardingStep[] = [
     },
     {
         illustration: <CelebrationIllustration size="xl" animated />,
+        eyebrow: 'The First Tee',
         title: "Ready to Play?",
         subtitle: "Create your first trip and let the competition begin!",
     },
@@ -93,6 +99,7 @@ export function Onboarding({ onComplete, onSkip, className }: OnboardingProps) {
     const isFirstStep = currentStep === 0;
     const isLastStep = currentStep === steps.length - 1;
     const step = steps[currentStep];
+    const progressLabel = `${currentStep + 1} of ${steps.length}`;
 
     const handleNext = useCallback(() => {
         if (isLastStep) {
@@ -144,99 +151,107 @@ export function Onboarding({ onComplete, onSkip, className }: OnboardingProps) {
             aria-label="Welcome to Ryder Cup Tracker"
             aria-modal="true"
         >
-            {/* Skip button */}
-            {!isLastStep && (
-                <button
-                    onClick={handleSkip}
-                    className="absolute top-4 right-4 p-2 text-ink-tertiary hover:text-ink-secondary transition-colors z-10"
-                    aria-label="Skip onboarding"
-                >
-                    <X className="w-6 h-6" />
-                </button>
-            )}
+            <div className="onboarding-shell">
+                <div className="onboarding-topbar">
+                    <div>
+                        <p className="onboarding-brand">Ryder Cup Battleground</p>
+                        <p className="onboarding-step-meta">Step {progressLabel}</p>
+                    </div>
 
-            {/* Main content */}
-            <div className="onboarding-content">
-                {/* Illustration */}
-                <div
-                    className="onboarding-illustration"
-                    key={currentStep} // Force re-render for animation
-                >
-                    {step.illustration}
-                </div>
-
-                {/* Text */}
-                <h1 className="onboarding-title">{step.title}</h1>
-                <p className="onboarding-subtitle">{step.subtitle}</p>
-
-                {/* Feature list */}
-                {step.features && (
-                    <ul className="mt-6 space-y-2 text-left max-w-xs">
-                        {step.features.map((feature, index) => (
-                            <li
-                                key={index}
-                                className="flex items-center gap-3 text-sm text-ink-secondary animate-stagger-item"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                                <span className="w-5 h-5 rounded-full bg-masters/10 text-masters flex items-center justify-center text-xs font-bold">
-                                    ✓
-                                </span>
-                                {feature}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-
-                {/* Step indicators */}
-                <div className="onboarding-dots" role="tablist" aria-label="Onboarding progress">
-                    {steps.map((_, index) => (
+                    {!isLastStep && (
                         <button
-                            key={index}
-                            className={cn('onboarding-dot', index === currentStep && 'active')}
-                            onClick={() => setCurrentStep(index)}
-                            role="tab"
-                            aria-selected={index === currentStep}
-                            aria-label={`Step ${index + 1} of ${steps.length}`}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* Actions */}
-            <div className="onboarding-actions">
-                <div className="flex gap-3">
-                    {/* Back button */}
-                    {!isFirstStep && (
-                        <button
-                            onClick={handlePrev}
-                            className="shrink-0 p-4 rounded-xl transition-all press-scale-sm"
-                            style={{
-                                background: 'var(--canvas-raised)',
-                                color: 'var(--ink-secondary)',
-                                border: '1px solid var(--stroke-light)'
-                            }}
-                            aria-label="Previous step"
+                            onClick={handleSkip}
+                            className="onboarding-skip-button"
+                            aria-label="Skip onboarding"
                         >
-                            <ChevronLeft className="w-6 h-6" />
+                            Skip
+                            <X className="w-4 h-4" />
                         </button>
                     )}
-
-                    {/* Next/Complete button */}
-                    <button
-                        onClick={handleNext}
-                        className="onboarding-button flex items-center justify-center gap-2 press-scale"
-                    >
-                        {isLastStep ? "Let's Go!" : 'Continue'}
-                        {!isLastStep && <ChevronRight className="w-5 h-5" />}
-                    </button>
                 </div>
 
-                {/* Skip text link */}
-                {!isLastStep && (
-                    <button onClick={handleSkip} className="onboarding-skip">
-                        Skip for now
-                    </button>
-                )}
+                <div className="onboarding-stage">
+                    <div className="onboarding-stage-frame">
+                        <div
+                            className="onboarding-illustration"
+                            key={currentStep}
+                        >
+                            {step.illustration}
+                        </div>
+                    </div>
+
+                    <div className="onboarding-copy">
+                        <p className="onboarding-overline">{step.eyebrow}</p>
+                        <h1 className="onboarding-title">{step.title}</h1>
+                        <p className="onboarding-subtitle">{step.subtitle}</p>
+                    </div>
+
+                    {step.features && (
+                        <div className="onboarding-feature-grid">
+                            {step.features.map((feature, index) => (
+                                <div
+                                    key={feature}
+                                    className="onboarding-feature-card animate-stagger-item"
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    <span className="onboarding-feature-check" aria-hidden="true">
+                                        ✓
+                                    </span>
+                                    <span>{feature}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="onboarding-footer">
+                    <div className="onboarding-progress-block">
+                        <div className="onboarding-progress-labels">
+                            <span>Progress</span>
+                            <span>{progressLabel}</span>
+                        </div>
+                        <div className="onboarding-dots" role="tablist" aria-label="Onboarding progress">
+                            {steps.map((_, index) => (
+                                <button
+                                    key={index}
+                                    className={cn('onboarding-dot', index === currentStep && 'active')}
+                                    onClick={() => setCurrentStep(index)}
+                                    role="tab"
+                                    aria-selected={index === currentStep}
+                                    aria-label={`Step ${index + 1} of ${steps.length}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="onboarding-actions">
+                        <div className="flex gap-3">
+                            {!isFirstStep && (
+                                <button
+                                    onClick={handlePrev}
+                                    className="onboarding-back-button press-scale-sm"
+                                    aria-label="Previous step"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            <button
+                                onClick={handleNext}
+                                className="onboarding-button flex items-center justify-center gap-2 press-scale"
+                            >
+                                {isLastStep ? "Let's Go!" : 'Continue'}
+                                {!isLastStep && <ChevronRight className="w-5 h-5" />}
+                            </button>
+                        </div>
+
+                        {!isLastStep && (
+                            <button onClick={handleSkip} className="onboarding-skip">
+                                Skip for now
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -262,36 +277,63 @@ export function WelcomeBack({
 }: WelcomeBackProps) {
     return (
         <div className="onboarding-overlay">
-            <div className="onboarding-content">
-                <div className="onboarding-illustration">
-                    <RyderCupTrophyIllustration size="xl" animated />
+            <div className="onboarding-shell">
+                <div className="onboarding-topbar">
+                    <div>
+                        <p className="onboarding-brand">Ryder Cup Battleground</p>
+                        <p className="onboarding-step-meta">Returning player</p>
+                    </div>
                 </div>
 
-                <h1 className="onboarding-title">
-                    {userName ? `Welcome back, ${userName}!` : 'Welcome back!'}
-                </h1>
-                <p className="onboarding-subtitle">
-                    {lastTripName
-                        ? `Ready to continue "${lastTripName}"?`
-                        : 'Ready to hit the links?'}
-                </p>
-            </div>
+                <div className="onboarding-stage">
+                    <div className="onboarding-stage-frame">
+                        <div className="onboarding-illustration">
+                            <RyderCupTrophyIllustration size="xl" animated />
+                        </div>
+                    </div>
 
-            <div className="onboarding-actions">
-                {lastTripName ? (
-                    <>
-                        <button onClick={onContinue} className="onboarding-button press-scale">
-                            Continue Trip
-                        </button>
-                        <button onClick={onNewTrip} className="onboarding-skip">
-                            Start a new trip instead
-                        </button>
-                    </>
-                ) : (
-                    <button onClick={onNewTrip} className="onboarding-button press-scale">
-                        Create New Trip
-                    </button>
-                )}
+                    <div className="onboarding-copy">
+                        <p className="onboarding-overline">Back at the Clubhouse</p>
+                        <h1 className="onboarding-title">
+                            {userName ? `Welcome back, ${userName}!` : 'Welcome back!'}
+                        </h1>
+                        <p className="onboarding-subtitle">
+                            {lastTripName
+                                ? `Ready to continue "${lastTripName}"?`
+                                : 'Ready to hit the links?'}
+                        </p>
+                    </div>
+
+                    {lastTripName && (
+                        <div className="onboarding-feature-grid">
+                            <div className="onboarding-feature-card">
+                                <span className="onboarding-feature-check" aria-hidden="true">
+                                    ✓
+                                </span>
+                                <span>Returning to {lastTripName}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="onboarding-footer">
+                    <div className="onboarding-actions">
+                        {lastTripName ? (
+                            <>
+                                <button onClick={onContinue} className="onboarding-button press-scale">
+                                    Continue Trip
+                                </button>
+                                <button onClick={onNewTrip} className="onboarding-skip">
+                                    Start a new trip instead
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={onNewTrip} className="onboarding-button press-scale">
+                                Create New Trip
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
