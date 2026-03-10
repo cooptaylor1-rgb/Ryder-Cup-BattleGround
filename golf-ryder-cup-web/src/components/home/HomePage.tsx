@@ -244,120 +244,138 @@ export default function HomePage() {
       <main className="container-editorial">
         {/* ── ACTIVE TOURNAMENT ── */}
         {activeTrip && (
-          <>
-            {/* TODAY HEADER */}
-            <section className="pt-[var(--space-8)]">
-              <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
-                {formatDate(new Date()).toUpperCase()}
-              </p>
-              <h1 className="type-display mt-[var(--space-2)] text-[var(--ink)]">
-                {activeTrip.name}
-              </h1>
-              {activeTrip.location && (
-                <p className="type-body-sm mt-[var(--space-1)] text-[var(--ink-secondary)] flex items-center gap-[var(--space-2)]">
-                  <MapPin size={14} strokeWidth={1.5} />
-                  {activeTrip.location}
-                </p>
-              )}
-            </section>
-
-            {/* SCORE HERO — Monumental, breathing */}
-            {standings ? (
-              <section className="pt-[var(--space-10)] pb-[var(--space-8)]">
-                <button
-                  onClick={() => handleSelectTrip(activeTrip.id)}
-                  className="w-full bg-transparent border-none cursor-pointer p-0 press-scale"
-                >
-                  {/* Live badge */}
-                  {liveMatchesCount > 0 && (
-                    <div className="live-indicator mb-[var(--space-6)] flex justify-center">
-                      Live
+          <div className="pt-[var(--space-8)] space-y-[var(--space-6)]">
+            <section>
+              <div className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--canvas)_88%,white)_0%,color-mix(in_srgb,var(--canvas-warm)_94%,white)_100%)] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+                <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+                  <div className="flex items-start justify-between gap-[var(--space-4)]">
+                    <div className="min-w-0">
+                      <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
+                        TODAY&apos;S MATCH BOOK
+                      </p>
+                      <h1 className="type-display mt-[var(--space-2)] text-[var(--ink)]">
+                        {activeTrip.name}
+                      </h1>
                     </div>
+
+                    <div className="shrink-0 rounded-full border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-3)] py-[var(--space-2)] text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters-deep)]">
+                      {liveMatchesCount > 0 ? 'Live Scoring' : 'In Progress'}
+                    </div>
+                  </div>
+
+                  <div className="mt-[var(--space-4)] flex flex-wrap gap-[var(--space-2)]">
+                    <HeroMetaPill icon={<Calendar size={13} strokeWidth={1.7} />}>
+                      {formatDate(new Date())}
+                    </HeroMetaPill>
+                    {activeTrip.location && (
+                      <HeroMetaPill icon={<MapPin size={13} strokeWidth={1.7} />}>
+                        {activeTrip.location}
+                      </HeroMetaPill>
+                    )}
+                    <HeroMetaPill icon={<Trophy size={13} strokeWidth={1.7} />}>
+                      {scoreNarrative ?? 'Trip in motion'}
+                    </HeroMetaPill>
+                  </div>
+                </div>
+
+                <div className="px-[var(--space-5)] py-[var(--space-6)]">
+                  {standings ? (
+                    <button
+                      onClick={() => handleSelectTrip(activeTrip.id)}
+                      className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
+                    >
+                      <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-[var(--space-4)]">
+                        <div className="rounded-[1.5rem] border border-[color:var(--team-usa)]/16 bg-[linear-gradient(180deg,rgba(27,59,119,0.08),rgba(255,255,255,0.62))] px-[var(--space-4)] py-[var(--space-5)] text-center">
+                          <span className="team-dot team-dot-lg team-dot-usa inline-block mb-[var(--space-3)]" />
+                          <p
+                            className="score-monumental"
+                            style={{
+                              color:
+                                standings.teamAPoints >= standings.teamBPoints
+                                  ? 'var(--team-usa)'
+                                  : 'var(--ink-tertiary)',
+                            }}
+                          >
+                            {standings.teamAPoints}
+                          </p>
+                          <p className="type-overline mt-[var(--space-3)] text-[var(--team-usa)]">
+                            {teamAName || 'USA'}
+                          </p>
+                        </div>
+
+                        <div className="pb-[var(--space-5)] text-center">
+                          <p className="type-overline text-[var(--ink-faint)]">MATCH</p>
+                          <div className="mt-[var(--space-2)] font-serif text-[2rem] italic text-[var(--ink-faint)]">
+                            –
+                          </div>
+                        </div>
+
+                        <div className="rounded-[1.5rem] border border-[color:var(--team-europe)]/16 bg-[linear-gradient(180deg,rgba(160,42,63,0.08),rgba(255,255,255,0.62))] px-[var(--space-4)] py-[var(--space-5)] text-center">
+                          <span className="team-dot team-dot-lg team-dot-europe inline-block mb-[var(--space-3)]" />
+                          <p
+                            className="score-monumental"
+                            style={{
+                              color:
+                                standings.teamBPoints > standings.teamAPoints
+                                  ? 'var(--team-europe)'
+                                  : 'var(--ink-tertiary)',
+                            }}
+                          >
+                            {standings.teamBPoints}
+                          </p>
+                          <p className="type-overline mt-[var(--space-3)] text-[var(--team-europe)]">
+                            {teamBName || 'EUR'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-[var(--space-5)] flex flex-wrap items-center justify-between gap-[var(--space-4)] rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.65)] px-[var(--space-4)] py-[var(--space-4)]">
+                        <div>
+                          <p className="type-overline text-[var(--ink-tertiary)]">State of Play</p>
+                          <p className="mt-[var(--space-1)] font-serif text-[1.35rem] italic text-[var(--ink)]">
+                            {scoreNarrative ?? 'All square'}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-[var(--space-3)]">
+                          <HeroMetaStat label="Live" value={liveMatchesCount} />
+                          <HeroMetaStat label="Players" value={players.length} />
+                          <div className="flex items-center gap-[var(--space-2)] text-[var(--masters)] font-medium text-sm">
+                            <span>View full standings</span>
+                            <ChevronRight size={16} strokeWidth={2} />
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleSelectTrip(activeTrip.id)}
+                      className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
+                    >
+                      <div className="rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.64)] px-[var(--space-5)] py-[var(--space-6)]">
+                        <p className="type-overline text-[var(--ink-tertiary)]">Trip Status</p>
+                        <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,7vw,2.6rem)] italic leading-[1.05] text-[var(--ink)]">
+                          Active, waiting for the first scorecard.
+                        </h2>
+                        <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                          Your trip is live. Open the scoreboard and start shaping the story.
+                        </p>
+                        <div className="mt-[var(--space-6)] inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-2)] text-[var(--masters)] font-medium text-sm">
+                          <span>Open trip</span>
+                          <ChevronRight size={16} strokeWidth={2} />
+                        </div>
+                      </div>
+                    </button>
                   )}
-
-                  {/* Score blocks */}
-                  <div className="flex items-center justify-center gap-[var(--space-6)]">
-                    {/* Team A */}
-                    <div className="text-center flex-1">
-                      <span className="team-dot team-dot-lg team-dot-usa inline-block mb-[var(--space-3)]" />
-                      <p
-                        className="score-monumental"
-                        style={{
-                          color: standings.teamAPoints >= standings.teamBPoints
-                            ? 'var(--team-usa)'
-                            : 'var(--ink-tertiary)',
-                        }}
-                      >
-                        {standings.teamAPoints}
-                      </p>
-                      <p className="type-overline mt-[var(--space-3)] text-[var(--team-usa)]">
-                        {teamAName || 'USA'}
-                      </p>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="font-serif text-2xl text-[var(--ink-faint)] pt-[var(--space-4)]">
-                      –
-                    </div>
-
-                    {/* Team B */}
-                    <div className="text-center flex-1">
-                      <span className="team-dot team-dot-lg team-dot-europe inline-block mb-[var(--space-3)]" />
-                      <p
-                        className="score-monumental"
-                        style={{
-                          color: standings.teamBPoints > standings.teamAPoints
-                            ? 'var(--team-europe)'
-                            : 'var(--ink-tertiary)',
-                        }}
-                      >
-                        {standings.teamBPoints}
-                      </p>
-                      <p className="type-overline mt-[var(--space-3)] text-[var(--team-europe)]">
-                        {teamBName || 'EUR'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Score narrative */}
-                  {scoreNarrative ? (
-                    <p className="type-body-sm text-center mt-[var(--space-6)] text-[var(--ink-secondary)] italic">
-                      {scoreNarrative}
-                    </p>
-                  ) : null}
-
-                  {/* View standings CTA */}
-                  <div className="flex items-center justify-center gap-[var(--space-2)] mt-[var(--space-8)] text-[var(--masters)] font-medium text-sm">
-                    <span>View full standings</span>
-                    <ChevronRight size={16} strokeWidth={2} />
-                  </div>
-                </button>
-              </section>
-            ) : (
-              /* Active trip without standings yet */
-              <section className="pt-[var(--space-8)] pb-[var(--space-6)]">
-                <button
-                  onClick={() => handleSelectTrip(activeTrip.id)}
-                  className="w-full bg-transparent border-none cursor-pointer p-0 text-left"
-                >
-                  <div className="live-indicator mb-[var(--space-4)]">Active</div>
-                  <div className="flex items-center gap-[var(--space-2)] mt-[var(--space-4)] text-[var(--masters)] font-medium">
-                    <span>Continue</span>
-                    <ChevronRight size={16} strokeWidth={2} />
-                  </div>
-                </button>
-              </section>
-            )}
-
-            <hr className="divider" />
+                </div>
+              </div>
+            </section>
 
             {/* YOUR MATCH — If user has an active match */}
             {userMatchData && currentUserPlayer && (
-              <>
-                <section className="py-[var(--space-6)]">
-                  <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)] mb-[var(--space-4)]">
-                    YOUR MATCH
-                  </p>
+              <section className="rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+                <HomeSectionHeader eyebrow="Your Match" title="Your card is on the clock." />
+                <div className="mt-[var(--space-4)]">
                   <YourMatchCard
                     match={userMatchData.match}
                     matchState={userMatchData.matchState || undefined}
@@ -368,42 +386,41 @@ export default function HomePage() {
                     teamBName={teamBName}
                     onEnterScore={handleEnterScore}
                   />
-                </section>
-                <hr className="divider-subtle" />
-              </>
+                </div>
+              </section>
             )}
 
             {/* LIVE NOW — Clean text list */}
             {liveMatchesCount > 0 && liveMatches && !userMatchData && (
-              <>
-                <section className="py-[var(--space-6)]">
-                  <div className="flex items-center justify-between mb-[var(--space-4)]">
-                    <div className="flex items-center gap-[var(--space-2)]">
-                      <div className="live-indicator">Live Now</div>
-                      <span className="type-caption text-[var(--ink-tertiary)]">
-                        {liveMatchesCount} match{liveMatchesCount !== 1 ? 'es' : ''}
-                      </span>
-                    </div>
+              <section className="rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+                <HomeSectionHeader
+                  eyebrow="Live Now"
+                  title={`${liveMatchesCount} match${liveMatchesCount !== 1 ? 'es' : ''} shaping the board.`}
+                  action={
                     <Link
                       href="/live"
                       className="type-caption flex items-center gap-[var(--space-1)] text-[var(--masters)] no-underline"
                     >
                       Watch <Tv size={14} />
                     </Link>
-                  </div>
-                </section>
-                <hr className="divider-subtle" />
-              </>
+                  }
+                />
+              </section>
             )}
 
             {/* SETUP GUIDE — For captains until setup is complete */}
             {isCaptainMode && sessions.length === 0 && (
-              <>
-                <section className="py-[var(--space-6)]">
-                  <p className="type-overline tracking-[0.15em] text-[var(--maroon)] mb-[var(--space-4)]">
-                    <Shield size={12} className="inline mr-[var(--space-1)] align-middle" />
-                    CAPTAIN SETUP
-                  </p>
+              <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
+                <HomeSectionHeader
+                  eyebrow={
+                    <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
+                      <Shield size={12} className="align-middle" />
+                      Captain Setup
+                    </span>
+                  }
+                  title="Build the trip before the first shot is struck."
+                />
+                <div className="mt-[var(--space-4)]">
                   <div className="card-captain">
                     {(() => {
                       const steps = [players.length >= 4, teams.length >= 2 && teamMembers.length >= 4, sessions.length > 0];
@@ -438,15 +455,15 @@ export default function HomePage() {
                       </button>
                     )}
                   </div>
-                </section>
-                <hr className="divider-subtle" />
-              </>
+                </div>
+              </section>
             )}
 
             {/* NON-CAPTAIN GUIDANCE — Show when not captain and no sessions exist */}
             {!isCaptainMode && sessions.length === 0 && players.length > 0 && (
-              <>
-                <section className="py-[var(--space-6)]">
+              <section className="rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
+                <HomeSectionHeader eyebrow="Clubhouse Note" title="The trip is set up; the pairings are not." />
+                <div className="mt-[var(--space-4)]">
                   <div className="card-editorial" style={{ padding: 'var(--space-5)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)' }}>
                     <Shield size={20} strokeWidth={1.5} className="text-[var(--masters)] shrink-0 mt-0.5" />
                     <div>
@@ -458,28 +475,31 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
-                </section>
-                <hr className="divider-subtle" />
-              </>
+                </div>
+              </section>
             )}
 
             {/* CAPTAIN QUICK TOOLS */}
             {isCaptainMode && (
-              <>
-                <section className="py-[var(--space-6)]">
-                  <div className="flex items-center justify-between mb-[var(--space-4)]">
-                    <p className="type-overline tracking-[0.15em] text-[var(--maroon)]">
-                      <Shield size={12} className="inline mr-[var(--space-1)] align-middle" />
-                      CAPTAIN TOOLS
-                    </p>
+              <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
+                <HomeSectionHeader
+                  eyebrow={
+                    <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
+                      <Shield size={12} className="align-middle" />
+                      Captain Tools
+                    </span>
+                  }
+                  title="Keep the day moving."
+                  action={
                     <Link
                       href="/captain"
                       className="type-caption flex items-center gap-[var(--space-1)] text-[var(--maroon)] no-underline"
                     >
                       All Tools <ChevronRight size={14} />
                     </Link>
-                  </div>
-                  <div className="grid grid-cols-3 gap-[var(--space-3)]">
+                  }
+                />
+                <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-3)] sm:grid-cols-4">
                     <Link href="/lineup/new" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
                       <Users size={18} className="text-[var(--maroon)]" />
                       <span className="type-micro text-[var(--ink)]">Lineup</span>
@@ -496,12 +516,10 @@ export default function HomePage() {
                       <Share2 size={18} className="text-[var(--maroon)]" />
                       <span className="type-micro text-[var(--ink)]">Invite</span>
                     </button>
-                  </div>
-                </section>
-                <hr className="divider-subtle" />
-              </>
+                </div>
+              </section>
             )}
-          </>
+          </div>
         )}
 
         {/* ── TOURNAMENT ARCHIVE ── */}
@@ -580,6 +598,52 @@ export default function HomePage() {
       <FirstLaunchWalkthrough />
     </div>
     </>
+  );
+}
+
+function HeroMetaPill({
+  icon,
+  children,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-xs)] font-medium text-[var(--ink-secondary)]">
+      <span className="text-[var(--masters)]">{icon}</span>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function HeroMetaStat({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-[1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)] text-center">
+      <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
+      <p className="mt-[2px] font-serif text-[1.2rem] italic text-[var(--ink)]">{value}</p>
+    </div>
+  );
+}
+
+function HomeSectionHeader({
+  eyebrow,
+  title,
+  action,
+}: {
+  eyebrow: React.ReactNode;
+  title: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-[var(--space-4)]">
+      <div className="min-w-0">
+        <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">{eyebrow}</p>
+        <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.45rem,5vw,2rem)] italic leading-[1.08] text-[var(--ink)]">
+          {title}
+        </h2>
+      </div>
+      {action && <div className="shrink-0 pt-[2px]">{action}</div>}
+    </div>
   );
 }
 
