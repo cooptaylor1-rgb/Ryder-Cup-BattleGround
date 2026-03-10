@@ -893,6 +893,15 @@ export default function EnhancedMatchScoringPage() {
   }
 
   const isMatchComplete = matchState.isClosedOut || matchState.holesRemaining === 0;
+  const teamALineup = teamAPlayers
+    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
+    .join(' & ');
+  const teamBLineup = teamBPlayers
+    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
+    .join(' & ');
+  const currentPar = currentTeeSet?.holePars?.[currentHole - 1] || 4;
+  const scoringModeMeta = getScoringModeMeta(scoringMode, isFourball);
+  const matchStatusLabel = isMatchComplete ? 'Final card' : isEditingScores ? 'Captain editing' : 'Live scoring';
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
@@ -1008,59 +1017,46 @@ export default function EnhancedMatchScoringPage() {
           />
         )}
 
-      {/* Header — minimal chrome, editorial restraint */}
-      <header className="sticky top-0 z-30 border-b bg-canvas border-rule">
+      <header className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur">
         <div className="container-editorial py-[var(--space-3)]">
-          <div className="flex items-center justify-between">
-            {/* Back + Title */}
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
               <button
                 onClick={() => router.push('/score')}
-                className="p-2 -ml-2 rounded-xl transition-opacity"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
                 aria-label="Back"
               >
-                <ChevronLeft size={20} className="text-ink-secondary" />
+                <ChevronLeft size={18} />
               </button>
-              <div>
-                <p className="type-overline text-masters">
-                  Match {activeMatch.matchOrder}
-                </p>
-                <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary">
-                  {teamAPlayers
-                    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
-                    .join(' & ')}{' '}
-                  vs{' '}
-                  {teamBPlayers
-                    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
-                    .join(' & ')}
+              <div className="min-w-0">
+                <p className="type-overline text-masters">Match {activeMatch.matchOrder}</p>
+                <p className="truncate font-sans text-[length:var(--text-xs)] text-ink-tertiary">
+                  {teamALineup} vs {teamBLineup}
                 </p>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-1">
-              {/* Voice */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowVoiceModal(true)}
-                className="p-2 rounded-xl transition-opacity"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
                 aria-label="Voice scoring"
               >
-                <Mic size={18} className="text-ink-secondary" />
+                <Mic size={18} />
               </button>
-
-              {/* Undo */}
               <button
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-sans transition-[opacity,background-color] duration-150 ${
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors',
                   undoStack.length > 0
-                    ? 'text-masters bg-[var(--gold-subtle)] opacity-100'
-                    : 'text-ink-tertiary bg-transparent opacity-50'
-                }`}
+                    ? 'bg-[var(--gold-subtle)] text-[var(--masters)]'
+                    : 'bg-transparent text-[var(--ink-tertiary)] opacity-50'
+                )}
                 aria-label={`Undo last action${undoStack.length > 0 ? ` (${undoStack.length} available)` : ''}`}
               >
                 <Undo2 size={14} />
-                <span className="text-[length:var(--text-xs)] font-medium">Undo</span>
+                Undo
               </button>
             </div>
           </div>
@@ -1068,60 +1064,81 @@ export default function EnhancedMatchScoringPage() {
       </header>
 
       <main className="container-editorial">
-        {/* Score Hero — Monumental serif display, editorial whitespace */}
-        <section className="pt-[var(--space-8)] pb-[var(--space-6)] text-center">
-          <div className="flex items-center justify-center gap-8">
-            {/* Team A */}
-            <div className="flex-1 text-right">
-              <p className="type-overline text-[color:var(--team-usa)]">{teamAName}</p>
-              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
-                {matchState.teamAHolesWon} holes
-              </p>
+        <section className="space-y-4 pt-[var(--space-8)]">
+          <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+            <div className="flex items-start justify-between gap-[var(--space-4)]">
+              <div>
+                <p className="type-overline text-[var(--masters)]">
+                  {currentSession ? currentSession.sessionType : 'Match play'}
+                </p>
+                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
+                  Sacred scoring
+                </h1>
+                <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                  {teamALineup} vs {teamBLineup}
+                </p>
+              </div>
+              <ScoringStatusBadge
+                label={matchStatusLabel}
+                tone={isMatchComplete ? 'muted' : 'masters'}
+              />
             </div>
 
-            {/* Score Display — monumental serif number */}
-            <motion.div
-              key={matchState.displayScore}
-              initial={prefersReducedMotion ? false : { scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="text-center"
-            >
-              <p
-                className={cn(
-                  'score-monumental',
-                  matchState.currentScore > 0
-                    ? 'text-[color:var(--team-usa)]'
-                    : matchState.currentScore < 0
-                      ? 'text-[color:var(--team-europe)]'
-                      : 'text-ink-tertiary'
-                )}
-              >
-                {matchState.displayScore}
-              </p>
-              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
-                thru {matchState.holesPlayed}
-              </p>
-              {matchState.isDormie && (
-                <p className="flex items-center justify-center gap-1 font-sans text-[length:var(--text-xs)] text-gold mt-xs">
-                  <AlertCircle size={12} />
-                  Dormie
+            <div className="mt-[var(--space-6)] grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+              <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left">
+                <p className="type-overline text-[color:var(--team-usa)]">{teamAName}</p>
+                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                  {matchState.teamAHolesWon} holes won
                 </p>
-              )}
-            </motion.div>
+              </div>
 
-            {/* Team B */}
-            <div className="flex-1 text-left">
-              <p className="type-overline text-[color:var(--team-europe)]">{teamBName}</p>
-              <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary mt-xs">
-                {matchState.teamBHolesWon} holes
-              </p>
+              <motion.div
+                key={matchState.displayScore}
+                initial={prefersReducedMotion ? false : { scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="text-center"
+              >
+                <p
+                  className={cn(
+                    'score-monumental',
+                    matchState.currentScore > 0
+                      ? 'text-[color:var(--team-usa)]'
+                      : matchState.currentScore < 0
+                        ? 'text-[color:var(--team-europe)]'
+                        : 'text-[var(--ink-tertiary)]'
+                  )}
+                >
+                  {matchState.displayScore}
+                </p>
+                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                  {matchState.holesPlayed > 0
+                    ? `Through ${matchState.holesPlayed}`
+                    : 'Opening tee'}
+                </p>
+                {matchState.isDormie && (
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gold)]">
+                    <AlertCircle size={12} />
+                    Dormie
+                  </p>
+                )}
+              </motion.div>
+
+              <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left sm:text-right">
+                <p className="type-overline text-[color:var(--team-europe)]">{teamBName}</p>
+                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                  {matchState.teamBHolesWon} holes won
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
+              <ScoringFactCard eyebrow="Current hole" value={`Hole ${currentHole}`} note={`Par ${currentPar}`} />
+              <ScoringFactCard eyebrow="Remaining" value={matchState.holesRemaining} note="Still in play" />
+              <ScoringFactCard eyebrow="Mode" value={scoringModeMeta.label} note={scoringModeMeta.note} />
             </div>
           </div>
-        </section>
 
-        {/* Hole Mini-Map */}
-        <section className="mb-4">
           <HoleMiniMap
             currentHole={currentHole}
             holeResults={matchState.holeResults}
@@ -1132,333 +1149,427 @@ export default function EnhancedMatchScoringPage() {
             onHoleSelect={goToHole}
             isComplete={isMatchComplete}
           />
+
+          <AnimatePresence>
+            {savingIndicator && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={cn(
+                  'mx-auto flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-[var(--canvas)]',
+                  savingIndicator === 'Saving score...'
+                    ? 'bg-[var(--masters)]'
+                    : savingIndicator === 'Saved offline'
+                      ? 'bg-[var(--warning)]'
+                      : 'bg-[var(--success)]'
+                )}
+                role="status"
+                aria-live="polite"
+              >
+                {savingIndicator === 'Saving score...' ? (
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-[color:var(--canvas)]/30 border-t-[var(--canvas)]" />
+                ) : (
+                  <Check size={14} strokeWidth={3} />
+                )}
+                <span className="text-sm font-medium">{savingIndicator}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
-        {/* Saving Indicator */}
-        <AnimatePresence>
-          {savingIndicator && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={cn(
-                'mb-4 flex items-center justify-center gap-2 py-2 px-4 rounded-full mx-auto w-fit text-[var(--canvas)]',
-                savingIndicator === 'Saving score...'
-                  ? 'bg-masters'
-                  : savingIndicator === 'Saved offline'
-                    ? 'bg-[var(--warning)]'
-                    : 'bg-[var(--success)]'
-              )}
-              role="status"
-              aria-live="polite"
-            >
-              {savingIndicator === 'Saving score...' ? (
-                <span className="w-3 h-3 border-2 border-[color:var(--canvas)]/30 border-t-[var(--canvas)] rounded-full animate-spin" />
-              ) : (
-                <Check size={14} strokeWidth={3} />
-              )}
-              <span className="text-sm font-medium">{savingIndicator}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Scoring Area */}
         {!isMatchComplete || isEditingScores ? (
-          <section className="space-y-4">
-            {/* Captain score correction banner */}
+          <section className="space-y-4 py-[var(--space-6)]">
             {isEditingScores && isMatchComplete && (
-              <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-[var(--gold-subtle)] border border-[var(--gold)]">
+              <div className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--gold)] bg-[var(--gold-subtle)] px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Shield size={16} className="text-[var(--gold)] shrink-0" />
+                  <Shield size={16} className="shrink-0 text-[var(--gold)]" />
                   <p className="text-sm font-medium text-[var(--ink)]">
-                    Captain: Editing completed match
+                    Captain is correcting a completed card.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsEditingScores(false)}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[var(--canvas)] border border-[var(--rule)]"
+                  className="rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink)]"
                 >
                   Done
                 </button>
               </div>
             )}
-            {/* Hole Navigation Header — immersive, focused */}
-            <div className="flex items-center justify-between px-[var(--space-2)]">
-              <button
-                onClick={prevHole}
-                disabled={currentHole <= 1}
-                className={`p-3 rounded-xl transition-opacity ${currentHole <= 1 ? 'opacity-30' : 'opacity-100'}`}
-              >
-                <ChevronLeft size={24} className="text-ink-secondary" />
-              </button>
 
-              <div className="text-center">
-                <p className="font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.01em] text-ink">
-                  Hole {currentHole}
-                </p>
-                {currentHoleResult && currentHoleResult.winner !== 'none' && (
-                  <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary mt-xxs">
-                    {currentHoleResult.winner === 'halved'
-                      ? 'Halved'
-                      : currentHoleResult.winner === 'teamA'
-                        ? `${teamAName} won`
-                        : `${teamBName} won`}
-                  </p>
-                )}
+            <div className="card-editorial overflow-hidden">
+              <div className="border-b border-[color:var(--rule)] px-4 py-4 sm:px-5">
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    onClick={prevHole}
+                    disabled={currentHole <= 1}
+                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <div className="text-center">
+                    <p className="type-overline text-[var(--masters)]">Current hole</p>
+                    <p className="mt-1 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+                      Hole {currentHole}
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                      {currentHoleResult && currentHoleResult.winner !== 'none'
+                        ? currentHoleResult.winner === 'halved'
+                          ? 'Hole halved'
+                          : currentHoleResult.winner === 'teamA'
+                            ? `${teamAName} won`
+                            : `${teamBName} won`
+                        : `Par ${currentPar}`}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={nextHole}
+                    disabled={currentHole >= 18}
+                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <ScoringStatusBadge label={scoringModeMeta.label} tone="subtle" />
+                  <ScoringStatusBadge label={`Par ${currentPar}`} tone="muted" />
+                  {scoringPreferences.quickScoreMode && (
+                    <ScoringStatusBadge label="Quick score armed" tone="subtle" />
+                  )}
+                </div>
               </div>
 
-              <button
-                onClick={nextHole}
-                disabled={currentHole >= 18}
-                className={`p-3 rounded-xl transition-opacity ${currentHole >= 18 ? 'opacity-30' : 'opacity-100'}`}
-              >
-                <ChevronRight size={24} className="text-ink-secondary" />
-              </button>
+              <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">
+                <AnimatePresence initial={false}>
+                  {showScoringModeTip && (
+                    <motion.div
+                      initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="rounded-[22px] border border-[color:rgba(0,102,68,0.15)] bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.78)_100%)] px-4 py-3"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Sparkles size={16} className="mt-0.5 shrink-0 text-[var(--masters)]" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-[var(--ink)]">
+                            Pick the mode that fits the moment.
+                          </p>
+                          <p className="mt-1 text-xs text-[var(--ink-secondary)]">
+                            Swipe when pace matters, use strokes when the hole needs detail,
+                            and lean on one-hand mode for pure on-course convenience.
+                          </p>
+                        </div>
+                        <button
+                          onClick={dismissScoringModeTip}
+                          className="rounded-full bg-[var(--masters)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--canvas)]"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="space-y-3">
+                  <div className="flex items-end justify-between gap-3">
+                    <div>
+                      <p className="type-overline text-[var(--ink-secondary)]">Scoring mode</p>
+                      <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                        {scoringModeMeta.description}
+                      </p>
+                    </div>
+                    <p className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)] sm:block">
+                      {scoringModeMeta.note}
+                    </p>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <div className="inline-flex min-w-full gap-2 rounded-[22px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-2 py-2">
+                      <ScoringModeChip
+                        label="Swipe"
+                        active={scoringMode === 'swipe'}
+                        onClick={() => handleScoringModeChange('swipe')}
+                      />
+                      <ScoringModeChip
+                        label="Buttons"
+                        active={scoringMode === 'buttons'}
+                        onClick={() => handleScoringModeChange('buttons')}
+                      />
+                      <ScoringModeChip
+                        label="Strokes"
+                        active={scoringMode === 'strokes'}
+                        onClick={() => handleScoringModeChange('strokes')}
+                      />
+                      {isFourball && (
+                        <ScoringModeChip
+                          label="Best Ball"
+                          active={scoringMode === 'fourball'}
+                          onClick={() => handleScoringModeChange('fourball')}
+                        />
+                      )}
+                      <ScoringModeChip
+                        label="One-Hand"
+                        active={scoringMode === 'oneHanded'}
+                        onClick={() => handleScoringModeChange('oneHanded')}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {scoringPreferences.quickScoreMode && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <QuickScoreTile
+                      teamName={teamAName}
+                      teamColor={teamAColor}
+                      pending={quickScorePending?.team === 'teamA'}
+                      onClick={() => handleQuickScoreTap('teamA')}
+                    />
+                    <QuickScoreTile
+                      teamName={teamBName}
+                      teamColor={teamBColor}
+                      pending={quickScorePending?.team === 'teamB'}
+                      onClick={() => handleQuickScoreTap('teamB')}
+                    />
+                    {quickScorePending && (
+                      <p className="col-span-2 text-center text-xs text-[var(--ink-tertiary)]">
+                        Quick score armed for{' '}
+                        {quickScorePending.team === 'teamA' ? teamAName : teamBName}.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
+                  <button
+                    onClick={() => setShowHandicapDetails(!showHandicapDetails)}
+                    className="w-full"
+                  >
+                    <HandicapStrokeIndicator
+                      currentHole={currentHole}
+                      teamAStrokes={activeMatch.teamAHandicapAllowance}
+                      teamBStrokes={activeMatch.teamBHandicapAllowance}
+                      holeHandicaps={holeHandicaps}
+                      teamAName={teamAName}
+                      teamBName={teamBName}
+                      showAllHoles={showHandicapDetails}
+                    />
+                  </button>
+                )}
+
+                <AnimatePresence mode="wait">
+                  {scoringMode === 'swipe' ? (
+                    <motion.div
+                      key="swipe"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <SwipeScorePanel
+                        holeNumber={currentHole}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        teamAColor={teamAColor}
+                        teamBColor={teamBColor}
+                        currentScore={matchState.currentScore}
+                        existingResult={currentHoleResult?.winner}
+                        onScore={handleScore}
+                        disabled={isSaving}
+                      />
+                    </motion.div>
+                  ) : scoringMode === 'strokes' ? (
+                    <motion.div
+                      key="strokes"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <StrokeScoreEntry
+                        holeNumber={currentHole}
+                        par={currentPar}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        teamAColor={teamAColor}
+                        teamBColor={teamBColor}
+                        teamAHandicapStrokes={activeMatch.teamAHandicapAllowance}
+                        teamBHandicapStrokes={activeMatch.teamBHandicapAllowance}
+                        holeHandicaps={holeHandicaps}
+                        initialTeamAScore={currentHoleResult?.teamAScore || null}
+                        initialTeamBScore={currentHoleResult?.teamBScore || null}
+                        onSubmit={handleScoreWithStrokes}
+                        isSubmitting={isSaving}
+                      />
+                      {currentHoleResult &&
+                        (currentHoleResult.teamAScore || currentHoleResult.teamBScore) && (
+                          <div className="mt-4 rounded-[20px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-4 py-3">
+                            <p className="text-center text-xs text-[var(--ink-tertiary)]">
+                              Previous score: {teamAName} {currentHoleResult.teamAScore} -{' '}
+                              {currentHoleResult.teamBScore} {teamBName}
+                            </p>
+                          </div>
+                        )}
+                    </motion.div>
+                  ) : scoringMode === 'fourball' ? (
+                    <motion.div
+                      key="fourball"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <FourballScoreEntry
+                        holeNumber={currentHole}
+                        par={currentPar}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        teamAColor={teamAColor}
+                        teamBColor={teamBColor}
+                        teamAPlayers={teamAPlayers.map((p) => ({
+                          id: p!.id,
+                          name: formatPlayerName(p!.firstName, p!.lastName),
+                          courseHandicap: p!.handicapIndex || 0,
+                        }))}
+                        teamBPlayers={teamBPlayers.map((p) => ({
+                          id: p!.id,
+                          name: formatPlayerName(p!.firstName, p!.lastName),
+                          courseHandicap: p!.handicapIndex || 0,
+                        }))}
+                        holeHandicaps={holeHandicaps}
+                        initialTeamAScores={currentHoleResult?.teamAPlayerScores}
+                        initialTeamBScores={currentHoleResult?.teamBPlayerScores}
+                        onSubmit={handleFourballScore}
+                        isSubmitting={isSaving}
+                      />
+                    </motion.div>
+                  ) : scoringMode === 'oneHanded' ? (
+                    <motion.div
+                      key="oneHanded"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <OneHandedScoringPanel
+                        holeNumber={currentHole}
+                        teamAName={teamAName}
+                        teamBName={teamBName}
+                        teamAColor={teamAColor}
+                        teamBColor={teamBColor}
+                        existingResult={currentHoleResult?.winner}
+                        onScore={handleScore}
+                        onPrevHole={prevHole}
+                        onNextHole={nextHole}
+                        onUndo={handleUndo}
+                        canUndo={undoStack.length > 0}
+                        disabled={isSaving}
+                        preferredHand={scoringPreferences.preferredHand}
+                        currentScore={matchState.currentScore}
+                        holesPlayed={matchState.holesPlayed}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="buttons"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="grid grid-cols-3 gap-3"
+                    >
+                      <button
+                        onClick={() => handleScore('teamA')}
+                        disabled={isSaving}
+                        className={cn(
+                          'rounded-[24px] border px-4 py-5 text-left font-sans transition-transform active:scale-[0.98]',
+                          currentHoleResult?.winner === 'teamA'
+                            ? 'border-[color:var(--gold)]'
+                            : 'border-transparent'
+                        )}
+                        style={{
+                          background: 'linear-gradient(180deg, var(--team-usa) 0%, rgba(20,92,163,0.9) 100%)',
+                          color: 'var(--canvas)',
+                          opacity: isSaving ? 0.5 : 1,
+                        }}
+                        aria-pressed={currentHoleResult?.winner === 'teamA'}
+                        aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
+                      >
+                        <span className="block text-[length:var(--text-lg)] font-semibold">{teamAName}</span>
+                        <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleScore('halved')}
+                        disabled={isSaving}
+                        className={cn(
+                          'rounded-[24px] border px-4 py-5 font-sans transition-transform active:scale-[0.98]',
+                          currentHoleResult?.winner === 'halved'
+                            ? 'border-[color:var(--gold)]'
+                            : 'border-[color:var(--rule)]'
+                        )}
+                        style={{
+                          background: 'var(--canvas-raised)',
+                          opacity: isSaving ? 0.5 : 1,
+                        }}
+                        aria-pressed={currentHoleResult?.winner === 'halved'}
+                        aria-label={`Score hole: Halved${currentHoleResult?.winner === 'halved' ? ' (selected)' : ''}`}
+                      >
+                        <span className="block text-[length:var(--text-lg)] font-semibold text-[var(--ink)]">
+                          Halve
+                        </span>
+                        <span className="mt-1 block text-[length:var(--text-xs)] text-[var(--ink-tertiary)]">
+                          tie hole
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => handleScore('teamB')}
+                        disabled={isSaving}
+                        className={cn(
+                          'rounded-[24px] border px-4 py-5 text-right font-sans transition-transform active:scale-[0.98]',
+                          currentHoleResult?.winner === 'teamB'
+                            ? 'border-[color:var(--gold)]'
+                            : 'border-transparent'
+                        )}
+                        style={{
+                          background: 'linear-gradient(180deg, var(--team-europe) 0%, rgba(132,41,61,0.92) 100%)',
+                          color: 'var(--canvas)',
+                          opacity: isSaving ? 0.5 : 1,
+                        }}
+                        aria-pressed={currentHoleResult?.winner === 'teamB'}
+                        aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
+                      >
+                        <span className="block text-[length:var(--text-lg)] font-semibold">{teamBName}</span>
+                        <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {scoringPreferences.quickScoreMode && (
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => handleQuickScoreTap('teamA')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[color:var(--team-usa-glow)] border-[color:var(--team-usa)] text-[color:var(--team-usa)]"
-                  aria-label={`Quick score ${teamAName}`}
-                >
-                  <p className="text-sm font-semibold uppercase tracking-wide">{teamAName}</p>
-                  <p className="text-xs mt-2 text-ink-tertiary">
-                    {quickScorePending?.team === 'teamA' ? 'Tap again to confirm' : 'Tap to score'}
-                  </p>
-                </button>
-                <button
-                  onClick={() => handleQuickScoreTap('teamB')}
-                  className="rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors bg-[color:var(--team-europe-glow)] border-[color:var(--team-europe)] text-[color:var(--team-europe)]"
-                  aria-label={`Quick score ${teamBName}`}
-                >
-                  <p className="text-sm font-semibold uppercase tracking-wide">{teamBName}</p>
-                  <p className="text-xs mt-2 text-ink-tertiary">
-                    {quickScorePending?.team === 'teamB' ? 'Tap again to confirm' : 'Tap to score'}
-                  </p>
-                </button>
-                {quickScorePending && (
-                  <p className="col-span-2 text-center text-xs text-ink-tertiary">
-                    Quick Score armed for{' '}
-                    {quickScorePending.team === 'teamA' ? teamAName : teamBName}.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Handicap Strokes */}
-            {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
-              <button
-                onClick={() => setShowHandicapDetails(!showHandicapDetails)}
-                className="w-full"
-              >
-                <HandicapStrokeIndicator
-                  currentHole={currentHole}
-                  teamAStrokes={activeMatch.teamAHandicapAllowance}
-                  teamBStrokes={activeMatch.teamBHandicapAllowance}
-                  holeHandicaps={holeHandicaps}
-                  teamAName={teamAName}
-                  teamBName={teamBName}
-                  showAllHoles={showHandicapDetails}
-                />
-              </button>
-            )}
-
-            {/* Swipe Score Panel */}
-            <AnimatePresence mode="wait">
-              {scoringMode === 'swipe' ? (
-                <motion.div
-                  key="swipe"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <SwipeScorePanel
-                    holeNumber={currentHole}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    teamAColor={teamAColor}
-                    teamBColor={teamBColor}
-                    currentScore={matchState.currentScore}
-                    existingResult={currentHoleResult?.winner}
-                    onScore={handleScore}
-                    disabled={isSaving}
-                  />
-                </motion.div>
-              ) : scoringMode === 'strokes' ? (
-                <motion.div
-                  key="strokes"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <StrokeScoreEntry
-                    holeNumber={currentHole}
-                    par={currentTeeSet?.holePars?.[currentHole - 1] || 4}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    teamAColor={teamAColor}
-                    teamBColor={teamBColor}
-                    teamAHandicapStrokes={activeMatch.teamAHandicapAllowance}
-                    teamBHandicapStrokes={activeMatch.teamBHandicapAllowance}
-                    holeHandicaps={holeHandicaps}
-                    initialTeamAScore={currentHoleResult?.teamAScore || null}
-                    initialTeamBScore={currentHoleResult?.teamBScore || null}
-                    onSubmit={handleScoreWithStrokes}
-                    isSubmitting={isSaving}
-                  />
-                  {/* Show current hole gross/net if already scored */}
-                  {currentHoleResult &&
-                    (currentHoleResult.teamAScore || currentHoleResult.teamBScore) && (
-                      <div className="mt-4 p-3 rounded-xl bg-canvas-sunken">
-                        <p className="text-xs text-center text-ink-tertiary">
-                          Previous score: {teamAName} {currentHoleResult.teamAScore} -{' '}
-                          {currentHoleResult.teamBScore} {teamBName}
-                        </p>
-                      </div>
-                    )}
-                </motion.div>
-              ) : scoringMode === 'fourball' ? (
-                <motion.div
-                  key="fourball"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <FourballScoreEntry
-                    holeNumber={currentHole}
-                    par={currentTeeSet?.holePars?.[currentHole - 1] || 4}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    teamAColor={teamAColor}
-                    teamBColor={teamBColor}
-                    teamAPlayers={teamAPlayers.map((p) => ({
-                      id: p!.id,
-                      name: formatPlayerName(p!.firstName, p!.lastName),
-                      courseHandicap: p!.handicapIndex || 0,
-                    }))}
-                    teamBPlayers={teamBPlayers.map((p) => ({
-                      id: p!.id,
-                      name: formatPlayerName(p!.firstName, p!.lastName),
-                      courseHandicap: p!.handicapIndex || 0,
-                    }))}
-                    holeHandicaps={holeHandicaps}
-                    initialTeamAScores={currentHoleResult?.teamAPlayerScores}
-                    initialTeamBScores={currentHoleResult?.teamBPlayerScores}
-                    onSubmit={handleFourballScore}
-                    isSubmitting={isSaving}
-                  />
-                </motion.div>
-              ) : scoringMode === 'oneHanded' ? (
-                <motion.div
-                  key="oneHanded"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="min-h-[50vh]"
-                >
-                  <OneHandedScoringPanel
-                    holeNumber={currentHole}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    teamAColor={teamAColor}
-                    teamBColor={teamBColor}
-                    existingResult={currentHoleResult?.winner}
-                    onScore={handleScore}
-                    onPrevHole={prevHole}
-                    onNextHole={nextHole}
-                    onUndo={handleUndo}
-                    canUndo={undoStack.length > 0}
-                    disabled={isSaving}
-                    preferredHand={scoringPreferences.preferredHand}
-                    currentScore={matchState.currentScore}
-                    holesPlayed={matchState.holesPlayed}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="buttons"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="space-y-3"
-                >
-                  {/* Traditional Buttons — clean, no scale transforms or glow */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <button
-                      onClick={() => handleScore('teamA')}
-                      disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-[var(--canvas)] font-sans font-semibold border-[3px] transition bg-[color:var(--team-usa)] ${
-                        isSaving ? 'opacity-50' : 'opacity-100'
-                      } ${
-                        currentHoleResult?.winner === 'teamA' ? 'border-gold' : 'border-transparent'
-                      }`}
-                      aria-pressed={currentHoleResult?.winner === 'teamA'}
-                      aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
-                    >
-                      <span className="block text-[length:var(--text-lg)]">{teamAName}</span>
-                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-80">wins hole</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleScore('halved')}
-                      disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl font-sans font-semibold bg-canvas-raised border-[3px] transition ${
-                        isSaving ? 'opacity-50' : 'opacity-100'
-                      } ${
-                        currentHoleResult?.winner === 'halved' ? 'border-gold' : 'border-rule'
-                      }`}
-                      aria-pressed={currentHoleResult?.winner === 'halved'}
-                      aria-label={`Score hole: Halved${currentHoleResult?.winner === 'halved' ? ' (selected)' : ''}`}
-                    >
-                      <span className="block text-[length:var(--text-lg)]">Halve</span>
-                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-60">tie hole</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleScore('teamB')}
-                      disabled={isSaving}
-                      className={`py-4 px-4 rounded-xl text-[var(--canvas)] font-sans font-semibold border-[3px] transition bg-[color:var(--team-europe)] ${
-                        isSaving ? 'opacity-50' : 'opacity-100'
-                      } ${
-                        currentHoleResult?.winner === 'teamB' ? 'border-gold' : 'border-transparent'
-                      }`}
-                      aria-pressed={currentHoleResult?.winner === 'teamB'}
-                      aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
-                    >
-                      <span className="block text-[length:var(--text-lg)]">{teamBName}</span>
-                      <span className="block mt-0.5 text-[length:var(--text-xs)] opacity-80">wins hole</span>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Advanced Tools (Presses, Side Bets) */}
-            <div className="rounded-2xl border border-rule">
+            <div className="card-editorial overflow-hidden">
               <button
                 onClick={() => setShowAdvancedTools((prev) => !prev)}
-                className="w-full flex items-center justify-between px-4 py-3"
+                className="flex w-full items-center justify-between px-4 py-4 sm:px-5"
                 aria-expanded={showAdvancedTools}
                 aria-controls="advanced-scoring-tools"
               >
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-ink">
-                    Advanced tools
-                  </p>
-                  <p className="text-xs text-ink-tertiary">
-                    Press tracker and side bets
+                  <p className="type-overline text-[var(--ink-secondary)]">Advanced tools</p>
+                  <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                    Press tracking and side bets live here.
                   </p>
                 </div>
                 <ChevronRight
                   size={18}
-                  className={`transition-transform text-ink-tertiary ${showAdvancedTools ? 'rotate-90' : ''}`}
+                  className={cn(
+                    'text-[var(--ink-tertiary)] transition-transform',
+                    showAdvancedTools && 'rotate-90'
+                  )}
                 />
               </button>
 
               {showAdvancedTools && (
-                <div id="advanced-scoring-tools" className="px-4 pb-4 space-y-4">
+                <div id="advanced-scoring-tools" className="space-y-4 border-t border-[color:var(--rule)] px-4 py-4 sm:px-5">
                   <PressTracker
                     currentHole={currentHole}
                     mainMatchScore={matchState.currentScore}
@@ -1478,101 +1589,6 @@ export default function EnhancedMatchScoringPage() {
                   />
                 </div>
               )}
-            </div>
-
-            {/* Scoring Mode Toggle — editorial pill selector */}
-            <div className="flex justify-center pt-2 relative font-sans">
-              {/* First-time onboarding tooltip */}
-              <AnimatePresence>
-                {showScoringModeTip && (
-                  <motion.div
-                    initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 p-3 rounded-xl z-50 bg-canvas-raised border border-rule shadow-card"
-                  >
-                    <div className="flex items-start gap-2">
-                      <Sparkles
-                        size={16}
-                        className="shrink-0 mt-0.5 text-masters"
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-ink">
-                          Multiple scoring modes!
-                        </p>
-                        <p className="text-xs mt-1 text-ink-secondary">
-                          Try <strong>Swipe</strong> for fast scoring, <strong>Strokes</strong> for
-                          detailed entry, or <strong>One-Hand</strong> while holding a beer.
-                        </p>
-                        <button
-                          onClick={dismissScoringModeTip}
-                          className="mt-2 text-xs font-medium px-2 py-1 rounded bg-masters text-[var(--canvas)]"
-                        >
-                          Got it!
-                        </button>
-                      </div>
-                    </div>
-                    {/* Arrow pointing down */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 rotate-45 bg-[var(--surface-raised)] border-r border-b border-[var(--rule)]" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-canvas-sunken">
-                <button
-                  onClick={() => handleScoringModeChange('swipe')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    scoringMode === 'swipe'
-                      ? 'bg-canvas text-ink shadow-card-sm'
-                      : 'bg-transparent text-ink-tertiary shadow-none'
-                  }`}
-                >
-                  Swipe
-                </button>
-                <button
-                  onClick={() => handleScoringModeChange('buttons')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    scoringMode === 'buttons'
-                      ? 'bg-canvas text-ink shadow-card-sm'
-                      : 'bg-transparent text-ink-tertiary shadow-none'
-                  }`}
-                >
-                  Buttons
-                </button>
-                <button
-                  onClick={() => handleScoringModeChange('strokes')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    scoringMode === 'strokes'
-                      ? 'bg-canvas text-ink shadow-card-sm'
-                      : 'bg-transparent text-ink-tertiary shadow-none'
-                  }`}
-                >
-                  Strokes
-                </button>
-                {isFourball && (
-                  <button
-                    onClick={() => handleScoringModeChange('fourball')}
-                    className={`px-3 py-1 rounded-full transition-all ${
-                      scoringMode === 'fourball'
-                        ? 'bg-masters text-[var(--canvas)] shadow-card-sm'
-                        : 'bg-transparent text-ink-tertiary shadow-none'
-                    }`}
-                  >
-                    Best Ball
-                  </button>
-                )}
-                <button
-                  onClick={() => handleScoringModeChange('oneHanded')}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    scoringMode === 'oneHanded'
-                      ? 'bg-masters text-[var(--canvas)] shadow-card-sm'
-                      : 'bg-transparent text-ink-tertiary shadow-none'
-                  }`}
-                >
-                  ✋ One-Hand
-                </button>
-              </div>
             </div>
           </section>
         ) : (
@@ -1837,5 +1853,142 @@ export default function EnhancedMatchScoringPage() {
       {ConfirmDialogComponent}
 
     </div>
+  );
+}
+
+function getScoringModeMeta(
+  scoringMode: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded',
+  isFourball: boolean
+) {
+  switch (scoringMode) {
+    case 'swipe':
+      return {
+        label: 'Swipe',
+        note: 'Fastest entry',
+        description: 'Big gestures for when the group is moving and you need speed.',
+      };
+    case 'strokes':
+      return {
+        label: 'Strokes',
+        note: 'Gross and net',
+        description: 'Capture exact gross scores and let the card sort out the hole.',
+      };
+    case 'fourball':
+      return {
+        label: isFourball ? 'Best Ball' : 'Fourball',
+        note: 'Player-by-player',
+        description: 'Track every player score when the format demands more detail.',
+      };
+    case 'oneHanded':
+      return {
+        label: 'One-Hand',
+        note: 'Thumb zone',
+        description: 'Large targets and thumb-first controls for true on-course use.',
+      };
+    default:
+      return {
+        label: 'Buttons',
+        note: 'Direct taps',
+        description: 'Simple taps and clear winner states without gesture learning.',
+      };
+  }
+}
+
+function ScoringFactCard({
+  eyebrow,
+  value,
+  note,
+}: {
+  eyebrow: string;
+  value: number | string;
+  note: string;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        {eyebrow}
+      </p>
+      <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+      <p className="mt-1 text-[11px] text-[var(--ink-secondary)]">{note}</p>
+    </div>
+  );
+}
+
+function ScoringStatusBadge({
+  label,
+  tone = 'subtle',
+}: {
+  label: string;
+  tone?: 'masters' | 'muted' | 'subtle';
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]',
+        tone === 'masters'
+          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+          : tone === 'muted'
+            ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+            : 'bg-[color:rgba(201,162,39,0.14)] text-[var(--gold)]'
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+function ScoringModeChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+        active
+          ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
+          : 'bg-transparent text-[var(--ink-tertiary)]'
+      )}
+    >
+      {label}
+    </button>
+  );
+}
+
+function QuickScoreTile({
+  teamName,
+  teamColor,
+  pending = false,
+  onClick,
+}: {
+  teamName: string;
+  teamColor: string;
+  pending?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-[24px] border border-dashed px-4 py-5 text-left transition-transform active:scale-[0.98]"
+      style={{
+        borderColor: teamColor,
+        background: `${teamColor}12`,
+        color: teamColor,
+      }}
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.14em]">{teamName}</p>
+      <p className="mt-2 text-sm font-semibold">{pending ? 'Tap again to confirm' : 'Quick score winner'}</p>
+      <p className="mt-1 text-xs text-[var(--ink-secondary)]">
+        {pending ? 'Armed for immediate scoring.' : 'Two taps keeps accidental entries out.'}
+      </p>
+    </button>
   );
 }

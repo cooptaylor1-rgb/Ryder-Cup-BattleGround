@@ -20,17 +20,6 @@ import {
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import { Button } from '@/components/ui/Button';
 
-/**
- * SCORE PAGE — Match List
- *
- * Fried Egg Golf Editorial Design:
- * - Cream canvas (#FAF8F5), warm ink (#1A1815)
- * - var(--font-serif) for display scores, var(--font-sans) for UI
- * - card-editorial for match cards, container-editorial for width
- * - Generous whitespace, restrained animations, no glow effects
- * - Active match uses score-monumental class for prominence
- */
-
 const logger = createLogger('score');
 
 export default function ScorePage() {
@@ -130,6 +119,31 @@ export default function ScorePage() {
         return inProgressMatches[0]?.match.id;
     }, [matchStates]);
 
+    const sessionStats = useMemo(() => {
+        let live = 0;
+        let completed = 0;
+        let userMatches = 0;
+
+        for (const matchState of matchStates) {
+            if (matchState.status === 'inProgress') live += 1;
+            if (matchState.status === 'completed') completed += 1;
+
+            if (
+                currentUserPlayer &&
+                (matchState.match.teamAPlayerIds.includes(currentUserPlayer.id) ||
+                    matchState.match.teamBPlayerIds.includes(currentUserPlayer.id))
+            ) {
+                userMatches += 1;
+            }
+        }
+
+        return {
+            live,
+            completed,
+            userMatches,
+        };
+    }, [currentUserPlayer, matchStates]);
+
     const getMatchPlayers = (playerIds: string[]) => {
         return playerIds
             .map(id => players.find(p => p.id === id))
@@ -212,44 +226,65 @@ export default function ScorePage() {
             />
 
             <main className="container-editorial">
-                {/* Session Header */}
                 {activeSession && (
-                    <section className="pt-[var(--space-8)] pb-[var(--space-6)]">
-                        <p className="type-overline mb-[var(--space-3)] text-[var(--masters)]">
-                            Session {activeSession.sessionNumber}
-                        </p>
-                        <h1 className="type-display capitalize">{activeSession.sessionType}</h1>
-                        <p className="type-caption mt-[var(--space-2)] text-[var(--ink-secondary)]">
-                            {activeSession.status === 'inProgress'
-                                ? 'In Progress'
-                                : activeSession.status === 'completed'
-                                  ? 'Complete'
-                                  : 'Scheduled'}
-                        </p>
-                    </section>
-                )}
-
-                <hr className="divider" />
-
-                {quickContinueMatchId && (
-                    <section className="pt-[var(--space-6)]">
-                        <button
-                            onClick={() => handleMatchSelect(quickContinueMatchId)}
-                            className="card-editorial card-interactive flex w-full items-center justify-between gap-[var(--space-4)] p-[var(--space-5)] text-left"
-                            aria-label="Continue scoring active match"
-                        >
-                            <div>
-                                <p className="type-overline text-[var(--masters)]">Quick Action</p>
-                                <p className="type-title-sm mt-[var(--space-1)] text-[var(--ink)]">Continue Scoring</p>
+                    <section className="pt-[var(--space-8)]">
+                        <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
+                            <div className="flex items-start justify-between gap-[var(--space-4)]">
+                                <div>
+                                    <p className="type-overline text-[var(--masters)]">Scoring Room</p>
+                                    <h1 className="type-display mt-[var(--space-2)] capitalize">
+                                        {activeSession.sessionType}
+                                    </h1>
+                                    <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                                        Session {activeSession.sessionNumber} for {currentTrip.name}
+                                    </p>
+                                </div>
+                                <SessionStatusPill status={activeSession.status} />
                             </div>
-                            <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
-                        </button>
+
+                            <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
+                                <ScoreSessionStat label="Live" value={sessionStats.live} />
+                                <ScoreSessionStat label="Complete" value={sessionStats.completed} />
+                                <ScoreSessionStat
+                                    label="Your Matches"
+                                    value={sessionStats.userMatches}
+                                />
+                            </div>
+
+                            {quickContinueMatchId && (
+                                <button
+                                    onClick={() => handleMatchSelect(quickContinueMatchId)}
+                                    className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.15)] bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.72)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left transition-transform active:scale-[0.99]"
+                                    aria-label="Continue scoring active match"
+                                >
+                                    <div>
+                                        <p className="type-overline text-[var(--masters)]">Quick Action</p>
+                                        <p className="type-title-sm mt-[var(--space-1)] text-[var(--ink)]">
+                                            Continue live match
+                                        </p>
+                                        <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                                            Jump straight back into the only match currently underway.
+                                        </p>
+                                    </div>
+                                    <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
+                                </button>
+                            )}
+                        </div>
                     </section>
                 )}
 
-                {/* Matches - BUG-011 FIX: Wrap with ErrorBoundary for graceful error handling */}
-                <section className="pt-[var(--space-6)] pb-[var(--space-8)]">
-                    <h2 className="type-overline mb-[var(--space-6)] text-[var(--ink-secondary)]">Matches</h2>
+                <section className="pb-[var(--space-8)] pt-[var(--space-6)]">
+                    <div className="mb-[var(--space-5)] flex items-end justify-between gap-4">
+                        <div>
+                            <p className="type-overline text-[var(--ink-secondary)]">Matches</p>
+                            <h2 className="mt-2 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+                                Choose a card and start walking.
+                            </h2>
+                        </div>
+                        <p className="hidden text-sm text-[var(--ink-tertiary)] sm:block">
+                            {matchStates.length} match{matchStates.length === 1 ? '' : 'es'}
+                        </p>
+                    </div>
 
                     <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
                         {isLoading ? (
@@ -290,13 +325,17 @@ export default function ScorePage() {
                     </ErrorBoundary>
                 </section>
 
-                {/* Session Selector */}
                 {sessions.length > 1 && (
                     <>
-                        <hr className="divider" />
                         <section className="pt-[var(--space-6)] pb-[var(--space-6)]">
-                            <h2 className="type-overline mb-[var(--space-4)] text-[var(--ink-secondary)]">Sessions</h2>
-                            <div className="flex gap-3 overflow-x-auto pb-2 -mx-[var(--space-5)] px-[var(--space-5)]">
+                            <div className="card-editorial p-[var(--space-4)]">
+                                <div className="mb-[var(--space-4)]">
+                                    <p className="type-overline text-[var(--ink-secondary)]">Sessions</p>
+                                    <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                                        Move between scheduled blocks without losing the scoring thread.
+                                    </p>
+                                </div>
+                                <div className="flex gap-3 overflow-x-auto pb-1">
                                 {sessions.map(session => (
                                     <Button
                                         key={session.id}
@@ -308,13 +347,12 @@ export default function ScorePage() {
                                         Session {session.sessionNumber}
                                     </Button>
                                 ))}
+                                </div>
                             </div>
                         </section>
                     </>
                 )}
             </main>
-
-            {/* Bottom Navigation */}
         </div>
     );
 }
@@ -348,37 +386,41 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
             onClick={onClick}
             aria-label={`Open Match ${matchNumber}${isUserMatch ? " (Your Match)" : ""}` }
             className={cn(
-                'card-editorial card-interactive relative w-full text-left transition-shadow',
+                'card-editorial card-interactive relative w-full overflow-hidden text-left transition-shadow',
                 isActive ? 'p-[var(--space-6)]' : 'p-[var(--space-5)]',
                 isUserMatch && 'border-2 border-[var(--masters)]'
             )}
         >
-            {/* Your Match Badge (P0-3) */}
             {isUserMatch && (
                 <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--masters)] px-3 py-[3px] text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-[var(--canvas)]">
                     Your Match
                 </div>
             )}
 
-            {/* Card header: match number + status */}
             <div className="mb-[var(--space-4)] flex items-center justify-between">
-                <span
-                    className={cn(
-                        'type-overline',
-                        isUserMatch ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
-                    )}
-                >
-                    Match {matchNumber}
-                </span>
-                {status === 'inProgress' && <span className="type-overline text-[var(--masters)]">Live</span>}
-                {status === 'completed' && <span className="type-overline text-[var(--ink-tertiary)]">Final</span>}
+                <div>
+                    <span
+                        className={cn(
+                            'type-overline',
+                            isUserMatch ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
+                        )}
+                    >
+                        Match {matchNumber}
+                    </span>
+                    <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                        {status === 'inProgress'
+                            ? 'Currently being scored'
+                            : status === 'completed'
+                              ? 'Card closed'
+                              : 'Waiting to start'}
+                    </p>
+                </div>
+                <SessionStatusPill status={status === 'inProgress' ? 'inProgress' : status === 'completed' ? 'completed' : 'scheduled'} />
             </div>
 
-            {/* Players + Score row */}
             <div className="flex items-center gap-4">
-                {/* Players */}
                 <div className="min-w-0 flex-1">
-                    <div className="mb-[var(--space-2)] flex items-center gap-2">
+                    <div className="mb-[var(--space-3)] flex items-center gap-2">
                         <span className="team-dot team-dot-usa" />
                         <span
                             className={cn(
@@ -413,8 +455,7 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                     </div>
                 </div>
 
-                {/* Score — monumental for active matches, serif for all */}
-                <div className="min-w-[70px] text-right">
+                <div className="min-w-[86px] rounded-[22px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-3 py-3 text-right">
                     <span
                         className={cn(
                             'block font-serif font-normal leading-none tracking-[-0.02em]',
@@ -439,5 +480,36 @@ function MatchRow({ matchState, matchNumber, teamAPlayers, teamBPlayers, onClick
                 <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-[var(--ink-tertiary)]" />
             </div>
         </button>
+    );
+}
+
+function ScoreSessionStat({ label, value }: { label: string; value: number }) {
+    return (
+        <div className="rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+                {label}
+            </p>
+            <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
+        </div>
+    );
+}
+
+function SessionStatusPill({ status }: { status: 'scheduled' | 'inProgress' | 'completed' }) {
+    const label =
+        status === 'inProgress' ? 'Live' : status === 'completed' ? 'Final' : 'Scheduled';
+
+    return (
+        <span
+            className={cn(
+                'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
+                status === 'inProgress'
+                    ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+                    : status === 'completed'
+                      ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+                      : 'bg-[color:rgba(201,162,39,0.15)] text-[var(--gold)]'
+            )}
+        >
+            {label}
+        </span>
     );
 }

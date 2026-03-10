@@ -1,475 +1,364 @@
-/**
- * HoleMiniMap — Phase 1.4: Smart Hole Navigation
- *
- * Visual mini-map showing all 18 holes with scoring status.
- * Enables quick jump to any hole with a single tap.
- *
- * Features:
- * - Compact 18-hole grid view
- * - Color-coded scoring status (won/lost/halved/unscored)
- * - Current hole highlight with pulse animation
- * - Touch-friendly targets (min 44px)
- * - Expandable full scorecard view
- * - Haptic feedback on selection
- */
-
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useCallback, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp, Flag } from 'lucide-react';
-import type { HoleResult } from '@/lib/types/models';
 import { useHaptic } from '@/lib/hooks';
+import { cn } from '@/lib/utils';
+import type { HoleResult } from '@/lib/types/models';
 
 interface HoleMiniMapProps {
-    /** Current active hole (1-18) */
-    currentHole: number;
-    /** All hole results for the match */
-    holeResults: HoleResult[];
-    /** Team A display name */
-    teamAName?: string;
-    /** Team B display name */
-    teamBName?: string;
-    /** Team A color */
-    teamAColor?: string;
-    /** Team B color */
-    teamBColor?: string;
-    /** Callback when hole is selected */
-    onHoleSelect: (holeNumber: number) => void;
-    /** Whether the match is complete */
-    isComplete?: boolean;
-    /** Number of holes (default 18) */
-    totalHoles?: number;
-    /** Optional class name */
-    className?: string;
+  currentHole: number;
+  holeResults: HoleResult[];
+  teamAName?: string;
+  teamBName?: string;
+  teamAColor?: string;
+  teamBColor?: string;
+  onHoleSelect: (holeNumber: number) => void;
+  isComplete?: boolean;
+  totalHoles?: number;
+  className?: string;
 }
 
-// Hole status for display
 type HoleStatus = 'teamA' | 'teamB' | 'halved' | 'unscored' | 'current';
 
+function formatRunningScore(score: number) {
+  if (score === 0) return 'AS';
+  return score > 0 ? `+${score}` : `${score}`;
+}
+
+function holeNumbers(start: number, count: number) {
+  return Array.from({ length: count }, (_, index) => start + index);
+}
+
 export function HoleMiniMap({
-    currentHole,
-    holeResults,
-    teamAName = 'USA',
-    teamBName = 'EUR',
-    teamAColor = '#1E3A5F',
-    teamBColor = '#722F37',
-    onHoleSelect,
-    isComplete = false,
-    totalHoles = 18,
-    className = '',
+  currentHole,
+  holeResults,
+  teamAName = 'USA',
+  teamBName = 'Europe',
+  teamAColor = 'var(--team-usa)',
+  teamBColor = 'var(--team-europe)',
+  onHoleSelect,
+  isComplete = false,
+  totalHoles = 18,
+  className,
 }: HoleMiniMapProps) {
-    const haptic = useHaptic();
-    const [isExpanded, setIsExpanded] = useState(false);
+  const haptic = useHaptic();
+  const [isExpanded, setIsExpanded] = useState(false);
 
-    // Build hole status map
-    const holeStatuses = useMemo(() => {
-        const statuses: Map<number, HoleStatus> = new Map();
+  const resultsByHole = useMemo(() => {
+    const map = new Map<number, HoleResult>();
+    for (const result of holeResults) {
+      map.set(result.holeNumber, result);
+    }
+    return map;
+  }, [holeResults]);
 
-        for (let i = 1; i <= totalHoles; i++) {
-            const result = holeResults.find(r => r.holeNumber === i);
+  const holeStatuses = useMemo(() => {
+    const map = new Map<number, HoleStatus>();
 
-            if (i === currentHole && !isComplete) {
-                statuses.set(i, 'current');
-            } else if (result) {
-                switch (result.winner) {
-                    case 'teamA':
-                        statuses.set(i, 'teamA');
-                        break;
-                    case 'teamB':
-                        statuses.set(i, 'teamB');
-                        break;
-                    case 'halved':
-                        statuses.set(i, 'halved');
-                        break;
-                    default:
-                        statuses.set(i, 'unscored');
-                }
-            } else {
-                statuses.set(i, 'unscored');
-            }
-        }
+    for (const hole of holeNumbers(1, totalHoles)) {
+      const result = resultsByHole.get(hole);
 
-        return statuses;
-    }, [currentHole, holeResults, totalHoles, isComplete]);
+      if (!isComplete && hole === currentHole) {
+        map.set(hole, 'current');
+        continue;
+      }
 
-    // Calculate running score at each hole
-    const runningScores = useMemo(() => {
-        const scores: Map<number, number> = new Map();
-        let score = 0;
+      if (result?.winner === 'teamA') map.set(hole, 'teamA');
+      else if (result?.winner === 'teamB') map.set(hole, 'teamB');
+      else if (result?.winner === 'halved') map.set(hole, 'halved');
+      else map.set(hole, 'unscored');
+    }
 
-        for (let i = 1; i <= totalHoles; i++) {
-            const result = holeResults.find(r => r.holeNumber === i);
-            if (result) {
-                if (result.winner === 'teamA') score++;
-                else if (result.winner === 'teamB') score--;
-            }
-            scores.set(i, score);
-        }
+    return map;
+  }, [currentHole, isComplete, resultsByHole, totalHoles]);
 
-        return scores;
-    }, [holeResults, totalHoles]);
+  const runningScores = useMemo(() => {
+    const map = new Map<number, number>();
+    let runningScore = 0;
 
-    // Handle hole tap
-    const handleHoleTap = useCallback((holeNumber: number) => {
-        haptic.select();
-        onHoleSelect(holeNumber);
-    }, [haptic, onHoleSelect]);
+    for (const hole of holeNumbers(1, totalHoles)) {
+      const result = resultsByHole.get(hole);
+      if (result?.winner === 'teamA') runningScore += 1;
+      if (result?.winner === 'teamB') runningScore -= 1;
+      map.set(hole, runningScore);
+    }
 
-    // Toggle expanded view
-    const toggleExpanded = useCallback(() => {
-        haptic.tap();
-        setIsExpanded((prev: boolean) => !prev);
-    }, [haptic]);
+    return map;
+  }, [resultsByHole, totalHoles]);
 
-    // Get color for hole status
-    const getHoleColor = (status: HoleStatus, isBackground = false) => {
-        const alpha = isBackground ? '20' : '';
-        switch (status) {
-            case 'teamA':
-                return isBackground ? `${teamAColor}${alpha}` : teamAColor;
-            case 'teamB':
-                return isBackground ? `${teamBColor}${alpha}` : teamBColor;
-            case 'halved':
-                return isBackground ? 'rgba(100, 100, 100, 0.2)' : '#666';
-            case 'current':
-                return isBackground ? 'rgba(0, 103, 71, 0.2)' : 'var(--masters)';
-            default:
-                return isBackground ? 'rgba(200, 200, 200, 0.2)' : 'transparent';
-        }
+  const summary = useMemo(() => {
+    let teamAWins = 0;
+    let teamBWins = 0;
+    let halved = 0;
+
+    for (const result of holeResults) {
+      if (result.winner === 'teamA') teamAWins += 1;
+      else if (result.winner === 'teamB') teamBWins += 1;
+      else if (result.winner === 'halved') halved += 1;
+    }
+
+    return {
+      teamAWins,
+      teamBWins,
+      halved,
+      scored: teamAWins + teamBWins + halved,
     };
+  }, [holeResults]);
 
-    // Compact view: 18 holes in a row
-    const CompactView = () => (
-        <div className="flex items-center gap-1">
-            {/* Front 9 */}
-            <div className="flex gap-0.5">
-                {Array.from({ length: 9 }, (_, i) => i + 1).map((hole) => {
-                    const status = holeStatuses.get(hole) || 'unscored';
-                    const isCurrent = hole === currentHole && !isComplete;
+  const getHoleTone = useCallback(
+    (status: HoleStatus) => {
+      switch (status) {
+        case 'teamA':
+          return {
+            background: `${teamAColor}1A`,
+            border: `${teamAColor}33`,
+            text: teamAColor,
+          };
+        case 'teamB':
+          return {
+            background: `${teamBColor}1A`,
+            border: `${teamBColor}33`,
+            text: teamBColor,
+          };
+        case 'halved':
+          return {
+            background: 'rgba(86, 79, 68, 0.11)',
+            border: 'rgba(86, 79, 68, 0.18)',
+            text: 'var(--ink-secondary)',
+          };
+        case 'current':
+          return {
+            background: 'rgba(0, 102, 68, 0.10)',
+            border: 'rgba(0, 102, 68, 0.24)',
+            text: 'var(--masters)',
+          };
+        default:
+          return {
+            background: 'rgba(255, 255, 255, 0.66)',
+            border: 'rgba(26, 24, 21, 0.08)',
+            text: 'var(--ink-tertiary)',
+          };
+      }
+    },
+    [teamAColor, teamBColor]
+  );
 
-                    return (
-                        <button
-                            key={hole}
-                            onClick={() => handleHoleTap(hole)}
-                            className={`
-                relative w-6 h-6 rounded-md flex items-center justify-center
-                text-xs font-medium transition-all duration-150
-                ${isCurrent ? 'ring-2 ring-offset-1' : ''}
-              `}
-                            style={{
-                                background: getHoleColor(status, true),
-                                color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status),
-                                ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
-                            }}
-                            aria-label={`Hole ${hole}${status !== 'unscored' ? `, ${status}` : ''}`}
-                        >
-                            {hole}
-                            {isCurrent && (
-                                <motion.span
-                                    className="absolute inset-0 rounded-md"
-                                    style={{ border: '2px solid var(--masters)' }}
-                                    animate={{ opacity: [1, 0.4, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                />
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
+  const handleHoleSelect = useCallback(
+    (holeNumber: number) => {
+      haptic.select();
+      onHoleSelect(holeNumber);
+    },
+    [haptic, onHoleSelect]
+  );
 
-            {/* Turn marker */}
-            <div className="w-px h-5 bg-[var(--rule)] mx-0.5" />
+  const toggleExpanded = useCallback(() => {
+    haptic.tap();
+    setIsExpanded((current) => !current);
+  }, [haptic]);
 
-            {/* Back 9 */}
-            <div className="flex gap-0.5">
-                {Array.from({ length: 9 }, (_, i) => i + 10).map((hole) => {
-                    const status = holeStatuses.get(hole) || 'unscored';
-                    const isCurrent = hole === currentHole && !isComplete;
+  const renderCompactRow = (holes: number[]) => (
+    <div className="flex gap-1.5">
+      {holes.map((hole) => {
+        const status = holeStatuses.get(hole) ?? 'unscored';
+        const tone = getHoleTone(status);
+        const isCurrent = status === 'current';
 
-                    return (
-                        <button
-                            key={hole}
-                            onClick={() => handleHoleTap(hole)}
-                            className={`
-                relative w-6 h-6 rounded-md flex items-center justify-center
-                text-xs font-medium transition-all duration-150
-                ${isCurrent ? 'ring-2 ring-offset-1' : ''}
-              `}
-                            style={{
-                                background: getHoleColor(status, true),
-                                color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status),
-                                ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
-                            }}
-                            aria-label={`Hole ${hole}${status !== 'unscored' ? `, ${status}` : ''}`}
-                        >
-                            {hole}
-                            {isCurrent && (
-                                <motion.span
-                                    className="absolute inset-0 rounded-md"
-                                    style={{ border: '2px solid var(--masters)' }}
-                                    animate={{ opacity: [1, 0.4, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                />
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
+        return (
+          <button
+            key={hole}
+            type="button"
+            onClick={() => handleHoleSelect(hole)}
+            className="relative flex h-8 w-8 items-center justify-center rounded-xl border text-[11px] font-semibold transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
+            style={{
+              background: tone.background,
+              borderColor: tone.border,
+              color: tone.text,
+              boxShadow: isCurrent ? '0 0 0 1px rgba(0, 102, 68, 0.12)' : undefined,
+            }}
+            aria-label={`Go to hole ${hole}`}
+          >
+            {hole}
+            {isCurrent && (
+              <motion.span
+                className="absolute inset-0 rounded-xl border border-[var(--masters)]"
+                animate={{ opacity: [0.95, 0.35, 0.95] }}
+                transition={{ duration: 1.4, repeat: Infinity }}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const renderExpandedSection = (label: string, holes: number[]) => (
+    <div>
+      <div className="mb-3 flex items-center gap-3">
+        <span className="type-overline text-[var(--ink-secondary)]">{label}</span>
+        <div className="h-px flex-1 bg-[color:var(--rule)]" />
+      </div>
+      <div className="grid grid-cols-3 gap-2 min-[360px]:grid-cols-4 sm:grid-cols-5">
+        {holes.map((hole) => {
+          const status = holeStatuses.get(hole) ?? 'unscored';
+          const tone = getHoleTone(status);
+          const runningScore = runningScores.get(hole) ?? 0;
+          const isCurrent = status === 'current';
+
+          return (
+            <button
+              key={hole}
+              type="button"
+              onClick={() => handleHoleSelect(hole)}
+              className="relative flex min-h-[72px] flex-col items-start justify-between rounded-2xl border px-3 py-2.5 text-left transition-transform duration-150 active:scale-[0.98]"
+              style={{
+                background: tone.background,
+                borderColor: tone.border,
+              }}
+              aria-label={`Go to hole ${hole}`}
+            >
+              <span className="text-sm font-semibold" style={{ color: tone.text }}>
+                {hole}
+              </span>
+              <div>
+                <p className="text-xs font-medium text-[var(--ink-secondary)]">
+                  {status === 'teamA'
+                    ? teamAName
+                    : status === 'teamB'
+                      ? teamBName
+                      : status === 'halved'
+                        ? 'Halved'
+                        : status === 'current'
+                          ? 'Current'
+                          : 'Unscored'}
+                </p>
+                <p className="mt-0.5 text-xs text-[var(--ink-tertiary)]">
+                  Match: {formatRunningScore(runningScore)}
+                </p>
+              </div>
+              {isCurrent && (
+                <Flag
+                  size={14}
+                  className="absolute right-2.5 top-2.5 text-[var(--masters)]"
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  return (
+    <div
+      className={cn(
+        'rounded-[28px] border border-[color:var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(245,240,233,0.96)_100%)] p-4 shadow-card sm:p-5',
+        className
+      )}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="type-overline text-[var(--masters)]">Routing</p>
+          <h3 className="mt-1 font-serif text-[length:var(--text-lg)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+            Hole map
+          </h3>
+          <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+            Jump anywhere without losing the thread of the match.
+          </p>
         </div>
-    );
+        <button
+          type="button"
+          onClick={toggleExpanded}
+          className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-medium text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          {isExpanded ? 'Compact' : 'Full card'}
+        </button>
+      </div>
 
-    // Expanded view: Full scorecard grid
-    const ExpandedView = () => (
-        <motion.div
+      <div className="mt-5 space-y-3">
+        <div className="overflow-x-auto">
+          <div className="inline-flex min-w-full items-center gap-3 rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/78 px-3 py-3">
+            {renderCompactRow(holeNumbers(1, Math.min(9, totalHoles)))}
+            {totalHoles > 9 && <div className="h-8 w-px bg-[color:var(--rule)]" />}
+            {totalHoles > 9 &&
+              renderCompactRow(holeNumbers(10, Math.max(0, totalHoles - 9)))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2.5">
+          <div className="rounded-2xl border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              {teamAName}
+            </p>
+            <p className="mt-1 font-serif text-[length:var(--text-xl)]" style={{ color: teamAColor }}>
+              {summary.teamAWins}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              Scored
+            </p>
+            <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">
+              {summary.scored}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+              {teamBName}
+            </p>
+            <p className="mt-1 font-serif text-[length:var(--text-xl)]" style={{ color: teamBColor }}>
+              {summary.teamBWins}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
-        >
-            <div className="pt-3 space-y-3">
-                {/* Front 9 */}
-                <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-medium text-[var(--ink-tertiary)] uppercase tracking-wider">
-                            Front 9
-                        </span>
-                        <div className="flex-1 h-px bg-[var(--rule)]" />
-                    </div>
-                    <div className="grid grid-cols-9 gap-1">
-                        {Array.from({ length: 9 }, (_, i) => i + 1).map((hole) => {
-                            const status = holeStatuses.get(hole) || 'unscored';
-                            const isCurrent = hole === currentHole && !isComplete;
-                            const score = runningScores.get(hole) || 0;
+          >
+            <div className="mt-5 space-y-5 border-t border-[color:var(--rule)] pt-5">
+              {renderExpandedSection('Front 9', holeNumbers(1, Math.min(9, totalHoles)))}
+              {totalHoles > 9 &&
+                renderExpandedSection(
+                  'Back 9',
+                  holeNumbers(10, Math.max(0, totalHoles - 9))
+                )}
 
-                            return (
-                                <button
-                                    key={hole}
-                                    onClick={() => handleHoleTap(hole)}
-                                    className={`
-                    relative aspect-square rounded-lg flex flex-col items-center justify-center
-                    transition-all duration-150 hover:scale-105
-                    ${isCurrent ? 'ring-2 ring-offset-2' : ''}
-                  `}
-                                    style={{
-                                        background: getHoleColor(status, true),
-                                        ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
-                                    }}
-                                >
-                                    <span
-                                        className="text-sm font-bold"
-                                        style={{ color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status) }}
-                                    >
-                                        {hole}
-                                    </span>
-                                    {status !== 'unscored' && status !== 'current' && (
-                                        <span className="text-[10px] font-medium" style={{ color: getHoleColor(status) }}>
-                                            {score > 0 ? `+${score}` : score === 0 ? 'AS' : score}
-                                        </span>
-                                    )}
-                                    {isCurrent && (
-                                        <Flag className="absolute top-0.5 right-0.5 w-3 h-3" style={{ color: 'var(--masters)' }} />
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Back 9 */}
-                <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-medium text-[var(--ink-tertiary)] uppercase tracking-wider">
-                            Back 9
-                        </span>
-                        <div className="flex-1 h-px bg-[var(--rule)]" />
-                    </div>
-                    <div className="grid grid-cols-9 gap-1">
-                        {Array.from({ length: 9 }, (_, i) => i + 10).map((hole) => {
-                            const status = holeStatuses.get(hole) || 'unscored';
-                            const isCurrent = hole === currentHole && !isComplete;
-                            const score = runningScores.get(hole) || 0;
-
-                            return (
-                                <button
-                                    key={hole}
-                                    onClick={() => handleHoleTap(hole)}
-                                    className={`
-                    relative aspect-square rounded-lg flex flex-col items-center justify-center
-                    transition-all duration-150 hover:scale-105
-                    ${isCurrent ? 'ring-2 ring-offset-2' : ''}
-                  `}
-                                    style={{
-                                        background: getHoleColor(status, true),
-                                        ['--tw-ring-color' as string]: isCurrent ? 'var(--masters)' : undefined,
-                                    }}
-                                >
-                                    <span
-                                        className="text-sm font-bold"
-                                        style={{ color: status === 'unscored' ? 'var(--ink-tertiary)' : getHoleColor(status) }}
-                                    >
-                                        {hole}
-                                    </span>
-                                    {status !== 'unscored' && status !== 'current' && (
-                                        <span className="text-[10px] font-medium" style={{ color: getHoleColor(status) }}>
-                                            {score > 0 ? `+${score}` : score === 0 ? 'AS' : score}
-                                        </span>
-                                    )}
-                                    {isCurrent && (
-                                        <Flag className="absolute top-0.5 right-0.5 w-3 h-3" style={{ color: 'var(--masters)' }} />
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-4 pt-2 border-t border-[var(--rule)]">
-                    <div className="flex items-center gap-1.5">
-                        <div
-                            className="w-3 h-3 rounded-sm"
-                            style={{ background: teamAColor }}
-                        />
-                        <span className="text-xs text-[var(--ink-secondary)]">{teamAName}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div
-                            className="w-3 h-3 rounded-sm"
-                            style={{ background: teamBColor }}
-                        />
-                        <span className="text-xs text-[var(--ink-secondary)]">{teamBName}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-sm bg-[color:var(--ink-tertiary)]" />
-                        <span className="text-xs text-[var(--ink-secondary)]">Halved</span>
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
-
-    // Calculate summary stats
-    const teamAWins = holeResults.filter(r => r.winner === 'teamA').length;
-    const teamBWins = holeResults.filter(r => r.winner === 'teamB').length;
-    const halved = holeResults.filter(r => r.winner === 'halved').length;
-    const scored = teamAWins + teamBWins + halved;
-
-    return (
-        <div className={`rounded-2xl p-3 ${className}`} style={{ background: 'var(--surface)' }}>
-            {/* Header with toggle */}
-            <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ink-secondary)' }}>
-                        Hole Map
-                    </span>
-                    <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>
-                        {scored} of {totalHoles} scored
-                    </span>
-                </div>
-                <button
-                    onClick={toggleExpanded}
-                    className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors"
-                    style={{ color: 'var(--masters)' }}
-                >
-                    {isExpanded ? (
-                        <>
-                            <ChevronUp className="w-3 h-3" />
-                            Collapse
-                        </>
-                    ) : (
-                        <>
-                            <ChevronDown className="w-3 h-3" />
-                            Expand
-                        </>
-                    )}
-                </button>
-            </div>
-
-            {/* Compact map */}
-            <CompactView />
-
-            {/* Expanded view */}
-            <AnimatePresence>
-                {isExpanded && <ExpandedView />}
-            </AnimatePresence>
-
-            {/* Quick stats bar */}
-            <div className="flex items-center justify-between mt-3 pt-2 border-t border-[var(--rule)]">
+              <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/72 px-4 py-3 text-xs text-[var(--ink-secondary)]">
                 <div className="flex items-center gap-2">
-                    <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-[var(--canvas)]"
-                        style={{ background: teamAColor }}
-                    >
-                        {teamAWins}
-                    </div>
-                    <span className="text-xs" style={{ color: 'var(--ink-secondary)' }}>{teamAName}</span>
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ background: teamAColor }}
+                  />
+                  {teamAName} won
                 </div>
-
-                <div className="flex items-center gap-1">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold bg-[color:var(--ink-tertiary)] text-[var(--canvas)]">
-                        {halved}
-                    </div>
-                    <span className="text-xs" style={{ color: 'var(--ink-tertiary)' }}>Halved</span>
-                </div>
-
                 <div className="flex items-center gap-2">
-                    <span className="text-xs" style={{ color: 'var(--ink-secondary)' }}>{teamBName}</span>
-                    <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-[var(--canvas)]"
-                        style={{ background: teamBColor }}
-                    >
-                        {teamBWins}
-                    </div>
+                  <span className="h-3 w-3 rounded-full bg-[var(--ink-secondary)]" />
+                  Halved
                 </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ background: teamBColor }}
+                  />
+                  {teamBName} won
+                </div>
+              </div>
             </div>
-        </div>
-    );
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
-/**
- * Compact inline version of the hole map for headers
- */
-export function HoleMiniMapInline({
-    currentHole,
-    holeResults,
-    teamAColor = '#1E3A5F',
-    teamBColor = '#722F37',
-    onHoleSelect,
-    totalHoles = 18,
-}: Omit<HoleMiniMapProps, 'teamAName' | 'teamBName' | 'isComplete' | 'className'>) {
-    const haptic = useHaptic();
-
-    return (
-        <div className="flex items-center gap-px">
-            {Array.from({ length: totalHoles }, (_, i) => i + 1).map((hole) => {
-                const result = holeResults.find(r => r.holeNumber === hole);
-                const isCurrent = hole === currentHole;
-
-                let bgColor = 'transparent';
-                if (result?.winner === 'teamA') bgColor = teamAColor;
-                else if (result?.winner === 'teamB') bgColor = teamBColor;
-                else if (result?.winner === 'halved') bgColor = '#666';
-
-                return (
-                    <button
-                        key={hole}
-                        onClick={() => {
-                            haptic.select();
-                            onHoleSelect(hole);
-                        }}
-                        className={`
-              w-2 h-4 rounded-sm transition-all
-              ${isCurrent ? 'ring-1 ring-white scale-125' : 'hover:scale-110'}
-            `}
-                        style={{
-                            background: bgColor || 'rgba(200, 200, 200, 0.3)',
-                        }}
-                        aria-label={`Go to hole ${hole}`}
-                    />
-                );
-            })}
-        </div>
-    );
-}
+export default HoleMiniMap;
