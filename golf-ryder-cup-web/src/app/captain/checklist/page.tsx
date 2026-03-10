@@ -4,16 +4,17 @@ import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { PreFlightChecklist } from '@/components/captain';
+import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import {
   CalendarDays,
-  Home,
   Map,
-  MoreHorizontal,
   Rocket,
   Shield,
   Users,
@@ -31,47 +32,11 @@ export default function ChecklistPage() {
   };
 
   if (!currentTrip) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to run the pre-flight checklist."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainNoTripState description="Start or select a trip to run the pre-flight checklist." />;
   }
 
   if (!isCaptainMode) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access the checklist."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access the checklist." />;
   }
 
   return (

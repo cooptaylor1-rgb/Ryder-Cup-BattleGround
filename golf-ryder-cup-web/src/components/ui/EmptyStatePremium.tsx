@@ -8,6 +8,7 @@
 
 'use client';
 
+import Link from 'next/link';
 import { type ReactNode, type ComponentType } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -273,10 +274,12 @@ export function EmptyStatePremium({
  */
 export function NoTournamentsEmpty({
     onCreateTrip,
-    onJoinTrip
+    onJoinTrip,
+    createHref,
 }: {
     onCreateTrip: () => void;
     onJoinTrip?: () => void;
+    createHref?: string;
 }) {
     return (
         <EmptyStatePremium
@@ -292,9 +295,19 @@ export function NoTournamentsEmpty({
             variant="large"
         >
             <div style={{ display: 'flex', gap: 'var(--space-3)', width: '100%', marginTop: 'var(--space-6)' }}>
-                <button onClick={onCreateTrip} className="btn-premium press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
-                    <Plus size={18} /> New Trip
-                </button>
+                {createHref ? (
+                    <Link
+                        href={createHref}
+                        className="btn-premium press-scale"
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)', textDecoration: 'none' }}
+                    >
+                        <Plus size={18} /> New Trip
+                    </Link>
+                ) : (
+                    <button onClick={onCreateTrip} className="btn-premium press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+                        <Plus size={18} /> New Trip
+                    </button>
+                )}
                 {onJoinTrip && (
                     <button onClick={onJoinTrip} className="press-scale" style={{
                         flex: 1,

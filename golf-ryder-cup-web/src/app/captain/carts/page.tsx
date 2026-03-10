@@ -3,16 +3,20 @@
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { CartAssignmentManager, type CartPlayer } from '@/components/captain';
+import {
+  CartAssignmentManager,
+  type CartPlayer,
+} from '@/components/captain';
+import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import {
   Car,
-  Home,
-  MoreHorizontal,
   Shield,
   Users,
 } from 'lucide-react';
@@ -23,47 +27,11 @@ export default function CartsPage() {
   const { isCaptainMode, showToast } = useUIStore();
 
   if (!currentTrip) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to manage cart assignments."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainNoTripState description="Start or select a trip to manage cart assignments." />;
   }
 
   if (!isCaptainMode) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access Cart Assignments."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access cart assignments." />;
   }
 
   const cartPlayers: CartPlayer[] = players.map((player) => {

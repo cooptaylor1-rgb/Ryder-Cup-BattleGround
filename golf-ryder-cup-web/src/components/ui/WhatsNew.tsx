@@ -73,6 +73,7 @@ const latestFeatures: Feature[] = [
 
 const STORAGE_KEY = 'ryder-whats-new-seen';
 const CURRENT_VERSION = '2.0.0';
+const WALKTHROUGH_STORAGE_KEY = 'walkthrough-completed';
 
 interface WhatsNewProps {
   onDismiss?: () => void;
@@ -96,7 +97,10 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
       return;
     }
 
-    if (!hasSeenCurrentVersion()) {
+    const walkthroughCompleted =
+      typeof window === 'undefined' || localStorage.getItem(WALKTHROUGH_STORAGE_KEY) === 'true';
+
+    if (walkthroughCompleted && !hasSeenCurrentVersion()) {
       const timer = setTimeout(() => setIsVisible(true), 1000);
       return () => clearTimeout(timer);
     }

@@ -4,9 +4,11 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
+import {
   Filter,
-  Home,
-  MoreHorizontal,
   Search,
   ShieldCheck,
   type LucideIcon,
@@ -16,7 +18,6 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
@@ -198,47 +199,11 @@ export default function CaptainAuditLogPage() {
   }, [capturedNow, entries]);
 
   if (!currentTrip) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to view the audit log."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainNoTripState description="Start or select a trip to view the audit log." />;
   }
 
   if (!isCaptainMode) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access the audit log."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access the audit log." />;
   }
 
   return (

@@ -2,20 +2,21 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { InvitationManager, QRCodeCard } from '@/components/captain';
+import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
 import {
   CloudOff,
-  Home,
   Link2,
-  MoreHorizontal,
   QrCode,
   Send,
   Share2,
   Users,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-import { InvitationManager, QRCodeCard } from '@/components/captain';
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
@@ -104,47 +105,11 @@ export default function InvitesPage() {
   }, [currentTrip]);
 
   if (!currentTrip) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to manage invitations."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainNoTripState description="Start or select a trip to manage invitations." />;
   }
 
   if (!isCaptainMode) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access Invitations."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access invitations." />;
   }
 
   const shareUrl = shareCode && origin ? `${origin}/join?code=${shareCode}` : '';

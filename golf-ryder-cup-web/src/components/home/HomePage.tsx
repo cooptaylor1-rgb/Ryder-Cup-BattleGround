@@ -2,12 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { db } from '@/lib/db';
 import { FirstLaunchWalkthrough } from '@/components/FirstLaunchWalkthrough';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
-import { tripLogger } from '@/lib/utils/logger';
 import {
   ChevronRight,
   MapPin,
@@ -26,7 +24,6 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   NoTournamentsEmpty,
   WhatsNew,
-  QuickStartWizard,
   YourMatchCard,
   CaptainToggle,
   ContinueScoringBanner,
@@ -59,7 +56,6 @@ export default function HomePage() {
   const router = useRouter();
   const { loadTrip, players, teams, teamMembers, sessions } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
-  const [showQuickStart, setShowQuickStart] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>(readPendingJoinCode);
   const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
 
@@ -109,62 +105,6 @@ export default function HomePage() {
     }
   }, [activeTrip, router, showToast]);
 
-  const handleQuickStartComplete = useCallback(
-    async (tripData: {
-      name: string;
-      location: string;
-      startDate: string;
-      endDate: string;
-      teamAName: string;
-      teamBName: string;
-    }) => {
-      try {
-        const tripId = crypto.randomUUID();
-        const now = new Date().toISOString();
-
-        await db.trips.add({
-          id: tripId,
-          name: tripData.name,
-          location: tripData.location || undefined,
-          startDate: tripData.startDate,
-          endDate: tripData.endDate,
-          isCaptainModeEnabled: false,
-          createdAt: now,
-          updatedAt: now,
-        });
-
-        const teamAId = crypto.randomUUID();
-        const teamBId = crypto.randomUUID();
-
-        await db.teams.bulkAdd([
-          {
-            id: teamAId,
-            tripId,
-            name: tripData.teamAName || 'USA',
-            color: 'usa' as const,
-            mode: 'ryderCup' as const,
-            createdAt: now,
-          },
-          {
-            id: teamBId,
-            tripId,
-            name: tripData.teamBName || 'Europe',
-            color: 'europe' as const,
-            mode: 'ryderCup' as const,
-            createdAt: now,
-          },
-        ]);
-
-        setShowQuickStart(false);
-        await loadTrip(tripId);
-        router.push('/players');
-      } catch (error) {
-        tripLogger.error('Failed to create trip:', error);
-      }
-    },
-    [loadTrip, router]
-  );
-
   const hasTrips = trips && trips.length > 0;
   const pastTrips = trips?.filter((t) => t.id !== activeTrip?.id) || [];
   const liveMatchesCount = liveMatches?.length || 0;
@@ -194,14 +134,6 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Full-screen overlays — must be outside the page wrapper to escape its stacking context */}
-      {showQuickStart && (
-        <QuickStartWizard
-          onComplete={handleQuickStartComplete}
-          onCancel={() => setShowQuickStart(false)}
-        />
-      )}
-
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <JoinTripModal
         isOpen={showJoinTrip}
@@ -530,7 +462,7 @@ export default function HomePage() {
             </h2>
             {hasTrips && (
               <button
-                onClick={() => setShowQuickStart(true)}
+                onClick={() => router.push('/trip/new')}
                 className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
               >
                 <Plus size={14} strokeWidth={2.5} />
@@ -588,7 +520,8 @@ export default function HomePage() {
             </div>
           ) : !activeTrip ? (
             <NoTournamentsEmpty
-              onCreateTrip={() => setShowQuickStart(true)}
+              createHref="/trip/new"
+              onCreateTrip={() => router.push('/trip/new')}
               onJoinTrip={() => setShowJoinTrip(true)}
             />
           ) : null}

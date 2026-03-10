@@ -65,6 +65,7 @@ export function QuickScoreFABv2({
     !forceShow &&
     (!currentTrip ||
       pathname === '/' ||
+      pathname === '/score' ||
       pathname.startsWith('/score/') ||
       pathname.startsWith('/profile/create') ||
       pathname.startsWith('/trip/new') ||

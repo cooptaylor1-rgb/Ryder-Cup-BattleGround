@@ -4,9 +4,12 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
+import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
@@ -22,9 +25,7 @@ import {
   Clock3,
   Edit3,
   Hash,
-  Home,
   Lock,
-  MoreHorizontal,
   PencilLine,
   Plus,
   Save,
@@ -307,60 +308,13 @@ export default function CaptainManagePage() {
 
   if (!currentTrip) {
     return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Manage Trip"
-          subtitle="No active trip"
-          icon={<Settings size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
-        />
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to manage sessions, matches, and player details."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
+      <CaptainNoTripState description="Start or select a trip to manage sessions, matches, and player details." />
     );
   }
 
   if (!isCaptainMode) {
     return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Manage Trip"
-          subtitle="Captain mode required"
-          icon={<Shield size={16} className="text-[var(--canvas)]" />}
-          iconContainerStyle={{
-            background: 'linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%)',
-          }}
-          onBack={() => router.back()}
-        />
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode before you start editing sessions, matches, or player handicaps."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
+      <CaptainModeRequiredState description="Turn on Captain Mode before you start editing sessions, matches, or player handicaps." />
     );
   }
 

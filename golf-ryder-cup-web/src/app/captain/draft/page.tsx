@@ -3,14 +3,16 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { DraftBoard } from '@/components/captain';
+import {
+  CaptainModeRequiredState,
+  CaptainNoTripState,
+} from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { draftLogger } from '@/lib/utils/logger';
 import {
   CheckCircle2,
-  Home,
-  MoreHorizontal,
   Shuffle,
   Users,
   UsersRound,
@@ -61,61 +63,11 @@ export default function DraftPage() {
   );
 
   if (!currentTrip) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Team Draft"
-          subtitle="No active trip"
-          onBack={() => router.back()}
-          icon={<Shuffle size={16} className="text-[var(--color-accent)]" />}
-        />
-
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="golf-ball"
-            title="No active trip"
-            description="Start or select a trip to run the team draft."
-            action={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-              icon: <Home size={16} />,
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainNoTripState description="Start or select a trip to run the team draft." />;
   }
 
   if (!isCaptainMode) {
-    return (
-      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <PageHeader
-          title="Team Draft"
-          subtitle="Captain mode required"
-          onBack={() => router.back()}
-          icon={<Shuffle size={16} className="text-[var(--color-accent)]" />}
-        />
-
-        <main className="container-editorial py-12">
-          <EmptyStatePremium
-            illustration="trophy"
-            title="Captain mode required"
-            description="Turn on Captain Mode to access the draft room."
-            action={{
-              label: 'Open More',
-              onClick: () => router.push('/more'),
-              icon: <MoreHorizontal size={16} />,
-            }}
-            secondaryAction={{
-              label: 'Go Home',
-              onClick: () => router.push('/'),
-            }}
-            variant="large"
-          />
-        </main>
-      </div>
-    );
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access the draft room." />;
   }
 
   const unassignedPlayers = players.filter(

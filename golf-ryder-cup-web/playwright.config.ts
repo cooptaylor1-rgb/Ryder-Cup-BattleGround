@@ -28,7 +28,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
 
   /* Worker configuration - can be overridden via CLI */
-  workers: process.env.CI ? 2 : undefined,
+  workers: process.env.CI ? 2 : 2,
 
   /* Global timeout per test */
   timeout: 60 * 1000, // 60 seconds

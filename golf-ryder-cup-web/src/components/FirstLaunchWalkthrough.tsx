@@ -54,8 +54,8 @@ export function FirstLaunchWalkthrough() {
     // Only show once, ever
     try {
       if (!localStorage.getItem(STORAGE_KEY)) {
-        // Small delay so the home page renders first
-        const timer = setTimeout(() => setVisible(true), 800);
+        // Give the primary home-page CTA time to be used before instructional UI takes over.
+        const timer = setTimeout(() => setVisible(true), 2500);
         return () => clearTimeout(timer);
       }
     } catch {

@@ -476,6 +476,23 @@ export async function dismissOnboardingModal(page: Page): Promise<void> {
 export async function dismissAllBlockingModals(page: Page): Promise<void> {
   await dismissOnboardingModal(page);
 
+  const blockingOverlayButtons = [
+    page.getByRole('button', { name: /skip walkthrough/i }),
+    page.getByRole('button', { name: /got it, let'?s go!?/i }),
+    page.getByRole('button', { name: /close/i }),
+  ];
+
+  for (const button of blockingOverlayButtons) {
+    try {
+      if (await button.first().isVisible({ timeout: 750 }).catch(() => false)) {
+        await button.first().click();
+        await page.waitForTimeout(TEST_CONFIG.delays.animation);
+      }
+    } catch {
+      // Continue trying other overlay controls
+    }
+  }
+
   // Handle wizard pages
   try {
     const isOnWizard = await page

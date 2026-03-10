@@ -7,16 +7,40 @@ import { useAuthStore } from '@/lib/stores';
 /**
  * AUTH GUARD COMPONENT
  *
- * Ensures users create a profile before using the app.
- * First-time users are redirected to profile creation.
+ * Restricts only the parts of the app that truly require a profile.
+ * Browsing routes stay open so new users can explore before account creation.
  *
- * Public routes (accessible without profile):
+ * Always-public routes:
  * - /profile/create
  * - /login
  * - /join/* (trip invitations)
  */
 
-const PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator', '/auth/callback'];
+const ALWAYS_PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator', '/auth/callback'];
+const PROTECTED_ROUTE_PREFIXES = ['/settings'];
+const PROTECTED_ROUTE_EXACT = ['/profile', '/profile/complete'];
+
+export function isProtectedAppRoute(pathname?: string | null) {
+  if (!pathname) {
+    return false;
+  }
+
+  const isAlwaysPublic = ALWAYS_PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+
+  if (isAlwaysPublic) {
+    return false;
+  }
+
+  if (PROTECTED_ROUTE_EXACT.includes(pathname)) {
+    return true;
+  }
+
+  return PROTECTED_ROUTE_PREFIXES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+}
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -28,10 +52,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const searchParams = useSearchParams();
   const { isAuthenticated, currentUser, hasResolvedSupabaseSession } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
-  const isPublicRoute = PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname?.startsWith(route + '/')
-  );
-  const requiresAuth = !isPublicRoute;
+  const requiresAuth = isProtectedAppRoute(pathname);
   const isAuthReady = isHydrated && hasResolvedSupabaseSession;
   const shouldRedirectToProfile = requiresAuth && isAuthReady && (!isAuthenticated || !currentUser);
 
