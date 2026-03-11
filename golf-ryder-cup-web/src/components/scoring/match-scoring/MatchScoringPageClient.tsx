@@ -17,11 +17,11 @@
 
 import { useEffect, useMemo, useState, useCallback, lazy, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useMatchState, useHaptic } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
-import { cn, formatPlayerName } from '@/lib/utils';
+import { formatPlayerName } from '@/lib/utils';
 import { deriveScoreAuditAction } from '@/lib/utils/scoringAudit';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { addAuditLogEntry, db } from '@/lib/db';
@@ -29,31 +29,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
 import { createCorrelationId, trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
-import {
-  Undo2,
-  ChevronLeft,
-  ChevronRight,
-  AlertCircle,
-  Check,
-  Mic,
-  X,
-  Sparkles,
-  Shield,
-} from 'lucide-react';
 import type { HoleWinner, PlayerHoleScore } from '@/lib/types/models';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
 
 // Core scoring components - loaded immediately
 import {
-  SwipeScorePanel,
-  HoleMiniMap,
   ScoreToast,
-  HandicapStrokeIndicator,
-  StrokeAlertBanner,
-  PressTracker,
-  StrokeScoreEntry,
-  FourballScoreEntry,
-  OneHandedScoringPanel,
   type Press,
 } from '@/components/scoring';
 // Lazy load heavy components that aren't immediately needed
@@ -62,9 +43,6 @@ const ScoreCelebration = lazy(() =>
 );
 import {
   StickyUndoBanner,
-  VoiceScoring,
-  QuickPhotoCapture,
-  SideBetReminder,
   WeatherAlerts,
   type UndoAction,
 } from '@/components/live-play';
@@ -72,12 +50,11 @@ import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
 import { MatchScoringCompleteState } from './MatchScoringCompleteState';
+import { MatchScoringActiveState } from './MatchScoringActiveState';
+import { MatchScoringHeroSection } from './MatchScoringHeroSection';
+import { MatchScoringSupportLayer } from './MatchScoringSupportLayer';
 import {
   getScoringModeMeta,
-  QuickScoreTile,
-  ScoringFactCard,
-  ScoringModeChip,
-  ScoringStatusBadge,
   type ScoringMode,
 } from './matchScoringShared';
 import { hashStringToSeed, mulberry32, toReminderBet } from './matchScoringUtils';
@@ -279,6 +256,24 @@ export default function MatchScoringPageClient() {
     if (!activeMatch) return [];
     return activeMatch.teamBPlayerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean);
   }, [activeMatch, players]);
+  const teamAFourballPlayers = useMemo(
+    () =>
+      teamAPlayers.map((player) => ({
+        id: player!.id,
+        name: formatPlayerName(player!.firstName, player!.lastName),
+        courseHandicap: player!.handicapIndex || 0,
+      })),
+    [teamAPlayers]
+  );
+  const teamBFourballPlayers = useMemo(
+    () =>
+      teamBPlayers.map((player) => ({
+        id: player!.id,
+        name: formatPlayerName(player!.firstName, player!.lastName),
+        courseHandicap: player!.handicapIndex || 0,
+      })),
+    [teamBPlayers]
+  );
 
   const currentHoleResult = useMemo(() => {
     if (!matchState) return undefined;
@@ -958,637 +953,98 @@ export default function MatchScoringPageClient() {
         onDismiss={() => setUndoAction(null)}
       />
 
-      {/* Voice Scoring Modal */}
-      <AnimatePresence>
-        {showVoiceModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={prefersReducedMotion ? false : { scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-sm mx-4 p-6 rounded-2xl bg-canvas border border-rule"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-serif text-[length:var(--text-lg)] font-normal text-ink">Voice Score</h3>
-                <button
-                  onClick={() => setShowVoiceModal(false)}
-                  className="p-2 rounded-xl transition-opacity"
-                >
-                  <X size={18} className="text-ink-secondary" />
-                </button>
-              </div>
-              <VoiceScoring
-                teamAName={teamAName}
-                teamBName={teamBName}
-                currentHole={currentHole}
-                onScoreConfirmed={handleVoiceScore}
-                floating={false}
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MatchScoringSupportLayer
+        isMatchComplete={isMatchComplete}
+        showVoiceModal={showVoiceModal}
+        currentHole={currentHole}
+        matchId={matchId}
+        teamAName={teamAName}
+        teamBName={teamBName}
+        teamAHandicapAllowance={activeMatch.teamAHandicapAllowance}
+        teamBHandicapAllowance={activeMatch.teamBHandicapAllowance}
+        holeHandicaps={holeHandicaps}
+        onCloseVoiceModal={() => setShowVoiceModal(false)}
+        onOpenVoiceModal={() => setShowVoiceModal(true)}
+        onVoiceScoreConfirmed={handleVoiceScore}
+        onPhotoCapture={handlePhotoCapture}
+        onStrokeAlertShown={(_hole, aStrokes, bStrokes) => {
+          if (aStrokes > 0 || bStrokes > 0) {
+            haptic.tap();
+          }
+        }}
+      />
 
-      {/* Stroke Alert Banner */}
-      {!isMatchComplete &&
-        (activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
-          <StrokeAlertBanner
-            currentHole={currentHole}
-            teamAStrokes={activeMatch.teamAHandicapAllowance}
-            teamBStrokes={activeMatch.teamBHandicapAllowance}
-            holeHandicaps={holeHandicaps}
-            teamAName={teamAName}
-            teamBName={teamBName}
-            autoDismissMs={5000}
-            onAlertShown={(hole, aStrokes, bStrokes) => {
-              if (aStrokes > 0 || bStrokes > 0) {
-                haptic.tap();
-              }
-            }}
-            position="top"
-          />
-        )}
-
-      <header className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur">
-        <div className="container-editorial py-[var(--space-3)]">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              <button
-                onClick={() => router.push('/score')}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
-                aria-label="Back"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <div className="min-w-0">
-                <p className="type-overline text-masters">Match {activeMatch.matchOrder}</p>
-                <p className="truncate font-sans text-[length:var(--text-xs)] text-ink-tertiary">
-                  {teamALineup} vs {teamBLineup}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowVoiceModal(true)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
-                aria-label="Voice scoring"
-              >
-                <Mic size={18} />
-              </button>
-              <button
-                onClick={handleUndo}
-                disabled={undoStack.length === 0}
-                className={cn(
-                  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors',
-                  undoStack.length > 0
-                    ? 'bg-[var(--gold-subtle)] text-[var(--masters)]'
-                    : 'bg-transparent text-[var(--ink-tertiary)] opacity-50'
-                )}
-                aria-label={`Undo last action${undoStack.length > 0 ? ` (${undoStack.length} available)` : ''}`}
-              >
-                <Undo2 size={14} />
-                Undo
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <MatchScoringHeroSection
+        matchOrder={activeMatch.matchOrder}
+        sessionLabel={currentSession ? currentSession.sessionType : 'Match play'}
+        teamALineup={teamALineup}
+        teamBLineup={teamBLineup}
+        matchStatusLabel={matchStatusLabel}
+        isMatchComplete={isMatchComplete}
+        matchState={matchState}
+        prefersReducedMotion={prefersReducedMotion}
+        teamAName={teamAName}
+        teamBName={teamBName}
+        teamAColor={teamAColor}
+        teamBColor={teamBColor}
+        currentHole={currentHole}
+        currentPar={currentPar}
+        scoringModeMeta={scoringModeMeta}
+        savingIndicator={savingIndicator}
+        undoCount={undoStack.length}
+        onBack={() => router.push('/score')}
+        onOpenVoiceScoring={() => setShowVoiceModal(true)}
+        onUndo={handleUndo}
+        onHoleSelect={goToHole}
+      />
 
       <main className="container-editorial">
-        <section className="space-y-4 pt-[var(--space-8)]">
-          <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
-            <div className="flex items-start justify-between gap-[var(--space-4)]">
-              <div>
-                <p className="type-overline text-[var(--masters)]">
-                  {currentSession ? currentSession.sessionType : 'Match play'}
-                </p>
-                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
-                  Sacred scoring
-                </h1>
-                <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
-                  {teamALineup} vs {teamBLineup}
-                </p>
-              </div>
-              <ScoringStatusBadge
-                label={matchStatusLabel}
-                tone={isMatchComplete ? 'muted' : 'masters'}
-              />
-            </div>
-
-            <div className="mt-[var(--space-6)] grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
-              <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left">
-                <p className="type-overline text-[color:var(--team-usa)]">{teamAName}</p>
-                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                  {matchState.teamAHolesWon} holes won
-                </p>
-              </div>
-
-              <motion.div
-                key={matchState.displayScore}
-                initial={prefersReducedMotion ? false : { scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="text-center"
-              >
-                <p
-                  className={cn(
-                    'score-monumental',
-                    matchState.currentScore > 0
-                      ? 'text-[color:var(--team-usa)]'
-                      : matchState.currentScore < 0
-                        ? 'text-[color:var(--team-europe)]'
-                        : 'text-[var(--ink-tertiary)]'
-                  )}
-                >
-                  {matchState.displayScore}
-                </p>
-                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                  {matchState.holesPlayed > 0
-                    ? `Through ${matchState.holesPlayed}`
-                    : 'Opening tee'}
-                </p>
-                {matchState.isDormie && (
-                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gold)]">
-                    <AlertCircle size={12} />
-                    Dormie
-                  </p>
-                )}
-              </motion.div>
-
-              <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left sm:text-right">
-                <p className="type-overline text-[color:var(--team-europe)]">{teamBName}</p>
-                <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                  {matchState.teamBHolesWon} holes won
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
-              <ScoringFactCard eyebrow="Current hole" value={`Hole ${currentHole}`} note={`Par ${currentPar}`} />
-              <ScoringFactCard eyebrow="Remaining" value={matchState.holesRemaining} note="Still in play" />
-              <ScoringFactCard eyebrow="Mode" value={scoringModeMeta.label} note={scoringModeMeta.note} />
-            </div>
-          </div>
-
-          <HoleMiniMap
+        {!isMatchComplete || isEditingScores ? (
+          <MatchScoringActiveState
+            isEditingScores={isEditingScores}
+            isMatchComplete={isMatchComplete}
             currentHole={currentHole}
-            holeResults={matchState.holeResults}
+            currentHoleResult={currentHoleResult}
+            currentPar={currentPar}
+            matchState={matchState}
+            scoringMode={scoringMode}
+            scoringModeMeta={scoringModeMeta}
+            isFourball={isFourball}
+            quickScoreMode={scoringPreferences.quickScoreMode}
+            preferredHand={scoringPreferences.preferredHand}
+            quickScorePendingTeam={quickScorePending?.team}
+            showHandicapDetails={showHandicapDetails}
+            showScoringModeTip={showScoringModeTip}
+            showAdvancedTools={showAdvancedTools}
+            prefersReducedMotion={prefersReducedMotion}
+            isSaving={isSaving}
+            undoCount={undoStack.length}
             teamAName={teamAName}
             teamBName={teamBName}
             teamAColor={teamAColor}
             teamBColor={teamBColor}
-            onHoleSelect={goToHole}
-            isComplete={isMatchComplete}
+            teamAHandicapAllowance={activeMatch.teamAHandicapAllowance}
+            teamBHandicapAllowance={activeMatch.teamBHandicapAllowance}
+            holeHandicaps={holeHandicaps}
+            presses={presses}
+            activeSideBets={activeSideBets}
+            currentPlayerIdForBets={teamAPlayers[0]?.id}
+            teamAFourballPlayers={teamAFourballPlayers}
+            teamBFourballPlayers={teamBFourballPlayers}
+            onFinishEditing={() => setIsEditingScores(false)}
+            onPrevHole={prevHole}
+            onNextHole={nextHole}
+            onDismissScoringModeTip={dismissScoringModeTip}
+            onScoringModeChange={handleScoringModeChange}
+            onQuickScoreTap={handleQuickScoreTap}
+            onToggleShowHandicapDetails={() => setShowHandicapDetails((prev) => !prev)}
+            onScore={handleScore}
+            onScoreWithStrokes={handleScoreWithStrokes}
+            onFourballScore={handleFourballScore}
+            onUndo={handleUndo}
+            onToggleShowAdvancedTools={() => setShowAdvancedTools((prev) => !prev)}
+            onPress={handlePress}
           />
-
-          <AnimatePresence>
-            {savingIndicator && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className={cn(
-                  'mx-auto flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-[var(--canvas)]',
-                  savingIndicator === 'Saving score...'
-                    ? 'bg-[var(--masters)]'
-                    : savingIndicator === 'Saved offline'
-                      ? 'bg-[var(--warning)]'
-                      : 'bg-[var(--success)]'
-                )}
-                role="status"
-                aria-live="polite"
-              >
-                {savingIndicator === 'Saving score...' ? (
-                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-[color:var(--canvas)]/30 border-t-[var(--canvas)]" />
-                ) : (
-                  <Check size={14} strokeWidth={3} />
-                )}
-                <span className="text-sm font-medium">{savingIndicator}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {!isMatchComplete || isEditingScores ? (
-          <section className="space-y-4 py-[var(--space-6)]">
-            {isEditingScores && isMatchComplete && (
-              <div className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--gold)] bg-[var(--gold-subtle)] px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Shield size={16} className="shrink-0 text-[var(--gold)]" />
-                  <p className="text-sm font-medium text-[var(--ink)]">
-                    Captain is correcting a completed card.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsEditingScores(false)}
-                  className="rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink)]"
-                >
-                  Done
-                </button>
-              </div>
-            )}
-
-            <div className="card-editorial overflow-hidden">
-              <div className="border-b border-[color:var(--rule)] px-4 py-4 sm:px-5">
-                <div className="flex items-center justify-between gap-3">
-                  <button
-                    onClick={prevHole}
-                    disabled={currentHole <= 1}
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-
-                  <div className="text-center">
-                    <p className="type-overline text-[var(--masters)]">Current hole</p>
-                    <p className="mt-1 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
-                      Hole {currentHole}
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                      {currentHoleResult && currentHoleResult.winner !== 'none'
-                        ? currentHoleResult.winner === 'halved'
-                          ? 'Hole halved'
-                          : currentHoleResult.winner === 'teamA'
-                            ? `${teamAName} won`
-                            : `${teamBName} won`
-                        : `Par ${currentPar}`}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={nextHole}
-                    disabled={currentHole >= 18}
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <ScoringStatusBadge label={scoringModeMeta.label} tone="subtle" />
-                  <ScoringStatusBadge label={`Par ${currentPar}`} tone="muted" />
-                  {scoringPreferences.quickScoreMode && (
-                    <ScoringStatusBadge label="Quick score armed" tone="subtle" />
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">
-                <AnimatePresence initial={false}>
-                  {showScoringModeTip && (
-                    <motion.div
-                      initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      className="rounded-[22px] border border-[color:rgba(0,102,68,0.15)] bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.78)_100%)] px-4 py-3"
-                    >
-                      <div className="flex items-start gap-3">
-                        <Sparkles size={16} className="mt-0.5 shrink-0 text-[var(--masters)]" />
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-[var(--ink)]">
-                            Pick the mode that fits the moment.
-                          </p>
-                          <p className="mt-1 text-xs text-[var(--ink-secondary)]">
-                            Swipe when pace matters, use strokes when the hole needs detail,
-                            and lean on one-hand mode for pure on-course convenience.
-                          </p>
-                        </div>
-                        <button
-                          onClick={dismissScoringModeTip}
-                          className="rounded-full bg-[var(--masters)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--canvas)]"
-                        >
-                          Close
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div className="space-y-3">
-                  <div className="flex items-end justify-between gap-3">
-                    <div>
-                      <p className="type-overline text-[var(--ink-secondary)]">Scoring mode</p>
-                      <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                        {scoringModeMeta.description}
-                      </p>
-                    </div>
-                    <p className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)] sm:block">
-                      {scoringModeMeta.note}
-                    </p>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <div className="inline-flex min-w-full gap-2 rounded-[22px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-2 py-2">
-                      <ScoringModeChip
-                        label="Swipe"
-                        active={scoringMode === 'swipe'}
-                        onClick={() => handleScoringModeChange('swipe')}
-                      />
-                      <ScoringModeChip
-                        label="Buttons"
-                        active={scoringMode === 'buttons'}
-                        onClick={() => handleScoringModeChange('buttons')}
-                      />
-                      <ScoringModeChip
-                        label="Strokes"
-                        active={scoringMode === 'strokes'}
-                        onClick={() => handleScoringModeChange('strokes')}
-                      />
-                      {isFourball && (
-                        <ScoringModeChip
-                          label="Best Ball"
-                          active={scoringMode === 'fourball'}
-                          onClick={() => handleScoringModeChange('fourball')}
-                        />
-                      )}
-                      <ScoringModeChip
-                        label="One-Hand"
-                        active={scoringMode === 'oneHanded'}
-                        onClick={() => handleScoringModeChange('oneHanded')}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {scoringPreferences.quickScoreMode && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <QuickScoreTile
-                      teamName={teamAName}
-                      teamColor={teamAColor}
-                      pending={quickScorePending?.team === 'teamA'}
-                      onClick={() => handleQuickScoreTap('teamA')}
-                    />
-                    <QuickScoreTile
-                      teamName={teamBName}
-                      teamColor={teamBColor}
-                      pending={quickScorePending?.team === 'teamB'}
-                      onClick={() => handleQuickScoreTap('teamB')}
-                    />
-                    {quickScorePending && (
-                      <p className="col-span-2 text-center text-xs text-[var(--ink-tertiary)]">
-                        Quick score armed for{' '}
-                        {quickScorePending.team === 'teamA' ? teamAName : teamBName}.
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {(activeMatch.teamAHandicapAllowance > 0 || activeMatch.teamBHandicapAllowance > 0) && (
-                  <button
-                    onClick={() => setShowHandicapDetails(!showHandicapDetails)}
-                    className="w-full"
-                  >
-                    <HandicapStrokeIndicator
-                      currentHole={currentHole}
-                      teamAStrokes={activeMatch.teamAHandicapAllowance}
-                      teamBStrokes={activeMatch.teamBHandicapAllowance}
-                      holeHandicaps={holeHandicaps}
-                      teamAName={teamAName}
-                      teamBName={teamBName}
-                      showAllHoles={showHandicapDetails}
-                    />
-                  </button>
-                )}
-
-                <AnimatePresence mode="wait">
-                  {scoringMode === 'swipe' ? (
-                    <motion.div
-                      key="swipe"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <SwipeScorePanel
-                        holeNumber={currentHole}
-                        teamAName={teamAName}
-                        teamBName={teamBName}
-                        teamAColor={teamAColor}
-                        teamBColor={teamBColor}
-                        currentScore={matchState.currentScore}
-                        existingResult={currentHoleResult?.winner}
-                        onScore={handleScore}
-                        disabled={isSaving}
-                      />
-                    </motion.div>
-                  ) : scoringMode === 'strokes' ? (
-                    <motion.div
-                      key="strokes"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <StrokeScoreEntry
-                        holeNumber={currentHole}
-                        par={currentPar}
-                        teamAName={teamAName}
-                        teamBName={teamBName}
-                        teamAColor={teamAColor}
-                        teamBColor={teamBColor}
-                        teamAHandicapStrokes={activeMatch.teamAHandicapAllowance}
-                        teamBHandicapStrokes={activeMatch.teamBHandicapAllowance}
-                        holeHandicaps={holeHandicaps}
-                        initialTeamAScore={currentHoleResult?.teamAScore || null}
-                        initialTeamBScore={currentHoleResult?.teamBScore || null}
-                        onSubmit={handleScoreWithStrokes}
-                        isSubmitting={isSaving}
-                      />
-                      {currentHoleResult &&
-                        (currentHoleResult.teamAScore || currentHoleResult.teamBScore) && (
-                          <div className="mt-4 rounded-[20px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-4 py-3">
-                            <p className="text-center text-xs text-[var(--ink-tertiary)]">
-                              Previous score: {teamAName} {currentHoleResult.teamAScore} -{' '}
-                              {currentHoleResult.teamBScore} {teamBName}
-                            </p>
-                          </div>
-                        )}
-                    </motion.div>
-                  ) : scoringMode === 'fourball' ? (
-                    <motion.div
-                      key="fourball"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <FourballScoreEntry
-                        holeNumber={currentHole}
-                        par={currentPar}
-                        teamAName={teamAName}
-                        teamBName={teamBName}
-                        teamAColor={teamAColor}
-                        teamBColor={teamBColor}
-                        teamAPlayers={teamAPlayers.map((p) => ({
-                          id: p!.id,
-                          name: formatPlayerName(p!.firstName, p!.lastName),
-                          courseHandicap: p!.handicapIndex || 0,
-                        }))}
-                        teamBPlayers={teamBPlayers.map((p) => ({
-                          id: p!.id,
-                          name: formatPlayerName(p!.firstName, p!.lastName),
-                          courseHandicap: p!.handicapIndex || 0,
-                        }))}
-                        holeHandicaps={holeHandicaps}
-                        initialTeamAScores={currentHoleResult?.teamAPlayerScores}
-                        initialTeamBScores={currentHoleResult?.teamBPlayerScores}
-                        onSubmit={handleFourballScore}
-                        isSubmitting={isSaving}
-                      />
-                    </motion.div>
-                  ) : scoringMode === 'oneHanded' ? (
-                    <motion.div
-                      key="oneHanded"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                    >
-                      <OneHandedScoringPanel
-                        holeNumber={currentHole}
-                        teamAName={teamAName}
-                        teamBName={teamBName}
-                        teamAColor={teamAColor}
-                        teamBColor={teamBColor}
-                        existingResult={currentHoleResult?.winner}
-                        onScore={handleScore}
-                        onPrevHole={prevHole}
-                        onNextHole={nextHole}
-                        onUndo={handleUndo}
-                        canUndo={undoStack.length > 0}
-                        disabled={isSaving}
-                        preferredHand={scoringPreferences.preferredHand}
-                        currentScore={matchState.currentScore}
-                        holesPlayed={matchState.holesPlayed}
-                      />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="buttons"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="grid grid-cols-3 gap-3"
-                    >
-                      <button
-                        onClick={() => handleScore('teamA')}
-                        disabled={isSaving}
-                        className={cn(
-                          'rounded-[24px] border px-4 py-5 text-left font-sans transition-transform active:scale-[0.98]',
-                          currentHoleResult?.winner === 'teamA'
-                            ? 'border-[color:var(--gold)]'
-                            : 'border-transparent'
-                        )}
-                        style={{
-                          background: 'linear-gradient(180deg, var(--team-usa) 0%, rgba(20,92,163,0.9) 100%)',
-                          color: 'var(--canvas)',
-                          opacity: isSaving ? 0.5 : 1,
-                        }}
-                        aria-pressed={currentHoleResult?.winner === 'teamA'}
-                        aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
-                      >
-                        <span className="block text-[length:var(--text-lg)] font-semibold">{teamAName}</span>
-                        <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleScore('halved')}
-                        disabled={isSaving}
-                        className={cn(
-                          'rounded-[24px] border px-4 py-5 font-sans transition-transform active:scale-[0.98]',
-                          currentHoleResult?.winner === 'halved'
-                            ? 'border-[color:var(--gold)]'
-                            : 'border-[color:var(--rule)]'
-                        )}
-                        style={{
-                          background: 'var(--canvas-raised)',
-                          opacity: isSaving ? 0.5 : 1,
-                        }}
-                        aria-pressed={currentHoleResult?.winner === 'halved'}
-                        aria-label={`Score hole: Halved${currentHoleResult?.winner === 'halved' ? ' (selected)' : ''}`}
-                      >
-                        <span className="block text-[length:var(--text-lg)] font-semibold text-[var(--ink)]">
-                          Halve
-                        </span>
-                        <span className="mt-1 block text-[length:var(--text-xs)] text-[var(--ink-tertiary)]">
-                          tie hole
-                        </span>
-                      </button>
-
-                      <button
-                        onClick={() => handleScore('teamB')}
-                        disabled={isSaving}
-                        className={cn(
-                          'rounded-[24px] border px-4 py-5 text-right font-sans transition-transform active:scale-[0.98]',
-                          currentHoleResult?.winner === 'teamB'
-                            ? 'border-[color:var(--gold)]'
-                            : 'border-transparent'
-                        )}
-                        style={{
-                          background: 'linear-gradient(180deg, var(--team-europe) 0%, rgba(132,41,61,0.92) 100%)',
-                          color: 'var(--canvas)',
-                          opacity: isSaving ? 0.5 : 1,
-                        }}
-                        aria-pressed={currentHoleResult?.winner === 'teamB'}
-                        aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
-                      >
-                        <span className="block text-[length:var(--text-lg)] font-semibold">{teamBName}</span>
-                        <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            <div className="card-editorial overflow-hidden">
-              <button
-                onClick={() => setShowAdvancedTools((prev) => !prev)}
-                className="flex w-full items-center justify-between px-4 py-4 sm:px-5"
-                aria-expanded={showAdvancedTools}
-                aria-controls="advanced-scoring-tools"
-              >
-                <div className="text-left">
-                  <p className="type-overline text-[var(--ink-secondary)]">Advanced tools</p>
-                  <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                    Press tracking and side bets live here.
-                  </p>
-                </div>
-                <ChevronRight
-                  size={18}
-                  className={cn(
-                    'text-[var(--ink-tertiary)] transition-transform',
-                    showAdvancedTools && 'rotate-90'
-                  )}
-                />
-              </button>
-
-              {showAdvancedTools && (
-                <div id="advanced-scoring-tools" className="space-y-4 border-t border-[color:var(--rule)] px-4 py-4 sm:px-5">
-                  <PressTracker
-                    currentHole={currentHole}
-                    mainMatchScore={matchState.currentScore}
-                    holesRemaining={matchState.holesRemaining}
-                    presses={presses}
-                    onPress={handlePress}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    betAmount={10}
-                    autoPress={false}
-                  />
-
-                  <SideBetReminder
-                    currentHole={currentHole}
-                    bets={activeSideBets}
-                    currentPlayerId={teamAPlayers[0]?.id}
-                  />
-                </div>
-              )}
-            </div>
-          </section>
         ) : (
           <MatchScoringCompleteState
             confettiPieces={confettiPieces}
@@ -1622,32 +1078,6 @@ export default function MatchScoringPageClient() {
           <WeatherAlerts showWeatherBar={true} />
         </section>
       </main>
-
-      {/* Quick Photo Capture - Fixed position */}
-      {!isMatchComplete && (
-        <div className="fixed bottom-24 left-4 z-40">
-          <QuickPhotoCapture
-            matchId={matchId}
-            holeNumber={currentHole}
-            teamAName={teamAName}
-            teamBName={teamBName}
-            onCapture={handlePhotoCapture}
-          />
-        </div>
-      )}
-
-      {/* Voice Scoring FAB - Fixed position, restrained */}
-      {!isMatchComplete && (
-        <div className="fixed bottom-24 right-4 z-40">
-          <button
-            onClick={() => setShowVoiceModal(true)}
-            className="w-14 h-14 rounded-full flex items-center justify-center bg-masters text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity"
-            aria-label="Voice scoring"
-          >
-            <Mic size={24} />
-          </button>
-        </div>
-      )}
 
       {/* Confirm Dialog */}
       {ConfirmDialogComponent}

@@ -2,7 +2,16 @@ import { cn } from '@/lib/utils';
 
 export type ScoringMode = 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded';
 
-export function getScoringModeMeta(scoringMode: ScoringMode, isFourball: boolean) {
+export interface ScoringModeMeta {
+  label: string;
+  note: string;
+  description: string;
+}
+
+export function getScoringModeMeta(
+  scoringMode: ScoringMode,
+  isFourball: boolean
+): ScoringModeMeta {
   switch (scoringMode) {
     case 'swipe':
       return {
