@@ -19,6 +19,8 @@ import {
   markAsPaid,
   waiveDues,
   getTripPayments,
+  buildPlayerFinancialSummary,
+  buildTripFinancialSummary,
   getPlayerFinancialSummary,
   getTripFinancialSummary,
   getVenmoLink,
@@ -527,6 +529,96 @@ describe('DuesService', () => {
   // ============================================
   // SUMMARIES
   // ============================================
+
+  describe('buildPlayerFinancialSummary', () => {
+    it('should exclude waived items while preserving them in the ledger list', async () => {
+      await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'green_fee',
+        description: 'Green Fee',
+        amount: 15000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+
+      const waivedItem = await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'food_beverage',
+        description: 'Dinner (comped)',
+        amount: 8000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+
+      await waiveDues(waivedItem.id);
+
+      const lineItems = await getPlayerDues(TRIP_ID, PLAYER_1_ID);
+      const payments = await getTripPayments(TRIP_ID);
+      const summary = buildPlayerFinancialSummary({
+        playerId: PLAYER_1_ID,
+        playerName: 'Tiger Woods',
+        lineItems,
+        payments,
+      });
+
+      expect(summary.totalDues).toBe(15000);
+      expect(summary.totalPaid).toBe(0);
+      expect(summary.balance).toBe(15000);
+      expect(summary.lineItems).toHaveLength(2);
+    });
+  });
+
+  describe('buildTripFinancialSummary', () => {
+    it('should ignore waived items and report zero-dues trips as settled', async () => {
+      const players: Player[] = [
+        createMockPlayer(PLAYER_1_ID, 'Tiger', 'Woods'),
+        createMockPlayer(PLAYER_2_ID, 'Phil', 'Mickelson'),
+      ];
+
+      const greenFee = await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'green_fee',
+        description: 'Green Fee',
+        amount: 15000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+
+      const waivedItem = await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'food_beverage',
+        description: 'Dinner (comped)',
+        amount: 8000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+
+      await waiveDues(waivedItem.id);
+      await markAsPaid(greenFee.id, 'cash', CAPTAIN_ID);
+
+      const summary = buildTripFinancialSummary(
+        TRIP_ID,
+        players,
+        await getTripDues(TRIP_ID),
+        await getTripPayments(TRIP_ID),
+      );
+
+      expect(summary.totalCollectable).toBe(15000);
+      expect(summary.totalCollected).toBe(15000);
+      expect(summary.outstandingBalance).toBe(0);
+      expect(summary.isFullySettled).toBe(true);
+      expect(summary.playerSummaries[1].totalDues).toBe(0);
+      expect(summary.playerSummaries[1].balance).toBe(0);
+    });
+  });
 
   describe('getPlayerFinancialSummary', () => {
     it('should compute correct totals for unpaid dues', async () => {

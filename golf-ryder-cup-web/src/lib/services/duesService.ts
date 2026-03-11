@@ -22,6 +22,12 @@ import type { Player } from '@/lib/types/models';
 
 const logger = createLogger('DuesService');
 
+type FinancialSummaryPlayer = Pick<Player, 'id' | 'firstName' | 'lastName'>;
+
+function formatPlayerName(player: FinancialSummaryPlayer): string {
+  return `${player.firstName}${player.lastName ? ` ${player.lastName}` : ''}`;
+}
+
 // ============================================
 // DUES CRUD
 // ============================================
@@ -172,22 +178,20 @@ export async function getTripPayments(tripId: string): Promise<PaymentRecord[]> 
 // SUMMARIES (Computed)
 // ============================================
 
-/** Get financial summary for a single player */
-export async function getPlayerFinancialSummary(
-  tripId: string,
-  playerId: string,
-  playerName: string,
-): Promise<PlayerFinancialSummary> {
-  const lineItems = await getPlayerDues(tripId, playerId);
-  const allPayments = await getTripPayments(tripId);
-  const payments = allPayments.filter(p => p.fromPlayerId === playerId);
-
-  const totalDues = lineItems
-    .filter(i => i.status !== 'waived')
-    .reduce((sum, i) => sum + i.amount, 0);
-  const totalPaid = lineItems
-    .filter(i => i.status !== 'waived')
-    .reduce((sum, i) => sum + i.amountPaid, 0);
+export function buildPlayerFinancialSummary({
+  playerId,
+  playerName,
+  lineItems,
+  payments,
+}: {
+  playerId: string;
+  playerName: string;
+  lineItems: DuesLineItem[];
+  payments: PaymentRecord[];
+}): PlayerFinancialSummary {
+  const collectableLineItems = lineItems.filter(item => item.status !== 'waived');
+  const totalDues = collectableLineItems.reduce((sum, item) => sum + item.amount, 0);
+  const totalPaid = collectableLineItems.reduce((sum, item) => sum + item.amountPaid, 0);
 
   return {
     playerId,
@@ -200,27 +204,26 @@ export async function getPlayerFinancialSummary(
   };
 }
 
-/** Get trip-wide financial summary */
-export async function getTripFinancialSummary(
+export function buildTripFinancialSummary(
   tripId: string,
-  players: Player[],
-): Promise<TripFinancialSummary> {
-  const playerSummaries: PlayerFinancialSummary[] = [];
+  players: FinancialSummaryPlayer[],
+  lineItems: DuesLineItem[],
+  paymentRecords: PaymentRecord[],
+): TripFinancialSummary {
+  const playerSummaries = players.map((player) =>
+    buildPlayerFinancialSummary({
+      playerId: player.id,
+      playerName: formatPlayerName(player),
+      lineItems: lineItems.filter((item) => item.playerId === player.id),
+      payments: paymentRecords.filter((payment) => payment.fromPlayerId === player.id),
+    })
+  );
 
-  for (const player of players) {
-    const summary = await getPlayerFinancialSummary(
-      tripId,
-      player.id,
-      `${player.firstName} ${player.lastName}`,
-    );
-    playerSummaries.push(summary);
-  }
-
-  const totalCollectable = playerSummaries.reduce((sum, s) => sum + s.totalDues, 0);
-  const totalCollected = playerSummaries.reduce((sum, s) => sum + s.totalPaid, 0);
+  const totalCollectable = playerSummaries.reduce((sum, summary) => sum + summary.totalDues, 0);
+  const totalCollected = playerSummaries.reduce((sum, summary) => sum + summary.totalPaid, 0);
   const delinquent = playerSummaries
-    .filter(s => s.balance > 0)
-    .sort((a, b) => b.balance - a.balance);
+    .filter((summary) => summary.balance > 0)
+    .sort((left, right) => right.balance - left.balance);
 
   return {
     tripId,
@@ -231,6 +234,38 @@ export async function getTripFinancialSummary(
     delinquent,
     isFullySettled: delinquent.length === 0,
   };
+}
+
+/** Get financial summary for a single player */
+export async function getPlayerFinancialSummary(
+  tripId: string,
+  playerId: string,
+  playerName: string,
+): Promise<PlayerFinancialSummary> {
+  const [lineItems, allPayments] = await Promise.all([
+    getPlayerDues(tripId, playerId),
+    getTripPayments(tripId),
+  ]);
+
+  return buildPlayerFinancialSummary({
+    playerId,
+    playerName,
+    lineItems,
+    payments: allPayments.filter(payment => payment.fromPlayerId === playerId),
+  });
+}
+
+/** Get trip-wide financial summary */
+export async function getTripFinancialSummary(
+  tripId: string,
+  players: Player[],
+): Promise<TripFinancialSummary> {
+  const [lineItems, paymentRecords] = await Promise.all([
+    getTripDues(tripId),
+    getTripPayments(tripId),
+  ]);
+
+  return buildTripFinancialSummary(tripId, players, lineItems, paymentRecords);
 }
 
 // ============================================
