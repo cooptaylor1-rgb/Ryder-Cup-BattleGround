@@ -25,6 +25,7 @@ export interface ConfirmDialogProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void | Promise<void>;
+    onCancel?: () => void;
     title: string;
     message: string;
     confirmLabel?: string;
@@ -73,6 +74,7 @@ export function ConfirmDialog({
     isOpen,
     onClose,
     onConfirm,
+    onCancel,
     title,
     message,
     confirmLabel = 'Confirm',
@@ -133,7 +135,10 @@ export function ConfirmDialog({
                 <div className="flex gap-3">
                     <Button
                         variant="secondary"
-                        onClick={onClose}
+                        onClick={() => {
+                            onCancel?.();
+                            onClose();
+                        }}
                         disabled={isLoading}
                         className="flex-1"
                     >
@@ -184,6 +189,7 @@ export function useConfirmDialog() {
     const [config, setConfig] = useState<Omit<ConfirmDialogProps, 'isOpen' | 'onClose'>>({
         onConfirm: () => {
         },
+        onCancel: undefined,
         title: '',
         message: '',
     });

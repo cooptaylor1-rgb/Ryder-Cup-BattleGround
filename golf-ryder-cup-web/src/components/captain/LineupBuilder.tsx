@@ -83,7 +83,7 @@ interface LineupBuilderProps {
   initialMatches?: MatchSlot[];
   onSave?: (matches: MatchSlot[]) => void;
   onPublish?: (matches: MatchSlot[]) => void;
-  onDeleteMatch?: (matchId: string) => Promise<void>;
+  onDeleteMatch?: (matchId: string) => Promise<boolean | void>;
   onAutoFill?: () => MatchSlot[];
   calculateFairness?: (matches: MatchSlot[]) => FairnessScore;
   isLocked?: boolean;
@@ -237,14 +237,15 @@ export function LineupBuilder({
     async (matchId: string) => {
       if (isLocked) return;
 
-      // Remove from local state
+      if (onDeleteMatch) {
+        const wasDeleted = await onDeleteMatch(matchId);
+        if (wasDeleted === false) {
+          return;
+        }
+      }
+
       setMatches((prev) => prev.filter((match) => match.id !== matchId));
       setHasChanges(true);
-
-      // Call the external delete handler to remove from database
-      if (onDeleteMatch) {
-        await onDeleteMatch(matchId);
-      }
     },
     [isLocked, onDeleteMatch]
   );
