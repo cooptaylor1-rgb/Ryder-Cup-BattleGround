@@ -39,14 +39,6 @@ export {
 // Phase 5: Data Integration Hooks
 // ============================================
 
-// Match scoring management
-export {
-  useMatchScoring,
-  type HoleScore,
-  type MatchStatus,
-  type PlayerRoundStats,
-} from './useMatchScoring';
-
 // Real-time live updates
 export {
   useLiveUpdates,

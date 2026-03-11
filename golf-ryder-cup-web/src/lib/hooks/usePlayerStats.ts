@@ -13,12 +13,22 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import type { Match, Player } from '../types/models';
+import type { Match, Player, RyderCupSession } from '../types/models';
+import {
+  filterMatchesByTrip,
+  getOpponentIdsForPlayer,
+  getPartnerIdsForPlayer,
+  resolvePlayerPerspectiveResult,
+  resolveRoundFormat,
+  type PlayerPerspectiveResult,
+} from './playerStatsUtils';
 
 const EMPTY_MATCHES: Match[] = [];
+const EMPTY_PLAYERS: Player[] = [];
+const EMPTY_SESSIONS: RyderCupSession[] = [];
 
 // ============================================
 // TYPES
@@ -136,7 +146,7 @@ interface UsePlayerStatsReturn {
 
 function calculateCareerStats(
     matches: {
-        result: 'win' | 'loss' | 'halved';
+        result: PlayerPerspectiveResult;
         score: number;
         toPar: number;
         birdies: number;
@@ -241,7 +251,7 @@ function calculateHeadToHead(
     matches: {
         opponentId: string;
         opponentName: string;
-        result: 'win' | 'loss' | 'halved';
+        result: PlayerPerspectiveResult;
     }[]
 ): HeadToHeadRecord[] {
     const recordMap = new Map<
@@ -282,9 +292,6 @@ function calculateHeadToHead(
 // ============================================
 
 export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): UsePlayerStatsReturn {
-    // Error state for potential async error handling
-    const [error, _setError] = useState<Error | null>(null);
-
     // Fetch player
     const player = useLiveQuery(
         async () => {
@@ -311,11 +318,49 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
         []
     ) ?? EMPTY_MATCHES;
 
+    const sessionIds = useMemo(
+        () => [...new Set(allMatches.map((match) => match.sessionId).filter(Boolean))],
+        [allMatches]
+    );
+    const sessions: RyderCupSession[] = useLiveQuery(
+        async () => {
+            if (sessionIds.length === 0) return [];
+            return (await db.sessions.bulkGet(sessionIds)).filter(Boolean) as RyderCupSession[];
+        },
+        [sessionIds.join('|')],
+        []
+    ) ?? EMPTY_SESSIONS;
+    const sessionsById = useMemo(
+        () => new Map(sessions.map((session) => [session.id, session])),
+        [sessions]
+    );
+
+    const relatedPlayerIds = useMemo(
+        () => [
+            ...new Set(
+                allMatches.flatMap((match) => [...match.teamAPlayerIds, ...match.teamBPlayerIds])
+            ),
+        ].filter((id) => id !== playerId),
+        [allMatches, playerId]
+    );
+    const relatedPlayers: Player[] = useLiveQuery(
+        async () => {
+            if (relatedPlayerIds.length === 0) return [];
+            return (await db.players.bulkGet(relatedPlayerIds)).filter(Boolean) as Player[];
+        },
+        [relatedPlayerIds.join('|')],
+        []
+    ) ?? EMPTY_PLAYERS;
+    const playersById = useMemo(
+        () => new Map(relatedPlayers.map((relatedPlayer) => [relatedPlayer.id, relatedPlayer])),
+        [relatedPlayers]
+    );
+
     // Filter for trip-specific matches if tripId provided
     const tripMatches = useMemo(() => {
         if (!tripId) return null;
-        return allMatches.filter((m: Match) => m.sessionId && tripId);
-    }, [allMatches, tripId]);
+        return filterMatchesByTrip(allMatches, sessionsById, tripId);
+    }, [allMatches, sessionsById, tripId]);
 
     // Fetch achievements
     const achievements = useLiveQuery(
@@ -334,17 +379,13 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
             return calculateCareerStats([]);
         }
 
-        // Transform matches to stats format
-        const statsMatches = allMatches.map((m: Match) => {
-            const isTeamA = m.teamAPlayerIds?.includes(playerId);
-            const result =
-                m.result === 'halved'
-                    ? ('halved' as const)
-                    : (isTeamA && m.result === 'teamAWin') || (!isTeamA && m.result === 'teamBWin')
-                        ? ('win' as const)
-                        : ('loss' as const);
+        const statsMatches = allMatches.flatMap((m: Match) => {
+            const result = resolvePlayerPerspectiveResult(m, playerId);
+            if (!result) {
+                return [];
+            }
 
-            return {
+            return [{
                 result,
                 score: 0, // Would come from round data
                 toPar: 0,
@@ -352,7 +393,7 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
                 pars: 0,
                 bogeys: 0,
                 doublePlus: 0,
-            };
+            }];
         });
 
         return calculateCareerStats(statsMatches);
@@ -362,16 +403,13 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
     const tripStats = useMemo(() => {
         if (!tripMatches || tripMatches.length === 0) return null;
 
-        const statsMatches = tripMatches.map((m: Match) => {
-            const isTeamA = m.teamAPlayerIds?.includes(playerId);
-            const result =
-                m.result === 'halved'
-                    ? ('halved' as const)
-                    : (isTeamA && m.result === 'teamAWin') || (!isTeamA && m.result === 'teamBWin')
-                        ? ('win' as const)
-                        : ('loss' as const);
+        const statsMatches = tripMatches.flatMap((m: Match) => {
+            const result = resolvePlayerPerspectiveResult(m, playerId);
+            if (!result) {
+                return [];
+            }
 
-            return {
+            return [{
                 result,
                 score: 0,
                 toPar: 0,
@@ -379,7 +417,7 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
                 pars: 0,
                 bogeys: 0,
                 doublePlus: 0,
-            };
+            }];
         });
 
         return calculateCareerStats(statsMatches);
@@ -389,16 +427,30 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
     const recentRounds = useMemo((): RoundStats[] => {
         if (!allMatches) return [];
 
-        return allMatches.slice(-10).map((m: Match) => {
-            const isTeamA = m.teamAPlayerIds?.includes(playerId);
-            const result =
-                m.result === 'halved'
-                    ? ('halved' as const)
-                    : (isTeamA && m.result === 'teamAWin') || (!isTeamA && m.result === 'teamBWin')
-                        ? ('win' as const)
-                        : ('loss' as const);
+        return [...allMatches]
+            .sort((a, b) => {
+                const aTime = Date.parse(a.updatedAt || a.createdAt || '');
+                const bTime = Date.parse(b.updatedAt || b.createdAt || '');
+                return bTime - aTime;
+            })
+            .flatMap((m: Match) => {
+            const result = resolvePlayerPerspectiveResult(m, playerId);
+            if (!result) {
+                return [];
+            }
 
-            return {
+            const partner = getPartnerIdsForPlayer(m, playerId)
+                .map((id) => playersById.get(id))
+                .filter((entry): entry is Player => Boolean(entry))
+                .map((entry) => `${entry.firstName} ${entry.lastName}`)
+                .join(' / ');
+            const opponent = getOpponentIdsForPlayer(m, playerId)
+                .map((id) => playersById.get(id))
+                .filter((entry): entry is Player => Boolean(entry))
+                .map((entry) => `${entry.firstName} ${entry.lastName}`)
+                .join(' / ');
+
+            return [{
                 roundId: m.id,
                 date: m.createdAt || new Date().toISOString(),
                 courseName: 'Unknown Course', // Would need course lookup
@@ -409,34 +461,38 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
                 bogeys: 0,
                 doubleBogeys: 0,
                 matchResult: result,
-                format: 'singles' as const, // Would need to get from session
-            };
-        });
-    }, [allMatches, playerId]);
+                format: resolveRoundFormat(sessionsById.get(m.sessionId)?.sessionType),
+                partner: partner || undefined,
+                opponent: opponent || undefined,
+            }];
+        }).slice(0, 10);
+    }, [allMatches, playerId, playersById, sessionsById]);
 
     // Head to head records
     const headToHead = useMemo(() => {
         if (!allMatches) return [];
 
-        const h2hMatches = allMatches.map((m: Match) => {
-            const isTeamA = m.teamAPlayerIds?.includes(playerId);
-            const opponentIds = isTeamA ? m.teamBPlayerIds : m.teamAPlayerIds;
-            const result =
-                m.result === 'halved'
-                    ? ('halved' as const)
-                    : (isTeamA && m.result === 'teamAWin') || (!isTeamA && m.result === 'teamBWin')
-                        ? ('win' as const)
-                        : ('loss' as const);
+        const h2hMatches = allMatches.flatMap((m: Match) => {
+            const result = resolvePlayerPerspectiveResult(m, playerId);
+            if (!result) {
+                return [];
+            }
 
-            return {
-                opponentId: opponentIds?.[0] || 'unknown',
-                opponentName: 'Opponent', // Would come from player lookup
-                result,
-            };
+            return getOpponentIdsForPlayer(m, playerId).map((opponentId) => {
+                const opponent = playersById.get(opponentId);
+
+                return {
+                    opponentId,
+                    opponentName: opponent
+                        ? `${opponent.firstName} ${opponent.lastName}`
+                        : 'Opponent',
+                    result,
+                };
+            });
         });
 
         return calculateHeadToHead(h2hMatches);
-    }, [allMatches, playerId]);
+    }, [allMatches, playerId, playersById]);
 
     // Scoring trends (by month/week)
     const scoringTrends = useMemo((): ScoringTrend[] => {
@@ -455,15 +511,15 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
         };
 
         for (const m of allMatches) {
-            // Use matchOrder as proxy for format (in real impl would get from session)
-            const format = 'singles';
+            const result = resolvePlayerPerspectiveResult(m, playerId);
+            if (!result) {
+                continue;
+            }
+
+            const format = resolveRoundFormat(sessionsById.get(m.sessionId)?.sessionType);
             if (formatStats[format]) {
                 formatStats[format].total++;
-                const isTeamA = m.teamAPlayerIds?.includes(playerId);
-                if (
-                    (isTeamA && m.result === 'teamAWin') ||
-                    (!isTeamA && m.result === 'teamBWin')
-                ) {
+                if (result === 'win') {
                     formatStats[format].wins++;
                 }
             }
@@ -483,7 +539,7 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
         }
 
         return best;
-    }, [allMatches, playerId]);
+    }, [allMatches, playerId, sessionsById]);
 
     // Clutch percentage (placeholder - would need close match data)
     const clutchPercentage = useMemo(() => {
@@ -541,8 +597,8 @@ export function usePlayerStats({ playerId, tripId }: UsePlayerStatsOptions): Use
         nemesis,
 
         // State
-        isLoading: !player && !error,
-        error: error,
+        isLoading: !player,
+        error: null,
     };
 }
 
