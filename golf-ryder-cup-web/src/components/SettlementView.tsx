@@ -5,7 +5,10 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
-import { generateTripSettlement } from '@/lib/services/extendedSideGamesService';
+import {
+  buildTripSettlementSummary,
+  getSettlementActivitySummary,
+} from '@/lib/services/tripSettlementService';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import type { TripSettlementSummary, SettlementTransaction } from '@/lib/types/sideGames';
 import {
@@ -79,34 +82,35 @@ export default function SettlementView() {
     []
   );
 
-  // Calculate settlement
-  const settlement: TripSettlementSummary | null = useMemo(() => {
-    if (!currentTrip || !wolfGames || !vegasGames || !hammerGames || !nassauGames) {
+  const activitySummary = useMemo(() => {
+    if (!currentTrip) {
       return null;
     }
 
-    // Extract skins results from completed skins bets
-    const skinsResults = (sideBets ?? [])
-      .filter((b) => b.type === 'skins' && b.status === 'completed' && b.winnerId)
-      .flatMap((b) => {
-        const pot = b.pot || 0;
-        const participants = b.participantIds || [];
-        const perPlayer = participants.length > 0 ? pot / participants.length : 0;
-        return participants.map((id) => ({
-          playerId: id,
-          amount: id === b.winnerId ? pot - perPlayer : -perPlayer,
-        }));
-      });
-
-    return generateTripSettlement(
-      currentTrip.id,
+    return getSettlementActivitySummary({
       wolfGames,
       vegasGames,
       hammerGames,
       nassauGames,
-      skinsResults,
-      players
-    );
+      sideBets,
+    });
+  }, [currentTrip, wolfGames, vegasGames, hammerGames, nassauGames, sideBets]);
+
+  // Calculate settlement from completed games only
+  const settlement: TripSettlementSummary | null = useMemo(() => {
+    if (!currentTrip) {
+      return null;
+    }
+
+    return buildTripSettlementSummary({
+      tripId: currentTrip.id,
+      wolfGames,
+      vegasGames,
+      hammerGames,
+      nassauGames,
+      sideBets,
+      players,
+    });
   }, [currentTrip, wolfGames, vegasGames, hammerGames, nassauGames, sideBets, players]);
 
   const handleMarkSettled = async (_txId: string) => {
@@ -145,21 +149,14 @@ export default function SettlementView() {
     );
   }
 
-  const hasGames =
-    (wolfGames?.length ?? 0) +
-      (vegasGames?.length ?? 0) +
-      (hammerGames?.length ?? 0) +
-      (nassauGames?.length ?? 0) >
-    0;
-
-  if (!hasGames && (sideBets?.length ?? 0) === 0) {
+  if (!activitySummary?.hasSettleableActivity) {
     return (
       <div className="py-12 text-center">
         <Wallet size={40} className="mx-auto mb-4 text-[var(--ink-tertiary)]" />
         <p className="type-title-sm mb-2 text-[var(--ink)]">No games to settle</p>
         <p className="type-body-sm text-[var(--ink-secondary)]">
-          Completed Wolf, Vegas, Hammer, Nassau, and Skins games will appear here with a &ldquo;who
-          owes who&rdquo; summary.
+          Completed Wolf, Vegas, Hammer, Nassau, and Skins results will appear here with a &ldquo;who
+          owes who&rdquo; summary once they are actually ready to settle.
         </p>
       </div>
     );
