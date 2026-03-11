@@ -101,14 +101,17 @@ export async function generateTripRecap(tripId: UUID): Promise<TripRecapData | n
   const trip = await db.trips.get(tripId);
   if (!trip) return null;
 
-  // 1. Compute trip records (awards, player stats, final score)
-  const records = await computeTripRecords(tripId);
-
-  // 2. Load sessions for day-by-day recaps
+  // 1. Load the trip schedule and matches first so recap generation only happens
+  // once the trip has enough completed competition to tell a real story.
   const sessions = await db.sessions.where('tripId').equals(tripId).sortBy('sessionNumber');
   const matches = await loadTripMatches(tripId);
+  const completedMatches = matches.filter((match: Match) => match.status === 'completed');
+  if (completedMatches.length === 0) return null;
+
+  // 2. Compute trip records (awards, player stats, final score)
+  const records = await computeTripRecords(tripId);
   const players = await db.players.where('tripId').equals(tripId).toArray();
-  const playerMap = new Map<UUID, Player>(players.map(p => [p.id, p]));
+  const playerMap = new Map<UUID, Player>(players.map((player) => [player.id, player]));
 
   // 3. Generate editorial narrative for the completed trip
   const narrative = buildTripNarrative(trip.name, records);
@@ -133,12 +136,10 @@ export async function generateTripRecap(tripId: UUID): Promise<TripRecapData | n
   const topPhotos = await loadTopPhotos(tripId);
 
   // 8. Generate highlights from match results
-  const highlights = generateHighlights(matches, records, playerMap);
+  const highlights = generateHighlights(completedMatches, records, playerMap);
 
   // 9. Build match results summary
-  const matchResults = matches
-    .filter((m: Match) => m.status === 'completed')
-    .map((m: Match) => {
+  const matchResults = completedMatches.map((m: Match) => {
       const teamANames = m.teamAPlayerIds
         .map((id: string) => playerMap.get(id))
         .filter((p): p is Player => Boolean(p))
@@ -167,7 +168,7 @@ export async function generateTripRecap(tripId: UUID): Promise<TripRecapData | n
     narrative,
     dayRecaps,
     awards: records.awards,
-    playerLeaderboard: records.playerStats.sort((a, b) => b.points - a.points),
+    playerLeaderboard: [...records.playerStats].sort((a, b) => b.points - a.points),
     funStats,
     topTrashTalk,
     topPhotos,
@@ -292,6 +293,7 @@ async function loadTopPhotos(tripId: UUID): Promise<TripRecapData['topPhotos']> 
       }))
       .sort((a, b) => {
         if (a.isMomentOfTrip !== b.isMomentOfTrip) return a.isMomentOfTrip ? -1 : 1;
+        if (a.momentVotes !== b.momentVotes) return b.momentVotes - a.momentVotes;
         return b.likeCount - a.likeCount;
       })
       .slice(0, 8);
@@ -355,6 +357,10 @@ function generateHighlights(
   }
 
   return highlights;
+}
+
+export function buildRecapShareText(recap: TripRecapData): string {
+  return `${recap.narrative.headline}\n\nFinal Score: USA ${recap.finalScore.usa} - ${recap.finalScore.europe} Europe\n\n${recap.narrative.body}`;
 }
 
 // ============================================
