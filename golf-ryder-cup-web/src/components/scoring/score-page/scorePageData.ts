@@ -1,0 +1,108 @@
+import { calculateMatchState } from '@/lib/services/scoringEngine';
+import type { Match } from '@/lib/types';
+import type { MatchState } from '@/lib/types/computed';
+import type { HoleResult, Player, RyderCupSession } from '@/lib/types/models';
+
+interface ScoreUserIdentity {
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+}
+
+export function findCurrentUserPlayer(
+    players: Player[],
+    currentUser: ScoreUserIdentity | null,
+    isAuthenticated: boolean
+): Player | undefined {
+    if (!isAuthenticated || !currentUser) return undefined;
+
+    return players.find((player) => {
+        const playerEmail = player.email?.toLowerCase();
+        const userEmail = currentUser.email?.toLowerCase();
+        if (playerEmail && userEmail && playerEmail === userEmail) return true;
+
+        const playerFirst = (player.firstName ?? '').toLowerCase();
+        const playerLast = (player.lastName ?? '').toLowerCase();
+        const userFirst = (currentUser.firstName ?? '').toLowerCase();
+        const userLast = (currentUser.lastName ?? '').toLowerCase();
+
+        if (!playerFirst || !userFirst || !playerLast || !userLast) return false;
+        return playerFirst === userFirst && playerLast === userLast;
+    });
+}
+
+export function getDefaultActiveScoringSession(
+    sessions: RyderCupSession[]
+): RyderCupSession | undefined {
+    return sessions.find((session) => session.status === 'inProgress') ??
+        sessions.find((session) => session.status === 'scheduled');
+}
+
+export function getResolvedActiveScoringSession(
+    sessions: RyderCupSession[],
+    selectedSessionId: string | null
+): RyderCupSession | undefined {
+    const defaultSession = getDefaultActiveScoringSession(sessions);
+    return selectedSessionId
+        ? sessions.find((session) => session.id === selectedSessionId) ?? defaultSession
+        : defaultSession;
+}
+
+export function buildHoleResultsByMatchId(holeResults: HoleResult[] | undefined) {
+    const list = holeResults ?? [];
+    const map = new Map<string, HoleResult[]>();
+
+    for (const result of list) {
+        const existing = map.get(result.matchId) ?? [];
+        existing.push(result);
+        map.set(result.matchId, existing);
+    }
+
+    return map;
+}
+
+export function buildScoringMatchStates(
+    matches: Match[] | undefined,
+    holeResultsByMatchId: Map<string, HoleResult[]>
+): MatchState[] {
+    return (matches ?? []).map((match) => {
+        const results = holeResultsByMatchId.get(match.id) ?? [];
+        return calculateMatchState(match, results);
+    });
+}
+
+export function getQuickContinueMatchId(matchStates: MatchState[]): string | undefined {
+    const inProgressMatches = matchStates.filter((state) => state.status === 'inProgress');
+    if (inProgressMatches.length !== 1) return undefined;
+    return inProgressMatches[0]?.match.id;
+}
+
+export function buildScoreSessionStats(
+    matchStates: MatchState[],
+    currentUserPlayerId?: string
+) {
+    let live = 0;
+    let completed = 0;
+    let userMatches = 0;
+
+    for (const matchState of matchStates) {
+        if (matchState.status === 'inProgress') live += 1;
+        if (matchState.status === 'completed') completed += 1;
+
+        if (
+            currentUserPlayerId &&
+            (matchState.match.teamAPlayerIds.includes(currentUserPlayerId) ||
+                matchState.match.teamBPlayerIds.includes(currentUserPlayerId))
+        ) {
+            userMatches += 1;
+        }
+    }
+
+    return { live, completed, userMatches };
+}
+
+export function getMatchPlayers(playerIds: string[], players: Player[]): Player[] {
+    return playerIds
+        .map((id) => players.find((player) => player.id === id))
+        .filter(Boolean) as Player[];
+}
