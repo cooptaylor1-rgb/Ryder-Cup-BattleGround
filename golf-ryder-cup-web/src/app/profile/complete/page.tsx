@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { PageLoadingSkeleton } from '@/components/ui';
 
 const CompleteProfilePageClient = dynamic(
-  () => import('@/components/player-onboarding/CompleteProfilePageClient'),
+  () => import('@/components/profile/CompleteProfilePageClient'),
   {
     loading: () => (
       <PageLoadingSkeleton title="Loading profile…" variant="form" showBackButton={false} />
