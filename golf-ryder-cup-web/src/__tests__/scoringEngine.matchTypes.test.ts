@@ -15,6 +15,7 @@ import {
   calculateMatchState,
   calculateMatchPoints,
   calculateMatchResult,
+  calculateStoredMatchResult,
 } from '@/lib/services/scoringEngine';
 import type { Match, HoleResult, HoleWinner } from '@/lib/types/models';
 
@@ -123,6 +124,7 @@ describe('ScoringEngine match-type golden tests', () => {
 
     const resultType = calculateMatchResult(state);
     expect(resultType).toBe('halved');
+    expect(calculateStoredMatchResult(state)).toBe('halved');
 
     const points = calculateMatchPoints(state);
     expect(points).toEqual({ teamAPoints: 0.5, teamBPoints: 0.5 });
@@ -159,6 +161,7 @@ describe('ScoringEngine match-type golden tests', () => {
 
     const resultType = calculateMatchResult(state);
     expect(resultType).toBe('oneUp');
+    expect(calculateStoredMatchResult(state)).toBe('teamAWin');
 
     const points = calculateMatchPoints(state);
     expect(points).toEqual({ teamAPoints: 1, teamBPoints: 0 });
@@ -174,6 +177,7 @@ describe('ScoringEngine match-type golden tests', () => {
     const inProgressState = calculateMatchState(match, inProgress);
     const inProgressPoints = calculateMatchPoints(inProgressState);
     expect(inProgressPoints.teamAPoints + inProgressPoints.teamBPoints).toBe(0);
+    expect(calculateStoredMatchResult(inProgressState)).toBe('notFinished');
 
     const completed = makeResults(
       Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, winner: 'halved' as HoleWinner }))

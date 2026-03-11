@@ -22,6 +22,7 @@ import {
   SESSION_TYPES,
   generateSessionName,
   getTodayDate,
+  isSupportedSessionType,
 } from './newLineupConfig';
 import { getTeamPlayersForLineup, toLineupPlayers } from './lineupBuilderData';
 
@@ -115,7 +116,12 @@ export default function NewLineupPageClient() {
     teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
     teamBPlayers.length >= selectedType.playersPerTeam * matchCount;
 
-  const handleTypeChange = useCallback((type: SessionType) => {
+  const handleTypeChange = useCallback((type: string) => {
+    if (!isSupportedSessionType(type)) {
+      showToast('info', 'That format is not available for live match sessions yet.');
+      return;
+    }
+
     setSessionType(type);
     const typeInfo =
       SESSION_TYPES.find((session) => session.value === type) ||
@@ -124,7 +130,7 @@ export default function NewLineupPageClient() {
     if (typeInfo) {
       setMatchCount(typeInfo.defaultMatches);
     }
-  }, []);
+  }, [showToast]);
 
   const allLineupPlayers = useMemo(
     () => [...lineupTeamA, ...lineupTeamB],

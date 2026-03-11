@@ -135,7 +135,7 @@ export function allocateStrokes(courseHandicap: number, holeHandicaps: number[])
     }
   }
 
-  return strokes;
+  return strokes.map((stroke) => (Object.is(stroke, -0) ? 0 : stroke));
 }
 
 /**

@@ -28,6 +28,7 @@ import { addAuditLogEntry, db } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createAuditEntry } from '@/lib/services/sessionLockService';
 import { createCorrelationId, trackFeature, trackScoreEntry, trackScoreUndo } from '@/lib/services/analyticsService';
+import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
 import { playScoreSound } from '@/lib/services/soundEffects';
 import type { HoleWinner, PlayerHoleScore } from '@/lib/types/models';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
@@ -64,6 +65,16 @@ import {
 import { useMatchPressTracking } from './useMatchPressTracking';
 import { hashStringToSeed, mulberry32, toReminderBet } from './matchScoringUtils';
 
+const DEFAULT_HOLE_HANDICAPS = [7, 11, 3, 13, 9, 1, 15, 5, 17, 8, 16, 10, 4, 12, 6, 18, 2, 14];
+
+function normalizeScoringMode(mode: ScoringMode, isFourball: boolean): ScoringMode {
+  if (isFourball) {
+    return mode === 'strokes' ? 'fourball' : mode;
+  }
+
+  return mode === 'fourball' ? 'buttons' : mode;
+}
+
 /**
  * Enhanced Match Scoring Page
  *
@@ -96,6 +107,7 @@ export default function MatchScoringPageClient() {
   const {
     showToast,
     scoringPreferences,
+    scoringModeByFormat,
     getScoringModeForFormat,
     setScoringModeForFormat,
     isCaptainMode,
@@ -172,11 +184,9 @@ export default function MatchScoringPageClient() {
   // Get tee set for handicap info
   const currentTeeSet = activeMatch?.teeSetId
     ? teeSets.find((t) => t.id === activeMatch.teeSetId)
-    : teeSets[0];
+    : undefined;
 
-  const holeHandicaps = currentTeeSet?.holeHandicaps || [
-    7, 11, 3, 13, 9, 1, 15, 5, 17, 8, 16, 10, 4, 12, 6, 18, 2, 14,
-  ];
+  const holeHandicaps = currentTeeSet?.holeHandicaps || DEFAULT_HOLE_HANDICAPS;
 
   // Load match on mount
   useEffect(() => {
@@ -238,16 +248,31 @@ export default function MatchScoringPageClient() {
 
   const isFourball = currentSession?.sessionType === 'fourball';
 
-  // Power user: Initialize scoring mode from persisted preference for this format
-  const [scoringMode, setScoringMode] = useState<ScoringMode>(() => {
-    if (!currentSession) return scoringPreferences.oneHandedMode ? 'oneHanded' : 'swipe';
-    return getScoringModeForFormat(currentSession.sessionType);
-  });
+  const scoringModeSessionKey = currentSession?.id ?? 'default';
+  const [scoringModeOverrides, setScoringModeOverrides] = useState<Record<string, ScoringMode>>(
+    {}
+  );
+  const preferredScoringMode = useMemo(() => {
+    if (!currentSession) {
+      return scoringPreferences.oneHandedMode ? 'oneHanded' : 'swipe';
+    }
+
+    return normalizeScoringMode(getScoringModeForFormat(currentSession.sessionType), isFourball);
+  }, [
+    currentSession,
+    getScoringModeForFormat,
+    isFourball,
+    scoringPreferences.oneHandedMode,
+  ]);
 
   const handleScoringModeChange = (mode: ScoringMode) => {
-    setScoringMode(mode);
+    const normalizedMode = normalizeScoringMode(mode, isFourball);
+    setScoringModeOverrides((current) => ({
+      ...current,
+      [scoringModeSessionKey]: normalizedMode,
+    }));
     if (currentSession) {
-      setScoringModeForFormat(currentSession.sessionType, mode);
+      setScoringModeForFormat(currentSession.sessionType, normalizedMode);
     }
   };
 
@@ -264,24 +289,55 @@ export default function MatchScoringPageClient() {
       .map((id) => players.find((player) => player.id === id))
       .filter((player): player is (typeof players)[number] => Boolean(player));
   }, [activeMatch, players]);
+  const matchHandicapContext = useMemo(
+    () =>
+      buildMatchHandicapContext({
+        sessionType: currentSession?.sessionType,
+        teamAPlayers,
+        teamBPlayers,
+        teeSet: currentTeeSet,
+      }),
+    [currentSession?.sessionType, teamAPlayers, teamBPlayers, currentTeeSet]
+  );
   const teamAFourballPlayers = useMemo(
     () =>
-      teamAPlayers.map((player) => ({
+      teamAPlayers.map((player, index) => ({
         id: player.id,
         name: formatPlayerName(player.firstName, player.lastName),
-        courseHandicap: player.handicapIndex || 0,
+        courseHandicap: matchHandicapContext.teamAPlayers[index]?.courseHandicap ?? 0,
+        strokeAllowance: matchHandicapContext.teamAPlayers[index]?.strokeAllowance ?? 0,
       })),
-    [teamAPlayers]
+    [teamAPlayers, matchHandicapContext.teamAPlayers]
   );
   const teamBFourballPlayers = useMemo(
     () =>
-      teamBPlayers.map((player) => ({
+      teamBPlayers.map((player, index) => ({
         id: player.id,
         name: formatPlayerName(player.firstName, player.lastName),
-        courseHandicap: player.handicapIndex || 0,
+        courseHandicap: matchHandicapContext.teamBPlayers[index]?.courseHandicap ?? 0,
+        strokeAllowance: matchHandicapContext.teamBPlayers[index]?.strokeAllowance ?? 0,
       })),
-    [teamBPlayers]
+    [teamBPlayers, matchHandicapContext.teamBPlayers]
   );
+
+  const effectiveScoringMode = scoringPreferences.oneHandedMode
+    ? 'oneHanded'
+    : normalizeScoringMode(
+        scoringModeOverrides[scoringModeSessionKey] ?? preferredScoringMode,
+        isFourball
+      );
+
+  useEffect(() => {
+    if (!currentSession?.sessionType) return;
+
+    const storedMode = scoringModeByFormat[currentSession.sessionType];
+    if (!storedMode) return;
+
+    const normalizedMode = normalizeScoringMode(storedMode, isFourball);
+    if (normalizedMode !== storedMode) {
+      setScoringModeForFormat(currentSession.sessionType, normalizedMode);
+    }
+  }, [currentSession?.sessionType, isFourball, scoringModeByFormat, setScoringModeForFormat]);
 
   const currentHoleResult = useMemo(() => {
     if (!matchState) return undefined;
@@ -412,7 +468,7 @@ export default function MatchScoringPageClient() {
       teamBPlayerScores?: PlayerHoleScore[],
     ) => {
       if (!matchState) return;
-      const scoringSource = source ?? scoringMode;
+      const scoringSource = source ?? effectiveScoringMode;
       const scoreAuditAction = deriveScoreAuditAction(currentHoleResult);
       const wasUnscored = scoreAuditAction === 'scoreEntered';
       const analyticsMethod: 'manual' | 'quick' | 'voice' | 'ocr' =
@@ -536,7 +592,7 @@ export default function MatchScoringPageClient() {
       teamBColor,
       currentHole,
       handleUndo,
-      scoringMode,
+      effectiveScoringMode,
       scoringPreferences.autoAdvance,
       scoringPreferences.soundEffects,
       nextHole,
@@ -552,7 +608,7 @@ export default function MatchScoringPageClient() {
       source?: 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice'
     ) => {
       if (isSaving || !matchState) return;
-      const scoringSource = source ?? scoringMode;
+      const scoringSource = source ?? effectiveScoringMode;
 
       // Check for match closeout
       const wouldCloseOut =
@@ -581,7 +637,7 @@ export default function MatchScoringPageClient() {
       teamAName,
       teamBName,
       showConfirm,
-      scoringMode,
+      effectiveScoringMode,
       executeScore,
     ]
   );
@@ -693,7 +749,7 @@ export default function MatchScoringPageClient() {
     .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
     .join(' & ');
   const currentPar = currentTeeSet?.holePars?.[currentHole - 1] || 4;
-  const scoringModeMeta = getScoringModeMeta(scoringMode, isFourball);
+  const scoringModeMeta = getScoringModeMeta(effectiveScoringMode, isFourball);
   const isMatchComplete = Boolean(matchState && (matchState.isClosedOut || matchState.holesRemaining === 0));
   const matchStatusLabel = isMatchComplete
     ? 'Final card'
@@ -874,9 +930,10 @@ export default function MatchScoringPageClient() {
         matchId={matchId}
         teamAName={teamAName}
         teamBName={teamBName}
-        teamAHandicapAllowance={activeMatch.teamAHandicapAllowance}
-        teamBHandicapAllowance={activeMatch.teamBHandicapAllowance}
+        teamAHandicapAllowance={matchHandicapContext.teamAHandicapAllowance}
+        teamBHandicapAllowance={matchHandicapContext.teamBHandicapAllowance}
         holeHandicaps={holeHandicaps}
+        showTeamStrokeAlerts={!isFourball}
         onCloseVoiceModal={() => setShowVoiceModal(false)}
         onOpenVoiceModal={() => setShowVoiceModal(true)}
         onVoiceScoreConfirmed={handleVoiceScore}
@@ -921,7 +978,7 @@ export default function MatchScoringPageClient() {
             currentHoleResult={currentHoleResult}
             currentPar={currentPar}
             matchState={matchState}
-            scoringMode={scoringMode}
+            scoringMode={effectiveScoringMode}
             scoringModeMeta={scoringModeMeta}
             isFourball={isFourball}
             quickScoreMode={scoringPreferences.quickScoreMode}
@@ -937,8 +994,8 @@ export default function MatchScoringPageClient() {
             teamBName={teamBName}
             teamAColor={teamAColor}
             teamBColor={teamBColor}
-            teamAHandicapAllowance={activeMatch.teamAHandicapAllowance}
-            teamBHandicapAllowance={activeMatch.teamBHandicapAllowance}
+            teamAHandicapAllowance={matchHandicapContext.teamAHandicapAllowance}
+            teamBHandicapAllowance={matchHandicapContext.teamBHandicapAllowance}
             holeHandicaps={holeHandicaps}
             presses={presses}
             activeSideBets={activeSideBets}

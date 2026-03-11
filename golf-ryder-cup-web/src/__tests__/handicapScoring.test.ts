@@ -39,6 +39,30 @@ import {
   STABLEFORD_POINTS as _STABLEFORD_POINTS,
   MODIFIED_STABLEFORD_POINTS as _MODIFIED_STABLEFORD_POINTS,
 } from '@/lib/types/scoringFormats';
+import type { Player, TeeSet } from '@/lib/types/models';
+
+function createMockPlayer(id: string, handicapIndex: number): Player {
+  return {
+    id,
+    tripId: 'trip-1',
+    firstName: 'Test',
+    lastName: id,
+    handicapIndex,
+  };
+}
+
+const stablefordTeeSet: TeeSet = {
+  id: 'tee-1',
+  courseId: 'course-1',
+  name: 'Blue',
+  rating: 72,
+  slope: 113,
+  par: 72,
+  holeHandicaps: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+  holePars: Array(18).fill(4),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
 // ============================================
 // COURSE HANDICAP CALCULATION TESTS
@@ -409,6 +433,14 @@ describe('Stableford Service', () => {
     it('should throw error for invalid hole handicaps array', () => {
       expect(() => calculateStrokesPerHole(10, [1, 2, 3])).toThrow();
     });
+
+    it('should preserve plus-handicap give-backs', () => {
+      const strokes = calculateStrokesPerHole(-2, holeHandicaps);
+
+      expect(strokes[0]).toBe(-1);
+      expect(strokes[1]).toBe(-1);
+      expect(strokes.slice(2)).toEqual(Array(16).fill(0));
+    });
   });
 
   describe('scoreStablefordHole', () => {
@@ -416,7 +448,7 @@ describe('Stableford Service', () => {
       // Par 4 hole, gross 5, receiving 1 stroke
       // Net score = 5 - 1 = 4 (par)
       // Points = 2
-      const result = scoreStablefordHole(1, 4, 5, 1, false);
+      const result = scoreStablefordHole(1, 4, 5, 1, { scoringMode: 'net' });
 
       expect(result.grossScore).toBe(5);
       expect(result.netScore).toBe(4);
@@ -428,7 +460,7 @@ describe('Stableford Service', () => {
       // Par 4 hole, gross 4, receiving 0 strokes
       // Net score = 4 - 0 = 4 (par)
       // Points = 2
-      const result = scoreStablefordHole(1, 4, 4, 0, false);
+      const result = scoreStablefordHole(1, 4, 4, 0, { scoringMode: 'net' });
 
       expect(result.grossScore).toBe(4);
       expect(result.netScore).toBe(4);
@@ -439,10 +471,49 @@ describe('Stableford Service', () => {
       // Par 4 hole, gross 6, receiving 3 strokes
       // Net score = 6 - 3 = 3 (birdie)
       // Points = 4 (using enhanced Stableford in stablefordService)
-      const result = scoreStablefordHole(1, 4, 6, 3, false);
+      const result = scoreStablefordHole(1, 4, 6, 3, { scoringMode: 'net' });
 
       expect(result.netScore).toBe(3);
       expect(result.stablefordPoints).toBe(4); // Enhanced: birdie = 4
+    });
+
+    it('should score gross Stableford from gross strokes even when strokes are received', () => {
+      const result = scoreStablefordHole(1, 4, 5, 1, { scoringMode: 'gross' });
+
+      expect(result.netScore).toBe(4);
+      expect(result.stablefordPoints).toBe(1);
+    });
+  });
+
+  describe('calculateStablefordRound', () => {
+    it('should respect gross scoring mode across the round', () => {
+      const player = {
+        player: createMockPlayer('gross-player', 12),
+        courseHandicap: 12,
+        strokesPerHole: Array(18).fill(1),
+      };
+      const grossScores = Array(18).fill(5);
+      const pars = Array(18).fill(4);
+
+      const result = _calculateStablefordRound(player, grossScores, pars, {
+        scoringMode: 'gross',
+      });
+
+      expect(result.totalPoints).toBe(18);
+      expect(result.totalNet).toBe(72);
+    });
+  });
+
+  describe('calculateCourseHandicap', () => {
+    it('should preserve plus-handicap course handicaps', () => {
+      const result = _stablefordCourseHandicap(-2.4, {
+        ...stablefordTeeSet,
+        slope: 113,
+        rating: 72,
+        par: 72,
+      });
+
+      expect(result).toBe(-2);
     });
   });
 });

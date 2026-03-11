@@ -14,6 +14,7 @@ interface MatchScoringSupportLayerProps {
   teamAHandicapAllowance: number;
   teamBHandicapAllowance: number;
   holeHandicaps: number[];
+  showTeamStrokeAlerts?: boolean;
   onCloseVoiceModal: () => void;
   onOpenVoiceModal: () => void;
   onVoiceScoreConfirmed: (winner: HoleWinner) => void;
@@ -31,6 +32,7 @@ export function MatchScoringSupportLayer({
   teamAHandicapAllowance,
   teamBHandicapAllowance,
   holeHandicaps,
+  showTeamStrokeAlerts = true,
   onCloseVoiceModal,
   onOpenVoiceModal,
   onVoiceScoreConfirmed,
@@ -78,6 +80,7 @@ export function MatchScoringSupportLayer({
       </AnimatePresence>
 
       {!isMatchComplete &&
+        showTeamStrokeAlerts &&
         (teamAHandicapAllowance > 0 || teamBHandicapAllowance > 0) && (
           <StrokeAlertBanner
             currentHole={currentHole}

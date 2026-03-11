@@ -17,6 +17,12 @@ export interface FormatOption {
   comingSoon?: boolean;
 }
 
+export const SUPPORTED_SESSION_TYPES = ['foursomes', 'fourball', 'singles'] as const;
+
+export function isSupportedSessionType(value: string): value is SessionType {
+  return SUPPORTED_SESSION_TYPES.includes(value as SessionType);
+}
+
 export function getScoringMode(formatValue: string): ScoringMode | 'both' | undefined {
   const config = FORMAT_CONFIGS[formatValue as MatchFormat];
   return config?.scoringMode;
@@ -236,7 +242,7 @@ export const ALL_FORMATS: FormatOption[] = [
 ];
 
 export const SESSION_TYPES = ALL_FORMATS.filter((format) =>
-  ['foursomes', 'fourball', 'singles'].includes(format.value)
+  isSupportedSessionType(format.value)
 ).map((format) => ({
   value: format.value as SessionType,
   label: format.label,

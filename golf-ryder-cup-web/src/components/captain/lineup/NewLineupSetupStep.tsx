@@ -8,6 +8,7 @@ import {
   FORMAT_CATEGORIES,
   POPULAR_FORMATS,
   getScoringMode,
+  isSupportedSessionType,
   type FormatOption,
 } from './newLineupConfig';
 
@@ -31,7 +32,7 @@ interface NewLineupSetupStepProps {
   onToggleAdvanced: () => void;
   onQuickSetup: () => void;
   onSessionNameChange: (value: string) => void;
-  onSelectFormat: (value: SessionType) => void;
+  onSelectFormat: (value: string) => void;
   onToggleShowAllFormats: () => void;
   onMatchCountChange: (value: number) => void;
   onScheduledDateChange: (value: string) => void;
@@ -178,16 +179,20 @@ export function NewLineupSetupStep({
                     <div className="space-y-2">
                       {formats.map((format) => {
                         const isSelected = sessionType === format.value;
-                        const isMatchPlay = ['foursomes', 'fourball', 'singles'].includes(
-                          format.value
-                        );
+                        const isMatchPlay = isSupportedSessionType(format.value);
                         const scoringMode = getScoringMode(format.value);
 
                         return (
                           <button
                             key={format.value}
-                            onClick={() => onSelectFormat(format.value as SessionType)}
-                            className={`card w-full text-left transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isMatchPlay ? 'opacity-70' : ''}`}
+                            type="button"
+                            onClick={() => {
+                              if (isMatchPlay) {
+                                onSelectFormat(format.value);
+                              }
+                            }}
+                            disabled={!isMatchPlay}
+                            className={`card w-full text-left transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isMatchPlay ? 'cursor-not-allowed opacity-70' : ''}`}
                             style={{ padding: 'var(--space-4)' }}
                           >
                             <div className="flex items-center justify-between">

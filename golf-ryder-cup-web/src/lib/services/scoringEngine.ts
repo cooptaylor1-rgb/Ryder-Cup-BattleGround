@@ -19,6 +19,7 @@ import type {
   MatchResultType,
   HoleResultEdit,
   PlayerHoleScore,
+  Player,
 } from '../types/models';
 import {
   ScoringEventType,
@@ -30,6 +31,7 @@ import {
 import type { MatchState } from '../types/computed';
 import { db } from '../db';
 import { scoringLogger } from '../utils/logger';
+import { buildMatchHandicapContext } from './matchHandicapService';
 
 // ============================================
 // CONSTANTS
@@ -536,6 +538,20 @@ export function calculateMatchResult(matchState: MatchState): MatchResultType {
   }
 }
 
+export function calculateStoredMatchResult(
+  matchState: MatchState
+): 'teamAWin' | 'teamBWin' | 'halved' | 'notFinished' {
+  if (!matchState.isClosedOut && matchState.holesRemaining > 0) {
+    return 'notFinished';
+  }
+
+  if (matchState.currentScore === 0) {
+    return 'halved';
+  }
+
+  return matchState.currentScore > 0 ? 'teamAWin' : 'teamBWin';
+}
+
 /**
  * Format the final match result for display.
  *
@@ -664,6 +680,21 @@ export async function createMatch(
   teamBPlayers: string[]
 ): Promise<Match> {
   const now = new Date().toISOString();
+  const session = await db.sessions.get(sessionId);
+  const loadedPlayers = (await db.players.bulkGet([...teamAPlayers, ...teamBPlayers])).filter(
+    Boolean
+  ) as Player[];
+  const playerById = new Map(loadedPlayers.map((player) => [player.id, player]));
+  const handicapContext = buildMatchHandicapContext({
+    sessionType: session?.sessionType,
+    teamAPlayers: teamAPlayers
+      .map((playerId) => playerById.get(playerId))
+      .filter((player): player is Player => Boolean(player)),
+    teamBPlayers: teamBPlayers
+      .map((playerId) => playerById.get(playerId))
+      .filter((player): player is Player => Boolean(player)),
+  });
+
   const match: Match = {
     id: crypto.randomUUID(),
     sessionId,
@@ -672,8 +703,8 @@ export async function createMatch(
     teamBPlayerIds: teamBPlayers,
     status: 'scheduled',
     currentHole: 1,
-    teamAHandicapAllowance: 0,
-    teamBHandicapAllowance: 0,
+    teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
+    teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
     result: 'notFinished',
     margin: 0,
     holesRemaining: 18,
@@ -699,7 +730,7 @@ export async function finalizeMatch(matchId: string): Promise<void> {
   const matchState = calculateMatchState(match, holeResults);
 
   if (matchState.isClosedOut || matchState.holesRemaining === 0) {
-    const resultType = calculateMatchResult(matchState);
+    const resultType = calculateStoredMatchResult(matchState);
 
     await db.matches.update(matchId, {
       status: 'completed',
@@ -732,6 +763,7 @@ export const ScoringEngine = {
 
   // Match results
   calculateMatchResult,
+  calculateStoredMatchResult,
   formatFinalResult,
   calculateMatchPoints,
 

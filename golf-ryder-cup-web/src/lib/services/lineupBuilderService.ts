@@ -14,6 +14,7 @@ import type {
     Player,
     Match,
 } from '../types/models';
+import { buildMatchHandicapContext } from './matchHandicapService';
 
 // ============================================
 // TYPES
@@ -591,6 +592,18 @@ export async function saveLineup(
 
         const teamAPlayerIds = lineupMatch.teamAPlayers.map((p) => p.id);
         const teamBPlayerIds = lineupMatch.teamBPlayers.map((p) => p.id);
+        const loadedPlayers = (await db.players.bulkGet([...teamAPlayerIds, ...teamBPlayerIds]))
+            .filter(Boolean) as Player[];
+        const playerById = new Map(loadedPlayers.map((player) => [player.id, player]));
+        const handicapContext = buildMatchHandicapContext({
+            sessionType: session.sessionType,
+            teamAPlayers: teamAPlayerIds
+                .map((playerId) => playerById.get(playerId))
+                .filter((player): player is Player => Boolean(player)),
+            teamBPlayers: teamBPlayerIds
+                .map((playerId) => playerById.get(playerId))
+                .filter((player): player is Player => Boolean(player)),
+        });
 
         if (existingMatches.length > 0) {
             // Update existing match
@@ -598,6 +611,8 @@ export async function saveLineup(
             await db.matches.update(match.id, {
                 teamAPlayerIds,
                 teamBPlayerIds,
+                teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
+                teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
                 updatedAt: now,
             });
             matchIds.push(match.id);
@@ -612,8 +627,8 @@ export async function saveLineup(
                 currentHole: 1,
                 teamAPlayerIds,
                 teamBPlayerIds,
-                teamAHandicapAllowance: 0,
-                teamBHandicapAllowance: 0,
+                teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
+                teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
                 result: 'notFinished',
                 margin: 0,
                 holesRemaining: 18,

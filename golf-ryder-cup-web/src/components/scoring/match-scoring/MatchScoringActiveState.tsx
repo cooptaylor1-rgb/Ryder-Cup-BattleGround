@@ -25,6 +25,7 @@ interface FourballPlayer {
   id: string;
   name: string;
   courseHandicap: number;
+  strokeAllowance: number;
 }
 
 interface MatchScoringActiveStateProps {
@@ -246,11 +247,13 @@ export function MatchScoringActiveState({
                   active={scoringMode === 'buttons'}
                   onClick={() => onScoringModeChange('buttons')}
                 />
-                <ScoringModeChip
-                  label="Strokes"
-                  active={scoringMode === 'strokes'}
-                  onClick={() => onScoringModeChange('strokes')}
-                />
+                {!isFourball && (
+                  <ScoringModeChip
+                    label="Strokes"
+                    active={scoringMode === 'strokes'}
+                    onClick={() => onScoringModeChange('strokes')}
+                  />
+                )}
                 {isFourball && (
                   <ScoringModeChip
                     label="Best Ball"
@@ -289,7 +292,7 @@ export function MatchScoringActiveState({
             </div>
           )}
 
-          {(teamAHandicapAllowance > 0 || teamBHandicapAllowance > 0) && (
+          {!isFourball && (teamAHandicapAllowance > 0 || teamBHandicapAllowance > 0) && (
             <button onClick={onToggleShowHandicapDetails} className="w-full">
               <HandicapStrokeIndicator
                 currentHole={currentHole}

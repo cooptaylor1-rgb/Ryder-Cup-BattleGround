@@ -19,6 +19,7 @@ import type { MatchState } from '../types/computed';
 import { db } from '../db';
 import {
     calculateMatchState,
+    calculateStoredMatchResult,
     recordHoleResult,
     undoLastScore,
     getCurrentHole,
@@ -340,12 +341,15 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 if (session) {
                     queueSyncOperation('holeResult', latestResult.id, 'update', session.tripId, latestResult);
                     // Calculate fields from match state for syncing
+                    const persistedResult = calculateStoredMatchResult(newMatchState);
+                    const nextMatchStatus = newMatchState.isClosedOut || newMatchState.holesRemaining === 0
+                        ? 'completed'
+                        : 'inProgress';
                     const matchToSync = {
                         ...activeMatch,
                         currentHole: Math.min(currentHole + 1, 18),
-                        result: newMatchState.isClosedOut
-                            ? (newMatchState.winningTeam === 'teamA' ? 'teamAWin' : 'teamBWin')
-                            : 'notFinished',
+                        status: nextMatchStatus,
+                        result: persistedResult,
                         margin: Math.abs(newMatchState.currentScore),
                         holesRemaining: newMatchState.holesRemaining,
                         updatedAt: new Date().toISOString(),
@@ -394,14 +398,9 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                     // BUG-007 FIX: Persist match status to local database (not just sync queue)
                     // Update local match record with new status when closeout occurs
                     if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
-                        // Determine the proper result type for the database
-                        const dbResult: 'teamAWin' | 'teamBWin' | 'halved' =
-                            newMatchState.currentScore > 0 ? 'teamAWin' :
-                            newMatchState.currentScore < 0 ? 'teamBWin' : 'halved';
-
                         await db.matches.update(activeMatch.id, {
                             status: 'completed' as const,
-                            result: dbResult,
+                            result: persistedResult,
                             margin: matchToSync.margin,
                             holesRemaining: matchToSync.holesRemaining,
                             updatedAt: matchToSync.updatedAt,

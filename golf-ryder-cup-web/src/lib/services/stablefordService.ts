@@ -7,6 +7,10 @@
 
 import type { Player, TeeSet } from '../types/models';
 import {
+    allocateStrokes,
+    calculateCourseHandicap as calculateCanonicalCourseHandicap,
+} from './handicapCalculator';
+import {
     calculateStablefordPoints,
     type StablefordHoleScore,
     type StablefordRoundScore,
@@ -52,10 +56,12 @@ export function calculateCourseHandicap(
     handicapIndex: number,
     teeSet: TeeSet
 ): number {
-    const courseHandicap = Math.round(
-        handicapIndex * (teeSet.slope / 113) + (teeSet.rating - teeSet.par)
+    return calculateCanonicalCourseHandicap(
+        handicapIndex,
+        teeSet.slope,
+        teeSet.rating,
+        teeSet.par
     );
-    return Math.max(0, courseHandicap);
 }
 
 /**
@@ -71,26 +77,7 @@ export function calculateStrokesPerHole(
     if (holeHandicaps.length !== 18) {
         throw new Error('holeHandicaps must have 18 elements');
     }
-
-    const strokes = new Array(18).fill(0);
-    const fullStrokes = Math.floor(courseHandicap / 18);
-    const remainingStrokes = courseHandicap % 18;
-
-    // Every hole gets the full strokes
-    for (let i = 0; i < 18; i++) {
-        strokes[i] = fullStrokes;
-    }
-
-    // Distribute remaining strokes to hardest holes first
-    for (let stroke = 0; stroke < remainingStrokes; stroke++) {
-        // Find hole with handicap rank = stroke + 1
-        const holeIndex = holeHandicaps.findIndex(rank => rank === stroke + 1);
-        if (holeIndex !== -1) {
-            strokes[holeIndex]++;
-        }
-    }
-
-    return strokes;
+    return allocateStrokes(courseHandicap, holeHandicaps);
 }
 
 // ============================================
@@ -105,10 +92,15 @@ export function scoreStablefordHole(
     par: number,
     grossScore: number,
     strokesReceived: number,
-    useModified: boolean = false
+    options: {
+        scoringMode?: ScoringMode;
+        useModified?: boolean;
+    } = {}
 ): StablefordHoleScore {
     const netScore = grossScore - strokesReceived;
-    const points = calculateStablefordPoints(netScore, par, useModified);
+    const scoringMode = options.scoringMode ?? 'net';
+    const scoreForPoints = scoringMode === 'gross' ? grossScore : netScore;
+    const points = calculateStablefordPoints(scoreForPoints, par, options.useModified ?? false);
 
     return {
         holeNumber,
@@ -127,7 +119,10 @@ export function calculateStablefordRound(
     player: StablefordPlayer,
     grossScores: (number | null)[],  // Array of 18 gross scores (null if not played)
     holePars: number[],
-    useModified: boolean = false
+    options: {
+        scoringMode?: ScoringMode;
+        useModified?: boolean;
+    } = {}
 ): StablefordRoundScore {
     if (grossScores.length !== 18 || holePars.length !== 18) {
         throw new Error('Must provide 18 scores and 18 pars');
@@ -160,7 +155,7 @@ export function calculateStablefordRound(
             holePars[i],
             grossScore,
             player.strokesPerHole[i],
-            useModified
+            options
         );
 
         holeScores.push(holeScore);

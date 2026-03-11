@@ -29,6 +29,7 @@ interface PlayerInfo {
   id: string;
   name: string;
   courseHandicap: number;
+  strokeAllowance: number;
 }
 
 interface FourballScoreEntryProps {
@@ -154,7 +155,10 @@ function PlayerScoreInput({
           <span className="text-xs font-medium truncate max-w-[100px] text-[var(--ink-secondary)]">
             {player.name}
           </span>
-          <span className="text-[10px] text-[var(--ink-tertiary)]">({player.courseHandicap})</span>
+          <span className="text-[10px] text-[var(--ink-tertiary)]">
+            CH {player.courseHandicap} · {player.strokeAllowance >= 0 ? player.strokeAllowance : `+${Math.abs(player.strokeAllowance)}`} shot
+            {Math.abs(player.strokeAllowance) === 1 ? '' : 's'}
+          </span>
         </div>
         {isBestBall && (
           <div
@@ -257,12 +261,12 @@ export function FourballScoreEntry({
 
   // Calculate stroke allocation for each player
   const teamAStrokesPerPlayer = useMemo(
-    () => teamAPlayers.map((p) => allocateStrokes(p.courseHandicap, holeHandicaps)),
+    () => teamAPlayers.map((p) => allocateStrokes(p.strokeAllowance, holeHandicaps)),
     [teamAPlayers, holeHandicaps]
   );
 
   const teamBStrokesPerPlayer = useMemo(
-    () => teamBPlayers.map((p) => allocateStrokes(p.courseHandicap, holeHandicaps)),
+    () => teamBPlayers.map((p) => allocateStrokes(p.strokeAllowance, holeHandicaps)),
     [teamBPlayers, holeHandicaps]
   );
 
