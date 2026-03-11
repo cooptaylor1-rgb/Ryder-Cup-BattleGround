@@ -20,6 +20,10 @@ import { EmptyStatePremium, InlineLoadingSkeleton } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 import {
+  getTeamPlayersForLineup,
+  toLineupPlayers,
+} from '@/components/captain/lineup/lineupBuilderData';
+import {
   Users,
   Play,
   Lock,
@@ -73,38 +77,18 @@ export default function SessionPage() {
     loadMatches();
   }, [sessionId, getSessionMatches, showToast]);
 
-  // Get team players
-  const getTeamPlayers = useCallback(
-    (teamId: string) => {
-      const memberIds = teamMembers.filter((tm) => tm.teamId === teamId).map((tm) => tm.playerId);
-      return players.filter((p) => memberIds.includes(p.id));
-    },
-    [teamMembers, players]
-  );
-
   const teamA = teams.find((t) => t.color === 'usa');
   const teamB = teams.find((t) => t.color === 'europe');
-  const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
-  const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
-
-  // Convert to LineupBuilder format
-  const lineupTeamA: LineupPlayer[] = teamAPlayers.map((p) => ({
-    id: p.id,
-    firstName: p.firstName,
-    lastName: p.lastName,
-    handicapIndex: p.handicapIndex ?? 0,
-    team: 'A' as const,
-    avatarUrl: p.avatarUrl,
-  }));
-
-  const lineupTeamB: LineupPlayer[] = teamBPlayers.map((p) => ({
-    id: p.id,
-    firstName: p.firstName,
-    lastName: p.lastName,
-    handicapIndex: p.handicapIndex ?? 0,
-    team: 'B' as const,
-    avatarUrl: p.avatarUrl,
-  }));
+  const teamAPlayers = useMemo(
+    () => getTeamPlayersForLineup(teamA?.id, teamMembers, players),
+    [teamA?.id, teamMembers, players]
+  );
+  const teamBPlayers = useMemo(
+    () => getTeamPlayersForLineup(teamB?.id, teamMembers, players),
+    [teamB?.id, teamMembers, players]
+  );
+  const lineupTeamA = useMemo(() => toLineupPlayers(teamAPlayers, 'A'), [teamAPlayers]);
+  const lineupTeamB = useMemo(() => toLineupPlayers(teamBPlayers, 'B'), [teamBPlayers]);
 
   // Session config
   const sessionConfig: SessionConfig | null = session
