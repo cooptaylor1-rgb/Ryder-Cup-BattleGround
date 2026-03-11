@@ -33,10 +33,7 @@ import type { HoleWinner, PlayerHoleScore } from '@/lib/types/models';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
 
 // Core scoring components - loaded immediately
-import {
-  ScoreToast,
-  type Press,
-} from '@/components/scoring';
+import { ScoreToast } from '@/components/scoring';
 // Lazy load heavy components that aren't immediately needed
 const ScoreCelebration = lazy(() =>
   import('@/components/scoring').then((mod) => ({ default: mod.ScoreCelebration }))
@@ -54,9 +51,17 @@ import { MatchScoringActiveState } from './MatchScoringActiveState';
 import { MatchScoringHeroSection } from './MatchScoringHeroSection';
 import { MatchScoringSupportLayer } from './MatchScoringSupportLayer';
 import {
+  buildMatchResultShareText,
+  buildMatchSummaryText,
+  buildPrintableMatchSummary,
+  countHalvedHoles,
+  findNextIncompleteMatch,
+} from './matchScoringReport';
+import {
   getScoringModeMeta,
   type ScoringMode,
 } from './matchScoringShared';
+import { useMatchPressTracking } from './useMatchPressTracking';
 import { hashStringToSeed, mulberry32, toReminderBet } from './matchScoringUtils';
 
 /**
@@ -133,7 +138,6 @@ export default function MatchScoringPageClient() {
   // UI State
   const [showVoiceModal, setShowVoiceModal] = useState(false);
   const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
-  const [presses, setPresses] = useState<Press[]>([]);
   const [showHandicapDetails, setShowHandicapDetails] = useState(false);
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
   const [showScoringModeTip, setShowScoringModeTip] = useState(false);
@@ -249,28 +253,32 @@ export default function MatchScoringPageClient() {
 
   const teamAPlayers = useMemo(() => {
     if (!activeMatch) return [];
-    return activeMatch.teamAPlayerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean);
+    return activeMatch.teamAPlayerIds
+      .map((id) => players.find((player) => player.id === id))
+      .filter((player): player is (typeof players)[number] => Boolean(player));
   }, [activeMatch, players]);
 
   const teamBPlayers = useMemo(() => {
     if (!activeMatch) return [];
-    return activeMatch.teamBPlayerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean);
+    return activeMatch.teamBPlayerIds
+      .map((id) => players.find((player) => player.id === id))
+      .filter((player): player is (typeof players)[number] => Boolean(player));
   }, [activeMatch, players]);
   const teamAFourballPlayers = useMemo(
     () =>
       teamAPlayers.map((player) => ({
-        id: player!.id,
-        name: formatPlayerName(player!.firstName, player!.lastName),
-        courseHandicap: player!.handicapIndex || 0,
+        id: player.id,
+        name: formatPlayerName(player.firstName, player.lastName),
+        courseHandicap: player.handicapIndex || 0,
       })),
     [teamAPlayers]
   );
   const teamBFourballPlayers = useMemo(
     () =>
       teamBPlayers.map((player) => ({
-        id: player!.id,
-        name: formatPlayerName(player!.firstName, player!.lastName),
-        courseHandicap: player!.handicapIndex || 0,
+        id: player.id,
+        name: formatPlayerName(player.firstName, player.lastName),
+        courseHandicap: player.handicapIndex || 0,
       })),
     [teamBPlayers]
   );
@@ -319,61 +327,21 @@ export default function MatchScoringPageClient() {
     [currentTrip, activeMatch, actorName]
   );
 
-  const buildMatchSummaryText = useCallback(() => {
-    if (!matchState || !activeMatch) return '';
-    const winnerText =
-      matchState.winningTeam === 'halved'
-        ? 'Match halved'
-        : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} wins`;
-    const teamALabel = teamAPlayers
-      .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
-      .join(' & ');
-    const teamBLabel = teamBPlayers
-      .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
-      .join(' & ');
-
-    return `⛳ ${winnerText} ${matchState.displayScore}\n${teamALabel} vs ${teamBLabel}\nHoles won: ${teamAName} ${matchState.teamAHolesWon} | ${teamBName} ${matchState.teamBHolesWon}\nHalved: ${matchState.holeResults.filter((r) => r.winner === 'halved').length}\nCompleted thru hole ${matchState.holesPlayed}`;
-  }, [matchState, activeMatch, teamAName, teamBName, teamAPlayers, teamBPlayers]);
-
   const handleExportSummary = useCallback(() => {
     if (!matchState) return;
-    const summaryText = buildMatchSummaryText();
-    const winnerLabel =
-      matchState.winningTeam === 'halved'
-        ? 'Match Halved'
-        : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} Wins`;
-
-    const printable = `
-      <html>
-        <head>
-          <title>Match Summary</title>
-          <style>
-            body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; padding: 32px; color: #1A1815; }
-            .card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; }
-            h1 { margin: 0 0 8px; font-size: 24px; }
-            .score { font-size: 32px; font-weight: 700; margin: 8px 0 16px; }
-            .meta { font-size: 14px; color: #4b5563; margin-top: 12px; }
-            .rows { margin-top: 16px; display: grid; gap: 8px; }
-            .label { font-weight: 600; }
-            pre { white-space: pre-wrap; font-size: 13px; }
-          </style>
-        </head>
-        <body>
-          <div class="card">
-            <h1>${winnerLabel}</h1>
-            <div class="score">${matchState.displayScore}</div>
-            <div class="rows">
-              <div><span class="label">${teamAName}:</span> ${matchState.teamAHolesWon} holes</div>
-              <div><span class="label">${teamBName}:</span> ${matchState.teamBHolesWon} holes</div>
-              <div><span class="label">Halved:</span> ${matchState.holeResults.filter((r) => r.winner === 'halved').length}</div>
-              <div><span class="label">Completed:</span> Thru hole ${matchState.holesPlayed}</div>
-            </div>
-            <div class="meta">Generated by Golf Ryder Cup</div>
-            <pre>${summaryText}</pre>
-          </div>
-        </body>
-      </html>
-    `;
+    const summaryText = buildMatchSummaryText({
+      matchState,
+      teamAName,
+      teamBName,
+      teamAPlayers,
+      teamBPlayers,
+    });
+    const printable = buildPrintableMatchSummary({
+      matchState,
+      teamAName,
+      teamBName,
+      summaryText,
+    });
 
     const win = window.open('', '_blank');
     if (!win) return;
@@ -381,25 +349,12 @@ export default function MatchScoringPageClient() {
     win.document.close();
     win.focus();
     win.print();
-  }, [matchState, teamAName, teamBName, buildMatchSummaryText]);
+  }, [matchState, teamAName, teamBName, teamAPlayers, teamBPlayers]);
 
   // Find next incomplete match in session for "Score Next Match" navigation
   const nextIncompleteMatch = useMemo(() => {
     if (!activeMatch || !sessionMatches.length) return undefined;
-    const currentIndex = sessionMatches.findIndex((m) => m.id === activeMatch.id);
-    // Look for the next match after current that isn't completed
-    for (let i = currentIndex + 1; i < sessionMatches.length; i++) {
-      if (sessionMatches[i].status !== 'completed') {
-        return sessionMatches[i];
-      }
-    }
-    // Wrap around - look from start to current
-    for (let i = 0; i < currentIndex; i++) {
-      if (sessionMatches[i].status !== 'completed') {
-        return sessionMatches[i];
-      }
-    }
-    return undefined;
+    return findNextIncompleteMatch(activeMatch.id, sessionMatches);
   }, [activeMatch, sessionMatches]);
 
   // Undo handler - must be defined before executeScore to avoid "accessed before declaration" error
@@ -719,75 +674,23 @@ export default function MatchScoringPageClient() {
     [showToast]
   );
 
-  // Press handler
-  const handlePress = useCallback(
-    (pressedBy: 'teamA' | 'teamB') => {
-      if (!matchState) return;
-
-      const newPress: Press = {
-        id: `press-${Date.now()}`,
-        startHole: currentHole,
-        pressedBy,
-        status: 'active',
-        score: 0,
-      };
-
-      setPresses((prev) => [...prev, newPress]);
+  const { presses, handlePress } = useMatchPressTracking({
+    matchState,
+    currentHole,
+    onPressTriggered: (team) => {
       haptic.tap();
       setToast({
-        message: `${pressedBy === 'teamA' ? teamAName : teamBName} pressed!`,
+        message: `${team === 'teamA' ? teamAName : teamBName} pressed!`,
         type: 'info',
       });
     },
-    [currentHole, matchState, haptic, teamAName, teamBName]
-  );
-
-  // Update press scores - deferred to avoid setState-in-effect warning
-  useEffect(() => {
-    if (!matchState) return;
-
-    // Defer state update to next tick to avoid cascading renders
-    const timeoutId = setTimeout(() => {
-      setPresses((prev) =>
-        prev.map((press) => {
-          if (press.status !== 'active') return press;
-
-          const pressHoleResults = matchState.holeResults.filter(
-            (r) => r.holeNumber >= press.startHole
-          );
-
-          let score = 0;
-          for (const result of pressHoleResults) {
-            if (result.winner === 'teamA') score += 1;
-            else if (result.winner === 'teamB') score -= 1;
-          }
-
-          const holesRemaining = 18 - matchState.holesPlayed;
-          const isClosedOut = Math.abs(score) > holesRemaining;
-
-          if (isClosedOut || matchState.isClosedOut) {
-            return {
-              ...press,
-              score,
-              status: 'closed' as const,
-              result: score > 0 ? 'teamA' : score < 0 ? 'teamB' : 'halved',
-              closedAtHole: matchState.holesPlayed,
-            };
-          }
-
-          return { ...press, score };
-        })
-      );
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
-  }, [matchState]);
+  });
 
   const teamALineup = teamAPlayers
-    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
+    .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
     .join(' & ');
   const teamBLineup = teamBPlayers
-    .map((p) => formatPlayerName(p!.firstName, p!.lastName, 'short'))
+    .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
     .join(' & ');
   const currentPar = currentTeeSet?.holePars?.[currentHole - 1] || 4;
   const scoringModeMeta = getScoringModeMeta(scoringMode, isFourball);
@@ -797,7 +700,17 @@ export default function MatchScoringPageClient() {
     : isEditingScores
       ? 'Captain editing'
       : 'Live scoring';
-  const summaryText = useMemo(() => buildMatchSummaryText(), [buildMatchSummaryText]);
+  const summaryText = useMemo(() => {
+    if (!matchState) return '';
+
+    return buildMatchSummaryText({
+      matchState,
+      teamAName,
+      teamBName,
+      teamAPlayers,
+      teamBPlayers,
+    });
+  }, [matchState, teamAName, teamBName, teamAPlayers, teamBPlayers]);
 
   const handleShareSummary = useCallback(() => {
     if (!summaryText) return;
@@ -813,12 +726,13 @@ export default function MatchScoringPageClient() {
 
   const handleShareResult = useCallback(() => {
     if (!matchState) return;
-
-    const winnerText =
-      matchState.winningTeam === 'halved'
-        ? 'Match halved!'
-        : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} wins ${matchState.displayScore}!`;
-    const shareText = `${winnerText}\n${teamALineup} vs ${teamBLineup}`;
+    const shareText = buildMatchResultShareText({
+      matchState,
+      teamAName,
+      teamBName,
+      teamALineup,
+      teamBLineup,
+    });
 
     if (navigator.share) {
       void navigator.share({ text: shareText });
@@ -1053,7 +967,7 @@ export default function MatchScoringPageClient() {
             displayScore={matchState.displayScore}
             teamAHolesWon={matchState.teamAHolesWon}
             teamBHolesWon={matchState.teamBHolesWon}
-            halvedHoles={matchState.holeResults.filter((result) => result.winner === 'halved').length}
+            halvedHoles={countHalvedHoles(matchState)}
             holesPlayed={matchState.holesPlayed}
             teamAName={teamAName}
             teamBName={teamBName}
