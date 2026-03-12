@@ -29,11 +29,16 @@ export interface ModalProps {
   onClose: () => void;
   title?: string;
   description?: string;
+  ariaLabel?: string;
   children?: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
+  overlayClassName?: string;
+  panelClassName?: string;
+  headerClassName?: string;
+  contentClassName?: string;
 }
 
 export function Modal({
@@ -41,11 +46,16 @@ export function Modal({
   onClose,
   title,
   description,
+  ariaLabel,
   children,
   size = 'md',
   showCloseButton = true,
   closeOnOverlayClick = true,
   closeOnEscape = true,
+  overlayClassName,
+  panelClassName,
+  headerClassName,
+  contentClassName,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -151,7 +161,8 @@ export function Modal({
         'fixed inset-0 z-50',
         'flex items-center justify-center p-4',
         'bg-[color:var(--ink)]/75 backdrop-blur-sm',
-        isExiting ? 'animate-fade-out' : 'animate-fade-in'
+        isExiting ? 'animate-fade-out' : 'animate-fade-in',
+        overlayClassName
       )}
       onClick={handleOverlayClick}
       role="presentation"
@@ -160,18 +171,20 @@ export function Modal({
         ref={modalRef}
         role="dialog"
         aria-modal="true"
+        aria-label={ariaLabel}
         aria-labelledby={title ? 'modal-title' : undefined}
         aria-describedby={description ? 'modal-description' : undefined}
         className={cn(
           'relative w-full rounded-xl',
           'border border-[var(--rule)] bg-[var(--surface-raised)] shadow-[var(--shadow-card-lg)]',
           sizeClasses[size],
-          isExiting ? 'animate-scale-out' : 'animate-scale-in'
+          isExiting ? 'animate-scale-out' : 'animate-scale-in',
+          panelClassName
         )}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-start justify-between gap-4 p-5 pb-3">
+          <div className={cn('flex items-start justify-between gap-4 p-5 pb-3', headerClassName)}>
             <div className="flex-1 min-w-0">
               {title && (
                 <h2 id="modal-title" className="text-xl font-bold text-[var(--ink-primary)]">
@@ -198,7 +211,7 @@ export function Modal({
         )}
 
         {/* Content */}
-        <div className="p-5 pt-3">{children}</div>
+        <div className={cn('p-5 pt-3', contentClassName)}>{children}</div>
       </div>
     </div>
   );

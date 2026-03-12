@@ -13,10 +13,11 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, KeyRound, Shield, ShieldCheck, X } from 'lucide-react';
+import { KeyRound, Shield, ShieldCheck } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { ConfirmDialog, Modal } from './Modal';
 
 interface CaptainToggleProps {
   className?: string;
@@ -39,6 +40,12 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
 
     // Show PIN modal to enable
     setShowPinModal(true);
+    setPin('');
+    setError('');
+  };
+
+  const handleClosePinModal = () => {
+    setShowPinModal(false);
     setPin('');
     setError('');
   };
@@ -105,127 +112,96 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
         )}
       </button>
 
-      {/* PIN Modal */}
-      {showPinModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-[var(--space-4)] bg-[color:var(--ink)]/50 backdrop-blur-[4px]"
-          onClick={() => setShowPinModal(false)}
-        >
-          <div
-            className="w-full max-w-[320px] rounded-[var(--radius-xl)] bg-[var(--canvas)] p-[var(--space-6)] shadow-[var(--shadow-xl)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="mb-[var(--space-4)] flex items-center justify-between">
-              <div className="flex items-center gap-[var(--space-2)]">
-                <Shield size={20} className="text-[var(--masters)]" />
-                <h3 className="type-title m-0">Captain Mode</h3>
-              </div>
-              <button
-                onClick={() => setShowPinModal(false)}
-                className="press-scale rounded-[var(--radius-md)] p-[var(--space-1)] text-[var(--ink-tertiary)]"
-                aria-label="Close"
-              >
-                <X size={20} />
-              </button>
-            </div>
+      <Modal
+        isOpen={showPinModal}
+        onClose={handleClosePinModal}
+        ariaLabel="Captain Mode"
+        showCloseButton={false}
+        closeOnOverlayClick
+        closeOnEscape
+        size="sm"
+        overlayClassName="z-[100] bg-[color:var(--ink)]/50 backdrop-blur-[4px]"
+        panelClassName="max-w-[320px] rounded-[var(--radius-xl)] border-0 bg-[var(--canvas)] shadow-[var(--shadow-xl)]"
+        contentClassName="p-[var(--space-6)]"
+      >
+        <div className="mb-[var(--space-4)] flex items-center gap-[var(--space-2)]">
+          <Shield size={20} className="text-[var(--masters)]" />
+          <h3 className="type-title m-0">Captain Mode</h3>
+        </div>
 
-            {/* Description */}
-            <p className="type-caption mb-[var(--space-4)] text-[var(--ink-secondary)]">
-              {captainPinHash
-                ? 'Enter your captain PIN to unlock advanced controls.'
-                : "Set a 4-digit PIN to enable captain mode. You'll need this PIN to re-enable captain mode later."}
-            </p>
+        <p className="type-caption mb-[var(--space-4)] text-[var(--ink-secondary)]">
+          {captainPinHash
+            ? 'Enter your captain PIN to unlock advanced controls.'
+            : "Set a 4-digit PIN to enable captain mode. You'll need this PIN to re-enable captain mode later."}
+        </p>
 
-            {/* PIN Input */}
-            <div className="mb-[var(--space-4)]">
-              <input
-                type="password"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={6}
-                value={pin}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '');
-                  setPin(val);
-                  setError('');
-                }}
-                placeholder="Enter PIN"
-                autoFocus
-                className={cn(
-                  'w-full rounded-[var(--radius-lg)] bg-[var(--canvas-raised)] px-[var(--space-4)] py-[var(--space-3)] text-[var(--text-xl)] text-center tracking-[0.5em] outline-none',
-                  error ? 'border-2 border-[var(--error)]' : 'border border-[var(--rule)]',
-                )}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleEnableCaptain();
-                  }
-                }}
-              />
-              {error && (
-                <p className="mt-[var(--space-2)] text-[var(--error)] text-[var(--text-sm)]">
-                  {error}
-                </p>
-              )}
-            </div>
-
-            {/* Forgot PIN link */}
-            {captainPinHash && (
-              <button
-                onClick={() => setShowResetConfirm(true)}
-                className="btn-ghost mb-[var(--space-3)] w-full text-sm text-[var(--masters)]"
-              >
-                <KeyRound size={14} className="mr-1 inline align-middle" />
-                Forgot PIN?
-              </button>
+        <div className="mb-[var(--space-4)]">
+          <input
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            value={pin}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '');
+              setPin(val);
+              setError('');
+            }}
+            placeholder="Enter PIN"
+            autoFocus
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'captain-pin-error' : undefined}
+            className={cn(
+              'w-full rounded-[var(--radius-lg)] bg-[var(--canvas-raised)] px-[var(--space-4)] py-[var(--space-3)] text-[var(--text-xl)] text-center tracking-[0.5em] outline-none',
+              error ? 'border-2 border-[var(--error)]' : 'border border-[var(--rule)]',
             )}
-
-            {/* Actions */}
-            <div className="flex gap-[var(--space-3)]">
-              <button onClick={() => setShowPinModal(false)} className="btn-secondary flex-1">
-                Cancel
-              </button>
-              <button
-                onClick={handleEnableCaptain}
-                disabled={pin.length < 4 || attempts >= 3}
-                className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {captainPinHash ? 'Unlock' : 'Enable'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Reset PIN Confirmation Modal */}
-      {showResetConfirm && (
-        <div
-          className="fixed inset-0 z-[101] flex items-center justify-center p-[var(--space-4)] bg-[color:var(--ink)]/60 backdrop-blur-[4px]"
-          onClick={() => setShowResetConfirm(false)}
-        >
-          <div
-            className="w-full max-w-[300px] rounded-[var(--radius-xl)] bg-[var(--canvas)] p-[var(--space-6)] text-center shadow-[var(--shadow-xl)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mx-auto mb-[var(--space-4)] flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--error)]/10">
-              <AlertCircle size={28} className="text-[var(--error)]" />
-            </div>
-            <h3 className="type-title mb-[var(--space-2)]">Reset Captain PIN?</h3>
-            <p className="type-caption mb-[var(--space-4)] text-[var(--ink-secondary)]">
-              This will clear your current PIN. You&apos;ll need to set a new one to access captain
-              features.
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleEnableCaptain();
+              }
+            }}
+          />
+          {error && (
+            <p id="captain-pin-error" className="mt-[var(--space-2)] text-[var(--error)] text-[var(--text-sm)]">
+              {error}
             </p>
-            <div className="flex gap-[var(--space-3)]">
-              <button onClick={() => setShowResetConfirm(false)} className="btn-secondary flex-1">
-                Cancel
-              </button>
-              <button onClick={handleResetPin} className="btn-danger flex-1">
-                Reset PIN
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+
+        {captainPinHash && (
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="btn-ghost mb-[var(--space-3)] w-full text-sm text-[var(--masters)]"
+          >
+            <KeyRound size={14} className="mr-1 inline align-middle" />
+            Forgot PIN?
+          </button>
+        )}
+
+        <div className="flex gap-[var(--space-3)]">
+          <button onClick={handleClosePinModal} className="btn-secondary flex-1">
+            Cancel
+          </button>
+          <button
+            onClick={handleEnableCaptain}
+            disabled={pin.length < 4 || attempts >= 3}
+            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {captainPinHash ? 'Unlock' : 'Enable'}
+          </button>
+        </div>
+      </Modal>
+
+      <ConfirmDialog
+        isOpen={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        onConfirm={handleResetPin}
+        title="Reset Captain PIN?"
+        description="This will clear your current PIN. You'll need to set a new one to access captain features."
+        confirmLabel="Reset PIN"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </>
   );
 }

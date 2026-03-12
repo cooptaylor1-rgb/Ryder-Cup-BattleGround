@@ -7,12 +7,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { syncService } from '@/lib/supabase';
 import { useTripStore } from '@/lib/stores/tripStore';
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { cn } from '@/lib/utils';
 import { Users, Loader2, CheckCircle, XCircle, Share2 } from 'lucide-react';
+import { Modal } from './Modal';
 
 interface JoinTripModalProps {
   isOpen: boolean;
@@ -24,18 +25,43 @@ interface JoinTripModalProps {
 
 export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinTripModalProps) {
   const [shareCode, setShareCode] = useState(initialCode || '');
-
-  // Sync initialCode prop changes into local state
-  useEffect(() => {
-    if (initialCode) {
-      setShareCode(initialCode.toUpperCase());
-    }
-  }, [initialCode]);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { loadTrip } = useTripStore();
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (successTimeoutRef.current) {
+      clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = null;
+    }
+    setShareCode(initialCode?.toUpperCase() || '');
+    setIsJoining(false);
+    setError(null);
+    setSuccess(false);
+  }, [initialCode, isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleClose = () => {
+    if (successTimeoutRef.current) {
+      clearTimeout(successTimeoutRef.current);
+      successTimeoutRef.current = null;
+    }
+    onClose();
+  };
 
   const handleJoin = async () => {
     if (!shareCode.trim()) {
@@ -54,9 +80,9 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
         // Load the trip from local DB (already synced by joinTripByShareCode)
         await loadTrip(result.tripId);
         setSuccess(true);
-        setTimeout(() => {
+        successTimeoutRef.current = setTimeout(() => {
           onSuccess?.(result.tripId!);
-          onClose();
+          handleClose();
         }, 1500);
       } else {
         setError(result.errors[0] || 'Failed to join trip. Please check the code and try again.');
@@ -71,8 +97,18 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm">
-      <div className="bg-[var(--surface-raised)] rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden border border-[color:var(--rule)]/40">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      ariaLabel="Join a Trip"
+      showCloseButton={false}
+      closeOnOverlayClick={false}
+      closeOnEscape={!isJoining}
+      size="md"
+      overlayClassName="bg-[color:var(--ink)]/50 backdrop-blur-sm"
+      panelClassName="max-w-md overflow-hidden rounded-2xl border border-[color:var(--rule)]/40 bg-[var(--surface-raised)] shadow-xl"
+      contentClassName="p-0"
+    >
         {/* Header */}
         <div className="p-6 border-b border-[color:var(--rule)]/40">
           <div className="flex items-center gap-3">
@@ -99,10 +135,14 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
           ) : (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-[var(--ink-secondary)] mb-2">
+                <label
+                  htmlFor="join-trip-share-code"
+                  className="block text-sm font-medium text-[var(--ink-secondary)] mb-2"
+                >
                   Share Code
                 </label>
                 <input
+                  id="join-trip-share-code"
                   type="text"
                   value={shareCode}
                   onChange={(e) => setShareCode(e.target.value.toUpperCase())}
@@ -116,9 +156,15 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                   )}
                   maxLength={8}
                   autoFocus
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? 'join-trip-share-code-error' : undefined}
                 />
                 {error && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-error">
+                  <div
+                    id="join-trip-share-code-error"
+                    role="alert"
+                    className="flex items-center gap-2 mt-2 text-sm text-error"
+                  >
                     <XCircle className="w-4 h-4" />
                     {error}
                   </div>
@@ -139,7 +185,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
         {!success && (
           <div className="flex gap-3 p-6 border-t border-[color:var(--rule)]/40">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 px-4 py-3 rounded-lg border border-[color:var(--rule)]/40 text-[var(--ink-secondary)] font-medium hover:bg-[color:var(--surface)]/60 transition-colors"
             >
               Cancel
@@ -166,8 +212,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
             </button>
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }
 
