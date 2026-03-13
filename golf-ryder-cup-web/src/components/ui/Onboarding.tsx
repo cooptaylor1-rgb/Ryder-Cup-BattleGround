@@ -10,12 +10,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
-    RyderCupTrophyIllustration,
-    TrophyIllustration,
-    GolfersIllustration,
-    ScorecardIllustration,
-    CelebrationIllustration,
-} from './illustrations';
+    ClubhouseScene,
+    FirstTeeScene,
+    ScheduleScene,
+    SidesScene,
+    StoryScene,
+} from './onboarding/OnboardingFeatureScenes';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
 // ============================================
@@ -23,11 +23,15 @@ import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 // ============================================
 
 interface OnboardingStep {
-    illustration: React.ReactNode;
+    scene: React.ReactNode;
     eyebrow: string;
     title: string;
     subtitle: string;
     features?: string[];
+    sceneDetails: Array<{
+        label: string;
+        value: string;
+    }>;
 }
 
 interface OnboardingProps {
@@ -42,49 +46,69 @@ interface OnboardingProps {
 
 const steps: OnboardingStep[] = [
     {
-        illustration: <RyderCupTrophyIllustration size="xl" animated />,
+        scene: <ClubhouseScene />,
         eyebrow: 'The Clubhouse',
-        title: "Welcome to Ryder Cup Tracker",
-        subtitle: "The best way to track your golf buddies trip. Compete, score, and crown champions.",
+        title: 'Welcome to Ryder Cup Battleground',
+        subtitle: 'A proper home for the golf trip: pairings, tee sheets, live scoring, and the annual story that follows.',
+        sceneDetails: [
+            { label: 'Field Note', value: 'Private trip ledger' },
+            { label: 'Issue', value: 'Match week' },
+        ],
     },
     {
-        illustration: <GolfersIllustration size="xl" />,
+        scene: <SidesScene />,
         eyebrow: 'The Sides',
-        title: "Ryder Cup Format",
-        subtitle: "Split into two teams and compete in classic Ryder Cup style matches.",
+        title: 'Set the sides',
+        subtitle: 'Build teams, shape pairings, and let the match board explain the competition at a glance.',
         features: [
-            "Create custom team names & rosters",
-            "Track handicaps automatically",
-            "Head-to-head matchups",
+            'Name the sides & roster the field',
+            'Track handicaps with match context',
+            'Arrange pairings session by session',
+        ],
+        sceneDetails: [
+            { label: 'Match Board', value: 'Four-ball to singles' },
+            { label: 'Identity', value: 'Two sides, one cup' },
         ],
     },
     {
-        illustration: <ScorecardIllustration size="xl" animated />,
-        eyebrow: 'The Scorecard',
-        title: "Score Hole by Hole",
-        subtitle: "Simple, beautiful scoring that updates standings in real-time.",
+        scene: <ScheduleScene />,
+        eyebrow: 'The Tee Sheet',
+        title: 'Lay out the week',
+        subtitle: 'Tee times, sessions, and formats arranged with the calm of a proper club-event board.',
         features: [
-            "Match play & stroke play",
-            "Four-ball & foursomes",
-            "Singles matches",
+            'Stage sessions and tee times',
+            'Build the rota by format',
+            'See the full week at a glance',
+        ],
+        sceneDetails: [
+            { label: 'Saturday Rota', value: 'First wave at 7:40' },
+            { label: 'Cadence', value: 'Built hole by hole' },
         ],
     },
     {
-        illustration: <TrophyIllustration size="xl" animated />,
+        scene: <StoryScene />,
         eyebrow: 'The Story',
-        title: "Track Every Stat",
-        subtitle: "See who's clutch, who's consistent, and who takes home the glory.",
+        title: 'Let the trip accumulate meaning',
+        subtitle: 'Standings, records, and awards gathered into something worth revisiting after the last putt drops.',
         features: [
-            "Live leaderboards",
-            "Individual player stats",
-            "Trip awards & history",
+            'Follow the live standings',
+            'Keep player records honest',
+            'Archive the rivalry by trip',
+        ],
+        sceneDetails: [
+            { label: 'Archive', value: 'Rivalry year by year' },
+            { label: 'Ledger', value: 'Stats, awards, history' },
         ],
     },
     {
-        illustration: <CelebrationIllustration size="xl" animated />,
+        scene: <FirstTeeScene />,
         eyebrow: 'The First Tee',
-        title: "Ready to Play?",
-        subtitle: "Create your first trip and let the competition begin!",
+        title: 'Ready for the opening peg?',
+        subtitle: 'Create the trip, name the sides, and send everyone to the first tee.',
+        sceneDetails: [
+            { label: 'Opening Hole', value: 'Dawn match start' },
+            { label: 'Ritual', value: 'Peg it and go' },
+        ],
     },
 ];
 
@@ -172,11 +196,28 @@ export function Onboarding({ onComplete, onSkip, className }: OnboardingProps) {
 
                 <div className="onboarding-stage">
                     <div className="onboarding-stage-frame">
-                        <div
-                            className="onboarding-illustration"
-                            key={currentStep}
-                        >
-                            {step.illustration}
+                        <div className="onboarding-stage-canvas">
+                            <div className="onboarding-scene-notes" aria-hidden="true">
+                                {step.sceneDetails.map((detail, index) => (
+                                    <div
+                                        key={`${detail.label}-${detail.value}`}
+                                        className={cn(
+                                            'onboarding-scene-note',
+                                            index > 0 && 'onboarding-scene-note--trailing'
+                                        )}
+                                    >
+                                        <span className="onboarding-scene-label">{detail.label}</span>
+                                        <span className="onboarding-scene-value">{detail.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div
+                                className="onboarding-illustration"
+                                key={currentStep}
+                            >
+                                {step.scene}
+                            </div>
                         </div>
                     </div>
 
@@ -194,8 +235,8 @@ export function Onboarding({ onComplete, onSkip, className }: OnboardingProps) {
                                     className="onboarding-feature-card animate-stagger-item"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
-                                    <span className="onboarding-feature-check" aria-hidden="true">
-                                        ✓
+                                    <span className="onboarding-feature-index" aria-hidden="true">
+                                        {String(index + 1).padStart(2, '0')}
                                     </span>
                                     <span>{feature}</span>
                                 </div>
@@ -287,8 +328,23 @@ export function WelcomeBack({
 
                 <div className="onboarding-stage">
                     <div className="onboarding-stage-frame">
-                        <div className="onboarding-illustration">
-                            <RyderCupTrophyIllustration size="xl" animated />
+                        <div className="onboarding-stage-canvas">
+                            <div className="onboarding-scene-notes" aria-hidden="true">
+                                <div className="onboarding-scene-note">
+                                    <span className="onboarding-scene-label">Field Note</span>
+                                    <span className="onboarding-scene-value">Back at the clubhouse</span>
+                                </div>
+                                <div className="onboarding-scene-note onboarding-scene-note--trailing">
+                                    <span className="onboarding-scene-label">Resume</span>
+                                    <span className="onboarding-scene-value">
+                                        {lastTripName ? 'Continue the rivalry' : 'Start the next round'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="onboarding-illustration">
+                                <ClubhouseScene />
+                            </div>
                         </div>
                     </div>
 
