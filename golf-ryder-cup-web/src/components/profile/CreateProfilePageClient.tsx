@@ -172,7 +172,7 @@ export default function CreateProfilePageClient() {
       };
 
       const profile = await createProfile(profileData, enableOfflinePin ? formData.pin : undefined);
-      let successMessage = 'Profile created. Let’s finish the rest of the setup.';
+      let successMessage = 'Profile created. You can add more details next.';
 
       if (isSupabaseConfigured && !authEmail) {
         try {
@@ -181,19 +181,19 @@ export default function CreateProfilePageClient() {
             buildMagicLinkRedirectPath(searchParams?.get('next'))
           );
           successMessage = enableOfflinePin
-            ? 'Profile created. Check your email to finish secure sign-in.'
-            : 'Profile created. Check your email to finish secure sign-in. You can add offline access later from Profile.';
+            ? 'Profile created. Check your email to finish signing in.'
+            : 'Profile created. Check your email to finish signing in. You can add a device PIN later from Profile.';
         } catch (signInLinkError) {
           logger.warn('Failed to send sign-in link after profile creation', {
             error: signInLinkError,
           });
           successMessage = enableOfflinePin
-            ? 'Profile created. Use your offline PIN for now and link email sign-in later.'
-            : 'Profile created. Email sign-in was unavailable, but you can add offline access later from Profile.';
+            ? 'Profile created. Use your device PIN for now and add email sign-in later.'
+            : 'Profile created. Email sign-in is unavailable right now, but you can add a device PIN later from Profile.';
         }
       } else if (isSupabaseConfigured && !enableOfflinePin) {
         successMessage =
-          'Profile created. You can add offline access later from Profile if you want this device to work without email.';
+          'Profile created. You can add a device PIN later from Profile if you want offline access on this device.';
       }
 
       showToast('success', successMessage);
@@ -339,7 +339,7 @@ function EssentialStep({
           Create your account
         </h1>
         <p className="mt-[var(--space-3)] text-base text-[var(--ink-secondary)]">
-          Just enough to get you on the board. The golf details can come next.
+          Start with the basics. You can add golf details next.
         </p>
       </div>
 
@@ -366,7 +366,7 @@ function EssentialStep({
       <ProfileTextField
         disabled={Boolean(authEmail)}
         error={errors.email}
-        hint={authEmail ? 'Locked to your signed-in account email' : 'Used for invites and secure sign-in'}
+        hint={authEmail ? 'Locked to your signed-in account email' : 'Used for invites and sign-in'}
         icon={<Mail className="h-5 w-5" />}
         label="Email"
         onChange={(value) => updateField('email', value)}
@@ -385,8 +385,8 @@ function EssentialStep({
         </div>
         <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-tertiary)]">
           {isCloudMode
-            ? 'Add a 4-digit PIN only if you want this device to keep working when email or network access is unavailable.'
-            : 'You will use this 4-digit PIN to sign in on this device when you are offline.'}
+            ? 'Add a 4-digit PIN if you want to use this app on this device without email or internet access.'
+            : 'Use this 4-digit PIN to open the app on this device when you are offline.'}
         </p>
 
         {isCloudMode && (
@@ -431,7 +431,7 @@ function EssentialStep({
           </div>
         ) : (
           <div className="mt-[var(--space-5)] rounded-[var(--radius-lg)] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-4)] text-sm leading-6 text-[var(--ink-secondary)]">
-            Skip this for now if secure email sign-in is enough. You can add offline access later from Profile.
+            Skip this for now. You can add a device PIN later from Profile.
           </div>
         )}
       </section>
@@ -455,10 +455,10 @@ function OptionalStep({
       <div className="text-center">
         <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">ALMOST THERE</p>
         <h1 className="mt-[var(--space-3)] font-serif text-[clamp(1.9rem,7vw,2.5rem)] italic leading-[1.05] text-[var(--ink)]">
-          Fine-tune your golf profile
+          Add your golf details
         </h1>
         <p className="mt-[var(--space-3)] text-base text-[var(--ink-secondary)]">
-          These details make pairings, handicaps, and match context sharper on day one.
+          Add your handicap, GHIN, home course, and tees now, or come back later.
         </p>
       </div>
 
@@ -487,7 +487,7 @@ function OptionalStep({
         {expanded && (
           <div className="space-y-[var(--space-5)] border-t border-[var(--rule)] px-[var(--space-5)] py-[var(--space-5)]">
             <ProfileTextField
-              hint="Used for fair pairings and match context"
+              hint="Helps with pairings and scoring"
               icon={<Hash className="h-5 w-5" />}
               label="Handicap Index"
               onChange={(value) => updateField('handicapIndex', value)}
@@ -542,10 +542,10 @@ function OptionalStep({
       <div className="rounded-[1.75rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(247,243,235,0.98))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_18px_36px_rgba(46,34,18,0.05)]">
         <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Later from Profile</p>
         <h2 className="mt-[var(--space-2)] font-serif text-[var(--text-xl)] italic text-[var(--ink)]">
-          Travel and trip preferences stay editable.
+          You can add the rest later.
         </h2>
         <p className="mt-[var(--space-3)] text-sm leading-6 text-[var(--ink-secondary)]">
-          Shirt size, dietary needs, and emergency contacts belong in the complete-profile step, not in the critical account-creation path.
+          Shirt size, dietary needs, and emergency contacts can wait until the next step or later from Profile.
         </p>
       </div>
     </section>

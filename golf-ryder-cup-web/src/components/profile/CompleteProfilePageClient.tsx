@@ -115,7 +115,7 @@ export default function CompleteProfilePageClient() {
 
       await updateProfile(updates);
       await completeOnboarding();
-      showToast('success', 'Profile complete! Welcome aboard.');
+      showToast('success', 'Profile saved. You are all set.');
       router.push(searchParams?.get('next') || '/');
     } catch (err) {
       logger.error('Failed to update profile', { error: err });
@@ -128,7 +128,7 @@ export default function CompleteProfilePageClient() {
   const handleSkip = async () => {
     try {
       await completeOnboarding();
-      showToast('info', 'You can complete your profile anytime in Settings.');
+      showToast('info', 'You can finish this later from Profile.');
       router.push(searchParams?.get('next') || '/');
     } catch (err) {
       logger.error('Failed to skip onboarding', { error: err });
@@ -143,7 +143,7 @@ export default function CompleteProfilePageClient() {
           <EmptyStatePremium
             illustration="golfers"
             title="Sign in to complete your profile"
-            description="Finish onboarding after you sign in."
+            description="Finish setting up your profile after you sign in."
             action={{
               label: 'Sign In',
               onClick: () => router.push('/login'),
@@ -166,7 +166,7 @@ export default function CompleteProfilePageClient() {
           <EmptyStatePremium
             illustration="golfers"
             title="You're all set"
-            description="Your profile onboarding is already complete."
+            description="Your profile is already set up."
             action={{
               label: 'Continue',
               onClick: () => router.push(nextPath),
@@ -213,8 +213,8 @@ export default function CompleteProfilePageClient() {
               Almost There
             </h2>
             <p className="font-sans text-[length:var(--text-base)] text-ink-secondary mt-[var(--space-3)] leading-normal">
-              Welcome, {currentUser.firstName}. A few more details help with
-              trip&nbsp;planning and fair match&nbsp;pairing.
+              Welcome, {currentUser.firstName}. A few more details help with trip planning,
+              pairings, and contact info.
             </p>
           </div>
 
@@ -254,7 +254,7 @@ export default function CompleteProfilePageClient() {
                     placeholder="12.5"
                     type="number"
                     icon={<Hash className="w-[18px] h-[18px]" />}
-                    hint="For fair match pairing"
+                    hint="Helps with pairings and scoring"
                   />
                   <InputField
                     label="GHIN Number"
