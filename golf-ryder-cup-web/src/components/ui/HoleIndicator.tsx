@@ -58,7 +58,7 @@ export function HoleIndicator({
             case 'halved':
                 return cn(
                     'text-[var(--canvas)]',
-                    'bg-linear-to-br from-[var(--color-accent)] to-[#A38B2D]',
+                    'bg-linear-to-br from-[var(--color-accent)] to-[var(--gold-dark)]',
                     'shadow-[var(--shadow-glow-gold)]'
                 );
             default:

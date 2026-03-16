@@ -262,8 +262,8 @@ export default function NotificationSettingsPage() {
 
               <SettingToggle
                 icon={ClipboardList}
-                iconWrapClassName="bg-[#8b5cf6]/10"
-                iconClassName="text-[#8b5cf6]"
+                iconWrapClassName="bg-[var(--masters)]/10"
+                iconClassName="text-[var(--masters)]"
                 title="Lineup published"
                 description="When new pairings are announced"
                 checked={preferences.lineupPublished}

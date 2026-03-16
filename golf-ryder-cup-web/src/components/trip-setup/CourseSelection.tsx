@@ -328,13 +328,13 @@ export function CourseSelection({
                                                     className="px-2 py-1 rounded-lg bg-[var(--surface-secondary)] text-xs flex items-center gap-2"
                                                 >
                                                     <div
-                                                        className={cn(
-                                                            'w-3 h-3 rounded-full',
-                                                            tee.color === 'gold'
-                                                                ? 'bg-[#D4AF37]'
-                                                                : tee.color === 'white'
-                                                                    ? 'bg-[#E5E7EB]'
-                                                                    : 'bg-[color:var(--tee-color)]'
+                                                    className={cn(
+                                                        'w-3 h-3 rounded-full',
+                                                        tee.color === 'gold'
+                                                            ? 'bg-[var(--gold)]'
+                                                            : tee.color === 'white'
+                                                                ? 'bg-[var(--canvas-raised)] ring-1 ring-[var(--rule-strong)]'
+                                                                : 'bg-[color:var(--tee-color)]'
                                                         )}
                                                         style={
                                                             tee.color === 'gold' || tee.color === 'white'
