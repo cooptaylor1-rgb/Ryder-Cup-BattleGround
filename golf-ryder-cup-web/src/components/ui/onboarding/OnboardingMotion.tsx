@@ -3,17 +3,68 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
+    AmbientMotion,
     BallMotion,
-    CardStackMotion,
+    CardMotion,
     FinalCallout,
     ONBOARDING_SPRING,
+    ONBOARDING_WORLD_WIDTH,
     PathMotion,
+    SceneCameraMotion,
 } from './OnboardingMotionPrimitives';
 
 interface OnboardingMotionProps {
     currentStep: number;
     className?: string;
     forceReducedMotion?: boolean;
+}
+
+function TerrainContours({
+    currentStep,
+    reducedMotion,
+}: {
+    currentStep: number;
+    reducedMotion: boolean;
+}) {
+    const transition = reducedMotion ? { duration: 0 } : ONBOARDING_SPRING;
+
+    return (
+        <>
+            <motion.path
+                d={`M0 224C142 202 282 196 430 198C602 202 772 176 916 142C1042 112 1180 110 1320 134V360H0Z`}
+                fill="url(#onboarding-terrain-back)"
+                initial={false}
+                animate={{
+                    x: currentStep * -8,
+                    y: currentStep >= 3 ? -8 : 0,
+                    opacity: 0.28,
+                }}
+                transition={transition}
+            />
+            <motion.path
+                d={`M0 268C138 252 282 252 426 238C584 224 738 210 892 202C1056 192 1178 204 1320 226V360H0Z`}
+                fill="url(#onboarding-terrain-mid)"
+                initial={false}
+                animate={{
+                    x: currentStep * 5,
+                    y: currentStep === 4 ? 6 : 0,
+                    opacity: 0.3,
+                }}
+                transition={transition}
+            />
+            <motion.path
+                d={`M0 312C150 298 292 294 436 284C620 270 790 260 920 254C1064 248 1180 254 1320 270V360H0Z`}
+                fill="url(#onboarding-terrain-front)"
+                initial={false}
+                animate={{
+                    x: currentStep * 3,
+                    y: currentStep === 4 ? 8 : 0,
+                    opacity: 0.26,
+                }}
+                transition={transition}
+            />
+        </>
+    );
 }
 
 export function OnboardingMotion({
@@ -38,135 +89,114 @@ export function OnboardingMotion({
                     <stop offset="0%" stopColor="var(--canvas-raised)" />
                     <stop offset="100%" stopColor="var(--canvas-warm)" />
                 </linearGradient>
-                <radialGradient id="onboarding-ambient-glow" cx="26%" cy="16%" r="46%">
-                    <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.26" />
+                <linearGradient id="onboarding-sky-wash" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.92)" />
+                    <stop offset="52%" stopColor="rgba(247,241,228,0.82)" />
+                    <stop offset="100%" stopColor="rgba(239,231,214,0.88)" />
+                </linearGradient>
+                <linearGradient id="onboarding-path-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="var(--masters)" />
+                    <stop offset="58%" stopColor="var(--masters-deep)" />
+                    <stop offset="100%" stopColor="var(--gold-dark)" />
+                </linearGradient>
+                <linearGradient id="onboarding-terrain-back" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(0,102,68,0.2)" />
+                    <stop offset="100%" stopColor="rgba(0,77,51,0.06)" />
+                </linearGradient>
+                <linearGradient id="onboarding-terrain-mid" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(201,162,39,0.12)" />
+                    <stop offset="100%" stopColor="rgba(0,77,51,0.1)" />
+                </linearGradient>
+                <linearGradient id="onboarding-terrain-front" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(26,24,21,0.12)" />
+                    <stop offset="100%" stopColor="rgba(26,24,21,0.03)" />
+                </linearGradient>
+                <radialGradient id="onboarding-sun-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.22" />
                     <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="onboarding-end-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(201,162,39,0.24)" />
+                    <stop offset="100%" stopColor="rgba(201,162,39,0)" />
                 </radialGradient>
             </defs>
 
-            <motion.circle
-                cx="172"
-                cy="78"
-                r="92"
-                fill="url(#onboarding-ambient-glow)"
+            <rect x="0" y="0" width="680" height="360" fill="url(#onboarding-sky-wash)" />
+
+            <motion.ellipse
+                cx="216"
+                cy="52"
+                rx="164"
+                ry="82"
+                fill="url(#onboarding-sun-glow)"
                 initial={false}
                 animate={{
-                    x: step * 6,
-                    y: step === 4 ? 8 : 0,
-                    opacity: step >= 3 ? 0.82 : 0.66,
-                    scale: step === 4 ? 1.08 : 1,
+                    x: step * 10,
+                    opacity: step === 4 ? 0.18 : 0.1,
+                    scale: step >= 3 ? 1.04 : 1,
                 }}
                 transition={transition}
             />
 
-            <motion.path
-                d="M0 226C98 210 176 208 270 210C358 212 456 188 590 150C632 138 660 134 680 132V360H0Z"
-                fill="var(--masters)"
-                initial={false}
-                animate={{ x: step * -4, y: step >= 3 ? -6 : 0, opacity: 0.08 }}
-                transition={transition}
-            />
-            <motion.path
-                d="M0 266C94 252 176 256 270 242C364 228 474 214 680 204V360H0Z"
-                fill="var(--gold)"
-                initial={false}
-                animate={{ x: step * 3, y: step === 4 ? 4 : 0, opacity: 0.06 }}
-                transition={transition}
-            />
-            <motion.path
-                d="M0 300C88 286 174 288 270 278C390 266 488 258 680 246V360H0Z"
-                fill="var(--ink)"
-                initial={false}
-                animate={{ x: step * 2, y: step === 4 ? 6 : 0, opacity: 0.045 }}
-                transition={transition}
-            />
+            <SceneCameraMotion currentStep={step} reducedMotion={reducedMotion} depth={0.56}>
+                <TerrainContours currentStep={step} reducedMotion={reducedMotion} />
+            </SceneCameraMotion>
 
-            <motion.g
-                initial={false}
-                animate={{
-                    x: step >= 1 ? -10 : 0,
-                    y: step >= 1 ? 6 : 0,
-                    opacity: step === 0 ? 0.92 : 0.32,
-                }}
-                transition={transition}
-            >
-                <path
-                    d="M62 246H122V218L100 196L82 210L68 196L62 204Z"
-                    fill="var(--ink)"
-                    opacity="0.11"
+            <SceneCameraMotion currentStep={step} reducedMotion={reducedMotion}>
+                <rect
+                    x="0"
+                    y="0"
+                    width={ONBOARDING_WORLD_WIDTH}
+                    height="360"
+                    fill="none"
+                    pointerEvents="none"
                 />
-                <path d="M92 188L96 176L100 188" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" />
-                <path d="M96 176V196" fill="none" stroke="var(--ink-secondary)" strokeWidth="1.5" strokeLinecap="round" />
-                <rect x="70" y="212" width="46" height="18" rx="4" fill="var(--canvas-raised)" opacity="0.72" />
-                <line x1="80" y1="220" x2="110" y2="220" stroke="var(--rule-strong)" strokeWidth="2" />
-            </motion.g>
+                <AmbientMotion currentStep={step} reducedMotion={reducedMotion} />
+                <PathMotion currentStep={step} reducedMotion={reducedMotion} />
+                <CardMotion currentStep={step} reducedMotion={reducedMotion} />
 
-            <motion.g
+                <motion.g
+                    initial={false}
+                    animate={{
+                        x: 1090,
+                        y: 288,
+                        opacity: step === 4 ? 1 : 0.08,
+                        scale: step === 4 ? 1 : 0.82,
+                    }}
+                    transition={transition}
+                >
+                    <path
+                        d="M0 0C18 -9 42 -9 66 0"
+                        fill="none"
+                        stroke="var(--masters)"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        opacity="0.4"
+                    />
+                    <path
+                        d="M32 -42V0M18 0H46"
+                        fill="none"
+                        stroke="var(--gold-dark)"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                    />
+                </motion.g>
+
+                <BallMotion currentStep={step} reducedMotion={reducedMotion} />
+                <FinalCallout currentStep={step} reducedMotion={reducedMotion} />
+            </SceneCameraMotion>
+
+            <motion.rect
+                x="0"
+                y="0"
+                width="680"
+                height="360"
+                fill="rgba(26,24,21,0.04)"
                 initial={false}
-                animate={{
-                    x: step >= 2 ? 8 : 0,
-                    y: step >= 2 ? 4 : 0,
-                    opacity: step < 4 ? 0.7 : 0.24,
-                }}
+                animate={{ opacity: step >= 3 ? 0.06 : 0.03 }}
                 transition={transition}
-            >
-                <path d="M598 134V220" stroke="var(--ink-secondary)" strokeWidth="2.5" strokeLinecap="round" />
-                <path
-                    d="M598 140C610 146 624 145 636 138V170C624 178 610 178 598 172Z"
-                    fill="var(--gold)"
-                    opacity="0.82"
-                />
-                <circle cx="598" cy="230" r="10" fill="var(--canvas-raised)" stroke="var(--rule-strong)" strokeWidth="1.5" />
-                <circle cx="598" cy="230" r="4" fill="var(--masters-deep)" />
-            </motion.g>
-
-            <CardStackMotion currentStep={step} reducedMotion={reducedMotion} />
-            <PathMotion currentStep={step} reducedMotion={reducedMotion} />
-
-            <motion.g
-                initial={false}
-                animate={{
-                    x: 516,
-                    y: 292,
-                    opacity: step === 4 ? 1 : 0.08,
-                    scale: step === 4 ? 1 : 0.8,
-                }}
-                transition={transition}
-            >
-                <path d="M0 0C18 -8 42 -8 62 0" fill="none" stroke="var(--masters)" strokeWidth="3" strokeLinecap="round" opacity="0.42" />
-                <path d="M30 -44V0M18 0H42" fill="none" stroke="var(--gold-dark)" strokeWidth="4" strokeLinecap="round" />
-            </motion.g>
-
-            <motion.g
-                initial={false}
-                animate={{
-                    x: 586,
-                    y: 252,
-                    opacity: step === 4 ? 1 : 0.14,
-                    scale: step === 4 ? 1 : 0.86,
-                }}
-                transition={transition}
-            >
-                <path d="M0 -72V0" stroke="var(--ink-secondary)" strokeWidth="2.5" strokeLinecap="round" />
-                <motion.path
-                    d="M0 -66C14 -60 28 -60 42 -68V-34C28 -28 14 -28 0 -34Z"
-                    fill="var(--masters-deep)"
-                    animate={
-                        step === 4 && !reducedMotion
-                            ? { rotate: [0, -1.8, 0.8, 0], x: [0, 2, -1, 0] }
-                            : { rotate: 0, x: 0 }
-                    }
-                    transition={
-                        step === 4 && !reducedMotion
-                            ? { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }
-                            : transition
-                    }
-                    style={{ transformBox: 'fill-box', transformOrigin: 'left center' }}
-                />
-            </motion.g>
-
-            <BallMotion currentStep={step} reducedMotion={reducedMotion} />
-            <FinalCallout currentStep={step} reducedMotion={reducedMotion} />
+                style={{ mixBlendMode: 'multiply' }}
+            />
         </svg>
     );
 }

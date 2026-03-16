@@ -4401,9 +4401,9 @@ html.dark body {
   border-radius: calc(min(2rem, var(--radius-2xl, 2rem)) - 0.35rem);
   overflow: hidden;
   background:
-    radial-gradient(circle at 22% 18%, rgba(201, 162, 39, 0.1), transparent 22%),
-    radial-gradient(circle at 76% 12%, rgba(var(--masters-rgb), 0.07), transparent 20%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(243, 238, 232, 0.64));
+    radial-gradient(circle at 18% 16%, rgba(201, 162, 39, 0.12), transparent 22%),
+    radial-gradient(circle at 82% 14%, rgba(var(--masters-rgb), 0.08), transparent 20%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(243, 238, 232, 0.68));
 }
 
 .onboarding-stage-canvas::before {
@@ -4414,9 +4414,9 @@ html.dark body {
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 29px,
-      rgba(24, 17, 11, 0.06) 29px,
-      rgba(24, 17, 11, 0.06) 30px
+      transparent 33px,
+      rgba(24, 17, 11, 0.04) 33px,
+      rgba(24, 17, 11, 0.04) 34px
     ),
     linear-gradient(
       180deg,
@@ -4424,7 +4424,7 @@ html.dark body {
       rgba(255, 255, 255, 0) 16%,
       rgba(18, 12, 8, 0.05) 100%
     );
-  opacity: 0.68;
+  opacity: 0.54;
   pointer-events: none;
   z-index: 0;
 }
@@ -4458,10 +4458,10 @@ html.dark body {
   max-width: 12rem;
   padding: 0.7rem 0.85rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.64);
-  border: 1px solid rgba(255, 255, 255, 0.66);
-  box-shadow: 0 10px 24px rgba(36, 25, 15, 0.08);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 26px rgba(36, 25, 15, 0.08);
+  backdrop-filter: blur(14px);
 }
 
 .onboarding-scene-note--trailing {
@@ -4491,6 +4491,7 @@ html.dark body {
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 20px 34px rgba(48, 32, 16, 0.14));
+  contain: layout paint style;
 }
 
 .onboarding-motion {
@@ -4498,9 +4499,11 @@ html.dark body {
   height: 100%;
   display: block;
   overflow: visible;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.onboarding-motion :is(g, path, circle, rect, ellipse) {
+.onboarding-motion :is(g, path, circle, rect, ellipse, text) {
   will-change: transform, opacity;
 }
 
