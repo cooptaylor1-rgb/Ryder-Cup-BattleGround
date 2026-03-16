@@ -133,16 +133,16 @@ export default function MorePageClient() {
     {
       id: 'trip-tools',
       eyebrow: 'Trip Tools',
-      title: 'The rooms that keep the weekend moving.',
+      title: 'Keep the trip organized.',
       description:
-        'Trip structure, money, schedule, and the practical work that has to stay within reach.',
+        'Schedule, money, courses, and the practical details that keep the week moving.',
       items: [
         ...(isCaptainMode
           ? [
               {
                 id: 'captain',
                 label: 'Captain command',
-                description: 'Lineups, logistics, and the full competition desk.',
+                description: 'Lineups, logistics, pairings, and captain controls.',
                 icon: Shield,
                 href: '/captain',
                 badge: 'Active',
@@ -153,14 +153,14 @@ export default function MorePageClient() {
         {
           id: 'schedule',
           label: 'Schedule',
-          description: 'Sessions, tee times, and the shape of the trip.',
+          description: 'Sessions, tee times, and the plan for the week.',
           icon: CalendarDays,
           href: '/schedule',
         },
         {
           id: 'finances',
           label: 'Finances',
-          description: 'Charges, balances, and settling up without the usual mess.',
+          description: 'Charges, balances, and who still owes what.',
           icon: DollarSign,
           href: '/finances',
           tone: 'green',
@@ -168,7 +168,7 @@ export default function MorePageClient() {
         {
           id: 'courses',
           label: 'Courses',
-          description: 'Course details, setup, and the places you are actually playing.',
+          description: 'Course details, setup, and where the matches are being played.',
           icon: MapPin,
           href: '/courses',
         },
@@ -177,14 +177,14 @@ export default function MorePageClient() {
     {
       id: 'trip-story',
       eyebrow: 'Story And Noise',
-      title: 'The social layer should still look curated.',
+      title: 'Keep the trip lively.',
       description:
-        'Banter, side games, awards, and the bits of trip memory that make the app feel alive.',
+        'Chat, side games, stats, awards, and the parts of the trip you will want to revisit later.',
       items: [
         {
           id: 'social',
           label: 'Banter and journal',
-          description: 'Trip talk, photos, and the running record of the weekend.',
+          description: 'Trip talk, photos, and the running record of the week.',
           icon: MessageSquare,
           href: '/social',
         },
@@ -199,21 +199,21 @@ export default function MorePageClient() {
         {
           id: 'trip-stats',
           label: 'Trip stats',
-          description: 'The off-course numbers that turn into stories a year later.',
+          description: 'The numbers that explain how the trip actually played out.',
           icon: BarChart3,
           href: '/trip-stats',
         },
         {
           id: 'awards',
           label: 'Awards',
-          description: 'Badges, milestones, and the ceremonial side of the recap.',
+          description: 'Badges, milestones, and the fun superlatives from the trip.',
           icon: Award,
           href: '/trip-stats/awards',
         },
         {
           id: 'recap',
           label: 'Trip recap',
-          description: 'The polished look back once the cup and the dust settle.',
+          description: 'A clean look back once the matches are done.',
           icon: Trophy,
           href: '/recap',
         },
@@ -222,14 +222,14 @@ export default function MorePageClient() {
     {
       id: 'app-support',
       eyebrow: 'Support And Preferences',
-      title: 'The utility layer should feel every bit as composed.',
+      title: 'Adjust the app and get help fast.',
       description:
-        'Appearance, notifications, backup, and the support pages people look for when the trip gets real.',
+        'Settings, appearance, notifications, backups, and help when something needs attention.',
       items: [
         {
           id: 'settings',
           label: 'Settings',
-          description: 'The central utility room for display, rules, alerts, and backups.',
+          description: 'Manage display, scoring, alerts, and backup options.',
           icon: Palette,
           href: '/settings',
         },
@@ -243,7 +243,7 @@ export default function MorePageClient() {
         {
           id: 'notifications',
           label: 'Notifications',
-          description: 'The difference between useful reminders and background static.',
+          description: 'Choose which reminders and alerts you actually want.',
           icon: Bell,
           href: '/settings/notifications',
         },
@@ -257,7 +257,7 @@ export default function MorePageClient() {
         {
           id: 'help',
           label: 'Help and FAQ',
-          description: 'The guidebook for scoring, captain logic, and support questions.',
+          description: 'Answers for scoring, setup, and the questions that come up mid-trip.',
           icon: HelpCircle,
           href: '/help',
         },
@@ -271,15 +271,15 @@ export default function MorePageClient() {
           {
             id: 'dev-tools',
             eyebrow: 'Development',
-            title: 'Tools for shaping the local build.',
+            title: 'Local testing tools.',
             description:
-              'Useful when you are testing the app, invisible when you are just trying to use it.',
+              'Shortcuts for loading or clearing local demo data while testing.',
             items: [
               {
                 id: 'load-demo',
                 label: 'Load demo data',
                 description:
-                  'Spin up a sample trip with enough structure to test the app quickly.',
+                  'Create a sample trip with enough data to test the app quickly.',
                 icon: Database,
                 action: handleSeedData,
                 disabled: isSeeding,
@@ -288,7 +288,7 @@ export default function MorePageClient() {
               {
                 id: 'clear-data',
                 label: 'Clear all local data',
-                description: 'Wipe the local sandbox and start from a clean sheet.',
+                description: 'Erase local test data and start fresh.',
                 icon: Trash2,
                 action: () => setShowClearConfirm(true),
                 tone: 'danger' as const,
@@ -302,9 +302,9 @@ export default function MorePageClient() {
           {
             id: 'admin-tools',
             eyebrow: 'Admin',
-            title: 'The sharp tools belong behind a second locked door.',
+            title: 'Admin-only tools.',
             description:
-              'Reserved for data cleanup and the destructive operations that should never feel casual.',
+              'Reserved for data cleanup and other high-impact actions.',
             items: [
               {
                 id: 'admin-panel',
@@ -318,8 +318,7 @@ export default function MorePageClient() {
               {
                 id: 'clear-admin-data',
                 label: 'Clear all data',
-                description:
-                  'A full reset for local trip data when the environment needs to be wiped.',
+                description: 'Fully reset local trip data on this device.',
                 icon: Trash2,
                 action: () => setShowClearConfirm(true),
                 tone: 'danger' as const,
@@ -373,12 +372,11 @@ export default function MorePageClient() {
                 Support Hub
               </p>
               <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.25rem)] italic leading-[1.02] text-[var(--ink)]">
-                This is the hallway that connects the serious rooms.
+                Everything you might need between rounds.
               </h1>
               <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                More should not feel like the junk drawer of the app. It should be the clubhouse
-                corridor: trip utilities in one direction, support in the other, and the keys to
-                captain access close at hand.
+                Find trip tools, support, settings, and access controls in one place without
+                digging through the rest of the app.
               </p>
 
               <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
@@ -415,22 +413,22 @@ export default function MorePageClient() {
                 value={isCaptainMode ? 'On' : 'Off'}
                 detail={
                   isCaptainMode
-                    ? 'Structural controls are unlocked.'
-                    : 'Lineups and management remain protected.'
+                    ? 'Captain tools are available.'
+                    : 'Captain tools stay locked until you turn them on.'
                 }
                 valueClassName="font-sans text-[1rem] not-italic leading-[1.25]"
               />
               <MoreFactCard
-                label="Support rooms"
+                label="Main sections"
                 value={primarySections.length}
-                detail="The main support clusters kept close to the user."
+                detail="The main places for trip tools, trip story, and support."
               />
               <MoreFactCard
                 label="Trip status"
                 value={currentTrip ? 'Loaded' : 'No trip'}
                 detail={
                   currentTrip
-                    ? 'The current weekend is active in this device.'
+                    ? 'Your current trip is open on this device.'
                     : 'Start or join a trip to unlock the full app.'
                 }
                 valueClassName="font-sans text-[1rem] not-italic leading-[1.25]"
@@ -473,14 +471,14 @@ export default function MorePageClient() {
 
           <aside className="space-y-[var(--space-4)]">
             <SidebarNote
-              title="Captain access should feel deliberate"
-              body="The app gets better when structural tools live behind one clear threshold instead of leaking into every screen by default."
+              title="Captain tools stay tucked away"
+              body="Most players never need lineup and management controls. When you do, they are easy to reach from here."
               icon={<Shield size={18} />}
               tone="maroon"
             />
             <SidebarNote
-              title="Help belongs nearby"
-              body="If a player hits a support question from here, the answer should feel one turn away instead of buried in a maze of utility rows."
+              title="Help should be one tap away"
+              body="Scoring questions, setup issues, and support answers should be easy to find when the trip is already underway."
               icon={<HelpCircle size={18} />}
             />
           </aside>

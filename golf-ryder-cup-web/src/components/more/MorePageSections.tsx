@@ -62,11 +62,11 @@ export function ProfilePanel({
         <div>
           <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Account</p>
           <h2 className="mt-[var(--space-2)] font-serif text-[1.75rem] italic text-[var(--ink)]">
-            Sign in when the trip deserves a durable identity.
+            Sign in if you want the trip to stay with you.
           </h2>
           <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">
-            Local play still works, but signed-in users get a cleaner bridge between device state
-            and the cloud-backed parts of the app.
+            You can still use the app locally, but signing in makes it easier to keep your trip,
+            profile, and history across devices.
           </p>
           <div className="mt-[var(--space-4)] flex flex-wrap gap-[var(--space-3)]">
             <Link
@@ -150,15 +150,15 @@ export function AccessPanel({
     <section className="rounded-[1.85rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
       <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Access Modes</p>
       <h2 className="mt-[var(--space-2)] font-serif text-[1.8rem] italic text-[var(--ink)]">
-        Unlock the structural tools on purpose.
+        Turn on the extra tools only when you need them.
       </h2>
       <div className="mt-[var(--space-4)] space-y-[var(--space-3)]">
         <ModeRow
           title="Captain mode"
           description={
             isCaptainMode
-              ? 'Full lineup and trip editing access is active.'
-              : 'Unlock lineups, sessions, and captain controls.'
+              ? 'Captain tools are on.'
+              : 'Open lineups, sessions, and captain controls.'
           }
           icon={captainIcon}
           enabled={isCaptainMode}
@@ -169,8 +169,8 @@ export function AccessPanel({
           title="Admin mode"
           description={
             isAdminMode
-              ? 'Destructive and elevated tools are active.'
-              : 'Reserve the dangerous tools for deliberate use only.'
+              ? 'Admin tools are on.'
+              : 'Advanced tools for cleanup, resets, and support.'
           }
           icon={adminIcon}
           enabled={isAdminMode}
@@ -254,7 +254,7 @@ export function MenuTile({ item }: { item: MenuItem }) {
         {item.description}
       </p>
       <p className="mt-[var(--space-4)] text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
-        {item.action ? 'Run tool' : 'Open room'}
+        {item.action ? 'Run tool' : 'Open'}
       </p>
     </>
   );
