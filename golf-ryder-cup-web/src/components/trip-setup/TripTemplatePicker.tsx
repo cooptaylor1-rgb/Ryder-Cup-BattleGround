@@ -31,15 +31,16 @@ type TripTemplate = LegacyTripTemplate;
 const COLORS = {
     usa: '#1565C0',
     europe: '#C62828',
-    gold: '#FFD54F',
-    green: '#004225',
-    success: '#4CAF50',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#A0A0A0',
-    textTertiary: '#707070',
-    surface: '#141414',
-    surfaceElevated: '#1E1E1E',
-    border: '#3A3A3A',
+    gold: 'var(--gold)',
+    green: 'var(--masters)',
+    textPrimary: 'var(--ink)',
+    textSecondary: 'var(--ink-secondary)',
+    textTertiary: 'var(--ink-tertiary)',
+    surface: 'var(--surface)',
+    surfaceElevated: 'var(--surface-raised)',
+    border: 'var(--rule)',
+    borderStrong: 'var(--rule-strong)',
+    canvas: 'var(--canvas)',
 };
 
 // ============================================
@@ -125,10 +126,13 @@ function TemplateCard({
                 padding: '20px',
                 borderRadius: '16px',
                 background: COLORS.surfaceElevated,
-                border: `2px solid ${isSelected ? COLORS.green : COLORS.border}`,
+                border: `2px solid ${isSelected ? COLORS.green : COLORS.borderStrong}`,
                 cursor: 'pointer',
                 position: 'relative',
                 overflow: 'hidden',
+                boxShadow: isSelected
+                    ? '0 18px 42px rgba(0, 102, 68, 0.12)'
+                    : '0 14px 32px rgba(41, 29, 17, 0.08)',
             }}
         >
             {/* Recommended Badge */}
@@ -143,7 +147,7 @@ function TemplateCard({
                         gap: '4px',
                         padding: '4px 8px',
                         borderRadius: '4px',
-                        background: `${COLORS.gold}20`,
+                        background: 'rgba(201, 162, 39, 0.14)',
                     }}
                 >
                     <Star size={12} style={{ color: COLORS.gold }} fill={COLORS.gold} />
@@ -242,7 +246,7 @@ function TemplateCard({
                             padding: '6px 10px',
                             borderRadius: '8px',
                             background: 'transparent',
-                            border: `1px solid ${COLORS.border}`,
+                            border: `1px solid ${COLORS.borderStrong}`,
                             color: COLORS.textSecondary,
                             fontSize: '0.75rem',
                             cursor: 'pointer',
@@ -281,7 +285,7 @@ function TemplateDetailModal({
             style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0, 0, 0, 0.8)',
+                background: 'rgba(26, 24, 21, 0.62)',
                 zIndex: 100,
                 display: 'flex',
                 alignItems: 'center',
@@ -299,6 +303,8 @@ function TemplateDetailModal({
                     maxWidth: '500px',
                     maxHeight: '85vh',
                     background: COLORS.surface,
+                    border: `1px solid ${COLORS.borderStrong}`,
+                    boxShadow: '0 32px 88px rgba(26, 24, 21, 0.24)',
                     borderRadius: '20px',
                     overflow: 'hidden',
                     display: 'flex',
@@ -336,7 +342,7 @@ function TemplateDetailModal({
                             height: '32px',
                             borderRadius: '50%',
                             background: COLORS.surfaceElevated,
-                            border: 'none',
+                            border: `1px solid ${COLORS.border}`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -363,6 +369,7 @@ function TemplateDetailModal({
                                 padding: '16px',
                                 borderRadius: '12px',
                                 background: COLORS.surfaceElevated,
+                                border: `1px solid ${COLORS.border}`,
                                 textAlign: 'center',
                             }}
                         >
@@ -378,6 +385,7 @@ function TemplateDetailModal({
                                 padding: '16px',
                                 borderRadius: '12px',
                                 background: COLORS.surfaceElevated,
+                                border: `1px solid ${COLORS.border}`,
                                 textAlign: 'center',
                             }}
                         >
@@ -391,6 +399,7 @@ function TemplateDetailModal({
                                 padding: '16px',
                                 borderRadius: '12px',
                                 background: COLORS.surfaceElevated,
+                                border: `1px solid ${COLORS.border}`,
                                 textAlign: 'center',
                             }}
                         >
@@ -426,6 +435,7 @@ function TemplateDetailModal({
                                         padding: '12px 16px',
                                         borderRadius: '10px',
                                         background: COLORS.surfaceElevated,
+                                        border: `1px solid ${COLORS.border}`,
                                     }}
                                 >
                                     <div>
@@ -532,7 +542,7 @@ function TemplateDetailModal({
                             borderRadius: '12px',
                             background: COLORS.green,
                             border: 'none',
-                            color: 'var(--canvas)',
+                            color: COLORS.canvas,
                             fontWeight: 600,
                             fontSize: '0.875rem',
                             cursor: 'pointer',
