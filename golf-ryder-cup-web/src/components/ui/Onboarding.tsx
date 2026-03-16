@@ -9,21 +9,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import {
-    ClubhouseScene,
-    FirstTeeScene,
-    ScheduleScene,
-    SidesScene,
-    StoryScene,
-} from './onboarding/OnboardingFeatureScenes';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
+import { OnboardingMotion } from './onboarding/OnboardingMotion';
 
 // ============================================
 // TYPES
 // ============================================
 
 interface OnboardingStep {
-    scene: React.ReactNode;
     eyebrow: string;
     title: string;
     subtitle: string;
@@ -46,7 +39,6 @@ interface OnboardingProps {
 
 const steps: OnboardingStep[] = [
     {
-        scene: <ClubhouseScene />,
         eyebrow: 'The Clubhouse',
         title: 'Welcome to Ryder Cup Battleground',
         subtitle: 'A proper home for the golf trip: pairings, tee sheets, live scoring, and the annual story that follows.',
@@ -56,7 +48,6 @@ const steps: OnboardingStep[] = [
         ],
     },
     {
-        scene: <SidesScene />,
         eyebrow: 'The Sides',
         title: 'Set the sides',
         subtitle: 'Build teams, shape pairings, and let the match board explain the competition at a glance.',
@@ -71,7 +62,6 @@ const steps: OnboardingStep[] = [
         ],
     },
     {
-        scene: <ScheduleScene />,
         eyebrow: 'The Tee Sheet',
         title: 'Lay out the week',
         subtitle: 'Tee times, sessions, and formats arranged with the calm of a proper club-event board.',
@@ -86,7 +76,6 @@ const steps: OnboardingStep[] = [
         ],
     },
     {
-        scene: <StoryScene />,
         eyebrow: 'The Story',
         title: 'Let the trip accumulate meaning',
         subtitle: 'Standings, records, and awards gathered into something worth revisiting after the last putt drops.',
@@ -101,7 +90,6 @@ const steps: OnboardingStep[] = [
         ],
     },
     {
-        scene: <FirstTeeScene />,
         eyebrow: 'The First Tee',
         title: 'Ready for the opening peg?',
         subtitle: 'Create the trip, name the sides, and send everyone to the first tee.',
@@ -214,9 +202,8 @@ export function Onboarding({ onComplete, onSkip, className }: OnboardingProps) {
 
                             <div
                                 className="onboarding-illustration"
-                                key={currentStep}
                             >
-                                {step.scene}
+                                <OnboardingMotion currentStep={currentStep} />
                             </div>
                         </div>
                     </div>
@@ -343,7 +330,7 @@ export function WelcomeBack({
                             </div>
 
                             <div className="onboarding-illustration">
-                                <ClubhouseScene />
+                                <OnboardingMotion currentStep={0} />
                             </div>
                         </div>
                     </div>
@@ -363,8 +350,8 @@ export function WelcomeBack({
                     {lastTripName && (
                         <div className="onboarding-feature-grid">
                             <div className="onboarding-feature-card">
-                                <span className="onboarding-feature-check" aria-hidden="true">
-                                    ✓
+                                <span className="onboarding-feature-index" aria-hidden="true">
+                                    01
                                 </span>
                                 <span>Returning to {lastTripName}</span>
                             </div>
