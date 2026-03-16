@@ -105,19 +105,21 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
       closeOnOverlayClick={false}
       closeOnEscape={!isJoining}
       size="md"
-      overlayClassName="bg-[color:var(--ink)]/50 backdrop-blur-sm"
-      panelClassName="max-w-md overflow-hidden rounded-2xl border border-[color:var(--rule)]/40 bg-[var(--surface-raised)] shadow-xl"
+      overlayClassName="bg-[color:var(--ink)]/58 backdrop-blur-[6px]"
+      panelClassName="max-w-md overflow-hidden rounded-2xl border border-[color:var(--rule-strong)]/75 bg-[var(--canvas-raised)] shadow-[0_28px_80px_rgba(26,24,21,0.24)]"
       contentClassName="p-0"
     >
         {/* Header */}
-        <div className="p-6 border-b border-[color:var(--rule)]/40">
+        <div className="border-b border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(247,242,236,0.94))] p-6">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-full bg-masters-primary/10">
               <Users className="w-6 h-6 text-masters-primary" />
             </div>
             <div>
               <h2 className="text-xl font-semibold text-[var(--ink)]">Join a Trip</h2>
-              <p className="text-sm text-[var(--ink-secondary)]">Enter the share code to join</p>
+              <p className="text-sm text-[var(--ink-secondary)]">
+                Enter the share code to join
+              </p>
             </div>
           </div>
         </div>
@@ -137,7 +139,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
               <div className="mb-6">
                 <label
                   htmlFor="join-trip-share-code"
-                  className="block text-sm font-medium text-[var(--ink-secondary)] mb-2"
+                  className="mb-2 block text-sm font-semibold text-[var(--ink)]"
                 >
                   Share Code
                 </label>
@@ -148,11 +150,10 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                   onChange={(e) => setShareCode(e.target.value.toUpperCase())}
                   placeholder="Enter 8-character code"
                   className={cn(
-                    'w-full px-4 py-3 text-center text-2xl font-mono tracking-widest',
-                    'rounded-lg border bg-[var(--surface)]',
-                    'text-[var(--ink)] placeholder:text-[var(--ink-tertiary)]',
+                    'w-full rounded-lg border bg-[var(--canvas)] px-4 py-3 text-center font-mono text-xl font-semibold tracking-[0.24em] sm:text-2xl',
+                    'text-[var(--ink)] placeholder:text-[color:var(--ink-secondary)]/85',
                     'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-[color:var(--canvas)]',
-                    error ? 'border-error text-error' : 'border-[color:var(--rule)]/40'
+                    error ? 'border-error text-error' : 'border-[color:var(--rule-strong)]/85'
                   )}
                   maxLength={8}
                   autoFocus
@@ -171,8 +172,8 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
                 )}
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-[color:var(--surface)]/60 mb-6 border border-[color:var(--rule)]/20">
-                <Share2 className="w-5 h-5 text-[var(--ink-tertiary)]" />
+              <div className="mb-6 flex items-center gap-3 rounded-lg border border-[color:var(--rule)]/70 bg-[var(--surface-muted)] p-4">
+                <Share2 className="w-5 h-5 text-[var(--ink-secondary)]" />
                 <div className="text-sm text-[var(--ink-secondary)]">
                   Ask the trip captain for the share code, or find it in the trip settings.
                 </div>
@@ -183,10 +184,10 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
 
         {/* Footer */}
         {!success && (
-          <div className="flex gap-3 p-6 border-t border-[color:var(--rule)]/40">
+          <div className="flex gap-3 border-t border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/96 p-6">
             <button
               onClick={handleClose}
-              className="flex-1 px-4 py-3 rounded-lg border border-[color:var(--rule)]/40 text-[var(--ink-secondary)] font-medium hover:bg-[color:var(--surface)]/60 transition-colors"
+              className="flex-1 rounded-lg border border-[color:var(--rule-strong)]/75 px-4 py-3 font-medium text-[var(--ink)] transition-colors hover:bg-[var(--surface-muted)]"
             >
               Cancel
             </button>
