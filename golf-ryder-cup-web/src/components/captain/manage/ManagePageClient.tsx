@@ -295,7 +295,7 @@ export function ManagePageClient() {
 
               <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
                 <Link
-                  href="/lineup/new"
+                  href="/lineup/new?mode=session"
                   className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
                 >
                   <Plus size={16} />
@@ -336,7 +336,7 @@ export function ManagePageClient() {
               icon={<CalendarDays size={28} className="text-[var(--ink-tertiary)]" />}
               title="No sessions built yet"
               description="Create a lineup to add sessions and matches to the board."
-              actionHref="/lineup/new"
+              actionHref="/lineup/new?mode=session"
               actionLabel="Create First Session"
             />
           ) : (

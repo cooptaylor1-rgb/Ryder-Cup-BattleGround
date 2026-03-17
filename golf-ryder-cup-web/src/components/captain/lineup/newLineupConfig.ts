@@ -263,10 +263,9 @@ export const FORMAT_CATEGORIES: {
   { value: 'individual', label: 'Individual', description: 'Stroke-based formats' },
 ];
 
-export function generateSessionName(existingSessions: number): string {
-  const sessionNum = existingSessions + 1;
-  const dayNum = sessionNum <= 3 ? sessionNum : Math.ceil(sessionNum / 2);
-  const timeSlot = sessionNum % 2 === 1 ? 'AM' : 'PM';
+export function generateSessionName(sessionNumber: number): string {
+  const dayNum = Math.ceil(sessionNumber / 2);
+  const timeSlot = sessionNumber % 2 === 1 ? 'AM' : 'PM';
   return `Day ${dayNum} ${timeSlot}`;
 }
 

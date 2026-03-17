@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { db } from '@/lib/db';
+import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
 import {
   LineupBuilder,
@@ -12,7 +15,7 @@ import {
   type FairnessScore,
 } from '@/components/captain';
 import { Users, Info } from 'lucide-react';
-import type { SessionType } from '@/lib/types';
+import type { Match, SessionType } from '@/lib/types';
 import { EmptyStatePremium } from '@/components/ui';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NewLineupSetupStep, LineupSetupFact } from './NewLineupSetupStep';
@@ -25,34 +28,55 @@ import {
   isSupportedSessionType,
 } from './newLineupConfig';
 import { getTeamPlayersForLineup, toLineupPlayers } from './lineupBuilderData';
+import {
+  findNextSessionNeedingLineup,
+  getDefaultSessionDateForNumber,
+  getDefaultTeeTimeForSessionNumber,
+  getNextSessionNumber,
+} from './newLineupSessions';
 
 type Step = 'setup' | 'lineup';
+type NewLineupMode = 'lineup' | 'session';
 
 const logger = createLogger('lineup');
 
-export default function NewLineupPageClient() {
+interface NewLineupPageClientProps {
+  mode?: NewLineupMode;
+}
+
+export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageClientProps) {
   const router = useRouter();
   const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
-  const defaultSessionName = useMemo(
-    () => generateSessionName(sessions.length),
-    [sessions.length]
+  const tripMatches = useLiveQuery(
+    async () => (currentTrip ? await db.matches.toArray() : []),
+    [currentTrip?.id],
+    undefined as Match[] | undefined
   );
 
-  const defaultDate = useMemo(() => {
-    if (currentTrip?.startDate) {
-      const tripStart = new Date(currentTrip.startDate);
-      const today = new Date();
-      return tripStart > today ? currentTrip.startDate : getTodayDate();
-    }
-    return getTodayDate();
-  }, [currentTrip?.startDate]);
-
-  const defaultTeeTime = useMemo(() => {
-    const now = new Date();
-    return now.getHours() < 11 ? '08:00' : '13:00';
-  }, []);
+  const nextSessionNumber = useMemo(() => getNextSessionNumber(sessions), [sessions]);
+  const fallbackDate = useMemo(() => getTodayDate(), []);
+  const defaultSessionName = useMemo(
+    () => generateSessionName(nextSessionNumber),
+    [nextSessionNumber]
+  );
+  const defaultDate = useMemo(
+    () => getDefaultSessionDateForNumber(currentTrip?.startDate, nextSessionNumber, fallbackDate),
+    [currentTrip?.startDate, fallbackDate, nextSessionNumber]
+  );
+  const defaultTeeTime = useMemo(
+    () => getDefaultTeeTimeForSessionNumber(nextSessionNumber),
+    [nextSessionNumber]
+  );
+  const nextSessionNeedingLineup = useMemo(
+    () => (tripMatches ? findNextSessionNeedingLineup(sessions, tripMatches) : null),
+    [sessions, tripMatches]
+  );
+  const draftSeedKey = useMemo(
+    () => `${mode}:${nextSessionNumber}:${defaultSessionName}:${defaultDate}:${defaultTeeTime}`,
+    [defaultDate, defaultSessionName, defaultTeeTime, mode, nextSessionNumber]
+  );
 
   const [step, setStep] = useState<Step>('setup');
   const [sessionName, setSessionName] = useState(defaultSessionName);
@@ -65,6 +89,36 @@ export default function NewLineupPageClient() {
   const [isCreating, setIsCreating] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showAllFormats, setShowAllFormats] = useState(false);
+  const [appliedDraftSeed, setAppliedDraftSeed] = useState('');
+
+  useEffect(() => {
+    if (step !== 'setup' || appliedDraftSeed === draftSeedKey) return;
+
+    setSessionName(defaultSessionName);
+    setSessionType('fourball');
+    setScheduledDate(defaultDate);
+    setFirstTeeTime(defaultTeeTime);
+    setTeeTimeInterval(10);
+    setMatchCount(4);
+    setPointsPerMatch(1);
+    setShowAdvanced(false);
+    setShowAllFormats(false);
+    setAppliedDraftSeed(draftSeedKey);
+  }, [
+    appliedDraftSeed,
+    defaultDate,
+    defaultSessionName,
+    defaultTeeTime,
+    draftSeedKey,
+    step,
+  ]);
+
+  useEffect(() => {
+    if (mode === 'session') return;
+    if (!nextSessionNeedingLineup) return;
+
+    router.replace(`/lineup/${nextSessionNeedingLineup.id}`);
+  }, [mode, nextSessionNeedingLineup, router]);
 
   const displayedFormats = useMemo(() => {
     if (showAllFormats) return ALL_FORMATS;
@@ -149,6 +203,44 @@ export default function NewLineupPageClient() {
     [allLineupPlayers]
   );
 
+  const buildPersistedLineupPlayer = useCallback(
+    (player: MatchSlot['teamAPlayers'][number], teamId: string, teamColor: 'usa' | 'europe'): PersistedLineupPlayer => ({
+      id: player.id,
+      name: `${player.firstName} ${player.lastName}`.trim(),
+      firstName: player.firstName,
+      lastName: player.lastName,
+      handicap: Number.isFinite(player.handicapIndex) ? player.handicapIndex : null,
+      teamColor,
+      teamId,
+    }),
+    []
+  );
+
+  const buildPersistedLineupState = useCallback(
+    (sessionId: string, matches: MatchSlot[]): LineupState | null => {
+      if (!teamA?.id || !teamB?.id) return null;
+
+      return {
+        sessionId,
+        sessionType,
+        playersPerMatch: selectedType.playersPerTeam * 2,
+        matches: matches.map((match, index) => ({
+          matchNumber: index + 1,
+          teamAPlayers: match.teamAPlayers.map((player) =>
+            buildPersistedLineupPlayer(player, teamA.id, 'usa')
+          ),
+          teamBPlayers: match.teamBPlayers.map((player) =>
+            buildPersistedLineupPlayer(player, teamB.id, 'europe')
+          ),
+          locked: false,
+        })),
+        availableTeamA: [],
+        availableTeamB: [],
+      };
+    },
+    [buildPersistedLineupPlayer, selectedType.playersPerTeam, sessionType, teamA?.id, teamB?.id]
+  );
+
   const handleAutoFill = useCallback((): MatchSlot[] => {
     const shuffledA = [...lineupTeamA].sort(() => Math.random() - 0.5);
     const shuffledB = [...lineupTeamB].sort(() => Math.random() - 0.5);
@@ -175,7 +267,7 @@ export default function NewLineupPageClient() {
   }, [showToast]);
 
   const handlePublish = useCallback(
-    async (_matches: MatchSlot[]) => {
+    async (matches: MatchSlot[]) => {
       if (!currentTrip) return;
 
       setIsCreating(true);
@@ -186,7 +278,7 @@ export default function NewLineupPageClient() {
         const session = await addSession({
           tripId: currentTrip.id,
           name: sessionName,
-          sessionNumber: 1,
+          sessionNumber: nextSessionNumber,
           sessionType,
           scheduledDate: scheduledDate || undefined,
           timeSlot: derivedTimeSlot,
@@ -194,6 +286,16 @@ export default function NewLineupPageClient() {
           status: 'scheduled',
           isLocked: true,
         });
+
+        const lineupState = buildPersistedLineupState(session.id, matches);
+        if (!lineupState) {
+          throw new Error('Teams must exist before publishing a lineup');
+        }
+
+        const saveResult = await saveLineup(lineupState, currentTrip.id);
+        if (!saveResult.success) {
+          throw new Error('Failed to persist lineup matches');
+        }
 
         showToast('success', 'Session created and lineup published!');
 
@@ -210,11 +312,13 @@ export default function NewLineupPageClient() {
     [
       currentTrip,
       sessionName,
+      nextSessionNumber,
       sessionType,
       scheduledDate,
       firstTeeTime,
       pointsPerMatch,
       addSession,
+      buildPersistedLineupState,
       showToast,
       router,
     ]
@@ -253,6 +357,48 @@ export default function NewLineupPageClient() {
             }}
             variant="large"
           />
+        </main>
+      </div>
+    );
+  }
+
+  if (mode !== 'session' && sessions.length > 0 && tripMatches === undefined) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Build Lineup"
+          subtitle="Loading next session"
+          icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+        <main className="container-editorial py-12">
+          <div className="card-editorial p-[var(--space-6)]">
+            <p className="type-overline text-[var(--masters)]">Lineup desk</p>
+            <p className="mt-3 text-sm text-[var(--ink-secondary)]">
+              Finding the next session that still needs pairings.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (mode !== 'session' && nextSessionNeedingLineup) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Build Lineup"
+          subtitle={nextSessionNeedingLineup.name}
+          icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
+          onBack={() => router.back()}
+        />
+        <main className="container-editorial py-12">
+          <div className="card-editorial p-[var(--space-6)]">
+            <p className="type-overline text-[var(--masters)]">Opening session</p>
+            <p className="mt-3 text-sm text-[var(--ink-secondary)]">
+              Jumping into the next round that still needs lineups.
+            </p>
+          </div>
         </main>
       </div>
     );

@@ -132,7 +132,7 @@ export default function MatchupsPage() {
             </div>
             {isCaptainMode && (
               <button
-                onClick={() => router.push('/lineup/new')}
+                onClick={() => router.push('/lineup/new?mode=session')}
                 className="inline-flex items-center gap-2 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-4 py-2 text-sm font-semibold text-[var(--masters)]"
               >
                 <Plus size={16} strokeWidth={2} />
@@ -202,7 +202,7 @@ export default function MatchupsPage() {
           ) : (
             <NoSessionsPremiumEmpty
               isCaptain={isCaptainMode}
-              onCreateSession={() => router.push('/lineup/new')}
+              onCreateSession={() => router.push('/lineup/new?mode=session')}
             />
           )}
         </section>

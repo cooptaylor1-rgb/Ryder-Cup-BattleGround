@@ -52,7 +52,7 @@ export function SetupGuide({ players, teams, sessions }: SetupGuideProps) {
                         number={3}
                         label="Create First Session"
                         done={sessions.length > 0}
-                        href="/lineup/new"
+                        href="/lineup/new?mode=session"
                         hint="Set up matchups"
                     />
                 </div>

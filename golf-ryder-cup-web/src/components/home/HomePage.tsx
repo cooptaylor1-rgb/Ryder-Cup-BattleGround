@@ -373,7 +373,7 @@ export default function HomePage() {
                     <div className="flex flex-col gap-[var(--space-2)]">
                       <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added — need at least 4`} />
                       <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && teamMembers.length >= 4} href="/captain/draft" hint="Draft players to teams" />
-                      <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new" hint="Set up matchups" />
+                      <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new?mode=session" hint="Set up matchups" />
                     </div>
 
                     {/* Prominent invite CTA after setup steps */}
