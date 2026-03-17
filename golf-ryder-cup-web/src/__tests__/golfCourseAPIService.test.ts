@@ -65,4 +65,33 @@ describe('golfCourseAPIService', () => {
     expect(course?.course_name).toBe('Cabot Citrus Farms');
     expect(course?.source).toBe('ghin');
   });
+
+  it('passes website metadata when fetching web-backed course details', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: {
+          id: 'web-north-berwick',
+          name: 'North Berwick West Links',
+          website: 'https://www.top100golfcourses.com/golf-course/north-berwick-west',
+          description: 'A revered links course on Scotland’s East Lothian coast.',
+          city: 'North Berwick',
+          state: 'Scotland',
+          source: 'web-profile',
+          holes: [],
+          teeSets: [],
+        },
+      }),
+    } as Response);
+
+    await getCourseById('web-north-berwick', {
+      website: 'https://www.top100golfcourses.com/golf-course/north-berwick-west',
+      title: 'North Berwick West Links',
+      description: 'A revered links course on Scotland’s East Lothian coast.',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/golf-courses/web-north-berwick?website=https%3A%2F%2Fwww.top100golfcourses.com%2Fgolf-course%2Fnorth-berwick-west&title=North+Berwick+West+Links&description=A+revered+links+course+on+Scotland%E2%80%99s+East+Lothian+coast.'
+    );
+  });
 });

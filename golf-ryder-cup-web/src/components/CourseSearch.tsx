@@ -14,6 +14,32 @@ import {
     type GolfCourseAPITee,
 } from '@/lib/services/golfCourseAPIService';
 
+function getCourseResultSubline(course: GolfCourseAPICourse): string {
+    const location = formatCourseLocation(course.location);
+    if (location) return location;
+
+    if (course.website) {
+        try {
+            return new URL(course.website).hostname.replace(/^www\./, '');
+        } catch {
+            // fall through
+        }
+    }
+
+    switch (course.source) {
+        case 'web':
+            return 'Web profile';
+        case 'osm':
+            return 'Map discovery';
+        case 'rapidapi':
+            return 'Golf database';
+        case 'ghin':
+            return 'GHIN';
+        default:
+            return 'Course search result';
+    }
+}
+
 interface CourseSearchProps {
     onSelectCourse: (course: {
         name: string;
@@ -124,26 +150,20 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     }, [query]);
 
     const handleSelectCourse = async (course: GolfCourseAPICourse) => {
-        if (
-            !course.tees &&
-            (course.source === 'osm' || course.source === 'web' || course.source === 'rapidapi')
-        ) {
-            setSelectedCourse(course);
-            return;
-        }
-
         setIsLoadingDetails(true);
         setError(null);
 
         try {
             // Fetch full course details
-            const fullCourse = await getCourseById(course.id);
-            if (!fullCourse) {
-                throw new Error('Could not load course details');
-            }
+            const fullCourse = await getCourseById(course.id, {
+                website: course.website,
+                title: course.course_name || course.club_name,
+                description: course.description,
+            });
 
-            setSelectedCourse(fullCourse);
+            setSelectedCourse(fullCourse ?? course);
         } catch (err) {
+            setSelectedCourse(course);
             setError(err instanceof Error ? err.message : 'Failed to load course');
         } finally {
             setIsLoadingDetails(false);
@@ -220,8 +240,23 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                     </h3>
                     <p className="text-sm text-[var(--ink-secondary)] flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
-                        {formatCourseLocation(selectedCourse.location)}
+                        {getCourseResultSubline(selectedCourse)}
                     </p>
+                    {selectedCourse.description && (
+                        <p className="mt-3 text-sm leading-6 text-[var(--ink-secondary)]">
+                            {selectedCourse.description}
+                        </p>
+                    )}
+                    {selectedCourse.website && (
+                        <a
+                            href={selectedCourse.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-3 inline-flex text-sm font-medium text-[var(--masters)] hover:underline"
+                        >
+                            View source profile
+                        </a>
+                    )}
                 </div>
 
                 {allTees.length === 0 ? (
@@ -315,8 +350,13 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                                     </div>
                                     <div className="text-sm text-[var(--ink-secondary)] flex items-center gap-1">
                                         <MapPin className="w-3 h-3 shrink-0" />
-                                        <span className="truncate">{formatCourseLocation(course.location)}</span>
+                                        <span className="truncate">{getCourseResultSubline(course)}</span>
                                     </div>
+                                    {course.description && (
+                                        <div className="mt-1 text-xs leading-5 text-[var(--ink-tertiary)] line-clamp-2">
+                                            {course.description}
+                                        </div>
+                                    )}
                                     {course.tees && (getAllTees(course).length > 0) && (
                                         <div className="text-xs text-[var(--masters)] mt-1">
                                             {getAllTees(course).length} tee{getAllTees(course).length !== 1 ? 's' : ''} available

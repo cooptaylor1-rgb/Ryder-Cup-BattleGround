@@ -37,6 +37,7 @@ interface CourseSearchResult {
     latitude?: number;
     longitude?: number;
     website?: string;
+    description?: string;
     source: 'ghin' | 'rapidapi' | 'osm' | 'web';
 }
 
@@ -535,6 +536,12 @@ async function searchPublicWeb(query: string): Promise<CourseSearchResult[]> {
                 /<a[^>]*class="[^"]*result__a[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
             )
         );
+        const snippets = Array.from(
+            html.matchAll(
+                /<(?:a|div)[^>]*class="[^"]*result__snippet[^"]*"[^>]*>([\s\S]*?)<\/(?:a|div)>/gi
+            ),
+            (match) => stripHtml(match[1]).trim()
+        );
 
         const results: CourseSearchResult[] = [];
         const queryWords = query
@@ -542,15 +549,16 @@ async function searchPublicWeb(query: string): Promise<CourseSearchResult[]> {
             .split(/\s+/)
             .filter((word) => word.length > 2);
 
-        for (const match of matches) {
+        for (const [index, match] of matches.entries()) {
             if (results.length >= 10) break;
 
+            const snippet = snippets[index] || '';
             const rawHref = match[1];
             const title = stripHtml(match[2]).trim();
             const href = unwrapDuckDuckGoLink(rawHref);
             const hostname = getHostname(href);
             const name = normalizeCourseTitle(title);
-            const haystack = `${name} ${hostname}`.toLowerCase();
+            const haystack = `${name} ${hostname} ${snippet}`.toLowerCase();
 
             const queryWordMatches = queryWords.filter((word) => haystack.includes(word)).length;
             const looksGolfRelated =
@@ -568,6 +576,7 @@ async function searchPublicWeb(query: string): Promise<CourseSearchResult[]> {
                 id: `web-${slugify(name).slice(0, 80) || results.length + 1}`,
                 name,
                 website: href,
+                description: snippet || undefined,
                 source: 'web',
             });
         }

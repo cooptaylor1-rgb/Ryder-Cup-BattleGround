@@ -53,6 +53,9 @@ export interface GolfCourseAPICourse {
     location: GolfCourseAPILocation;
     source?: 'api' | 'ghin' | 'rapidapi' | 'osm' | 'web';
     website?: string;
+    description?: string;
+    phone?: string;
+    sourcePageUrl?: string;
     tees?: {
         male?: GolfCourseAPITee[];
         female?: GolfCourseAPITee[];
@@ -174,6 +177,7 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
             longitude?: number;
             source: string;
             website?: string;
+            description?: string;
         }) => ({
             id: result.id,
             club_name: result.name,
@@ -187,6 +191,8 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
             },
             source: result.source as GolfCourseAPICourse['source'],
             website: result.website,
+            description: result.description,
+            sourcePageUrl: result.website,
             // Free API doesn't provide tee data
             tees: undefined,
         }));
@@ -199,14 +205,28 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
 /**
  * Get detailed course information by ID
  */
-export async function getCourseById(courseId: string | number): Promise<GolfCourseAPICourse | null> {
+export async function getCourseById(
+    courseId: string | number,
+    options?: {
+        website?: string;
+        title?: string;
+        description?: string;
+    }
+): Promise<GolfCourseAPICourse | null> {
     try {
         const normalizedCourseId = String(courseId);
         const useSourceAwareRoute =
             normalizedCourseId.includes('-') && !/^\d+$/.test(normalizedCourseId);
 
+        const detailParams = new URLSearchParams();
+        if (options?.website) detailParams.set('website', options.website);
+        if (options?.title) detailParams.set('title', options.title);
+        if (options?.description) detailParams.set('description', options.description);
+
         const endpoint = useSourceAwareRoute
-            ? `/api/golf-courses/${encodeURIComponent(normalizedCourseId)}`
+            ? `/api/golf-courses/${encodeURIComponent(normalizedCourseId)}${
+                detailParams.size > 0 ? `?${detailParams.toString()}` : ''
+              }`
             : `/api/golf-courses?action=get&id=${encodeURIComponent(normalizedCourseId)}`;
 
         const response = await fetch(endpoint);
@@ -228,7 +248,10 @@ export async function getCourseById(courseId: string | number): Promise<GolfCour
                 club_name: detail.name,
                 course_name: detail.name,
                 website: detail.website,
+                description: detail.description,
+                phone: detail.phone,
                 source: detail.source || 'web',
+                sourcePageUrl: detail.sourcePageUrl || detail.website,
                 location: {
                     address: detail.address,
                     city: detail.city,

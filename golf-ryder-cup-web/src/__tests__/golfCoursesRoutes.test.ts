@@ -117,6 +117,7 @@ describe('Golf Course Routes', () => {
       expect(data.results[0].source).toBe('web');
       expect(data.results[0].name).toContain('Cabot Citrus Farms');
       expect(data.results[0].website).toBe('https://cabotcitrusfarms.com');
+      expect(data.results[0].description).toBeUndefined();
     });
   });
 
@@ -145,6 +146,74 @@ describe('Golf Course Routes', () => {
       expect(data.data.source).toBe('placeholder');
       expect(data.data.holes).toHaveLength(18);
       expect(data.data.teeSets).toHaveLength(4);
+    });
+
+    it('extracts web-backed course details from structured page metadata', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        text: async () => `
+          <html>
+            <head>
+              <title>North Berwick West Links | Top 100 Golf Courses</title>
+              <meta name="description" content="A revered links course on Scotland's golf coast." />
+              <script type="application/ld+json">
+                {
+                  "@context": "https://schema.org",
+                  "@type": "SportsActivityLocation",
+                  "name": "North Berwick West Links",
+                  "description": "A revered links course on Scotland's golf coast.",
+                  "url": "https://www.top100golfcourses.com/golf-course/north-berwick-west",
+                  "telephone": "+44 1620 892747",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "Beach Road",
+                    "addressLocality": "North Berwick",
+                    "addressRegion": "Scotland",
+                    "addressCountry": "United Kingdom"
+                  },
+                  "teeSets": [
+                    {
+                      "@type": "PropertyValue",
+                      "name": "Championship",
+                      "courseRating": "73.2",
+                      "slopeRating": "138",
+                      "totalYardage": "6642"
+                    }
+                  ]
+                }
+              </script>
+            </head>
+            <body>
+              <h1>North Berwick West Links</h1>
+            </body>
+          </html>
+        `,
+      } as Response);
+
+      const response = await getCourseDetails(
+        new NextRequest(
+          'http://localhost:3000/api/golf-courses/web-north-berwick?website=https%3A%2F%2Fwww.top100golfcourses.com%2Fgolf-course%2Fnorth-berwick-west&title=North%20Berwick%20West%20Links'
+        ),
+        {
+          params: Promise.resolve({ courseId: 'web-north-berwick' }),
+        }
+      );
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data.source).toBe('web-extracted');
+      expect(data.data.name).toBe('North Berwick West Links');
+      expect(data.data.city).toBe('North Berwick');
+      expect(data.data.state).toBe('Scotland');
+      expect(data.data.website).toBe('https://www.top100golfcourses.com/golf-course/north-berwick-west');
+      expect(data.data.description).toContain('links course');
+      expect(data.data.teeSets[0]).toMatchObject({
+        name: 'Championship',
+        rating: 73.2,
+        slope: 138,
+        totalYardage: 6642,
+      });
     });
   });
 });
