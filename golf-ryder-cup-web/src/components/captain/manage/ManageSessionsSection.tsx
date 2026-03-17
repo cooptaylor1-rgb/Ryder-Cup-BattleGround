@@ -7,8 +7,10 @@ import {
   ChevronUp,
   Clock3,
   Edit3,
+  Flag,
   Hash,
   Lock,
+  MapPin,
   Save,
   Trash2,
   Zap,
@@ -16,7 +18,7 @@ import {
 
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
-import type { Match, RyderCupSession } from '@/lib/types/models';
+import type { Course, Match, RyderCupSession, TeeSet } from '@/lib/types/models';
 
 import { ManageFactCard } from './ManagePageShell';
 
@@ -62,6 +64,8 @@ const sessionStatusStyles: Record<
 
 export function SessionManagementCard({
   session,
+  courses,
+  teeSets,
   isExpanded,
   onToggle,
   onSaveSession,
@@ -76,6 +80,8 @@ export function SessionManagementCard({
   isSubmitting,
 }: {
   session: SessionWithMatches;
+  courses: Course[];
+  teeSets: TeeSet[];
   isExpanded: boolean;
   onToggle: () => void;
   onSaveSession: (updates: Partial<RyderCupSession>) => Promise<void>;
@@ -195,8 +201,10 @@ export function SessionManagementCard({
               ) : (
                 session.matches.map((match) => (
                   <MatchManagementCard
-                    key={`${match.id}:${match.status}:${match.teamAHandicapAllowance}:${match.teamBHandicapAllowance}:${editingMatchId === match.id ? 'edit' : 'view'}`}
+                    key={`${match.id}:${match.status}:${match.teamAHandicapAllowance}:${match.teamBHandicapAllowance}:${match.courseId ?? ''}:${match.teeSetId ?? ''}:${editingMatchId === match.id ? 'edit' : 'view'}`}
                     match={match}
+                    courses={courses}
+                    teeSets={teeSets}
                     teamAName={teamAName}
                     teamBName={teamBName}
                     getPlayerNames={getPlayerNames}
@@ -310,6 +318,8 @@ function SessionSettingsEditor({
 
 function MatchManagementCard({
   match,
+  courses,
+  teeSets,
   teamAName,
   teamBName,
   getPlayerNames,
@@ -321,6 +331,8 @@ function MatchManagementCard({
   isSubmitting,
 }: {
   match: Match;
+  courses: Course[];
+  teeSets: TeeSet[];
   teamAName: string;
   teamBName: string;
   getPlayerNames: (playerIds: string[]) => string;
@@ -331,12 +343,25 @@ function MatchManagementCard({
   onDelete: () => void;
   isSubmitting: boolean;
 }) {
+  const initialTeeSet = match.teeSetId
+    ? teeSets.find((teeSet) => teeSet.id === match.teeSetId)
+    : undefined;
+  const initialCourseId = match.courseId ?? initialTeeSet?.courseId ?? '';
   const [teamAAllowance, setTeamAAllowance] = useState(String(match.teamAHandicapAllowance));
   const [teamBAllowance, setTeamBAllowance] = useState(String(match.teamBHandicapAllowance));
   const [status, setStatus] = useState<Match['status']>(match.status);
+  const [courseId, setCourseId] = useState(initialCourseId);
+  const [teeSetId, setTeeSetId] = useState(match.teeSetId ?? '');
 
   const teamANames = getPlayerNames(match.teamAPlayerIds);
   const teamBNames = getPlayerNames(match.teamBPlayerIds);
+  const selectedCourse = courseId ? courses.find((course) => course.id === courseId) : undefined;
+  const selectedTeeSet = teeSetId ? teeSets.find((teeSet) => teeSet.id === teeSetId) : undefined;
+  const availableTeeSets = courseId
+    ? teeSets
+        .filter((teeSet) => teeSet.courseId === courseId)
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : [];
   const statusMeta =
     status === 'completed'
       ? sessionStatusStyles.completed
@@ -365,9 +390,9 @@ function MatchManagementCard({
           />
         </div>
 
-        <div className="mt-[var(--space-4)] space-y-[var(--space-4)]">
-          <label className="space-y-[var(--space-2)]">
-            <span className="type-meta font-semibold text-[var(--ink)]">Match status</span>
+          <div className="mt-[var(--space-4)] space-y-[var(--space-4)]">
+            <label className="space-y-[var(--space-2)]">
+              <span className="type-meta font-semibold text-[var(--ink)]">Match status</span>
             <select
               value={status}
               onChange={(event) => setStatus(event.target.value as Match['status'])}
@@ -405,6 +430,64 @@ function MatchManagementCard({
               <p className="type-caption">{teamBNames || 'TBD'}</p>
             </label>
           </div>
+
+          <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+            <label className="space-y-[var(--space-2)]">
+              <span className="type-meta font-semibold text-[var(--ink)]">Course</span>
+              <select
+                value={courseId}
+                onChange={(event) => {
+                  const nextCourseId = event.target.value;
+                  setCourseId(nextCourseId);
+                  if (!nextCourseId) {
+                    setTeeSetId('');
+                    return;
+                  }
+
+                  const teeSetStillValid = teeSets.some(
+                    (teeSet) => teeSet.id === teeSetId && teeSet.courseId === nextCourseId
+                  );
+                  if (!teeSetStillValid) {
+                    setTeeSetId('');
+                  }
+                }}
+                className="input"
+              >
+                <option value="">No course assigned</option>
+                {courses
+                  .slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+
+            <label className="space-y-[var(--space-2)]">
+              <span className="type-meta font-semibold text-[var(--ink)]">Tee set</span>
+              <select
+                value={teeSetId}
+                onChange={(event) => setTeeSetId(event.target.value)}
+                className="input"
+                disabled={!courseId}
+              >
+                <option value="">{courseId ? 'Select tee set' : 'Choose course first'}</option>
+                {availableTeeSets.map((teeSet) => (
+                  <option key={teeSet.id} value={teeSet.id}>
+                    {teeSet.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <p className="type-caption">
+            {selectedCourse
+              ? `${selectedCourse.name}${selectedTeeSet ? ` • ${selectedTeeSet.name}` : ''}`
+              : 'Assign the course and tee set here so scoring uses the right card.'}
+          </p>
         </div>
 
         <div className="mt-[var(--space-5)] flex flex-col gap-[var(--space-3)] sm:flex-row">
@@ -423,6 +506,8 @@ function MatchManagementCard({
                 status,
                 teamAHandicapAllowance: Number(teamAAllowance) || 0,
                 teamBHandicapAllowance: Number(teamBAllowance) || 0,
+                courseId: courseId || undefined,
+                teeSetId: teeSetId || undefined,
               })
             }
             disabled={isSubmitting}
@@ -450,6 +535,21 @@ function MatchManagementCard({
             </div>
           </div>
           <div className="mt-[var(--space-3)] grid gap-[var(--space-2)]">
+            <div className="flex flex-wrap items-center gap-[var(--space-2)] text-[var(--ink-secondary)]">
+              <div className="inline-flex items-center gap-[6px] rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-[var(--space-2)] py-[6px]">
+                <MapPin size={12} className="text-[var(--ink-tertiary)]" />
+                <span className="type-micro font-semibold">
+                  {selectedCourse?.name ?? 'No course assigned'}
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-[6px] rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-[var(--space-2)] py-[6px]">
+                <Flag size={12} className="text-[var(--ink-tertiary)]" />
+                <span className="type-micro font-semibold">
+                  {selectedTeeSet?.name ?? 'No tee set'}
+                </span>
+              </div>
+            </div>
+
             <div className="rounded-[1rem] border border-[color:var(--team-usa)]/16 bg-[color:var(--team-usa)]/8 px-[var(--space-3)] py-[var(--space-3)]">
               <div className="flex items-center justify-between gap-[var(--space-3)]">
                 <span className="type-meta font-semibold text-[var(--team-usa)]">{teamAName}</span>

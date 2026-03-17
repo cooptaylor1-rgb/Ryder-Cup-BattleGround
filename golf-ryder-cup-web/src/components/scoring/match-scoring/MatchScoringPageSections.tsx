@@ -241,6 +241,8 @@ export function MatchScoringPageSections({
       <MatchScoringHeroSection
         matchOrder={matchOrder}
         sessionLabel={model.currentSession ? model.currentSession.sessionType : 'Match play'}
+        currentCourseName={model.currentCourse?.name}
+        currentTeeSetName={model.currentTeeSet?.name}
         teamALineup={model.teamALineup}
         teamBLineup={model.teamBLineup}
         matchStatusLabel={model.matchStatusLabel}

@@ -45,7 +45,7 @@ import {
 
 export function ManagePageClient() {
   const router = useRouter();
-  const { currentTrip, players, teams, teamMembers } = useTripStore();
+  const { currentTrip, players, teams, teamMembers, courses, teeSets } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
@@ -345,6 +345,8 @@ export function ManagePageClient() {
                 <SessionManagementCard
                   key={session.id}
                   session={session}
+                  courses={courses}
+                  teeSets={teeSets}
                   isExpanded={expandedSessions.has(session.id)}
                   onToggle={() => toggleSession(session.id)}
                   onSaveSession={(updates) => handleUpdateSession(session.id, updates)}

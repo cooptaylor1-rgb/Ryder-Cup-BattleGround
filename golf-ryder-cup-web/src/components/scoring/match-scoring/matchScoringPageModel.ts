@@ -6,6 +6,7 @@ import { db } from '@/lib/db';
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
 import type { MatchState } from '@/lib/types/computed';
 import type {
+  Course,
   Match,
   Player,
   RyderCupSession,
@@ -37,6 +38,7 @@ export const DEFAULT_HOLE_HANDICAPS = [
 export interface MatchScoringPageModel {
   activeSideBets: ReminderSideBet[];
   actorName: string;
+  currentCourse?: Course;
   currentSession?: RyderCupSession;
   currentTeeSet?: TeeSet;
   currentHoleResult?: MatchState['holeResults'][number];
@@ -76,6 +78,7 @@ export interface MatchScoringPageModel {
 
 interface UseMatchScoringPageModelOptions {
   currentTrip: Trip | null;
+  courses: Course[];
   players: Player[];
   teams: Team[];
   teeSets: TeeSet[];
@@ -118,6 +121,7 @@ export function useMatchScoringPageModel(
 ): MatchScoringPageModel {
   const {
     currentTrip,
+    courses,
     players,
     teams,
     teeSets,
@@ -151,6 +155,10 @@ export function useMatchScoringPageModel(
 
   const currentTeeSet = activeMatch?.teeSetId
     ? teeSets.find((teeSet) => teeSet.id === activeMatch.teeSetId)
+    : undefined;
+  const resolvedCourseId = activeMatch?.courseId ?? currentTeeSet?.courseId;
+  const currentCourse = resolvedCourseId
+    ? courses.find((course) => course.id === resolvedCourseId)
     : undefined;
 
   const holeHandicaps = currentTeeSet?.holeHandicaps || DEFAULT_HOLE_HANDICAPS;
@@ -283,6 +291,7 @@ export function useMatchScoringPageModel(
   return {
     activeSideBets,
     actorName,
+    currentCourse,
     currentSession,
     currentTeeSet,
     currentHoleResult,

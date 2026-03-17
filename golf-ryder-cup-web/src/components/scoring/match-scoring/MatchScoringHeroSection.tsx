@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, Check, ChevronLeft, Mic, Undo2 } from 'lucide-react';
+import { AlertCircle, Check, ChevronLeft, Flag, MapPin, Mic, Undo2 } from 'lucide-react';
 import { HoleMiniMap } from '@/components/scoring';
 import type { MatchState } from '@/lib/types/computed';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,8 @@ import {
 interface MatchScoringHeroSectionProps {
   matchOrder: number;
   sessionLabel: string;
+  currentCourseName?: string;
+  currentTeeSetName?: string;
   teamALineup: string;
   teamBLineup: string;
   matchStatusLabel: string;
@@ -36,6 +38,8 @@ interface MatchScoringHeroSectionProps {
 export function MatchScoringHeroSection({
   matchOrder,
   sessionLabel,
+  currentCourseName,
+  currentTeeSetName,
   teamALineup,
   teamBLineup,
   matchStatusLabel,
@@ -118,6 +122,21 @@ export function MatchScoringHeroSection({
               <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
                 {teamALineup} vs {teamBLineup}
               </p>
+              <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                <div className="inline-flex items-center gap-1 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-2 py-1">
+                  <MapPin size={12} className="text-[var(--ink-tertiary)]" />
+                  <span>{currentCourseName ?? 'Course not assigned'}</span>
+                </div>
+                <div className="inline-flex items-center gap-1 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-2 py-1">
+                  <Flag size={12} className="text-[var(--ink-tertiary)]" />
+                  <span>{currentTeeSetName ?? 'Tee set not assigned'}</span>
+                </div>
+              </div>
+              {!currentCourseName && (
+                <p className="mt-2 text-xs text-[var(--warning)]">
+                  Set the course and tee set in Captain Manage {'>'} Edit Match before handicap-based scoring starts.
+                </p>
+              )}
             </div>
             <ScoringStatusBadge
               label={matchStatusLabel}

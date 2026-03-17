@@ -33,7 +33,7 @@ export default function MatchScoringPageClient() {
   const params = useParams();
   const matchId = params.matchId as string;
 
-  const { currentTrip, players, teams, teeSets, sessions } = useTripStore();
+  const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore();
   const { currentUser, isAuthenticated } = useAuthStore();
   const {
     showToast,
@@ -83,6 +83,7 @@ export default function MatchScoringPageClient() {
 
   const model = useMatchScoringPageModel({
     currentTrip,
+    courses,
     players,
     teams,
     teeSets,
