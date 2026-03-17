@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PageHeader } from '@/components/layout';
 import {
@@ -17,17 +17,22 @@ import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components
 import { db } from '@/lib/db';
 import { useAuthStore, useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
+import { navigateBackOr } from '@/lib/utils/navigation';
 import { AlertCircle, CalendarDays, ChevronRight, User } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 
 export default function SchedulePageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentTrip, sessions, players } = useTripStore();
   const { currentUser, isAuthenticated } = useAuthStore();
   const [matches, setMatches] = useState<Match[]>([]);
-  const [selectedTab, setSelectedTab] = useState<'my' | 'all'>('my');
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  const selectedTab = searchParams?.get('view') === 'all' ? 'all' : 'my';
+  const myScheduleHref = '/schedule';
+  const fullScheduleHref = '/schedule?view=all';
 
   const loadMatches = useCallback(async () => {
     if (!isAuthenticated) {
@@ -96,7 +101,7 @@ export default function SchedulePageClient() {
           title="Schedule"
           subtitle="Sign in required"
           icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          onBack={() => navigateBackOr(router, '/')}
         />
 
         <main className="container-editorial py-12">
@@ -126,7 +131,7 @@ export default function SchedulePageClient() {
           title="Schedule"
           subtitle="No active trip"
           icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          onBack={() => navigateBackOr(router, '/')}
         />
 
         <main className="container-editorial py-12">
@@ -158,7 +163,7 @@ export default function SchedulePageClient() {
         title="Schedule"
         subtitle={currentTrip.name}
         icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        onBack={() => navigateBackOr(router, '/')}
         rightSlot={
           currentUserPlayer ? (
             <div className="flex items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface-card)] px-3 py-1.5 shadow-sm">
@@ -169,7 +174,11 @@ export default function SchedulePageClient() {
         }
       />
 
-      <ScheduleTabSelector selectedTab={selectedTab} onSelect={setSelectedTab} />
+      <ScheduleTabSelector
+        selectedTab={selectedTab}
+        myHref={myScheduleHref}
+        allHref={fullScheduleHref}
+      />
 
       <main className="container-editorial pb-8" id="schedule-content" role="tabpanel">
         {loadError ? (
@@ -207,7 +216,7 @@ export default function SchedulePageClient() {
               description="You haven't been assigned to any matches. Check the Full Schedule tab or ask your captain."
               action={{
                 label: 'View Full Schedule',
-                onClick: () => setSelectedTab('all'),
+                onClick: () => router.push(fullScheduleHref),
               }}
               variant="default"
             />

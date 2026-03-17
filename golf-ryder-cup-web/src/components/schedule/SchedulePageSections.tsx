@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { cn, getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import type { DaySchedule, ScheduleEntry } from '@/components/schedule/scheduleData';
 import {
@@ -15,44 +16,48 @@ import {
 
 export function ScheduleTabSelector({
   selectedTab,
-  onSelect,
+  myHref,
+  allHref,
 }: {
   selectedTab: 'my' | 'all';
-  onSelect: (tab: 'my' | 'all') => void;
+  myHref: string;
+  allHref: string;
 }) {
   return (
     <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">
       <div className="flex gap-2">
-        <button
-          onClick={() => onSelect('my')}
+        <Link
+          href={myHref}
+          scroll={false}
           role="tab"
           aria-selected={selectedTab === 'my'}
           aria-controls="schedule-content"
           className={cn(
-            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2',
+            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2 no-underline',
             selectedTab === 'my'
               ? 'bg-[var(--masters)] text-[var(--canvas)]'
-              : 'bg-[var(--surface)] border border-[var(--rule)]'
+              : 'bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)]'
           )}
         >
           <User size={18} />
           Your Matches
-        </button>
-        <button
-          onClick={() => onSelect('all')}
+        </Link>
+        <Link
+          href={allHref}
+          scroll={false}
           role="tab"
           aria-selected={selectedTab === 'all'}
           aria-controls="schedule-content"
           className={cn(
-            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2',
+            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2 no-underline',
             selectedTab === 'all'
               ? 'bg-[var(--masters)] text-[var(--canvas)]'
-              : 'bg-[var(--surface)] border border-[var(--rule)]'
+              : 'bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)]'
           )}
         >
           <Calendar size={18} />
           Full Schedule
-        </button>
+        </Link>
       </div>
     </div>
   );

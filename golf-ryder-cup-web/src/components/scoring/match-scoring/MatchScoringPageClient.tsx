@@ -14,6 +14,7 @@ import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { navigateBackOr } from '@/lib/utils/navigation';
 
 import {
   MatchScoringErrorState,
@@ -47,6 +48,7 @@ export default function MatchScoringPageClient() {
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
+  const handleBackToScore = () => navigateBackOr(router, '/score');
 
   const {
     activeMatch,
@@ -148,7 +150,7 @@ export default function MatchScoringPageClient() {
     return (
       <MatchScoringUnauthenticatedState
         onSignIn={() => router.push('/login')}
-        onBackToScore={() => router.push('/score')}
+        onBackToScore={handleBackToScore}
       />
     );
   }
@@ -162,13 +164,13 @@ export default function MatchScoringPageClient() {
       <MatchScoringErrorState
         error={error}
         onRetry={() => void selectMatch(matchId)}
-        onBackToScore={() => router.push('/score')}
+        onBackToScore={handleBackToScore}
       />
     );
   }
 
   if (!activeMatch || !matchState) {
-    return <MatchScoringUnavailableState onBackToScore={() => router.push('/score')} />;
+    return <MatchScoringUnavailableState onBackToScore={handleBackToScore} />;
   }
 
   return (
@@ -189,7 +191,7 @@ export default function MatchScoringPageClient() {
       quickScoreMode={scoringPreferences.quickScoreMode}
       preferredHand={scoringPreferences.preferredHand}
       confirmDialog={ConfirmDialogComponent}
-      onBackToScore={() => router.push('/score')}
+      onBackToScore={handleBackToScore}
       onHoleSelect={goToHole}
       onPrevHole={prevHole}
       onNextHole={nextHole}
@@ -203,7 +205,7 @@ export default function MatchScoringPageClient() {
       onCloseVoiceModal={() => ui.setShowVoiceModal(false)}
       onViewStandings={() => router.push('/standings')}
       onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
-      onBackToMatches={() => router.push('/score')}
+      onBackToMatches={handleBackToScore}
       onEditScores={() => {
         ui.setIsEditingScores(true);
         goToHole(1);
