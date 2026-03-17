@@ -9,6 +9,7 @@ import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import { db } from '@/lib/db';
 import { createLogger } from '@/lib/utils/logger';
 import { useAuthStore, useScoringStore, useTripStore } from '@/lib/stores';
+import { navigateBackOr } from '@/lib/utils/navigation';
 import {
     buildHoleResultsByMatchId,
     buildScoreSessionStats,
@@ -107,7 +108,7 @@ export default function ScorePageClient() {
                     title="Score"
                     subtitle="Sign in required"
                     icon={<Target size={16} className="text-[var(--masters)]" />}
-                    onBack={() => router.back()}
+                    onBack={() => navigateBackOr(router, '/')}
                 />
                 <ScoreSignInState onSignIn={() => router.push('/login')} />
             </div>
@@ -121,7 +122,7 @@ export default function ScorePageClient() {
                     title="Score"
                     subtitle="No active trip"
                     icon={<Target size={16} className="text-[var(--masters)]" />}
-                    onBack={() => router.back()}
+                    onBack={() => navigateBackOr(router, '/')}
                 />
                 <ScoreNoTripState onBackHome={() => router.push('/')} />
             </div>
@@ -134,7 +135,7 @@ export default function ScorePageClient() {
                 title="Score"
                 subtitle={currentTrip.name}
                 icon={<Target size={16} className="text-[var(--masters)]" />}
-                onBack={() => router.back()}
+                onBack={() => navigateBackOr(router, '/')}
                 rightSlot={<SyncStatusBadge showText />}
             />
 

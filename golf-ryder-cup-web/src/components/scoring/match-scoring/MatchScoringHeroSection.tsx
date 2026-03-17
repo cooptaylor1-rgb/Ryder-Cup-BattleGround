@@ -63,6 +63,7 @@ export function MatchScoringHeroSection({
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
               <button
+                type="button"
                 onClick={onBack}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
                 aria-label="Back"
@@ -79,6 +80,7 @@ export function MatchScoringHeroSection({
 
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={onOpenVoiceScoring}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
                 aria-label="Voice scoring"
@@ -86,6 +88,7 @@ export function MatchScoringHeroSection({
                 <Mic size={18} />
               </button>
               <button
+                type="button"
                 onClick={onUndo}
                 disabled={undoCount === 0}
                 className={cn(

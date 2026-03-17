@@ -14,7 +14,6 @@ import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { navigateBackOr } from '@/lib/utils/navigation';
 
 import {
   MatchScoringErrorState,
@@ -48,7 +47,7 @@ export default function MatchScoringPageClient() {
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
-  const handleBackToScore = () => navigateBackOr(router, '/score');
+  const handleBackToScore = () => router.push('/score');
 
   const {
     activeMatch,

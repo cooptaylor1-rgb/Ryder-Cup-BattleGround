@@ -27,6 +27,7 @@ export function PageHeader({
         <div className="flex items-center gap-3 min-w-0">
           {onBack ? (
             <button
+              type="button"
               onClick={onBack}
               className="p-2 -ml-2 press-scale text-[var(--ink-secondary)] bg-transparent border-0 cursor-pointer rounded-[var(--radius-md)]"
               aria-label="Back"
