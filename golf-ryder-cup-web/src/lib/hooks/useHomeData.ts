@@ -14,6 +14,7 @@ import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { TeamStandings, MatchState } from '@/lib/types/computed';
 import type { Match, RyderCupSession, Trip, Player, SideBet, BanterPost } from '@/lib/types/models';
+import type { TripAward } from '@/lib/types/tripStats';
 
 interface UserMatchData {
     match: Match;
@@ -41,6 +42,8 @@ interface HomeData {
     // Live data
     liveMatches: Match[];
     liveMatchesCount: number;
+    tripMatches: Match[];
+    tripSessions: RyderCupSession[];
 
     // Social data
     banterPosts: BanterPost[];
@@ -49,6 +52,9 @@ interface HomeData {
     // Side bets
     sideBets: SideBet[];
     activeSideBetsCount: number;
+
+    // Awards
+    tripAwards: TripAward[];
 
     // Team names
     teamAName: string;
@@ -64,15 +70,20 @@ export function useHomeData(): HomeData {
         // 1. Get all trips (single query)
         const allTrips = await db.trips.orderBy('startDate').reverse().toArray();
 
-        // 2. Find active trip
+        // 2. Find the date-active trip as a fallback when the user has not selected one
         const now = new Date();
-        const activeTrip = allTrips.find(t => {
+        const dateActiveTrip = allTrips.find(t => {
             const start = new Date(t.startDate);
             const end = new Date(t.endDate);
             return now >= start && now <= end;
         }) || null;
 
-        if (!activeTrip) {
+        const selectedTrip =
+            currentTrip
+                ? allTrips.find((trip) => trip.id === currentTrip.id) ?? currentTrip
+                : dateActiveTrip;
+
+        if (!selectedTrip) {
             return {
                 trips: allTrips,
                 activeTrip: null,
@@ -81,14 +92,17 @@ export function useHomeData(): HomeData {
                 holeResults: [],
                 sideBets: [],
                 banterPosts: [],
+                tripAwards: [],
+                dateActiveTripId: dateActiveTrip?.id ?? null,
             };
         }
 
         // 3. Batch query for all trip-related data
-        const [tripSessions, sideBets, banterPosts] = await Promise.all([
-            db.sessions.where('tripId').equals(activeTrip.id).toArray(),
-            db.sideBets.where('tripId').equals(activeTrip.id).toArray(),
-            db.banterPosts.where('tripId').equals(activeTrip.id).toArray(),
+        const [tripSessions, sideBets, banterPosts, tripAwards] = await Promise.all([
+            db.sessions.where('tripId').equals(selectedTrip.id).toArray(),
+            db.sideBets.where('tripId').equals(selectedTrip.id).toArray(),
+            db.banterPosts.where('tripId').equals(selectedTrip.id).toArray(),
+            db.tripAwards.where('tripId').equals(selectedTrip.id).toArray(),
         ]);
 
         // 4. Get all matches for all sessions in one query
@@ -108,14 +122,16 @@ export function useHomeData(): HomeData {
 
         return {
             trips: allTrips,
-            activeTrip,
+            activeTrip: selectedTrip,
             sessions: tripSessions,
             matches: allMatches,
             holeResults,
             sideBets,
             banterPosts,
+            tripAwards,
+            dateActiveTripId: dateActiveTrip?.id ?? null,
         };
-    }, []);
+    }, [currentTrip?.id]);
 
     // Find current user's player record
     const currentUserPlayer = useMemo(() => {
@@ -172,12 +188,26 @@ export function useHomeData(): HomeData {
     }, [consolidatedData?.activeTrip?.id]);
 
     // Load trip when active trip changes
-    // Using useEffect instead of useMemo for side effects
+    // If the user has not explicitly selected a trip, fall back to the date-active trip.
     useEffect(() => {
-        if (consolidatedData?.activeTrip && consolidatedData.activeTrip.id !== currentTrip?.id) {
+        if (
+            !currentTrip &&
+            consolidatedData?.dateActiveTripId
+        ) {
+            loadTrip(consolidatedData.dateActiveTripId);
+        }
+    }, [consolidatedData?.dateActiveTripId, currentTrip, loadTrip]);
+
+    // If the selected trip is stale in store, refresh it from IndexedDB.
+    useEffect(() => {
+        if (
+            currentTrip &&
+            consolidatedData?.activeTrip &&
+            consolidatedData.activeTrip.id !== currentTrip.id
+        ) {
             loadTrip(consolidatedData.activeTrip.id);
         }
-    }, [consolidatedData?.activeTrip, currentTrip?.id, loadTrip]);
+    }, [consolidatedData?.activeTrip, currentTrip, loadTrip]);
 
     // Get team names
     const teamA = teams.find(t => t.color === 'usa');
@@ -189,6 +219,9 @@ export function useHomeData(): HomeData {
     const pastTrips = trips.filter(t => t.id !== activeTrip?.id);
     const sideBets = consolidatedData?.sideBets || [];
     const banterPosts = consolidatedData?.banterPosts || [];
+    const tripSessions = consolidatedData?.sessions || [];
+    const tripMatches = consolidatedData?.matches || [];
+    const tripAwards = consolidatedData?.tripAwards || [];
 
     return {
         isLoading: consolidatedData === undefined,
@@ -201,10 +234,13 @@ export function useHomeData(): HomeData {
         currentUserPlayer: currentUserPlayer ?? null,
         liveMatches,
         liveMatchesCount: liveMatches.length,
+        tripMatches,
+        tripSessions,
         banterPosts,
         unreadMessages: banterPosts.length,
         sideBets,
         activeSideBetsCount: sideBets.filter(b => b.status === 'active').length,
+        tripAwards,
         teamAName: teamA?.name || 'USA',
         teamBName: teamB?.name || 'Europe',
     };

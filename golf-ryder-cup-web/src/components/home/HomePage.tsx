@@ -31,6 +31,7 @@ import {
 } from '@/components/ui';
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { PageHeader } from '@/components/layout';
+import { TripDashboardSections } from './TripDashboardSections';
 
 function readPendingJoinCode(): string | undefined {
   if (typeof window === 'undefined') {
@@ -58,6 +59,7 @@ export default function HomePage() {
   const { isCaptainMode, showToast } = useUIStore();
   const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>(readPendingJoinCode);
   const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
+  const [homeClock] = useState(() => Date.now());
 
   // Check for a pending join code from /join deep link
   useEffect(() => {
@@ -73,6 +75,11 @@ export default function HomePage() {
     userMatchData,
     currentUserPlayer,
     liveMatches,
+    tripMatches,
+    tripSessions,
+    tripAwards,
+    sideBets,
+    banterPosts,
     isLoading,
     teamAName,
     teamBName,
@@ -80,8 +87,16 @@ export default function HomePage() {
 
   const handleSelectTrip = async (tripId: string) => {
     await loadTrip(tripId);
-    router.push('/standings');
+    router.push('/');
   };
+
+  const handleOpenStandings = useCallback(() => {
+    router.push('/standings');
+  }, [router]);
+
+  const handleOpenSchedule = useCallback(() => {
+    router.push('/schedule?view=all');
+  }, [router]);
 
   const handleEnterScore = useCallback(() => {
     if (userMatchData?.match) {
@@ -120,6 +135,19 @@ export default function HomePage() {
 
     return `${leader} leads by ${diff} point${diff !== 1 ? 's' : ''}`;
   }, [standings, teamAName, teamBName]);
+
+  const tripStateLabel = useMemo(() => {
+    if (!activeTrip) return null;
+
+    const now = homeClock;
+    const start = new Date(activeTrip.startDate).getTime();
+    const end = new Date(activeTrip.endDate).getTime();
+
+    if (now < start) return 'Upcoming';
+    if (now > end) return 'Completed';
+    if (liveMatchesCount > 0) return 'Live Scoring';
+    return 'Trip Live';
+  }, [activeTrip, homeClock, liveMatchesCount]);
 
   const headerSubtitle = activeTrip
     ? (scoreNarrative ?? activeTrip.name)
@@ -191,7 +219,7 @@ export default function HomePage() {
                     </div>
 
                     <div className="shrink-0 rounded-full border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-3)] py-[var(--space-2)] text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters-deep)]">
-                      {liveMatchesCount > 0 ? 'Live Scoring' : 'In Progress'}
+                      {tripStateLabel}
                     </div>
                   </div>
 
@@ -213,7 +241,7 @@ export default function HomePage() {
                 <div className="px-[var(--space-5)] py-[var(--space-6)]">
                   {standings ? (
                     <button
-                      onClick={() => handleSelectTrip(activeTrip.id)}
+                      onClick={handleOpenStandings}
                       className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
                     >
                       <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-[var(--space-4)]">
@@ -273,7 +301,7 @@ export default function HomePage() {
                           <HeroMetaStat label="Live" value={liveMatchesCount} />
                           <HeroMetaStat label="Players" value={players.length} />
                           <div className="flex items-center gap-[var(--space-2)] text-[var(--masters)] font-medium text-sm">
-                            <span>View full standings</span>
+                            <span>View leaderboard</span>
                             <ChevronRight size={16} strokeWidth={2} />
                           </div>
                         </div>
@@ -281,19 +309,23 @@ export default function HomePage() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleSelectTrip(activeTrip.id)}
+                      onClick={handleOpenSchedule}
                       className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
                     >
                       <div className="rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.64)] px-[var(--space-5)] py-[var(--space-6)]">
                         <p className="type-overline text-[var(--ink-tertiary)]">Trip Status</p>
                         <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,7vw,2.6rem)] italic leading-[1.05] text-[var(--ink)]">
-                          Active, waiting for the first scorecard.
+                          {tripStateLabel === 'Upcoming'
+                            ? 'Everything is set before the opening tee time.'
+                            : tripStateLabel === 'Completed'
+                              ? 'The trip is complete. Review the board and the record.'
+                              : 'Your trip is live. The first scorecard is still waiting.'}
                         </h2>
                         <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-                          Your trip is live. Open the scoreboard and start shaping the story.
+                          Open the schedule, matchups, and trip tools from one home screen.
                         </p>
                         <div className="mt-[var(--space-6)] inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-2)] text-[var(--masters)] font-medium text-sm">
-                          <span>Open trip</span>
+                          <span>Open schedule</span>
                           <ChevronRight size={16} strokeWidth={2} />
                         </div>
                       </div>
@@ -302,6 +334,21 @@ export default function HomePage() {
                 </div>
               </div>
             </section>
+
+            <TripDashboardSections
+              trip={activeTrip}
+              standings={standings}
+              userMatchData={userMatchData}
+              currentUserPlayer={currentUserPlayer}
+              players={players}
+              sessions={tripSessions}
+              matches={tripMatches}
+              sideBets={sideBets}
+              banterPosts={banterPosts}
+              tripAwards={tripAwards}
+              teamAName={teamAName}
+              teamBName={teamBName}
+            />
 
             {/* YOUR MATCH — If user has an active match */}
             {userMatchData && currentUserPlayer && (
@@ -458,7 +505,7 @@ export default function HomePage() {
         <section className={`${activeTrip ? 'pt-[var(--space-6)]' : 'pt-[var(--space-10)]'} pb-[var(--space-10)]`}>
           <div className="flex items-center justify-between mb-[var(--space-6)]">
             <h2 className="type-overline tracking-[0.15em]">
-              {hasTrips ? (activeTrip ? 'Past Tournaments' : 'Tournaments') : 'Get Started'}
+              {hasTrips ? (activeTrip ? 'Other Trips' : 'Tournaments') : 'Get Started'}
             </h2>
             {hasTrips && (
               <button
