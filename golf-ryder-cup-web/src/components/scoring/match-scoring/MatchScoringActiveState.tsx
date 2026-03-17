@@ -21,6 +21,7 @@ import {
   type ScoringModeMeta,
 } from './matchScoringShared';
 import { MatchInsideGamesPanel } from './MatchInsideGamesPanel';
+import { MatchTripMomentsPanel } from './MatchTripMomentsPanel';
 
 interface FourballPlayer {
   id: string;
@@ -506,7 +507,7 @@ export function MatchScoringActiveState({
           <div className="text-left">
             <p className="type-overline text-[var(--ink-secondary)]">Advanced tools</p>
             <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-              Press tracking and side bets live here.
+              Presses, inside games, stats, and awards live here.
             </p>
           </div>
           <ChevronRight
@@ -544,6 +545,15 @@ export function MatchScoringActiveState({
                 teamAPlayers={teamAPlayers}
                 teamBPlayers={teamBPlayers}
                 sideBets={activeMatchSideBets}
+              />
+            ) : null}
+
+            {currentTripId ? (
+              <MatchTripMomentsPanel
+                tripId={currentTripId}
+                match={matchState.match}
+                players={[...teamAPlayers, ...teamBPlayers]}
+                recordedByPlayerId={currentPlayerIdForBets}
               />
             ) : null}
 
