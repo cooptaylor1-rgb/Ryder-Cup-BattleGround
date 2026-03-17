@@ -29,6 +29,7 @@ import {
 } from '../services/tripSyncService';
 import { deleteTripCascade } from '../services/cascadeDelete';
 import { createLogger } from '../utils/logger';
+import { mergeTripPlayers } from '../utils/tripPlayers';
 import { useUIStore } from './uiStore';
 
 const logger = createLogger('TripStore');
@@ -123,14 +124,31 @@ export const useTripStore = create<TripState>()(
 
           // Load team members and players
           const teamIds = teams.map((t) => t.id);
-          const teamMembers = await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
+          const teamMembers =
+            teamIds.length === 0
+              ? []
+              : await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
 
-          const playerIds = teamMembers.map((tm) => tm.playerId);
-          const players = await db.players.where('id').anyOf(playerIds).toArray();
+          const playerIds = [...new Set(teamMembers.map((tm) => tm.playerId))];
+          const [tripPlayers, linkedPlayers] = await Promise.all([
+            db.players.where('tripId').equals(tripId).toArray(),
+            playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
+          ]);
+          const { players, backfilledPlayers } = mergeTripPlayers(
+            tripId,
+            tripPlayers,
+            linkedPlayers
+          );
+          if (backfilledPlayers.length > 0) {
+            await db.players.bulkPut(backfilledPlayers);
+          }
 
           // Load tee sets for courses
           const courseIds = courses.map((c) => c.id);
-          const teeSets = await db.teeSets.where('courseId').anyOf(courseIds).toArray();
+          const teeSets =
+            courseIds.length === 0
+              ? []
+              : await db.teeSets.where('courseId').anyOf(courseIds).toArray();
 
           set({
             currentTrip: trip,
@@ -275,18 +293,21 @@ export const useTripStore = create<TripState>()(
 
       // Player management
       addPlayer: async (playerData) => {
+        const { currentTrip } = get();
+        if (!currentTrip) {
+          throw new Error('No active trip');
+        }
+
         const player: Player = {
           ...playerData,
           id: crypto.randomUUID(),
+          tripId: currentTrip.id,
         };
 
         await db.players.add(player);
 
         // Queue sync
-        const { currentTrip } = get();
-        if (currentTrip) {
-          queueSyncOperation('player', player.id, 'create', currentTrip.id, player);
-        }
+        queueSyncOperation('player', player.id, 'create', currentTrip.id, player);
 
         set((state) => ({
           players: [...state.players, player],

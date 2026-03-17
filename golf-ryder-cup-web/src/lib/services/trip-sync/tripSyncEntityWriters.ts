@@ -101,7 +101,7 @@ export async function syncPlayerToCloud(
   playerId: string,
   operation: SyncOperation,
   data?: Player,
-  _tripId?: string
+  tripId?: string
 ): Promise<void> {
   if (operation === 'delete') {
     const { error } = await getTable('players').delete().eq('id', playerId);
@@ -114,6 +114,7 @@ export async function syncPlayerToCloud(
 
   const cloudData = {
     id: player.id,
+    trip_id: player.tripId ?? tripId ?? null,
     first_name: player.firstName,
     last_name: player.lastName,
     email: player.email || null,

@@ -1,4 +1,5 @@
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
+import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 
 import { db } from '../../db';
 import type { Trip } from '../../types/models';
@@ -25,14 +26,30 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
 
     const teams = await db.teams.where('tripId').equals(tripId).toArray();
     const teamIds = teams.map((team) => team.id);
-    const teamMembers = await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
-    const playerIds = teamMembers.map((teamMember) => teamMember.playerId);
-    const players = await db.players.where('id').anyOf(playerIds).toArray();
+    const teamMembers =
+      teamIds.length === 0
+        ? []
+        : await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
+    const playerIds = [...new Set(teamMembers.map((teamMember) => teamMember.playerId))];
+    const [tripPlayers, linkedPlayers] = await Promise.all([
+      db.players.where('tripId').equals(tripId).toArray(),
+      playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
+    ]);
+    const { players, backfilledPlayers } = mergeTripPlayers(
+      tripId,
+      tripPlayers,
+      linkedPlayers
+    );
+    if (backfilledPlayers.length > 0) {
+      await db.players.bulkPut(backfilledPlayers);
+    }
     const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
     const sessionIds = sessions.map((session) => session.id);
-    const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
+    const matches =
+      sessionIds.length === 0 ? [] : await db.matches.where('sessionId').anyOf(sessionIds).toArray();
     const matchIds = matches.map((match) => match.id);
-    const holeResults = await db.holeResults.where('matchId').anyOf(matchIds).toArray();
+    const holeResults =
+      matchIds.length === 0 ? [] : await db.holeResults.where('matchId').anyOf(matchIds).toArray();
 
     await syncTripToCloud(tripId, 'update', trip);
 
@@ -90,18 +107,39 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
     ]);
 
     const teamIds = (teams || []).map((team: { id: string }) => team.id);
-    const { data: teamMembers } = await getTable('team_members').select('*').in('team_id', teamIds);
+    const { data: teamMembers } =
+      teamIds.length === 0
+        ? { data: [] }
+        : await getTable('team_members').select('*').in('team_id', teamIds);
 
-    const playerIds = (teamMembers || []).map(
+    const playerIds = [...new Set((teamMembers || []).map(
       (teamMember: { player_id: string }) => teamMember.player_id
-    );
-    const { data: players } = await getTable('players').select('*').in('id', playerIds);
+    ))];
+    const [{ data: tripPlayers }, { data: linkedPlayers }] = await Promise.all([
+      getTable('players').select('*').eq('trip_id', trip.id),
+      playerIds.length === 0
+        ? Promise.resolve({ data: [] as Array<Record<string, unknown>> })
+        : getTable('players').select('*').in('id', playerIds),
+    ]);
+    const playerRows = new Map<string, Record<string, unknown>>();
+    for (const player of (tripPlayers as Array<Record<string, unknown>> | null) ?? []) {
+      playerRows.set(String(player.id), player);
+    }
+    for (const player of (linkedPlayers as Array<Record<string, unknown>> | null) ?? []) {
+      playerRows.set(String(player.id), player);
+    }
 
     const sessionIds = (sessions || []).map((session: { id: string }) => session.id);
-    const { data: matches } = await getTable('matches').select('*').in('session_id', sessionIds);
+    const { data: matches } =
+      sessionIds.length === 0
+        ? { data: [] }
+        : await getTable('matches').select('*').in('session_id', sessionIds);
 
     const matchIds = (matches || []).map((match: { id: string }) => match.id);
-    const { data: holeResults } = await getTable('hole_results').select('*').in('match_id', matchIds);
+    const { data: holeResults } =
+      matchIds.length === 0
+        ? { data: [] }
+        : await getTable('hole_results').select('*').in('match_id', matchIds);
 
     await db.transaction(
       'rw',
@@ -121,17 +159,25 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
         };
         await db.trips.put(localTrip);
 
-        for (const player of players || []) {
-          await db.players.put({
-            id: player.id,
-            firstName: player.first_name,
-            lastName: player.last_name,
-            email: player.email,
-            handicapIndex: player.handicap_index,
-            ghin: player.ghin,
-            teePreference: player.tee_preference,
-            avatarUrl: player.avatar_url,
-          });
+        const { players: normalizedPlayers } = mergeTripPlayers(
+          trip.id,
+          Array.from(playerRows.values()).map((player) => ({
+            id: String(player.id),
+            tripId: typeof player.trip_id === 'string' ? player.trip_id : undefined,
+            firstName: String(player.first_name ?? ''),
+            lastName: String(player.last_name ?? ''),
+            email: typeof player.email === 'string' ? player.email : undefined,
+            handicapIndex:
+              typeof player.handicap_index === 'number' ? player.handicap_index : undefined,
+            ghin: typeof player.ghin === 'string' ? player.ghin : undefined,
+            teePreference:
+              typeof player.tee_preference === 'string' ? player.tee_preference : undefined,
+            avatarUrl: typeof player.avatar_url === 'string' ? player.avatar_url : undefined,
+          }))
+        );
+
+        for (const player of normalizedPlayers) {
+          await db.players.put(player);
         }
 
         for (const team of teams || []) {

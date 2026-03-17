@@ -16,6 +16,7 @@ import {
   type TableName,
 } from './client';
 import { db } from '../db';
+import { mergeTripPlayers } from '../utils/tripPlayers';
 import type {
   Trip,
   Player,
@@ -280,15 +281,25 @@ class SyncService {
       const teamIds = teams.map((t) => t.id);
       const sessionIds = sessions.map((s) => s.id);
       const relevantTeamMembers = teamMembers.filter((tm) => teamIds.includes(tm.teamId));
-      const playerIds = relevantTeamMembers.map((tm) => tm.playerId);
+      const playerIds = [...new Set(relevantTeamMembers.map((tm) => tm.playerId))];
 
-      const [players, matches] = await Promise.all([
-        db.players.where('id').anyOf(playerIds).toArray(),
-        db.matches.where('sessionId').anyOf(sessionIds).toArray(),
+      const [tripPlayers, linkedPlayers, matches] = await Promise.all([
+        db.players.where('tripId').equals(tripId).toArray(),
+        playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
+        sessionIds.length === 0 ? [] : db.matches.where('sessionId').anyOf(sessionIds).toArray(),
       ]);
+      const { players, backfilledPlayers } = mergeTripPlayers(
+        tripId,
+        tripPlayers,
+        linkedPlayers
+      );
+      if (backfilledPlayers.length > 0) {
+        await db.players.bulkPut(backfilledPlayers);
+      }
 
       const matchIds = matches.map((m) => m.id);
-      const holeResults = await db.holeResults.where('matchId').anyOf(matchIds).toArray();
+      const holeResults =
+        matchIds.length === 0 ? [] : await db.holeResults.where('matchId').anyOf(matchIds).toArray();
 
       // Upsert to Supabase using type-safe helpers
       const { error: tripError } = await upsertRecord(
@@ -459,10 +470,10 @@ class SyncService {
 
         // Fetch matches for all sessions
         const sessionIds = (sessionsData as Array<{ id: string }>).map((s) => s.id);
-        const { data: matchesData } = await getSupabase()
-          .from('matches')
-          .select('*')
-          .in('session_id', sessionIds);
+        const { data: matchesData } =
+          sessionIds.length === 0
+            ? { data: [] }
+            : await getSupabase().from('matches').select('*').in('session_id', sessionIds);
 
         if (matchesData) {
           for (const matchData of matchesData) {
@@ -475,10 +486,10 @@ class SyncService {
 
           // Fetch hole results for all matches
           const matchIds = (matchesData as Array<{ id: string }>).map((m) => m.id);
-          const { data: holeResultsData } = await getSupabase()
-            .from('hole_results')
-            .select('*')
-            .in('match_id', matchIds);
+          const { data: holeResultsData } =
+            matchIds.length === 0
+              ? { data: [] }
+              : await getSupabase().from('hole_results').select('*').in('match_id', matchIds);
 
           if (holeResultsData) {
             for (const hrData of holeResultsData) {
@@ -500,25 +511,39 @@ class SyncService {
           .select('*')
           .in('team_id', teamIds);
 
+        const { data: tripPlayersData } = await getSupabase()
+          .from('players')
+          .select('*')
+          .eq('trip_id', trip.id);
+
         if (teamMembersData) {
-          const playerIds = (teamMembersData as Array<{ player_id: string }>).map(
+          const playerIds = [...new Set((teamMembersData as Array<{ player_id: string }>).map(
             (tm) => tm.player_id
+          ))];
+
+          let linkedPlayersData: Array<Record<string, unknown>> = [];
+          if (playerIds.length > 0) {
+            const { data } = await getSupabase().from('players').select('*').in('id', playerIds);
+            linkedPlayersData = (data as Array<Record<string, unknown>> | null) ?? [];
+          }
+
+          const allPlayerRows = new Map<string, Record<string, unknown>>();
+          for (const playerData of (tripPlayersData as Array<Record<string, unknown>> | null) ?? []) {
+            allPlayerRows.set(String(playerData.id), playerData);
+          }
+          for (const playerData of linkedPlayersData) {
+            allPlayerRows.set(String(playerData.id), playerData);
+          }
+
+          const remotePlayers = Array.from(allPlayerRows.values()).map(
+            (playerData) =>
+              convertKeysToCamelCase(playerData) as unknown as Player
           );
+          const { players } = mergeTripPlayers(trip.id, remotePlayers);
 
-          // Fetch players
-          const { data: playersData } = await getSupabase()
-            .from('players')
-            .select('*')
-            .in('id', playerIds);
-
-          if (playersData) {
-            for (const playerData of playersData) {
-              const player = convertKeysToCamelCase(
-                playerData as unknown as Record<string, unknown>
-              ) as unknown as Player;
-              await db.players.put(player);
-              synced++;
-            }
+          for (const player of players) {
+            await db.players.put(player);
+            synced++;
           }
 
           for (const tmData of teamMembersData) {
@@ -526,6 +551,17 @@ class SyncService {
               tmData as unknown as Record<string, unknown>
             ) as unknown as TeamMember;
             await db.teamMembers.put(tm);
+            synced++;
+          }
+        } else {
+          const remotePlayers = ((tripPlayersData as Array<Record<string, unknown>> | null) ?? []).map(
+            (playerData) =>
+              convertKeysToCamelCase(playerData) as unknown as Player
+          );
+          const { players } = mergeTripPlayers(trip.id, remotePlayers);
+
+          for (const player of players) {
+            await db.players.put(player);
             synced++;
           }
         }

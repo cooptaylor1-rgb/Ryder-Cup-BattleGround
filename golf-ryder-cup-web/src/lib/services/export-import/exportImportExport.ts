@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import type { Course, Player, TeeSet } from '@/lib/types/models';
+import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 import type { TripExport } from '@/lib/types/export';
 
 import { APP_VERSION, fetchCollectionByIds, SCHEMA_VERSION, uniqueStringIds } from './exportImportShared';
@@ -20,10 +21,15 @@ export async function exportTrip(
   );
 
   const playerIds = uniqueStringIds(teamMembers.map((member) => member.playerId));
-  const players =
+  const [tripPlayers, linkedPlayers] = await Promise.all([
+    db.players.where('tripId').equals(tripId).toArray(),
     playerIds.length === 0
-      ? []
-      : (await db.players.bulkGet(playerIds)).filter((player): player is Player => player !== undefined);
+      ? Promise.resolve([] as Player[])
+      : db.players.bulkGet(playerIds).then((players) =>
+          players.filter((player): player is Player => player !== undefined)
+        ),
+  ]);
+  const { players } = mergeTripPlayers(tripId, tripPlayers, linkedPlayers);
 
   const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
   const sessionIds = sessions.map((session) => session.id);
