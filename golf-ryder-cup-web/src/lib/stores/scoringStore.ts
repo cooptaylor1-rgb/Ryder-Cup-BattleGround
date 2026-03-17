@@ -73,7 +73,14 @@ interface ScoringState {
     clearActiveMatch: () => void;
 
     // Scoring actions
-    scoreHole: (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => Promise<void>;
+    scoreHole: (
+        winner: HoleWinner,
+        teamAScore?: number,
+        teamBScore?: number,
+        teamAPlayerScores?: PlayerHoleScore[],
+        teamBPlayerScores?: PlayerHoleScore[],
+        options?: { advanceHole?: boolean }
+    ) => Promise<void>;
     undoLastHole: () => Promise<void>;
     goToHole: (holeNumber: number) => void;
     nextHole: () => void;
@@ -290,7 +297,14 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
     },
 
     // Score a hole
-    scoreHole: async (winner: HoleWinner, teamAScore?: number, teamBScore?: number, teamAPlayerScores?: PlayerHoleScore[], teamBPlayerScores?: PlayerHoleScore[]) => {
+    scoreHole: async (
+        winner: HoleWinner,
+        teamAScore?: number,
+        teamBScore?: number,
+        teamAPlayerScores?: PlayerHoleScore[],
+        teamBPlayerScores?: PlayerHoleScore[],
+        options?: { advanceHole?: boolean }
+    ) => {
         const { activeMatch, currentHole, isSessionLocked } = get();
         if (!activeMatch) return;
 
@@ -333,6 +347,11 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
 
             const newMatchState = calculateMatchState(activeMatch, holeResults);
 
+            const shouldAdvanceHole = options?.advanceHole ?? true;
+            const nextHole = newMatchState.isClosedOut || !shouldAdvanceHole
+                ? currentHole
+                : Math.min(currentHole + 1, 18);
+
             // Get the latest hole result for cloud sync
             const latestResult = holeResults.find(r => r.holeNumber === currentHole);
             if (latestResult) {
@@ -347,7 +366,7 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                         : 'inProgress';
                     const matchToSync = {
                         ...activeMatch,
-                        currentHole: Math.min(currentHole + 1, 18),
+                        currentHole: nextHole,
                         status: nextMatchStatus,
                         result: persistedResult,
                         margin: Math.abs(newMatchState.currentScore),
@@ -414,11 +433,6 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 ...get().undoStack,
                 { matchId: activeMatch.id, holeNumber: currentHole, previousResult },
             ];
-
-            // Auto-advance to next hole if not closed out
-            const nextHole = newMatchState.isClosedOut
-                ? currentHole
-                : Math.min(currentHole + 1, 18);
 
             // Update session match states too
             const matchStates = new Map(get().matchStates);

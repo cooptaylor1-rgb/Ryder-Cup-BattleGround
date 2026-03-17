@@ -52,10 +52,10 @@ interface MatchScoringPageActionsOptions {
     teamAScore?: number,
     teamBScore?: number,
     teamAPlayerScores?: PlayerHoleScore[],
-    teamBPlayerScores?: PlayerHoleScore[]
+    teamBPlayerScores?: PlayerHoleScore[],
+    options?: { advanceHole?: boolean }
   ) => Promise<void>;
   undoLastHole: () => Promise<void>;
-  nextHole: () => void;
   showConfirm: (options: {
     title: string;
     message: string;
@@ -116,7 +116,6 @@ export function useMatchScoringPageActions(
     isSessionLocked,
     scoreHole,
     undoLastHole,
-    nextHole,
     showConfirm,
     showToast,
     haptic,
@@ -224,6 +223,11 @@ export function useMatchScoringPageActions(
           : scoringSource === 'swipe' || scoringSource === 'oneHanded'
             ? 'quick'
             : 'manual';
+      const wouldCloseOut =
+        Math.abs(
+          matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)
+        ) >
+        matchState.holesRemaining - 1;
 
       ui.setSavingIndicator('Saving score...');
 
@@ -234,10 +238,13 @@ export function useMatchScoringPageActions(
           teamAStrokeScore,
           teamBStrokeScore,
           teamAPlayerScores,
-          teamBPlayerScores
+          teamBPlayerScores,
+          { advanceHole: scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut }
         );
       } else {
-        await scoreHole(winner);
+        await scoreHole(winner, undefined, undefined, undefined, undefined, {
+          advanceHole: scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut,
+        });
       }
 
       if (activeMatch) {
@@ -260,13 +267,6 @@ export function useMatchScoringPageActions(
 
       ui.setSavingIndicator(isOnline ? 'Score saved' : 'Saved offline');
       setTimeout(() => ui.setSavingIndicator(null), 1500);
-
-      const wouldCloseOut =
-        Math.abs(
-          matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)
-        ) >
-        matchState.holesRemaining - 1;
-
       if (scoringPreferences.soundEffects) {
         playScoreSound({
           outcome: winner === 'teamA' ? 'teamA' : winner === 'teamB' ? 'teamB' : 'halved',
@@ -321,12 +321,6 @@ export function useMatchScoringPageActions(
         timestamp: Date.now(),
         onUndo: handleUndo,
       });
-
-      if (scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut && currentHole < 18) {
-        setTimeout(() => {
-          nextHole();
-        }, 300);
-      }
     },
     [
       matchState,
@@ -340,7 +334,6 @@ export function useMatchScoringPageActions(
       handleUndo,
       scoringPreferences.autoAdvance,
       scoringPreferences.soundEffects,
-      nextHole,
       recordScoreAudit,
       isOnline,
     ]

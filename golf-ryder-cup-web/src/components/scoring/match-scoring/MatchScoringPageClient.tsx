@@ -128,7 +128,6 @@ export default function MatchScoringPageClient() {
     isSessionLocked,
     scoreHole,
     undoLastHole,
-    nextHole,
     showConfirm,
     showToast,
     haptic,
