@@ -33,7 +33,6 @@ import {
   MenuTile,
   MoreFactCard,
   ProfilePanel,
-  SidebarNote,
   TripPanel,
 } from '@/components/more/MorePageSections';
 import { Button } from '@/components/ui/Button';
@@ -133,9 +132,8 @@ export default function MorePageClient() {
     {
       id: 'trip-tools',
       eyebrow: 'Trip Tools',
-      title: 'Keep the trip organized.',
-      description:
-        'Schedule, money, courses, and the practical details that keep the week moving.',
+      title: 'Trip tools',
+      description: 'Schedule, money, courses, and the trip details.',
       items: [
         ...(isCaptainMode
           ? [
@@ -177,9 +175,8 @@ export default function MorePageClient() {
     {
       id: 'trip-story',
       eyebrow: 'Story And Noise',
-      title: 'Keep the trip lively.',
-      description:
-        'Chat, side games, stats, awards, and the parts of the trip you will want to revisit later.',
+      title: 'Trip activity',
+      description: 'Chat, side games, stats, awards, and the recap.',
       items: [
         {
           id: 'social',
@@ -222,9 +219,8 @@ export default function MorePageClient() {
     {
       id: 'app-support',
       eyebrow: 'Support And Preferences',
-      title: 'Adjust the app and get help fast.',
-      description:
-        'Settings, appearance, notifications, backups, and help when something needs attention.',
+      title: 'Help and settings',
+      description: 'Settings, appearance, notifications, backups, and help.',
       items: [
         {
           id: 'settings',
@@ -437,51 +433,35 @@ export default function MorePageClient() {
           </div>
         </section>
 
-        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.14fr)_18rem]">
-          <div className="space-y-[var(--space-4)]">
-            <ProfilePanel
-              isAuthenticated={isAuthenticated}
-              currentUserName={
-                currentUser ? `${currentUser.firstName} ${currentUser.lastName}`.trim() : null
-              }
-              currentUserEmail={currentUser?.email || null}
-              initials={initials}
-            />
+        <section className="mt-[var(--space-6)] space-y-[var(--space-4)]">
+          <ProfilePanel
+            isAuthenticated={isAuthenticated}
+            currentUserName={
+              currentUser ? `${currentUser.firstName} ${currentUser.lastName}`.trim() : null
+            }
+            currentUserEmail={currentUser?.email || null}
+            initials={initials}
+          />
 
-            {currentTrip ? (
-              <TripPanel
-                tripName={currentTrip.name}
-                tripDates={formatTripRange(currentTrip.startDate, currentTrip.endDate)}
-                tripLocation={currentTrip.location}
-                onExit={() => setShowExitTripConfirm(true)}
-              />
-            ) : null}
+          {currentTrip ? (
+            <TripPanel
+              tripName={currentTrip.name}
+              tripDates={formatTripRange(currentTrip.startDate, currentTrip.endDate)}
+              tripLocation={currentTrip.location}
+              onExit={() => setShowExitTripConfirm(true)}
+            />
+          ) : null}
 
-            <AccessPanel
-              isCaptainMode={isCaptainMode}
-              isAdminMode={isAdminMode}
-              onCaptainClick={() =>
-                isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)
-              }
-              onAdminClick={() => (isAdminMode ? disableAdminMode() : setShowAdminModal(true))}
-              captainIcon={isCaptainMode ? <Unlock size={18} /> : <Lock size={18} />}
-              adminIcon={<Shield size={18} />}
-            />
-          </div>
-
-          <aside className="space-y-[var(--space-4)]">
-            <SidebarNote
-              title="Captain tools stay tucked away"
-              body="Most players never need lineup and management controls. When you do, they are easy to reach from here."
-              icon={<Shield size={18} />}
-              tone="maroon"
-            />
-            <SidebarNote
-              title="Help should be one tap away"
-              body="Scoring questions, setup issues, and support answers should be easy to find when the trip is already underway."
-              icon={<HelpCircle size={18} />}
-            />
-          </aside>
+          <AccessPanel
+            isCaptainMode={isCaptainMode}
+            isAdminMode={isAdminMode}
+            onCaptainClick={() =>
+              isCaptainMode ? disableCaptainMode() : setShowCaptainModal(true)
+            }
+            onAdminClick={() => (isAdminMode ? disableAdminMode() : setShowAdminModal(true))}
+            captainIcon={isCaptainMode ? <Unlock size={18} /> : <Lock size={18} />}
+            adminIcon={<Shield size={18} />}
+          />
         </section>
 
         {primarySections.map((section) => (
@@ -637,7 +617,7 @@ export default function MorePageClient() {
         onClose={() => setShowClearConfirm(false)}
         onConfirm={handleClearData}
         title="Clear all local data?"
-        message="This removes trips, matches, scores, and demo data from this device. It should feel like a deliberate reset because it is one."
+        message="This removes trips, matches, scores, and demo data from this device."
         confirmLabel="Clear all"
         cancelLabel="Cancel"
         variant="danger"

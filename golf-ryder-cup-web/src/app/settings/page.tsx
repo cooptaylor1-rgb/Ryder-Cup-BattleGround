@@ -109,21 +109,20 @@ export default function SettingsPage() {
             <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
               <SettingsFactCard label="Current theme" value={(theme || 'outdoor').replace(/^\w/, (char) => char.toUpperCase())} detail="The visual mode your device is using now." />
               <SettingsFactCard label="Core controls" value={SETTING_ITEMS.length} detail="The four rooms that matter most on a golf trip." />
-              <SettingsFactCard label="Support path" value="Help" detail="When a player gets stuck, there should be one obvious place to go." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
+              <SettingsFactCard label="Support path" value="Help" detail="Open help for setup, scoring, and app questions." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
             </div>
           </div>
         </section>
 
-        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.12fr)_18rem]">
+        <section className="mt-[var(--space-6)]">
           <div className="rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_20px_44px_rgba(41,29,17,0.08)]">
             <div>
               <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Preference Boards</p>
               <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
-                Put every important toggle behind a door that feels intentional.
+                Choose the settings you need.
               </h2>
               <p className="mt-[var(--space-2)] max-w-[34rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                Settings should feel less like a junk drawer and more like a small suite of serious rooms.
-                The trip only needs a few of them, but those few should be easy to find and worth opening.
+                Scoring, appearance, notifications, and backups all live here.
               </p>
             </div>
 
@@ -150,25 +149,6 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
-
-          <aside className="space-y-[var(--space-4)]">
-            <SettingsSidebarCard
-              title="Theme should earn its keep"
-              body="The palette matters less than legibility in noon sun and pace in motion. Outdoor mode should feel like a tool, not a novelty."
-              icon={<Palette size={18} />}
-            />
-            <SettingsSidebarCard
-              title="Backups are trust"
-              body="Nothing says amateur hour like a trip disappearing because one phone died. Backup belongs near the top of the utility hierarchy."
-              icon={<Database size={18} />}
-              tone="green"
-            />
-            <SettingsSidebarCard
-              title="Support lives nearby"
-              body="Help should sit one step away from settings, not buried three menus deep under whatever marketing called 'more.'"
-              icon={<HelpCircle size={18} />}
-            />
-          </aside>
         </section>
       </main>
     </div>
@@ -194,35 +174,6 @@ function SettingsFactCard({
       </p>
       <p className="mt-[var(--space-2)] text-xs leading-5 text-[color:var(--canvas)]/72">{detail}</p>
     </div>
-  );
-}
-
-function SettingsSidebarCard({
-  title,
-  body,
-  icon,
-  tone = 'ink',
-}: {
-  title: string;
-  body: string;
-  icon: React.ReactNode;
-  tone?: 'ink' | 'green';
-}) {
-  return (
-    <aside
-      className={cn(
-        'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
-        tone === 'green'
-          ? 'border-[var(--masters)]/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(238,246,241,0.99))]'
-          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
-      )}
-    >
-      <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
-        {icon}
-      </div>
-      <h3 className="mt-[var(--space-3)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
-      <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
-    </aside>
   );
 }
 
