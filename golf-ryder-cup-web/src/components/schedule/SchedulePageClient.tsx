@@ -184,13 +184,15 @@ export default function SchedulePageClient() {
             <div>
               <p className="font-medium text-[var(--warning)]">Profile not linked</p>
               <p className="type-caption mt-1">
-                Create a profile or sign in to see your personal tee times.
+                {currentUser
+                  ? "You're signed in, but this trip doesn't have a player entry that matches your profile yet."
+                  : 'Create a profile or sign in to see your personal tee times.'}
               </p>
               <Link
-                href="/profile/create"
+                href={currentUser ? '/profile' : '/profile/create'}
                 className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[var(--masters)]"
               >
-                Create Profile
+                {currentUser ? 'Open Profile' : 'Create Profile'}
                 <ChevronRight size={16} />
               </Link>
             </div>

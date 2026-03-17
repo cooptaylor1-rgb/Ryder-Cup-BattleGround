@@ -67,7 +67,7 @@ export default function CreateProfilePageClient() {
   useEffect(() => {
     if (isAuthenticated && currentUser?.hasCompletedOnboarding) {
       const nextPath = searchParams?.get('next');
-      router.push(nextPath || '/');
+      router.push(nextPath || '/profile');
     }
   }, [currentUser, isAuthenticated, router, searchParams]);
 
