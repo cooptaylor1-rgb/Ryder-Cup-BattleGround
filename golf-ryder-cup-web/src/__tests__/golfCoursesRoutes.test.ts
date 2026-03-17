@@ -79,6 +79,45 @@ describe('Golf Course Routes', () => {
       expect(data.results).toHaveLength(5);
       expect(data.results[0].source).toBe('osm');
     });
+
+    it('falls back to public web results when structured providers return nothing', async () => {
+      const emptyResponse = {
+        ok: true,
+        json: async () => [],
+      } as Response;
+
+      const webHtml = `
+        <html>
+          <body>
+            <a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fcabotcitrusfarms.com">
+              Cabot Citrus Farms | Golf Resort in Florida
+            </a>
+          </body>
+        </html>
+      `;
+
+      const fetchMock = vi.spyOn(globalThis, 'fetch');
+      fetchMock
+        .mockResolvedValueOnce(emptyResponse)
+        .mockResolvedValueOnce(emptyResponse)
+        .mockResolvedValueOnce(emptyResponse)
+        .mockResolvedValueOnce(emptyResponse)
+        .mockResolvedValueOnce({
+          ok: true,
+          text: async () => webHtml,
+        } as Response);
+
+      const response = await searchCourses(
+        new NextRequest('http://localhost:3000/api/golf-courses/search?q=cabot%20citrus%20farms')
+      );
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.results[0].source).toBe('web');
+      expect(data.results[0].name).toContain('Cabot Citrus Farms');
+      expect(data.results[0].website).toBe('https://cabotcitrusfarms.com');
+    });
   });
 
   describe('GET /api/golf-courses/[courseId]', () => {

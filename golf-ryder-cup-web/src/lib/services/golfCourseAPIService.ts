@@ -47,10 +47,12 @@ export interface GolfCourseAPILocation {
 }
 
 export interface GolfCourseAPICourse {
-    id: number;
+    id: string | number;
     club_name: string;
     course_name: string;
     location: GolfCourseAPILocation;
+    source?: 'api' | 'ghin' | 'rapidapi' | 'osm' | 'web';
+    website?: string;
     tees?: {
         male?: GolfCourseAPITee[];
         female?: GolfCourseAPITee[];
@@ -121,15 +123,24 @@ export async function searchCourses(query: string): Promise<GolfCourseAPICourse[
 
         if (response.ok) {
             const data = await response.json();
-            return data.courses || [];
+            const paidResults = (data.courses || []).map((course: GolfCourseAPICourse) => ({
+                ...course,
+                source: course.source || 'api',
+            }));
+
+            if (paidResults.length > 0) {
+                return paidResults;
+            }
         }
 
-        const error = await response.json();
-        if (error.configured === false) {
-            configuredCache = false;
-            // Fall through to free search
-        } else {
-            throw new Error(error.error || 'Search failed');
+        if (!response.ok) {
+            const error = await response.json();
+            if (error.configured === false) {
+                configuredCache = false;
+                // Fall through to free search
+            } else {
+                throw new Error(error.error || 'Search failed');
+            }
         }
     }
 
@@ -162,8 +173,9 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
             latitude?: number;
             longitude?: number;
             source: string;
+            website?: string;
         }) => ({
-            id: parseInt(result.id.replace(/\D/g, '')) || Math.random() * 1000000,
+            id: result.id,
             club_name: result.name,
             course_name: result.name,
             location: {
@@ -173,6 +185,8 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
                 latitude: result.latitude,
                 longitude: result.longitude,
             },
+            source: result.source as GolfCourseAPICourse['source'],
+            website: result.website,
             // Free API doesn't provide tee data
             tees: undefined,
         }));
@@ -185,9 +199,17 @@ async function searchCoursesFree(query: string): Promise<GolfCourseAPICourse[]> 
 /**
  * Get detailed course information by ID
  */
-export async function getCourseById(courseId: number): Promise<GolfCourseAPICourse | null> {
+export async function getCourseById(courseId: string | number): Promise<GolfCourseAPICourse | null> {
     try {
-        const response = await fetch(`/api/golf-courses?action=get&id=${courseId}`);
+        const normalizedCourseId = String(courseId);
+        const useSourceAwareRoute =
+            normalizedCourseId.includes('-') && !/^\d+$/.test(normalizedCourseId);
+
+        const endpoint = useSourceAwareRoute
+            ? `/api/golf-courses/${encodeURIComponent(normalizedCourseId)}`
+            : `/api/golf-courses?action=get&id=${encodeURIComponent(normalizedCourseId)}`;
+
+        const response = await fetch(endpoint);
 
         if (!response.ok) {
             const error = await response.json();
@@ -195,7 +217,54 @@ export async function getCourseById(courseId: number): Promise<GolfCourseAPICour
         }
 
         const data = await response.json();
-        return data.course || null;
+        if (data.course) {
+            return data.course || null;
+        }
+
+        if (data.data) {
+            const detail = data.data;
+            return {
+                id: detail.id,
+                club_name: detail.name,
+                course_name: detail.name,
+                website: detail.website,
+                source: detail.source || 'web',
+                location: {
+                    address: detail.address,
+                    city: detail.city,
+                    state: detail.state,
+                },
+                tees: {
+                    male: (detail.teeSets || []).map((tee: {
+                        name: string;
+                        rating?: number;
+                        slope?: number;
+                        par?: number;
+                        totalYardage?: number;
+                        yardages?: (number | null)[];
+                    }) => ({
+                        tee_name: tee.name,
+                        course_rating: tee.rating ?? 0,
+                        slope_rating: tee.slope ?? 0,
+                        total_yards:
+                            tee.totalYardage ??
+                            (tee.yardages || []).reduce(
+                                (sum: number, yardage: number | null) => sum + (yardage ?? 0),
+                                0
+                            ),
+                        number_of_holes: 18,
+                        par_total: tee.par ?? detail.holes?.reduce((sum: number, hole: { par: number }) => sum + (hole.par ?? 0), 0) ?? 72,
+                        holes: (detail.holes || []).map((hole: { par: number; yardage: number | null; handicap: number }) => ({
+                            par: hole.par,
+                            yardage: hole.yardage ?? 0,
+                            handicap: hole.handicap,
+                        })),
+                    })),
+                },
+            };
+        }
+
+        return null;
     } catch (error) {
         logger.error('Failed to fetch course:', error);
         return null;

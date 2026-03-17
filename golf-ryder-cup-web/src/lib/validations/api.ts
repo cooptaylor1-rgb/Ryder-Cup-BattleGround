@@ -71,7 +71,7 @@ export const courseSearchParamsSchema = z.object({
         message: 'Action must be search, get, or check',
     }),
     q: z.string().min(2, 'Search query must be at least 2 characters').optional(),
-    id: z.string().uuid('Invalid course ID').optional(),
+    id: z.string().trim().min(1, 'Course ID is required').max(200, 'Course ID is too long').optional(),
 }).refine(
     (data) => {
         if (data.action === 'search') return !!data.q;

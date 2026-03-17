@@ -36,7 +36,8 @@ interface CourseSearchResult {
     country?: string;
     latitude?: number;
     longitude?: number;
-    source: 'ghin' | 'rapidapi' | 'osm';
+    website?: string;
+    source: 'ghin' | 'rapidapi' | 'osm' | 'web';
 }
 
 // Reserved for future use when full course details fetching is implemented
@@ -111,6 +112,11 @@ export async function GET(request: NextRequest) {
         if (results.length === 0) {
             const osmResults = await searchOpenStreetMap(query, state);
             results.push(...osmResults);
+        }
+
+        if (results.length === 0) {
+            const webResults = await searchPublicWeb(query);
+            results.push(...webResults);
         }
 
         let res = NextResponse.json({
@@ -508,6 +514,107 @@ async function searchOpenStreetMap(
         logger.error('OSM search error:', error);
         return [];
     }
+}
+
+async function searchPublicWeb(query: string): Promise<CourseSearchResult[]> {
+    try {
+        const response = await fetchWithTimeout(
+            `https://duckduckgo.com/html/?q=${encodeURIComponent(`${query} golf course`)}`,
+            {
+                headers: {
+                    'User-Agent': 'GolfRyderCupApp/1.0',
+                },
+            }
+        );
+
+        if (!response.ok) return [];
+
+        const html = await response.text();
+        const matches = Array.from(
+            html.matchAll(
+                /<a[^>]*class="[^"]*result__a[^"]*"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi
+            )
+        );
+
+        const results: CourseSearchResult[] = [];
+        const queryWords = query
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((word) => word.length > 2);
+
+        for (const match of matches) {
+            if (results.length >= 10) break;
+
+            const rawHref = match[1];
+            const title = stripHtml(match[2]).trim();
+            const href = unwrapDuckDuckGoLink(rawHref);
+            const hostname = getHostname(href);
+            const name = normalizeCourseTitle(title);
+            const haystack = `${name} ${hostname}`.toLowerCase();
+
+            const queryWordMatches = queryWords.filter((word) => haystack.includes(word)).length;
+            const looksGolfRelated =
+                haystack.includes('golf') ||
+                haystack.includes('club') ||
+                haystack.includes('course') ||
+                haystack.includes('resort') ||
+                queryWordMatches >= Math.max(1, Math.ceil(queryWords.length / 2));
+
+            if (!looksGolfRelated || !href || results.some((result) => similarNames(result.name, name))) {
+                continue;
+            }
+
+            results.push({
+                id: `web-${slugify(name).slice(0, 80) || results.length + 1}`,
+                name,
+                website: href,
+                source: 'web',
+            });
+        }
+
+        return results;
+    } catch (error) {
+        logger.error('Public web search error:', error);
+        return [];
+    }
+}
+
+function stripHtml(value: string): string {
+    return value.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/&quot;/g, '"');
+}
+
+function unwrapDuckDuckGoLink(rawHref: string): string | undefined {
+    try {
+        const decodedHref = rawHref.replace(/&amp;/g, '&');
+        const url = new URL(decodedHref, 'https://duckduckgo.com');
+        const redirectTarget = url.searchParams.get('uddg');
+        return redirectTarget ? decodeURIComponent(redirectTarget) : url.toString();
+    } catch {
+        return undefined;
+    }
+}
+
+function getHostname(url: string | undefined): string {
+    if (!url) return '';
+    try {
+        return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+        return '';
+    }
+}
+
+function normalizeCourseTitle(title: string): string {
+    return title
+        .replace(/\s+/g, ' ')
+        .replace(/\s+[|·-]\s+.*$/, '')
+        .trim();
+}
+
+function slugify(value: string): string {
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
 }
 
 // Helper to check name similarity (for deduplication)

@@ -124,6 +124,14 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     }, [query]);
 
     const handleSelectCourse = async (course: GolfCourseAPICourse) => {
+        if (
+            !course.tees &&
+            (course.source === 'osm' || course.source === 'web' || course.source === 'rapidapi')
+        ) {
+            setSelectedCourse(course);
+            return;
+        }
+
         setIsLoadingDetails(true);
         setError(null);
 
