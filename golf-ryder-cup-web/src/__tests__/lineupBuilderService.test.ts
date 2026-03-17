@@ -265,4 +265,86 @@ describe('lineupBuilderService', () => {
     expect(savedMatch?.teamAHandicapAllowance).toBe(expected.teamAHandicapAllowance);
     expect(savedMatch?.teamBHandicapAllowance).toBe(expected.teamBHandicapAllowance);
   });
+
+  it('saveLineup updates existing session matches instead of leaving template slots empty', async () => {
+    const now = isoNow();
+    const trip: Trip = {
+      id: 'trip-1',
+      name: 'Trip',
+      startDate: now,
+      endDate: now,
+      isCaptainModeEnabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const session: RyderCupSession = {
+      id: 'session-1',
+      tripId: trip.id,
+      name: 'Opening Foursomes',
+      sessionNumber: 1,
+      sessionType: 'foursomes',
+      status: 'scheduled',
+      createdAt: now,
+    };
+
+    const players: Player[] = [
+      { id: 'a1', firstName: 'Alpha', lastName: 'One', handicapIndex: 4 },
+      { id: 'a2', firstName: 'Alpha', lastName: 'Two', handicapIndex: 7 },
+      { id: 'b1', firstName: 'Bravo', lastName: 'One', handicapIndex: 10 },
+      { id: 'b2', firstName: 'Bravo', lastName: 'Two', handicapIndex: 12 },
+    ];
+
+    const existingMatch: Match = {
+      id: 'match-1',
+      sessionId: session.id,
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 0,
+      teamAPlayerIds: [],
+      teamBPlayerIds: [],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await db.trips.put(trip);
+    await db.sessions.put(session);
+    await db.players.bulkPut(players);
+    await db.matches.put(existingMatch);
+
+    const state: LineupState = {
+      sessionId: session.id,
+      sessionType: session.sessionType,
+      playersPerMatch: 4,
+      matches: [
+        {
+          matchNumber: 1,
+          teamAPlayers: [
+            createLineupPlayer('a1', 'usa', 4),
+            createLineupPlayer('a2', 'usa', 7),
+          ],
+          teamBPlayers: [
+            createLineupPlayer('b1', 'europe', 10),
+            createLineupPlayer('b2', 'europe', 12),
+          ],
+          locked: false,
+        },
+      ],
+      availableTeamA: [],
+      availableTeamB: [],
+    };
+
+    const result = await saveLineup(state, trip.id);
+    expect(result.success).toBe(true);
+    expect(result.matchIds).toEqual([existingMatch.id]);
+
+    const savedMatch = await db.matches.get(existingMatch.id);
+    expect(savedMatch?.teamAPlayerIds).toEqual(['a1', 'a2']);
+    expect(savedMatch?.teamBPlayerIds).toEqual(['b1', 'b2']);
+  });
 });

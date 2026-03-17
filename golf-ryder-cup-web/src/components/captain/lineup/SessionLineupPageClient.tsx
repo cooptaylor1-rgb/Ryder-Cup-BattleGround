@@ -6,6 +6,11 @@ import { PageHeader } from '@/components/layout';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { calculateFairnessScore, type MatchSlot } from '@/components/captain';
 import { deleteMatchCascade } from '@/lib/services/cascadeDelete';
+import {
+    saveLineup,
+    type LineupPlayer as PersistedLineupPlayer,
+    type LineupState,
+} from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import { getTeamPlayersForLineup, toLineupPlayers } from './lineupBuilderData';
@@ -43,23 +48,23 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
 
     const session = sessions.find((entry) => entry.id === sessionId);
 
-    useEffect(() => {
-        async function loadMatches() {
-            if (!sessionId) return;
-            setIsLoading(true);
-            try {
-                const loadedMatches = await getSessionMatches(sessionId);
-                setMatches(loadedMatches);
-            } catch (error) {
-                lineupLogger.error('Failed to load matches', { sessionId, error });
-                showToast('error', 'Failed to load matches');
-            } finally {
-                setIsLoading(false);
-            }
+    const loadMatches = useCallback(async () => {
+        if (!sessionId) return;
+        setIsLoading(true);
+        try {
+            const loadedMatches = await getSessionMatches(sessionId);
+            setMatches(loadedMatches);
+        } catch (error) {
+            lineupLogger.error('Failed to load matches', { sessionId, error });
+            showToast('error', 'Failed to load matches');
+        } finally {
+            setIsLoading(false);
         }
-
-        void loadMatches();
     }, [getSessionMatches, sessionId, showToast]);
+
+    useEffect(() => {
+        void loadMatches();
+    }, [loadMatches]);
 
     const teamA = teams.find((team) => team.color === 'usa');
     const teamB = teams.find((team) => team.color === 'europe');
@@ -135,6 +140,69 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
         (matchSlots: MatchSlot[]) =>
             calculateSessionFairness(matchSlots, allLineupPlayers, calculateFairnessScore),
         [allLineupPlayers]
+    );
+
+    const buildPersistedLineupPlayer = useCallback(
+        (
+            player: MatchSlot['teamAPlayers'][number],
+            teamId: string,
+            teamColor: 'usa' | 'europe'
+        ): PersistedLineupPlayer => ({
+            id: player.id,
+            name: `${player.firstName} ${player.lastName}`.trim(),
+            firstName: player.firstName,
+            lastName: player.lastName,
+            handicap: Number.isFinite(player.handicapIndex) ? player.handicapIndex : null,
+            teamColor,
+            teamId,
+        }),
+        []
+    );
+
+    const buildPersistedLineupState = useCallback(
+        (matchSlots: MatchSlot[]): LineupState | null => {
+            if (!session || !teamA?.id || !teamB?.id) return null;
+
+            return {
+                sessionId: session.id,
+                sessionType: session.sessionType,
+                playersPerMatch: session.sessionType === 'singles' ? 2 : 4,
+                matches: matchSlots.map((match, index) => ({
+                    matchNumber: index + 1,
+                    teamAPlayers: match.teamAPlayers.map((player) =>
+                        buildPersistedLineupPlayer(player, teamA.id, 'usa')
+                    ),
+                    teamBPlayers: match.teamBPlayers.map((player) =>
+                        buildPersistedLineupPlayer(player, teamB.id, 'europe')
+                    ),
+                    locked: false,
+                })),
+                availableTeamA: [],
+                availableTeamB: [],
+            };
+        },
+        [buildPersistedLineupPlayer, session, teamA?.id, teamB?.id]
+    );
+
+    const persistLineup = useCallback(
+        async (matchSlots: MatchSlot[]) => {
+            if (!currentTrip) {
+                throw new Error('No active trip');
+            }
+
+            const lineupState = buildPersistedLineupState(matchSlots);
+            if (!lineupState) {
+                throw new Error('Session teams are not ready for lineup persistence');
+            }
+
+            const result = await saveLineup(lineupState, currentTrip.id);
+            if (!result.success) {
+                throw new Error('Lineup persistence failed');
+            }
+
+            await loadMatches();
+        },
+        [buildPersistedLineupState, currentTrip, loadMatches]
     );
 
     const getMatchPlayerNames = useCallback(
@@ -235,10 +303,24 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                         initialMatches={initialMatches}
                         calculateFairness={calculateFairness}
                         onDeleteMatch={handleDeleteMatch}
-                        onSaveDraft={() => showToast('info', 'Lineup saved as draft')}
-                        onPublish={() => {
-                            showToast('success', 'Lineup published!');
-                            setViewMode('matches');
+                        onSaveDraft={async (matchSlots) => {
+                            try {
+                                await persistLineup(matchSlots);
+                                showToast('info', 'Lineup saved as draft');
+                            } catch (error) {
+                                lineupLogger.error('Failed to save lineup draft', { sessionId, error });
+                                showToast('error', 'Failed to save lineup');
+                            }
+                        }}
+                        onPublish={async (matchSlots) => {
+                            try {
+                                await persistLineup(matchSlots);
+                                showToast('success', 'Lineup published!');
+                                setViewMode('matches');
+                            } catch (error) {
+                                lineupLogger.error('Failed to publish lineup', { sessionId, error });
+                                showToast('error', 'Failed to publish lineup');
+                            }
                         }}
                     />
                 )}
