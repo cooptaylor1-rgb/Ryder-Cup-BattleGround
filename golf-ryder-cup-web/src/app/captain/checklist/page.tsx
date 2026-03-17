@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { PreFlightChecklist } from '@/components/captain';
 import {
   CaptainModeRequiredState,
@@ -10,7 +11,9 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import type { Match } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
 import {
   CalendarDays,
@@ -25,7 +28,15 @@ export default function ChecklistPage() {
   const { currentTrip, players, teams, teamMembers, sessions, courses, teeSets } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
 
-  const matches: never[] = [];
+  const matches = useLiveQuery(
+    async () => {
+      if (!currentTrip || sessions.length === 0) return [] as Match[];
+      const sessionIds = sessions.map((session) => session.id);
+      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
+    },
+    [currentTrip?.id, sessions.map((session) => session.id).join('|')],
+    [] as Match[]
+  );
 
   const handleAllClear = () => {
     showToast('success', 'All systems go! Ready to play.');
@@ -128,6 +139,7 @@ export default function ChecklistPage() {
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Fixes</p>
               <div className="mt-[var(--space-4)] space-y-3">
                 <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
+                <QuickFixLink href="/captain/manage" icon={<Map size={18} />} title="Set Courses & Tees" body="Assign the course card used for handicap calculations." />
                 <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Command" body="Return to the main board." />
               </div>
             </div>

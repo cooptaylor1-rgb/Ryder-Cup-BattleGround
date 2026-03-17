@@ -73,7 +73,7 @@ export function FloatingMyMatch({
     const [hasNewUpdate, setHasNewUpdate] = useState(false);
 
     // Hide on scoring pages to avoid redundancy
-    const shouldHide = pathname?.startsWith('/score/');
+    const shouldHide = pathname?.startsWith('/score/') || pathname?.startsWith('/captain');
 
     // Find the active session
     const activeSession = useMemo(() => {

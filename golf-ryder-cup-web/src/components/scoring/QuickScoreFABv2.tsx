@@ -66,6 +66,7 @@ export function QuickScoreFABv2({
     (!currentTrip ||
       pathname === '/' ||
       pathname === '/schedule' ||
+      pathname.startsWith('/captain') ||
       pathname === '/score' ||
       pathname.startsWith('/score/') ||
       pathname.startsWith('/profile/create') ||
@@ -194,31 +195,10 @@ export function QuickScoreFABv2({
     return null;
   }
 
-  // If there's no active match, show a gentle "Start scoring" affordance instead of disappearing.
+  // Let the dedicated "my match" widget own the no-match affordance. Otherwise we can
+  // end up with two floating buttons competing for the same corner of the screen.
   if (!activeMatchData) {
-    return (
-      <div
-        ref={fabRef}
-        className="fixed z-50"
-        style={{ bottom: position.bottom, right: position.right }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            haptic.navigate();
-            router.push('/schedule');
-          }}
-          className={
-            'flex items-center gap-2 rounded-full shadow-xl px-4 py-3 ' +
-            'bg-[var(--surface)] border border-[var(--rule)] '
-          }
-          aria-label="Start scoring"
-        >
-          <Target className="w-5 h-5 text-[var(--ink-secondary)]" />
-          <span className="text-sm font-medium text-[var(--ink-secondary)]">Start scoring</span>
-        </button>
-      </div>
-    );
+    return null;
   }
 
   return (

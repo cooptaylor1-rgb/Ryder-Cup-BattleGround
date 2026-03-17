@@ -132,9 +132,9 @@ export function MatchScoringHeroSection({
                   <span>{currentTeeSetName ?? 'Tee set not assigned'}</span>
                 </div>
               </div>
-              {!currentCourseName && (
+              {(!currentCourseName || !currentTeeSetName) && (
                 <p className="mt-2 text-xs text-[var(--warning)]">
-                  Set the course and tee set in Captain Manage {'>'} Edit Match before handicap-based scoring starts.
+                  Captain: open Manage Trip, expand the session, then use Set course & tee on this match before handicap-based scoring starts.
                 </p>
               )}
             </div>

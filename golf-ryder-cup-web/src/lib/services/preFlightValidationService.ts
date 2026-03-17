@@ -308,15 +308,55 @@ function validateCourses(
 ): ValidationItem[] {
     const items: ValidationItem[] = [];
 
+    const scheduledMatches = matches.filter(m => m.status !== 'cancelled');
+    const matchesWithCourses = scheduledMatches.filter(m => m.courseId);
+    const matchesMissingCourse = scheduledMatches.filter(m => !m.courseId);
+    const matchesMissingTeeSet = scheduledMatches.filter(m => m.courseId && !m.teeSetId);
+    const matchesWithInvalidTeeSet = scheduledMatches.filter(m => {
+        if (!m.teeSetId) return false;
+        const teeSet = teeSets.find(ts => ts.id === m.teeSetId);
+        if (!teeSet) return true;
+        return Boolean(m.courseId && teeSet.courseId !== m.courseId);
+    });
+
     // Check if any sessions use courses
-    const matchesWithCourses = matches.filter(m => m.courseId);
     if (matchesWithCourses.length === 0 && sessions.length > 0) {
         items.push(createValidation(
             'courses',
             'warning',
             'No courses assigned to matches',
             'Assign courses to enable handicap calculations.',
-            { actionLabel: 'Add Course', actionHref: '/courses' }
+            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+        ));
+    }
+
+    if (matchesMissingCourse.length > 0) {
+        items.push(createValidation(
+            'courses',
+            'warning',
+            `${matchesMissingCourse.length} match(es) missing a course`,
+            'Set the course on each match so the scoring card and handicap inputs use the right routing.',
+            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+        ));
+    }
+
+    if (matchesMissingTeeSet.length > 0) {
+        items.push(createValidation(
+            'courses',
+            'warning',
+            `${matchesMissingTeeSet.length} match(es) missing a tee set`,
+            'Choose the tee set on the match so handicap calculations use the correct rating and slope.',
+            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+        ));
+    }
+
+    if (matchesWithInvalidTeeSet.length > 0) {
+        items.push(createValidation(
+            'courses',
+            'error',
+            `${matchesWithInvalidTeeSet.length} match(es) have invalid course / tee setup`,
+            'At least one match references a tee set that is missing or belongs to another course.',
+            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
         ));
     }
 

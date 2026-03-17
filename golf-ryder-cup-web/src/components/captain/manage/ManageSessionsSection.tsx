@@ -187,7 +187,7 @@ export function SessionManagementCard({
                   Live pairings and allowances
                 </h4>
                 <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
-                  Make quick corrections without leaving the management surface.
+                  Edit a match here to assign its course and tee set before handicap-based scoring starts.
                 </p>
               </div>
 
@@ -357,6 +357,7 @@ function MatchManagementCard({
   const teamBNames = getPlayerNames(match.teamBPlayerIds);
   const selectedCourse = courseId ? courses.find((course) => course.id === courseId) : undefined;
   const selectedTeeSet = teeSetId ? teeSets.find((teeSet) => teeSet.id === teeSetId) : undefined;
+  const needsCourseSetup = !selectedCourse || !selectedTeeSet;
   const availableTeeSets = courseId
     ? teeSets
         .filter((teeSet) => teeSet.courseId === courseId)
@@ -549,6 +550,28 @@ function MatchManagementCard({
                 </span>
               </div>
             </div>
+
+            {needsCourseSetup ? (
+              <div className="rounded-[1rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 px-[var(--space-3)] py-[var(--space-3)]">
+                <div className="flex items-start justify-between gap-[var(--space-3)]">
+                  <div>
+                    <p className="type-meta font-semibold text-[var(--warning)]">
+                      Course setup needed
+                    </p>
+                    <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                      Set the course and tee set here so handicap calculations use the right card.
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={onEdit}
+                    className="shrink-0"
+                  >
+                    Set course & tee
+                  </Button>
+                </div>
+              </div>
+            ) : null}
 
             <div className="rounded-[1rem] border border-[color:var(--team-usa)]/16 bg-[color:var(--team-usa)]/8 px-[var(--space-3)] py-[var(--space-3)]">
               <div className="flex items-center justify-between gap-[var(--space-3)]">
