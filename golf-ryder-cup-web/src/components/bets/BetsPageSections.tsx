@@ -270,6 +270,7 @@ export function BetComposerModal({
   onParticipantToggle,
   onNassauPlayerToggle,
   onSubmit,
+  matchScopeMode = 'flexible',
 }: {
   matches: Match[];
   players: Player[];
@@ -291,6 +292,7 @@ export function BetComposerModal({
   onParticipantToggle: (playerId: string) => void;
   onNassauPlayerToggle: (team: 'A' | 'B', playerId: string) => void;
   onSubmit: () => void;
+  matchScopeMode?: 'flexible' | 'match-only';
 }) {
   return (
     <div
@@ -379,7 +381,17 @@ export function BetComposerModal({
             )}
           </div>
 
-          {newBetType !== 'nassau' ? (
+          {newBetType !== 'nassau' && matchScopeMode === 'match-only' && selectedMatch ? (
+            <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
+              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Scope</p>
+              <div className="mt-[var(--space-3)] rounded-[1.15rem] border border-[var(--maroon)] bg-[color:var(--maroon)]/6 px-[var(--space-4)] py-[var(--space-3)]">
+                <p className="font-semibold text-[var(--ink)]">Match #{selectedMatch.matchOrder}</p>
+                <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">
+                  This inside game is attached to the players in the current match.
+                </p>
+              </div>
+            </div>
+          ) : newBetType !== 'nassau' ? (
             <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Scope</p>
               <div className="mt-[var(--space-3)] grid gap-2">
@@ -443,7 +455,7 @@ export function BetComposerModal({
                 </SelectionGroup>
               </div>
             </div>
-          ) : !selectedMatch ? (
+          ) : !selectedMatch && matchScopeMode !== 'match-only' ? (
             <div className="rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-3)]">
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Participants</p>
               <div className="mt-[var(--space-3)] flex flex-wrap gap-2">

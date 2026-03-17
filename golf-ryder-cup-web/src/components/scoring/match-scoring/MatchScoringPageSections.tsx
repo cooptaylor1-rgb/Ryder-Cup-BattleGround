@@ -107,6 +107,7 @@ export function MatchScoringUnavailableState({
 
 interface MatchScoringPageSectionsProps {
   matchId: string;
+  currentTripId?: string;
   matchOrder: number;
   matchState: MatchState;
   currentHole: number;
@@ -139,6 +140,7 @@ interface MatchScoringPageSectionsProps {
 
 export function MatchScoringPageSections({
   matchId,
+  currentTripId,
   matchOrder,
   matchState,
   currentHole,
@@ -294,9 +296,13 @@ export function MatchScoringPageSections({
             holeHandicaps={model.holeHandicaps}
             presses={presses}
             activeSideBets={model.activeSideBets}
-            currentPlayerIdForBets={model.teamAPlayers[0]?.id}
+            activeMatchSideBets={model.activeMatchSideBets}
+            currentTripId={currentTripId}
+            currentPlayerIdForBets={model.currentUserPlayerId}
             teamAFourballPlayers={model.teamAFourballPlayers}
             teamBFourballPlayers={model.teamBFourballPlayers}
+            teamAPlayers={model.teamAPlayers}
+            teamBPlayers={model.teamBPlayers}
             onFinishEditing={() => ui.setIsEditingScores(false)}
             onPrevHole={onPrevHole}
             onNextHole={onNextHole}

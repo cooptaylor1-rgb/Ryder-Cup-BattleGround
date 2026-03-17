@@ -11,7 +11,7 @@ import {
 } from '@/components/scoring';
 import { SideBetReminder, type SideBet as ReminderSideBet } from '@/components/live-play';
 import type { MatchState } from '@/lib/types/computed';
-import type { HoleResult, HoleWinner, PlayerHoleScore } from '@/lib/types/models';
+import type { HoleResult, HoleWinner, Player, PlayerHoleScore, SideBet } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
 import {
   QuickScoreTile,
@@ -20,6 +20,7 @@ import {
   type ScoringMode,
   type ScoringModeMeta,
 } from './matchScoringShared';
+import { MatchInsideGamesPanel } from './MatchInsideGamesPanel';
 
 interface FourballPlayer {
   id: string;
@@ -56,9 +57,13 @@ interface MatchScoringActiveStateProps {
   holeHandicaps: number[];
   presses: Press[];
   activeSideBets: ReminderSideBet[];
+  activeMatchSideBets: SideBet[];
+  currentTripId?: string;
   currentPlayerIdForBets?: string;
   teamAFourballPlayers: FourballPlayer[];
   teamBFourballPlayers: FourballPlayer[];
+  teamAPlayers: Player[];
+  teamBPlayers: Player[];
   onFinishEditing: () => void;
   onPrevHole: () => void;
   onNextHole: () => void;
@@ -112,9 +117,13 @@ export function MatchScoringActiveState({
   holeHandicaps,
   presses,
   activeSideBets,
+  activeMatchSideBets,
+  currentTripId,
   currentPlayerIdForBets,
   teamAFourballPlayers,
   teamBFourballPlayers,
+  teamAPlayers,
+  teamBPlayers,
   onFinishEditing,
   onPrevHole,
   onNextHole,
@@ -525,6 +534,18 @@ export function MatchScoringActiveState({
               betAmount={10}
               autoPress={false}
             />
+
+            {currentTripId ? (
+              <MatchInsideGamesPanel
+                tripId={currentTripId}
+                match={matchState.match}
+                teamAName={teamAName}
+                teamBName={teamBName}
+                teamAPlayers={teamAPlayers}
+                teamBPlayers={teamBPlayers}
+                sideBets={activeMatchSideBets}
+              />
+            ) : null}
 
             <SideBetReminder
               currentHole={currentHole}

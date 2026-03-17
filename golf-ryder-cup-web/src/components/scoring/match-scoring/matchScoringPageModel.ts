@@ -10,6 +10,7 @@ import type {
   Match,
   Player,
   RyderCupSession,
+  SideBet,
   Team,
   TeeSet,
   Trip,
@@ -37,8 +38,10 @@ export const DEFAULT_HOLE_HANDICAPS = [
 
 export interface MatchScoringPageModel {
   activeSideBets: ReminderSideBet[];
+  activeMatchSideBets: SideBet[];
   actorName: string;
   currentCourse?: Course;
+  currentUserPlayerId?: string;
   currentSession?: RyderCupSession;
   currentTeeSet?: TeeSet;
   currentHoleResult?: MatchState['holeResults'][number];
@@ -108,6 +111,24 @@ function buildLineup(players: Player[]): string {
     .join(' & ');
 }
 
+function resolveCurrentUserPlayer(players: Player[], currentUser: UserProfile | null) {
+  if (!currentUser) return undefined;
+
+  return players.find((player) => {
+    const playerEmail = player.email?.toLowerCase();
+    const userEmail = currentUser.email?.toLowerCase();
+    if (playerEmail && userEmail && playerEmail === userEmail) return true;
+
+    const playerFirst = (player.firstName ?? '').toLowerCase();
+    const playerLast = (player.lastName ?? '').toLowerCase();
+    const userFirst = (currentUser.firstName ?? '').toLowerCase();
+    const userLast = (currentUser.lastName ?? '').toLowerCase();
+
+    if (!playerFirst || !playerLast || !userFirst || !userLast) return false;
+    return playerFirst === userFirst && playerLast === userLast;
+  });
+}
+
 export function normalizeScoringMode(mode: ScoringMode, isFourball: boolean): ScoringMode {
   if (isFourball) {
     return mode === 'strokes' ? 'fourball' : mode;
@@ -148,9 +169,44 @@ export function useMatchScoringPageModel(
     []
   );
 
+  const currentUserPlayer = useMemo(
+    () => resolveCurrentUserPlayer(players, currentUser),
+    [players, currentUser]
+  );
+
+  const activeMatchParticipantIds = useMemo(
+    () =>
+      activeMatch
+        ? new Set([...activeMatch.teamAPlayerIds, ...activeMatch.teamBPlayerIds])
+        : new Set<string>(),
+    [activeMatch]
+  );
+
+  const activeMatchSideBets = useMemo(
+    () =>
+      (dbSideBets ?? [])
+        .filter((bet) => {
+          if (!activeMatch) return false;
+          return bet.matchId === activeMatch.id;
+        })
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
+    [activeMatch, dbSideBets]
+  );
+
   const activeSideBets = useMemo(
-    () => (dbSideBets ?? []).filter((bet) => bet.status === 'active').map(toReminderBet),
-    [dbSideBets]
+    () =>
+      (dbSideBets ?? [])
+        .filter((bet) => {
+          if (!activeMatch) return false;
+          if (bet.status !== 'active') return false;
+          if (bet.matchId === activeMatch.id) return true;
+          return (
+            !bet.matchId &&
+            bet.participantIds.some((participantId) => activeMatchParticipantIds.has(participantId))
+          );
+        })
+        .map(toReminderBet),
+    [activeMatch, activeMatchParticipantIds, dbSideBets]
   );
 
   const currentTeeSet = activeMatch?.teeSetId
@@ -290,8 +346,10 @@ export function useMatchScoringPageModel(
 
   return {
     activeSideBets,
+    activeMatchSideBets,
     actorName,
     currentCourse,
+    currentUserPlayerId: currentUserPlayer?.id,
     currentSession,
     currentTeeSet,
     currentHoleResult,

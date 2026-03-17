@@ -175,6 +175,7 @@ export default function MatchScoringPageClient() {
   return (
     <MatchScoringPageSections
       matchId={matchId}
+      currentTripId={currentTrip?.id}
       matchOrder={activeMatch.matchOrder}
       matchState={matchState}
       currentHole={currentHole}

@@ -10,6 +10,11 @@ import { EmptyStatePremium } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
+import {
+  buildCustomSideBet,
+  buildNassauSideBet,
+  buildQuickSideBet,
+} from '@/lib/services/sideBetService';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { Match, SideBet, SideBetType } from '@/lib/types/models';
 import { Calculator, Check, Clock, DollarSign, Flag, Home, Plus, Trophy } from 'lucide-react';
@@ -130,18 +135,11 @@ export default function BetsPageClient() {
     }
 
     const definition = getSideBetDefinition(type);
-    const newBet: SideBet = {
-      id: crypto.randomUUID(),
+    const newBet = buildQuickSideBet({
       tripId: currentTrip.id,
       type,
-      name: definition.label,
-      description: definition.description,
-      status: 'active',
-      pot: definition.defaultPot,
-      perHole: definition.defaultPerHole,
-      participantIds: players.map((player) => player.id),
-      createdAt: new Date().toISOString(),
-    };
+      participants: players,
+    });
 
     try {
       setIsSubmitting(true);
@@ -196,29 +194,18 @@ export default function BetsPageClient() {
           return;
         }
 
-        const teamANames = nassauTeamA
-          .map((id) => playerById.get(id)?.lastName || playerById.get(id)?.firstName)
-          .filter(Boolean)
-          .join(' & ');
-        const teamBNames = nassauTeamB
-          .map((id) => playerById.get(id)?.lastName || playerById.get(id)?.firstName)
-          .filter(Boolean)
-          .join(' & ');
-
-        const newBet: SideBet = {
-          id: crypto.randomUUID(),
+        const newBet = buildNassauSideBet({
           tripId: currentTrip.id,
-          type: 'nassau',
           name,
-          description: `${teamANames} vs ${teamBNames}`,
-          status: 'active',
           pot: parseInt(newBetPot, 10) || definition.defaultPot,
-          participantIds: [...nassauTeamA, ...nassauTeamB],
-          nassauTeamA,
-          nassauTeamB,
-          nassauResults: {},
-          createdAt: new Date().toISOString(),
-        };
+          match: selectedMatch,
+          teamAPlayers: nassauTeamA
+            .map((id) => playerById.get(id))
+            .filter(Boolean) as typeof players,
+          teamBPlayers: nassauTeamB
+            .map((id) => playerById.get(id))
+            .filter(Boolean) as typeof players,
+        });
 
         await db.sideBets.add(newBet);
         showToast('success', `${name} created`);
@@ -236,24 +223,20 @@ export default function BetsPageClient() {
         return;
       }
 
-      const newBet: SideBet = {
-        id: crypto.randomUUID(),
+      const newBet = buildCustomSideBet({
         tripId: currentTrip.id,
-        matchId: selectedMatch?.id,
         type: newBetType,
         name,
-        description: selectedMatch
-          ? `Inside game for Match #${selectedMatch.matchOrder}`
-          : definition.description,
-        status: 'active',
         pot: parseInt(newBetPot, 10) || definition.defaultPot,
         perHole:
           newBetType === 'skins'
             ? parseInt(newBetPerHole, 10) || definition.defaultPerHole
             : undefined,
-        participantIds,
-        createdAt: new Date().toISOString(),
-      };
+        participants: participantIds
+          .map((id) => playerById.get(id))
+          .filter(Boolean) as typeof players,
+        match: selectedMatch,
+      });
 
       await db.sideBets.add(newBet);
       showToast('success', `${name} created`);
