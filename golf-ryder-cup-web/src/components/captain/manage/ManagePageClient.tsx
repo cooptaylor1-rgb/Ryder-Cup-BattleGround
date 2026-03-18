@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CalendarDays,
+  Map,
   Plus,
   Settings,
   Shield,
@@ -293,7 +294,7 @@ export function ManagePageClient() {
                 </div>
               </div>
 
-              <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+              <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
                 <Link
                   href="/lineup/new?mode=session"
                   className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
@@ -302,12 +303,27 @@ export function ManagePageClient() {
                   New Session
                 </Link>
                 <Link
+                  href="/courses"
+                  className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--gold)]/22 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
+                >
+                  <Map size={16} />
+                  Course Library
+                </Link>
+                <Link
                   href="/captain/draft"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--gold)]/22 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
                 >
                   <Trophy size={16} />
                   Open Draft Room
                 </Link>
+              </div>
+
+              <div className="rounded-[1.2rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 px-[var(--space-4)] py-[var(--space-4)]">
+                <p className="type-meta font-semibold text-[var(--ink)]">How course setup works</p>
+                <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                  Add or import the course in the Course Library first. Then expand a session below
+                  and use a match card&apos;s <span className="font-semibold text-[var(--ink)]">Set course &amp; tee</span> action.
+                </p>
               </div>
             </div>
           </div>

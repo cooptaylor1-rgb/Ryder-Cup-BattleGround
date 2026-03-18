@@ -134,7 +134,7 @@ function createTeeSet(overrides: Partial<TeeSet> = {}): TeeSet {
 }
 
 describe('preFlightValidationService', () => {
-  it('flags matches missing course and tee assignments with manage actions', () => {
+  it('routes captains to the course library when no course data exists yet', () => {
     const result = runPreFlightCheck(
       createTrip(),
       createPlayers(),
@@ -146,11 +146,20 @@ describe('preFlightValidationService', () => {
       []
     );
 
-    expect(result.warnings.some((item) => item.title.includes('missing a course'))).toBe(true);
-    expect(result.warnings.some((item) => item.title.includes('No courses assigned to matches'))).toBe(true);
     expect(
-      result.warnings.every((item) =>
-        item.category !== 'courses' || item.actionHref === '/captain/manage' || item.actionHref === '/courses'
+      result.warnings.some(
+        (item) =>
+          item.title.includes('No courses assigned to matches') &&
+          item.actionHref === '/courses' &&
+          item.actionLabel === 'Add Course Library'
+      )
+    ).toBe(true);
+    expect(
+      result.warnings.some(
+        (item) =>
+          item.title.includes('missing a course') &&
+          item.actionHref === '/courses' &&
+          item.actionLabel === 'Add Course Library'
       )
     ).toBe(true);
   });
@@ -167,7 +176,14 @@ describe('preFlightValidationService', () => {
       [createTeeSet()]
     );
 
-    expect(result.warnings.some((item) => item.title.includes('missing a tee set'))).toBe(true);
+    expect(
+      result.warnings.some(
+        (item) =>
+          item.title.includes('missing a tee set') &&
+          item.actionHref === '/captain/manage' &&
+          item.actionLabel === 'Assign Tee Set'
+      )
+    ).toBe(true);
   });
 
   it('errors when a match references an invalid tee set for the course', () => {
@@ -183,5 +199,27 @@ describe('preFlightValidationService', () => {
     );
 
     expect(result.errors.some((item) => item.title.includes('invalid course / tee setup'))).toBe(true);
+  });
+
+  it('keeps course assignment issues on the manage screen once the library exists', () => {
+    const result = runPreFlightCheck(
+      createTrip(),
+      createPlayers(),
+      createTeams(),
+      createTeamMembers(),
+      [createSession()],
+      [createMatch()],
+      [createCourse()],
+      [createTeeSet()]
+    );
+
+    expect(
+      result.warnings.some(
+        (item) =>
+          item.title.includes('missing a course') &&
+          item.actionHref === '/captain/manage' &&
+          item.actionLabel === 'Assign Course'
+      )
+    ).toBe(true);
   });
 });

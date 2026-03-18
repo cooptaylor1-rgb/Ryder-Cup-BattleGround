@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { PreFlightChecklist } from '@/components/captain';
 import {
   CaptainModeRequiredState,
@@ -27,16 +26,65 @@ export default function ChecklistPage() {
   const router = useRouter();
   const { currentTrip, players, teams, teamMembers, sessions, courses, teeSets } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [matchesLoadError, setMatchesLoadError] = useState<string | null>(null);
+  const currentTripId = currentTrip?.id;
 
-  const matches = useLiveQuery(
-    async () => {
-      if (!currentTrip || sessions.length === 0) return [] as Match[];
-      const sessionIds = sessions.map((session) => session.id);
-      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
-    },
-    [currentTrip?.id, sessions.map((session) => session.id).join('|')],
-    [] as Match[]
+  const sessionIdsKey = useMemo(
+    () =>
+      sessions
+        .map((session) => session.id)
+        .sort()
+        .join('|'),
+    [sessions]
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMatches() {
+      if (!currentTripId || sessions.length === 0) {
+        if (!cancelled) {
+          setMatches([]);
+          setMatchesLoadError(null);
+        }
+        return;
+      }
+
+      try {
+        // Pulling the table then filtering in memory is slower than an indexed query,
+        // but this page is tiny and it avoids route-killing Dexie query failures.
+        const sessionIds = new Set(sessions.map((session) => session.id));
+        const allMatches = await db.matches.toArray();
+        const nextMatches = allMatches
+          .filter((match) => sessionIds.has(match.sessionId))
+          .sort((a, b) => {
+            if (a.sessionId === b.sessionId) {
+              return a.matchOrder - b.matchOrder;
+            }
+            return a.sessionId.localeCompare(b.sessionId);
+          });
+
+        if (!cancelled) {
+          setMatches(nextMatches);
+          setMatchesLoadError(null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setMatches([]);
+          setMatchesLoadError(
+            error instanceof Error ? error.message : 'Failed to load matches for the checklist.'
+          );
+        }
+      }
+    }
+
+    void loadMatches();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentTripId, sessionIdsKey, sessions]);
 
   const handleAllClear = () => {
     showToast('success', 'All systems go! Ready to play.');
@@ -78,11 +126,25 @@ export default function ChecklistPage() {
                   Open manage
                 </Button>
                 <Link
+                  href="/courses"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--gold)]/28 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-transform duration-150 hover:scale-[1.02] hover:border-[color:var(--gold)]/42 hover:bg-[color:var(--gold)]/14"
+                >
+                  Add or import courses
+                </Link>
+                <Link
                   href="/players"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--rule)]/55 bg-[color:var(--surface)]/78 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-transform duration-150 hover:scale-[1.02] hover:border-[var(--maroon-subtle)] hover:bg-[var(--surface)]"
                 >
                   Review roster
                 </Link>
+              </div>
+
+              <div className="mt-[var(--space-4)] rounded-[1.2rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/76 px-[var(--space-4)] py-[var(--space-4)]">
+                <p className="type-meta font-semibold text-[var(--ink)]">Course setup path</p>
+                <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                  First build or import the course in the library. Then open Manage Trip and use
+                  each match card&apos;s <span className="font-semibold text-[var(--ink)]">Set course &amp; tee</span> action.
+                </p>
               </div>
             </div>
 
@@ -108,6 +170,15 @@ export default function ChecklistPage() {
                 Check the routing before the day starts moving.
               </h2>
             </div>
+
+            {matchesLoadError ? (
+              <div className="mb-[var(--space-4)] rounded-[1.25rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 px-[var(--space-4)] py-[var(--space-4)]">
+                <p className="type-meta font-semibold text-[var(--warning)]">Match board loaded with a fallback query</p>
+                <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                  The direct match lookup failed once on this device, so the checklist fell back to a safer load path instead of crashing the captain room.
+                </p>
+              </div>
+            ) : null}
 
             <PreFlightChecklist
               tripId={currentTrip.id}
@@ -139,7 +210,8 @@ export default function ChecklistPage() {
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Fixes</p>
               <div className="mt-[var(--space-4)] space-y-3">
                 <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
-                <QuickFixLink href="/captain/manage" icon={<Map size={18} />} title="Set Courses & Tees" body="Assign the course card used for handicap calculations." />
+                <QuickFixLink href="/courses" icon={<Map size={18} />} title="Add or Import Courses" body="Build the course library and tee sets first." />
+                <QuickFixLink href="/captain/manage" icon={<Shield size={18} />} title="Assign Match Courses" body="Use each match card to set the course and tee used for handicaps." />
                 <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Command" body="Return to the main board." />
               </div>
             </div>

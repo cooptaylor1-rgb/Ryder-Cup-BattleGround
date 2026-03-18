@@ -326,7 +326,10 @@ function validateCourses(
             'warning',
             'No courses assigned to matches',
             'Assign courses to enable handicap calculations.',
-            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+            {
+                actionLabel: courses.length === 0 ? 'Add Course Library' : 'Assign Matches',
+                actionHref: courses.length === 0 ? '/courses' : '/captain/manage',
+            }
         ));
     }
 
@@ -336,7 +339,10 @@ function validateCourses(
             'warning',
             `${matchesMissingCourse.length} match(es) missing a course`,
             'Set the course on each match so the scoring card and handicap inputs use the right routing.',
-            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+            {
+                actionLabel: courses.length === 0 ? 'Add Course Library' : 'Assign Course',
+                actionHref: courses.length === 0 ? '/courses' : '/captain/manage',
+            }
         ));
     }
 
@@ -346,7 +352,10 @@ function validateCourses(
             'warning',
             `${matchesMissingTeeSet.length} match(es) missing a tee set`,
             'Choose the tee set on the match so handicap calculations use the correct rating and slope.',
-            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+            {
+                actionLabel: teeSets.length === 0 ? 'Add Tee Sets' : 'Assign Tee Set',
+                actionHref: teeSets.length === 0 ? '/courses' : '/captain/manage',
+            }
         ));
     }
 

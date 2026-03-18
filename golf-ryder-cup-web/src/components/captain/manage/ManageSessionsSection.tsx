@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import {
   CheckCircle2,
@@ -559,16 +560,29 @@ function MatchManagementCard({
                       Course setup needed
                     </p>
                     <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
-                      Set the course and tee set here so handicap calculations use the right card.
+                      {courses.length === 0
+                        ? 'Start by adding or importing the course into the library, then assign it here.'
+                        : selectedCourse && availableTeeSets.length === 0
+                          ? 'This course has no tee sets yet. Add them in the library, then return here to assign one.'
+                          : 'Set the course and tee set here so handicap calculations use the right card.'}
                     </p>
                   </div>
-                  <Button
-                    variant="secondary"
-                    onClick={onEdit}
-                    className="shrink-0"
-                  >
-                    Set course & tee
-                  </Button>
+                  <div className="flex shrink-0 flex-col gap-[var(--space-2)] sm:flex-row">
+                    <Button
+                      variant="secondary"
+                      onClick={onEdit}
+                    >
+                      Set course & tee
+                    </Button>
+                    {(courses.length === 0 || (selectedCourse && availableTeeSets.length === 0)) ? (
+                      <Link
+                        href="/courses"
+                        className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--gold)]/24 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
+                      >
+                        Open course library
+                      </Link>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ) : null}
