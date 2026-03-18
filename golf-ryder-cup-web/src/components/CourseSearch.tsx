@@ -249,7 +249,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                     )}
                     {selectedCourse.website && (
                         <a
-                            href={selectedCourse.website}
+                            href={selectedCourse.sourcePageUrl || selectedCourse.website}
                             target="_blank"
                             rel="noreferrer"
                             className="mt-3 inline-flex text-sm font-medium text-[var(--masters)] hover:underline"

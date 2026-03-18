@@ -6,6 +6,12 @@ const { addRateLimitHeadersMock, applyRateLimitAsyncMock } = vi.hoisted(() => ({
   applyRateLimitAsyncMock: vi.fn<() => Promise<NextResponse | null>>(async () => null),
 }));
 
+const { pdfState } = vi.hoisted(() => ({
+  pdfState: {
+    pages: [] as Array<Array<{ str: string; transform: number[]; width?: number; height?: number }>>,
+  },
+}));
+
 vi.mock('@/lib/utils/apiMiddleware', async () => {
   const actual = await vi.importActual<typeof import('@/lib/utils/apiMiddleware')>(
     '@/lib/utils/apiMiddleware'
@@ -16,6 +22,20 @@ vi.mock('@/lib/utils/apiMiddleware', async () => {
     applyRateLimitAsync: applyRateLimitAsyncMock,
   };
 });
+
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
+  getDocument: vi.fn(() => ({
+    promise: Promise.resolve({
+      numPages: pdfState.pages.length,
+      getPage: async (pageNumber: number) => ({
+        getTextContent: async () => ({
+          items: pdfState.pages[pageNumber - 1] || [],
+        }),
+      }),
+    }),
+    destroy: vi.fn(async () => undefined),
+  })),
+}));
 
 import { GET as searchCourses } from '@/app/api/golf-courses/search/route';
 import { GET as getCourseDetails } from '@/app/api/golf-courses/[courseId]/route';
@@ -41,6 +61,7 @@ describe('Golf Course Routes', () => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
     applyRateLimitAsyncMock.mockResolvedValue(null);
+    pdfState.pages = [];
   });
 
   afterEach(() => {
@@ -213,6 +234,84 @@ describe('Golf Course Routes', () => {
         rating: 73.2,
         slope: 138,
         totalYardage: 6642,
+      });
+    });
+
+    it('follows linked scorecard pdfs and extracts playable tee data', async () => {
+      pdfState.pages = [
+        [
+          { str: 'ROOST', transform: [1, 0, 0, 1, 100, 800] },
+          { str: 'BLACK', transform: [1, 0, 0, 1, 100, 700] },
+          { str: '76.1', transform: [1, 0, 0, 1, 220, 700] },
+          { str: '/', transform: [1, 0, 0, 1, 250, 700] },
+          { str: '143', transform: [1, 0, 0, 1, 270, 700] },
+          { str: 'GREEN', transform: [1, 0, 0, 1, 100, 680] },
+          { str: '73.7', transform: [1, 0, 0, 1, 220, 680] },
+          { str: '/', transform: [1, 0, 0, 1, 250, 680] },
+          { str: '137', transform: [1, 0, 0, 1, 270, 680] },
+        ],
+        Array.from({ length: 18 }, (_, index) => {
+          const holeNumber = index + 1;
+          const y = 700 - index * 20;
+          return [
+            { str: String(holeNumber), transform: [1, 0, 0, 1, 20, y] },
+            { str: String(430 + index), transform: [1, 0, 0, 1, 60, y] },
+            { str: String(395 + index), transform: [1, 0, 0, 1, 110, y] },
+            { str: holeNumber % 4 === 0 ? '5' : holeNumber % 3 === 0 ? '3' : '4', transform: [1, 0, 0, 1, 160, y] },
+            { str: String(holeNumber), transform: [1, 0, 0, 1, 200, y] },
+            { str: String(19 - holeNumber), transform: [1, 0, 0, 1, 230, y] },
+          ];
+        }).flat(),
+      ];
+
+      const fetchMock = vi.spyOn(globalThis, 'fetch');
+      fetchMock
+        .mockResolvedValueOnce({
+          ok: true,
+          headers: new Headers({ 'content-type': 'text/html' }),
+          text: async () => `
+            <html>
+              <head>
+                <title>Roost | Cabot Citrus Farms</title>
+              </head>
+              <body>
+                <a href="/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf">View Scorecard</a>
+              </body>
+            </html>
+          `,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          headers: new Headers({ 'content-type': 'application/pdf' }),
+          arrayBuffer: async () => new ArrayBuffer(16),
+        } as Response);
+
+      const response = await getCourseDetails(
+        new NextRequest(
+          'http://localhost:3000/api/golf-courses/web-roost?website=https%3A%2F%2Fcabot.com%2Fcitrusfarms%2Fgolf%2Froost%2F&title=Roost'
+        ),
+        {
+          params: Promise.resolve({ courseId: 'web-roost' }),
+        }
+      );
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.data.source).toBe('web-extracted');
+      expect(data.data.sourcePageUrl).toBe('https://cabot.com/citrusfarms/golf/roost/');
+      expect(data.data.teeSets).toHaveLength(2);
+      expect(data.data.teeSets[0]).toMatchObject({
+        name: 'Black',
+        rating: 76.1,
+        slope: 143,
+      });
+      expect(data.data.teeSets[0].yardages).toHaveLength(18);
+      expect(data.data.holes).toHaveLength(18);
+      expect(data.data.holes[0]).toMatchObject({
+        par: 4,
+        handicap: 1,
+        yardage: 430,
       });
     });
   });

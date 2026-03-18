@@ -64,8 +64,15 @@ interface ExtractedCourseProfile {
     phone?: string;
     website?: string;
     description?: string;
+    sourcePageUrl?: string;
     holes: HoleData[];
     teeSets: TeeSetData[];
+}
+
+interface LinkedCourseAsset {
+    url: string;
+    label: string;
+    kind: 'scorecard' | 'page';
 }
 
 export async function GET(
@@ -273,38 +280,49 @@ async function extractFromWebProfile({
         const structuredRecords = extractJsonLdRecords(html);
         const meta = extractMetaTags(html);
         const pageText = extractPageText(html);
+        const linkedAssetProfile = await extractLinkedCourseAssetProfile(html, website);
 
         const structuredProfile = buildProfileFromStructuredData(structuredRecords);
         const heuristicProfile = buildProfileFromPageSignals(pageText, html);
 
         const holes = coerceHoles(
-            structuredProfile.holes.length > 0 ? structuredProfile.holes : heuristicProfile.holes
+            linkedAssetProfile.holes.length > 0
+                ? linkedAssetProfile.holes
+                : structuredProfile.holes.length > 0
+                  ? structuredProfile.holes
+                  : heuristicProfile.holes
         );
         const teeSets = coerceTeeSets(
-            structuredProfile.teeSets.length > 0 ? structuredProfile.teeSets : heuristicProfile.teeSets
+            linkedAssetProfile.teeSets.length > 0
+                ? linkedAssetProfile.teeSets
+                : structuredProfile.teeSets.length > 0
+                  ? structuredProfile.teeSets
+                  : heuristicProfile.teeSets
         );
 
         return {
             id: courseId,
             name:
+                linkedAssetProfile.name ||
                 structuredProfile.name ||
                 heuristicProfile.name ||
                 meta.ogTitle ||
                 meta.title ||
                 titleHint ||
                 'Unknown Course',
-            address: structuredProfile.address || heuristicProfile.address,
-            city: structuredProfile.city || heuristicProfile.city,
-            state: structuredProfile.state || heuristicProfile.state,
-            country: structuredProfile.country || heuristicProfile.country,
-            phone: structuredProfile.phone || heuristicProfile.phone,
+            address: linkedAssetProfile.address || structuredProfile.address || heuristicProfile.address,
+            city: linkedAssetProfile.city || structuredProfile.city || heuristicProfile.city,
+            state: linkedAssetProfile.state || structuredProfile.state || heuristicProfile.state,
+            country: linkedAssetProfile.country || structuredProfile.country || heuristicProfile.country,
+            phone: linkedAssetProfile.phone || structuredProfile.phone || heuristicProfile.phone,
             website: structuredProfile.website || meta.canonical || website,
             description:
+                linkedAssetProfile.description ||
                 structuredProfile.description ||
                 heuristicProfile.description ||
                 meta.description ||
                 descriptionHint,
-            sourcePageUrl: website,
+            sourcePageUrl: linkedAssetProfile.sourcePageUrl || website,
             holes,
             teeSets,
             source: teeSets.length > 0 || holes.some((hole) => hole.yardage !== null) ? 'web-extracted' : 'web-profile',
@@ -313,6 +331,400 @@ async function extractFromWebProfile({
         apiLogger.error('Web profile extraction error:', { website, error });
         return null;
     }
+}
+
+async function extractLinkedCourseAssetProfile(
+    html: string,
+    baseUrl: string
+): Promise<ExtractedCourseProfile> {
+    const assets = extractLinkedCourseAssets(html, baseUrl);
+
+    for (const asset of assets) {
+        if (asset.kind === 'scorecard') {
+            const pdfProfile = await extractProfileFromPdfAsset(asset.url, baseUrl);
+            if (pdfProfile.teeSets.length > 0 || pdfProfile.holes.length > 0) {
+                return pdfProfile;
+            }
+            continue;
+        }
+
+        const nestedProfile = await extractProfileFromLinkedPage(asset.url, baseUrl);
+        if (nestedProfile.teeSets.length > 0 || nestedProfile.holes.length > 0) {
+            return nestedProfile;
+        }
+    }
+
+    return {
+        holes: [],
+        teeSets: [],
+    };
+}
+
+function extractLinkedCourseAssets(html: string, baseUrl: string): LinkedCourseAsset[] {
+    const matches = html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi);
+    const seen = new Set<string>();
+    const assets: Array<LinkedCourseAsset & { score: number }> = [];
+
+    for (const match of matches) {
+        const href = decodeHtml(match[1] || '').trim();
+        const label = decodeHtml(stripTags(match[2] || '').replace(/\s+/g, ' ').trim());
+        const url = toAbsoluteHttpUrl(href, baseUrl);
+        if (!url || seen.has(url)) continue;
+        seen.add(url);
+
+        const haystack = `${label} ${href}`.toLowerCase();
+        const scorecardLike = /scorecard|score card|yardage|yardages|ratings?|slope/i.test(haystack);
+        const pdfLike = url.toLowerCase().includes('.pdf');
+        const pageLike = /course|golf|links|roost|karoo|squeeze|wedge/i.test(haystack);
+
+        if (!scorecardLike && !pdfLike && !pageLike) continue;
+
+        assets.push({
+            url,
+            label,
+            kind: scorecardLike || pdfLike ? 'scorecard' : 'page',
+            score: (scorecardLike ? 100 : 0) + (pdfLike ? 50 : 0) + (pageLike ? 10 : 0),
+        });
+    }
+
+    return assets
+        .sort((a, b) => b.score - a.score)
+        .map(({ score: _score, ...asset }) => asset);
+}
+
+function toAbsoluteHttpUrl(value: string, baseUrl: string): string | null {
+    if (!value || value.startsWith('#') || value.startsWith('mailto:') || value.startsWith('tel:')) {
+        return null;
+    }
+
+    try {
+        const absolute = new URL(value, baseUrl);
+        if (absolute.protocol !== 'http:' && absolute.protocol !== 'https:') {
+            return null;
+        }
+        return absolute.toString();
+    } catch {
+        return null;
+    }
+}
+
+async function extractProfileFromLinkedPage(
+    pageUrl: string,
+    baseUrl: string
+): Promise<ExtractedCourseProfile> {
+    try {
+        const response = await fetchWithTimeout(pageUrl, {
+            headers: {
+                'User-Agent': 'GolfRyderCupApp/1.0',
+                Accept: 'text/html,application/xhtml+xml',
+            },
+        });
+
+        if (!response.ok) {
+            return { holes: [], teeSets: [] };
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('pdf') || pageUrl.toLowerCase().endsWith('.pdf')) {
+            return extractProfileFromPdfAsset(pageUrl, baseUrl);
+        }
+
+        const html = await response.text();
+        const pageText = extractPageText(html);
+        const structuredProfile = buildProfileFromStructuredData(extractJsonLdRecords(html));
+        const heuristicProfile = buildProfileFromPageSignals(pageText, html);
+        const nestedAssetProfile = await extractLinkedCourseAssetProfile(html, pageUrl);
+
+        return {
+            name: structuredProfile.name || heuristicProfile.name,
+            address: structuredProfile.address || heuristicProfile.address,
+            city: structuredProfile.city || heuristicProfile.city,
+            state: structuredProfile.state || heuristicProfile.state,
+            country: structuredProfile.country || heuristicProfile.country,
+            phone: structuredProfile.phone || heuristicProfile.phone,
+            website: structuredProfile.website || pageUrl,
+            description: structuredProfile.description || heuristicProfile.description,
+            sourcePageUrl: nestedAssetProfile.sourcePageUrl || pageUrl,
+            holes:
+                nestedAssetProfile.holes.length > 0
+                    ? nestedAssetProfile.holes
+                    : structuredProfile.holes.length > 0
+                      ? structuredProfile.holes
+                      : heuristicProfile.holes,
+            teeSets:
+                nestedAssetProfile.teeSets.length > 0
+                    ? nestedAssetProfile.teeSets
+                    : structuredProfile.teeSets.length > 0
+                      ? structuredProfile.teeSets
+                      : heuristicProfile.teeSets,
+        };
+    } catch (error) {
+        apiLogger.error('Linked profile extraction error:', { pageUrl, error });
+        return { holes: [], teeSets: [] };
+    }
+}
+
+async function extractProfileFromPdfAsset(
+    pdfUrl: string,
+    baseUrl: string
+): Promise<ExtractedCourseProfile> {
+    try {
+        const response = await fetchWithTimeout(pdfUrl, {
+            headers: {
+                'User-Agent': 'GolfRyderCupApp/1.0',
+                Accept: 'application/pdf,*/*',
+            },
+        });
+
+        if (!response.ok) {
+            return { holes: [], teeSets: [] };
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('pdf') && !pdfUrl.toLowerCase().endsWith('.pdf')) {
+            return { holes: [], teeSets: [] };
+        }
+
+        const pdf = await extractPdfPages(await response.arrayBuffer());
+        const tees = extractTeeSetsFromPdfPages(pdf.pages);
+        const scorecard = extractScorecardFromPdfPages(pdf.pages, tees.length);
+
+        const teeSets = (tees.length > 0 ? tees : scorecard.teeSets).map((tee, index) => {
+            const yardages = scorecard.teeSets[index]?.yardages || tee.yardages || Array(18).fill(null);
+            const totalYardage = tee.totalYardage ?? sumYardages(yardages);
+
+            return {
+                ...tee,
+                yardages,
+                totalYardage: totalYardage > 0 ? totalYardage : undefined,
+            };
+        });
+
+        return {
+            name: pdf.courseName,
+            sourcePageUrl: baseUrl,
+            holes: scorecard.holes,
+            teeSets,
+        };
+    } catch (error) {
+        apiLogger.error('PDF scorecard extraction error:', { pdfUrl, error });
+        return { holes: [], teeSets: [] };
+    }
+}
+
+async function extractPdfPages(arrayBuffer: ArrayBuffer): Promise<{
+    courseName?: string;
+    pages: PdfTextItem[][];
+}> {
+    const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const task = getDocument({ data: new Uint8Array(arrayBuffer) });
+
+    try {
+        const pdf = await task.promise;
+        const pages: PdfTextItem[][] = [];
+        let courseName: string | undefined;
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+            const page = await pdf.getPage(pageNumber);
+            const content = await page.getTextContent();
+            const items = (content.items as Array<{
+                str?: string;
+                transform?: number[];
+                width?: number;
+                height?: number;
+            }>)
+                .map((item) => ({
+                    str: item.str?.trim() || '',
+                    x: item.transform?.[4] ?? 0,
+                    y: item.transform?.[5] ?? 0,
+                    width: item.width ?? 0,
+                    height: item.height ?? 0,
+                }))
+                .filter((item) => item.str.length > 0);
+
+            if (!courseName) {
+                courseName = inferCourseNameFromPdfItems(items);
+            }
+
+            pages.push(items);
+        }
+
+        return { courseName, pages };
+    } finally {
+        await task.destroy();
+    }
+}
+
+interface PdfTextItem {
+    str: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+interface PdfRow {
+    y: number;
+    items: PdfTextItem[];
+}
+
+function inferCourseNameFromPdfItems(items: PdfTextItem[]): string | undefined {
+    const candidates = items
+        .map((item) => item.str.trim())
+        .filter((value) => /^[A-Z][A-Z\s/&-]{2,}$/.test(value) && !/RATING|SLOPE|HANDICAP|TOTAL|SIGNED|ATTESTED/.test(value));
+
+    if (candidates.length === 0) return undefined;
+    const unique = Array.from(new Set(candidates));
+    return toTitleCase(unique[unique.length - 1]);
+}
+
+function extractTeeSetsFromPdfPages(pages: PdfTextItem[][]): TeeSetData[] {
+    for (const page of pages) {
+        const rows = groupPdfRows(page);
+        const teeRows = rows
+            .map((row) => normalizePdfRowText(row))
+            .map((text): TeeSetData | null => {
+                const match = text.match(/^([A-Z][A-Z /]+?)\s+(\d{2}\.\d)\s*\/\s*(\d{2,3})(?:\s+(\d{2}\.\d)\s*\/\s*(\d{2,3}))?$/);
+                if (!match) return null;
+
+                return {
+                    name: toTitleCase(match[1]),
+                    color: inferTeeColor(toTitleCase(match[1])),
+                    rating: Number.parseFloat(match[2]),
+                    slope: Number.parseInt(match[3], 10),
+                    yardages: Array(18).fill(null),
+                };
+            })
+            .filter((row): row is TeeSetData => row !== null);
+
+        if (teeRows.length > 0) {
+            return teeRows;
+        }
+    }
+
+    return [];
+}
+
+function extractScorecardFromPdfPages(
+    pages: PdfTextItem[][],
+    teeCountHint: number
+): {
+    holes: HoleData[];
+    teeSets: TeeSetData[];
+} {
+    for (const page of pages) {
+        const rows = groupPdfRows(page);
+        const holeRows = rows
+            .map((row) => parseScorecardHoleRow(row, teeCountHint))
+            .filter((row): row is ParsedScorecardHoleRow => row !== null)
+            .sort((a, b) => a.holeNumber - b.holeNumber);
+
+        if (holeRows.length !== 18) continue;
+
+        const teeCount = teeCountHint > 0 ? teeCountHint : holeRows[0].yardages.length;
+        const teeSets = Array.from({ length: teeCount }, (_, index) => ({
+            name: `Tee ${index + 1}`,
+            color: undefined,
+            yardages: holeRows.map((row) => row.yardages[index] ?? null),
+            totalYardage: holeRows.reduce((sum, row) => sum + (row.yardages[index] ?? 0), 0),
+        }));
+
+        const holes = holeRows.map((row) => ({
+            par: row.par,
+            handicap: row.handicap,
+            yardage: row.yardages[0] ?? null,
+        }));
+
+        return { holes, teeSets };
+    }
+
+    return { holes: [], teeSets: [] };
+}
+
+function groupPdfRows(items: PdfTextItem[], tolerance = 3): PdfRow[] {
+    const sorted = [...items].sort((a, b) => {
+        if (Math.abs(b.y - a.y) > tolerance) return b.y - a.y;
+        return a.x - b.x;
+    });
+
+    const rows: PdfRow[] = [];
+
+    for (const item of sorted) {
+        const row = rows.find((entry) => Math.abs(entry.y - item.y) <= tolerance);
+        if (row) {
+            row.items.push(item);
+            continue;
+        }
+        rows.push({ y: item.y, items: [item] });
+    }
+
+    return rows
+        .map((row) => ({
+            ...row,
+            items: [...row.items].sort((a, b) => a.x - b.x),
+        }))
+        .sort((a, b) => b.y - a.y);
+}
+
+function normalizePdfRowText(row: PdfRow): string {
+    return row.items
+        .map((item) => item.str)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\s+\/\s+/g, ' / ');
+}
+
+function parseScorecardHoleRow(
+    row: PdfRow,
+    teeCountHint: number
+): ParsedScorecardHoleRow | null {
+    const numericTokens = row.items
+        .map((item) => item.str.replace(/,/g, '').trim())
+        .filter((value) => /^\d{1,4}$/.test(value))
+        .map((value) => Number.parseInt(value, 10));
+
+    const holeNumber = numericTokens[0];
+    if (!holeNumber || holeNumber < 1 || holeNumber > 18) {
+        return null;
+    }
+
+    const teeCount = teeCountHint > 0 ? teeCountHint : Math.max(1, numericTokens.length - 4);
+    if (numericTokens.length < teeCount + 3) {
+        return null;
+    }
+
+    return {
+        holeNumber,
+        yardages: numericTokens.slice(1, 1 + teeCount),
+        par: numericTokens[1 + teeCount] ?? 4,
+        handicap: numericTokens[2 + teeCount] ?? holeNumber,
+    };
+}
+
+function sumYardages(yardages: Array<number | null>): number {
+    return yardages.reduce<number>((sum, value) => sum + (value ?? 0), 0);
+}
+
+interface ParsedScorecardHoleRow {
+    holeNumber: number;
+    yardages: number[];
+    par: number;
+    handicap: number;
+}
+
+function toTitleCase(value: string): string {
+    return value
+        .toLowerCase()
+        .split(/\s+/)
+        .map((word) =>
+            word
+                .split('/')
+                .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : part))
+                .join(' / ')
+        )
+        .join(' ')
+        .replace(/\s+\/\s+/g, ' / ');
 }
 
 function extractJsonLdRecords(html: string): Record<string, unknown>[] {
