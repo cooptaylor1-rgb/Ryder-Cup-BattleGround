@@ -226,12 +226,26 @@ export const useUIStore = create<UIState>()(
         const id = crypto.randomUUID();
         const toast: Toast = { id, type, message, duration };
 
-        set((state) => ({
-          toasts: [...state.toasts, toast],
-        }));
+        let shouldScheduleDismiss = true;
+
+        set((state) => {
+          const hasDuplicateToast = state.toasts.some(
+            (existingToast) =>
+              existingToast.type === type && existingToast.message === message
+          );
+
+          if (hasDuplicateToast) {
+            shouldScheduleDismiss = false;
+            return state;
+          }
+
+          return {
+            toasts: [...state.toasts, toast],
+          };
+        });
 
         // Auto-dismiss
-        if (duration > 0) {
+        if (shouldScheduleDismiss && duration > 0) {
           setTimeout(() => {
             get().dismissToast(id);
           }, duration);
