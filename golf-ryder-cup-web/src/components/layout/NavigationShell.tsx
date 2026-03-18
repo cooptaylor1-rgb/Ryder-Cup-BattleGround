@@ -41,6 +41,10 @@ export function NavigationShell({ children }: { children: ReactNode }) {
   const hideNav = HIDE_NAV_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + '/')
   );
+  const hideLivePlayWidgets =
+    !currentTrip ||
+    pathname === '/captain' ||
+    pathname.startsWith('/captain/');
 
   return (
     <>
@@ -69,7 +73,7 @@ export function NavigationShell({ children }: { children: ReactNode }) {
       {!hideNav && <BottomNav />}
 
       {/* Live-play overlays — only when a trip is active */}
-      {currentTrip && (
+      {!hideLivePlayWidgets && (
         <>
           <FloatingMyMatch bottomOffset={hideNav ? 20 : 80} />
           <QuickStandingsOverlay />

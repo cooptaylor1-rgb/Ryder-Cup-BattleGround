@@ -83,7 +83,7 @@ export function PreFlightChecklist({
   const [loading, setLoading] = useState(true);
   const [showPassedChecks, setShowPassedChecks] = useState(false);
 
-  const runCheck = useCallback(() => {
+  const runCheck = useCallback((announceSuccess = false) => {
     setLoading(true);
 
     try {
@@ -110,7 +110,7 @@ export function PreFlightChecklist({
       );
 
       setResult(checkResult);
-      if (checkResult.isReady && onAllClear) {
+      if (announceSuccess && checkResult.isReady && onAllClear) {
         onAllClear();
       }
     } catch (error) {
@@ -122,7 +122,7 @@ export function PreFlightChecklist({
   }, [courses, matches, onAllClear, players, sessions, teamMembers, teams, teeSets, trip, tripId]);
 
   useEffect(() => {
-    runCheck();
+    runCheck(false);
   }, [runCheck]);
 
   const summary = useMemo(() => (result ? getPreFlightSummary(result) : null), [result]);
@@ -166,7 +166,7 @@ export function PreFlightChecklist({
             </p>
             <button
               type="button"
-              onClick={runCheck}
+              onClick={() => runCheck(true)}
               className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)]"
             >
               <RefreshCw size={16} />
@@ -213,7 +213,7 @@ export function PreFlightChecklist({
 
           <button
             type="button"
-            onClick={runCheck}
+            onClick={() => runCheck(true)}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
           >
             <RefreshCw size={16} />
