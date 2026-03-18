@@ -204,6 +204,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                 </p>
                 {onClose && (
                     <button
+                        type="button"
                         onClick={onClose}
                         className="text-sm text-[var(--masters)] hover:underline"
                     >
@@ -222,13 +223,14 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
             <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                     <button
+                        type="button"
                         onClick={() => setSelectedCourse(null)}
                         className="text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] flex items-center gap-1"
                     >
                         ← Back to search
                     </button>
                     {onClose && (
-                        <button onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
+                        <button type="button" onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
                             <X className="w-5 h-5" />
                         </button>
                     )}
@@ -263,6 +265,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                     <div className="p-4 bg-[color:var(--warning)]/10 rounded-lg text-[var(--warning)] text-sm">
                         No tee data available for this course. You can still import basic info and add tees manually.
                         <button
+                            type="button"
                             onClick={() => handleImportCourse([])}
                             className="mt-2 block w-full py-2 bg-[color:var(--warning)]/15 hover:bg-[color:var(--warning)]/20 rounded font-medium text-[var(--ink-primary)]"
                         >
@@ -284,6 +287,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             ))}
                         </div>
                         <button
+                            type="button"
                             onClick={() => handleImportCourse(allTees)}
                             className="mt-4 w-full py-3 bg-[var(--masters)] text-[var(--canvas)] font-medium rounded-lg hover:bg-[color:var(--masters)]/90"
                         >
@@ -301,7 +305,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-[var(--ink-primary)]">Search Course Database</h3>
                 {onClose && (
-                    <button onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
+                    <button type="button" onClick={onClose} className="p-1 text-[var(--ink-tertiary)] hover:text-[var(--ink-secondary)]" aria-label="Close">
                         <X className="w-5 h-5" />
                     </button>
                 )}
@@ -319,6 +323,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--ink-tertiary)]" />
                 <button
+                    type="button"
                     onClick={handleSearch}
                     disabled={isSearching || query.trim().length < 2}
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[var(--masters)] text-[var(--canvas)] text-sm font-medium rounded-md hover:bg-[color:var(--masters)]/90 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -338,6 +343,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                 <div className="space-y-2 max-h-80 overflow-y-auto">
                     {results.map((course) => (
                         <button
+                            type="button"
                             key={course.id}
                             onClick={() => handleSelectCourse(course)}
                             disabled={isLoadingDetails}
@@ -392,6 +398,7 @@ function TeeOption({ tee, onSelect }: { tee: GolfCourseAPITee; onSelect: () => v
 
     return (
         <button
+            type="button"
             onClick={onSelect}
             className={cn(
                 "w-full p-3 text-left border rounded-lg hover:border-[var(--masters)] transition-colors",
