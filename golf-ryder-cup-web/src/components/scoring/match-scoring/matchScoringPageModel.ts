@@ -18,7 +18,7 @@ import type {
 import type { SessionType } from '@/lib/types';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { formatPlayerName } from '@/lib/utils';
-import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
+import { resolveCurrentTripPlayer, type CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
 import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
 
@@ -92,6 +92,7 @@ interface UseMatchScoringPageModelOptions {
   currentHole: number;
   sessionMatches: Match[];
   currentUser: UserProfile | null;
+  currentIdentity: CurrentTripPlayerIdentity | null;
   scoringPreferences: ScoringPreferences;
   scoringModeByFormat: Record<string, ScoringMode>;
   getScoringModeForFormat: (format: SessionType) => ScoringMode;
@@ -135,6 +136,7 @@ export function useMatchScoringPageModel(
     currentHole,
     sessionMatches,
     currentUser,
+    currentIdentity,
     scoringPreferences,
     scoringModeByFormat,
     getScoringModeForFormat,
@@ -153,8 +155,8 @@ export function useMatchScoringPageModel(
   );
 
   const currentUserPlayer = useMemo(
-    () => resolveCurrentTripPlayer(players, currentUser, Boolean(currentUser)) ?? undefined,
-    [players, currentUser]
+    () => resolveCurrentTripPlayer(players, currentIdentity, Boolean(currentIdentity)) ?? undefined,
+    [currentIdentity, players]
   );
 
   const activeMatchParticipantIds = useMemo(

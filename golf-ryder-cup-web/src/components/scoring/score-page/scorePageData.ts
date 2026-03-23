@@ -2,17 +2,11 @@ import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { Match } from '@/lib/types';
 import type { MatchState } from '@/lib/types/computed';
 import type { HoleResult, Player, RyderCupSession } from '@/lib/types/models';
-import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
-
-interface ScoreUserIdentity {
-    email?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
-}
+import { resolveCurrentTripPlayer, type CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 
 export function findCurrentUserPlayer(
     players: Player[],
-    currentUser: ScoreUserIdentity | null,
+    currentUser: CurrentTripPlayerIdentity | null,
     isAuthenticated: boolean
 ): Player | undefined {
     return resolveCurrentTripPlayer(players, currentUser, isAuthenticated) ?? undefined;

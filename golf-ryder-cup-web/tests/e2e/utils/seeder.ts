@@ -341,24 +341,47 @@ export function toIndexedDBFormat(trips: GeneratedTrip[]): {
 
         // Sessions & Matches
         for (const session of trip.sessions) {
+            const sessionStatuses = session.matches.map((match) => match.status);
+            const sessionStatus =
+                sessionStatuses.some((status) => status === 'inProgress')
+                    ? 'inProgress'
+                    : sessionStatuses.length > 0 && sessionStatuses.every((status) => status === 'completed')
+                        ? 'completed'
+                        : 'scheduled';
+            const sessionDate = new Date(trip.startDate);
+            sessionDate.setDate(sessionDate.getDate() + Math.floor((session.sessionNumber - 1) / 2));
+
             result.sessions.push({
                 id: session.id,
                 tripId: trip.id,
                 name: session.name,
                 sessionNumber: session.sessionNumber,
                 sessionType: session.sessionType,
+                scheduledDate: sessionDate.toISOString(),
+                timeSlot: session.sessionNumber % 2 === 1 ? 'AM' : 'PM',
+                pointsPerMatch: 1,
+                status: sessionStatus,
+                isLocked: false,
                 createdAt: now,
                 updatedAt: now,
             });
 
-            for (const match of session.matches) {
+            for (const [matchIndex, match] of session.matches.entries()) {
+                const holesPlayed = match.scores?.length ?? 0;
                 result.matches.push({
                     id: match.id,
                     sessionId: match.sessionId,
                     tripId: trip.id,
+                    matchOrder: matchIndex + 1,
                     teamAPlayerIds: match.teamAPlayerIds,
                     teamBPlayerIds: match.teamBPlayerIds,
                     status: match.status,
+                    currentHole: Math.min(18, Math.max(1, holesPlayed + 1)),
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: match.status === 'completed' ? 'halved' : 'notFinished',
+                    margin: 0,
+                    holesRemaining: Math.max(0, 18 - holesPlayed),
                     createdAt: now,
                     updatedAt: now,
                 });

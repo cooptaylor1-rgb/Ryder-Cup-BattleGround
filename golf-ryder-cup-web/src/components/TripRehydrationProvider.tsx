@@ -5,6 +5,7 @@ import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { tripLogger } from '@/lib/utils/logger';
+import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 
 /**
  * Trip Rehydration Provider
@@ -22,7 +23,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
     const hasCheckedUserTrip = useRef(false);
     const isEnsuringTripPlayer = useRef(false);
     const { currentTrip, loadTrip, isLoading, players } = useTripStore();
-    const { currentUser, isAuthenticated } = useAuthStore();
+    const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
     // Rehydrate persisted trip state
     useEffect(() => {
@@ -61,6 +62,8 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
                 // Find player records matching the current user (by email or name)
                 const allPlayers = await db.players.toArray();
                 const userPlayers = allPlayers.filter(p =>
+                    (authUserId && p.linkedAuthUserId === authUserId) ||
+                    (currentUser.id && p.linkedProfileId === currentUser.id) ||
                     (p.email && currentUser.email &&
                         p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
                     (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
@@ -129,7 +132,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         };
 
         findAndLoadUserTrip();
-    }, [isAuthenticated, currentUser, currentTrip, loadTrip]);
+    }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip]);
 
     useEffect(() => {
         if (!isAuthenticated || !currentUser || !currentTrip || isEnsuringTripPlayer.current) {
@@ -144,7 +147,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
                 const linkResult = await ensureCurrentUserTripPlayerLink(
                     currentTrip.id,
                     players,
-                    currentUser,
+                    withTripPlayerIdentity(currentUser, authUserId),
                     isAuthenticated
                 );
 
@@ -167,7 +170,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
             cancelled = true;
             isEnsuringTripPlayer.current = false;
         };
-    }, [currentTrip, currentUser, isAuthenticated, loadTrip, players]);
+    }, [authUserId, currentTrip, currentUser, isAuthenticated, loadTrip, players]);
 
     return <>{children}</>;
 }

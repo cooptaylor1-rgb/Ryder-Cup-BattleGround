@@ -56,6 +56,14 @@ export interface GolfCourseAPICourse {
     description?: string;
     phone?: string;
     sourcePageUrl?: string;
+    dataCompleteness?: 'playable' | 'basic' | 'placeholder';
+    hasPlayableTeeData?: boolean;
+    provenance?: Array<{
+        kind: string;
+        label: string;
+        url?: string;
+        confidence?: 'low' | 'medium' | 'high';
+    }>;
     tees?: {
         male?: GolfCourseAPITee[];
         female?: GolfCourseAPITee[];
@@ -252,6 +260,9 @@ export async function getCourseById(
                 phone: detail.phone,
                 source: detail.source || 'web',
                 sourcePageUrl: detail.sourcePageUrl || detail.website,
+                dataCompleteness: detail.dataCompleteness,
+                hasPlayableTeeData: detail.hasPlayableTeeData,
+                provenance: detail.provenance,
                 location: {
                     address: detail.address,
                     city: detail.city,

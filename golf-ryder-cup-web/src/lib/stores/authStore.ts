@@ -265,7 +265,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const { authEmail } = get();
+          const { authEmail, authUserId } = get();
           const now = new Date().toISOString();
           const id = generateId();
           const users = readStoredUsers();
@@ -296,6 +296,8 @@ export const useAuthStore = create<AuthState>()(
           // Also add to IndexedDB players table for trip assignment
           await db.players.put({
             id: profile.id,
+            linkedProfileId: profile.id,
+            linkedAuthUserId: authUserId ?? undefined,
             firstName: profile.firstName,
             lastName: profile.lastName,
             email: profile.email,
@@ -404,6 +406,8 @@ export const useAuthStore = create<AuthState>()(
 
           // Update IndexedDB
           await db.players.update(currentUser.id, {
+            linkedProfileId: currentUser.id,
+            linkedAuthUserId: get().authUserId ?? undefined,
             firstName: updatedProfile.firstName,
             lastName: updatedProfile.lastName,
             email: updatedProfile.email,

@@ -50,7 +50,17 @@ const searchResult: GolfCourseAPICourse = {
 const detailResult: GolfCourseAPICourse = {
   ...searchResult,
   description: 'Detailed course profile',
-  sourcePageUrl: 'https://cabot.com/citrusfarms/golf/roost/',
+  sourcePageUrl: 'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf',
+  dataCompleteness: 'basic',
+  hasPlayableTeeData: false,
+  provenance: [
+    {
+      kind: 'scorecard-pdf',
+      label: 'Linked scorecard PDF',
+      url: 'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf',
+      confidence: 'high',
+    },
+  ],
 };
 
 describe('CourseSearch', () => {
@@ -109,5 +119,26 @@ describe('CourseSearch', () => {
     });
 
     expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it('shows extraction status and the extracted source link in detail view', async () => {
+    render(<CourseSearch onSelectCourse={vi.fn()} />);
+
+    await screen.findByText('Search Course Database');
+
+    fireEvent.change(screen.getByPlaceholderText('Search by course name or city...'), {
+      target: { value: 'cabot roost' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+    await screen.findByRole('button', { name: /Roost/i });
+    fireEvent.click(screen.getByRole('button', { name: /Roost/i }));
+
+    await screen.findByText('Basic course profile only');
+    expect(screen.getByText('Linked scorecard PDF')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View extracted source' })).toHaveAttribute(
+      'href',
+      detailResult.sourcePageUrl
+    );
   });
 });

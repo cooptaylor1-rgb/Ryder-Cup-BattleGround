@@ -1,5 +1,5 @@
 import { SessionTypeDisplay, type Match, type Player, type Trip } from '@/lib/types/models';
-import type { UserProfile } from '@/lib/stores/authStore';
+import type { CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 
 export interface ScheduleEntry {
@@ -36,7 +36,7 @@ interface ScheduleSessionLike {
 
 export function resolveCurrentUserPlayer(
   players: Player[],
-  currentUser: UserProfile | null,
+  currentUser: CurrentTripPlayerIdentity | null,
   isAuthenticated: boolean
 ) {
   return resolveCurrentTripPlayer(players, currentUser, isAuthenticated) ?? undefined;

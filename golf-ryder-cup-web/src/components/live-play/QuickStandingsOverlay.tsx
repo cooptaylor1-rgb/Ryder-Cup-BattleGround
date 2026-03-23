@@ -76,8 +76,11 @@ export function QuickStandingsOverlay({
     const pullProgress = useTransform(pullY, [0, pullThreshold], [0, 1]);
     const indicatorOpacity = useTransform(pullY, [0, pullThreshold / 2], [0.3, 1]);
 
-    // Don't show on home page
-    const shouldEnable = pathname !== '/' && currentTrip;
+    const supportsQuickStandings =
+        pathname.startsWith('/score') ||
+        pathname.startsWith('/schedule');
+
+    const shouldEnable = Boolean(currentTrip && supportsQuickStandings);
 
     // Find active session
     const activeSession = useMemo(() => {

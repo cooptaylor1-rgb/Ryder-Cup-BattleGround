@@ -12,7 +12,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
-import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
+import { resolveCurrentTripPlayer, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import type { TeamStandings, MatchState } from '@/lib/types/computed';
 import type { Match, RyderCupSession, Trip, Player, SideBet, BanterPost } from '@/lib/types/models';
 import type { TripAward } from '@/lib/types/tripStats';
@@ -64,7 +64,7 @@ interface HomeData {
 
 export function useHomeData(): HomeData {
     const { loadTrip, currentTrip, players, teams, sessions: _sessions } = useTripStore();
-    const { currentUser, isAuthenticated } = useAuthStore();
+    const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
     // Single consolidated query for all trip-related data
     const consolidatedData = useLiveQuery(async () => {
@@ -136,8 +136,12 @@ export function useHomeData(): HomeData {
 
     // Find current user's player record
   const currentUserPlayer = useMemo(() => {
-        return resolveCurrentTripPlayer(players, currentUser, isAuthenticated);
-    }, [currentUser, isAuthenticated, players]);
+        return resolveCurrentTripPlayer(
+            players,
+            withTripPlayerIdentity(currentUser, authUserId),
+            isAuthenticated
+        );
+    }, [authUserId, currentUser, isAuthenticated, players]);
 
     // Calculate user's match data
     const userMatchData = useMemo((): UserMatchData | null => {

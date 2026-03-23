@@ -6,13 +6,14 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
 import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
+import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 import {
@@ -34,7 +35,7 @@ export default function MatchScoringPageClient() {
   const matchId = params.matchId as string;
 
   const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore();
-  const { currentUser, isAuthenticated } = useAuthStore();
+  const { currentUser, isAuthenticated, authUserId } = useAuthStore();
   const {
     showToast,
     scoringPreferences,
@@ -74,6 +75,10 @@ export default function MatchScoringPageClient() {
   const [scoringModeOverrides, setScoringModeOverrides] = useState<Record<string, ScoringMode>>(
     {}
   );
+  const currentIdentity = useMemo(
+    () => withTripPlayerIdentity(currentUser, authUserId),
+    [authUserId, currentUser]
+  );
 
   useEffect(() => {
     if (matchId && (!activeMatch || activeMatch.id !== matchId)) {
@@ -93,6 +98,7 @@ export default function MatchScoringPageClient() {
     currentHole,
     sessionMatches,
     currentUser,
+    currentIdentity,
     scoringPreferences,
     scoringModeByFormat,
     getScoringModeForFormat,

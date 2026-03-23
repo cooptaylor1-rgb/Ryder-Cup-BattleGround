@@ -195,6 +195,18 @@ export interface Trip {
 export interface Player {
   id: UUID;
   tripId?: UUID;
+  /**
+   * Local explicit link to the app profile that owns this roster entry.
+   * This is used for deterministic client-side identity resolution and is
+   * intentionally optional for legacy trips and imported data.
+   */
+  linkedProfileId?: UUID;
+  /**
+   * Explicit link to the authenticated Supabase user when available.
+   * This is local-first today; cloud sync can still fall back to email/name
+   * matching when a remote copy does not carry this field yet.
+   */
+  linkedAuthUserId?: UUID;
   firstName: string;
   lastName: string;
   email?: string;

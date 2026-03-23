@@ -435,6 +435,7 @@ export async function dismissOnboardingModal(page: Page): Promise<void> {
       await page.waitForTimeout(TEST_CONFIG.delays.animation);
 
       const dismissButtons = [
+        page.locator('button:has-text("Skip")'),
         page.locator('button:has-text("Skip for now")'),
         page.locator('button:has-text("Skip onboarding")'),
         page.locator('[role="dialog"] button:has-text("Skip")'),
@@ -481,6 +482,7 @@ export async function dismissAllBlockingModals(page: Page): Promise<void> {
   await dismissOnboardingModal(page);
 
   const blockingOverlayButtons = [
+    page.getByRole('button', { name: /^skip$/i }),
     page.getByRole('button', { name: /skip walkthrough/i }),
     page.getByRole('button', { name: /got it, let'?s go!?/i }),
     page.getByRole('button', { name: /close/i }),

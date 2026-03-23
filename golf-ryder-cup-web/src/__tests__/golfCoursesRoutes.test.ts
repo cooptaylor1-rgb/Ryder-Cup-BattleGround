@@ -229,6 +229,8 @@ describe('Golf Course Routes', () => {
       expect(data.data.state).toBe('Scotland');
       expect(data.data.website).toBe('https://www.top100golfcourses.com/golf-course/north-berwick-west');
       expect(data.data.description).toContain('links course');
+      expect(data.data.dataCompleteness).toBe('playable');
+      expect(data.data.hasPlayableTeeData).toBe(true);
       expect(data.data.teeSets[0]).toMatchObject({
         name: 'Championship',
         rating: 73.2,
@@ -299,7 +301,14 @@ describe('Golf Course Routes', () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.data.source).toBe('web-extracted');
-      expect(data.data.sourcePageUrl).toBe('https://cabot.com/citrusfarms/golf/roost/');
+      expect(data.data.sourcePageUrl).toBe(
+        'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf'
+      );
+      expect(data.data.dataCompleteness).toBe('playable');
+      expect(data.data.hasPlayableTeeData).toBe(true);
+      expect(data.data.provenance[0]).toMatchObject({
+        kind: 'scorecard-pdf',
+      });
       expect(data.data.teeSets).toHaveLength(2);
       expect(data.data.teeSets[0]).toMatchObject({
         name: 'Black',

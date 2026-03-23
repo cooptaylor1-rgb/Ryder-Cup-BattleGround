@@ -9,6 +9,8 @@
  */
 
 import { test as base, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   waitForStableDOM,
   dismissAllBlockingModals,
@@ -23,7 +25,19 @@ import {
   type GeneratedTrip,
 } from '../utils/seeder';
 
-const TEST_DB_VERSION = 11;
+function getTestDatabaseVersion(): number {
+  const dbSource = readFileSync(join(process.cwd(), 'src/lib/db/index.ts'), 'utf8');
+  const versionMatches = [...dbSource.matchAll(/this\.version\((\d+)\)\.stores/g)];
+  const currentDexieVersion = Math.max(
+    1,
+    ...versionMatches.map((match) => Number.parseInt(match[1] ?? '1', 10))
+  );
+
+  // Dexie stores the IndexedDB version as verno * 10 for integer schema versions.
+  return currentDexieVersion * 10;
+}
+
+const TEST_DB_VERSION = getTestDatabaseVersion();
 
 const TEST_DB_SCHEMA = [
   { name: 'trips', keyPath: 'id', indexes: [['name', 'name'], ['startDate', 'startDate']] },

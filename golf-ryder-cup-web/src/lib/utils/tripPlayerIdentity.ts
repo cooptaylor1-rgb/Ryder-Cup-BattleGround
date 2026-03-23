@@ -2,6 +2,7 @@ import type { Player } from '@/lib/types/models';
 
 export interface CurrentTripPlayerIdentity {
   id?: string | null;
+  authUserId?: string | null;
   email?: string | null;
   firstName?: string | null;
   lastName?: string | null;
@@ -20,6 +21,8 @@ export type TripPlayerLinkStatus =
   | 'ambiguous-name-match'
   | 'unresolved'
   | 'claimed-name-match'
+  | 'claimed-explicit'
+  | 'link-conflict'
   | 'created';
 
 export interface TripPlayerLinkResult {
@@ -48,6 +51,20 @@ function buildNameKey(identity: CurrentTripPlayerIdentity | Player): string | nu
   return `${firstName}|${lastName}`;
 }
 
+export function withTripPlayerIdentity(
+  currentUser: CurrentTripPlayerIdentity | null,
+  authUserId?: string | null
+): CurrentTripPlayerIdentity | null {
+  if (!currentUser) {
+    return null;
+  }
+
+  return {
+    ...currentUser,
+    authUserId: authUserId ?? currentUser.authUserId ?? null,
+  };
+}
+
 export function assessTripPlayerLink(
   players: Player[],
   currentUser: CurrentTripPlayerIdentity | null,
@@ -61,14 +78,36 @@ export function assessTripPlayerLink(
     };
   }
 
-  const idMatch = currentUser.id
-    ? players.find((player) => player.id === currentUser.id) ?? null
+  const linkedAuthMatch = currentUser.authUserId
+    ? players.find((player) => player.linkedAuthUserId === currentUser.authUserId) ?? null
     : null;
-  if (idMatch) {
+  if (linkedAuthMatch) {
     return {
       status: 'linked-id',
-      player: idMatch,
-      candidates: [idMatch],
+      player: linkedAuthMatch,
+      candidates: [linkedAuthMatch],
+    };
+  }
+
+  const linkedProfileMatch = currentUser.id
+    ? players.find((player) => player.linkedProfileId === currentUser.id) ?? null
+    : null;
+  if (linkedProfileMatch) {
+    return {
+      status: 'linked-id',
+      player: linkedProfileMatch,
+      candidates: [linkedProfileMatch],
+    };
+  }
+
+  const legacyIdMatch = currentUser.id
+    ? players.find((player) => player.id === currentUser.id) ?? null
+    : null;
+  if (legacyIdMatch) {
+    return {
+      status: 'linked-id',
+      player: legacyIdMatch,
+      candidates: [legacyIdMatch],
     };
   }
 

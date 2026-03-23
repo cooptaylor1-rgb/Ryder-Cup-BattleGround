@@ -40,6 +40,34 @@ function getCourseResultSubline(course: GolfCourseAPICourse): string {
     }
 }
 
+function getCourseDetailStatus(course: GolfCourseAPICourse): {
+    tone: 'success' | 'warning' | 'neutral';
+    title: string;
+    description: string;
+} {
+    if (course.dataCompleteness === 'playable' || course.hasPlayableTeeData) {
+        return {
+            tone: 'success',
+            title: 'Playable tee data found',
+            description: 'Ratings, slopes, or usable yardage data were extracted for this course.',
+        };
+    }
+
+    if (course.dataCompleteness === 'basic') {
+        return {
+            tone: 'warning',
+            title: 'Basic course profile only',
+            description: 'The importer found profile details, but tee setup still needs to be added manually.',
+        };
+    }
+
+    return {
+        tone: 'neutral',
+        title: 'Limited course data',
+        description: 'This result may only contain a lightweight profile until a scorecard or tee source is found.',
+    };
+}
+
 interface CourseSearchProps {
     onSelectCourse: (course: {
         name: string;
@@ -218,6 +246,12 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     // Course detail view
     if (selectedCourse) {
         const allTees = getAllTees(selectedCourse);
+        const detailStatus = getCourseDetailStatus(selectedCourse);
+        const extractedSourceUrl = selectedCourse.sourcePageUrl || selectedCourse.website;
+        const courseSiteUrl =
+            selectedCourse.website && selectedCourse.website !== extractedSourceUrl
+                ? selectedCourse.website
+                : null;
 
         return (
             <div className="p-4">
@@ -249,21 +283,57 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             {selectedCourse.description}
                         </p>
                     )}
-                    {selectedCourse.website && (
-                        <a
-                            href={selectedCourse.sourcePageUrl || selectedCourse.website}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-3 inline-flex text-sm font-medium text-[var(--masters)] hover:underline"
-                        >
-                            View source profile
-                        </a>
-                    )}
+                    <div
+                        className={cn(
+                            'mt-4 rounded-xl border px-4 py-3',
+                            detailStatus.tone === 'success'
+                                ? 'border-[color:var(--success)]/25 bg-[color:var(--success)]/10'
+                                : detailStatus.tone === 'warning'
+                                    ? 'border-[color:var(--warning)]/25 bg-[color:var(--warning)]/10'
+                                    : 'border-[var(--rule)] bg-[var(--surface-secondary)]'
+                        )}
+                    >
+                        <p className="text-sm font-semibold text-[var(--ink-primary)]">
+                            {detailStatus.title}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-[var(--ink-secondary)]">
+                            {detailStatus.description}
+                        </p>
+                        {selectedCourse.provenance?.length ? (
+                            <p className="mt-2 text-xs uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+                                {selectedCourse.provenance[0]?.label}
+                            </p>
+                        ) : null}
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                        {extractedSourceUrl ? (
+                            <a
+                                href={extractedSourceUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex text-sm font-medium text-[var(--masters)] hover:underline"
+                            >
+                                View extracted source
+                            </a>
+                        ) : null}
+                        {courseSiteUrl ? (
+                            <a
+                                href={courseSiteUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex text-sm font-medium text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:underline"
+                            >
+                                Visit course site
+                            </a>
+                        ) : null}
+                    </div>
                 </div>
 
                 {allTees.length === 0 ? (
                     <div className="p-4 bg-[color:var(--warning)]/10 rounded-lg text-[var(--warning)] text-sm">
-                        No tee data available for this course. You can still import basic info and add tees manually.
+                        {selectedCourse.dataCompleteness === 'basic'
+                            ? 'The importer found course details but no playable tee data. You can still import the profile and add tees manually.'
+                            : 'No tee data is available for this course yet. You can still import basic info and add tees manually.'}
                         <button
                             type="button"
                             onClick={() => handleImportCourse([])}

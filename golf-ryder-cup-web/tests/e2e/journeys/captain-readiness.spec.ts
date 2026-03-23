@@ -4,42 +4,36 @@ import {
   waitForStableDOM,
 } from '../utils/test-helpers';
 
+async function logCaptainRouteError(page: import('@playwright/test').Page) {
+  const boundaryHeading = page.getByText(/The command room hit a rough patch\./i);
+  if (!(await boundaryHeading.isVisible().catch(() => false))) {
+    return;
+  }
+
+  const errorDetails = page.getByText(/Error details/i);
+  if (await errorDetails.isVisible().catch(() => false)) {
+    await errorDetails.click();
+    const message = await page.locator('pre').textContent().catch(() => null);
+    if (message) {
+      console.error('[captain-manage error details]', message);
+    }
+  }
+}
+
 test.describe('Captain readiness routes', () => {
-  test.beforeEach(async ({ page, clearDatabase, enableCaptainMode }) => {
+  test.beforeEach(async ({ page, clearDatabase, seedSmallDataset, enableCaptainMode }) => {
     await clearDatabase();
     await page.goto('/');
     await waitForStableDOM(page);
     await dismissAllBlockingModals(page);
-
-    await page
-      .getByRole('button', { name: /Skip onboarding/i })
-      .click({ force: true, timeout: 3000 })
-      .catch(() => {});
-    await page
-      .getByRole('button', { name: /Skip for now/i })
-      .click({ force: true, timeout: 3000 })
-      .catch(() => {});
-
-    const skipWalkthrough = page.getByRole('button', { name: /Skip walkthrough/i }).first();
-    if (await skipWalkthrough.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await skipWalkthrough.click({ force: true });
-      await page.waitForTimeout(500);
-    }
-
-    await page.getByRole('link', { name: /New Trip/i }).click();
+    await seedSmallDataset();
+    await page.reload();
     await waitForStableDOM(page);
-
-    await page.getByText(/Classic Ryder Cup/i).first().click();
-    await waitForStableDOM(page);
-
-    await page.getByRole('button', { name: /Review Trip/i }).click();
-    await waitForStableDOM(page);
-
-    await page.getByRole('button', { name: /Create Trip/i }).click();
-    await page.waitForURL(/\/\?tripId=/);
+    await dismissAllBlockingModals(page);
     await enableCaptainMode();
     await page.goto('/');
     await waitForStableDOM(page);
+    await dismissAllBlockingModals(page);
   });
 
   test('loads checklist without falling into the captain error boundary @smoke', async ({ page }) => {
@@ -55,8 +49,11 @@ test.describe('Captain readiness routes', () => {
   });
 
   test('routes captains from manage trip into the course library @smoke', async ({ page }) => {
-    await page.goto('/captain/manage');
+    await page.goto('/captain');
     await waitForStableDOM(page);
+    await page.locator('a[href="/captain/manage"]').first().click();
+    await waitForStableDOM(page);
+    await logCaptainRouteError(page);
 
     await expect(page.getByTestId('captain-manage-page')).toBeVisible();
     const courseLibraryLink = page.getByTestId('captain-course-library-link');
@@ -69,8 +66,11 @@ test.describe('Captain readiness routes', () => {
   });
 
   test('routes into lineup setup from captain manage tools @smoke', async ({ page }) => {
-    await page.goto('/captain/manage');
+    await page.goto('/captain');
     await waitForStableDOM(page);
+    await page.locator('a[href="/captain/manage"]').first().click();
+    await waitForStableDOM(page);
+    await logCaptainRouteError(page);
 
     await page.getByTestId('captain-new-session-link').click();
     await waitForStableDOM(page);

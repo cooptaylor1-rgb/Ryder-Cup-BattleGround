@@ -18,7 +18,7 @@ import { db } from '@/lib/db';
 import { useAuthStore, useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
 import { navigateBackOr } from '@/lib/utils/navigation';
-import { assessTripPlayerLink } from '@/lib/utils/tripPlayerIdentity';
+import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { AlertCircle, CalendarDays, ChevronRight, User } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 
@@ -26,7 +26,7 @@ export default function SchedulePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentTrip, sessions, players } = useTripStore();
-  const { currentUser, isAuthenticated } = useAuthStore();
+  const { currentUser, isAuthenticated, authUserId } = useAuthStore();
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -73,13 +73,18 @@ export default function SchedulePageClient() {
     void loadMatches();
   }, [loadMatches]);
 
+  const currentIdentity = useMemo(
+    () => withTripPlayerIdentity(currentUser, authUserId),
+    [authUserId, currentUser]
+  );
+
   const currentUserPlayer = useMemo(
-    () => resolveCurrentUserPlayer(players, currentUser, isAuthenticated),
-    [currentUser, isAuthenticated, players]
+    () => resolveCurrentUserPlayer(players, currentIdentity, isAuthenticated),
+    [currentIdentity, isAuthenticated, players]
   );
   const currentUserPlayerLink = useMemo(
-    () => assessTripPlayerLink(players, currentUser, isAuthenticated),
-    [currentUser, isAuthenticated, players]
+    () => assessTripPlayerLink(players, currentIdentity, isAuthenticated),
+    [currentIdentity, isAuthenticated, players]
   );
 
   const scheduleByDay = useMemo(

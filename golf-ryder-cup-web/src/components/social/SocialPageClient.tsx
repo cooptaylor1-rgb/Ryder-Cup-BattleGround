@@ -18,26 +18,27 @@ import { db } from '@/lib/db';
 import { useAuthStore, useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
 import { shareBanterPost } from '@/lib/utils/share';
-import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
+import { resolveCurrentTripPlayer, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import type { BanterPost } from '@/lib/types/models';
 
 const QUICK_EMOJIS = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
 
 function resolveCurrentFeedPlayer(
   players: ReturnType<typeof useTripStore.getState>['players'],
-  currentUser: ReturnType<typeof useAuthStore.getState>['currentUser']
+  currentUser: ReturnType<typeof useAuthStore.getState>['currentUser'],
+  authUserId: ReturnType<typeof useAuthStore.getState>['authUserId']
 ) {
   if (!currentUser) {
     return players[0];
   }
 
-  return resolveCurrentTripPlayer(players, currentUser, true) ?? players[0];
+  return resolveCurrentTripPlayer(players, withTripPlayerIdentity(currentUser, authUserId), true) ?? players[0];
 }
 
 export default function SocialPageClient() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore();
-  const { currentUser } = useAuthStore();
+  const { currentUser, authUserId } = useAuthStore();
   const { showToast } = useUIStore();
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
@@ -65,8 +66,8 @@ export default function SocialPageClient() {
   }, []);
 
   const currentFeedPlayer = useMemo(
-    () => resolveCurrentFeedPlayer(players, currentUser),
-    [currentUser, players]
+    () => resolveCurrentFeedPlayer(players, currentUser, authUserId),
+    [authUserId, currentUser, players]
   );
   const currentUserId = currentFeedPlayer?.id;
   const totalReactions = useMemo(

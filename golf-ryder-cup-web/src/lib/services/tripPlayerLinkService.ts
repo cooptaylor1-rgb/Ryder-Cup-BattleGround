@@ -24,6 +24,8 @@ function buildTripPlayerFromIdentity(
   return {
     id: crypto.randomUUID(),
     tripId,
+    linkedProfileId: currentUser.id ?? undefined,
+    linkedAuthUserId: currentUser.authUserId ?? undefined,
     firstName,
     lastName,
     email,
@@ -34,6 +36,76 @@ function buildTripPlayerFromIdentity(
     joinedAt: now,
     createdAt: now,
     updatedAt: now,
+  };
+}
+
+function hasConflictingExplicitLink(
+  player: Player,
+  currentUser: CurrentTripPlayerIdentity
+): boolean {
+  return Boolean(
+    (player.linkedProfileId && currentUser.id && player.linkedProfileId !== currentUser.id) ||
+      (player.linkedAuthUserId &&
+        currentUser.authUserId &&
+        player.linkedAuthUserId !== currentUser.authUserId)
+  );
+}
+
+function mergeLinkedPlayerIdentity(
+  tripId: string,
+  player: Player,
+  currentUser: CurrentTripPlayerIdentity,
+  options?: {
+    allowEmailMismatch?: boolean;
+  }
+): TripPlayerLinkResult | Player {
+  const normalizedUserEmail = normalizeEmail(currentUser.email);
+  const normalizedPlayerEmail = normalizeEmail(player.email);
+
+  if (
+    !options?.allowEmailMismatch &&
+    normalizedPlayerEmail &&
+    normalizedUserEmail &&
+    normalizedPlayerEmail !== normalizedUserEmail
+  ) {
+    return {
+      status: 'link-conflict',
+      player: null,
+      candidates: [player],
+    };
+  }
+
+  return {
+    ...player,
+    tripId,
+    linkedProfileId: currentUser.id ?? player.linkedProfileId,
+    linkedAuthUserId: currentUser.authUserId ?? player.linkedAuthUserId,
+    email:
+      normalizedPlayerEmail &&
+      normalizedUserEmail &&
+      normalizedPlayerEmail !== normalizedUserEmail
+        ? player.email
+        : normalizedUserEmail ?? player.email,
+    handicapIndex: player.handicapIndex ?? currentUser.handicapIndex ?? undefined,
+    ghin: player.ghin ?? currentUser.ghin ?? undefined,
+    teePreference: player.teePreference ?? currentUser.preferredTees ?? undefined,
+    avatarUrl: player.avatarUrl ?? currentUser.avatarUrl ?? undefined,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+async function persistLinkedPlayer(
+  tripId: string,
+  player: Player,
+  status: TripPlayerLinkResult['status']
+): Promise<TripPlayerLinkResult> {
+  await db.players.put(player);
+  queueSyncOperation('player', player.id, 'update', tripId, player);
+
+  return {
+    status,
+    player,
+    candidates: [player],
   };
 }
 
@@ -65,39 +137,20 @@ export async function ensureCurrentUserTripPlayerLink(
       };
     }
 
-    const normalizedUserEmail = normalizeEmail(currentUser.email);
-    const normalizedCandidateEmail = normalizeEmail(candidate.email);
-    if (
-      normalizedCandidateEmail &&
-      normalizedUserEmail &&
-      normalizedCandidateEmail !== normalizedUserEmail
-    ) {
+    if (hasConflictingExplicitLink(candidate, currentUser)) {
       return {
-        status: 'ambiguous-name-match',
+        status: 'link-conflict',
         player: null,
         candidates: [candidate],
       };
     }
 
-    const updatedPlayer: Player = {
-      ...candidate,
-      tripId,
-      email: normalizedUserEmail ?? candidate.email,
-      handicapIndex: candidate.handicapIndex ?? currentUser.handicapIndex ?? undefined,
-      ghin: candidate.ghin ?? currentUser.ghin ?? undefined,
-      teePreference: candidate.teePreference ?? currentUser.preferredTees ?? undefined,
-      avatarUrl: candidate.avatarUrl ?? currentUser.avatarUrl ?? undefined,
-      updatedAt: new Date().toISOString(),
-    };
+    const merged = mergeLinkedPlayerIdentity(tripId, candidate, currentUser);
+    if ('status' in merged) {
+      return merged;
+    }
 
-    await db.players.put(updatedPlayer);
-    queueSyncOperation('player', updatedPlayer.id, 'update', tripId, updatedPlayer);
-
-    return {
-      status: 'claimed-name-match',
-      player: updatedPlayer,
-      candidates: [updatedPlayer],
-    };
+    return persistLinkedPlayer(tripId, merged, 'claimed-name-match');
   }
 
   if (!currentUser) {
@@ -113,4 +166,56 @@ export async function ensureCurrentUserTripPlayerLink(
     player: createdPlayer,
     candidates: [createdPlayer],
   };
+}
+
+export async function claimTripPlayerForCurrentUser(
+  tripId: string,
+  playerId: string,
+  players: Player[],
+  currentUser: CurrentTripPlayerIdentity | null,
+  isAuthenticated = true,
+  options?: {
+    allowEmailMismatch?: boolean;
+  }
+): Promise<TripPlayerLinkResult> {
+  const initialResult = assessTripPlayerLink(players, currentUser, isAuthenticated);
+  if (!currentUser || initialResult.status === 'missing-user') {
+    return initialResult;
+  }
+
+  if (initialResult.player?.id === playerId) {
+    return initialResult;
+  }
+
+  const candidate = players.find((player) => player.id === playerId) ?? (await db.players.get(playerId));
+  if (!candidate) {
+    return {
+      status: 'unresolved',
+      player: null,
+      candidates: [],
+    };
+  }
+
+  if (candidate.tripId && candidate.tripId !== tripId) {
+    return {
+      status: 'link-conflict',
+      player: null,
+      candidates: [candidate],
+    };
+  }
+
+  if (hasConflictingExplicitLink(candidate, currentUser)) {
+    return {
+      status: 'link-conflict',
+      player: null,
+      candidates: [candidate],
+    };
+  }
+
+  const merged = mergeLinkedPlayerIdentity(tripId, candidate, currentUser, options);
+  if ('status' in merged) {
+    return merged;
+  }
+
+  return persistLinkedPlayer(tripId, merged, 'claimed-explicit');
 }

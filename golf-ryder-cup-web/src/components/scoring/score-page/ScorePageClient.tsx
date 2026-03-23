@@ -10,6 +10,7 @@ import { db } from '@/lib/db';
 import { createLogger } from '@/lib/utils/logger';
 import { useAuthStore, useScoringStore, useTripStore } from '@/lib/stores';
 import { navigateBackOr } from '@/lib/utils/navigation';
+import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import {
     buildHoleResultsByMatchId,
     buildScoreSessionStats,
@@ -28,12 +29,17 @@ export default function ScorePageClient() {
     const router = useRouter();
     const { currentTrip, sessions, players } = useTripStore();
     const { selectMatch } = useScoringStore();
-    const { currentUser, isAuthenticated } = useAuthStore();
+    const { currentUser, isAuthenticated, authUserId } = useAuthStore();
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
+    const currentIdentity = useMemo(
+        () => withTripPlayerIdentity(currentUser, authUserId),
+        [authUserId, currentUser]
+    );
+
     const currentUserPlayer = useMemo(
-        () => findCurrentUserPlayer(players, currentUser, isAuthenticated),
-        [currentUser, isAuthenticated, players]
+        () => findCurrentUserPlayer(players, currentIdentity, isAuthenticated),
+        [currentIdentity, isAuthenticated, players]
     );
 
     const defaultActiveSession = useMemo(

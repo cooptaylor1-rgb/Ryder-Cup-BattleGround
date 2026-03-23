@@ -13,6 +13,7 @@ import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkSe
 import { useAuthStore } from '@/lib/stores';
 import { useTripStore } from '@/lib/stores/tripStore';
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
+import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { cn } from '@/lib/utils';
 import { Users, Loader2, CheckCircle, XCircle, Share2 } from 'lucide-react';
 import { Modal } from './Modal';
@@ -33,7 +34,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { loadTrip } = useTripStore();
-  const { currentUser, isAuthenticated } = useAuthStore();
+  const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
   useEffect(() => {
     if (!isOpen) {
@@ -86,7 +87,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
         const linkResult = await ensureCurrentUserTripPlayerLink(
           result.tripId,
           loadedPlayers,
-          currentUser,
+          withTripPlayerIdentity(currentUser, authUserId),
           isAuthenticated
         );
         if (linkResult.status === 'claimed-name-match' || linkResult.status === 'created') {
