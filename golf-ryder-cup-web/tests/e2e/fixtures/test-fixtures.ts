@@ -9,7 +9,12 @@
  */
 
 import { test as base, expect } from '@playwright/test';
-import { waitForStableDOM, dismissAllBlockingModals, clearIndexedDB } from '../utils/test-helpers';
+import {
+  waitForStableDOM,
+  dismissAllBlockingModals,
+  clearIndexedDB,
+  enableCaptainMode as enableCaptainModeHelper,
+} from '../utils/test-helpers';
 import {
   generateTestData,
   toIndexedDBFormat,
@@ -17,6 +22,155 @@ import {
   type SeedSize,
   type GeneratedTrip,
 } from '../utils/seeder';
+
+const TEST_DB_VERSION = 11;
+
+const TEST_DB_SCHEMA = [
+  { name: 'trips', keyPath: 'id', indexes: [['name', 'name'], ['startDate', 'startDate']] },
+  { name: 'players', keyPath: 'id', indexes: [['tripId', 'tripId'], ['name', 'name'], ['handicapIndex', 'handicapIndex']] },
+  { name: 'teams', keyPath: 'id', indexes: [['tripId', 'tripId'], ['name', 'name']] },
+  { name: 'teamMembers', keyPath: 'id', indexes: [['teamId', 'teamId'], ['playerId', 'playerId'], ['teamId+playerId', ['teamId', 'playerId']]] },
+  { name: 'sessions', keyPath: 'id', indexes: [['tripId', 'tripId'], ['scheduledDate', 'scheduledDate'], ['tripId+scheduledDate', ['tripId', 'scheduledDate']]] },
+  { name: 'matches', keyPath: 'id', indexes: [['sessionId', 'sessionId'], ['status', 'status'], ['sessionId+matchOrder', ['sessionId', 'matchOrder']]] },
+  { name: 'holeResults', keyPath: 'id', indexes: [['matchId', 'matchId'], ['holeNumber', 'holeNumber'], ['matchId+holeNumber', ['matchId', 'holeNumber']]] },
+  { name: 'courses', keyPath: 'id', indexes: [['name', 'name']] },
+  { name: 'teeSets', keyPath: 'id', indexes: [['courseId', 'courseId'], ['courseId+name', ['courseId', 'name']]] },
+  { name: 'scheduleDays', keyPath: 'id', indexes: [['tripId', 'tripId'], ['date', 'date'], ['tripId+date', ['tripId', 'date']]] },
+  { name: 'scheduleItems', keyPath: 'id', indexes: [['scheduleDayId', 'scheduleDayId'], ['startTime', 'startTime']] },
+  { name: 'auditLog', keyPath: 'id', indexes: [['tripId', 'tripId'], ['timestamp', 'timestamp'], ['actionType', 'actionType'], ['tripId+timestamp', ['tripId', 'timestamp']]] },
+  { name: 'banterPosts', keyPath: 'id', indexes: [['tripId', 'tripId'], ['timestamp', 'timestamp'], ['tripId+timestamp', ['tripId', 'timestamp']]] },
+  { name: 'scoringEvents', keyPath: 'localId', autoIncrement: true, indexes: [['id', 'id'], ['matchId', 'matchId'], ['timestamp', 'timestamp'], ['synced', 'synced'], ['matchId+timestamp', ['matchId', 'timestamp']], ['matchId+synced', ['matchId', 'synced']]] },
+  { name: 'syncMeta', keyPath: 'key', indexes: [] },
+  { name: 'courseProfiles', keyPath: 'id', indexes: [['name', 'name']] },
+  { name: 'teeSetProfiles', keyPath: 'id', indexes: [['courseProfileId', 'courseProfileId'], ['courseProfileId+name', ['courseProfileId', 'name']]] },
+  { name: 'sideBets', keyPath: 'id', indexes: [['tripId', 'tripId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'tripStats', keyPath: 'id', indexes: [['tripId', 'tripId'], ['playerId', 'playerId'], ['sessionId', 'sessionId'], ['statType', 'statType'], ['tripId+playerId', ['tripId', 'playerId']], ['tripId+statType', ['tripId', 'statType']], ['playerId+statType', ['playerId', 'statType']]] },
+  { name: 'tripAwards', keyPath: 'id', indexes: [['tripId', 'tripId'], ['awardType', 'awardType'], ['winnerId', 'winnerId'], ['tripId+awardType', ['tripId', 'awardType']]] },
+  { name: 'wolfGames', keyPath: 'id', indexes: [['tripId', 'tripId'], ['sessionId', 'sessionId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'vegasGames', keyPath: 'id', indexes: [['tripId', 'tripId'], ['sessionId', 'sessionId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'hammerGames', keyPath: 'id', indexes: [['tripId', 'tripId'], ['sessionId', 'sessionId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'nassauGames', keyPath: 'id', indexes: [['tripId', 'tripId'], ['sessionId', 'sessionId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'settlements', keyPath: 'id', indexes: [['tripId', 'tripId'], ['fromPlayerId', 'fromPlayerId'], ['toPlayerId', 'toPlayerId'], ['status', 'status'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'chatMessages', keyPath: 'id', indexes: [['tripId', 'tripId'], ['threadId', 'threadId'], ['authorId', 'authorId'], ['timestamp', 'timestamp'], ['tripId+timestamp', ['tripId', 'timestamp']], ['threadId+timestamp', ['threadId', 'timestamp']]] },
+  { name: 'chatThreads', keyPath: 'id', indexes: [['tripId', 'tripId'], ['createdAt', 'createdAt'], ['tripId+createdAt', ['tripId', 'createdAt']]] },
+  { name: 'trashTalks', keyPath: 'id', indexes: [['tripId', 'tripId'], ['authorId', 'authorId'], ['targetId', 'targetId'], ['timestamp', 'timestamp'], ['tripId+timestamp', ['tripId', 'timestamp']]] },
+  { name: 'photos', keyPath: 'id', indexes: [['tripId', 'tripId'], ['albumId', 'albumId'], ['uploaderId', 'uploaderId'], ['uploadedAt', 'uploadedAt'], ['tripId+uploadedAt', ['tripId', 'uploadedAt']], ['albumId+uploadedAt', ['albumId', 'uploadedAt']]] },
+  { name: 'photoAlbums', keyPath: 'id', indexes: [['tripId', 'tripId'], ['createdAt', 'createdAt'], ['tripId+createdAt', ['tripId', 'createdAt']]] },
+  { name: 'polls', keyPath: 'id', indexes: [['tripId', 'tripId'], ['createdById', 'createdById'], ['status', 'status'], ['expiresAt', 'expiresAt'], ['tripId+status', ['tripId', 'status']], ['tripId+expiresAt', ['tripId', 'expiresAt']]] },
+  { name: 'headToHeadRecords', keyPath: 'id', indexes: [['tripId', 'tripId'], ['player1Id', 'player1Id'], ['player2Id', 'player2Id'], ['tripId+player1Id', ['tripId', 'player1Id']], ['player1Id+player2Id', ['player1Id', 'player2Id']]] },
+  { name: 'tripArchives', keyPath: 'id', indexes: [['tripId', 'tripId'], ['archivedAt', 'archivedAt']] },
+  { name: 'courseSyncQueue', keyPath: 'queueId', autoIncrement: true, indexes: [['courseProfileId', 'courseProfileId'], ['status', 'status'], ['retryCount', 'retryCount'], ['createdAt', 'createdAt'], ['status+retryCount', ['status', 'retryCount']]] },
+  { name: 'tripSyncQueue', keyPath: 'id', indexes: [['tripId', 'tripId'], ['status', 'status'], ['retryCount', 'retryCount'], ['createdAt', 'createdAt'], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'duesLineItems', keyPath: 'id', indexes: [['tripId', 'tripId'], ['playerId', 'playerId'], ['category', 'category'], ['status', 'status'], ['tripId+playerId', ['tripId', 'playerId']], ['tripId+status', ['tripId', 'status']], ['tripId+category', ['tripId', 'category']]] },
+  { name: 'paymentRecords', keyPath: 'id', indexes: [['tripId', 'tripId'], ['fromPlayerId', 'fromPlayerId'], ['createdAt', 'createdAt'], ['tripId+fromPlayerId', ['tripId', 'fromPlayerId']]] },
+  { name: 'tripTemplates', keyPath: 'id', indexes: [['name', 'name'], ['isBuiltin', 'isBuiltin'], ['useCount', 'useCount'], ['createdAt', 'createdAt']] },
+] as const;
+
+async function seedDatabase(
+  page: import('@playwright/test').Page,
+  seedData: Record<string, unknown[]>,
+  currentTripId?: string
+): Promise<void> {
+  await page.evaluate(
+    ({ dbVersion, schema, data, tripId }) =>
+      new Promise<void>((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+          reject(new Error('Timed out while seeding GolfTripDB'));
+        }, 15000);
+
+        const request = indexedDB.open('GolfTripDB', dbVersion);
+
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          const upgradeTx = request.transaction;
+          if (!upgradeTx) return;
+
+          for (const storeSchema of schema) {
+            let store: IDBObjectStore;
+            if (db.objectStoreNames.contains(storeSchema.name)) {
+              store = upgradeTx.objectStore(storeSchema.name);
+            } else {
+              store = db.createObjectStore(storeSchema.name, {
+                keyPath: storeSchema.keyPath,
+                autoIncrement: storeSchema.autoIncrement ?? false,
+              });
+            }
+
+            for (const [indexName, keyPath] of storeSchema.indexes) {
+              if (!store.indexNames.contains(indexName)) {
+                store.createIndex(indexName, keyPath);
+              }
+            }
+          }
+        };
+
+        request.onerror = () => {
+          window.clearTimeout(timeoutId);
+          reject(request.error ?? new Error('Failed to open GolfTripDB'));
+        };
+
+        request.onblocked = () => {
+          window.clearTimeout(timeoutId);
+          reject(new Error('GolfTripDB open was blocked'));
+        };
+
+        request.onsuccess = () => {
+          const db = request.result;
+          const storeNames = Array.from(db.objectStoreNames);
+
+          if (storeNames.length === 0) {
+            window.clearTimeout(timeoutId);
+            db.close();
+            reject(new Error('GolfTripDB opened without object stores'));
+            return;
+          }
+
+          try {
+            const tx = db.transaction(storeNames, 'readwrite');
+
+            for (const storeName of storeNames) {
+              tx.objectStore(storeName).clear();
+            }
+
+            for (const [tableName, records] of Object.entries(data)) {
+              const store = tx.objectStore(tableName);
+              for (const record of records) {
+                store.put(record);
+              }
+            }
+
+            tx.oncomplete = () => {
+              if (tripId) {
+                localStorage.setItem(
+                  'golf-trip-storage',
+                  JSON.stringify({ state: { currentTripId: tripId }, version: 0 })
+                );
+              }
+              window.clearTimeout(timeoutId);
+              db.close();
+              resolve();
+            };
+
+            tx.onerror = () => {
+              window.clearTimeout(timeoutId);
+              db.close();
+              reject(tx.error ?? new Error('Failed to seed GolfTripDB'));
+            };
+          } catch (error) {
+            window.clearTimeout(timeoutId);
+            db.close();
+            reject(error);
+          }
+        };
+      }),
+    {
+      dbVersion: TEST_DB_VERSION,
+      schema: TEST_DB_SCHEMA,
+      data: seedData,
+      tripId: currentTripId,
+    }
+  );
+}
 
 // ============================================================================
 // FIXTURE TYPES
@@ -87,46 +241,8 @@ export const test = base.extend<TestFixtures, TestWorkerFixtures>({
       const config = { ...SEED_CONFIGS.small, seed: 'small-dataset-seed' };
       const data = generateTestData(config);
       const dbData = toIndexedDBFormat(data);
-
-      await page.evaluate((seedData) => {
-        return new Promise<void>((resolve, reject) => {
-          const request = indexedDB.open('GolfTripDB');
-          request.onsuccess = () => {
-            const db = request.result;
-            try {
-              const tx = db.transaction(
-                ['trips', 'players', 'teams', 'teamMembers', 'sessions', 'matches'],
-                'readwrite'
-              );
-
-              for (const [tableName, records] of Object.entries(seedData)) {
-                const store = tx.objectStore(tableName);
-                for (const record of records as unknown[]) {
-                  store.put(record);
-                }
-              }
-
-              tx.oncomplete = () => resolve();
-              tx.onerror = () => reject(tx.error);
-            } catch (e) {
-              reject(e);
-            }
-          };
-          request.onerror = () => reject(request.error);
-        });
-      }, dbData);
-
-      // Persist current trip ID for TripRehydrationProvider
       const firstTripId = data[0]?.id;
-      if (firstTripId) {
-        await page.evaluate((tripId) => {
-          localStorage.setItem(
-            'golf-trip-storage',
-            JSON.stringify({ state: { currentTripId: tripId }, version: 0 })
-          );
-        }, firstTripId);
-      }
-
+      await seedDatabase(page, dbData as Record<string, unknown[]>, firstTripId);
       return data;
     };
     await use(seedFn);
@@ -138,46 +254,8 @@ export const test = base.extend<TestFixtures, TestWorkerFixtures>({
       const config = { ...SEED_CONFIGS.large, seed: 'large-dataset-seed' };
       const data = generateTestData(config);
       const dbData = toIndexedDBFormat(data);
-
-      await page.evaluate((seedData) => {
-        return new Promise<void>((resolve, reject) => {
-          const request = indexedDB.open('GolfTripDB');
-          request.onsuccess = () => {
-            const db = request.result;
-            try {
-              const tx = db.transaction(
-                ['trips', 'players', 'teams', 'teamMembers', 'sessions', 'matches'],
-                'readwrite'
-              );
-
-              for (const [tableName, records] of Object.entries(seedData)) {
-                const store = tx.objectStore(tableName);
-                for (const record of records as unknown[]) {
-                  store.put(record);
-                }
-              }
-
-              tx.oncomplete = () => resolve();
-              tx.onerror = () => reject(tx.error);
-            } catch (e) {
-              reject(e);
-            }
-          };
-          request.onerror = () => reject(request.error);
-        });
-      }, dbData);
-
-      // Persist current trip ID for TripRehydrationProvider
       const firstTripId = data[0]?.id;
-      if (firstTripId) {
-        await page.evaluate((tripId) => {
-          localStorage.setItem(
-            'golf-trip-storage',
-            JSON.stringify({ state: { currentTripId: tripId }, version: 0 })
-          );
-        }, firstTripId);
-      }
-
+      await seedDatabase(page, dbData as Record<string, unknown[]>, firstTripId);
       return data;
     };
     await use(seedFn);
@@ -189,46 +267,8 @@ export const test = base.extend<TestFixtures, TestWorkerFixtures>({
       const fullConfig = { ...SEED_CONFIGS[config.size], seed: config.seed };
       const data = generateTestData(fullConfig);
       const dbData = toIndexedDBFormat(data);
-
-      await page.evaluate((seedData) => {
-        return new Promise<void>((resolve, reject) => {
-          const request = indexedDB.open('GolfTripDB');
-          request.onsuccess = () => {
-            const db = request.result;
-            try {
-              const tx = db.transaction(
-                ['trips', 'players', 'teams', 'teamMembers', 'sessions', 'matches'],
-                'readwrite'
-              );
-
-              for (const [tableName, records] of Object.entries(seedData)) {
-                const store = tx.objectStore(tableName);
-                for (const record of records as unknown[]) {
-                  store.put(record);
-                }
-              }
-
-              tx.oncomplete = () => resolve();
-              tx.onerror = () => reject(tx.error);
-            } catch (e) {
-              reject(e);
-            }
-          };
-          request.onerror = () => reject(request.error);
-        });
-      }, dbData);
-
-      // Persist current trip ID for TripRehydrationProvider
       const firstTripId = data[0]?.id;
-      if (firstTripId) {
-        await page.evaluate((tripId) => {
-          localStorage.setItem(
-            'golf-trip-storage',
-            JSON.stringify({ state: { currentTripId: tripId }, version: 0 })
-          );
-        }, firstTripId);
-      }
-
+      await seedDatabase(page, dbData as Record<string, unknown[]>, firstTripId);
       return data;
     };
     await use(seedFn);
@@ -237,19 +277,7 @@ export const test = base.extend<TestFixtures, TestWorkerFixtures>({
   // Enable captain mode
   enableCaptainMode: async ({ page }, use) => {
     const enableFn = async (pin?: string) => {
-      await page.goto('/captain');
-      await waitForStableDOM(page);
-
-      const pinInput = page.locator('input[type="password"], input[type="tel"], input[pattern]');
-
-      if ((await pinInput.count()) > 0 && pin) {
-        await pinInput.first().fill(pin);
-        await page.locator('button[type="submit"], button:has-text("Verify")').first().click();
-        await waitForStableDOM(page);
-      }
-
-      const captainIndicator = page.locator('text=/captain mode|captain enabled/i');
-      return await captainIndicator.isVisible({ timeout: 5000 }).catch(() => false);
+      return enableCaptainModeHelper(page, pin);
     };
     await use(enableFn);
   },

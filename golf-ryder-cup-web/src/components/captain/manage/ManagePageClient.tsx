@@ -32,6 +32,7 @@ import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascade
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
 import { captainLogger } from '@/lib/utils/logger';
+import { navigateBackOr } from '@/lib/utils/navigation';
 
 import {
   buildPlayerById,
@@ -255,7 +256,7 @@ export function ManagePageClient() {
   }
 
   return (
-    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" data-testid="captain-manage-page">
       <PageHeader
         title="Manage Trip"
         subtitle={currentTrip.name}
@@ -264,7 +265,7 @@ export function ManagePageClient() {
           background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
           boxShadow: 'var(--shadow-glow-green)',
         }}
-        onBack={() => router.back()}
+        onBack={() => navigateBackOr(router, '/captain')}
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
@@ -297,6 +298,7 @@ export function ManagePageClient() {
               <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
                 <Link
                   href="/lineup/new?mode=session"
+                  data-testid="captain-new-session-link"
                   className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
                 >
                   <Plus size={16} />
@@ -304,6 +306,7 @@ export function ManagePageClient() {
                 </Link>
                 <Link
                   href="/courses"
+                  data-testid="captain-course-library-link"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--gold)]/22 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
                 >
                   <Map size={16} />

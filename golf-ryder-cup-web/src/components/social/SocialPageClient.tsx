@@ -18,6 +18,7 @@ import { db } from '@/lib/db';
 import { useAuthStore, useTripStore, useUIStore } from '@/lib/stores';
 import { uiLogger } from '@/lib/utils/logger';
 import { shareBanterPost } from '@/lib/utils/share';
+import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 import type { BanterPost } from '@/lib/types/models';
 
 const QUICK_EMOJIS = ['\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\u26F3', '\uD83C\uDFAF'];
@@ -30,26 +31,7 @@ function resolveCurrentFeedPlayer(
     return players[0];
   }
 
-  const matchedPlayer = players.find((player) => {
-    const playerEmail = player.email?.toLowerCase();
-    const userEmail = currentUser.email?.toLowerCase();
-    if (playerEmail && userEmail && playerEmail === userEmail) {
-      return true;
-    }
-
-    const playerFirst = (player.firstName ?? '').toLowerCase();
-    const playerLast = (player.lastName ?? '').toLowerCase();
-    const userFirst = (currentUser.firstName ?? '').toLowerCase();
-    const userLast = (currentUser.lastName ?? '').toLowerCase();
-
-    if (!playerFirst || !playerLast || !userFirst || !userLast) {
-      return false;
-    }
-
-    return playerFirst === userFirst && playerLast === userLast;
-  });
-
-  return matchedPlayer ?? players[0];
+  return resolveCurrentTripPlayer(players, currentUser, true) ?? players[0];
 }
 
 export default function SocialPageClient() {

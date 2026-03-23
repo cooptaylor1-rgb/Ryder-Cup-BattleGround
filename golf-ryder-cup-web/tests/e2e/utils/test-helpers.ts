@@ -449,8 +449,12 @@ export async function dismissOnboardingModal(page: Page): Promise<void> {
             .isVisible({ timeout: 1000 })
             .catch(() => false)
         ) {
-          await button.first().click();
+          await button.first().click({ force: true });
           await page.waitForTimeout(TEST_CONFIG.delays.animation);
+          await page
+            .locator('[role="dialog"]')
+            .waitFor({ state: 'hidden', timeout: TEST_CONFIG.timeouts.fast })
+            .catch(() => {});
           break;
         }
       }
@@ -651,6 +655,23 @@ export async function assertPageLoadTime(page: Page, maxMs: number): Promise<voi
  * Enable captain mode via UI
  */
 export async function enableCaptainMode(page: Page, pin?: string): Promise<boolean> {
+  if (!pin) {
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'golf-ui-storage',
+        JSON.stringify({
+          state: {
+            isCaptainMode: true,
+          },
+          version: 0,
+        })
+      );
+    });
+    await page.reload();
+    await waitForStableDOM(page);
+    return true;
+  }
+
   await navigateAndSetup(page, '/captain');
 
   // Look for PIN input

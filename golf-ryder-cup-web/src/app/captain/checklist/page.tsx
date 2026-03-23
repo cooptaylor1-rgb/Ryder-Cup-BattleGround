@@ -9,10 +9,12 @@ import {
   CaptainNoTripState,
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
+import { ErrorBoundary } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
 import type { Match } from '@/lib/types/models';
+import { navigateBackOr } from '@/lib/utils/navigation';
 import { cn } from '@/lib/utils';
 import {
   CalendarDays,
@@ -99,11 +101,11 @@ export default function ChecklistPage() {
   }
 
   return (
-    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" data-testid="captain-checklist-page">
       <PageHeader
         title="Pre-Flight"
         subtitle={currentTrip.name}
-        onBack={() => router.back()}
+        onBack={() => navigateBackOr(router, '/captain')}
         icon={<Rocket size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
       />
@@ -162,63 +164,111 @@ export default function ChecklistPage() {
           </div>
         </section>
 
-        <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
-          <div className="rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
-            <div className="mb-[var(--space-4)]">
-              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Launch Checklist</p>
-              <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
-                Check the routing before the day starts moving.
-              </h2>
+        <ErrorBoundary
+          resetKey={`${currentTrip.id}:${sessionIdsKey}:${matches.length}:${matchesLoadError ?? 'ok'}`}
+          fallback={<ChecklistRuntimeFallback />}
+        >
+          <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
+            <div className="rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+              <div className="mb-[var(--space-4)]">
+                <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Launch Checklist</p>
+                <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
+                  Check the routing before the day starts moving.
+                </h2>
+              </div>
+
+              {matchesLoadError ? (
+                <div className="mb-[var(--space-4)] rounded-[1.25rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 px-[var(--space-4)] py-[var(--space-4)]">
+                  <p className="type-meta font-semibold text-[var(--warning)]">Match board loaded with a fallback query</p>
+                  <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                    The direct match lookup failed once on this device, so the checklist fell back to a safer load path instead of crashing the captain room.
+                  </p>
+                </div>
+              ) : null}
+
+              <PreFlightChecklist
+                tripId={currentTrip.id}
+                trip={currentTrip}
+                players={players}
+                teams={teams}
+                teamMembers={teamMembers}
+                sessions={sessions}
+                matches={matches}
+                courses={courses}
+                teeSets={teeSets}
+                onAllClear={handleAllClear}
+              />
             </div>
 
-            {matchesLoadError ? (
-              <div className="mb-[var(--space-4)] rounded-[1.25rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 px-[var(--space-4)] py-[var(--space-4)]">
-                <p className="type-meta font-semibold text-[var(--warning)]">Match board loaded with a fallback query</p>
-                <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
-                  The direct match lookup failed once on this device, so the checklist fell back to a safer load path instead of crashing the captain room.
-                </p>
+            <aside className="space-y-[var(--space-4)]">
+              <ChecklistSidebarCard
+                title="Fix the inputs first"
+                body="Roster, teams, and sessions are the load-bearing pieces. If those are sound, the rest of the board usually follows."
+                icon={<Users size={18} />}
+              />
+              <ChecklistSidebarCard
+                title="Do this before breakfast"
+                body="The checklist is most valuable before the group is standing on property. After that, it turns from planning tool into damage control."
+                icon={<Rocket size={18} />}
+                tone="maroon"
+              />
+              <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
+                <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Fixes</p>
+                <div className="mt-[var(--space-4)] space-y-3">
+                  <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
+                  <QuickFixLink href="/courses" icon={<Map size={18} />} title="Add or Import Courses" body="Build the course library and tee sets first." />
+                  <QuickFixLink href="/captain/manage" icon={<Shield size={18} />} title="Assign Match Courses" body="Use each match card to set the course and tee used for handicaps." />
+                  <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Command" body="Return to the main board." />
+                </div>
               </div>
-            ) : null}
-
-            <PreFlightChecklist
-              tripId={currentTrip.id}
-              trip={currentTrip}
-              players={players}
-              teams={teams}
-              teamMembers={teamMembers}
-              sessions={sessions}
-              matches={matches}
-              courses={courses}
-              teeSets={teeSets}
-              onAllClear={handleAllClear}
-            />
-          </div>
-
-          <aside className="space-y-[var(--space-4)]">
-            <ChecklistSidebarCard
-              title="Fix the inputs first"
-              body="Roster, teams, and sessions are the load-bearing pieces. If those are sound, the rest of the board usually follows."
-              icon={<Users size={18} />}
-            />
-            <ChecklistSidebarCard
-              title="Do this before breakfast"
-              body="The checklist is most valuable before the group is standing on property. After that, it turns from planning tool into damage control."
-              icon={<Rocket size={18} />}
-              tone="maroon"
-            />
-            <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
-              <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Fixes</p>
-              <div className="mt-[var(--space-4)] space-y-3">
-                <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
-                <QuickFixLink href="/courses" icon={<Map size={18} />} title="Add or Import Courses" body="Build the course library and tee sets first." />
-                <QuickFixLink href="/captain/manage" icon={<Shield size={18} />} title="Assign Match Courses" body="Use each match card to set the course and tee used for handicaps." />
-                <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Command" body="Return to the main board." />
-              </div>
-            </div>
-          </aside>
-        </section>
+            </aside>
+          </section>
+        </ErrorBoundary>
       </main>
     </div>
+  );
+}
+
+function ChecklistRuntimeFallback() {
+  return (
+    <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
+      <div className="rounded-[2rem] border border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.08),rgba(255,255,255,0.98))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+        <p className="type-overline tracking-[0.16em] text-[var(--warning)]">Checklist fallback</p>
+        <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
+          The board hit a snag, but the trip did not.
+        </h2>
+        <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+          The captain route stayed open on purpose. Use one of the quick fixes to keep moving,
+          then come back and run the checklist again.
+        </p>
+
+        <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
+          <Link
+            href="/captain/manage"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--masters)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)] transition-transform duration-150 hover:scale-[1.02]"
+          >
+            Open manage
+          </Link>
+          <Link
+            href="/courses"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--gold)]/28 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-transform duration-150 hover:scale-[1.02]"
+          >
+            Add or import courses
+          </Link>
+        </div>
+      </div>
+
+      <aside className="space-y-[var(--space-4)]">
+        <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
+          <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Quick Fixes</p>
+          <div className="mt-[var(--space-4)] space-y-3">
+            <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
+            <QuickFixLink href="/courses" icon={<Map size={18} />} title="Add or Import Courses" body="Build the course library and tee sets first." />
+            <QuickFixLink href="/captain/manage" icon={<Shield size={18} />} title="Assign Match Courses" body="Use each match card to set the course and tee used for handicaps." />
+          </div>
+        </div>
+      </aside>
+    </section>
   );
 }
 

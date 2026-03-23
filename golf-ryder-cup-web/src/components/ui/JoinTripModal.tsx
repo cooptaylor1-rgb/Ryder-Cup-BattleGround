@@ -9,6 +9,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { syncService } from '@/lib/supabase';
+import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
+import { useAuthStore } from '@/lib/stores';
 import { useTripStore } from '@/lib/stores/tripStore';
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { cn } from '@/lib/utils';
@@ -31,6 +33,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { loadTrip } = useTripStore();
+  const { currentUser, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     if (!isOpen) {
@@ -79,6 +82,16 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
         storeTripShareCode(result.tripId, shareCode.trim());
         // Load the trip from local DB (already synced by joinTripByShareCode)
         await loadTrip(result.tripId);
+        const loadedPlayers = useTripStore.getState?.()?.players ?? [];
+        const linkResult = await ensureCurrentUserTripPlayerLink(
+          result.tripId,
+          loadedPlayers,
+          currentUser,
+          isAuthenticated
+        );
+        if (linkResult.status === 'claimed-name-match' || linkResult.status === 'created') {
+          await loadTrip(result.tripId);
+        }
         setSuccess(true);
         successTimeoutRef.current = setTimeout(() => {
           onSuccess?.(result.tripId!);

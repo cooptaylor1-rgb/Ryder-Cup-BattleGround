@@ -2,6 +2,7 @@ import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { Match } from '@/lib/types';
 import type { MatchState } from '@/lib/types/computed';
 import type { HoleResult, Player, RyderCupSession } from '@/lib/types/models';
+import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 
 interface ScoreUserIdentity {
     email?: string | null;
@@ -14,21 +15,7 @@ export function findCurrentUserPlayer(
     currentUser: ScoreUserIdentity | null,
     isAuthenticated: boolean
 ): Player | undefined {
-    if (!isAuthenticated || !currentUser) return undefined;
-
-    return players.find((player) => {
-        const playerEmail = player.email?.toLowerCase();
-        const userEmail = currentUser.email?.toLowerCase();
-        if (playerEmail && userEmail && playerEmail === userEmail) return true;
-
-        const playerFirst = (player.firstName ?? '').toLowerCase();
-        const playerLast = (player.lastName ?? '').toLowerCase();
-        const userFirst = (currentUser.firstName ?? '').toLowerCase();
-        const userLast = (currentUser.lastName ?? '').toLowerCase();
-
-        if (!playerFirst || !userFirst || !playerLast || !userLast) return false;
-        return playerFirst === userFirst && playerLast === userLast;
-    });
+    return resolveCurrentTripPlayer(players, currentUser, isAuthenticated) ?? undefined;
 }
 
 export function getDefaultActiveScoringSession(

@@ -12,6 +12,7 @@ import { db } from '@/lib/db';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
+import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 import type { TeamStandings, MatchState } from '@/lib/types/computed';
 import type { Match, RyderCupSession, Trip, Player, SideBet, BanterPost } from '@/lib/types/models';
 import type { TripAward } from '@/lib/types/tripStats';
@@ -134,14 +135,8 @@ export function useHomeData(): HomeData {
     }, [currentTrip?.id]);
 
     // Find current user's player record
-    const currentUserPlayer = useMemo(() => {
-        if (!isAuthenticated || !currentUser) return null;
-        return players.find(
-            p =>
-                (p.email && currentUser.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
-                (p.firstName.toLowerCase() === currentUser.firstName.toLowerCase() &&
-                    p.lastName.toLowerCase() === currentUser.lastName.toLowerCase())
-        );
+  const currentUserPlayer = useMemo(() => {
+        return resolveCurrentTripPlayer(players, currentUser, isAuthenticated);
     }, [currentUser, isAuthenticated, players]);
 
     // Calculate user's match data

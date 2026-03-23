@@ -18,6 +18,7 @@ import { db } from '@/lib/db';
 import { useAuthStore, useTripStore } from '@/lib/stores';
 import { tripLogger } from '@/lib/utils/logger';
 import { navigateBackOr } from '@/lib/utils/navigation';
+import { assessTripPlayerLink } from '@/lib/utils/tripPlayerIdentity';
 import { AlertCircle, CalendarDays, ChevronRight, User } from 'lucide-react';
 import type { Match } from '@/lib/types/models';
 
@@ -74,6 +75,10 @@ export default function SchedulePageClient() {
 
   const currentUserPlayer = useMemo(
     () => resolveCurrentUserPlayer(players, currentUser, isAuthenticated),
+    [currentUser, isAuthenticated, players]
+  );
+  const currentUserPlayerLink = useMemo(
+    () => assessTripPlayerLink(players, currentUser, isAuthenticated),
     [currentUser, isAuthenticated, players]
   );
 
@@ -193,9 +198,12 @@ export default function SchedulePageClient() {
             <div>
               <p className="font-medium text-[var(--warning)]">Profile not linked</p>
               <p className="type-caption mt-1">
-                {currentUser
-                  ? "You're signed in, but this trip doesn't have a player entry that matches your profile yet."
-                  : 'Create a profile or sign in to see your personal tee times.'}
+                {currentUserPlayerLink.status === 'ambiguous-email-match' ||
+                currentUserPlayerLink.status === 'ambiguous-name-match'
+                  ? "This trip has more than one possible roster match for your profile. Ask the captain to confirm which player entry is yours."
+                  : currentUser
+                    ? "You're signed in, but this trip doesn't have a linked player entry for your profile yet."
+                    : 'Create a profile or sign in to see your personal tee times.'}
               </p>
               <Link
                 href={currentUser ? '/profile' : '/profile/create'}

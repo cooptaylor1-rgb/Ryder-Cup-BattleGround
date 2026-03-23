@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import {
   getPreFlightSummary,
   groupValidationsByCategory,
@@ -82,6 +82,7 @@ export function PreFlightChecklist({
   const [result, setResult] = useState<PreFlightCheckResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPassedChecks, setShowPassedChecks] = useState(false);
+  const lastSuccessfulAnnouncementKey = useRef<string | null>(null);
 
   const runCheck = useCallback((announceSuccess = false) => {
     setLoading(true);
@@ -110,8 +111,29 @@ export function PreFlightChecklist({
       );
 
       setResult(checkResult);
+      if (!checkResult.isReady) {
+        lastSuccessfulAnnouncementKey.current = null;
+      }
+
       if (announceSuccess && checkResult.isReady && onAllClear) {
-        onAllClear();
+        const successKey = JSON.stringify({
+          completionPercentage: checkResult.completionPercentage,
+          errors: checkResult.errors.map((item) => ({
+            category: item.category,
+            title: item.title,
+            description: item.description,
+          })),
+          warnings: checkResult.warnings.map((item) => ({
+            category: item.category,
+            title: item.title,
+            description: item.description,
+          })),
+        });
+
+        if (lastSuccessfulAnnouncementKey.current !== successKey) {
+          lastSuccessfulAnnouncementKey.current = successKey;
+          onAllClear();
+        }
       }
     } catch (error) {
       logger.error('Pre-flight check failed:', error);
@@ -164,12 +186,13 @@ export function PreFlightChecklist({
             <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
               Re-run the board. If this keeps happening, the validation service needs attention.
             </p>
-            <button
-              type="button"
-              onClick={() => runCheck(true)}
-              className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)]"
-            >
-              <RefreshCw size={16} />
+          <button
+            type="button"
+            onClick={() => runCheck(true)}
+            data-testid="preflight-rerun"
+            className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)]"
+          >
+            <RefreshCw size={16} />
               Run again
             </button>
           </div>
@@ -214,6 +237,7 @@ export function PreFlightChecklist({
           <button
             type="button"
             onClick={() => runCheck(true)}
+            data-testid="preflight-rerun"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
           >
             <RefreshCw size={16} />

@@ -1,5 +1,6 @@
 import { SessionTypeDisplay, type Match, type Player, type Trip } from '@/lib/types/models';
 import type { UserProfile } from '@/lib/stores/authStore';
+import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 
 export interface ScheduleEntry {
   id: string;
@@ -38,28 +39,7 @@ export function resolveCurrentUserPlayer(
   currentUser: UserProfile | null,
   isAuthenticated: boolean
 ) {
-  if (!isAuthenticated || !currentUser) {
-    return undefined;
-  }
-
-  return players.find((player) => {
-    const playerEmail = player.email?.toLowerCase();
-    const userEmail = currentUser.email?.toLowerCase();
-    if (playerEmail && userEmail && playerEmail === userEmail) {
-      return true;
-    }
-
-    const playerFirst = (player.firstName ?? '').toLowerCase();
-    const playerLast = (player.lastName ?? '').toLowerCase();
-    const userFirst = (currentUser.firstName ?? '').toLowerCase();
-    const userLast = (currentUser.lastName ?? '').toLowerCase();
-
-    if (!playerFirst || !playerLast || !userFirst || !userLast) {
-      return false;
-    }
-
-    return playerFirst === userFirst && playerLast === userLast;
-  });
+  return resolveCurrentTripPlayer(players, currentUser, isAuthenticated) ?? undefined;
 }
 
 export function buildScheduleByDay({

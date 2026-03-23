@@ -571,6 +571,7 @@ function MatchManagementCard({
                     <Button
                       variant="secondary"
                       onClick={onEdit}
+                      data-testid={`match-course-setup-${match.id}`}
                     >
                       Set course & tee
                     </Button>

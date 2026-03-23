@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useTripStore, useAuthStore } from '@/lib/stores';
 import { db } from '@/lib/db';
+import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { tripLogger } from '@/lib/utils/logger';
 
 /**
@@ -19,7 +20,8 @@ import { tripLogger } from '@/lib/utils/logger';
 export function TripRehydrationProvider({ children }: { children: React.ReactNode }) {
     const hasRehydrated = useRef(false);
     const hasCheckedUserTrip = useRef(false);
-    const { currentTrip, loadTrip, isLoading } = useTripStore();
+    const isEnsuringTripPlayer = useRef(false);
+    const { currentTrip, loadTrip, isLoading, players } = useTripStore();
     const { currentUser, isAuthenticated } = useAuthStore();
 
     // Rehydrate persisted trip state
@@ -128,6 +130,44 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
 
         findAndLoadUserTrip();
     }, [isAuthenticated, currentUser, currentTrip, loadTrip]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !currentUser || !currentTrip || isEnsuringTripPlayer.current) {
+            return;
+        }
+
+        let cancelled = false;
+        isEnsuringTripPlayer.current = true;
+
+        const ensureTripPlayerLink = async () => {
+            try {
+                const linkResult = await ensureCurrentUserTripPlayerLink(
+                    currentTrip.id,
+                    players,
+                    currentUser,
+                    isAuthenticated
+                );
+
+                if (
+                    !cancelled &&
+                    (linkResult.status === 'claimed-name-match' || linkResult.status === 'created')
+                ) {
+                    await loadTrip(currentTrip.id);
+                }
+            } catch (error) {
+                tripLogger.error('Failed to ensure trip player link:', error);
+            } finally {
+                isEnsuringTripPlayer.current = false;
+            }
+        };
+
+        void ensureTripPlayerLink();
+
+        return () => {
+            cancelled = true;
+            isEnsuringTripPlayer.current = false;
+        };
+    }, [currentTrip, currentUser, isAuthenticated, loadTrip, players]);
 
     return <>{children}</>;
 }

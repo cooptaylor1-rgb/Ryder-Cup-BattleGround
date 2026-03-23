@@ -13,7 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration
  */
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
+const playwrightPort = process.env.PLAYWRIGHT_PORT || '3100';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${playwrightPort}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -183,7 +184,7 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
   webServer: {
-    command: 'pnpm run dev',
+    command: `pnpm exec next dev --hostname 127.0.0.1 --port ${playwrightPort}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

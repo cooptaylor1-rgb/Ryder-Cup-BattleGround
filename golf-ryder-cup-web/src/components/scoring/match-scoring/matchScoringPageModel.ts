@@ -18,6 +18,7 @@ import type {
 import type { SessionType } from '@/lib/types';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { formatPlayerName } from '@/lib/utils';
+import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
 import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
 
@@ -111,24 +112,6 @@ function buildLineup(players: Player[]): string {
     .join(' & ');
 }
 
-function resolveCurrentUserPlayer(players: Player[], currentUser: UserProfile | null) {
-  if (!currentUser) return undefined;
-
-  return players.find((player) => {
-    const playerEmail = player.email?.toLowerCase();
-    const userEmail = currentUser.email?.toLowerCase();
-    if (playerEmail && userEmail && playerEmail === userEmail) return true;
-
-    const playerFirst = (player.firstName ?? '').toLowerCase();
-    const playerLast = (player.lastName ?? '').toLowerCase();
-    const userFirst = (currentUser.firstName ?? '').toLowerCase();
-    const userLast = (currentUser.lastName ?? '').toLowerCase();
-
-    if (!playerFirst || !playerLast || !userFirst || !userLast) return false;
-    return playerFirst === userFirst && playerLast === userLast;
-  });
-}
-
 export function normalizeScoringMode(mode: ScoringMode, isFourball: boolean): ScoringMode {
   if (isFourball) {
     return mode === 'strokes' ? 'fourball' : mode;
@@ -170,7 +153,7 @@ export function useMatchScoringPageModel(
   );
 
   const currentUserPlayer = useMemo(
-    () => resolveCurrentUserPlayer(players, currentUser),
+    () => resolveCurrentTripPlayer(players, currentUser, Boolean(currentUser)) ?? undefined,
     [players, currentUser]
   );
 
