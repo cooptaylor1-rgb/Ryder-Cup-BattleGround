@@ -64,6 +64,18 @@ export interface GolfCourseAPICourse {
         url?: string;
         confidence?: 'low' | 'medium' | 'high';
     }>;
+    sourceAssets?: Array<{
+        url: string;
+        label: string;
+        kind: 'scorecard' | 'page';
+    }>;
+    missingFields?: string[];
+    duplicateCandidates?: Array<{
+        id: string;
+        name: string;
+        location?: string;
+        reason: string;
+    }>;
     tees?: {
         male?: GolfCourseAPITee[];
         female?: GolfCourseAPITee[];
@@ -263,6 +275,9 @@ export async function getCourseById(
                 dataCompleteness: detail.dataCompleteness,
                 hasPlayableTeeData: detail.hasPlayableTeeData,
                 provenance: detail.provenance,
+                sourceAssets: detail.sourceAssets,
+                missingFields: detail.missingFields,
+                duplicateCandidates: detail.duplicateCandidates,
                 location: {
                     address: detail.address,
                     city: detail.city,

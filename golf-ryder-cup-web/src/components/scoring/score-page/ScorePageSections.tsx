@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player, RyderCupSession } from '@/lib/types/models';
+import type { TripPlayerLinkStatus } from '@/lib/utils/tripPlayerIdentity';
 
 export function ScoreSignInState({
     onSignIn,
@@ -52,11 +53,13 @@ interface ScorePageSectionsProps {
     sessions: RyderCupSession[];
     selectedSessionId: string | null;
     currentUserPlayerId?: string;
+    currentUserPlayerLinkStatus: TripPlayerLinkStatus;
     isLoading: boolean;
     getMatchPlayers: (playerIds: string[]) => Player[];
     onSelectMatch: (matchId: string) => void;
     onSelectSession: (sessionId: string) => void;
     onGoToMatchups: () => void;
+    onOpenProfile: () => void;
 }
 
 export function ScorePageSections({
@@ -68,11 +71,13 @@ export function ScorePageSections({
     sessions,
     selectedSessionId,
     currentUserPlayerId,
+    currentUserPlayerLinkStatus,
     isLoading,
     getMatchPlayers,
     onSelectMatch,
     onSelectSession,
     onGoToMatchups,
+    onOpenProfile,
 }: ScorePageSectionsProps) {
     return (
         <main className="container-editorial">
@@ -132,6 +137,25 @@ export function ScorePageSections({
                         {matchStates.length} match{matchStates.length === 1 ? '' : 'es'}
                     </p>
                 </div>
+
+                {!currentUserPlayerId ? (
+                    <div className="mb-[var(--space-5)] rounded-[1.2rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 p-[var(--space-4)]">
+                        <p className="text-sm font-semibold text-[var(--warning)]">Roster link needed</p>
+                        <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+                            {currentUserPlayerLinkStatus === 'ambiguous-email-match' ||
+                            currentUserPlayerLinkStatus === 'ambiguous-name-match'
+                                ? 'There is more than one possible roster match for your profile. Review it before relying on personal scoring shortcuts.'
+                                : "You're signed in, but this trip does not have a linked player entry for your profile yet."}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={onOpenProfile}
+                            className="mt-[var(--space-3)] inline-flex text-sm font-semibold text-[var(--masters)]"
+                        >
+                            Link profile to roster
+                        </button>
+                    </div>
+                ) : null}
 
                 <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
                     {isLoading ? (

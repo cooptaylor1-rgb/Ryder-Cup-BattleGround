@@ -150,16 +150,18 @@ describe('preFlightValidationService', () => {
       result.warnings.some(
         (item) =>
           item.title.includes('No courses assigned to matches') &&
-          item.actionHref === '/courses' &&
-          item.actionLabel === 'Add Course Library'
+          item.actionHref === '/courses?returnTo=%2Fcaptain%2Fchecklist' &&
+          item.actionLabel === 'Add or Import Courses' &&
+          item.actionKind === 'open-library'
       )
     ).toBe(true);
     expect(
       result.warnings.some(
         (item) =>
           item.title.includes('missing a course') &&
-          item.actionHref === '/courses' &&
-          item.actionLabel === 'Add Course Library'
+          item.actionHref === '/courses?returnTo=%2Fcaptain%2Fchecklist' &&
+          item.actionLabel === 'Add or Import Courses' &&
+          item.actionKind === 'open-library'
       )
     ).toBe(true);
   });
@@ -180,8 +182,9 @@ describe('preFlightValidationService', () => {
       result.warnings.some(
         (item) =>
           item.title.includes('missing a tee set') &&
-          item.actionHref === '/captain/manage' &&
-          item.actionLabel === 'Assign Tee Set'
+          item.actionHref === '/captain/manage?focus=course&sessionId=session-1&matchId=match-1' &&
+          item.actionLabel === 'Assign Match Course' &&
+          item.actionKind === 'assign-match-course'
       )
     ).toBe(true);
   });
@@ -217,8 +220,32 @@ describe('preFlightValidationService', () => {
       result.warnings.some(
         (item) =>
           item.title.includes('missing a course') &&
-          item.actionHref === '/captain/manage' &&
-          item.actionLabel === 'Assign Course'
+          item.actionHref === '/captain/manage?focus=course&sessionId=session-1&matchId=match-1' &&
+          item.actionLabel === 'Assign Match Course' &&
+          item.actionKind === 'assign-match-course'
+      )
+    ).toBe(true);
+  });
+
+  it('routes incomplete lineups directly to the session lineup screen', () => {
+    const result = runPreFlightCheck(
+      createTrip(),
+      createPlayers(),
+      createTeams(),
+      createTeamMembers(),
+      [createSession()],
+      [createMatch({ teamAPlayerIds: [], teamBPlayerIds: ['p5', 'p6'] })],
+      [createCourse()],
+      [createTeeSet()]
+    );
+
+    expect(
+      result.errors.some(
+        (item) =>
+          item.title.includes('incomplete lineups') &&
+          item.actionHref === '/lineup/session-1' &&
+          item.actionLabel === 'Set Lineup' &&
+          item.actionKind === 'open-lineup'
       )
     ).toBe(true);
   });

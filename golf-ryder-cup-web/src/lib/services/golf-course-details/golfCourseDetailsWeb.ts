@@ -111,6 +111,7 @@ export async function extractFromWebProfile({
           ? 'web-extracted'
           : 'web-profile',
       provenance,
+      sourceAssets: linkedAssetProfile.sourceAssets,
     });
   } catch (error) {
     apiLogger.error('Web profile extraction error:', { website, error });
@@ -130,6 +131,7 @@ async function extractLinkedCourseAssetProfile(
       if (pdfProfile.teeSets.length > 0 || pdfProfile.holes.length > 0) {
         return {
           ...pdfProfile,
+          sourceAssets: assets,
           provenance: withProvenance(pdfProfile.provenance, {
             kind: 'scorecard-pdf',
             label: asset.label || 'Linked scorecard PDF',
@@ -145,6 +147,7 @@ async function extractLinkedCourseAssetProfile(
     if (nestedProfile.teeSets.length > 0 || nestedProfile.holes.length > 0) {
       return {
         ...nestedProfile,
+        sourceAssets: assets,
         provenance: nestedProfile.provenance?.length
           ? nestedProfile.provenance
           : [
@@ -162,6 +165,7 @@ async function extractLinkedCourseAssetProfile(
   return {
     holes: [],
     teeSets: [],
+    sourceAssets: assets,
   };
 }
 
@@ -256,6 +260,7 @@ async function extractProfileFromLinkedPage(pageUrl: string): Promise<ExtractedC
                   confidence: 'medium',
                 },
               ],
+      sourceAssets: nestedAssetProfile.sourceAssets,
     };
   } catch (error) {
     apiLogger.error('Linked profile extraction error:', { pageUrl, error });

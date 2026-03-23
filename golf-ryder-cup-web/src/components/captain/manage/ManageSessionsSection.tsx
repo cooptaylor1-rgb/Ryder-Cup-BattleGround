@@ -28,6 +28,7 @@ export interface SessionWithMatches extends RyderCupSession {
 }
 
 type SessionStatus = RyderCupSession['status'];
+type MatchReadinessState = 'needs-course' | 'needs-tee' | 'ready';
 
 const sessionStatusStyles: Record<
   SessionStatus,
@@ -62,6 +63,51 @@ const sessionStatusStyles: Record<
     label: 'Completed',
   },
 };
+
+function getMatchReadinessState({
+  selectedCourse,
+  selectedTeeSet,
+}: {
+  selectedCourse?: Course;
+  selectedTeeSet?: TeeSet;
+}): MatchReadinessState {
+  if (!selectedCourse) {
+    return 'needs-course';
+  }
+
+  if (!selectedTeeSet) {
+    return 'needs-tee';
+  }
+
+  return 'ready';
+}
+
+function MatchReadinessPill({ readiness }: { readiness: MatchReadinessState }) {
+  const config =
+    readiness === 'ready'
+      ? {
+          label: 'Ready for handicaps',
+          className:
+            'border-[color:var(--success)]/18 bg-[color:var(--success)]/12 text-[var(--success)]',
+        }
+      : readiness === 'needs-tee'
+        ? {
+            label: 'Needs tee',
+            className:
+              'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/12 text-[var(--warning)]',
+          }
+        : {
+            label: 'Needs course',
+            className:
+              'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/12 text-[var(--warning)]',
+          };
+
+  return (
+    <div className={cn('rounded-full border px-[var(--space-2)] py-[5px]', config.className)}>
+      <span className="type-micro font-semibold">{config.label}</span>
+    </div>
+  );
+}
 
 export function SessionManagementCard({
   session,
@@ -358,12 +404,15 @@ function MatchManagementCard({
   const teamBNames = getPlayerNames(match.teamBPlayerIds);
   const selectedCourse = courseId ? courses.find((course) => course.id === courseId) : undefined;
   const selectedTeeSet = teeSetId ? teeSets.find((teeSet) => teeSet.id === teeSetId) : undefined;
-  const needsCourseSetup = !selectedCourse || !selectedTeeSet;
   const availableTeeSets = courseId
     ? teeSets
         .filter((teeSet) => teeSet.courseId === courseId)
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
+  const readiness = getMatchReadinessState({ selectedCourse, selectedTeeSet });
+  const needsCourseSetup = readiness !== 'ready';
+  const missingLibraryData = courses.length === 0 || (selectedCourse && availableTeeSets.length === 0);
+  const primaryCourseActionLabel = missingLibraryData ? 'Add or import courses' : 'Set course & tee';
   const statusMeta =
     status === 'completed'
       ? sessionStatusStyles.completed
@@ -535,6 +584,7 @@ function MatchManagementCard({
             >
               <span className="type-micro font-semibold">{statusMeta.label}</span>
             </div>
+            <MatchReadinessPill readiness={readiness} />
           </div>
           <div className="mt-[var(--space-3)] grid gap-[var(--space-2)]">
             <div className="flex flex-wrap items-center gap-[var(--space-2)] text-[var(--ink-secondary)]">
@@ -557,7 +607,7 @@ function MatchManagementCard({
                 <div className="flex items-start justify-between gap-[var(--space-3)]">
                   <div>
                     <p className="type-meta font-semibold text-[var(--warning)]">
-                      Course setup needed
+                      {readiness === 'needs-course' ? 'Course required' : 'Tee set required'}
                     </p>
                     <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
                       {courses.length === 0
@@ -568,21 +618,23 @@ function MatchManagementCard({
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col gap-[var(--space-2)] sm:flex-row">
-                    <Button
-                      variant="secondary"
-                      onClick={onEdit}
-                      data-testid={`match-course-setup-${match.id}`}
-                    >
-                      Set course & tee
-                    </Button>
-                    {(courses.length === 0 || (selectedCourse && availableTeeSets.length === 0)) ? (
+                    {missingLibraryData ? (
                       <Link
                         href="/courses"
                         className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--gold)]/24 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
+                        data-testid={`match-course-setup-${match.id}`}
                       >
-                        Open course library
+                        {primaryCourseActionLabel}
                       </Link>
-                    ) : null}
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        onClick={onEdit}
+                        data-testid={`match-course-setup-${match.id}`}
+                      >
+                        {primaryCourseActionLabel}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

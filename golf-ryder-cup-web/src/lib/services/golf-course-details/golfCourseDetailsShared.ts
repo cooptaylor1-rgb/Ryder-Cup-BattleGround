@@ -3,6 +3,7 @@ import type {
   CourseProfileCompleteness,
   CourseProfileProvenance,
   HoleData,
+  LinkedCourseAsset,
   TeeSetData,
 } from './golfCourseDetailsTypes';
 
@@ -185,6 +186,41 @@ export function determineCourseProfileCompleteness(
   return hasCourseProfile ? 'basic' : 'placeholder';
 }
 
+export function deriveMissingCourseFields(
+  details: Pick<CourseDetailsResponse, 'description' | 'city' | 'state' | 'country'>,
+  holes: HoleData[],
+  teeSets: TeeSetData[]
+): string[] {
+  const missingFields: string[] = [];
+
+  if (!details.description) {
+    missingFields.push('description');
+  }
+
+  if (!details.city && !details.state && !details.country) {
+    missingFields.push('location');
+  }
+
+  if (teeSets.length === 0) {
+    missingFields.push('tee-data');
+  } else if (
+    !teeSets.some(
+      (tee) =>
+        typeof tee.rating === 'number' ||
+        typeof tee.slope === 'number' ||
+        tee.yardages.some((yardage) => yardage !== null)
+    )
+  ) {
+    missingFields.push('ratings-or-yardage');
+  }
+
+  if (holes.length !== 18) {
+    missingFields.push('hole-layout');
+  }
+
+  return missingFields;
+}
+
 export function buildCourseDetailsResponse(
   details: Omit<CourseDetailsResponse, 'dataCompleteness' | 'hasPlayableTeeData'>
 ): CourseDetailsResponse {
@@ -192,6 +228,10 @@ export function buildCourseDetailsResponse(
   const teeSets = coerceTeeSets(details.teeSets);
   const dataCompleteness = determineCourseProfileCompleteness(holes, teeSets, details.source);
   const hasPlayableTeeData = dataCompleteness === 'playable';
+  const missingFields =
+    details.missingFields && details.missingFields.length > 0
+      ? details.missingFields
+      : deriveMissingCourseFields(details, holes, teeSets);
 
   return {
     ...details,
@@ -199,6 +239,7 @@ export function buildCourseDetailsResponse(
     teeSets,
     dataCompleteness,
     hasPlayableTeeData,
+    missingFields,
   };
 }
 

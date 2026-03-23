@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Search, MapPin, Loader2, ChevronRight, Database, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { db } from '@/lib/db';
 import {
     searchCourses,
     getCourseById,
@@ -13,6 +15,10 @@ import {
     type GolfCourseAPICourse,
     type GolfCourseAPITee,
 } from '@/lib/services/golfCourseAPIService';
+import {
+    buildCanonicalCourseKey,
+    findDuplicateCourseProfiles,
+} from '@/lib/utils/courseImport';
 
 function getCourseResultSubline(course: GolfCourseAPICourse): string {
     const location = formatCourseLocation(course.location);
@@ -72,6 +78,9 @@ interface CourseSearchProps {
     onSelectCourse: (course: {
         name: string;
         location: string;
+        sourceUrl?: string;
+        canonicalKey?: string;
+        duplicateCandidates?: GolfCourseAPICourse['duplicateCandidates'];
         teeSets: Array<{
             name: string;
             color: string;
@@ -97,6 +106,21 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     const [isCheckingConfig, setIsCheckingConfig] = useState(true);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const lastSearchRef = useRef<string>('');
+    const existingCourseProfiles = useLiveQuery(() => db.courseProfiles.toArray(), [], []);
+    const duplicateCandidates = useMemo(
+        () =>
+            selectedCourse
+                ? findDuplicateCourseProfiles({
+                      name: selectedCourse.course_name || selectedCourse.club_name,
+                      city: selectedCourse.location?.city,
+                      state: selectedCourse.location?.state,
+                      country: selectedCourse.location?.country,
+                      sourceUrl: selectedCourse.sourcePageUrl || selectedCourse.website,
+                      existingProfiles: existingCourseProfiles ?? [],
+                  })
+                : [],
+        [existingCourseProfiles, selectedCourse]
+    );
 
     // Check if API is configured on mount
     useEffect(() => {
@@ -208,6 +232,15 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
         onSelectCourse({
             name: selectedCourse.course_name || selectedCourse.club_name,
             location: formatCourseLocation(selectedCourse.location),
+            sourceUrl: selectedCourse.sourcePageUrl || selectedCourse.website,
+            canonicalKey: buildCanonicalCourseKey({
+                name: selectedCourse.course_name || selectedCourse.club_name,
+                city: selectedCourse.location?.city,
+                state: selectedCourse.location?.state,
+                country: selectedCourse.location?.country,
+                sourceUrl: selectedCourse.sourcePageUrl || selectedCourse.website,
+            }),
+            duplicateCandidates,
             teeSets,
         });
     };
@@ -327,6 +360,68 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             </a>
                         ) : null}
                     </div>
+                    {selectedCourse.sourceAssets?.length ? (
+                        <div className="mt-4 rounded-xl border border-[var(--rule)] bg-[var(--surface-secondary)] px-4 py-3">
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+                                Sources followed
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {selectedCourse.sourceAssets.map((asset) => (
+                                    <span
+                                        key={asset.url}
+                                        className="rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-2 py-1 text-[11px] font-medium text-[var(--ink-secondary)]"
+                                    >
+                                        {asset.kind === 'scorecard' ? 'Scorecard' : 'Linked page'} · {asset.label || asset.url}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ) : null}
+                    {selectedCourse.missingFields?.length ? (
+                        <div className="mt-4 rounded-xl border border-[var(--rule)] bg-[var(--surface-secondary)] px-4 py-3">
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+                                Still missing
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-[var(--ink-secondary)]">
+                                {selectedCourse.missingFields
+                                    .map((field) =>
+                                        field === 'tee-data'
+                                            ? 'tee data'
+                                            : field === 'ratings-or-yardage'
+                                                ? 'ratings or structured yardage'
+                                                : field === 'hole-layout'
+                                                    ? '18-hole layout'
+                                                    : field
+                                    )
+                                    .join(', ')}
+                            </p>
+                        </div>
+                    ) : null}
+                    {duplicateCandidates.length > 0 ? (
+                        <div className="mt-4 rounded-xl border border-[color:var(--warning)]/25 bg-[color:var(--warning)]/10 px-4 py-3">
+                            <p className="text-sm font-semibold text-[var(--warning)]">
+                                This may already be in your course library
+                            </p>
+                            <div className="mt-2 space-y-2">
+                                {duplicateCandidates.map((candidate) => (
+                                    <div key={candidate.id} className="text-sm text-[var(--ink-secondary)]">
+                                        <span className="font-medium text-[var(--ink)]">{candidate.name}</span>
+                                        {candidate.location ? ` · ${candidate.location}` : ''}
+                                        <span className="ml-2 text-[var(--ink-tertiary)]">({candidate.reason})</span>
+                                    </div>
+                                ))}
+                            </div>
+                            {onClose ? (
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="mt-3 inline-flex text-sm font-semibold text-[var(--masters)]"
+                                >
+                                    Review existing library
+                                </button>
+                            ) : null}
+                        </div>
+                    ) : null}
                 </div>
 
                 {allTees.length === 0 ? (
@@ -339,7 +434,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             onClick={() => handleImportCourse([])}
                             className="mt-2 block w-full py-2 bg-[color:var(--warning)]/15 hover:bg-[color:var(--warning)]/20 rounded font-medium text-[var(--ink-primary)]"
                         >
-                            Import Course (No Tees)
+                            {duplicateCandidates.length > 0 ? 'Import Anyway (No Tees)' : 'Import Course (No Tees)'}
                         </button>
                     </div>
                 ) : (
@@ -353,6 +448,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                                     key={idx}
                                     tee={tee}
                                     onSelect={() => handleImportCourse([tee])}
+                                    importLabel={duplicateCandidates.length > 0 ? 'Import anyway' : 'Import'}
                                 />
                             ))}
                         </div>
@@ -361,7 +457,9 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
                             onClick={() => handleImportCourse(allTees)}
                             className="mt-4 w-full py-3 bg-[var(--masters)] text-[var(--canvas)] font-medium rounded-lg hover:bg-[color:var(--masters)]/90"
                         >
-                            Import All Tees ({allTees.length})
+                            {duplicateCandidates.length > 0
+                                ? `Import Anyway (${allTees.length} tees)`
+                                : `Import All Tees (${allTees.length})`}
                         </button>
                     </>
                 )}
@@ -463,7 +561,15 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
     );
 }
 
-function TeeOption({ tee, onSelect }: { tee: GolfCourseAPITee; onSelect: () => void }) {
+function TeeOption({
+    tee,
+    onSelect,
+    importLabel = 'Import',
+}: {
+    tee: GolfCourseAPITee;
+    onSelect: () => void;
+    importLabel?: string;
+}) {
     const hasHoleData = tee.holes && tee.holes.length > 0;
 
     return (
@@ -489,7 +595,12 @@ function TeeOption({ tee, onSelect }: { tee: GolfCourseAPITee; onSelect: () => v
                         </div>
                     )}
                 </div>
-                <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--masters)]">
+                        {importLabel}
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-[var(--ink-tertiary)]" />
+                </div>
             </div>
         </button>
     );

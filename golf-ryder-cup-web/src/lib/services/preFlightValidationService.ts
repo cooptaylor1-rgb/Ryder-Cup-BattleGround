@@ -12,6 +12,7 @@ import type {
     ValidationItem,
     ValidationCategory,
     ValidationSeverity,
+    ValidationActionKind,
 } from '@/lib/types/captain';
 import type {
     Trip,
@@ -53,6 +54,7 @@ function createValidation(
     options?: {
         actionLabel?: string;
         actionHref?: string;
+        actionKind?: ValidationActionKind;
         autoFixable?: boolean;
     }
 ): ValidationItem {
@@ -64,6 +66,29 @@ function createValidation(
         description,
         ...options,
     };
+}
+
+function buildCourseLibraryHref() {
+    return '/courses?returnTo=%2Fcaptain%2Fchecklist';
+}
+
+function buildManageCourseHref(sessionId?: string, matchId?: string) {
+    const params = new URLSearchParams({ focus: 'course' });
+    if (sessionId) {
+        params.set('sessionId', sessionId);
+    }
+    if (matchId) {
+        params.set('matchId', matchId);
+    }
+    return `/captain/manage?${params.toString()}`;
+}
+
+function buildLineupHref(sessionId?: string) {
+    if (!sessionId) {
+        return '/lineup/new?mode=session';
+    }
+
+    return `/lineup/${sessionId}`;
 }
 
 /**
@@ -208,7 +233,11 @@ function validateSessions(
             'error',
             'No sessions created',
             'Create at least one session to start the tournament.',
-            { actionLabel: 'Create Session', actionHref: '/matchups' }
+            {
+                actionLabel: 'Create Session',
+                actionHref: buildLineupHref(),
+                actionKind: 'open-lineup',
+            }
         ));
         return items;
     }
@@ -224,7 +253,11 @@ function validateSessions(
                 'warning',
                 `${session.name} has no matches`,
                 'This session needs matches to be created.',
-                { actionLabel: 'Add Matches', actionHref: `/matchups?session=${session.id}` }
+                {
+                    actionLabel: 'Add Matches',
+                    actionHref: buildLineupHref(session.id),
+                    actionKind: 'open-lineup',
+                }
             ));
         }
 
@@ -235,7 +268,11 @@ function validateSessions(
                 'warning',
                 `${session.name} has no date`,
                 'Set a scheduled date for this session.',
-                { actionLabel: 'Set Date', actionHref: `/matchups?session=${session.id}` }
+                {
+                    actionLabel: 'Open Session',
+                    actionHref: buildLineupHref(session.id),
+                    actionKind: 'open-lineup',
+                }
             ));
         }
     });
@@ -267,7 +304,11 @@ function validateLineups(
                 'error',
                 `${session.name} has incomplete lineups`,
                 `${incompleteMatches.length} of ${sessionMatches.length} matches need player assignments.`,
-                { actionLabel: 'Set Lineup', actionHref: `/matchups?session=${session.id}` }
+                {
+                    actionLabel: 'Set Lineup',
+                    actionHref: buildLineupHref(session.id),
+                    actionKind: 'open-lineup',
+                }
             ));
         }
     });
@@ -288,7 +329,11 @@ function validateLineups(
                 'error',
                 `Duplicate players in ${session.name}`,
                 'A player cannot be in multiple matches within the same session.',
-                { actionLabel: 'Fix Lineup', actionHref: `/matchups?session=${session.id}` }
+                {
+                    actionLabel: 'Fix Lineup',
+                    actionHref: buildLineupHref(session.id),
+                    actionKind: 'open-lineup',
+                }
             ));
         }
     });
@@ -318,6 +363,16 @@ function validateCourses(
         if (!teeSet) return true;
         return Boolean(m.courseId && teeSet.courseId !== m.courseId);
     });
+    const firstCourseIssueMatch =
+        matchesMissingCourse[0] ?? matchesMissingTeeSet[0] ?? matchesWithInvalidTeeSet[0] ?? null;
+    const hasCourseLibrary = courses.length > 0;
+    const hasAnyTeeSets = teeSets.length > 0;
+    const manageCourseHref = buildManageCourseHref(
+        firstCourseIssueMatch
+            ? sessions.find((session) => session.id === firstCourseIssueMatch.sessionId)?.id
+            : undefined,
+        firstCourseIssueMatch?.id
+    );
 
     // Check if any sessions use courses
     if (matchesWithCourses.length === 0 && sessions.length > 0) {
@@ -327,8 +382,9 @@ function validateCourses(
             'No courses assigned to matches',
             'Assign courses to enable handicap calculations.',
             {
-                actionLabel: courses.length === 0 ? 'Add Course Library' : 'Assign Matches',
-                actionHref: courses.length === 0 ? '/courses' : '/captain/manage',
+                actionLabel: hasCourseLibrary ? 'Assign Match Course' : 'Add or Import Courses',
+                actionHref: hasCourseLibrary ? manageCourseHref : buildCourseLibraryHref(),
+                actionKind: hasCourseLibrary ? 'assign-match-course' : 'open-library',
             }
         ));
     }
@@ -340,8 +396,9 @@ function validateCourses(
             `${matchesMissingCourse.length} match(es) missing a course`,
             'Set the course on each match so the scoring card and handicap inputs use the right routing.',
             {
-                actionLabel: courses.length === 0 ? 'Add Course Library' : 'Assign Course',
-                actionHref: courses.length === 0 ? '/courses' : '/captain/manage',
+                actionLabel: hasCourseLibrary ? 'Assign Match Course' : 'Add or Import Courses',
+                actionHref: hasCourseLibrary ? manageCourseHref : buildCourseLibraryHref(),
+                actionKind: hasCourseLibrary ? 'assign-match-course' : 'open-library',
             }
         ));
     }
@@ -353,8 +410,9 @@ function validateCourses(
             `${matchesMissingTeeSet.length} match(es) missing a tee set`,
             'Choose the tee set on the match so handicap calculations use the correct rating and slope.',
             {
-                actionLabel: teeSets.length === 0 ? 'Add Tee Sets' : 'Assign Tee Set',
-                actionHref: teeSets.length === 0 ? '/courses' : '/captain/manage',
+                actionLabel: hasAnyTeeSets ? 'Assign Match Course' : 'Add or Import Courses',
+                actionHref: hasAnyTeeSets ? manageCourseHref : buildCourseLibraryHref(),
+                actionKind: hasAnyTeeSets ? 'assign-match-course' : 'open-library',
             }
         ));
     }
@@ -365,7 +423,11 @@ function validateCourses(
             'error',
             `${matchesWithInvalidTeeSet.length} match(es) have invalid course / tee setup`,
             'At least one match references a tee set that is missing or belongs to another course.',
-            { actionLabel: 'Open Manage', actionHref: '/captain/manage' }
+            {
+                actionLabel: hasCourseLibrary ? 'Assign Match Course' : 'Add or Import Courses',
+                actionHref: hasCourseLibrary ? manageCourseHref : buildCourseLibraryHref(),
+                actionKind: hasCourseLibrary ? 'assign-match-course' : 'open-library',
+            }
         ));
     }
 
@@ -381,7 +443,11 @@ function validateCourses(
                 'error',
                 `${courseName} (${teeSet.name}) missing hole handicaps`,
                 'All 18 hole handicaps are required for proper stroke allocation.',
-                { actionLabel: 'Edit Course', actionHref: '/courses' }
+                {
+                    actionLabel: 'Open Course Library',
+                    actionHref: buildCourseLibraryHref(),
+                    actionKind: 'open-library',
+                }
             ));
         } else if (config.requireCourseHandicaps) {
             // Validate handicap values (should be 1-18, each appearing once)
@@ -395,7 +461,11 @@ function validateCourses(
                     'warning',
                     `${courseName} (${teeSet.name}) has invalid hole handicaps`,
                     'Hole handicaps should be unique values from 1-18.',
-                    { actionLabel: 'Fix Handicaps', actionHref: '/courses' }
+                    {
+                        actionLabel: 'Open Course Library',
+                        actionHref: buildCourseLibraryHref(),
+                        actionKind: 'open-library',
+                    }
                 ));
             }
         }
@@ -407,7 +477,11 @@ function validateCourses(
                 'error',
                 `${courseName} (${teeSet.name}) missing hole pars`,
                 'All 18 hole pars are required.',
-                { actionLabel: 'Edit Course', actionHref: '/courses' }
+                {
+                    actionLabel: 'Open Course Library',
+                    actionHref: buildCourseLibraryHref(),
+                    actionKind: 'open-library',
+                }
             ));
         }
 
@@ -418,7 +492,11 @@ function validateCourses(
                 'warning',
                 `${courseName} (${teeSet.name}) missing rating/slope`,
                 'Course rating and slope are needed for accurate handicap calculations.',
-                { actionLabel: 'Edit Course', actionHref: '/courses' }
+                {
+                    actionLabel: 'Open Course Library',
+                    actionHref: buildCourseLibraryHref(),
+                    actionKind: 'open-library',
+                }
             ));
         }
     });

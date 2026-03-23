@@ -306,7 +306,7 @@ export function QuickStandingsOverlay({
             {/* Pull gesture detector */}
             {!isVisible && (
                 <motion.div
-                    className="fixed top-0 left-0 right-0 h-32 z-30"
+                    className="fixed left-0 right-0 top-20 h-24 z-30"
                     onPan={handlePan}
                     onPanEnd={handlePanEnd}
                 />

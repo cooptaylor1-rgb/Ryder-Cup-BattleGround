@@ -309,6 +309,12 @@ describe('Golf Course Routes', () => {
       expect(data.data.provenance[0]).toMatchObject({
         kind: 'scorecard-pdf',
       });
+      expect(data.data.sourceAssets).toMatchObject([
+        expect.objectContaining({
+          kind: 'scorecard',
+          url: 'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf',
+        }),
+      ]);
       expect(data.data.teeSets).toHaveLength(2);
       expect(data.data.teeSets[0]).toMatchObject({
         name: 'Black',

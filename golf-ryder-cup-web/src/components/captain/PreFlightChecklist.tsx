@@ -438,6 +438,7 @@ function IssueCard({ item }: { item: ValidationItem }) {
       {item.actionLabel && item.actionHref ? (
         <Link
           href={item.actionHref}
+          data-action-kind={item.actionKind}
           className="mt-[var(--space-3)] inline-flex text-sm font-semibold text-[var(--maroon)]"
         >
           {item.actionLabel}

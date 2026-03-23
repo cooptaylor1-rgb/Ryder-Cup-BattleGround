@@ -50,6 +50,40 @@ describe('tripPlayerIdentity', () => {
     expect(result.player?.id).toBe('player-1');
   });
 
+  it('persists explicit link fields when a unique email match is found', async () => {
+    const existingPlayer: Player = {
+      id: 'player-1',
+      tripId: 'trip-1',
+      firstName: 'Tom',
+      lastName: 'Morris',
+      email: 'tom@example.com',
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.players.put(existingPlayer);
+
+    const result = await ensureCurrentUserTripPlayerLink(
+      'trip-1',
+      [existingPlayer],
+      {
+        id: 'profile-1',
+        authUserId: 'auth-1',
+        email: 'tom@example.com',
+        firstName: 'Tom',
+        lastName: 'Morris',
+      },
+      true
+    );
+
+    expect(result.status).toBe('linked-email');
+    expect(result.player?.linkedProfileId).toBe('profile-1');
+    expect(result.player?.linkedAuthUserId).toBe('auth-1');
+
+    const stored = await db.players.get(existingPlayer.id);
+    expect(stored?.linkedProfileId).toBe('profile-1');
+    expect(stored?.linkedAuthUserId).toBe('auth-1');
+  });
+
   it('resolves an explicitly linked player by auth user id', () => {
     const players: Player[] = [
       {
@@ -133,6 +167,38 @@ describe('tripPlayerIdentity', () => {
     expect(storedPlayers[0]?.email).toBe('new@example.com');
   });
 
+  it('re-checks the latest trip roster before creating a new player', async () => {
+    const existingPlayer: Player = {
+      id: 'player-db',
+      tripId: 'trip-1',
+      firstName: 'Tom',
+      lastName: 'Morris',
+      email: 'tom@example.com',
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.players.put(existingPlayer);
+
+    const result = await ensureCurrentUserTripPlayerLink(
+      'trip-1',
+      [],
+      {
+        id: 'profile-2',
+        authUserId: 'auth-2',
+        email: 'tom@example.com',
+        firstName: 'Tom',
+        lastName: 'Morris',
+      },
+      true
+    );
+
+    expect(result.status).toBe('linked-email');
+    expect(result.player?.id).toBe(existingPlayer.id);
+
+    const storedPlayers = await db.players.toArray();
+    expect(storedPlayers).toHaveLength(1);
+  });
+
   it('leaves ambiguous name matches unresolved', async () => {
     const players: Player[] = [
       {
@@ -168,6 +234,66 @@ describe('tripPlayerIdentity', () => {
     expect(result.status).toBe('ambiguous-name-match');
     expect(result.player).toBeNull();
     expect(result.candidates).toHaveLength(2);
+  });
+
+  it('leaves ambiguous email matches unresolved and does not create a player', async () => {
+    const players: Player[] = [
+      {
+        id: 'player-1',
+        tripId: 'trip-1',
+        firstName: 'Tom',
+        lastName: 'Morris',
+        email: 'tom@example.com',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: 'player-2',
+        tripId: 'trip-1',
+        firstName: 'Tommy',
+        lastName: 'Morris',
+        email: 'tom@example.com',
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+    await db.players.bulkPut(players);
+
+    const result = await ensureCurrentUserTripPlayerLink(
+      'trip-1',
+      players,
+      {
+        id: 'user-1',
+        authUserId: 'auth-1',
+        email: 'tom@example.com',
+        firstName: 'Tom',
+        lastName: 'Morris',
+      },
+      true
+    );
+
+    expect(result.status).toBe('ambiguous-email-match');
+    expect(result.player).toBeNull();
+    expect(result.candidates).toHaveLength(2);
+    expect(await db.players.count()).toBe(2);
+  });
+
+  it('does not create a duplicate player on repeated ensure calls after creation', async () => {
+    const currentUser = {
+      id: 'profile-1',
+      authUserId: 'auth-1',
+      email: 'new@example.com',
+      firstName: 'New',
+      lastName: 'Player',
+    };
+
+    const firstResult = await ensureCurrentUserTripPlayerLink('trip-1', [], currentUser, true);
+    const secondResult = await ensureCurrentUserTripPlayerLink('trip-1', [], currentUser, true);
+
+    expect(firstResult.status).toBe('created');
+    expect(secondResult.status).toBe('linked-id');
+    expect(secondResult.player?.id).toBe(firstResult.player?.id);
+    expect(await db.players.count()).toBe(1);
   });
 
   it('supports explicit captain-reviewed claim for an ambiguous roster candidate', async () => {

@@ -10,7 +10,7 @@ import { db } from '@/lib/db';
 import { createLogger } from '@/lib/utils/logger';
 import { useAuthStore, useScoringStore, useTripStore } from '@/lib/stores';
 import { navigateBackOr } from '@/lib/utils/navigation';
-import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
+import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import {
     buildHoleResultsByMatchId,
     buildScoreSessionStats,
@@ -39,6 +39,10 @@ export default function ScorePageClient() {
 
     const currentUserPlayer = useMemo(
         () => findCurrentUserPlayer(players, currentIdentity, isAuthenticated),
+        [currentIdentity, isAuthenticated, players]
+    );
+    const currentUserPlayerLink = useMemo(
+        () => assessTripPlayerLink(players, currentIdentity, isAuthenticated),
         [currentIdentity, isAuthenticated, players]
     );
 
@@ -154,11 +158,13 @@ export default function ScorePageClient() {
                 sessions={sessions}
                 selectedSessionId={selectedSessionId ?? activeSession?.id ?? null}
                 currentUserPlayerId={currentUserPlayer?.id}
+                currentUserPlayerLinkStatus={currentUserPlayerLink.status}
                 isLoading={isLoading}
                 getMatchPlayers={(playerIds) => getMatchPlayers(playerIds, players)}
                 onSelectMatch={handleMatchSelect}
                 onSelectSession={setSelectedSessionId}
                 onGoToMatchups={() => router.push('/matchups')}
+                onOpenProfile={() => router.push('/profile')}
             />
         </div>
     );

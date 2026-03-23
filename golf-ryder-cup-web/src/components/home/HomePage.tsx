@@ -74,6 +74,7 @@ export default function HomePage() {
     standings,
     userMatchData,
     currentUserPlayer,
+    tripPlayerLink,
     liveMatches,
     tripMatches,
     tripSessions,
@@ -340,6 +341,7 @@ export default function HomePage() {
               standings={standings}
               userMatchData={userMatchData}
               currentUserPlayer={currentUserPlayer}
+              tripPlayerLink={tripPlayerLink}
               players={players}
               sessions={tripSessions}
               matches={tripMatches}
@@ -348,6 +350,7 @@ export default function HomePage() {
               tripAwards={tripAwards}
               teamAName={teamAName}
               teamBName={teamBName}
+              isCaptainMode={isCaptainMode}
             />
 
             {/* YOUR MATCH — If user has an active match */}

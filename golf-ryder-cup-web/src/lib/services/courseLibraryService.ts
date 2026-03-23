@@ -13,6 +13,7 @@ import type { Course, TeeSet } from '../types/models';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
 import { syncCourseToCloud } from './courseLibrarySyncService';
 import { createLogger } from '../utils/logger';
+import { buildCanonicalCourseKey } from '../utils/courseImport';
 
 const logger = createLogger('CourseLibrary');
 
@@ -67,6 +68,16 @@ export async function createCourseProfile(
         name: data.name,
         location: data.location,
         notes: data.notes,
+        sourceUrl: data.sourceUrl,
+        canonicalKey:
+            data.canonicalKey ||
+            buildCanonicalCourseKey({
+                name: data.name,
+                city: data.location,
+                state: data.location,
+                country: data.location,
+                sourceUrl: data.sourceUrl,
+            }),
         createdAt: now,
         updatedAt: now,
     };
@@ -186,6 +197,12 @@ export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Pr
         id: profileId,
         name: course.name,
         location: course.location,
+        canonicalKey: buildCanonicalCourseKey({
+            name: course.name,
+            city: course.location,
+            state: course.location,
+            country: course.location,
+        }),
         createdAt: now,
         updatedAt: now,
     };

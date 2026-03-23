@@ -90,7 +90,12 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
           withTripPlayerIdentity(currentUser, authUserId),
           isAuthenticated
         );
-        if (linkResult.status === 'claimed-name-match' || linkResult.status === 'created') {
+        if (
+          linkResult.status === 'claimed-name-match' ||
+          linkResult.status === 'created' ||
+          linkResult.status === 'linked-email' ||
+          linkResult.status === 'linked-id'
+        ) {
           await loadTrip(result.tripId);
         }
         setSuccess(true);

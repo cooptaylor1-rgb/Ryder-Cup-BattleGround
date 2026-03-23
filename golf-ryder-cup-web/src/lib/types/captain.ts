@@ -28,6 +28,8 @@ export type ValidationCategory =
     | 'schedule'
     | 'handicaps';
 
+export type ValidationActionKind = 'open-library' | 'assign-match-course' | 'open-lineup';
+
 export interface ValidationItem {
     id: string;
     severity: ValidationSeverity;
@@ -36,6 +38,7 @@ export interface ValidationItem {
     description: string;
     actionLabel?: string;
     actionHref?: string;
+    actionKind?: ValidationActionKind;
     autoFixable?: boolean;
 }
 

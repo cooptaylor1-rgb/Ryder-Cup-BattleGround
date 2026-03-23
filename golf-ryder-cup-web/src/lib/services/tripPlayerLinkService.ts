@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import type { Player } from '@/lib/types/models';
+import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 import type { CurrentTripPlayerIdentity, TripPlayerLinkResult } from '@/lib/utils/tripPlayerIdentity';
 import { assessTripPlayerLink } from '@/lib/utils/tripPlayerIdentity';
 
@@ -109,6 +110,46 @@ async function persistLinkedPlayer(
   };
 }
 
+async function getLatestTripPlayers(tripId: string, players: Player[]): Promise<Player[]> {
+  const storedPlayers = await db.players.where('tripId').equals(tripId).toArray();
+  return mergeTripPlayers(tripId, storedPlayers, players).players;
+}
+
+async function maybePersistMatchedPlayer(
+  tripId: string,
+  player: Player,
+  currentUser: CurrentTripPlayerIdentity,
+  status: TripPlayerLinkResult['status'],
+  options?: {
+    allowEmailMismatch?: boolean;
+  }
+): Promise<TripPlayerLinkResult> {
+  const merged = mergeLinkedPlayerIdentity(tripId, player, currentUser, options);
+  if ('status' in merged) {
+    return merged;
+  }
+
+  const requiresPersistence =
+    merged.tripId !== player.tripId ||
+    merged.linkedProfileId !== player.linkedProfileId ||
+    merged.linkedAuthUserId !== player.linkedAuthUserId ||
+    merged.email !== player.email ||
+    merged.handicapIndex !== player.handicapIndex ||
+    merged.ghin !== player.ghin ||
+    merged.teePreference !== player.teePreference ||
+    merged.avatarUrl !== player.avatarUrl;
+
+  if (!requiresPersistence) {
+    return {
+      status,
+      player,
+      candidates: [player],
+    };
+  }
+
+  return persistLinkedPlayer(tripId, merged, status);
+}
+
 export async function ensureCurrentUserTripPlayerLink(
   tripId: string,
   players: Player[],
@@ -119,17 +160,41 @@ export async function ensureCurrentUserTripPlayerLink(
 
   if (
     initialResult.status === 'missing-user' ||
-    initialResult.status === 'linked-id' ||
-    initialResult.status === 'linked-email' ||
     initialResult.status === 'ambiguous-email-match' ||
     initialResult.status === 'ambiguous-name-match'
   ) {
     return initialResult;
   }
 
-  if (initialResult.status === 'claimable-name-match') {
-    const candidate = initialResult.candidates[0];
-    if (!candidate || !currentUser) {
+  if (!currentUser) {
+    return initialResult;
+  }
+
+  const latestPlayers = await getLatestTripPlayers(tripId, players);
+  const latestResult = assessTripPlayerLink(latestPlayers, currentUser, isAuthenticated);
+
+  if (latestResult.status === 'missing-user') {
+    return latestResult;
+  }
+
+  if (latestResult.status === 'linked-id' && latestResult.player) {
+    return maybePersistMatchedPlayer(tripId, latestResult.player, currentUser, 'linked-id');
+  }
+
+  if (latestResult.status === 'linked-email' && latestResult.player) {
+    return maybePersistMatchedPlayer(tripId, latestResult.player, currentUser, 'linked-email');
+  }
+
+  if (
+    latestResult.status === 'ambiguous-email-match' ||
+    latestResult.status === 'ambiguous-name-match'
+  ) {
+    return latestResult;
+  }
+
+  if (latestResult.status === 'claimable-name-match') {
+    const candidate = latestResult.candidates[0];
+    if (!candidate) {
       return {
         status: 'unresolved',
         player: null,
@@ -153,10 +218,6 @@ export async function ensureCurrentUserTripPlayerLink(
     return persistLinkedPlayer(tripId, merged, 'claimed-name-match');
   }
 
-  if (!currentUser) {
-    return initialResult;
-  }
-
   const createdPlayer = buildTripPlayerFromIdentity(tripId, currentUser);
   await db.players.put(createdPlayer);
   queueSyncOperation('player', createdPlayer.id, 'create', tripId, createdPlayer);
@@ -178,16 +239,24 @@ export async function claimTripPlayerForCurrentUser(
     allowEmailMismatch?: boolean;
   }
 ): Promise<TripPlayerLinkResult> {
-  const initialResult = assessTripPlayerLink(players, currentUser, isAuthenticated);
+  const latestPlayers = await getLatestTripPlayers(tripId, players);
+  const initialResult = assessTripPlayerLink(latestPlayers, currentUser, isAuthenticated);
   if (!currentUser || initialResult.status === 'missing-user') {
     return initialResult;
   }
 
   if (initialResult.player?.id === playerId) {
-    return initialResult;
+    return maybePersistMatchedPlayer(
+      tripId,
+      initialResult.player,
+      currentUser,
+      initialResult.status,
+      options
+    );
   }
 
-  const candidate = players.find((player) => player.id === playerId) ?? (await db.players.get(playerId));
+  const candidate =
+    latestPlayers.find((player) => player.id === playerId) ?? (await db.players.get(playerId));
   if (!candidate) {
     return {
       status: 'unresolved',

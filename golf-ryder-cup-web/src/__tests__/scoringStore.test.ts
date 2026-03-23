@@ -144,4 +144,48 @@ describe('scoringStore scoreHole', () => {
       winner: 'halved',
     });
   });
+
+  it('undoes the last scored hole and restores the exact prior hole', async () => {
+    await seedMatch();
+
+    await useScoringStore.getState().selectMatch('match-1');
+    useScoringStore.getState().goToHole(7);
+
+    await useScoringStore.getState().scoreHole('teamA');
+    expect(useScoringStore.getState().currentHole).toBe(8);
+
+    await useScoringStore.getState().undoLastHole();
+
+    expect(useScoringStore.getState().currentHole).toBe(7);
+    expect(useScoringStore.getState().undoStack).toHaveLength(0);
+    expect(await db.holeResults.where({ matchId: 'match-1', holeNumber: 7 }).first()).toBeUndefined();
+  });
+
+  it('refreshes all match states from persisted local data', async () => {
+    await seedMatch();
+
+    await useScoringStore.getState().loadSessionMatches('session-1');
+    await useScoringStore.getState().selectMatch('match-1');
+
+    await db.holeResults.put({
+      id: 'hole-result-1',
+      matchId: 'match-1',
+      holeNumber: 1,
+      winner: 'teamA',
+      timestamp: isoNow(),
+    });
+    await db.matches.update('match-1', {
+      currentHole: 2,
+      status: 'inProgress',
+      margin: 1,
+      holesRemaining: 17,
+      updatedAt: isoNow(),
+    });
+
+    await useScoringStore.getState().refreshAllMatchStates();
+
+    expect(useScoringStore.getState().activeMatch?.currentHole).toBe(2);
+    expect(useScoringStore.getState().activeMatchState?.currentScore).toBe(1);
+    expect(useScoringStore.getState().matchStates.get('match-1')?.holesPlayed).toBe(1);
+  });
 });

@@ -1,4 +1,4 @@
-import { SessionTypeDisplay, type Match, type Player, type Trip } from '@/lib/types/models';
+import { SessionTypeDisplay, type Course, type Match, type Player, type TeeSet, type Trip } from '@/lib/types/models';
 import type { CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
 
@@ -15,6 +15,9 @@ export interface ScheduleEntry {
   isUserMatch?: boolean;
   players?: string[];
   status?: 'upcoming' | 'inProgress' | 'completed';
+  courseName?: string;
+  teeSetName?: string;
+  handicapReady?: boolean;
 }
 
 export interface DaySchedule {
@@ -47,12 +50,16 @@ export function buildScheduleByDay({
   sessions,
   matches,
   players,
+  courses,
+  teeSets,
   currentUserPlayer,
 }: {
   currentTrip: Trip | null;
   sessions: ScheduleSessionLike[];
   matches: Match[];
   players: Player[];
+  courses: Course[];
+  teeSets: TeeSet[];
   currentUserPlayer?: Player;
 }): DaySchedule[] {
   if (!currentTrip) {
@@ -67,6 +74,8 @@ export function buildScheduleByDay({
       `${player.firstName} ${player.lastName?.[0] || ''}`.trim() || 'Unknown',
     ])
   );
+  const courseById = new Map(courses.map((course) => [course.id, course]));
+  const teeSetById = new Map(teeSets.map((teeSet) => [teeSet.id, teeSet]));
   const currentUserPlayerId = currentUserPlayer?.id;
   const days: DaySchedule[] = [];
 
@@ -122,6 +131,9 @@ export function buildScheduleByDay({
           ? match.teamAPlayerIds.includes(currentUserPlayerId) ||
             match.teamBPlayerIds.includes(currentUserPlayerId)
           : false;
+        const teeSet = match.teeSetId ? teeSetById.get(match.teeSetId) : undefined;
+        const course = (match.courseId ? courseById.get(match.courseId) : undefined) ??
+          (teeSet?.courseId ? courseById.get(teeSet.courseId) : undefined);
 
         const baseHour = session.timeSlot === 'AM' ? 8 : 13;
         const interval = session.sessionType === 'singles' ? 8 : 10;
@@ -142,6 +154,9 @@ export function buildScheduleByDay({
           matchId: match.id,
           isUserMatch: userInMatch,
           players: [...match.teamAPlayerIds, ...match.teamBPlayerIds],
+          courseName: course?.name,
+          teeSetName: teeSet?.name,
+          handicapReady: Boolean(course && teeSet),
           status:
             match.status === 'completed'
               ? 'completed'

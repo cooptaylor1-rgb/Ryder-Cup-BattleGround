@@ -12,10 +12,16 @@ import {
   Trophy,
 } from 'lucide-react';
 
-import { formatDate, formatPlayerName } from '@/lib/utils';
+import { cn, formatDate, formatPlayerName } from '@/lib/utils';
 import type { TeamStandings, MatchState } from '@/lib/types/computed';
 import type { BanterPost, Match, Player, RyderCupSession, SideBet, Trip } from '@/lib/types/models';
 import type { TripAward } from '@/lib/types/tripStats';
+import type { TripPlayerLinkResult } from '@/lib/utils/tripPlayerIdentity';
+import {
+  buildNextUpBlock,
+  buildUserMatchCardContent,
+  getNextSession,
+} from './tripDashboardModel';
 
 interface UserMatchData {
   match: Match;
@@ -28,6 +34,7 @@ interface TripDashboardSectionsProps {
   standings: TeamStandings | null;
   userMatchData: UserMatchData | null;
   currentUserPlayer: Player | null;
+  tripPlayerLink: TripPlayerLinkResult;
   players: Player[];
   sessions: RyderCupSession[];
   matches: Match[];
@@ -36,6 +43,7 @@ interface TripDashboardSectionsProps {
   tripAwards: TripAward[];
   teamAName: string;
   teamBName: string;
+  isCaptainMode: boolean;
 }
 
 export function TripDashboardSections({
@@ -43,6 +51,7 @@ export function TripDashboardSections({
   standings,
   userMatchData,
   currentUserPlayer,
+  tripPlayerLink,
   players,
   sessions,
   matches,
@@ -51,8 +60,23 @@ export function TripDashboardSections({
   tripAwards,
   teamAName,
   teamBName,
+  isCaptainMode,
 }: TripDashboardSectionsProps) {
   const nextSession = getNextSession(sessions);
+  const nextUp = buildNextUpBlock({
+    userMatchData,
+    currentUserPlayer,
+    sessions,
+    matches,
+    tripPlayerLink,
+    isCaptainMode,
+  });
+  const userMatchCard = buildUserMatchCardContent({
+    userMatchData,
+    currentUserPlayer,
+    tripPlayerLink,
+    players,
+  });
   const latestPost = [...banterPosts].sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0];
   const activeBets = sideBets.filter((bet) => bet.status === 'active');
   const activeBetPot = activeBets.reduce((sum, bet) => sum + (bet.pot ?? 0), 0);
@@ -78,6 +102,21 @@ export function TripDashboardSections({
         <DashboardStat label="Awards" value={tripAwards.length} />
       </div>
 
+      {nextUp ? (
+        <div className="mt-[var(--space-5)]">
+          <DashboardCard
+            href={nextUp.href}
+            eyebrow={nextUp.eyebrow}
+            title={nextUp.title}
+            body={nextUp.body}
+            footerLabel={nextUp.footerLabel}
+            icon={<Target size={18} strokeWidth={1.8} />}
+            accentClassName="bg-[color:var(--masters)]/10 text-[var(--masters)]"
+            className="border-[color:var(--masters)]/18 bg-[linear-gradient(135deg,rgba(0,102,68,0.08),rgba(255,255,255,0.9))]"
+          />
+        </div>
+      ) : null}
+
       <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] sm:grid-cols-2 xl:grid-cols-3">
         <DashboardCard
           href="/standings"
@@ -94,11 +133,11 @@ export function TripDashboardSections({
         />
 
         <DashboardCard
-          href={userMatchData?.match.status === 'inProgress' ? `/score/${userMatchData.match.id}` : currentUserPlayer ? '/schedule' : '/profile'}
+          href={userMatchCard.href}
           eyebrow="Your Matches"
-          title={buildUserMatchTitle(userMatchData, currentUserPlayer)}
-          body={buildUserMatchBody(userMatchData, currentUserPlayer, players)}
-          footerLabel={userMatchData?.match.status === 'inProgress' ? 'Enter scoring' : currentUserPlayer ? 'Open schedule' : 'Open profile'}
+          title={buildUserMatchTitle(userMatchData, currentUserPlayer, userMatchCard.title)}
+          body={buildUserMatchBody(userMatchData, currentUserPlayer, players, userMatchCard.body)}
+          footerLabel={userMatchCard.footerLabel}
           icon={<Target size={18} strokeWidth={1.8} />}
           accentClassName="bg-[color:var(--team-usa)]/10 text-[var(--team-usa)]"
         />
@@ -192,6 +231,7 @@ function DashboardCard({
   footerLabel,
   icon,
   accentClassName,
+  className,
 }: {
   href: string;
   eyebrow: string;
@@ -200,11 +240,15 @@ function DashboardCard({
   footerLabel: string;
   icon: ReactNode;
   accentClassName: string;
+  className?: string;
 }) {
   return (
     <Link
       href={href}
-      className="group rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]"
+      className={cn(
+        'group rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]',
+        className
+      )}
     >
       <div className="flex items-start justify-between gap-[var(--space-3)]">
         <div className={`inline-flex rounded-full px-[var(--space-3)] py-[var(--space-2)] ${accentClassName}`}>
@@ -232,24 +276,6 @@ function DashboardCard({
   );
 }
 
-function getNextSession(sessions: RyderCupSession[]): RyderCupSession | null {
-  if (sessions.length === 0) return null;
-
-  const sorted = [...sessions].sort((left, right) => {
-    const leftTime = left.scheduledDate ? new Date(left.scheduledDate).getTime() : Number.MAX_SAFE_INTEGER;
-    const rightTime = right.scheduledDate ? new Date(right.scheduledDate).getTime() : Number.MAX_SAFE_INTEGER;
-    if (leftTime !== rightTime) return leftTime - rightTime;
-
-    const leftSlot = left.timeSlot === 'PM' ? 1 : 0;
-    const rightSlot = right.timeSlot === 'PM' ? 1 : 0;
-    if (leftSlot !== rightSlot) return leftSlot - rightSlot;
-
-    return left.sessionNumber - right.sessionNumber;
-  });
-
-  return sorted.find((session) => session.status !== 'completed') ?? sorted[0] ?? null;
-}
-
 function buildStandingsNarrative(
   standings: TeamStandings,
   teamAName: string,
@@ -264,10 +290,12 @@ function buildStandingsNarrative(
 
 function buildUserMatchTitle(
   userMatchData: UserMatchData | null,
-  currentUserPlayer: Player | null
+  currentUserPlayer: Player | null,
+  fallbackTitle?: string
 ): string {
   if (userMatchData?.match.status === 'inProgress') return 'Your match is live';
   if (userMatchData) return `Match ${userMatchData.match.matchOrder} is on your card`;
+  if (fallbackTitle) return fallbackTitle;
   if (currentUserPlayer) return 'Your tee sheet lives here';
   return 'Link your profile to personalize';
 }
@@ -275,12 +303,13 @@ function buildUserMatchTitle(
 function buildUserMatchBody(
   userMatchData: UserMatchData | null,
   currentUserPlayer: Player | null,
-  players: Player[]
+  players: Player[],
+  fallbackBody?: string
 ): string {
   if (!userMatchData) {
-    return currentUserPlayer
+    return fallbackBody ?? (currentUserPlayer
       ? 'Open the schedule to see your upcoming matches and assigned pairings.'
-      : 'Connect your profile so the app can find your matches and tee times.';
+      : 'Connect your profile so the app can find your matches and tee times.');
   }
 
   const opponents = resolveOpponents(userMatchData.match, currentUserPlayer, players);

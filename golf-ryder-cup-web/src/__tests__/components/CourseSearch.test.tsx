@@ -5,17 +5,23 @@ import { CourseSearch } from '@/components/CourseSearch';
 import type { GolfCourseAPICourse } from '@/lib/services/golfCourseAPIService';
 
 const {
+  mockUseLiveQuery,
   mockSearchCourses,
   mockGetCourseById,
   mockCheckConfigured,
   mockGetAllTees,
   mockConvertTee,
 } = vi.hoisted(() => ({
+  mockUseLiveQuery: vi.fn(),
   mockSearchCourses: vi.fn(),
   mockGetCourseById: vi.fn(),
   mockCheckConfigured: vi.fn(),
   mockGetAllTees: vi.fn(),
   mockConvertTee: vi.fn(),
+}));
+
+vi.mock('dexie-react-hooks', () => ({
+  useLiveQuery: mockUseLiveQuery,
 }));
 
 vi.mock('@/lib/services/golfCourseAPIService', async () => {
@@ -53,6 +59,14 @@ const detailResult: GolfCourseAPICourse = {
   sourcePageUrl: 'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf',
   dataCompleteness: 'basic',
   hasPlayableTeeData: false,
+  sourceAssets: [
+    {
+      kind: 'scorecard',
+      label: 'Scorecard PDF',
+      url: 'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf',
+    },
+  ],
+  missingFields: ['tee-data', 'hole-layout'],
   provenance: [
     {
       kind: 'scorecard-pdf',
@@ -65,6 +79,7 @@ const detailResult: GolfCourseAPICourse = {
 
 describe('CourseSearch', () => {
   beforeEach(() => {
+    mockUseLiveQuery.mockReturnValue([]);
     mockCheckConfigured.mockResolvedValue(true);
     mockSearchCourses.mockResolvedValue([searchResult]);
     mockGetCourseById.mockResolvedValue(detailResult);
@@ -136,9 +151,44 @@ describe('CourseSearch', () => {
 
     await screen.findByText('Basic course profile only');
     expect(screen.getByText('Linked scorecard PDF')).toBeInTheDocument();
+    expect(screen.getByText('Sources followed')).toBeInTheDocument();
+    expect(screen.getByText(/Scorecard · Scorecard PDF/i)).toBeInTheDocument();
+    expect(screen.getByText('Still missing')).toBeInTheDocument();
+    expect(screen.getByText(/tee data, 18-hole layout/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View extracted source' })).toHaveAttribute(
       'href',
       detailResult.sourcePageUrl
     );
+  });
+
+  it('warns about duplicate library entries before import', async () => {
+    mockUseLiveQuery.mockReturnValue([
+      {
+        id: 'existing-course-1',
+        name: 'Roost',
+        location: 'Brooksville, FL, United States',
+        sourceUrl: 'https://cabot.com/citrusfarms/golf/roost/',
+        canonicalKey: 'roost|brooksville|fl|united states|cabot.com',
+        createdAt: '2026-03-20T10:00:00.000Z',
+        updatedAt: '2026-03-20T10:00:00.000Z',
+      },
+    ]);
+
+    render(<CourseSearch onSelectCourse={vi.fn()} onClose={vi.fn()} />);
+
+    await screen.findByText('Search Course Database');
+
+    fireEvent.change(screen.getByPlaceholderText('Search by course name or city...'), {
+      target: { value: 'cabot roost' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+    await screen.findByRole('button', { name: /Roost/i });
+    fireEvent.click(screen.getByRole('button', { name: /Roost/i }));
+
+    await screen.findByText('This may already be in your course library');
+    expect(screen.getByText(/Exact course \+ location match/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Review existing library' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Import Anyway (No Tees)' })).toBeInTheDocument();
   });
 });

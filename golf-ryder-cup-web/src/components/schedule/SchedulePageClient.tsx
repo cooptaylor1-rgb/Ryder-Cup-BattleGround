@@ -25,7 +25,7 @@ import type { Match } from '@/lib/types/models';
 export default function SchedulePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, sessions, players } = useTripStore();
+  const { currentTrip, sessions, players, courses, teeSets } = useTripStore();
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,9 +94,11 @@ export default function SchedulePageClient() {
         sessions,
         matches,
         players,
+        courses,
+        teeSets,
         currentUserPlayer,
       }),
-    [currentTrip, currentUserPlayer, matches, players, sessions]
+    [courses, currentTrip, currentUserPlayer, matches, players, sessions, teeSets]
   );
 
   const mySchedule = useMemo(
@@ -201,7 +203,7 @@ export default function SchedulePageClient() {
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-[color:var(--warning)]/30 bg-[color:var(--warning)]/10 p-4">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-[var(--warning)]" />
             <div>
-              <p className="font-medium text-[var(--warning)]">Profile not linked</p>
+              <p className="font-medium text-[var(--warning)]">Roster link needed</p>
               <p className="type-caption mt-1">
                 {currentUserPlayerLink.status === 'ambiguous-email-match' ||
                 currentUserPlayerLink.status === 'ambiguous-name-match'
@@ -214,7 +216,7 @@ export default function SchedulePageClient() {
                 href={currentUser ? '/profile' : '/profile/create'}
                 className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[var(--masters)]"
               >
-                {currentUser ? 'Open Profile' : 'Create Profile'}
+                {currentUser ? 'Link profile to roster' : 'Create Profile'}
                 <ChevronRight size={16} />
               </Link>
             </div>

@@ -46,6 +46,14 @@ export interface CourseDetailsResponse {
   dataCompleteness: CourseProfileCompleteness;
   hasPlayableTeeData: boolean;
   provenance: CourseProfileProvenance[];
+  sourceAssets?: LinkedCourseAsset[];
+  missingFields?: string[];
+  duplicateCandidates?: Array<{
+    id: string;
+    name: string;
+    location?: string;
+    reason: string;
+  }>;
 }
 
 export interface ExtractedCourseProfile {
@@ -61,6 +69,7 @@ export interface ExtractedCourseProfile {
   holes: HoleData[];
   teeSets: TeeSetData[];
   provenance?: CourseProfileProvenance[];
+  sourceAssets?: LinkedCourseAsset[];
 }
 
 export interface LinkedCourseAsset {

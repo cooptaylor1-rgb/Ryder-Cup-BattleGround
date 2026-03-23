@@ -15,6 +15,8 @@ export interface CourseProfile {
     name: string;
     location?: string;
     notes?: string;
+    sourceUrl?: string;
+    canonicalKey?: string;
     createdAt: ISODateString;
     updatedAt: ISODateString;
 }

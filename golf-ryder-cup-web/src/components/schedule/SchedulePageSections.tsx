@@ -214,6 +214,38 @@ function ScheduleEntryCard({
           {entry.subtitle ? (
             <p className="mt-1 truncate text-sm text-[var(--ink-secondary)]">{entry.subtitle}</p>
           ) : null}
+          {!isSession && (entry.courseName || entry.teeSetName || entry.handicapReady === false) ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {entry.courseName ? (
+                <span className="rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-2 py-1 text-[11px] font-medium text-[var(--ink-secondary)]">
+                  {entry.courseName}
+                </span>
+              ) : (
+                <span className="rounded-full border border-[color:var(--warning)]/20 bg-[color:var(--warning)]/10 px-2 py-1 text-[11px] font-medium text-[var(--warning)]">
+                  Course needed
+                </span>
+              )}
+              {entry.teeSetName ? (
+                <span className="rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-2 py-1 text-[11px] font-medium text-[var(--ink-secondary)]">
+                  {entry.teeSetName}
+                </span>
+              ) : (
+                <span className="rounded-full border border-[color:var(--warning)]/20 bg-[color:var(--warning)]/10 px-2 py-1 text-[11px] font-medium text-[var(--warning)]">
+                  Tee needed
+                </span>
+              )}
+              <span
+                className={cn(
+                  'rounded-full border px-2 py-1 text-[11px] font-medium',
+                  entry.handicapReady
+                    ? 'border-[color:var(--success)]/20 bg-[color:var(--success)]/10 text-[var(--success)]'
+                    : 'border-[color:var(--warning)]/20 bg-[color:var(--warning)]/10 text-[var(--warning)]'
+                )}
+              >
+                {entry.handicapReady ? 'Handicap ready' : 'Needs setup'}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         {onPress ? <ChevronRight size={18} className="shrink-0 text-[var(--ink-tertiary)]" /> : null}

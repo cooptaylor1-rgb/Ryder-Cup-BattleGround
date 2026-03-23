@@ -213,6 +213,14 @@ export default function CourseLibraryPage() {
     const handleImportFromDatabase = async (courseData: {
         name: string;
         location: string;
+        sourceUrl?: string;
+        canonicalKey?: string;
+        duplicateCandidates?: Array<{
+            id: string;
+            name: string;
+            location?: string;
+            reason: string;
+        }>;
         teeSets: Array<{
             name: string;
             color: string;
@@ -229,6 +237,8 @@ export default function CourseLibraryPage() {
                 {
                     name: courseData.name,
                     location: courseData.location,
+                    sourceUrl: courseData.sourceUrl,
+                    canonicalKey: courseData.canonicalKey,
                 },
                 courseData.teeSets.map(tee => ({
                     name: tee.name,
@@ -241,7 +251,12 @@ export default function CourseLibraryPage() {
                     totalYardage: tee.yardage,
                 }))
             );
-            showToast('success', `${courseData.name} imported to library`);
+            showToast(
+                'success',
+                courseData.duplicateCandidates?.length
+                    ? `${courseData.name} imported to library. Review for duplicates if needed.`
+                    : `${courseData.name} imported to library`
+            );
             setShowDatabaseSearch(false);
         } catch {
             showToast('error', 'Could not import course');

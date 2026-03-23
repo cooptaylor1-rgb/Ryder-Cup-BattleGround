@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CalendarDays,
@@ -47,6 +47,7 @@ import {
 
 export function ManagePageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentTrip, players, teams, teamMembers, courses, teeSets } = useTripStore();
   const { isCaptainMode, showToast } = useUIStore();
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
@@ -55,6 +56,9 @@ export function ManagePageClient() {
   const [editingMatch, setEditingMatch] = useState<string | null>(null);
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const requestedSessionId = searchParams?.get('sessionId') ?? null;
+  const requestedMatchId = searchParams?.get('matchId') ?? null;
+  const requestedFocus = searchParams?.get('focus') ?? null;
 
   const sessions = useLiveQuery(
     async () =>
@@ -110,6 +114,37 @@ export function ManagePageClient() {
         .join(' & '),
     [playerById]
   );
+
+  useEffect(() => {
+    if (!sessionsWithMatches.length) {
+      return;
+    }
+
+    const requestedSession =
+      (requestedSessionId &&
+        sessionsWithMatches.find((session) => session.id === requestedSessionId)) ||
+      (requestedMatchId
+        ? sessionsWithMatches.find((session) =>
+            session.matches.some((match) => match.id === requestedMatchId)
+          )
+        : undefined);
+
+    if (requestedSession) {
+      setExpandedSessions((current) => {
+        if (current.has(requestedSession.id)) {
+          return current;
+        }
+
+        const next = new Set(current);
+        next.add(requestedSession.id);
+        return next;
+      });
+    }
+
+    if (requestedFocus === 'course' && requestedMatchId) {
+      setEditingMatch((current) => (current === requestedMatchId ? current : requestedMatchId));
+    }
+  }, [requestedFocus, requestedMatchId, requestedSessionId, sessionsWithMatches]);
 
   const executeDeleteMatch = useCallback(
     async (matchId: string) => {
