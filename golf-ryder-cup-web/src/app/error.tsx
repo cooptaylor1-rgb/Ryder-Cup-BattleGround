@@ -47,7 +47,7 @@ const categoryConfig: Record<ErrorCategory, {
   data: {
     icon: <Database size={40} />,
     title: 'Data problem',
-    iconColor: 'var(--info, #5B8FA8)',
+    iconColor: 'var(--info, #5B8FA8)', // --info is a Tailwind token, not a CSS var; fallback matches tailwind.config.ts info.DEFAULT
   },
   general: {
     icon: <AlertTriangle size={40} />,
