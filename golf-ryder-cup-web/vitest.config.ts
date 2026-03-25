@@ -22,10 +22,10 @@ export default defineConfig({
             ],
             // Thresholds for world-class quality
             thresholds: {
-                statements: 60,
-                branches: 50,
-                functions: 60,
-                lines: 60,
+                statements: 90,
+                branches: 85,
+                functions: 90,
+                lines: 90,
             },
         },
     },
