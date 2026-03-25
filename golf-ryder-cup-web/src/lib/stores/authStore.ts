@@ -198,14 +198,13 @@ export const useAuthStore = create<AuthState>()(
           if (isHashedPin(userEntry.pin!)) {
             pinValid = await verifyPin(pin, userEntry.pin!);
           } else {
-            // Legacy plain-text PIN: force the user to reset
-            authLogger.warn(`Legacy plain-text PIN detected for: ${userEntry.profile.email}. Forcing reset.`);
-            const resetHashedPin = await hashPin(pin);
-            users[userEntry.profile.id] = { profile: userEntry.profile, pin: resetHashedPin };
+            // Legacy plain-text PIN: force the user to set a new PIN via email sign-in
+            authLogger.warn(`Legacy plain-text PIN detected for: ${userEntry.profile.email}. Clearing PIN — user must reset.`);
+            users[userEntry.profile.id] = { profile: userEntry.profile, pin: null };
             localStorage.setItem('golf-app-users', JSON.stringify(users));
             set({
               isLoading: false,
-              error: 'Your PIN has been upgraded to a more secure format. Please log in again with the same PIN.',
+              error: 'Your PIN has expired for security reasons. Please sign in with email and set a new PIN in your profile.',
             });
             return false;
           }
