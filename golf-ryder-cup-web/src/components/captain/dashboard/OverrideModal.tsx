@@ -1,10 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 
 import { useHaptic } from '@/lib/hooks';
 
-import { OverrideModalSections } from './OverrideModalSections';
+const OverrideModalSections = lazy(() =>
+  import('./OverrideModalSections').then((mod) => ({ default: mod.OverrideModalSections }))
+);
 import {
     computeNewMatchScore,
     getOriginalHoleScore,
@@ -51,7 +53,8 @@ export function OverrideModal({
     });
 
     return (
-        <OverrideModalSections
+        <Suspense fallback={null}>
+            <OverrideModalSections
             isOpen={isOpen}
             matchScore={matchScore}
             currentUserName={currentUserName}
@@ -74,6 +77,7 @@ export function OverrideModal({
             onNotesChange={modal.setNotes}
             onSubmit={modal.handleSubmit}
         />
+        </Suspense>
     );
 }
 

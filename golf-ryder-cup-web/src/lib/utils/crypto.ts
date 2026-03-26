@@ -91,6 +91,6 @@ export async function verifyPin(pin: string, stored: string): Promise<boolean> {
     return actual === stored.toLowerCase();
   }
 
-  // Very old plaintext PIN
-  return stored === pin;
+  // Very old plaintext PIN — reject; callers must force a reset first
+  return false;
 }
