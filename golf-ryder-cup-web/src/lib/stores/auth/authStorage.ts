@@ -5,10 +5,32 @@
  * independently testable.
  */
 
+import { z } from 'zod';
 import { authLogger } from '../../utils/logger';
+import { safeParse } from '../../utils/safeParse';
 import type { StoredUserRecord, UserProfile } from './authTypes';
 
 const STORAGE_KEY = 'golf-app-users';
+
+/**
+ * Zod schema that validates the shape of stored user records.
+ *
+ * We use `z.record(z.object(...).passthrough())` so that we validate
+ * required fields exist while allowing additional optional fields
+ * to survive round-trips (forward-compatibility).
+ */
+const storedUsersSchema = z.record(
+  z.string(),
+  z.object({
+    profile: z.object({
+      id: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+      email: z.string().optional(),
+    }).passthrough(),
+    pin: z.string().nullish(),
+  }),
+);
 
 // ————————————————————————————————————————
 // Read helpers
@@ -20,12 +42,13 @@ export function readStoredUsers(): Record<string, StoredUserRecord> {
     return {};
   }
 
-  try {
-    return JSON.parse(storedUsers) as Record<string, StoredUserRecord>;
-  } catch (parseError) {
-    authLogger.error('Failed to parse stored users:', parseError);
+  const parsed = safeParse(storedUsers, storedUsersSchema);
+  if (!parsed) {
+    authLogger.error('Stored user data failed validation — returning empty');
     return {};
   }
+
+  return parsed as Record<string, StoredUserRecord>;
 }
 
 export function writeStoredUsers(users: Record<string, StoredUserRecord>): void {
