@@ -26,6 +26,7 @@ const storedUsersSchema = z.record(
       id: z.string(),
       firstName: z.string(),
       lastName: z.string(),
+      // Email is optional because it may be resolved later during profile creation
       email: z.string().optional(),
     }).passthrough(),
     pin: z.string().nullish(),

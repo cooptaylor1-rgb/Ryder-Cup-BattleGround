@@ -97,9 +97,6 @@ export function OfflineIndicator() {
   const timerIds = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    // Clear any outstanding timers from a previous render
-    const pending = timerIds.current;
-
     // Defer state updates to avoid setState-in-effect warnings
     const timeoutId = setTimeout(() => {
       if (!isOnline) {
@@ -134,7 +131,7 @@ export function OfflineIndicator() {
 
     return () => {
       clearTimeout(timeoutId);
-      pending.forEach(clearTimeout);
+      timerIds.current.forEach(clearTimeout);
       timerIds.current = [];
     };
   }, [isOnline, syncStatus]);
