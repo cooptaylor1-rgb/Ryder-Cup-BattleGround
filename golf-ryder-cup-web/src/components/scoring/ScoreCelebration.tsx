@@ -18,6 +18,7 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Minus, Flag, Sparkles, Star } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
+import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 
 interface ScoreCelebrationProps {
     /** Type of celebration to show */
@@ -66,9 +67,8 @@ export function ScoreCelebration({
     const [particles, setParticles] = useState<Particle[]>([]);
     const [isVisible, setIsVisible] = useState(false);
 
-    // Check for reduced motion preference
-    const prefersReducedMotion = typeof window !== 'undefined'
-        && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    // Check for reduced motion preference (reactive — updates if user toggles preference)
+    const prefersReducedMotion = usePrefersReducedMotion();
 
     // Generate confetti particles
     const generateParticles = useCallback((count: number, color: string) => {
