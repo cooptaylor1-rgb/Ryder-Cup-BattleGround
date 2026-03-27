@@ -29,6 +29,7 @@ import {
 } from '../services/tripSyncService';
 import { deleteTripCascade } from '../services/cascadeDelete';
 import { createLogger } from '../utils/logger';
+import { handleError } from '../utils/errorHandling';
 import { mergeTripPlayers } from '../utils/tripPlayers';
 import { useUIStore } from './uiStore';
 
@@ -162,8 +163,9 @@ export const useTripStore = create<TripState>()(
             syncStatus: getTripSyncStatus(tripId),
           });
         } catch (error) {
+          const appError = handleError(error, { action: 'loadTrip', tripId }, { severity: 'high', reportToSentry: false });
           set({
-            error: error instanceof Error ? error.message : 'Failed to load trip',
+            error: appError.userMessage,
             isLoading: false,
           });
         }
