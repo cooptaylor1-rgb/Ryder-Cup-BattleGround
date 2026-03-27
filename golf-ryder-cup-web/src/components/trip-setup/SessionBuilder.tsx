@@ -18,6 +18,7 @@ import {
     Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { generateId } from '@/lib/utils/generateId';
 
 export type SessionType = 'fourball' | 'foursomes' | 'singles' | 'mixed';
 export type TimeSlot = 'AM' | 'PM' | 'twilight';
@@ -133,7 +134,7 @@ export function SessionBuilder({
     const [showPresets, setShowPresets] = useState(false);
 
     const generateSessionId = useCallback(() => {
-        return `session-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        return generateId('session');
     }, []);
 
     const addSession = useCallback((dayOffset: number = 0) => {

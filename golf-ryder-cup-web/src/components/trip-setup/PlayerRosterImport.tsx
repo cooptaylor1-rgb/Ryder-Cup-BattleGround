@@ -16,6 +16,7 @@ import {
     RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { generateId } from '@/lib/utils/generateId';
 
 export interface PlayerInfo {
     id: string;
@@ -35,7 +36,7 @@ interface PlayerRosterImportProps {
     className?: string;
 }
 
-const generatePlayerId = () => `player-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const generatePlayerId = () => generateId('player');
 
 const SAMPLE_ROSTER = `Name,Handicap,Email
 John Smith,12,john@example.com

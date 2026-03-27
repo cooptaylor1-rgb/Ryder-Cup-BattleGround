@@ -7,6 +7,7 @@ import { useTripStore, useUIStore } from '@/lib/stores';
 import { db } from '@/lib/db';
 import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
+import { shuffle } from '@/lib/utils/shuffle';
 import {
   LineupBuilder,
   calculateFairnessScore,
@@ -242,8 +243,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   );
 
   const handleAutoFill = useCallback((): MatchSlot[] => {
-    const shuffledA = [...lineupTeamA].sort(() => Math.random() - 0.5);
-    const shuffledB = [...lineupTeamB].sort(() => Math.random() - 0.5);
+    const shuffledA = shuffle([...lineupTeamA]);
+    const shuffledB = shuffle([...lineupTeamB]);
 
     return Array.from({ length: matchCount }, (_, matchIndex) => {
       const teamAForMatch = Array.from({ length: selectedType.playersPerTeam }, (_, playerIndex) => {

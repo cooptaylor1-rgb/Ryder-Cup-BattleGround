@@ -14,6 +14,7 @@
 // ============================================
 // TYPES
 import { createLogger } from '@/lib/utils/logger';
+import { generateId } from '@/lib/utils/generateId';
 
 const analyticsLogger = createLogger('Analytics');
 
@@ -407,7 +408,7 @@ class AnalyticsService {
   }
 
   private generateSessionId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return generateId('session');
   }
 
   private log(message: string, data?: unknown): void {
@@ -535,7 +536,7 @@ type TrackingProps = Record<string, string | number | boolean | null>;
 
 /** Generate a unique correlation ID for tracing related analytics events */
 export function createCorrelationId(prefix: string): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  return generateId(prefix);
 }
 
 /** Track a sync failure event */

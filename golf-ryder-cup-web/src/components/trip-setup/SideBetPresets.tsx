@@ -17,6 +17,7 @@ import {
     Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { generateId } from '@/lib/utils/generateId';
 
 export interface SideBetConfig {
     id: string;
@@ -117,7 +118,7 @@ export function SideBetPresets({
     });
 
     const generateBetId = useCallback(() => {
-        return `bet-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+        return generateId('bet');
     }, []);
 
     const addPresetBet = useCallback((preset: Omit<SideBetConfig, 'id' | 'isEnabled'>) => {

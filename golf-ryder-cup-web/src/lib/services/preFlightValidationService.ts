@@ -14,6 +14,7 @@ import type {
     ValidationSeverity,
     ValidationActionKind,
 } from '@/lib/types/captain';
+import { generateId } from '@/lib/utils/generateId';
 import type {
     Trip,
     Player,
@@ -59,7 +60,7 @@ function createValidation(
     }
 ): ValidationItem {
     return {
-        id: `${category}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: generateId(category),
         category,
         severity,
         title,
