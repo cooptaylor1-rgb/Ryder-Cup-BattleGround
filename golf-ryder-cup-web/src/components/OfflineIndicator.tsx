@@ -11,7 +11,7 @@
  * - Respects user's reduced motion preferences
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   WifiOff,
@@ -94,6 +94,7 @@ export function OfflineIndicator() {
   const [justCameOnline, setJustCameOnline] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const timerIds = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     // Defer state updates to avoid setState-in-effect warnings
@@ -109,24 +110,30 @@ export function OfflineIndicator() {
         setJustCameOnline(true);
 
         // Simulate sync completion
-        setTimeout(() => {
+        const t1 = setTimeout(() => {
           setIsSyncing(false);
           setSyncStatus('synced');
         }, 2000);
 
         // Show "back online" message briefly
-        setTimeout(() => {
+        const t2 = setTimeout(() => {
           setShowBanner(false);
         }, 3000);
 
         // Hide "just came online" indicator after animation
-        setTimeout(() => {
+        const t3 = setTimeout(() => {
           setJustCameOnline(false);
         }, 4000);
+
+        timerIds.current.push(t1, t2, t3);
       }
     }, 0);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      timerIds.current.forEach(clearTimeout);
+      timerIds.current = [];
+    };
   }, [isOnline, syncStatus]);
 
   // Don't show anything if online and not just reconnected

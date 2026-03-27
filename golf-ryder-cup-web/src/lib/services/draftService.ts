@@ -15,6 +15,7 @@ import type {
     DraftState,
 } from '@/lib/types/captain';
 import type { Player, UUID } from '@/lib/types/models';
+import { shuffle } from '@/lib/utils/shuffle';
 
 // Re-export types for convenience
 export type {
@@ -40,7 +41,7 @@ export function createDraftConfig(
     const roundCount = Math.ceil(playerCount / captainIds.length);
 
     // Randomize draft order
-    const shuffledCaptains = [...captainIds].sort(() => Math.random() - 0.5);
+    const shuffledCaptains = shuffle([...captainIds]);
 
     return {
         id: crypto.randomUUID(),
@@ -216,7 +217,7 @@ export function autoPickPlayer(state: DraftState): UUID | null {
 export function randomizeTeams(
     players: Player[]
 ): { teamA: Player[]; teamB: Player[] } {
-    const shuffled = [...players].sort(() => Math.random() - 0.5);
+    const shuffled = shuffle([...players]);
     const midpoint = Math.ceil(shuffled.length / 2);
 
     return {

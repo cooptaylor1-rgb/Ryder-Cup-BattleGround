@@ -14,6 +14,7 @@
 // ============================================
 // TYPES
 import { createLogger } from '@/lib/utils/logger';
+import { generateId } from '@/lib/utils/generateId';
 
 const analyticsLogger = createLogger('Analytics');
 
@@ -105,6 +106,7 @@ class AnalyticsService {
   private eventQueue: AnalyticsEvent[] = [];
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private initialized = false;
+  private autoTrackingCleanup: (() => void) | null = null;
 
   constructor(config: Partial<AnalyticsConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
@@ -378,17 +380,33 @@ class AnalyticsService {
   private setupAutoTracking(): void {
     if (typeof window === 'undefined') return;
 
-    // Track page visibility changes
-    document.addEventListener('visibilitychange', () => {
+    const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         this.flush();
       }
-    });
+    };
 
-    // Track before unload
-    window.addEventListener('beforeunload', () => {
+    const handleBeforeUnload = () => {
       this.flush();
-    });
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    this.autoTrackingCleanup = () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }
+
+  /** Remove event listeners registered by setupAutoTracking */
+  destroy(): void {
+    this.autoTrackingCleanup?.();
+    this.autoTrackingCleanup = null;
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
   }
 
   // ----------------------------------------
@@ -407,7 +425,7 @@ class AnalyticsService {
   }
 
   private generateSessionId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return generateId('session');
   }
 
   private log(message: string, data?: unknown): void {
@@ -527,53 +545,18 @@ export type AnalyticsEventName = (typeof AnalyticsEvents)[keyof typeof Analytics
 
 // ============================================
 // CORRELATION & TRACKING HELPERS
-// Standalone functions that wrap the analytics singleton
-// for convenience in components and stores.
+// Re-exported from analyticsTracking.ts for backward compatibility.
+// New code should import directly from '@/lib/services/analyticsTracking'.
 // ============================================
 
-type TrackingProps = Record<string, string | number | boolean | null>;
-
-/** Generate a unique correlation ID for tracing related analytics events */
-export function createCorrelationId(prefix: string): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-/** Track a sync failure event */
-export function trackSyncFailure(props: Record<string, unknown>): void {
-  analytics.error('sync_failure', props as TrackingProps);
-}
-
-/** Track a feature usage event */
-export function trackFeature(featureName: string, action: string): void {
-  analytics.feature(featureName, { action });
-}
-
-/** Track a score entry event */
-export function trackScoreEntry(props: Record<string, unknown>): void {
-  analytics.scoring('score_entry', props as TrackingProps);
-}
-
-/** Track a score undo event */
-export function trackScoreUndo(props: Record<string, unknown>): void {
-  analytics.scoring('score_undo', props as TrackingProps);
-}
-
-/** Track a social action event */
-export function trackSocialAction(props: Record<string, unknown>): void {
-  analytics.social('social_action', props as TrackingProps);
-}
-
-/** Track standings published event */
-export function trackStandingsPublished(props: Record<string, unknown>): void {
-  analytics.engagement('standings_published', props as TrackingProps);
-}
-
-/** Track standings tab changed event */
-export function trackStandingsTabChanged(props: Record<string, unknown>): void {
-  analytics.navigation('standings_tab_changed', props as TrackingProps);
-}
-
-/** Track standings viewed event */
-export function trackStandingsViewed(props: Record<string, unknown>): void {
-  analytics.navigation('standings_viewed', props as TrackingProps);
-}
+export {
+  createCorrelationId,
+  trackSyncFailure,
+  trackFeature,
+  trackScoreEntry,
+  trackScoreUndo,
+  trackSocialAction,
+  trackStandingsPublished,
+  trackStandingsTabChanged,
+  trackStandingsViewed,
+} from './analyticsTracking';

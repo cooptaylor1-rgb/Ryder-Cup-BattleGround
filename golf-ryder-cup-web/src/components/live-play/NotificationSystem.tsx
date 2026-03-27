@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
+import { usePrefersReducedMotion, announceToScreenReader } from '@/lib/utils/accessibility';
 
 // ============================================
 // TYPES
@@ -326,7 +327,16 @@ export function NotificationToast({
     autoHideDuration = 5000,
 }: NotificationToastProps) {
     const { trigger } = useHaptic();
+    const prefersReducedMotion = usePrefersReducedMotion();
     const tone = NOTIFICATION_TONE_CLASSES[notification.priority] ?? NOTIFICATION_TONE_CLASSES.low;
+
+    // Announce to screen readers
+    useEffect(() => {
+        announceToScreenReader(
+            `${notification.title}: ${notification.message}`,
+            notification.priority === 'urgent' ? 'assertive' : 'polite',
+        );
+    }, [notification.title, notification.message, notification.priority]);
 
     // Auto-dismiss
     useEffect(() => {
@@ -358,10 +368,10 @@ export function NotificationToast({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
+            transition={prefersReducedMotion ? { duration: 0.15 } : { type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
                 'max-w-sm w-full p-4 rounded-2xl backdrop-blur-md border shadow-[var(--shadow-card-lg)]',
                 'flex items-start gap-3 transition-colors',

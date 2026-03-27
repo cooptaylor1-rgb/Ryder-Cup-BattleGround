@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -106,6 +106,7 @@ export function QuickPhotoCapture({
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [isOpen, setIsOpen] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
@@ -118,6 +119,13 @@ export function QuickPhotoCapture({
     // Wrapper for haptic feedback
     const trigger = useCallback((type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection') => {
         triggerHaptic(type);
+    }, []);
+
+    // Clean up pending timer on unmount
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
     }, []);
 
     // Start camera stream
@@ -161,7 +169,8 @@ export function QuickPhotoCapture({
         setError(null);
 
         // Small delay for modal animation
-        setTimeout(startCamera, 100);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(startCamera, 100);
     }, [startCamera, trigger]);
 
     // Close camera modal
@@ -198,7 +207,8 @@ export function QuickPhotoCapture({
         setCapturedImage(dataUrl);
 
         // Flash effect timing
-        setTimeout(() => setIsCapturing(false), 150);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => setIsCapturing(false), 150);
 
         // Stop camera while reviewing
         stopCamera();
@@ -216,7 +226,8 @@ export function QuickPhotoCapture({
         trigger('selection');
         stopCamera();
         setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
-        setTimeout(startCamera, 100);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(startCamera, 100);
     }, [startCamera, stopCamera, trigger]);
 
     // Save photo

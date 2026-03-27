@@ -18,6 +18,7 @@ import type { MatchState } from '../types/computed';
 import { db } from '../db';
 import { trackSyncFailure, createCorrelationId } from '../services/analyticsService';
 import { calculateMatchState } from '../services/scoringEngine';
+import { handleError } from '../utils/errorHandling';
 import { loadSelectedMatchData, loadSessionMatchesData } from './scoring-store/scoringStoreLoaders';
 import { scoreActiveHoleData, undoLastHoleData } from './scoring-store/scoringStoreMutations';
 import {
@@ -117,8 +118,9 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 isLoading: false,
             });
         } catch (error) {
+            const appError = handleError(error, { action: 'loadSessionMatches' }, { severity: 'medium', reportToSentry: false });
             set({
-                error: error instanceof Error ? error.message : 'Failed to load matches',
+                error: appError.userMessage,
                 isLoading: false,
             });
         }
@@ -141,8 +143,9 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 undoStack,
             });
         } catch (error) {
+            const appError = handleError(error, { action: 'selectMatch', matchId }, { severity: 'medium', reportToSentry: false });
             set({
-                error: error instanceof Error ? error.message : 'Failed to load match',
+                error: appError.userMessage,
                 isLoading: false,
             });
         }
@@ -204,16 +207,17 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 lastSavedAt: scoringResult.lastSavedAt,
             });
         } catch (error) {
+            const appError = handleError(error, { action: 'scoreActiveHole', matchId: activeMatch.id }, { severity: 'high' });
             trackSyncFailure({
                 area: 'sync_queue',
                 operation: 'score_hole',
                 matchId: activeMatch.id,
-                reason: error instanceof Error ? error.message : 'unknown',
+                reason: appError.message,
                 correlationId: createCorrelationId('score-op'),
             });
 
             set({
-                error: error instanceof Error ? error.message : 'Failed to save score',
+                error: appError.userMessage,
                 isSaving: false,
             });
         }
@@ -253,8 +257,9 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 isSaving: false,
             });
         } catch (error) {
+            const appError = handleError(error, { action: 'undoLastHole' }, { severity: 'medium', reportToSentry: false });
             set({
-                error: error instanceof Error ? error.message : 'Failed to undo',
+                error: appError.userMessage,
                 isSaving: false,
             });
         }

@@ -1,4 +1,5 @@
 import type { UUID } from '@/lib/types/models';
+import { shuffle } from '@/lib/utils/shuffle';
 import type {
     HammerConfig,
     HammerGame,
@@ -50,7 +51,7 @@ export function createWolfGame(
         throw new Error('Wolf requires exactly 4 players');
     }
 
-    const rotation = [...playerIds].sort(() => Math.random() - 0.5);
+    const rotation = shuffle([...playerIds]);
 
     return {
         id: createId(),

@@ -20,6 +20,7 @@ interface SWConfig {
 
 let swRegistration: ServiceWorkerRegistration | null = null;
 let updateCallback: SWUpdateCallback | null = null;
+let swCleanup: (() => void) | null = null;
 
 /**
  * Register the service worker
@@ -72,8 +73,16 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
 
         // Setup online/offline handlers
         if (config?.onOffline || config?.onOnline) {
-            window.addEventListener('online', () => config.onOnline?.());
-            window.addEventListener('offline', () => config.onOffline?.());
+            const onlineHandler = () => config.onOnline?.();
+            const offlineHandler = () => config.onOffline?.();
+            window.addEventListener('online', onlineHandler);
+            window.addEventListener('offline', offlineHandler);
+
+            // Store cleanup for unregisterServiceWorker
+            swCleanup = () => {
+                window.removeEventListener('online', onlineHandler);
+                window.removeEventListener('offline', offlineHandler);
+            };
         }
 
         return registration;
@@ -90,6 +99,10 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
         return false;
     }
+
+    // Remove online/offline listeners registered during init
+    swCleanup?.();
+    swCleanup = null;
 
     try {
         const registration = await navigator.serviceWorker.ready;

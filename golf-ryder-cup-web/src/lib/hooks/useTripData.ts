@@ -17,6 +17,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useHaptic } from './useHaptic';
+import { generateId } from '@/lib/utils/generateId';
 import type { Match, Player, RyderCupSession } from '../types/models';
 
 // ============================================
@@ -318,7 +319,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
         async (player: Omit<TripPlayer, 'id' | 'joinedAt' | 'stats'>): Promise<string> => {
             setError(null);
             try {
-                const id = `player-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const id = generateId('player');
                 // Split name into firstName and lastName for Player model
                 const nameParts = player.name.trim().split(/\s+/);
                 const firstName = nameParts[0] || '';
@@ -375,7 +376,7 @@ export function useTripData({ tripId }: UseTripDataOptions): UseTripDataReturn {
         async (session: Omit<TripSession, 'id' | 'status' | 'matchCount'>): Promise<string> => {
             setError(null);
             try {
-                const id = `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const id = generateId('session');
                 // Map TripSession sessionType to RyderCupSession sessionType
                 const validSessionTypes = ['foursomes', 'fourball', 'singles'];
                 const sessionType = validSessionTypes.includes(session.sessionType || '')

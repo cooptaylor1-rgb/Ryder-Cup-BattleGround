@@ -13,6 +13,7 @@
 import { db } from '../db';
 import type { RyderCupSession } from '../types/models';
 import { notifyLogger } from '@/lib/utils/logger';
+import { generateId } from '@/lib/utils/generateId';
 
 // ============================================
 // TYPES
@@ -269,7 +270,7 @@ function saveScheduledNotifications(): void {
 export function scheduleNotification(
   notification: Omit<ScheduledNotification, 'id' | 'sent'>
 ): string {
-  const id = `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const id = generateId('notif');
 
   scheduledNotifications.push({
     ...notification,

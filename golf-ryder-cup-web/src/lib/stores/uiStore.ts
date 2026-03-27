@@ -15,6 +15,9 @@ import { hashPin, verifyPin, isHashedPin } from '@/lib/utils/crypto';
 // TYPES
 // ============================================
 
+// Track auto-dismiss timers so they can be cancelled when a toast is manually dismissed
+const toastTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
 type Tab = 'score' | 'matchups' | 'standings' | 'more';
 type Theme = 'light' | 'dark' | 'outdoor';
 type ScoringMode = 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded';
@@ -246,13 +249,20 @@ export const useUIStore = create<UIState>()(
 
         // Auto-dismiss
         if (shouldScheduleDismiss && duration > 0) {
-          setTimeout(() => {
+          const timer = setTimeout(() => {
+            toastTimers.delete(id);
             get().dismissToast(id);
           }, duration);
+          toastTimers.set(id, timer);
         }
       },
 
       dismissToast: (id) => {
+        const timer = toastTimers.get(id);
+        if (timer) {
+          clearTimeout(timer);
+          toastTimers.delete(id);
+        }
         set((state) => ({
           toasts: state.toasts.filter((t) => t.id !== id),
         }));
