@@ -135,6 +135,14 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
     const velocityRef = useRef(0);
     const lastY = useRef(0);
     const lastTime = useRef(0);
+    const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Clean up animation timers on unmount
+    useEffect(() => {
+      return () => {
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
+      };
+    }, []);
 
     // Calculate current height
     const currentHeight = getSnapPointHeight(
@@ -158,7 +166,8 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
 
         onSnapChange?.(point);
 
-        setTimeout(() => setIsAnimating(false), 300);
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
+        animTimerRef.current = setTimeout(() => setIsAnimating(false), 300);
       },
       [snapPoints, haptics, onSnapChange]
     );
@@ -166,7 +175,8 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
     // Close the sheet
     const close = useCallback(() => {
       setIsAnimating(true);
-      setTimeout(() => {
+      if (animTimerRef.current) clearTimeout(animTimerRef.current);
+      animTimerRef.current = setTimeout(() => {
         onClose();
         setIsAnimating(false);
         setCurrentSnap(initialSnap);

@@ -106,6 +106,7 @@ class AnalyticsService {
   private eventQueue: AnalyticsEvent[] = [];
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private initialized = false;
+  private autoTrackingCleanup: (() => void) | null = null;
 
   constructor(config: Partial<AnalyticsConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
@@ -379,17 +380,33 @@ class AnalyticsService {
   private setupAutoTracking(): void {
     if (typeof window === 'undefined') return;
 
-    // Track page visibility changes
-    document.addEventListener('visibilitychange', () => {
+    const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         this.flush();
       }
-    });
+    };
 
-    // Track before unload
-    window.addEventListener('beforeunload', () => {
+    const handleBeforeUnload = () => {
       this.flush();
-    });
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    this.autoTrackingCleanup = () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }
+
+  /** Remove event listeners registered by setupAutoTracking */
+  destroy(): void {
+    this.autoTrackingCleanup?.();
+    this.autoTrackingCleanup = null;
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
   }
 
   // ----------------------------------------

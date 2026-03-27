@@ -103,6 +103,7 @@ class SyncService {
   private isSyncing = false;
   private lastSyncAt: Date | null = null;
   private syncListeners: Array<(status: SyncStatus) => void> = [];
+  private onlineHandler: (() => void) | null = null;
 
   constructor() {
     // Load pending changes from localStorage
@@ -110,7 +111,16 @@ class SyncService {
 
     // Listen for online/offline events
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => this.syncPendingChanges());
+      this.onlineHandler = () => this.syncPendingChanges();
+      window.addEventListener('online', this.onlineHandler);
+    }
+  }
+
+  /** Remove event listeners to prevent memory leaks */
+  destroy(): void {
+    if (this.onlineHandler && typeof window !== 'undefined') {
+      window.removeEventListener('online', this.onlineHandler);
+      this.onlineHandler = null;
     }
   }
 
