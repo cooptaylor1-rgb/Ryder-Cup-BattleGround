@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import {
@@ -90,7 +91,7 @@ function createDemoPhotos(players: { id?: string }[]): Photo[] {
 
 export default function PhotosPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
 
   // Use lazy initialization for demo photos to avoid Date.now() in render
   const [photos, setPhotos] = useState<Photo[]>(() => createDemoPhotos(players));

@@ -23,14 +23,14 @@ import {
 import { MatchInsideGamesPanel } from './MatchInsideGamesPanel';
 import { MatchTripMomentsPanel } from './MatchTripMomentsPanel';
 
-interface FourballPlayer {
+export interface FourballPlayer {
   id: string;
   name: string;
   courseHandicap: number;
   strokeAllowance: number;
 }
 
-interface MatchScoringActiveStateProps {
+export interface ScoringContext {
   isEditingScores: boolean;
   isMatchComplete: boolean;
   currentHole: number;
@@ -41,14 +41,13 @@ interface MatchScoringActiveStateProps {
   scoringModeMeta: ScoringModeMeta;
   isFourball: boolean;
   quickScoreMode: boolean;
-  preferredHand: 'left' | 'right';
   quickScorePendingTeam?: 'teamA' | 'teamB';
-  showHandicapDetails: boolean;
-  showScoringModeTip: boolean;
-  showAdvancedTools: boolean;
-  prefersReducedMotion: boolean;
   isSaving: boolean;
   undoCount: number;
+  presses: Press[];
+}
+
+export interface TeamContext {
   teamAName: string;
   teamBName: string;
   teamAColor: string;
@@ -56,15 +55,28 @@ interface MatchScoringActiveStateProps {
   teamAHandicapAllowance: number;
   teamBHandicapAllowance: number;
   holeHandicaps: number[];
-  presses: Press[];
-  activeSideBets: ReminderSideBet[];
-  activeMatchSideBets: SideBet[];
-  currentTripId?: string;
-  currentPlayerIdForBets?: string;
   teamAFourballPlayers: FourballPlayer[];
   teamBFourballPlayers: FourballPlayer[];
   teamAPlayers: Player[];
   teamBPlayers: Player[];
+}
+
+export interface ScoringUIPreferences {
+  preferredHand: 'left' | 'right';
+  showHandicapDetails: boolean;
+  showScoringModeTip: boolean;
+  showAdvancedTools: boolean;
+  prefersReducedMotion: boolean;
+}
+
+export interface SideBetContext {
+  activeSideBets: ReminderSideBet[];
+  activeMatchSideBets: SideBet[];
+  currentTripId?: string;
+  currentPlayerIdForBets?: string;
+}
+
+export interface ScoringHandlers {
   onFinishEditing: () => void;
   onPrevHole: () => void;
   onNextHole: () => void;
@@ -90,55 +102,83 @@ interface MatchScoringActiveStateProps {
   onPress: (pressedBy: 'teamA' | 'teamB') => void;
 }
 
+interface MatchScoringActiveStateProps {
+  scoring: ScoringContext;
+  teams: TeamContext;
+  preferences: ScoringUIPreferences;
+  sideBets: SideBetContext;
+  handlers: ScoringHandlers;
+}
+
 export function MatchScoringActiveState({
-  isEditingScores,
-  isMatchComplete,
-  currentHole,
-  currentHoleResult,
-  currentPar,
-  matchState,
-  scoringMode,
-  scoringModeMeta,
-  isFourball,
-  quickScoreMode,
-  preferredHand,
-  quickScorePendingTeam,
-  showHandicapDetails,
-  showScoringModeTip,
-  showAdvancedTools,
-  prefersReducedMotion,
-  isSaving,
-  undoCount,
-  teamAName,
-  teamBName,
-  teamAColor,
-  teamBColor,
-  teamAHandicapAllowance,
-  teamBHandicapAllowance,
-  holeHandicaps,
-  presses,
-  activeSideBets,
-  activeMatchSideBets,
-  currentTripId,
-  currentPlayerIdForBets,
-  teamAFourballPlayers,
-  teamBFourballPlayers,
-  teamAPlayers,
-  teamBPlayers,
-  onFinishEditing,
-  onPrevHole,
-  onNextHole,
-  onDismissScoringModeTip,
-  onScoringModeChange,
-  onQuickScoreTap,
-  onToggleShowHandicapDetails,
-  onScore,
-  onScoreWithStrokes,
-  onFourballScore,
-  onUndo,
-  onToggleShowAdvancedTools,
-  onPress,
+  scoring,
+  teams,
+  preferences,
+  sideBets,
+  handlers,
 }: MatchScoringActiveStateProps) {
+  const {
+    isEditingScores,
+    isMatchComplete,
+    currentHole,
+    currentHoleResult,
+    currentPar,
+    matchState,
+    scoringMode,
+    scoringModeMeta,
+    isFourball,
+    quickScoreMode,
+    quickScorePendingTeam,
+    isSaving,
+    undoCount,
+    presses,
+  } = scoring;
+
+  const {
+    teamAName,
+    teamBName,
+    teamAColor,
+    teamBColor,
+    teamAHandicapAllowance,
+    teamBHandicapAllowance,
+    holeHandicaps,
+    teamAFourballPlayers,
+    teamBFourballPlayers,
+    teamAPlayers,
+    teamBPlayers,
+  } = teams;
+
+  const {
+    preferredHand,
+    showHandicapDetails,
+    showScoringModeTip,
+    showAdvancedTools,
+    prefersReducedMotion,
+  } = preferences;
+
+  const {
+    activeSideBets,
+    activeMatchSideBets,
+    currentTripId,
+    currentPlayerIdForBets,
+  } = sideBets;
+
+  const {
+    onFinishEditing,
+    onPrevHole,
+    onNextHole,
+    onDismissScoringModeTip,
+    onScoringModeChange,
+    onQuickScoreTap,
+    onToggleShowHandicapDetails,
+    onScore,
+    onScoreWithStrokes,
+    onFourballScore,
+    onUndo,
+    onToggleShowAdvancedTools,
+    onPress,
+  } = handlers;
+
   return (
     <section className="space-y-4 py-[var(--space-6)]">
       {isEditingScores && isMatchComplete && (

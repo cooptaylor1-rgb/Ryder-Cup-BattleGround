@@ -14,6 +14,7 @@ import {
   markAsPaid,
 } from '@/lib/services/duesService';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { DuesCategory } from '@/lib/types/finances';
 import { createLogger } from '@/lib/utils/logger';
 import {
@@ -32,8 +33,8 @@ const logger = createLogger('finances');
 
 export default function FinancesPageClient() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);

@@ -13,6 +13,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { Target, Trophy, Home, Settings, Shield, CalendarDays } from 'lucide-react';
 
 interface NavItem {
@@ -40,7 +41,7 @@ export interface NavBadges {
 export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isCaptainMode } = useUIStore();
+  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   const isActive = (item: NavItem) => {
     if (item.href === '/') return pathname === '/';

@@ -1,5 +1,4 @@
 import { createLogger } from '@/lib/utils/logger';
-import { v4 as uuidv4 } from 'uuid';
 
 import { calcRetryDelay, syncSleep } from '../baseSyncService';
 import { isSupabaseConfigured, supabase } from '../../supabase/client';
@@ -26,7 +25,7 @@ export function getDeviceId(): string {
 
   let deviceId = localStorage.getItem(DEVICE_ID_KEY);
   if (!deviceId) {
-    deviceId = uuidv4();
+    deviceId = crypto.randomUUID();
     localStorage.setItem(DEVICE_ID_KEY, deviceId);
   }
   return deviceId;

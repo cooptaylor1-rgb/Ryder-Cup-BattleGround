@@ -16,7 +16,7 @@ const localStorageMock = (() => {
   };
 })();
 
-let useUIStore: (typeof import('@/lib/stores'))['useUIStore'];
+let useToastStore: (typeof import('@/lib/stores'))['useToastStore'];
 
 describe('uiStore toasts', () => {
   beforeEach(async () => {
@@ -31,27 +31,27 @@ describe('uiStore toasts', () => {
 
     localStorageMock.clear();
     vi.resetModules();
-    ({ useUIStore } = await import('@/lib/stores'));
-    useUIStore.setState({ toasts: [] });
+    ({ useToastStore } = await import('@/lib/stores'));
+    useToastStore.setState({ toasts: [] });
   });
 
   it('deduplicates identical active toasts', () => {
-    const store = useUIStore.getState();
+    const store = useToastStore.getState();
 
     store.showToast('success', 'All systems go! Ready to play.', 0);
     store.showToast('success', 'All systems go! Ready to play.', 0);
 
-    expect(useUIStore.getState().toasts).toHaveLength(1);
+    expect(useToastStore.getState().toasts).toHaveLength(1);
   });
 
   it('keeps distinct toasts even when the type matches', () => {
-    const store = useUIStore.getState();
+    const store = useToastStore.getState();
 
     store.showToast('success', 'Captain Mode enabled', 0);
     store.showToast('success', 'All systems go! Ready to play.', 0);
 
-    expect(useUIStore.getState().toasts).toHaveLength(2);
-    expect(useUIStore.getState().toasts.map((toast) => toast.message)).toEqual([
+    expect(useToastStore.getState().toasts).toHaveLength(2);
+    expect(useToastStore.getState().toasts.map((toast) => toast.message)).toEqual([
       'Captain Mode enabled',
       'All systems go! Ready to play.',
     ]);

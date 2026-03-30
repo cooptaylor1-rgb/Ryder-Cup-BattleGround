@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { useAuthStore, useScoringStore, useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
@@ -34,7 +35,7 @@ export default function MatchScoringPageClient() {
   const params = useParams();
   const matchId = params.matchId as string;
 
-  const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore();
+  const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, courses: s.courses, players: s.players, teams: s.teams, teeSets: s.teeSets, sessions: s.sessions })));
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
   const {
     showToast,
@@ -43,7 +44,7 @@ export default function MatchScoringPageClient() {
     getScoringModeForFormat,
     setScoringModeForFormat,
     isCaptainMode,
-  } = useUIStore();
+  } = useUIStore(useShallow(s => ({ showToast: s.showToast, scoringPreferences: s.scoringPreferences, scoringModeByFormat: s.scoringModeByFormat, getScoringModeForFormat: s.getScoringModeForFormat, setScoringModeForFormat: s.setScoringModeForFormat, isCaptainMode: s.isCaptainMode })));
   const haptic = useHaptic();
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();

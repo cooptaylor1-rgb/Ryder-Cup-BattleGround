@@ -8,7 +8,6 @@
  * - Different handicap ranges
  */
 
-import { v4 as uuidv4 } from 'uuid';
 
 // Types matching the app's models
 export interface GeneratedTrip {
@@ -172,7 +171,7 @@ export interface GeneratedTestData {
  */
 export function generateTrip(scenario: TripScenario, index: number): GeneratedTestData {
     const now = new Date().toISOString();
-    const tripId = uuidv4();
+    const tripId = crypto.randomUUID();
 
     // Generate trip dates
     const startDate = new Date();
@@ -219,7 +218,7 @@ export function generateTrip(scenario: TripScenario, index: number): GeneratedTe
         }
 
         players.push({
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             firstName,
             lastName,
             handicapIndex: handicap,
@@ -238,7 +237,7 @@ export function generateTrip(scenario: TripScenario, index: number): GeneratedTe
     const teamBStyle = randomElement(TEAM_B_COLORS);
 
     const teamA: GeneratedTeam = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         tripId,
         name: randomElement(TEAM_A_NAMES),
         ...teamAStyle,
@@ -248,7 +247,7 @@ export function generateTrip(scenario: TripScenario, index: number): GeneratedTe
     };
 
     const teamB: GeneratedTeam = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         tripId,
         name: randomElement(TEAM_B_NAMES),
         ...teamBStyle,

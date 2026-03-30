@@ -7,6 +7,7 @@ import { computeTripRecords } from '@/lib/services/awardsService';
 import type { TripRecords, Award, PlayerStats } from '@/lib/types/awards';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
@@ -114,7 +115,7 @@ export default function AwardsPage() {
   const router = useRouter();
   const params = useParams();
   const tripId = params.tripId as string;
-  const { showToast } = useUIStore();
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [records, setRecords] = useState<TripRecords | null>(null);
   const [isLoading, setIsLoading] = useState(true);

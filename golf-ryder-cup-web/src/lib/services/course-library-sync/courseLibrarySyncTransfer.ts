@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '@/lib/db';
 import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
@@ -217,7 +216,7 @@ export async function createAndSyncCourseProfile(
   source: CourseSyncSource = 'user'
 ): Promise<CourseProfile> {
   const now = new Date().toISOString();
-  const profileId = uuidv4();
+  const profileId = crypto.randomUUID();
 
   const profile: CourseProfile = {
     id: profileId,
@@ -229,7 +228,7 @@ export async function createAndSyncCourseProfile(
   };
 
   const teeSetProfiles: TeeSetProfile[] = (teeSets || []).map((teeSet) => ({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     courseProfileId: profileId,
     name: teeSet.name,
     color: teeSet.color,

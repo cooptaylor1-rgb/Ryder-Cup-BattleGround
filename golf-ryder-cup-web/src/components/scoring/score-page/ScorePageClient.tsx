@@ -9,6 +9,7 @@ import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import { db } from '@/lib/db';
 import { createLogger } from '@/lib/utils/logger';
 import { useAuthStore, useScoringStore, useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { navigateBackOr } from '@/lib/utils/navigation';
 import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import {
@@ -27,7 +28,7 @@ const logger = createLogger('score');
 
 export default function ScorePageClient() {
     const router = useRouter();
-    const { currentTrip, sessions, players } = useTripStore();
+    const { currentTrip, sessions, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players })));
     const { selectMatch } = useScoringStore();
     const { currentUser, isAuthenticated, authUserId } = useAuthStore();
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);

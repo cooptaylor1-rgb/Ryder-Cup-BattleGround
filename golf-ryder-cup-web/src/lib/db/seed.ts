@@ -6,7 +6,7 @@
  */
 
 import { db } from './index';
-import { v4 as uuidv4 } from 'uuid';
+
 import {
     Trip,
     Player,
@@ -101,11 +101,11 @@ export async function seedDemoData(): Promise<string> {
     endDate.setDate(endDate.getDate() + 2);
 
     // Generate IDs
-    const tripId = uuidv4();
-    const courseId = uuidv4();
-    const teeSetId = uuidv4();
-    const teamAId = uuidv4();
-    const teamBId = uuidv4();
+    const tripId = crypto.randomUUID();
+    const courseId = crypto.randomUUID();
+    const teeSetId = crypto.randomUUID();
+    const teamAId = crypto.randomUUID();
+    const teamBId = crypto.randomUUID();
 
     // Create course
     const course: Course = {
@@ -135,7 +135,7 @@ export async function seedDemoData(): Promise<string> {
 
     // Create players
     const players: Player[] = DEMO_PLAYERS.map((p, _index) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         ...p,
         createdAt: now,
         updatedAt: now,
@@ -182,7 +182,7 @@ export async function seedDemoData(): Promise<string> {
 
     // Create team members (first 6 players = USA, next 6 = Europe)
     const teamMembers: TeamMember[] = players.map((player, index) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         teamId: index < 6 ? teamAId : teamBId,
         playerId: player.id,
         sortOrder: index % 6,
@@ -193,7 +193,7 @@ export async function seedDemoData(): Promise<string> {
     // Create sessions
     const sessions: RyderCupSession[] = [
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             tripId,
             name: 'Day 1 AM - Foursomes',
             sessionNumber: 1,
@@ -207,7 +207,7 @@ export async function seedDemoData(): Promise<string> {
             updatedAt: now,
         },
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             tripId,
             name: 'Day 1 PM - Fourball',
             sessionNumber: 2,
@@ -221,7 +221,7 @@ export async function seedDemoData(): Promise<string> {
             updatedAt: now,
         },
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             tripId,
             name: 'Day 2 - Singles',
             sessionNumber: 3,
@@ -244,7 +244,7 @@ export async function seedDemoData(): Promise<string> {
     const matches: Match[] = [
         // Match 1
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             sessionId: foursomesSession.id,
             courseId,
             teeSetId,
@@ -263,7 +263,7 @@ export async function seedDemoData(): Promise<string> {
         },
         // Match 2
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             sessionId: foursomesSession.id,
             courseId,
             teeSetId,
@@ -282,7 +282,7 @@ export async function seedDemoData(): Promise<string> {
         },
         // Match 3
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             sessionId: foursomesSession.id,
             courseId,
             teeSetId,

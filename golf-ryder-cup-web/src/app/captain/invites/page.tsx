@@ -19,13 +19,14 @@ import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { cn } from '@/lib/utils';
 
 export default function InvitesPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isLoadingShareCode, setIsLoadingShareCode] = useState(false);
   const origin = typeof window !== 'undefined' ? window.location.origin : '';

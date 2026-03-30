@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTripStore, useAuthStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { tripLogger } from '@/lib/utils/logger';
@@ -22,7 +23,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
     const hasRehydrated = useRef(false);
     const hasCheckedUserTrip = useRef(false);
     const isEnsuringTripPlayer = useRef(false);
-    const { currentTrip, loadTrip, isLoading, players } = useTripStore();
+    const { currentTrip, loadTrip, isLoading, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, isLoading: s.isLoading, players: s.players })));
     const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
     // Rehydrate persisted trip state

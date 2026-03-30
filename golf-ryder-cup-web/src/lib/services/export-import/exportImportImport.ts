@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 
 import type { TripExport, ImportResult } from '@/lib/types/export';
 import type {
@@ -20,12 +19,12 @@ import { validateExport } from './exportImportValidation';
 
 function createIdMaps(exportData: TripExport): ImportIdMaps {
   return {
-    player: new Map(exportData.players.map((player) => [player.id, uuidv4()])),
-    team: new Map(exportData.teams.map((team) => [team.id, uuidv4()])),
-    session: new Map(exportData.sessions.map((session) => [session.id, uuidv4()])),
-    match: new Map(exportData.matches.map((match) => [match.id, uuidv4()])),
-    course: new Map(exportData.courses.map((course) => [course.id, uuidv4()])),
-    teeSet: new Map(exportData.teeSets.map((teeSet) => [teeSet.id, uuidv4()])),
+    player: new Map(exportData.players.map((player) => [player.id, crypto.randomUUID()])),
+    team: new Map(exportData.teams.map((team) => [team.id, crypto.randomUUID()])),
+    session: new Map(exportData.sessions.map((session) => [session.id, crypto.randomUUID()])),
+    match: new Map(exportData.matches.map((match) => [match.id, crypto.randomUUID()])),
+    course: new Map(exportData.courses.map((course) => [course.id, crypto.randomUUID()])),
+    teeSet: new Map(exportData.teeSets.map((teeSet) => [teeSet.id, crypto.randomUUID()])),
   };
 }
 
@@ -40,7 +39,7 @@ function requireMappedId(map: Map<string, string>, sourceId: string, label: stri
 
 function prepareImportPayload(exportData: TripExport): PreparedImportPayload {
   const importedAt = new Date().toISOString();
-  const newTripId = uuidv4();
+  const newTripId = crypto.randomUUID();
   const idMaps = createIdMaps(exportData);
 
   const trip: Trip = {
@@ -69,7 +68,7 @@ function prepareImportPayload(exportData: TripExport): PreparedImportPayload {
 
   const teamMembers: TeamMember[] = exportData.teamMembers.map((teamMember) => ({
     ...teamMember,
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     teamId: requireMappedId(idMaps.team, teamMember.teamId, 'team'),
     playerId: requireMappedId(idMaps.player, teamMember.playerId, 'player'),
     createdAt: importedAt,
@@ -101,7 +100,7 @@ function prepareImportPayload(exportData: TripExport): PreparedImportPayload {
 
   const holeResults: HoleResult[] = exportData.holeResults.map((holeResult) => ({
     ...holeResult,
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     matchId: requireMappedId(idMaps.match, holeResult.matchId, 'match'),
     scoredBy: holeResult.scoredBy
       ? requireMappedId(idMaps.player, holeResult.scoredBy, 'player')

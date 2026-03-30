@@ -269,57 +269,65 @@ export function MatchScoringPageSections({
       <main className="container-editorial">
         {!model.isMatchComplete || ui.isEditingScores ? (
           <MatchScoringActiveState
-            isEditingScores={ui.isEditingScores}
-            isMatchComplete={model.isMatchComplete}
-            currentHole={currentHole}
-            currentHoleResult={currentHoleResult}
-            currentPar={model.currentPar}
-            matchState={matchState}
-            scoringMode={model.effectiveScoringMode}
-            scoringModeMeta={model.scoringModeMeta}
-            isFourball={model.isFourball}
-            quickScoreMode={quickScoreMode}
-            preferredHand={preferredHand}
-            quickScorePendingTeam={ui.quickScorePending?.team}
-            showHandicapDetails={ui.showHandicapDetails}
-            showScoringModeTip={ui.showScoringModeTip}
-            showAdvancedTools={ui.showAdvancedTools}
-            prefersReducedMotion={prefersReducedMotion}
-            isSaving={isSaving}
-            undoCount={undoCount}
-            teamAName={model.teamAName}
-            teamBName={model.teamBName}
-            teamAColor={model.teamAColor}
-            teamBColor={model.teamBColor}
-            teamAHandicapAllowance={model.matchHandicapContext.teamAHandicapAllowance}
-            teamBHandicapAllowance={model.matchHandicapContext.teamBHandicapAllowance}
-            holeHandicaps={model.holeHandicaps}
-            presses={presses}
-            activeSideBets={model.activeSideBets}
-            activeMatchSideBets={model.activeMatchSideBets}
-            currentTripId={currentTripId}
-            currentPlayerIdForBets={model.currentUserPlayerId}
-            teamAFourballPlayers={model.teamAFourballPlayers}
-            teamBFourballPlayers={model.teamBFourballPlayers}
-            teamAPlayers={model.teamAPlayers}
-            teamBPlayers={model.teamBPlayers}
-            onFinishEditing={() => ui.setIsEditingScores(false)}
-            onPrevHole={onPrevHole}
-            onNextHole={onNextHole}
-            onDismissScoringModeTip={ui.dismissScoringModeTip}
-            onScoringModeChange={onScoringModeChange}
-            onQuickScoreTap={actions.handleQuickScoreTap}
-            onToggleShowHandicapDetails={() =>
-              ui.setShowHandicapDetails((previous) => !previous)
-            }
-            onScore={actions.handleScore}
-            onScoreWithStrokes={actions.handleScoreWithStrokes}
-            onFourballScore={actions.handleFourballScore}
-            onUndo={actions.handleUndo}
-            onToggleShowAdvancedTools={() =>
-              ui.setShowAdvancedTools((previous) => !previous)
-            }
-            onPress={onPress}
+            scoring={{
+              isEditingScores: ui.isEditingScores,
+              isMatchComplete: model.isMatchComplete,
+              currentHole,
+              currentHoleResult,
+              currentPar: model.currentPar,
+              matchState,
+              scoringMode: model.effectiveScoringMode,
+              scoringModeMeta: model.scoringModeMeta,
+              isFourball: model.isFourball,
+              quickScoreMode,
+              quickScorePendingTeam: ui.quickScorePending?.team,
+              isSaving,
+              undoCount,
+              presses,
+            }}
+            teams={{
+              teamAName: model.teamAName,
+              teamBName: model.teamBName,
+              teamAColor: model.teamAColor,
+              teamBColor: model.teamBColor,
+              teamAHandicapAllowance: model.matchHandicapContext.teamAHandicapAllowance,
+              teamBHandicapAllowance: model.matchHandicapContext.teamBHandicapAllowance,
+              holeHandicaps: model.holeHandicaps,
+              teamAFourballPlayers: model.teamAFourballPlayers,
+              teamBFourballPlayers: model.teamBFourballPlayers,
+              teamAPlayers: model.teamAPlayers,
+              teamBPlayers: model.teamBPlayers,
+            }}
+            preferences={{
+              preferredHand,
+              showHandicapDetails: ui.showHandicapDetails,
+              showScoringModeTip: ui.showScoringModeTip,
+              showAdvancedTools: ui.showAdvancedTools,
+              prefersReducedMotion,
+            }}
+            sideBets={{
+              activeSideBets: model.activeSideBets,
+              activeMatchSideBets: model.activeMatchSideBets,
+              currentTripId,
+              currentPlayerIdForBets: model.currentUserPlayerId,
+            }}
+            handlers={{
+              onFinishEditing: () => ui.setIsEditingScores(false),
+              onPrevHole,
+              onNextHole,
+              onDismissScoringModeTip: ui.dismissScoringModeTip,
+              onScoringModeChange,
+              onQuickScoreTap: actions.handleQuickScoreTap,
+              onToggleShowHandicapDetails: () =>
+                ui.setShowHandicapDetails((previous) => !previous),
+              onScore: actions.handleScore,
+              onScoreWithStrokes: actions.handleScoreWithStrokes,
+              onFourballScore: actions.handleFourballScore,
+              onUndo: actions.handleUndo,
+              onToggleShowAdvancedTools: () =>
+                ui.setShowAdvancedTools((previous) => !previous),
+              onPress,
+            }}
           />
         ) : (
           <MatchScoringCompleteState

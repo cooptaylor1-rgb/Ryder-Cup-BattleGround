@@ -16,6 +16,7 @@
 
 import { useCallback, useMemo, useRef } from 'react';
 import { useUIStore } from '../stores';
+import { useShallow } from 'zustand/shallow';
 
 type HapticType =
   | 'light' // Subtle tap - selections, toggles
@@ -97,7 +98,7 @@ const supportsVibration = (): boolean => {
  * Includes visual feedback fallback for iOS Safari
  */
 export function useHaptic() {
-  const { scoringPreferences } = useUIStore();
+  const { scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
   const cleanupTimers = useRef<Map<HTMLElement, NodeJS.Timeout>>(new Map());
 
   // Haptic patterns designed for premium feel

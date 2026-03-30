@@ -5,7 +5,7 @@
  * Also handles trip duplication.
  */
 
-import { v4 as uuidv4 } from 'uuid';
+
 import { db } from '../db';
 import type {
     Trip,
@@ -62,7 +62,7 @@ export async function createTripFromTemplate(
     }
 
     const now = new Date().toISOString();
-    const tripId = uuidv4();
+    const tripId = crypto.randomUUID();
 
     // Calculate end date based on template days
     const endDate = new Date(options.startDate);
@@ -84,7 +84,7 @@ export async function createTripFromTemplate(
     // Create teams
     const teams: Team[] = [
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             tripId,
             name: options.teamAName || 'Team USA',
             color: 'usa',
@@ -93,7 +93,7 @@ export async function createTripFromTemplate(
             createdAt: now,
         },
         {
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             tripId,
             name: options.teamBName || 'Team Europe',
             color: 'europe',
@@ -109,7 +109,7 @@ export async function createTripFromTemplate(
     let sessionNumber = 1;
 
     for (const templateSession of template.sessions) {
-        const sessionId = uuidv4();
+        const sessionId = crypto.randomUUID();
         const sessionDate = new Date(options.startDate);
         sessionDate.setDate(sessionDate.getDate() + templateSession.dayOffset);
 
@@ -132,7 +132,7 @@ export async function createTripFromTemplate(
         // Create empty matches for this session
         for (let i = 0; i < templateSession.matchCount; i++) {
             const match: Match = {
-                id: uuidv4(),
+                id: crypto.randomUUID(),
                 sessionId,
                 matchOrder: i + 1,
                 status: 'scheduled',
@@ -188,7 +188,7 @@ export async function duplicateTrip(
     const dayOffset = Math.floor((newStartDate.getTime() - sourceStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // Create new trip
-    const newTripId = uuidv4();
+    const newTripId = crypto.randomUUID();
     const sourceEndDate = new Date(sourceTrip.endDate);
     const newEndDate = new Date(sourceEndDate);
     newEndDate.setDate(newEndDate.getDate() + dayOffset);
@@ -211,7 +211,7 @@ export async function duplicateTrip(
 
     // Create new teams
     const newTeams: Team[] = sourceTeams.map(team => {
-        const newId = uuidv4();
+        const newId = crypto.randomUUID();
         teamIdMap.set(team.id, newId);
         return {
             ...team,
@@ -224,7 +224,7 @@ export async function duplicateTrip(
 
     // Create new sessions with adjusted dates
     const newSessions: RyderCupSession[] = sourceSessions.map(session => {
-        const newId = uuidv4();
+        const newId = crypto.randomUUID();
         sessionIdMap.set(session.id, newId);
 
         let newSessionDate: string | undefined;
@@ -252,7 +252,7 @@ export async function duplicateTrip(
         const sourceMatches = await db.matches.where('sessionId').equals(session.id).toArray();
         for (const match of sourceMatches) {
             newMatches.push({
-                id: uuidv4(),
+                id: crypto.randomUUID(),
                 sessionId: sessionIdMap.get(session.id)!,
                 matchOrder: match.matchOrder,
                 status: 'scheduled',
@@ -287,7 +287,7 @@ export async function duplicateTrip(
         newPlayers = sourcePlayers
             .filter((p): p is Player => p !== undefined)
             .map(player => {
-                const newId = uuidv4();
+                const newId = crypto.randomUUID();
                 playerIdMap.set(player.id, newId);
                 return {
                     ...player,
@@ -298,7 +298,7 @@ export async function duplicateTrip(
             });
 
         newTeamMembers = sourceTeamMembers.map(tm => ({
-            id: uuidv4(),
+            id: crypto.randomUUID(),
             teamId: teamIdMap.get(tm.teamId)!,
             playerId: playerIdMap.get(tm.playerId)!,
             sortOrder: tm.sortOrder,

@@ -12,6 +12,7 @@ import { syncService } from '@/lib/supabase';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { useAuthStore } from '@/lib/stores';
 import { useTripStore } from '@/lib/stores/tripStore';
+import { useShallow } from 'zustand/shallow';
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { cn } from '@/lib/utils';
@@ -33,7 +34,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   const [success, setSuccess] = useState(false);
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { loadTrip } = useTripStore();
+  const { loadTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip })));
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
   useEffect(() => {

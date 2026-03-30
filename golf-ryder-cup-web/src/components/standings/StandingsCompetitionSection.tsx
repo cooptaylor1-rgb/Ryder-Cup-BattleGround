@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { NoStandingsPremiumEmpty } from '@/components/ui';
+import { NoStandingsEmpty } from '@/components/ui';
 import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
 import type { MagicNumber, PlayerLeaderboard, TeamStandings } from '@/lib/types/computed';
 import { PartyPopper, Share2, Trophy } from 'lucide-react';
@@ -103,7 +103,7 @@ function PlayerRow({
 }
 
 function CompetitionEmptyState() {
-  return <NoStandingsPremiumEmpty />;
+  return <NoStandingsEmpty />;
 }
 
 export function CompetitionTab({

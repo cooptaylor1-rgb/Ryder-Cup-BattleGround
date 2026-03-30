@@ -27,6 +27,7 @@ import {
 import { usePWA } from './PWAProvider';
 import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import type { SyncQueueItem as TripSyncQueueItem } from '@/lib/types/sync';
 
@@ -44,7 +45,7 @@ interface SyncQueueItemDisplay {
 
 // Hook to track sync queue
 export function useSyncQueue() {
-  const { currentTrip } = useTripStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
 
   const pendingQueue = useLiveQuery(
     async () => {

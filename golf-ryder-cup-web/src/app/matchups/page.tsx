@@ -3,16 +3,17 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
-import { EmptyStatePremium, NoSessionsPremiumEmpty } from '@/components/ui';
+import { EmptyStatePremium, NoSessionsEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 export default function MatchupsPage() {
   const router = useRouter();
-  const { currentTrip, sessions, teams, players, teamMembers } = useTripStore();
-  const { isCaptainMode } = useUIStore();
+  const { currentTrip, sessions, teams, players, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers })));
+  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   // If no active trip selected, show an explicit empty state (no redirect).
 
@@ -200,7 +201,7 @@ export default function MatchupsPage() {
               ))}
             </div>
           ) : (
-            <NoSessionsPremiumEmpty
+            <NoSessionsEmpty
               isCaptain={isCaptainMode}
               onCreateSession={() => router.push('/lineup/new?mode=session')}
             />

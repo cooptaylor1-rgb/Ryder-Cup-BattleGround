@@ -22,12 +22,13 @@ import {
   type NotificationPreferences,
 } from '@/lib/services/notificationService';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
 
 export default function NotificationSettingsPage() {
   const router = useRouter();
-  const { currentTrip } = useTripStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
 
   const [preferences, setPreferences] = useState<NotificationPreferences>(getPreferences());
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>(() => {

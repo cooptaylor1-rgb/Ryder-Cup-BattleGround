@@ -1,34 +1,31 @@
 /**
- * UI Store
+ * UI Store — Facade
  *
- * Global UI state for navigation, modals, and app-wide settings.
+ * Backward-compatible facade that composes focused sub-stores.
+ * New code should import from the focused stores directly:
+ *   - useToastStore  — toasts, modals, global loading
+ *   - useThemeStore  — theme, dark mode, accent color
+ *   - useAccessStore — captain/admin mode, PIN management
+ *   - useScoringPrefsStore — scoring UI preferences
+ *
+ * This facade remains for existing consumers that destructure from useUIStore.
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useToastStore, type Toast } from './toastStore';
+import { useThemeStore, type Theme, type AccentTheme } from './themeStore';
+import { useAccessStore } from './accessStore';
+import { useScoringPrefsStore } from './scoringPrefsStore';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
-import { DEFAULT_SCORING_PREFERENCES } from '@/lib/types/scoringPreferences';
 import type { SessionType } from '@/lib/types';
-import { hashPin, verifyPin, isHashedPin } from '@/lib/utils/crypto';
 
 // ============================================
 // TYPES
 // ============================================
 
-// Track auto-dismiss timers so they can be cancelled when a toast is manually dismissed
-const toastTimers = new Map<string, ReturnType<typeof setTimeout>>();
-
 type Tab = 'score' | 'matchups' | 'standings' | 'more';
-type Theme = 'light' | 'dark' | 'outdoor';
 type ScoringMode = 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded';
-type AccentTheme = 'masters' | 'usa' | 'europe';
-
-interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-  message: string;
-  duration?: number;
-}
 
 interface Modal {
   type: string;
@@ -36,341 +33,171 @@ interface Modal {
 }
 
 interface UIState {
-  // Navigation
+  // Navigation (stays in facade — lightweight)
   activeTab: Tab;
   setActiveTab: (tab: Tab) => void;
 
-  // Theme
+  // Offline status (stays in facade — used broadly)
+  isOnline: boolean;
+  setOnlineStatus: (isOnline: boolean) => void;
+
+  // === Delegated to useThemeStore ===
   theme: Theme;
   isDarkMode: boolean;
+  autoTheme: boolean;
+  accentTheme: AccentTheme;
   setTheme: (theme: Theme) => void;
   toggleDarkMode: () => void;
-  autoTheme: boolean;
   setAutoTheme: (enabled: boolean) => void;
-  accentTheme: AccentTheme;
   setAccentTheme: (theme: AccentTheme) => void;
 
-  // Captain Mode
+  // === Delegated to useAccessStore ===
   isCaptainMode: boolean;
   captainPinHash: string | null;
   enableCaptainMode: (pin: string) => Promise<void>;
   enableCaptainModeForCreator: () => void;
   disableCaptainMode: () => void;
   resetCaptainPin: () => void;
-
-  // Admin Mode (power user features)
   isAdminMode: boolean;
   adminPinHash: string | null;
   enableAdminMode: (pin: string) => Promise<void>;
   disableAdminMode: () => void;
 
-  // Toasts
+  // === Delegated to useToastStore ===
   toasts: Toast[];
   showToast: (type: Toast['type'], message: string, duration?: number) => void;
   dismissToast: (id: string) => void;
   clearToasts: () => void;
-
-  // Modals
   activeModal: Modal | null;
   openModal: (type: string, props?: Record<string, unknown>) => void;
   closeModal: () => void;
-
-  // Offline status
-  isOnline: boolean;
-  setOnlineStatus: (isOnline: boolean) => void;
-
-  // Loading overlay
   isGlobalLoading: boolean;
   globalLoadingMessage: string | null;
   showGlobalLoading: (message?: string) => void;
   hideGlobalLoading: () => void;
 
-  // Enhanced Scoring UI preferences (P2.3)
+  // === Delegated to useScoringPrefsStore ===
   scoringPreferences: ScoringPreferences;
   updateScoringPreference: <K extends keyof ScoringPreferences>(
     key: K,
-    value: ScoringPreferences[K]
+    value: ScoringPreferences[K],
   ) => void;
   resetScoringPreferences: () => void;
-
-  // Power user: Scoring mode per format (persisted)
   scoringModeByFormat: Record<string, ScoringMode>;
   getScoringModeForFormat: (format: SessionType) => ScoringMode;
   setScoringModeForFormat: (format: SessionType, mode: ScoringMode) => void;
 }
 
 // ============================================
-// STORE
+// FACADE STORE
 // ============================================
 
 export const useUIStore = create<UIState>()(
   persist(
     (set, get) => ({
-      // Navigation
+      // ─── Navigation (owned by facade) ──────────────────────
       activeTab: 'score',
       setActiveTab: (tab) => set({ activeTab: tab }),
 
-      // Theme (default to outdoor for better visibility on the course)
-      theme: 'outdoor' as Theme,
-      isDarkMode: false,
-      autoTheme: false,
-      accentTheme: 'masters',
-
-      setTheme: (theme: Theme) => {
-        set({ theme, isDarkMode: theme === 'dark' });
-
-        // Update document classes
-        if (typeof document !== 'undefined') {
-          document.documentElement.classList.remove('dark', 'outdoor');
-          if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else if (theme === 'outdoor') {
-            document.documentElement.classList.add('outdoor');
-          }
-        }
-      },
-
-      toggleDarkMode: () => {
-        const currentTheme = get().theme;
-        const newTheme = currentTheme === 'dark' ? 'outdoor' : 'dark';
-        get().setTheme(newTheme);
-      },
-
-      setAutoTheme: (enabled) => {
-        set({ autoTheme: enabled });
-      },
-
-      setAccentTheme: (theme) => {
-        set({ accentTheme: theme });
-      },
-
-      // Captain Mode
-      isCaptainMode: false,
-      captainPinHash: null,
-
-      enableCaptainMode: async (pin) => {
-        const current = get().captainPinHash;
-
-        // If a PIN is already set, require verification before enabling.
-        if (current) {
-          const ok = await verifyPin(pin, current);
-          if (!ok) {
-            throw new Error('Incorrect PIN');
-          }
-        }
-
-        // If the stored PIN is legacy (plain/sha), upgrade it.
-        const nextHash = current && isHashedPin(current) && current.startsWith('pbkdf2$') ? current : await hashPin(pin);
-
-        set({
-          isCaptainMode: true,
-          captainPinHash: nextHash,
-        });
-
-        get().showToast('success', 'Captain Mode enabled');
-      },
-
-      enableCaptainModeForCreator: () => {
-        set({ isCaptainMode: true });
-        get().showToast('success', 'Captain Mode enabled for trip creator');
-      },
-
-      disableCaptainMode: () => {
-        set({
-          isCaptainMode: false,
-        });
-
-        get().showToast('info', 'Captain Mode disabled');
-      },
-
-      resetCaptainPin: () => {
-        set({
-          captainPinHash: null,
-          isCaptainMode: false,
-        });
-        get().showToast(
-          'info',
-          'Captain PIN has been reset. Set a new PIN to re-enable Captain Mode.'
-        );
-      },
-
-      // Admin Mode (power user features like bulk delete, data management)
-      isAdminMode: false,
-      adminPinHash: null,
-
-      enableAdminMode: async (pin) => {
-        const current = get().adminPinHash;
-
-        if (current) {
-          const ok = await verifyPin(pin, current);
-          if (!ok) throw new Error('Incorrect PIN');
-        }
-
-        const nextHash = current && isHashedPin(current) && current.startsWith('pbkdf2$') ? current : await hashPin(pin);
-
-        set({
-          isAdminMode: true,
-          adminPinHash: nextHash,
-        });
-        get().showToast('success', 'Admin Mode enabled');
-      },
-
-      disableAdminMode: () => {
-        set({
-          isAdminMode: false,
-        });
-        get().showToast('info', 'Admin Mode disabled');
-      },
-
-      // Toasts
-      toasts: [],
-
-      showToast: (type, message, duration = 3000) => {
-        const id = crypto.randomUUID();
-        const toast: Toast = { id, type, message, duration };
-
-        let shouldScheduleDismiss = true;
-
-        set((state) => {
-          const hasDuplicateToast = state.toasts.some(
-            (existingToast) =>
-              existingToast.type === type && existingToast.message === message
-          );
-
-          if (hasDuplicateToast) {
-            shouldScheduleDismiss = false;
-            return state;
-          }
-
-          return {
-            toasts: [...state.toasts, toast],
-          };
-        });
-
-        // Auto-dismiss
-        if (shouldScheduleDismiss && duration > 0) {
-          const timer = setTimeout(() => {
-            toastTimers.delete(id);
-            get().dismissToast(id);
-          }, duration);
-          toastTimers.set(id, timer);
-        }
-      },
-
-      dismissToast: (id) => {
-        const timer = toastTimers.get(id);
-        if (timer) {
-          clearTimeout(timer);
-          toastTimers.delete(id);
-        }
-        set((state) => ({
-          toasts: state.toasts.filter((t) => t.id !== id),
-        }));
-      },
-
-      clearToasts: () => {
-        set({ toasts: [] });
-      },
-
-      // Modals
-      activeModal: null,
-
-      openModal: (type, props) => {
-        set({ activeModal: { type, props } });
-      },
-
-      closeModal: () => {
-        set({ activeModal: null });
-      },
-
-      // Offline status
+      // ─── Offline status (owned by facade) ──────────────────
       isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
-
       setOnlineStatus: (isOnline) => {
         const wasOnline = get().isOnline;
         set({ isOnline });
-
-        // Show toast on status change
         if (wasOnline && !isOnline) {
-          get().showToast('warning', 'You are offline. Scores will sync when reconnected.', 5000);
+          useToastStore
+            .getState()
+            .showToast('warning', 'You are offline. Scores will sync when reconnected.', 5000);
         } else if (!wasOnline && isOnline) {
-          get().showToast('success', 'Back online! Syncing scores...', 3000);
+          useToastStore.getState().showToast('success', 'Back online! Syncing scores...', 3000);
         }
       },
 
-      // Global loading
-      isGlobalLoading: false,
-      globalLoadingMessage: null,
-
-      showGlobalLoading: (message) => {
-        set({
-          isGlobalLoading: true,
-          globalLoadingMessage: message || null,
-        });
+      // ─── Theme (delegated) ─────────────────────────────────
+      get theme() {
+        return useThemeStore.getState().theme;
       },
-
-      hideGlobalLoading: () => {
-        set({
-          isGlobalLoading: false,
-          globalLoadingMessage: null,
-        });
+      get isDarkMode() {
+        return useThemeStore.getState().isDarkMode;
       },
-
-      // Enhanced Scoring preferences (P2.3)
-      scoringPreferences: DEFAULT_SCORING_PREFERENCES,
-
-      updateScoringPreference: (key, value) => {
-        set((state) => ({
-          scoringPreferences: {
-            ...state.scoringPreferences,
-            [key]: value,
-          },
-        }));
+      get autoTheme() {
+        return useThemeStore.getState().autoTheme;
       },
-
-      resetScoringPreferences: () => {
-        set({ scoringPreferences: DEFAULT_SCORING_PREFERENCES });
+      get accentTheme() {
+        return useThemeStore.getState().accentTheme;
       },
+      setTheme: (theme) => useThemeStore.getState().setTheme(theme),
+      toggleDarkMode: () => useThemeStore.getState().toggleDarkMode(),
+      setAutoTheme: (enabled) => useThemeStore.getState().setAutoTheme(enabled),
+      setAccentTheme: (theme) => useThemeStore.getState().setAccentTheme(theme),
 
-      // Power user: Scoring mode per format (persisted)
-      scoringModeByFormat: {
-        fourball: 'fourball',
-        foursomes: 'swipe',
-        singles: 'swipe',
-      } as Record<string, ScoringMode>,
-
-      getScoringModeForFormat: (format: SessionType) => {
-        const { scoringModeByFormat, scoringPreferences } = get();
-        // One-handed mode takes precedence if enabled
-        if (scoringPreferences.oneHandedMode) return 'oneHanded';
-        return scoringModeByFormat[format] || 'swipe';
+      // ─── Access Control (delegated) ────────────────────────
+      get isCaptainMode() {
+        return useAccessStore.getState().isCaptainMode;
       },
-
-      setScoringModeForFormat: (format: SessionType, mode: ScoringMode) => {
-        set((state) => ({
-          scoringModeByFormat: {
-            ...state.scoringModeByFormat,
-            [format]: mode,
-          },
-        }));
+      get captainPinHash() {
+        return useAccessStore.getState().captainPinHash;
       },
+      enableCaptainMode: (pin) => useAccessStore.getState().enableCaptainMode(pin),
+      enableCaptainModeForCreator: () => useAccessStore.getState().enableCaptainModeForCreator(),
+      disableCaptainMode: () => useAccessStore.getState().disableCaptainMode(),
+      resetCaptainPin: () => useAccessStore.getState().resetCaptainPin(),
+      get isAdminMode() {
+        return useAccessStore.getState().isAdminMode;
+      },
+      get adminPinHash() {
+        return useAccessStore.getState().adminPinHash;
+      },
+      enableAdminMode: (pin) => useAccessStore.getState().enableAdminMode(pin),
+      disableAdminMode: () => useAccessStore.getState().disableAdminMode(),
+
+      // ─── Toasts & Modals (delegated) ───────────────────────
+      get toasts() {
+        return useToastStore.getState().toasts;
+      },
+      showToast: (type, message, duration) =>
+        useToastStore.getState().showToast(type, message, duration),
+      dismissToast: (id) => useToastStore.getState().dismissToast(id),
+      clearToasts: () => useToastStore.getState().clearToasts(),
+      get activeModal() {
+        return useToastStore.getState().activeModal;
+      },
+      openModal: (type, props) => useToastStore.getState().openModal(type, props),
+      closeModal: () => useToastStore.getState().closeModal(),
+      get isGlobalLoading() {
+        return useToastStore.getState().isGlobalLoading;
+      },
+      get globalLoadingMessage() {
+        return useToastStore.getState().globalLoadingMessage;
+      },
+      showGlobalLoading: (message) => useToastStore.getState().showGlobalLoading(message),
+      hideGlobalLoading: () => useToastStore.getState().hideGlobalLoading(),
+
+      // ─── Scoring Preferences (delegated) ───────────────────
+      get scoringPreferences() {
+        return useScoringPrefsStore.getState().scoringPreferences;
+      },
+      updateScoringPreference: (key, value) =>
+        useScoringPrefsStore.getState().updateScoringPreference(key, value),
+      resetScoringPreferences: () => useScoringPrefsStore.getState().resetScoringPreferences(),
+      get scoringModeByFormat() {
+        return useScoringPrefsStore.getState().scoringModeByFormat;
+      },
+      getScoringModeForFormat: (format) =>
+        useScoringPrefsStore.getState().getScoringModeForFormat(format),
+      setScoringModeForFormat: (format, mode) =>
+        useScoringPrefsStore.getState().setScoringModeForFormat(format, mode),
     }),
     {
       name: 'golf-ui-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // Persist these settings
-        theme: state.theme,
-        isDarkMode: state.isDarkMode,
-        isCaptainMode: state.isCaptainMode,
-        captainPinHash: state.captainPinHash,
-        isAdminMode: state.isAdminMode,
-        adminPinHash: state.adminPinHash,
-        scoringPreferences: state.scoringPreferences,
-        scoringModeByFormat: state.scoringModeByFormat,
+        // Only persist facade-owned state (nav, online status)
+        // Theme, access, and scoring prefs are persisted by their own stores
+        activeTab: state.activeTab,
       }),
-    }
-  )
+    },
+  ),
 );
 
 export default useUIStore;

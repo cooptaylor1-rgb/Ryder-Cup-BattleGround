@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
@@ -47,8 +48,8 @@ interface NewLineupPageClientProps {
 
 export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageClientProps) {
   const router = useRouter();
-  const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addSession: s.addSession, sessions: s.sessions })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   const tripMatches = useLiveQuery(
     async () => (currentTrip ? await db.matches.toArray() : []),

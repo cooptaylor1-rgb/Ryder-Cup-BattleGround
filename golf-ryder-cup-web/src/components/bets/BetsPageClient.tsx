@@ -14,8 +14,9 @@ import {
   buildCustomSideBet,
   buildNassauSideBet,
   buildQuickSideBet,
-} from '@/lib/services/sideBetService';
+} from '@/lib/services/sideBetBuilders';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Match, SideBet, SideBetType } from '@/lib/types/models';
 import { Calculator, Check, Clock, DollarSign, Flag, Home, Plus, Trophy } from 'lucide-react';
 import {
@@ -38,8 +39,8 @@ type BetsTab = 'active' | 'completed' | 'settle';
 
 export default function BetsPageClient() {
   const router = useRouter();
-  const { currentTrip, players, sessions } = useTripStore();
-  const { showToast } = useUIStore();
+  const { currentTrip, players, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions })));
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [selectedTab, setSelectedTab] = useState<BetsTab>('active');
   const [showCreateModal, setShowCreateModal] = useState(false);

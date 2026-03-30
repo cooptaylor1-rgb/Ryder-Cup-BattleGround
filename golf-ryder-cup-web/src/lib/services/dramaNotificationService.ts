@@ -4,15 +4,11 @@
  * Detects dramatic moments during scoring and fires push notifications.
  * Hooks into the scoring store's scoreHole flow.
  *
- * Drama moments:
- * - Match completed (win or halve)
- * - Lead change in a match (team that was down takes the lead)
- * - All square on 16+ (tense finish)
- * - Dormie (up by exactly the holes remaining)
- * - Cup lead change (overall team score flips)
+ * Uses shared detection logic from dramaMomentDetection.ts.
  */
 
-import type { MatchState } from '../types/computed';
+import type { AnyDramaMoment } from './dramaMomentDetection';
+import { detectDramaMoments } from './dramaMomentDetection';
 import { sendNotification, canSendNotifications } from './notificationService';
 import { notifyLogger } from '@/lib/utils/logger';
 
@@ -22,9 +18,9 @@ import { notifyLogger } from '@/lib/utils/logger';
 
 export interface DramaContext {
   /** Match state BEFORE the hole was scored */
-  previousState: MatchState;
+  previousState: import('../types/computed').MatchState;
   /** Match state AFTER the hole was scored */
-  newState: MatchState;
+  newState: import('../types/computed').MatchState;
   /** Hole number just scored */
   holeNumber: number;
   /** Team A player names */
@@ -44,7 +40,7 @@ let lastNotificationTime = 0;
 const THROTTLE_MS = 10_000;
 
 // ============================================
-// DRAMA DETECTION
+// DRAMA DETECTION → NOTIFICATIONS
 // ============================================
 
 /**
@@ -57,81 +53,64 @@ export function checkForDrama(ctx: DramaContext): void {
   const now = Date.now();
   if (now - lastNotificationTime < THROTTLE_MS) return;
 
-  const { previousState, newState, holeNumber, teamANames, teamBNames, tripName } = ctx;
+  const { teamANames, teamBNames, tripName, holeNumber } = ctx;
   const matchLabel = `${teamANames} vs ${teamBNames}`;
 
-  // 1. Match completed
-  if (previousState.status !== 'completed' && newState.status === 'completed') {
-    lastNotificationTime = now;
-    if (newState.winningTeam === 'halved') {
-      sendDramaNotification(
-        'Match Halved!',
-        `${matchLabel} — All square after ${holeNumber} holes`,
-        tripName,
-      );
-    } else {
-      const winner = newState.winningTeam === 'teamA' ? teamANames : teamBNames;
-      sendDramaNotification(
-        'Match Won!',
-        `${winner} wins ${newState.displayScore} — ${matchLabel}`,
-        tripName,
-      );
-    }
-    return; // Don't stack notifications
-  }
+  const moments = detectDramaMoments(ctx);
+  if (moments.length === 0) return;
 
-  // 2. Lead change (team that was trailing now leads)
-  const prevLeading = previousState.currentScore > 0 ? 'teamA' : previousState.currentScore < 0 ? 'teamB' : null;
-  const newLeading = newState.currentScore > 0 ? 'teamA' : newState.currentScore < 0 ? 'teamB' : null;
-  if (prevLeading && newLeading && prevLeading !== newLeading) {
-    lastNotificationTime = now;
-    const newLeader = newLeading === 'teamA' ? teamANames : teamBNames;
-    sendDramaNotification(
-      'Lead Change!',
-      `${newLeader} takes the lead on hole ${holeNumber} — ${matchLabel}`,
-      tripName,
-    );
-    return;
-  }
+  // Act on the first (highest-priority) moment
+  const moment = moments[0];
+  lastNotificationTime = now;
+  const { title, body } = formatNotification(moment, matchLabel, holeNumber);
+  sendDramaNotification(title, body, tripName);
+}
 
-  // 3. All square on hole 16, 17, or 18 (tense finish)
-  if (newState.currentScore === 0 && holeNumber >= 16 && previousState.currentScore !== 0) {
-    lastNotificationTime = now;
-    sendDramaNotification(
-      'All Square!',
-      `${matchLabel} tied up on hole ${holeNumber} — this one's going down to the wire`,
-      tripName,
-    );
-    return;
-  }
+// ============================================
+// FORMATTING
+// ============================================
 
-  // 4. Dormie situation
-  if (newState.isDormie && !previousState.isDormie) {
-    lastNotificationTime = now;
-    const leader = newState.winningTeam === 'teamA' ? teamANames : teamBNames;
-    sendDramaNotification(
-      'Dormie!',
-      `${leader} is dormie (${Math.abs(newState.currentScore)} up with ${newState.holesRemaining} to play) — ${matchLabel}`,
-      tripName,
-    );
-    return;
-  }
-
-  // 5. Cup lead change (overall team score)
-  if (ctx.cupScoreBefore && ctx.cupScoreAfter) {
-    const prevCupLeader = ctx.cupScoreBefore.teamA > ctx.cupScoreBefore.teamB ? 'A'
-      : ctx.cupScoreBefore.teamA < ctx.cupScoreBefore.teamB ? 'B' : null;
-    const newCupLeader = ctx.cupScoreAfter.teamA > ctx.cupScoreAfter.teamB ? 'A'
-      : ctx.cupScoreAfter.teamA < ctx.cupScoreAfter.teamB ? 'B' : null;
-
-    if (prevCupLeader && newCupLeader && prevCupLeader !== newCupLeader) {
-      lastNotificationTime = now;
-      sendDramaNotification(
-        'Cup Lead Change!',
-        `The overall lead has flipped! ${ctx.cupScoreAfter.teamA} - ${ctx.cupScoreAfter.teamB}`,
-        tripName,
-      );
-    }
+function formatNotification(
+  moment: AnyDramaMoment,
+  matchLabel: string,
+  holeNumber: number,
+): { title: string; body: string } {
+  switch (moment.type) {
+    case 'match-halved':
+      return {
+        title: 'Match Halved!',
+        body: `${matchLabel} — All square after ${holeNumber} holes`,
+      };
+    case 'match-won':
+      return {
+        title: 'Match Won!',
+        body: `${moment.winnerNames} wins ${moment.displayScore} — ${matchLabel}`,
+      };
+    case 'lead-change':
+      return {
+        title: 'Lead Change!',
+        body: `${moment.newLeaderNames} takes the lead on hole ${holeNumber} — ${matchLabel}`,
+      };
+    case 'all-square-late':
+      return {
+        title: 'All Square!',
+        body: `${matchLabel} tied up on hole ${holeNumber} — this one's going down to the wire`,
+      };
+    case 'dormie':
+      return {
+        title: 'Dormie!',
+        body: `${moment.leaderNames} is dormie (${moment.lead} up with ${moment.holesRemaining} to play) — ${matchLabel}`,
+      };
+    case 'cup-lead-change':
+      return {
+        title: 'Cup Lead Change!',
+        body: `The overall lead has flipped! ${moment.newCupScoreA} - ${moment.newCupScoreB}`,
+      };
+    case 'dominant':
+      return {
+        title: 'Dominant Performance!',
+        body: `${moment.dominantNames} goes ${moment.lead} up — ${matchLabel}`,
+      };
   }
 }
 

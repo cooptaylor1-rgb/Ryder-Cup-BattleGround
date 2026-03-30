@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import {
@@ -38,7 +39,7 @@ export default function CompleteProfilePageClient() {
   const searchParams = useSearchParams();
   const { currentUser, isAuthenticated, updateProfile, completeOnboarding, isLoading } =
     useAuthStore();
-  const { showToast } = useUIStore();
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [formData, setFormData] = useState<FormData>({
     nickname: '',

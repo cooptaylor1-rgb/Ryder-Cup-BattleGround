@@ -19,6 +19,7 @@ import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { getSideBetDefinition } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Match, NassauResults, Player, SideBet } from '@/lib/types/models';
 import {
   calculateNextSkinValue,
@@ -33,8 +34,8 @@ export default function BetDetailPage() {
   const router = useRouter();
   const params = useParams();
   const betId = params.betId as string;
-  const { currentTrip, players } = useTripStore();
-  const { showToast } = useUIStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
   const [selectedHole, setSelectedHole] = useState<number | null>(null);
 

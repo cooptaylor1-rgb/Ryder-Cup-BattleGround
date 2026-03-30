@@ -5,7 +5,7 @@ import {
   buildNassauSideBet,
   buildQuickSideBet,
   canCreateMatchNassau,
-} from '@/lib/services/sideBetService';
+} from '@/lib/services/sideBetBuilders';
 import type { Match, Player } from '@/lib/types/models';
 
 const players: Player[] = [
@@ -32,7 +32,7 @@ const match: Match = {
   updatedAt: '2026-03-17T12:00:00.000Z',
 };
 
-describe('sideBetService', () => {
+describe('sideBetBuilders', () => {
   it('builds match-scoped quick bets with match participants', () => {
     const bet = buildQuickSideBet({
       tripId: 'trip-1',

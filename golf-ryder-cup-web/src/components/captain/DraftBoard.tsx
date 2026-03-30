@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { cn, formatPlayerName } from '@/lib/utils';
 import { useTripStore } from '@/lib/stores/tripStore';
+import { useShallow } from 'zustand/shallow';
 import { Player, Team } from '@/lib/types';
 import {
   ArrowRight,
@@ -65,7 +66,7 @@ const teamToneStyles: Record<
 };
 
 export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps) {
-  const { currentTrip } = useTripStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
   const [mode, setMode] = useState<DraftMode | null>(null);
   const [config, setConfig] = useState<DraftConfig | null>(null);
   const [draftState, setDraftState] = useState<DraftState | null>(null);

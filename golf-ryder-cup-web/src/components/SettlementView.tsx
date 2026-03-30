@@ -5,6 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import {
   SettlementBalancesSection,
   SettlementSummaryCard,
@@ -27,8 +28,8 @@ import { Check, Calculator, Wallet } from 'lucide-react';
 
 export default function SettlementView() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
-  const { showToast } = useUIStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
 
   // Load all completed side games from DB

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Share2, Trophy } from 'lucide-react';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { buildRecapShareText, generateTripRecap, type TripRecapData } from '@/lib/services/recapService';
 import { EmptyStatePremium } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -21,7 +22,7 @@ import {
 
 export default function RecapPageClient() {
   const router = useRouter();
-  const { currentTrip } = useTripStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
   const [recap, setRecap] = useState<TripRecapData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<RecapSection>('overview');

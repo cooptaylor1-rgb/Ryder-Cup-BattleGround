@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout';
 import { ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import {
     exportTripToFile,
     importTripFromFile,
@@ -24,7 +25,7 @@ import { loadTripSummaries } from './backupPageData';
 
 export default function BackupPageClient() {
     const router = useRouter();
-    const { currentTrip } = useTripStore();
+    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [trips, setTrips] = useState<Awaited<ReturnType<typeof loadTripSummaries>>['trips']>([]);

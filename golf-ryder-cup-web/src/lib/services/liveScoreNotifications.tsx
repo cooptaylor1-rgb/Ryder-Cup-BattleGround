@@ -15,6 +15,7 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { useTripStore } from '@/lib/stores';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { calculateTeamStandings, calculateMagicNumber } from '@/lib/services/tournamentEngine';
@@ -101,8 +102,8 @@ export function sendNotification(
 export function useLiveScoreNotifications(
     options: ScoreNotificationOptions = DEFAULT_OPTIONS
 ) {
-    const { currentTrip, teams } = useTripStore();
-    const { showToast } = useUIStore();
+    const { currentTrip, teams } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams })));
+    const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
     const previousStandings = useRef<TeamStandings | null>(null);
     const previousMatchResults = useRef<Map<string, string>>(new Map());
 

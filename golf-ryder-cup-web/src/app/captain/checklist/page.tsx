@@ -13,6 +13,7 @@ import { ErrorBoundary } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Match } from '@/lib/types/models';
 import { navigateBackOr } from '@/lib/utils/navigation';
 import { cn } from '@/lib/utils';
@@ -26,8 +27,8 @@ import {
 
 export default function ChecklistPage() {
   const router = useRouter();
-  const { currentTrip, players, teams, teamMembers, sessions, courses, teeSets } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players, teams, teamMembers, sessions, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, sessions: s.sessions, courses: s.courses, teeSets: s.teeSets })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
   const [matches, setMatches] = useState<Match[]>([]);
   const [matchesLoadError, setMatchesLoadError] = useState<string | null>(null);
   const currentTripId = currentTrip?.id;

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 
 // ============================================
 // TYPES
@@ -175,7 +176,7 @@ export function WeatherBanner({
   const [showControls, setShowControls] = useState(false);
   const [noteInput, setNoteInput] = useState('');
   const [nowMs, setNowMs] = useState(() => Date.now());
-  const { isCaptainMode } = useUIStore();
+  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   const canControl = showCaptainControls && isCaptainMode;
   const config = DELAY_CONFIGS[delayStatus];
