@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 
 // ============================================
@@ -101,7 +102,7 @@ export function getConnectionQuality(): ConnectionQuality {
  * Hook to track connection quality
  */
 export function useConnectionQuality(): ConnectionQuality {
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
   const [quality, setQuality] = useState<ConnectionQuality>(() =>
     typeof navigator === 'undefined' ? 'good' : getConnectionQuality()
   );
@@ -205,7 +206,7 @@ export function useConnectionAwareFetch<T>({
   staleWhileRevalidate = true,
   deps = [],
 }: FetchOptions<T>): ConnectionAwareResult<T> {
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
   const connectionQuality = useConnectionQuality();
 
   const [data, setData] = useState<T | null>(null);
@@ -369,7 +370,7 @@ export function useOfflineMutation<TData, TVariables>(
     onOffline?: (variables: TVariables) => void;
   } = {}
 ) {
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 

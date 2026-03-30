@@ -5,7 +5,6 @@
  * Supports SMALL (quick tests) and LARGE (stress tests) datasets.
  */
 
-import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================
 // CONFIGURATION
@@ -150,7 +149,7 @@ export function generateTestData(config: SeederConfig): GeneratedTrip[] {
     const trips: GeneratedTrip[] = [];
 
     for (let t = 0; t < config.tripCount; t++) {
-        const tripId = uuidv4();
+        const tripId = crypto.randomUUID();
         const startDate = new Date();
         startDate.setDate(startDate.getDate() + 1 + (t * 7));
 
@@ -173,7 +172,7 @@ export function generateTestData(config: SeederConfig): GeneratedTrip[] {
             usedNames.add(fullName);
 
             players.push({
-                id: uuidv4(),
+                id: crypto.randomUUID(),
                 firstName,
                 lastName,
                 email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@test.com`,
@@ -188,7 +187,7 @@ export function generateTestData(config: SeederConfig): GeneratedTrip[] {
         const sessionTypes: Array<'foursomes' | 'fourball' | 'singles'> = ['foursomes', 'fourball', 'singles'];
 
         for (let s = 0; s < config.sessionsPerTrip; s++) {
-            const sessionId = uuidv4();
+            const sessionId = crypto.randomUUID();
             const sessionType = sessionTypes[s % sessionTypes.length];
 
             // Generate matches
@@ -197,7 +196,7 @@ export function generateTestData(config: SeederConfig): GeneratedTrip[] {
             const teamBPlayers = players.filter(p => p.team === 'europe');
 
             for (let m = 0; m < config.matchesPerSession; m++) {
-                const matchId = uuidv4();
+                const matchId = crypto.randomUUID();
                 const isTeamFormat = sessionType !== 'singles';
                 const playersPerTeam = isTeamFormat ? 2 : 1;
 
@@ -298,8 +297,8 @@ export function toIndexedDBFormat(trips: GeneratedTrip[]): {
         });
 
         // Teams
-        const teamAId = uuidv4();
-        const teamBId = uuidv4();
+        const teamAId = crypto.randomUUID();
+        const teamBId = crypto.randomUUID();
 
         result.teams.push(
             {
@@ -330,7 +329,7 @@ export function toIndexedDBFormat(trips: GeneratedTrip[]): {
             });
 
             result.teamMembers.push({
-                id: uuidv4(),
+                id: crypto.randomUUID(),
                 teamId: player.team === 'usa' ? teamAId : teamBId,
                 playerId: player.id,
                 sortOrder: 0,

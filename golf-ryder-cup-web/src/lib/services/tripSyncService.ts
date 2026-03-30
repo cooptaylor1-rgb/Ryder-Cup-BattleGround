@@ -11,6 +11,7 @@ import {
   scheduleSyncQueueProcessing,
 } from './trip-sync/tripSyncQueue';
 import { canSync, logger, setOnlineStatus } from './trip-sync/tripSyncShared';
+import { registerSyncHandler } from './syncOrchestrator';
 
 export type { SyncEntity, SyncOperation, SyncQueueItem } from '../types/sync';
 export type { BulkSyncResult, SyncStatus, TripSyncResult } from './trip-sync/tripSyncTypes';
@@ -34,27 +35,24 @@ export {
 } from './trip-sync/tripSyncShareCodes';
 export { pullTripByShareCode, syncTripToCloudFull } from './trip-sync/tripSyncTripTransfer';
 
-let onlineHandler: (() => void) | null = null;
-let offlineHandler: (() => void) | null = null;
+let unregisterHandler: (() => void) | null = null;
 
 export function initTripSyncNetworkListeners(): () => void {
   if (typeof window === 'undefined') return () => {};
 
   cleanupTripSyncNetworkListeners();
 
-  onlineHandler = () => {
-    setOnlineStatus(true);
-    logger.log('Network online - triggering sync');
-    scheduleSyncQueueProcessing();
-  };
-
-  offlineHandler = () => {
-    setOnlineStatus(false);
-    logger.log('Network offline - queuing changes');
-  };
-
-  window.addEventListener('online', onlineHandler);
-  window.addEventListener('offline', offlineHandler);
+  unregisterHandler = registerSyncHandler('tripSync', {
+    onOnline: () => {
+      setOnlineStatus(true);
+      logger.log('Network online - triggering sync');
+      scheduleSyncQueueProcessing();
+    },
+    onOffline: () => {
+      setOnlineStatus(false);
+      logger.log('Network offline - queuing changes');
+    },
+  });
 
   setOnlineStatus(navigator.onLine);
 
@@ -62,15 +60,9 @@ export function initTripSyncNetworkListeners(): () => void {
 }
 
 export function cleanupTripSyncNetworkListeners(): void {
-  if (typeof window === 'undefined') return;
-
-  if (onlineHandler) {
-    window.removeEventListener('online', onlineHandler);
-    onlineHandler = null;
-  }
-  if (offlineHandler) {
-    window.removeEventListener('offline', offlineHandler);
-    offlineHandler = null;
+  if (unregisterHandler) {
+    unregisterHandler();
+    unregisterHandler = null;
   }
 }
 

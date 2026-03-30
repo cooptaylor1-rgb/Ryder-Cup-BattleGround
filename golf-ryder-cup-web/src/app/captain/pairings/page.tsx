@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import type { Match } from '@/lib/types/models';
 import {
@@ -24,8 +25,8 @@ import {
 
 export default function CaptainPairingsPage() {
   const router = useRouter();
-  const { currentTrip, sessions, teams, players } = useTripStore();
-  const { isCaptainMode } = useUIStore();
+  const { currentTrip, sessions, teams, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players })));
+  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   const sessionIds = sessions.map((session) => session.id);
   const matches = useLiveQuery(

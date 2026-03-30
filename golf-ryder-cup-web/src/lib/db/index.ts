@@ -271,6 +271,18 @@ export class GolfTripDB extends Dexie {
     this.version(11).stores({
       tripTemplates: 'id, name, isBuiltin, useCount, createdAt',
     });
+
+    // Schema version 12 - Performance indexes
+    // Add compound indexes for common query patterns:
+    // - [tripId+status] on sessions: filter sessions by trip and status
+    // - [tripId+createdAt] on players: order players within a trip
+    // - [tripId+synced] on scoringEvents: batch sync queries by trip
+    this.version(12).stores({
+      sessions: 'id, tripId, scheduledDate, [tripId+scheduledDate], [tripId+status]',
+      players: 'id, tripId, name, handicapIndex, [tripId+createdAt]',
+      scoringEvents:
+        '++localId, id, matchId, timestamp, synced, [matchId+timestamp], [matchId+synced], [tripId+synced]',
+    });
   }
 }
 

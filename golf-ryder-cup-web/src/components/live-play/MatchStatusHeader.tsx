@@ -23,6 +23,7 @@ import { ChevronDown, Target, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore, useScoringStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import type { Match, Player } from '@/lib/types/models';
 
@@ -64,7 +65,7 @@ export function MatchStatusHeader({
     const router = useRouter();
     const pathname = usePathname();
     const { trigger } = useHaptic();
-    const { currentTrip, sessions, players } = useTripStore();
+    const { currentTrip, sessions, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players })));
     const { selectMatch } = useScoringStore();
 
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);

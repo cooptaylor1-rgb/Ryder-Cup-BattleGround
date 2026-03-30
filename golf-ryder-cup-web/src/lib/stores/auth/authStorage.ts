@@ -49,7 +49,7 @@ export function readStoredUsers(): Record<string, StoredUserRecord> {
     return {};
   }
 
-  return parsed as Record<string, StoredUserRecord>;
+  return parsed as unknown as Record<string, StoredUserRecord>;
 }
 
 export function writeStoredUsers(users: Record<string, StoredUserRecord>): void {

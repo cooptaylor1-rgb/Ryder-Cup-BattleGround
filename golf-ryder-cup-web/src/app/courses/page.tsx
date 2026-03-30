@@ -13,7 +13,8 @@ import { ScorecardUpload, type HoleData } from '@/components/course';
 import type { CourseProfile, TeeSetProfile } from '@/lib/types/courseProfile';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
-import { NoCoursesPremiumEmpty, NoSearchResultsEmpty } from '@/components/ui';
+import { useShallow } from 'zustand/shallow';
+import { NoCoursesEmpty, NoSearchResultsEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 /**
@@ -126,7 +127,7 @@ function CourseCard({
 
 export default function CourseLibraryPage() {
     const router = useRouter();
-    const { showToast } = useUIStore();
+    const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
     const [searchQuery, setSearchQuery] = useState('');
     const [showDatabaseSearch, setShowDatabaseSearch] = useState(false);
     const [showScorecardUpload, setShowScorecardUpload] = useState(false);
@@ -395,7 +396,7 @@ export default function CourseLibraryPage() {
                         onClear={() => setSearchQuery('')}
                     />
                 ) : (
-                    <NoCoursesPremiumEmpty onSearchCourses={() => setShowDatabaseSearch(true)} />
+                    <NoCoursesEmpty onSearchCourses={() => setShowDatabaseSearch(true)} />
                 )}
             </main>
         </div>

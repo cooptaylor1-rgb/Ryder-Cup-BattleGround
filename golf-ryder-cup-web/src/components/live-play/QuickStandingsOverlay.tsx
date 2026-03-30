@@ -23,6 +23,7 @@ import { Trophy, ChevronDown, Circle, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import type { Team } from '@/lib/types/models';
@@ -66,7 +67,7 @@ export function QuickStandingsOverlay({
 }: QuickStandingsOverlayProps) {
     const pathname = usePathname();
     const { trigger } = useHaptic();
-    const { currentTrip, teams, players, sessions } = useTripStore();
+    const { currentTrip, teams, players, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, sessions: s.sessions })));
 
     const [isVisible, setIsVisible] = useState(false);
     const [_isPulling, setIsPulling] = useState(false);

@@ -40,13 +40,14 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { clearDemoData, seedDemoData } from '@/lib/db/seed';
 import { useAuthStore, useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 
 const logger = createLogger('more');
 
 export default function MorePageClient() {
   const router = useRouter();
-  const { currentTrip, loadTrip, clearTrip } = useTripStore();
+  const { currentTrip, loadTrip, clearTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, clearTrip: s.clearTrip })));
   const { currentUser, isAuthenticated } = useAuthStore();
   const {
     isCaptainMode,
@@ -56,7 +57,7 @@ export default function MorePageClient() {
     enableAdminMode,
     disableAdminMode,
     showToast,
-  } = useUIStore();
+  } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode, disableCaptainMode: s.disableCaptainMode, isAdminMode: s.isAdminMode, enableAdminMode: s.enableAdminMode, disableAdminMode: s.disableAdminMode, showToast: s.showToast })));
 
   const [showCaptainModal, setShowCaptainModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);

@@ -35,6 +35,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 
 // ============================================
 // TYPES
@@ -131,7 +132,7 @@ export function SideBetReminder({
     className,
 }: SideBetReminderProps) {
     const { trigger } = useHaptic();
-    const { players } = useTripStore();
+    const { players } = useTripStore(useShallow(s => ({ players: s.players })));
 
     const [dismissedBets, setDismissedBets] = useState<Set<string>>(new Set());
     const [expandedBet, setExpandedBet] = useState<string | null>(null);

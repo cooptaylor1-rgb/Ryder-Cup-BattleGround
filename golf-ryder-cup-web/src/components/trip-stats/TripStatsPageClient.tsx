@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { useTripStore } from '@/lib/stores/tripStore';
+import { useShallow } from 'zustand/shallow';
 import * as tripStatsService from '@/lib/services/tripStatsService';
 import {
   buildTripStatCategoryLeaders,
@@ -38,7 +39,7 @@ import {
 
 export default function TripStatsPageClient() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
   const [activeCategory, setActiveCategory] = useState<TripStatCategory>('beverages');
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedPlayerId, setSelectedPlayerId] = useState<UUID | null>(null);

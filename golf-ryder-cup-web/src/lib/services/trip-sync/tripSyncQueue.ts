@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '../../db';
 import type { SyncEntity, SyncOperation, SyncQueueItem } from '../../types/sync';
@@ -149,7 +148,7 @@ export function queueSyncOperation(
   }
 
   const item: SyncQueueItem = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     entity,
     entityId,
     operation,

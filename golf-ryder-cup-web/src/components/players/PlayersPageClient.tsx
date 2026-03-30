@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Plus, Shield, UserPlus, Users, UsersRound, X } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium, NoPlayersPremiumEmpty } from '@/components/ui';
+import { EmptyStatePremium, NoPlayersEmpty } from '@/components/ui';
 import {
   PlayersFactCard,
   RosterSectionCard,
 } from '@/components/players/PlayersPageSections';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Player } from '@/lib/types/models';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -63,8 +64,8 @@ export default function PlayersPageClient() {
     removePlayer,
     assignPlayerToTeam,
     removePlayerFromTeam,
-  } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addPlayer: s.addPlayer, updatePlayer: s.updatePlayer, removePlayer: s.removePlayer, assignPlayerToTeam: s.assignPlayerToTeam, removePlayerFromTeam: s.removePlayerFromTeam })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkAdd, setShowBulkAdd] = useState(false);
@@ -371,7 +372,7 @@ export default function PlayersPageClient() {
 
         {players.length === 0 ? (
           <div className="py-[var(--space-10)]">
-            <NoPlayersPremiumEmpty
+            <NoPlayersEmpty
               onAddPlayer={isCaptainMode ? () => setShowAddModal(true) : undefined}
             />
           </div>

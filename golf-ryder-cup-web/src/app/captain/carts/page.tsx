@@ -14,6 +14,7 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import {
   Car,
@@ -23,8 +24,8 @@ import {
 
 export default function CartsPage() {
   const router = useRouter();
-  const { currentTrip, players, teams, teamMembers } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players, teams, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   if (!currentTrip) {
     return <CaptainNoTripState description="Start or select a trip to manage cart assignments." />;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
-import { EmptyStatePremium, ErrorBoundary, NoScoresPremiumEmpty } from '@/components/ui';
+import { EmptyStatePremium, ErrorBoundary, NoScoresEmpty } from '@/components/ui';
 import { ChevronRight } from 'lucide-react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { MatchState } from '@/lib/types/computed';
@@ -189,7 +189,7 @@ export function ScorePageSections({
                             })}
                         </div>
                     ) : (
-                        <NoScoresPremiumEmpty onStartScoring={onGoToMatchups} />
+                        <NoScoresEmpty onStartScoring={onGoToMatchups} />
                     )}
                 </ErrorBoundary>
             </section>

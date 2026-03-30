@@ -23,6 +23,7 @@ import { Target, ChevronUp, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
 import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import type { Match, HoleResult } from '@/lib/types/models';
@@ -65,9 +66,9 @@ export function FloatingMyMatch({
     const router = useRouter();
     const pathname = usePathname();
     const { trigger } = useHaptic();
-    const { currentTrip, sessions, players } = useTripStore();
+    const { currentTrip, sessions, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players })));
     const { selectMatch } = useScoringStore();
-    const { scoringPreferences: _scoringPreferences } = useUIStore();
+    const { scoringPreferences: _scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
 
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const [hasNewUpdate, setHasNewUpdate] = useState(false);

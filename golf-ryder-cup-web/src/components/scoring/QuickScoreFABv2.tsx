@@ -21,6 +21,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Mic, ChevronRight, X, Trophy, Minus } from 'lucide-react';
 import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
@@ -42,9 +43,9 @@ export function QuickScoreFABv2({
   const pathname = usePathname();
   const router = useRouter();
   const haptic = useHaptic();
-  const { currentTrip } = useTripStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
   const { scoreHole, selectMatch, activeMatch, currentHole: _currentHole } = useScoringStore();
-  const { scoringPreferences: _scoringPreferences } = useUIStore();
+  const { scoringPreferences: _scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
@@ -92,7 +93,7 @@ export function QuickScoreFABv2({
   }, [currentTrip?.id]);
 
   // Get teams for names
-  const { teams } = useTripStore();
+  const { teams } = useTripStore(useShallow(s => ({ teams: s.teams })));
   const teamA = teams.find((t) => t.color === 'usa');
   const teamB = teams.find((t) => t.color === 'europe');
 

@@ -16,7 +16,7 @@ import { Inbox } from 'lucide-react';
 // Re-export premium versions for backwards compatibility
 export {
   EmptyStatePremium,
-  NoTournamentsEmpty as NoTripsEmpty,
+  NoTournamentsEmpty,
   NoMatchesEmpty,
   NoSessionsEmpty,
   NoPlayersEmpty,

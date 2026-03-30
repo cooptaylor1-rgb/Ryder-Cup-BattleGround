@@ -9,7 +9,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import {
     getWeather,
     getWindDirection,
@@ -162,7 +161,7 @@ export function WeatherWidget({
                                 {weather.hourly.slice(0, 12).map((hour, i) => (
                                     <div key={i} className="flex flex-col items-center gap-1 min-w-[45px]">
                                         <span className="text-xs text-[var(--ink-tertiary)]">
-                                            {i === 0 ? 'Now' : format(hour.time, 'ha')}
+                                            {i === 0 ? 'Now' : hour.time.toLocaleTimeString([], { hour: 'numeric' })}
                                         </span>
                                         <WeatherIcon
                                             condition={hour.condition.icon}
@@ -295,7 +294,7 @@ export function WeatherWidget({
                     {weather.hourly.slice(0, 12).map((hour, i) => (
                         <div key={i} className="flex flex-col items-center gap-1 min-w-[50px]">
                             <span className="text-xs text-[var(--ink-tertiary)]">
-                                {i === 0 ? 'Now' : format(hour.time, 'ha')}
+                                {i === 0 ? 'Now' : hour.time.toLocaleTimeString([], { hour: 'numeric' })}
                             </span>
                             <WeatherIcon
                                 condition={hour.condition.icon}
@@ -318,7 +317,7 @@ export function WeatherWidget({
                     {weather.daily.map((day, i) => (
                         <div key={i} className="flex items-center gap-4">
                             <span className="w-12 text-sm text-[var(--ink-tertiary)]">
-                                {i === 0 ? 'Today' : format(day.date, 'EEE')}
+                                {i === 0 ? 'Today' : day.date.toLocaleDateString([], { weekday: 'short' })}
                             </span>
                             <WeatherIcon condition={day.condition.icon} size="sm" isDay />
                             <span className="flex-1 text-sm text-[var(--ink-tertiary)] truncate">

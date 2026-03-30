@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useTripStore } from '@/lib/stores/tripStore';
+import { useShallow } from 'zustand/shallow';
 import * as tripStatsService from '@/lib/services/tripStatsService';
 import type { UUID, Player } from '@/lib/types/models';
 import type { AwardType, TripAward } from '@/lib/types/tripStats';
@@ -198,7 +199,7 @@ const funnyAwards: AwardType[] = [
 
 export default function TripAwardsPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore();
+  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
   const [refreshKey, setRefreshKey] = useState(0);
 
   const awards = useLiveQuery(

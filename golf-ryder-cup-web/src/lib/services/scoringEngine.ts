@@ -26,39 +26,3 @@ export { recordHoleResult } from './scoring-engine/scoringEngineCommands';
 export { undoLastScore } from './scoring-engine/scoringEngineHistory';
 export { createMatch, finalizeMatch } from './scoring-engine/scoringEngineMatch';
 
-import {
-  calculateMatchState,
-  calculateMatchStateSnapshot,
-  formatMatchScore,
-  getCurrentHole,
-} from './scoring-engine/scoringEngineAggregation';
-import {
-  calculateMatchPoints,
-  calculateMatchResult,
-  calculateStoredMatchResult,
-  checkDormie,
-  formatFinalResult,
-  wouldCloseOut,
-} from './scoring-engine/scoringEngineResults';
-import { recordHoleResult } from './scoring-engine/scoringEngineCommands';
-import { undoLastScore } from './scoring-engine/scoringEngineHistory';
-import { createMatch, finalizeMatch } from './scoring-engine/scoringEngineMatch';
-
-export const ScoringEngine = {
-  calculateMatchState,
-  calculateMatchStateSnapshot,
-  formatMatchScore,
-  recordHoleResult,
-  undoLastScore,
-  getCurrentHole,
-  calculateMatchResult,
-  calculateStoredMatchResult,
-  formatFinalResult,
-  calculateMatchPoints,
-  checkDormie,
-  wouldCloseOut,
-  createMatch,
-  finalizeMatch,
-};
-
-export default ScoringEngine;

@@ -15,6 +15,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 
 const logger = createLogger('Optimistic');
@@ -276,7 +277,7 @@ export function useOptimistic<T>(
 export function useSyncQueue() {
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
 
   // Define processQueue first before using it in useEffect
   const processQueue = useCallback(async () => {

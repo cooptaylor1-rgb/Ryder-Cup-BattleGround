@@ -10,6 +10,7 @@ import {
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { draftLogger } from '@/lib/utils/logger';
 import {
   CheckCircle2,
@@ -20,8 +21,8 @@ import {
 
 export default function DraftPage() {
   const router = useRouter();
-  const { currentTrip, players, teams, assignPlayerToTeam, teamMembers } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players, teams, assignPlayerToTeam, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, assignPlayerToTeam: s.assignPlayerToTeam, teamMembers: s.teamMembers })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   const handleDraftComplete = useCallback(
     async (assignments: Map<string, string>) => {

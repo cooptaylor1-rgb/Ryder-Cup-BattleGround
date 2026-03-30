@@ -16,6 +16,7 @@ import {
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { db } from '@/lib/db';
 import { useAuthStore, useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { tripLogger } from '@/lib/utils/logger';
 import { navigateBackOr } from '@/lib/utils/navigation';
 import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
@@ -25,7 +26,7 @@ import type { Match } from '@/lib/types/models';
 export default function SchedulePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, sessions, players, courses, teeSets } = useTripStore();
+  const { currentTrip, sessions, players, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players, courses: s.courses, teeSets: s.teeSets })));
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);

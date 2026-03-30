@@ -9,6 +9,7 @@ import { useRealtimeScoring } from '@/lib/hooks/useRealtimeScoring';
 import { db } from '@/lib/db';
 import { uiLogger } from '@/lib/utils/logger';
 import { useScoringStore, useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 import type { ScoreUpdate } from '@/lib/services/realtimeSyncService';
@@ -16,7 +17,7 @@ import { LiveNoTripState, LivePageSections } from './LivePageSections';
 
 export default function LivePageClient() {
     const router = useRouter();
-    const { currentTrip, players, getActiveSession } = useTripStore();
+    const { currentTrip, players, getActiveSession } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, getActiveSession: s.getActiveSession })));
     const { matchStates, loadSessionMatches, refreshMatchState } = useScoringStore();
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [soundEnabled, setSoundEnabled] = useState(true);

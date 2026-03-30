@@ -9,7 +9,7 @@
  * Built-in templates are merged in at read time from builtinTemplates.ts.
  */
 
-import { v4 as uuidv4 } from 'uuid';
+
 import { db } from '@/lib/db';
 import type { TripTemplate, TemplateConfig } from '@/lib/types/templates';
 import { BUILTIN_TEMPLATES, getBuiltinTemplate } from '@/lib/data/builtinTemplates';
@@ -53,7 +53,7 @@ export async function saveAsTemplate(
   const now = new Date().toISOString();
 
   const template: TripTemplate = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     name,
     description,
     isBuiltin: false,

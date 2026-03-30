@@ -3,6 +3,9 @@
  *
  * Consolidated data fetching for the home page to avoid N+1 query patterns.
  * Batches multiple database queries into fewer operations.
+ *
+ * Split into focused sub-hooks so consumers can subscribe to only
+ * the slices they need, reducing unnecessary re-renders.
  */
 'use client';
 
@@ -10,6 +13,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo } from 'react';
 import { db } from '@/lib/db';
 import { useTripStore, useAuthStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import {
@@ -19,65 +23,68 @@ import {
     type TripPlayerLinkResult,
 } from '@/lib/utils/tripPlayerIdentity';
 import type { TeamStandings, MatchState } from '@/lib/types/computed';
-import type { Match, RyderCupSession, Trip, Player, SideBet, BanterPost } from '@/lib/types/models';
+import type { Match, RyderCupSession, Trip, Player, SideBet, BanterPost, HoleResult } from '@/lib/types/models';
 import type { TripAward } from '@/lib/types/tripStats';
 
-interface UserMatchData {
+// ============================================
+// TYPES
+// ============================================
+
+export interface UserMatchData {
     match: Match;
     session: RyderCupSession;
     matchState: MatchState | null;
 }
 
-interface HomeData {
-    // Loading states
-    isLoading: boolean;
+interface ConsolidatedData {
+    trips: Trip[];
+    activeTrip: Trip | null;
+    sessions: RyderCupSession[];
+    matches: Match[];
+    holeResults: HoleResult[];
+    sideBets: SideBet[];
+    banterPosts: BanterPost[];
+    tripAwards: TripAward[];
+    dateActiveTripId: string | null;
+}
 
-    // Trip data
+interface HomeData {
+    isLoading: boolean;
     trips: Trip[];
     activeTrip: Trip | null;
     pastTrips: Trip[];
     hasTrips: boolean;
-
-    // Standings
     standings: TeamStandings | null;
-
-    // User's match
     userMatchData: UserMatchData | null;
     currentUserPlayer: Player | null;
     tripPlayerLink: TripPlayerLinkResult;
-
-    // Live data
     liveMatches: Match[];
     liveMatchesCount: number;
     tripMatches: Match[];
     tripSessions: RyderCupSession[];
-
-    // Social data
     banterPosts: BanterPost[];
     unreadMessages: number;
-
-    // Side bets
     sideBets: SideBet[];
     activeSideBetsCount: number;
-
-    // Awards
     tripAwards: TripAward[];
-
-    // Team names
     teamAName: string;
     teamBName: string;
 }
 
-export function useHomeData(): HomeData {
-    const { loadTrip, currentTrip, players, teams, sessions: _sessions } = useTripStore();
-    const { currentUser, isAuthenticated, authUserId } = useAuthStore();
+// ============================================
+// CORE DATA QUERY (shared by sub-hooks)
+// ============================================
 
-    // Single consolidated query for all trip-related data
-    const consolidatedData = useLiveQuery(async () => {
-        // 1. Get all trips (single query)
+/**
+ * Core batched query — fetches all trip-related data in minimal DB round-trips.
+ * Returns undefined while loading (first Dexie tick).
+ */
+export function useConsolidatedTripData(): ConsolidatedData | undefined {
+    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
+
+    return useLiveQuery(async () => {
         const allTrips = await db.trips.orderBy('startDate').reverse().toArray();
 
-        // 2. Find the date-active trip as a fallback when the user has not selected one
         const now = new Date();
         const dateActiveTrip = allTrips.find(t => {
             const start = new Date(t.startDate);
@@ -104,7 +111,6 @@ export function useHomeData(): HomeData {
             };
         }
 
-        // 3. Batch query for all trip-related data
         const [tripSessions, sideBets, banterPosts, tripAwards] = await Promise.all([
             db.sessions.where('tripId').equals(selectedTrip.id).toArray(),
             db.sideBets.where('tripId').equals(selectedTrip.id).toArray(),
@@ -112,13 +118,11 @@ export function useHomeData(): HomeData {
             db.tripAwards.where('tripId').equals(selectedTrip.id).toArray(),
         ]);
 
-        // 4. Get all matches for all sessions in one query
         const sessionIds = tripSessions.map(s => s.id);
         const allMatches = sessionIds.length > 0
             ? await db.matches.where('sessionId').anyOf(sessionIds).toArray()
             : [];
 
-        // 5. Get hole results for in-progress matches
         const inProgressMatchIds = allMatches
             .filter(m => m.status === 'inProgress')
             .map(m => m.id);
@@ -139,8 +143,53 @@ export function useHomeData(): HomeData {
             dateActiveTripId: dateActiveTrip?.id ?? null,
         };
     }, [currentTrip?.id]);
+}
 
-    // Find current user's player record
+// ============================================
+// FOCUSED SUB-HOOKS
+// ============================================
+
+/** Trip list and active trip selection. */
+export function useTrips(data: ConsolidatedData | undefined) {
+    return useMemo(() => {
+        const trips = data?.trips || [];
+        const activeTrip = data?.activeTrip || null;
+        return {
+            trips,
+            activeTrip,
+            pastTrips: trips.filter(t => t.id !== activeTrip?.id),
+            hasTrips: trips.length > 0,
+            isLoading: data === undefined,
+        };
+    }, [data]);
+}
+
+/** Team standings for the active trip. */
+export function useStandings(activeTripId: string | undefined | null) {
+    return useLiveQuery(async (): Promise<TeamStandings | null> => {
+        if (!activeTripId) return null;
+        return calculateTeamStandings(activeTripId);
+    }, [activeTripId]);
+}
+
+/** Team names from the store. */
+export function useTeamNames() {
+    const { teams } = useTripStore(useShallow(s => ({ teams: s.teams })));
+    return useMemo(() => {
+        const teamA = teams.find(t => t.color === 'usa');
+        const teamB = teams.find(t => t.color === 'europe');
+        return {
+            teamAName: teamA?.name || 'USA',
+            teamBName: teamB?.name || 'Europe',
+        };
+    }, [teams]);
+}
+
+/** Current user's player record and trip-player link status. */
+export function useCurrentUserPlayer() {
+    const { players } = useTripStore(useShallow(s => ({ players: s.players })));
+    const { currentUser, isAuthenticated, authUserId } = useAuthStore();
+
     const currentUserPlayer = useMemo(() => {
         return resolveCurrentTripPlayer(
             players,
@@ -148,6 +197,7 @@ export function useHomeData(): HomeData {
             isAuthenticated
         );
     }, [authUserId, currentUser, isAuthenticated, players]);
+
     const tripPlayerLink = useMemo(
         () =>
             assessTripPlayerLink(
@@ -158,15 +208,19 @@ export function useHomeData(): HomeData {
         [authUserId, currentUser, isAuthenticated, players]
     );
 
-    // Calculate user's match data
-    const userMatchData = useMemo((): UserMatchData | null => {
-        if (!consolidatedData?.activeTrip || !currentUserPlayer || !consolidatedData.matches) {
-            return null;
-        }
+    return { currentUserPlayer: currentUserPlayer ?? null, tripPlayerLink };
+}
 
-        const { matches, sessions: tripSessions, holeResults } = consolidatedData;
+/** The current user's active match (in progress or scheduled). */
+export function useUserMatch(
+    data: ConsolidatedData | undefined,
+    currentUserPlayer: Player | null,
+): UserMatchData | null {
+    return useMemo((): UserMatchData | null => {
+        if (!data?.activeTrip || !currentUserPlayer || !data.matches) return null;
 
-        // Find user's match (prefer inProgress, then scheduled)
+        const { matches, sessions: tripSessions, holeResults } = data;
+
         const userMatches = matches.filter(
             m => m.teamAPlayerIds.includes(currentUserPlayer.id) ||
                 m.teamBPlayerIds.includes(currentUserPlayer.id)
@@ -180,7 +234,6 @@ export function useHomeData(): HomeData {
         const session = tripSessions.find(s => s.id === userMatch.sessionId);
         if (!session) return null;
 
-        // Calculate match state if in progress
         let matchState: MatchState | null = null;
         if (userMatch.status === 'inProgress') {
             const matchHoleResults = holeResults.filter(hr => hr.matchId === userMatch.id);
@@ -188,75 +241,103 @@ export function useHomeData(): HomeData {
         }
 
         return { match: userMatch, session, matchState };
-    }, [consolidatedData, currentUserPlayer]);
+    }, [data, currentUserPlayer]);
+}
 
-    // Calculate live matches
-    const liveMatches = useMemo(() => {
-        return consolidatedData?.matches?.filter(m => m.status === 'inProgress') || [];
-    }, [consolidatedData?.matches]);
+/** Live (in-progress) matches. */
+export function useLiveMatches(data: ConsolidatedData | undefined) {
+    return useMemo(() => {
+        const live = data?.matches?.filter(m => m.status === 'inProgress') || [];
+        return { liveMatches: live, liveMatchesCount: live.length };
+    }, [data?.matches]);
+}
 
-    // Calculate standings (only when active trip changes)
-    const standings = useLiveQuery(async (): Promise<TeamStandings | null> => {
-        if (!consolidatedData?.activeTrip) return null;
-        return calculateTeamStandings(consolidatedData.activeTrip.id);
-    }, [consolidatedData?.activeTrip?.id]);
+/** Social feed data. */
+export function useSocialData(data: ConsolidatedData | undefined) {
+    return useMemo(() => {
+        const posts = data?.banterPosts || [];
+        return { banterPosts: posts, unreadMessages: posts.length };
+    }, [data?.banterPosts]);
+}
 
-    // Load trip when active trip changes
-    // If the user has not explicitly selected a trip, fall back to the date-active trip.
+/** Side bets and awards summary. */
+export function useSideBetsSummary(data: ConsolidatedData | undefined) {
+    return useMemo(() => {
+        const bets = data?.sideBets || [];
+        const awards = data?.tripAwards || [];
+        return {
+            sideBets: bets,
+            activeSideBetsCount: bets.filter(b => b.status === 'active').length,
+            tripAwards: awards,
+        };
+    }, [data?.sideBets, data?.tripAwards]);
+}
+
+// ============================================
+// AUTO-LOAD EFFECTS
+// ============================================
+
+/**
+ * Side-effect: auto-loads a trip into the store when the date-active trip
+ * changes or the selected trip falls out of sync.
+ */
+export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
+    const { loadTrip, currentTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, currentTrip: s.currentTrip })));
+
     useEffect(() => {
-        if (
-            !currentTrip &&
-            consolidatedData?.dateActiveTripId
-        ) {
-            loadTrip(consolidatedData.dateActiveTripId);
+        if (!currentTrip && data?.dateActiveTripId) {
+            loadTrip(data.dateActiveTripId);
         }
-    }, [consolidatedData?.dateActiveTripId, currentTrip, loadTrip]);
+    }, [data?.dateActiveTripId, currentTrip, loadTrip]);
 
-    // If the selected trip is stale in store, refresh it from IndexedDB.
     useEffect(() => {
         if (
             currentTrip &&
-            consolidatedData?.activeTrip &&
-            consolidatedData.activeTrip.id !== currentTrip.id
+            data?.activeTrip &&
+            data.activeTrip.id !== currentTrip.id
         ) {
-            loadTrip(consolidatedData.activeTrip.id);
+            loadTrip(data.activeTrip.id);
         }
-    }, [consolidatedData?.activeTrip, currentTrip, loadTrip]);
+    }, [data?.activeTrip, currentTrip, loadTrip]);
+}
 
-    // Get team names
-    const teamA = teams.find(t => t.color === 'usa');
-    const teamB = teams.find(t => t.color === 'europe');
+// ============================================
+// COMPOSED HOOK (backward compat)
+// ============================================
 
-    // Calculate derived values
-    const trips = consolidatedData?.trips || [];
-    const activeTrip = consolidatedData?.activeTrip || null;
-    const pastTrips = trips.filter(t => t.id !== activeTrip?.id);
-    const sideBets = consolidatedData?.sideBets || [];
-    const banterPosts = consolidatedData?.banterPosts || [];
-    const tripSessions = consolidatedData?.sessions || [];
-    const tripMatches = consolidatedData?.matches || [];
-    const tripAwards = consolidatedData?.tripAwards || [];
+/**
+ * Full home data hook — composes all sub-hooks.
+ * Prefer using individual sub-hooks in new code for better re-render isolation.
+ */
+export function useHomeData(): HomeData {
+    const data = useConsolidatedTripData();
+    const tripInfo = useTrips(data);
+    const standings = useStandings(data?.activeTrip?.id);
+    const { teamAName, teamBName } = useTeamNames();
+    const { currentUserPlayer, tripPlayerLink } = useCurrentUserPlayer();
+    const userMatchData = useUserMatch(data, currentUserPlayer);
+    const { liveMatches, liveMatchesCount } = useLiveMatches(data);
+    const { banterPosts, unreadMessages } = useSocialData(data);
+    const { sideBets, activeSideBetsCount, tripAwards } = useSideBetsSummary(data);
+
+    useAutoLoadTrip(data);
 
     return {
-        isLoading: consolidatedData === undefined,
-        trips,
-        activeTrip,
-        pastTrips,
-        hasTrips: trips.length > 0,
+        ...tripInfo,
         standings: standings ?? null,
         userMatchData,
-        currentUserPlayer: currentUserPlayer ?? null,
+        currentUserPlayer,
         tripPlayerLink,
         liveMatches,
-        liveMatchesCount: liveMatches.length,
-        tripMatches,
-        tripSessions,
+        liveMatchesCount,
+        tripMatches: data?.matches || [],
+        tripSessions: data?.sessions || [],
         banterPosts,
-        unreadMessages: banterPosts.length,
+        unreadMessages,
         sideBets,
-        activeSideBetsCount: sideBets.filter(b => b.status === 'active').length,
+        activeSideBetsCount,
         tripAwards,
-        teamAName: teamA?.name || 'USA',
-        teamBName: teamB?.name || 'Europe',
+        teamAName,
+        teamBName,
     };
 }

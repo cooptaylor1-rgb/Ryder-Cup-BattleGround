@@ -12,6 +12,7 @@ import {
   scheduleCourseSyncQueueProcessing,
 } from './course-library-sync/courseLibrarySyncQueue';
 import { canSync, logger, setOnlineStatus } from './course-library-sync/courseLibrarySyncShared';
+import { registerSyncHandler } from './syncOrchestrator';
 
 export type {
   BulkSyncResult,
@@ -39,27 +40,24 @@ export {
 } from './course-library-sync/courseLibrarySyncTransfer';
 export { getDeviceId } from './course-library-sync/courseLibrarySyncShared';
 
-let onlineHandler: (() => void) | null = null;
-let offlineHandler: (() => void) | null = null;
+let unregisterHandler: (() => void) | null = null;
 
 export function initNetworkListeners(): () => void {
   if (typeof window === 'undefined') return () => {};
 
   cleanupNetworkListeners();
 
-  onlineHandler = () => {
-    setOnlineStatus(true);
-    logger.log('Network online - triggering sync');
-    scheduleCourseSyncQueueProcessing();
-  };
-
-  offlineHandler = () => {
-    setOnlineStatus(false);
-    logger.log('Network offline - queuing syncs');
-  };
-
-  window.addEventListener('online', onlineHandler);
-  window.addEventListener('offline', offlineHandler);
+  unregisterHandler = registerSyncHandler('courseLibrarySync', {
+    onOnline: () => {
+      setOnlineStatus(true);
+      logger.log('Network online - triggering sync');
+      scheduleCourseSyncQueueProcessing();
+    },
+    onOffline: () => {
+      setOnlineStatus(false);
+      logger.log('Network offline - queuing syncs');
+    },
+  });
 
   setOnlineStatus(navigator.onLine);
 
@@ -67,15 +65,9 @@ export function initNetworkListeners(): () => void {
 }
 
 export function cleanupNetworkListeners(): void {
-  if (typeof window === 'undefined') return;
-
-  if (onlineHandler) {
-    window.removeEventListener('online', onlineHandler);
-    onlineHandler = null;
-  }
-  if (offlineHandler) {
-    window.removeEventListener('offline', offlineHandler);
-    offlineHandler = null;
+  if (unregisterHandler) {
+    unregisterHandler();
+    unregisterHandler = null;
   }
 }
 

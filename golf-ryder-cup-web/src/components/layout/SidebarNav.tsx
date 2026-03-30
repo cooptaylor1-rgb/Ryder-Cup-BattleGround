@@ -10,6 +10,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useUIStore, useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { Tooltip } from '@/components/ui/Tooltip';
 import {
     Target,
@@ -46,8 +47,8 @@ interface SidebarNavProps {
 export function SidebarNav({ isExpanded = false, onToggle }: SidebarNavProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const { isCaptainMode } = useUIStore();
-    const { currentTrip } = useTripStore();
+    const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
 
     const handleNavClick = (item: NavItem) => {
         router.push(item.href);

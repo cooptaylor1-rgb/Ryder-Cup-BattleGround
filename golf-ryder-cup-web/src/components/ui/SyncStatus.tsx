@@ -14,6 +14,7 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import {
   Cloud,
   CloudOff,
@@ -37,7 +38,7 @@ export function SyncStatus({
   className,
   showLabel = true,
 }: SyncStatusProps) {
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
   const { pendingCount, isSyncing, processQueue } = useSyncQueue();
 
   // Determine current sync state
@@ -309,7 +310,7 @@ interface FloatingSyncStatusProps {
 }
 
 export function FloatingSyncStatus({ className }: FloatingSyncStatusProps) {
-  const { isOnline } = useUIStore();
+  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
   const { pendingCount, isSyncing, processQueue: _processQueue } = useSyncQueue();
 
   // Don't show if everything is synced

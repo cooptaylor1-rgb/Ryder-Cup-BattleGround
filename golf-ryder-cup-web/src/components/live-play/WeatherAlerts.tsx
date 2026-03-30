@@ -35,6 +35,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { getWeather, getWindDirection, formatTime, type GolfWeather } from '@/lib/services/weatherService';
 
 // ============================================
@@ -136,7 +137,7 @@ export function WeatherAlerts({
     longitude,
 }: WeatherAlertsProps) {
     const { trigger } = useHaptic();
-    const { currentTrip: _currentTrip } = useTripStore();
+    const { currentTrip: _currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
 
     const [weather, setWeather] = useState<WeatherConditions | null>(null);
     const [_golfWeatherData, setGolfWeatherData] = useState<GolfWeather | null>(null);

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import NextImage from 'next/image';
 import { useAuthStore, useTripStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { claimTripPlayerForCurrentUser } from '@/lib/services/tripPlayerLinkService';
 import { createLogger } from '@/lib/utils/logger';
 import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
@@ -14,14 +14,17 @@ import {
   Phone,
   Hash,
   Home,
-  Lock,
   AlertCircle,
   Edit2,
   LogOut,
   X,
-  Save,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
+import { ProfileField } from './ProfileField';
+import { ProfileHeroCard } from './ProfileHeroCard';
+import { TripPlayerLinkSection } from './TripPlayerLinkSection';
+import { OfflinePinSection } from './OfflinePinSection';
+import { ProfileEditSaveBar } from './ProfileEditSaveBar';
 
 /**
  * PROFILE PAGE
@@ -56,17 +59,13 @@ export default function ProfilePage() {
     authUserId,
     setOfflinePin,
   } = useAuthStore();
-  const { currentTrip, players, loadTrip } = useTripStore();
-  const { showToast, isCaptainMode } = useUIStore();
+  const { currentTrip, players, loadTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, loadTrip: s.loadTrip })));
+  const { showToast, isCaptainMode } = useUIStore(useShallow(s => ({ showToast: s.showToast, isCaptainMode: s.isCaptainMode })));
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [hasOfflinePin, setHasOfflinePin] = useState(false);
-  const [showOfflinePinForm, setShowOfflinePinForm] = useState(false);
-  const [offlinePin, setOfflinePinValue] = useState('');
-  const [confirmOfflinePin, setConfirmOfflinePin] = useState('');
-  const [isSavingOfflinePin, setIsSavingOfflinePin] = useState(false);
   const [isClaimingTripPlayer, setIsClaimingTripPlayer] = useState(false);
 
   const currentIdentity = useMemo(
@@ -120,40 +119,6 @@ export default function ProfilePage() {
   const handleCancel = () => {
     setFormData(currentUser || {});
     setIsEditing(false);
-  };
-
-  const handleSaveOfflinePin = async () => {
-    if (!currentUser) {
-      return;
-    }
-
-    if (!/^\d{4}$/.test(offlinePin)) {
-      showToast('error', 'Offline PIN must be exactly 4 digits');
-      return;
-    }
-
-    if (offlinePin !== confirmOfflinePin) {
-      showToast('error', 'Offline PINs do not match');
-      return;
-    }
-
-    setIsSavingOfflinePin(true);
-    try {
-      await setOfflinePin(offlinePin);
-      setHasOfflinePin(true);
-      setShowOfflinePinForm(false);
-      setOfflinePinValue('');
-      setConfirmOfflinePin('');
-      showToast('success', hasOfflinePin ? 'Offline PIN updated' : 'Offline PIN saved');
-    } catch (error) {
-      logger.error('Failed to save offline PIN', { error });
-      showToast(
-        'error',
-        error instanceof Error ? error.message : 'Failed to save offline PIN'
-      );
-    } finally {
-      setIsSavingOfflinePin(false);
-    }
   };
 
   const handleClaimTripPlayer = async (playerId: string, allowEmailMismatch = false) => {
@@ -260,9 +225,6 @@ export default function ProfilePage() {
     );
   }
 
-  const displayName = currentUser.nickname || currentUser.firstName;
-  const initials = `${currentUser.firstName?.[0] || '?'}${currentUser.lastName?.[0] || '?'}`;
-
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-canvas">
       <PageHeader
@@ -296,157 +258,17 @@ export default function ProfilePage() {
           {/* ============================
               PROFILE HERO CARD
               ============================ */}
-          <div className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] overflow-hidden mb-[var(--space-6)]">
-            <div className="bg-gradient-to-b from-canvas to-canvas-sunken pt-[var(--space-10)] px-[var(--space-6)] pb-[var(--space-8)] flex flex-col items-center text-center">
-              {/* Avatar */}
-              <div className="w-[5.5rem] h-[5.5rem] rounded-[var(--radius-full)] bg-canvas-raised border-2 border-rule flex items-center justify-center mb-[var(--space-4)] shadow-card overflow-hidden">
-                {currentUser.avatarUrl ? (
-                  <NextImage
-                    src={currentUser.avatarUrl}
-                    alt={displayName}
-                    width={88}
-                    height={88}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <span className="font-serif text-[clamp(1.75rem,5vw,2.25rem)] italic text-masters leading-none tracking-[-0.02em]">
-                    {initials}
-                  </span>
-                )}
-              </div>
-
-              {/* Name */}
-              <h2 className="font-serif text-[clamp(1.5rem,5vw,1.75rem)] italic font-normal text-ink leading-[1.2] tracking-[-0.01em] m-0">
-                {currentUser.firstName} {currentUser.lastName}
-              </h2>
-
-              {/* Nickname */}
-              {currentUser.nickname && (
-                <p className="font-sans text-[length:var(--text-sm)] text-ink-tertiary m-0 pt-[var(--space-1)]">
-                  &ldquo;{currentUser.nickname}&rdquo;
-                </p>
-              )}
-
-              {/* Handicap Badge */}
-              <div className="mt-[var(--space-5)] flex flex-col items-center gap-[var(--space-1)]">
-                <span className="type-overline text-ink-tertiary tracking-[0.15em]">
-                  Handicap
-                </span>
-                <span className="font-serif text-[clamp(2rem,6vw,2.5rem)] font-normal text-masters leading-none tracking-[-0.02em]">
-                  {currentUser.handicapIndex?.toFixed(1) || '\u2014'}
-                </span>
-              </div>
-            </div>
-          </div>
+          <ProfileHeroCard currentUser={currentUser} />
 
           {currentTrip ? (
-            <section className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] p-[var(--space-6)] mb-[var(--space-6)]">
-              <span className="type-overline text-ink-tertiary tracking-[0.15em] block mb-[var(--space-2)]">
-                Current Trip
-              </span>
-              <h3 className="font-serif text-[length:var(--text-xl)] italic font-normal text-ink m-0 mb-[var(--space-3)] leading-[1.2]">
-                Roster Link
-              </h3>
-              <p className="font-sans text-[length:var(--text-sm)] text-ink-secondary m-0 mb-[var(--space-5)] leading-[1.6]">
-                {linkedTripPlayer
-                  ? `Your profile is linked to ${linkedTripPlayer.firstName} ${linkedTripPlayer.lastName} in ${currentTrip.name}.`
-                  : `Connect your profile to the correct roster entry in ${currentTrip.name} so matches, schedule, and scoring resolve correctly.`}
-              </p>
-
-              {linkedTripPlayer ? (
-                <div className="rounded-[var(--radius-md)] border border-[color:var(--masters)]/25 bg-[var(--masters-subtle)] px-[var(--space-4)] py-[var(--space-4)]">
-                  <p className="font-sans text-[length:var(--text-sm)] font-semibold text-[var(--masters)] m-0">
-                    Linked player
-                  </p>
-                  <p className="font-sans text-[length:var(--text-base)] text-ink m-0 mt-[var(--space-1)]">
-                    {linkedTripPlayer.firstName} {linkedTripPlayer.lastName}
-                    {linkedTripPlayer.team ? ` • ${linkedTripPlayer.team.toUpperCase()}` : ''}
-                  </p>
-                  <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-2)] leading-[1.5]">
-                    This is the roster row the app will use for your matches, stats, and scoring.
-                  </p>
-                </div>
-              ) : null}
-
-              {!linkedTripPlayer && tripPlayerLink.status === 'claimable-name-match' ? (
-                <div className="rounded-[var(--radius-md)] border border-rule bg-canvas px-[var(--space-4)] py-[var(--space-4)]">
-                  <p className="font-sans text-[length:var(--text-sm)] font-semibold text-ink m-0">
-                    One likely roster match found
-                  </p>
-                  <p className="font-sans text-[length:var(--text-base)] text-ink m-0 mt-[var(--space-1)]">
-                    {tripPlayerLink.candidates[0]?.firstName} {tripPlayerLink.candidates[0]?.lastName}
-                  </p>
-                  <button
-                    type="button"
-                    disabled={isClaimingTripPlayer}
-                    onClick={() => {
-                      const candidateId = tripPlayerLink.candidates[0]?.id;
-                      if (candidateId) {
-                        void handleClaimTripPlayer(candidateId);
-                      }
-                    }}
-                    className="press-scale mt-[var(--space-4)] rounded-[var(--radius-full)] bg-[var(--masters)] px-[var(--space-4)] py-[var(--space-2)] font-sans text-[length:var(--text-sm)] font-semibold text-[var(--canvas)] border-none"
-                  >
-                    {isClaimingTripPlayer ? 'Linking…' : 'Link This Roster Entry'}
-                  </button>
-                </div>
-              ) : null}
-
-              {!linkedTripPlayer &&
-              (tripPlayerLink.status === 'ambiguous-email-match' ||
-                tripPlayerLink.status === 'ambiguous-name-match') ? (
-                <div className="rounded-[var(--radius-md)] border border-[color:var(--warning)]/30 bg-[color:var(--warning)]/10 px-[var(--space-4)] py-[var(--space-4)]">
-                  <p className="font-sans text-[length:var(--text-sm)] font-semibold text-[var(--warning)] m-0">
-                    Multiple roster candidates found
-                  </p>
-                  <p className="font-sans text-[length:var(--text-sm)] text-ink-secondary m-0 mt-[var(--space-2)] leading-[1.6]">
-                    {isCaptainMode
-                      ? 'Choose the correct roster entry below to finish the link deliberately.'
-                      : 'Captain mode is required to choose between multiple roster entries.'}
-                  </p>
-                  <div className="mt-[var(--space-4)] flex flex-col gap-[var(--space-3)]">
-                    {tripPlayerLink.candidates.map((candidate) => (
-                      <div
-                        key={candidate.id}
-                        className="flex items-center justify-between gap-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas px-[var(--space-4)] py-[var(--space-3)]"
-                      >
-                        <div>
-                          <p className="font-sans text-[length:var(--text-sm)] font-semibold text-ink m-0">
-                            {candidate.firstName} {candidate.lastName}
-                          </p>
-                          <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-1)]">
-                            {candidate.email || 'No email on roster'}
-                          </p>
-                        </div>
-                        {isCaptainMode ? (
-                          <button
-                            type="button"
-                            disabled={isClaimingTripPlayer}
-                            onClick={() => void handleClaimTripPlayer(candidate.id, true)}
-                            className="press-scale rounded-[var(--radius-full)] border border-rule bg-canvas-raised px-[var(--space-3)] py-[var(--space-2)] font-sans text-[length:var(--text-xs)] font-semibold text-ink"
-                          >
-                            Link
-                          </button>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {!linkedTripPlayer &&
-              (tripPlayerLink.status === 'unresolved' || tripPlayerLink.status === 'missing-user') ? (
-                <div className="rounded-[var(--radius-md)] border border-rule bg-canvas px-[var(--space-4)] py-[var(--space-4)]">
-                  <p className="font-sans text-[length:var(--text-sm)] font-semibold text-ink m-0">
-                    No roster match found yet
-                  </p>
-                  <p className="font-sans text-[length:var(--text-sm)] text-ink-secondary m-0 mt-[var(--space-2)] leading-[1.6]">
-                    Ask the captain to add you on the Players screen, or open captain mode and assign your roster entry there.
-                  </p>
-                </div>
-              ) : null}
-            </section>
+            <TripPlayerLinkSection
+              tripName={currentTrip.name}
+              linkedTripPlayer={linkedTripPlayer}
+              tripPlayerLink={tripPlayerLink}
+              isClaimingTripPlayer={isClaimingTripPlayer}
+              isCaptainMode={isCaptainMode}
+              onClaimTripPlayer={handleClaimTripPlayer}
+            />
           ) : null}
 
           {/* ============================
@@ -712,93 +534,13 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="bg-canvas-raised border border-rule rounded-[var(--radius-lg)] p-[var(--space-6)] mb-[var(--space-6)]">
-            <span className="type-overline text-ink-tertiary tracking-[0.15em] block mb-[var(--space-2)]">
-              Access
-            </span>
-            <h3 className="font-serif text-[length:var(--text-xl)] italic font-normal text-ink m-0 mb-[var(--space-3)] leading-[1.2]">
-              Offline Sign-In
-            </h3>
-            <p className="font-sans text-[length:var(--text-sm)] text-ink-secondary m-0 mb-[var(--space-4)] leading-[1.6]">
-              Email sign-in stays your primary account access. Add a 4-digit PIN only if you want
-              this device to keep working offline.
-            </p>
-            <div className="rounded-[var(--radius-md)] border border-rule bg-canvas px-[var(--space-4)] py-[var(--space-4)] mb-[var(--space-4)]">
-              <div className="flex items-start justify-between gap-[var(--space-3)]">
-                <div>
-                  <p className="font-sans text-[length:var(--text-sm)] font-semibold text-ink m-0">
-                    {hasOfflinePin ? 'Offline PIN saved on this device' : 'Offline PIN not set'}
-                  </p>
-                  <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-1)] leading-[1.5]">
-                    {hasOfflinePin
-                      ? 'You can use your device PIN from the sign-in screen when email or network access is unavailable.'
-                      : 'Without a PIN, this device will rely on your secure email sign-in link.'}
-                  </p>
-                </div>
-                {!isEditing && (
-                  <button
-                    type="button"
-                    onClick={() => setShowOfflinePinForm((prev) => !prev)}
-                    className="press-scale rounded-[var(--radius-full)] border border-rule bg-canvas-raised px-[var(--space-3)] py-[var(--space-2)] font-sans text-[length:var(--text-xs)] font-semibold text-ink-secondary"
-                  >
-                    {showOfflinePinForm ? 'Cancel' : hasOfflinePin ? 'Update PIN' : 'Add PIN'}
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {showOfflinePinForm && !isEditing && (
-              <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2">
-                <div>
-                  <label className="flex items-center gap-[var(--space-1)] font-sans text-[length:var(--text-xs)] font-semibold tracking-[0.15em] uppercase text-ink-tertiary mb-[var(--space-2)]">
-                    <Lock className="w-4 h-4 text-ink-faint" />
-                    New PIN
-                  </label>
-                  <input
-                    type="password"
-                    value={offlinePin}
-                    onChange={(e) => setOfflinePinValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    inputMode="numeric"
-                    maxLength={4}
-                    className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-mono text-[length:var(--text-base)] tracking-[0.3em] text-center text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)]"
-                    placeholder="••••"
-                  />
-                </div>
-                <div>
-                  <label className="flex items-center gap-[var(--space-1)] font-sans text-[length:var(--text-xs)] font-semibold tracking-[0.15em] uppercase text-ink-tertiary mb-[var(--space-2)]">
-                    <Lock className="w-4 h-4 text-ink-faint" />
-                    Confirm PIN
-                  </label>
-                  <input
-                    type="password"
-                    value={confirmOfflinePin}
-                    onChange={(e) =>
-                      setConfirmOfflinePin(e.target.value.replace(/\D/g, '').slice(0, 4))
-                    }
-                    inputMode="numeric"
-                    maxLength={4}
-                    className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-mono text-[length:var(--text-base)] tracking-[0.3em] text-center text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)]"
-                    placeholder="••••"
-                  />
-                </div>
-
-                <div className="sm:col-span-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleSaveOfflinePin}
-                    disabled={isSavingOfflinePin}
-                    className="btn-premium press-scale"
-                    style={{
-                      opacity: isSavingOfflinePin ? 0.6 : 1,
-                      cursor: isSavingOfflinePin ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {isSavingOfflinePin ? 'Saving PIN...' : hasOfflinePin ? 'Update Offline PIN' : 'Save Offline PIN'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
+          <OfflinePinSection
+            hasOfflinePin={hasOfflinePin}
+            isEditing={isEditing}
+            onSavePin={setOfflinePin}
+            onPinSaved={() => setHasOfflinePin(true)}
+            showToast={showToast}
+          />
 
           {/* ============================
               SIGN OUT BUTTON
@@ -817,108 +559,16 @@ export default function ProfilePage() {
 
       {/* ============================
           SAVE BAR (when editing)
-          Keep BottomNav visible; lift save bar above nav height (80px).
           ============================ */}
       {isEditing && (
-        <div className="fixed inset-x-0 z-40 bg-canvas border-t border-rule p-[var(--space-4)] bottom-[calc(env(safe-area-inset-bottom,_0px)_+_80px)]">
-          <div className="max-w-[28rem] mx-auto flex gap-[var(--space-3)]">
-            {/* Cancel Button */}
-            <button
-              onClick={handleCancel}
-              className="press-scale shrink-0 py-[var(--space-3)] px-[var(--space-5)] rounded-[var(--radius-full)] border border-rule bg-canvas-raised text-ink-secondary font-sans text-[length:var(--text-sm)] font-semibold cursor-pointer min-h-touch transition-all duration-fast"
-            >
-              Cancel
-            </button>
-
-            {/* Save Button */}
-            <button
-              onClick={handleSave}
-              disabled={isSaving || isLoading}
-              className="btn-premium press-scale flex-1"
-              style={{
-                opacity: isSaving || isLoading ? 0.6 : 1,
-                cursor: isSaving || isLoading ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {isSaving ? (
-                <span className="flex items-center justify-center gap-[var(--space-2)]">
-                  <span className="w-4 h-4 border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite]" />
-                  Saving...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-[var(--space-2)]">
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-}
-
-// ============================================
-// Profile Field Component
-// ============================================
-
-interface ProfileFieldProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  isEditing: boolean;
-  onChange: (value: string) => void;
-  type?: 'text' | 'email' | 'tel' | 'number';
-  min?: number;
-  max?: number;
-  step?: number;
-  disabled?: boolean;
-  hint?: string;
-}
-
-function ProfileField({
-  icon,
-  label,
-  value,
-  isEditing,
-  onChange,
-  type = 'text',
-  min,
-  max,
-  step,
-  disabled = false,
-  hint,
-}: ProfileFieldProps) {
-  return (
-    <div>
-      <label className="flex items-center gap-[var(--space-1)] font-sans text-[length:var(--text-xs)] font-semibold tracking-[0.15em] uppercase text-ink-tertiary mb-[var(--space-2)]">
-        <span className="text-ink-faint">{icon}</span>
-        {label}
-      </label>
-      {isEditing ? (
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          readOnly={disabled}
-          className="w-full py-[var(--space-2)] px-[var(--space-3)] rounded-[var(--radius-md)] border border-rule bg-canvas-raised font-sans text-[length:var(--text-base)] text-ink outline-none transition-[border-color,box-shadow] duration-fast box-border focus:border-masters focus:shadow-[var(--shadow-focus)] disabled:cursor-not-allowed disabled:bg-[var(--surface)] disabled:text-ink-secondary"
+        <ProfileEditSaveBar
+          isSaving={isSaving}
+          isLoading={isLoading}
+          onSave={handleSave}
+          onCancel={handleCancel}
         />
-      ) : (
-        <p className="font-sans text-[length:var(--text-base)] text-ink m-0 leading-[1.5]">
-          {value || '\u2014'}
-        </p>
       )}
-      {hint && (
-        <p className="font-sans text-[length:var(--text-xs)] text-ink-tertiary m-0 mt-[var(--space-1)] leading-[1.4]">
-          {hint}
-        </p>
-      )}
+
     </div>
   );
 }

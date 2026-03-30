@@ -15,6 +15,7 @@ import {
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import {
   CalendarDays,
@@ -27,8 +28,8 @@ import {
 
 export default function MessagesPage() {
   const router = useRouter();
-  const { currentTrip, players, sessions } = useTripStore();
-  const { isCaptainMode, showToast } = useUIStore();
+  const { currentTrip, players, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions })));
+  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [showComposer, setShowComposer] = useState(false);

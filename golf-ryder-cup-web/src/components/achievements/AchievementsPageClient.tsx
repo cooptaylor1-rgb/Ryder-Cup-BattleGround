@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { loadTripAchievementSummary, type TripAchievement, type TripAchievementIcon } from '@/lib/services/achievementService';
 import { useTripStore, useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { createLogger } from '@/lib/utils/logger';
 import { PageHeader } from '@/components/layout';
@@ -44,8 +45,8 @@ const ICONS: Record<TripAchievementIcon, ComponentType<LucideProps>> = {
 
 export default function AchievementsPageClient() {
   const router = useRouter();
-  const { currentTrip } = useTripStore();
-  const { showToast } = useUIStore();
+  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [achievements, setAchievements] = useState<TripAchievement[]>([]);
   const [isLoading, setIsLoading] = useState(true);

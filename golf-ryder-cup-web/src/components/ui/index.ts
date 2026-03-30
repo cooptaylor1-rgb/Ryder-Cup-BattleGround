@@ -86,7 +86,7 @@ export {
 export {
   EmptyState,
   EmptyStatePremium,
-  NoTripsEmpty,
+  NoTournamentsEmpty,
   NoMatchesEmpty,
   NoSessionsEmpty,
   NoPlayersEmpty,
@@ -112,16 +112,7 @@ export {
   type BreadcrumbProps,
 } from './Breadcrumb';
 
-// Legacy alias (still actively used by TournamentList)
-export { NoTripsEmpty as NoTournamentsEmpty } from './EmptyState';
 
-// Premium aliases (still actively used by 5 pages — migrate to direct names when convenient)
-export { NoMatchesEmpty as NoMatchesPremiumEmpty } from './EmptyState';
-export { NoSessionsEmpty as NoSessionsPremiumEmpty } from './EmptyState';
-export { NoPlayersEmpty as NoPlayersPremiumEmpty } from './EmptyState';
-export { NoStandingsEmpty as NoStandingsPremiumEmpty } from './EmptyState';
-export { NoCoursesEmpty as NoCoursesPremiumEmpty } from './EmptyState';
-export { NoScoresEmpty as NoScoresPremiumEmpty } from './EmptyState';
 
 // Golf illustrations
 export {
@@ -164,15 +155,11 @@ export { CaptainToggle } from './CaptainToggle';
 
 // Phase 4: Polish & Delight
 export {
-  Skeleton as SkeletonLoader,
-  MatchCardSkeleton as MatchCardSkeletonV2,
   ScoreCardSkeleton,
   LeaderboardSkeleton,
   PlayerCardSkeleton,
   StatsSkeleton,
-  PhotoGridSkeleton as PhotoGridSkeletonV2,
   ActivityFeedSkeleton,
-  PageSkeleton as PageSkeletonV2,
   SkeletonWrapper,
 } from './SkeletonLoaders';
 

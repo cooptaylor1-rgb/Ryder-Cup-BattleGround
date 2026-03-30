@@ -4,18 +4,13 @@
  * Auto-generates banter posts when dramatic scoring events happen.
  * Posts appear in the social feed alongside player-written messages.
  *
- * Dramatic triggers:
- * - Match won / halved
- * - Lead change
- * - All square late (hole 16+)
- * - Dormie
- * - Streak (3+ holes won in a row)
- * - Cup lead change
+ * Uses shared detection logic from dramaMomentDetection.ts.
  */
 
 import { db } from '../db';
 import type { MatchState } from '../types/computed';
 import type { BanterPost, UUID } from '../types/models';
+import { detectDramaMoments, type AnyDramaMoment } from './dramaMomentDetection';
 
 // ============================================
 // TYPES
@@ -46,7 +41,10 @@ export async function generateTrashTalk(ctx: TrashTalkContext): Promise<void> {
   const now = Date.now();
   if (now - lastPostTime < THROTTLE_MS) return;
 
-  const message = pickTrashTalkMessage(ctx);
+  const moments = detectDramaMoments(ctx);
+  if (moments.length === 0) return;
+
+  const message = pickMessageForMoment(moments[0], ctx);
   if (!message) return;
 
   lastPostTime = now;
@@ -57,7 +55,7 @@ export async function generateTrashTalk(ctx: TrashTalkContext): Promise<void> {
     content: message,
     authorName: 'Ryder Cup HQ',
     postType: 'result',
-    emoji: pickEmoji(ctx),
+    emoji: pickEmoji(moments[0]),
     relatedMatchId: ctx.newState.match.id,
     timestamp: new Date().toISOString(),
   };
@@ -73,47 +71,25 @@ export async function generateTrashTalk(ctx: TrashTalkContext): Promise<void> {
 // MESSAGE SELECTION
 // ============================================
 
-function pickTrashTalkMessage(ctx: TrashTalkContext): string | null {
-  const { previousState, newState, holeNumber, teamANames, teamBNames } = ctx;
+function pickMessageForMoment(moment: AnyDramaMoment, ctx: TrashTalkContext): string | null {
+  const { teamANames, teamBNames, holeNumber } = ctx;
 
-  // 1. Match completed
-  if (previousState.status !== 'completed' && newState.status === 'completed') {
-    if (newState.winningTeam === 'halved') {
+  switch (moment.type) {
+    case 'match-halved':
       return pickRandom(halvedMessages(teamANames, teamBNames));
-    }
-    const winner = newState.winningTeam === 'teamA' ? teamANames : teamBNames;
-    const loser = newState.winningTeam === 'teamA' ? teamBNames : teamANames;
-    return pickRandom(matchWonMessages(winner, loser, newState.displayScore));
+    case 'match-won':
+      return pickRandom(matchWonMessages(moment.winnerNames!, moment.loserNames!, moment.displayScore));
+    case 'lead-change':
+      return pickRandom(leadChangeMessages(moment.newLeaderNames, moment.prevLeaderNames, holeNumber));
+    case 'all-square-late':
+      return pickRandom(allSquareLateMessages(teamANames, teamBNames, holeNumber));
+    case 'dormie':
+      return pickRandom(dormieMessages(moment.leaderNames, moment.trailerNames, moment.holesRemaining));
+    case 'dominant':
+      return pickRandom(dominantMessages(moment.dominantNames, moment.lead));
+    case 'cup-lead-change':
+      return null; // Cup lead changes don't generate trash talk
   }
-
-  // 2. Lead change
-  const prevLeading = previousState.currentScore > 0 ? 'teamA' : previousState.currentScore < 0 ? 'teamB' : null;
-  const newLeading = newState.currentScore > 0 ? 'teamA' : newState.currentScore < 0 ? 'teamB' : null;
-  if (prevLeading && newLeading && prevLeading !== newLeading) {
-    const newLeader = newLeading === 'teamA' ? teamANames : teamBNames;
-    const prevLeader = prevLeading === 'teamA' ? teamANames : teamBNames;
-    return pickRandom(leadChangeMessages(newLeader, prevLeader, holeNumber));
-  }
-
-  // 3. All square late (16+)
-  if (newState.currentScore === 0 && holeNumber >= 16 && previousState.currentScore !== 0) {
-    return pickRandom(allSquareLateMessages(teamANames, teamBNames, holeNumber));
-  }
-
-  // 4. Dormie
-  if (newState.isDormie && !previousState.isDormie) {
-    const leader = newState.winningTeam === 'teamA' ? teamANames : teamBNames;
-    const trailer = newState.winningTeam === 'teamA' ? teamBNames : teamANames;
-    return pickRandom(dormieMessages(leader, trailer, newState.holesRemaining));
-  }
-
-  // 5. 3+ up (dominant performance)
-  if (Math.abs(newState.currentScore) >= 3 && Math.abs(previousState.currentScore) < 3) {
-    const dominant = newState.currentScore > 0 ? teamANames : teamBNames;
-    return pickRandom(dominantMessages(dominant, Math.abs(newState.currentScore)));
-  }
-
-  return null;
 }
 
 // ============================================
@@ -178,13 +154,19 @@ function pickRandom(arr: string[]): string {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function pickEmoji(ctx: TrashTalkContext): string {
-  const { previousState, newState } = ctx;
-  if (previousState.status !== 'completed' && newState.status === 'completed') {
-    return newState.winningTeam === 'halved' ? '🤝' : '🏆';
+function pickEmoji(moment: AnyDramaMoment): string {
+  switch (moment.type) {
+    case 'match-halved':
+      return '🤝';
+    case 'match-won':
+      return '🏆';
+    case 'dormie':
+      return '😬';
+    case 'all-square-late':
+      return '⚡';
+    case 'dominant':
+      return '🔥';
+    default:
+      return '⛳';
   }
-  if (newState.isDormie && !previousState.isDormie) return '😬';
-  if (newState.currentScore === 0) return '⚡';
-  if (Math.abs(newState.currentScore) >= 3) return '🔥';
-  return '⛳';
 }

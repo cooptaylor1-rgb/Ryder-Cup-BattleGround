@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 
 import type { PlayerImportRow } from '@/lib/types/captain';
 import type { Player } from '@/lib/types/models';
@@ -41,5 +40,5 @@ export function generatePlayerId(): string {
     return crypto.randomUUID();
   }
 
-  return uuidv4();
+  return crypto.randomUUID();
 }

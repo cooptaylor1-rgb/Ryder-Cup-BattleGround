@@ -12,6 +12,7 @@ import { db } from '@/lib/db';
 import { loadTripAchievementSummary } from '@/lib/services/achievementService';
 import { countActiveTripStatCategories } from '@/lib/services/tripStatsBoardService';
 import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 
 interface StatsRouteCard {
   id: string;
@@ -25,7 +26,7 @@ interface StatsRouteCard {
 
 export default function StatsPageClient() {
   const router = useRouter();
-  const { currentTrip: activeTrip, players } = useTripStore();
+  const { currentTrip: activeTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
   const [achievementSummary, setAchievementSummary] = useState({ unlockedCount: 0, totalCount: 0 });
 
   const tripStats = useLiveQuery(

@@ -7,7 +7,7 @@
  * NOTE: All courses are automatically synced to Supabase when online.
  */
 
-import { v4 as uuidv4 } from 'uuid';
+
 import { db } from '../db';
 import type { Course, TeeSet } from '../types/models';
 import type { CourseProfile, TeeSetProfile } from '../types/courseProfile';
@@ -61,7 +61,7 @@ export async function createCourseProfile(
     source: 'user' | 'ocr' | 'api' | 'import' = 'user'
 ): Promise<CourseProfile> {
     const now = new Date().toISOString();
-    const profileId = uuidv4();
+    const profileId = crypto.randomUUID();
 
     const profile: CourseProfile = {
         id: profileId,
@@ -83,7 +83,7 @@ export async function createCourseProfile(
     };
 
     const teeSetProfiles: TeeSetProfile[] = (teeSets || []).map((ts) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         courseProfileId: profileId,
         name: ts.name,
         color: ts.color,
@@ -146,7 +146,7 @@ export async function addTeeSetProfile(
 ): Promise<TeeSetProfile> {
     const now = new Date().toISOString();
     const teeSet: TeeSetProfile = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         courseProfileId,
         name: data.name,
         color: data.color,
@@ -191,7 +191,7 @@ export async function deleteTeeSetProfile(id: string): Promise<void> {
  */
 export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Promise<CourseProfile> {
     const now = new Date().toISOString();
-    const profileId = uuidv4();
+    const profileId = crypto.randomUUID();
 
     const profile: CourseProfile = {
         id: profileId,
@@ -208,7 +208,7 @@ export async function saveCourseToLibrary(course: Course, teeSets: TeeSet[]): Pr
     };
 
     const teeSetProfiles: TeeSetProfile[] = teeSets.map((ts) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         courseProfileId: profileId,
         name: ts.name,
         color: ts.color,
@@ -253,7 +253,7 @@ export async function createCourseFromProfile(
 
     const teeSetProfiles = await getTeeSetProfiles(profileId);
     const now = new Date().toISOString();
-    const courseId = uuidv4();
+    const courseId = crypto.randomUUID();
 
     const course: Course = {
         id: courseId,
@@ -264,7 +264,7 @@ export async function createCourseFromProfile(
     };
 
     const teeSets: TeeSet[] = teeSetProfiles.map((tsp) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         courseId,
         name: tsp.name,
         color: tsp.color,

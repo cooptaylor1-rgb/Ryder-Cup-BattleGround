@@ -7,6 +7,7 @@ import { Medal, Plus, ScrollText } from 'lucide-react';
 import { db } from '@/lib/db';
 import { getSuggestedAwards, giveAward, incrementStat, recordStat } from '@/lib/services/tripStatsService';
 import { useUIStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Match, Player } from '@/lib/types/models';
 import {
   AWARD_DEFINITIONS,
@@ -44,7 +45,7 @@ export function MatchTripMomentsPanel({
   players,
   recordedByPlayerId,
 }: MatchTripMomentsPanelProps) {
-  const { showToast } = useUIStore();
+  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(
     recordedByPlayerId && players.some((player) => player.id === recordedByPlayerId)
       ? recordedByPlayerId
