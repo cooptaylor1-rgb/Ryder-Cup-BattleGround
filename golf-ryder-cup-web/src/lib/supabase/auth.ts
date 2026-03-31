@@ -98,12 +98,12 @@ export async function requestEmailSignInLink(
   redirectPath: string = buildMagicLinkRedirectPath('/login')
 ): Promise<void> {
   if (!supabase) {
-    throw new Error('Supabase is not configured');
+    throw new Error('Cloud sign-in is temporarily unavailable. Your data is still saved locally.');
   }
 
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) {
-    throw new Error('Email is required');
+    throw new Error('Please enter your email address.');
   }
 
   const emailRedirectTo =
@@ -121,7 +121,7 @@ export async function requestEmailSignInLink(
 
   if (error) {
     authLogger.warn('Failed to request Supabase email sign-in link:', error);
-    throw new Error(error.message || 'Failed to send sign-in link');
+    throw new Error('Couldn\'t send the sign-in link. Check your email address and try again.');
   }
 }
 
@@ -154,7 +154,7 @@ export async function completeSupabaseAuthFromUrl(
       authLogger.warn('Failed to exchange Supabase auth code:', error);
       return {
         status: 'error',
-        message: error.message || 'This sign-in link is invalid or expired.',
+        message: 'This sign-in link has expired. Please request a new one from the login page.',
       };
     }
 
@@ -176,7 +176,7 @@ export async function completeSupabaseAuthFromUrl(
       authLogger.warn('Failed to verify Supabase OTP:', error);
       return {
         status: 'error',
-        message: error.message || 'This sign-in link is invalid or expired.',
+        message: 'This sign-in link has expired. Please request a new one from the login page.',
       };
     }
 
@@ -198,7 +198,7 @@ export async function completeSupabaseAuthFromUrl(
       authLogger.warn('Failed to restore Supabase session from callback hash:', error);
       return {
         status: 'error',
-        message: error.message || 'This sign-in link is invalid or expired.',
+        message: 'This sign-in link has expired. Please request a new one from the login page.',
       };
     }
 

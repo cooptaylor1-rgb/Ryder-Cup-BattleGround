@@ -103,7 +103,7 @@ export function ScoreCelebration({
                 setIsVisible(false);
                 setTimeout(() => {
                     onComplete?.();
-                }, 300); // Wait for exit animation
+                }, 150); // Brief exit fade — keep scoring responsive
             }, duration);
 
             return () => clearTimeout(timer);
@@ -112,10 +112,37 @@ export function ScoreCelebration({
 
     if (!show && !isVisible) return null;
 
+    // Build accessible announcement for screen readers
+    const ariaAnnouncement = (() => {
+        switch (type) {
+            case 'holeWon':
+                return `${teamName ?? 'Team'} wins hole ${holeNumber ?? ''}`;
+            case 'holeLost':
+                return `Hole ${holeNumber ?? ''} lost`;
+            case 'holeHalved':
+                return `Hole ${holeNumber ?? ''} halved`;
+            case 'matchWon':
+                return `${teamName ?? 'Team'} wins the match${finalScore ? ` ${finalScore}` : ''}`;
+            case 'matchLost':
+                return `Match lost${finalScore ? ` ${finalScore}` : ''}`;
+            case 'matchHalved':
+                return `Match halved${finalScore ? ` ${finalScore}` : ''}`;
+            default:
+                return '';
+        }
+    })();
+
+    // Screen reader announcement — rendered for all celebration types
+    const ariaLiveRegion = (
+        <div role="status" aria-live="assertive" className="sr-only">
+            {ariaAnnouncement}
+        </div>
+    );
+
     // Hole Won Celebration
     if (type === 'holeWon') {
         return (
-            <AnimatePresence>
+            <>{ariaLiveRegion}<AnimatePresence>
                 {isVisible && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -199,13 +226,14 @@ export function ScoreCelebration({
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence></>
         );
     }
 
     // Hole Halved Celebration
     if (type === 'holeHalved') {
         return (
+            <>{ariaLiveRegion}
             <AnimatePresence>
                 {isVisible && (
                     <motion.div
@@ -227,13 +255,14 @@ export function ScoreCelebration({
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence></>
         );
     }
 
     // Match Won Celebration (the big one!)
     if (type === 'matchWon') {
         return (
+            <>{ariaLiveRegion}
             <AnimatePresence>
                 {isVisible && (
                     <motion.div
@@ -346,14 +375,14 @@ export function ScoreCelebration({
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence></>
         );
     }
 
     // Match Halved
     if (type === 'matchHalved') {
         return (
-            <AnimatePresence>
+            <>{ariaLiveRegion}<AnimatePresence>
                 {isVisible && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -381,13 +410,14 @@ export function ScoreCelebration({
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence></>
         );
     }
 
     // Hole Lost (subtle feedback)
     if (type === 'holeLost') {
         return (
+            <>{ariaLiveRegion}
             <AnimatePresence>
                 {isVisible && (
                     <motion.div
@@ -413,7 +443,7 @@ export function ScoreCelebration({
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence></>
         );
     }
 

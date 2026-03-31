@@ -480,12 +480,16 @@ export function useMatchScoringPageActions(
   const handleExportSummary = useCallback(() => {
     if (!matchState) return;
 
+    const matchUrl = activeMatch
+      ? `${window.location.origin}/score/${activeMatch.id}`
+      : undefined;
     const summaryText = buildMatchSummaryText({
       matchState,
       teamAName: model.teamAName,
       teamBName: model.teamBName,
       teamAPlayers: model.teamAPlayers,
       teamBPlayers: model.teamBPlayers,
+      matchUrl,
     });
     const printable = buildPrintableMatchSummary({
       matchState,
@@ -504,16 +508,20 @@ export function useMatchScoringPageActions(
 
   const handleShareResult = useCallback(() => {
     if (!matchState) return;
+    const matchUrl = activeMatch
+      ? `${window.location.origin}/score/${activeMatch.id}`
+      : undefined;
     const shareText = buildMatchResultShareText({
       matchState,
       teamAName: model.teamAName,
       teamBName: model.teamBName,
       teamALineup: model.teamALineup,
       teamBLineup: model.teamBLineup,
+      matchUrl,
     });
 
     if (navigator.share) {
-      void navigator.share({ text: shareText });
+      void navigator.share({ text: shareText, url: matchUrl });
       return;
     }
 

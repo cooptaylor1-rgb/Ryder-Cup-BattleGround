@@ -66,12 +66,12 @@ export function LivePageSections({
     onGoToMatchups,
 }: LivePageSectionsProps) {
     const controlButtonClass =
-        'min-h-11 min-w-11 rounded-[1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.74)] p-2.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]';
+        'min-h-11 min-w-11 rounded-[1rem] border border-[var(--rule)] bg-[color:var(--surface-raised)]/74 p-2.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]';
 
     return (
         <main className="container-editorial py-6">
             {activeSession ? (
-                <section className="mb-[var(--space-6)] overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,244,237,0.94))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+                <section className="mb-[var(--space-6)] overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--canvas)_84%,transparent),color-mix(in_srgb,var(--canvas-sunken)_94%,transparent))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
                     <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
                         <div className="flex items-start justify-between gap-[var(--space-4)]">
                             <div className="min-w-0">
@@ -263,13 +263,13 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
 
     return (
         <div
-            className={`overflow-hidden rounded-[1.75rem] border bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,244,237,0.94))] transition-all duration-500 ${
+            className={`overflow-hidden rounded-[1.75rem] border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface-raised)_86%,transparent),color-mix(in_srgb,var(--canvas-sunken)_94%,transparent))] transition-all duration-500 ${
                 isFlashing
                     ? 'scale-[1.02] border-[var(--masters)] shadow-[0_18px_36px_rgba(22,101,52,0.2)]'
                     : 'border-[var(--rule)] shadow-[0_12px_30px_rgba(46,34,18,0.06)]'
             }`}
         >
-            <div className="flex items-center justify-between border-b border-[var(--rule)] bg-[rgba(255,255,255,0.7)] px-4 py-3">
+            <div className="flex items-center justify-between border-b border-[var(--rule)] bg-[color:var(--surface-raised)]/70 px-4 py-3">
                 <span className="type-overline text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
                 <span
                     className={
@@ -289,7 +289,7 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
             </div>
 
             <div className="px-4 pt-4">
-                <div className="rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] text-center">
+                <div className="rounded-[1.25rem] border border-[var(--rule)] bg-[color:var(--surface-raised)]/72 px-[var(--space-4)] py-[var(--space-4)] text-center">
                     <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
                         {state?.status === 'completed' ? 'Final Margin' : 'Current Margin'}
                     </p>
@@ -313,7 +313,7 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
                     className={`mb-3 flex items-center justify-between rounded-[1rem] border px-4 py-3 transition-all ${
                         isTeamAWinning
                             ? 'border-[color:var(--team-usa)]/18 bg-[color:var(--team-usa)]/12'
-                            : 'border-[var(--rule)] bg-[rgba(255,255,255,0.62)]'
+                            : 'border-[var(--rule)] bg-[color:var(--surface-raised)]/62'
                     }`}
                 >
                     <div className="flex items-center gap-3">
@@ -341,7 +341,7 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
                     className={`flex items-center justify-between rounded-[1rem] border px-4 py-3 transition-all ${
                         isTeamBWinning
                             ? 'border-[color:var(--team-europe)]/18 bg-[color:var(--team-europe)]/12'
-                            : 'border-[var(--rule)] bg-[rgba(255,255,255,0.62)]'
+                            : 'border-[var(--rule)] bg-[color:var(--surface-raised)]/62'
                     }`}
                 >
                     <div className="flex items-center gap-3">
@@ -413,7 +413,7 @@ function LiveStatusPill({ connected, label }: { connected: boolean; label: strin
             className="inline-flex items-center gap-[var(--space-2)] rounded-full border px-[var(--space-3)] py-[var(--space-2)]"
             style={{
                 borderColor: connected ? 'rgba(22,163,74,0.2)' : 'var(--rule)',
-                background: connected ? 'rgba(22,163,74,0.08)' : 'rgba(255,255,255,0.68)',
+                background: connected ? 'rgba(22,163,74,0.08)' : 'color-mix(in srgb, var(--surface-raised) 68%, transparent)',
             }}
             title={connected ? 'Live — connected' : 'Offline — using cached data'}
         >
@@ -445,7 +445,7 @@ function LiveFactCard({
     valueClassName?: string;
 }) {
     return (
-        <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] px-[var(--space-4)] py-[var(--space-3)]">
+        <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[color:var(--surface-raised)]/68 px-[var(--space-4)] py-[var(--space-3)]">
             <div className="flex items-center gap-[var(--space-2)] text-[var(--masters)]">
                 {icon}
                 <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
