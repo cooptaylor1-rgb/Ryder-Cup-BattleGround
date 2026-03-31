@@ -5631,15 +5631,11 @@ html.dark body {
 }
 
 
-
-
-
 /* === iOS VISUAL HAPTIC FEEDBACK SYSTEM ===
    Since iOS Safari doesn't support Vibration API,
    we provide rich visual feedback that feels tactile.
    These animations simulate the feel of haptic responses.
    ============================================ */
-
 
 /* --- Score Point Feedback (satisfying double-pulse) --- */
 @keyframes haptic-score-point {
@@ -5941,9 +5937,6 @@ html.dark body {
 }
 
 
-
-
-
 /* --- iOS Blur Backdrop --- */
 @keyframes ios-backdrop-in {
   0% {
@@ -5960,12 +5953,6 @@ html.dark body {
   animation: ios-backdrop-in var(--ios-duration-fast) var(--ios-ease-out) forwards;
 }
 
-
-
-
-
-
-
 /* --- Scrollbar Hide (iOS-like) --- */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -5975,10 +5962,6 @@ html.dark body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
-
-
-
 
 
 
