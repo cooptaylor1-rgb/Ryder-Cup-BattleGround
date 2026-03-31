@@ -184,8 +184,9 @@ export async function incrementCourseUsage(courseId: string): Promise<void> {
 
   try {
     if (typeof supabase?.rpc === 'function') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: rpcError } = await (supabase.rpc as any)('increment_course_usage', {
+      // Supabase SDK doesn't generate types for custom RPC functions
+      // @ts-expect-error -- increment_course_usage is a custom Postgres function
+      const { error: rpcError } = await supabase.rpc('increment_course_usage', {
         course_id: courseId,
       });
 

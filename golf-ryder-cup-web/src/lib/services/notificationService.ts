@@ -506,13 +506,6 @@ export function getPendingNotificationCount(): number {
 }
 
 /**
- * Get all scheduled notifications for a trip
- */
-export function getTripNotifications(tripId: string): ScheduledNotification[] {
-  return scheduledNotifications.filter((n) => n.tripId === tripId && !n.sent);
-}
-
-/**
  * Cleanup notification service
  * Should be called on app unmount to prevent memory leaks
  */
