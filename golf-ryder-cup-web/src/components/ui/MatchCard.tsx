@@ -7,6 +7,7 @@
 
 'use client';
 
+import React from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
@@ -21,7 +22,7 @@ interface MatchCardProps {
     onClick?: () => void;
 }
 
-export function MatchCard({
+export const MatchCard = React.memo(function MatchCard({
     matchState,
     teamAPlayers,
     teamBPlayers,
@@ -152,6 +153,6 @@ export function MatchCard({
             </div>
         </div>
     );
-}
+});
 
 export default MatchCard;

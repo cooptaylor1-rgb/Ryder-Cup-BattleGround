@@ -108,20 +108,28 @@ const DEFAULT_COORDS = { lat: 33.5021, lng: -82.0241 };
 // WEATHER ICON MAPPING
 // ============================================
 
+const DAY_ICON_MAP: Record<string, string> = {
+    'sun': '☀️',
+    'cloud-sun': '⛅',
+    'cloud-moon': '🌙',
+    'cloud': '☁️',
+    'cloud-rain': '🌧️',
+    'cloud-drizzle': '🌦️',
+    'cloud-snow': '❄️',
+    'cloud-lightning': '⛈️',
+    'cloud-fog': '🌫️',
+    'cloud-hail': '🌨️',
+};
+
+const NIGHT_ICON_MAP: Record<string, string> = {
+    ...DAY_ICON_MAP,
+    'sun': '🌙',
+    'cloud-sun': '☁️',
+};
+
 function getWeatherIcon(iconName: string, isDay: boolean = true): string {
-    const iconMap: Record<string, string> = {
-        'sun': isDay ? '☀️' : '🌙',
-        'cloud-sun': isDay ? '⛅' : '☁️',
-        'cloud-moon': '🌙',
-        'cloud': '☁️',
-        'cloud-rain': '🌧️',
-        'cloud-drizzle': '🌦️',
-        'cloud-snow': '❄️',
-        'cloud-lightning': '⛈️',
-        'cloud-fog': '🌫️',
-        'cloud-hail': '🌨️',
-    };
-    return iconMap[iconName] || '☁️';
+    const map = isDay ? DAY_ICON_MAP : NIGHT_ICON_MAP;
+    return map[iconName] || '☁️';
 }
 
 // ============================================

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import type { ReactNode } from 'react';
 import { EmptyStatePremium } from '@/components/ui';
 import { Clock3, Flag, Maximize2, RefreshCw, Volume2, VolumeX, Wifi, WifiOff } from 'lucide-react';
@@ -226,7 +227,7 @@ interface LiveMatchCardProps {
     isFlashing?: boolean;
 }
 
-function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardProps) {
+const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardProps) {
     const teamAPlayers = match.teamAPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
     const teamBPlayers = match.teamBPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
 
@@ -404,7 +405,7 @@ function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardPro
             ) : null}
         </div>
     );
-}
+});
 
 function LiveStatusPill({ connected, label }: { connected: boolean; label: string }) {
     return (

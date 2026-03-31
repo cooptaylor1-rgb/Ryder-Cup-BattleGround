@@ -286,6 +286,9 @@ async function serveOfflinePage() {
 /**
  * Safely cache responses
  */
+// Maximum entries per cache to prevent unbounded growth on long sessions
+const MAX_CACHE_ENTRIES = 500;
+
 async function putInCache(cacheName, request, response) {
   // Response should already be cloned before calling this function
   if (!response || !response.ok) {
@@ -294,6 +297,16 @@ async function putInCache(cacheName, request, response) {
 
   try {
     const cache = await caches.open(cacheName);
+
+    // Evict oldest entries if cache is too large (FIFO)
+    const keys = await cache.keys();
+    if (keys.length >= MAX_CACHE_ENTRIES) {
+      const evictCount = keys.length - MAX_CACHE_ENTRIES + 1;
+      for (let i = 0; i < evictCount; i++) {
+        await cache.delete(keys[i]);
+      }
+    }
+
     // Response passed in should already be a clone
     await cache.put(request, response);
   } catch (error) {

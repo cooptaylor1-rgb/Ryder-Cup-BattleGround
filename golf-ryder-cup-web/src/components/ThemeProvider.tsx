@@ -15,6 +15,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { theme, setTheme, autoTheme, accentTheme } = useUIStore(useShallow(s => ({ theme: s.theme, setTheme: s.setTheme, autoTheme: s.autoTheme, accentTheme: s.accentTheme })));
 
   // Apply theme on mount and when it changes
+  // Apply theme on mount and toggle auto-theme interval.
+  // Only depend on autoTheme — setTheme is a stable Zustand action ref,
+  // and including theme caused the interval to restart on every theme change.
   useEffect(() => {
     if (!autoTheme) {
       setTheme(theme);
@@ -30,7 +33,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     applyAutoTheme();
     const intervalId = setInterval(applyAutoTheme, 10 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [theme, setTheme, autoTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoTheme]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;

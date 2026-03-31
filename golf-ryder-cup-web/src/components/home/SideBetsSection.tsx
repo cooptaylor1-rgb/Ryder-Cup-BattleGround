@@ -5,6 +5,7 @@
  */
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, DollarSign, Trophy, Target, Ruler, CircleDot, Zap } from 'lucide-react';
 import type { SideBet } from '@/lib/types/models';
@@ -118,7 +119,7 @@ interface SideBetRowProps {
     icon: React.ReactNode;
 }
 
-function SideBetRow({ type, status, icon }: SideBetRowProps) {
+const SideBetRow = React.memo(function SideBetRow({ type, status, icon }: SideBetRowProps) {
     return (
         <Link
             href="/bets"
@@ -140,4 +141,4 @@ function SideBetRow({ type, status, icon }: SideBetRowProps) {
             <ChevronRight size={16} style={{ color: 'var(--ink-tertiary)' }} />
         </Link>
     );
-}
+});

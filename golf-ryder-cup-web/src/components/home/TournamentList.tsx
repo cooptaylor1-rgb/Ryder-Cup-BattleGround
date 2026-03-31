@@ -5,6 +5,7 @@
  */
 'use client';
 
+import React from 'react';
 import { Trophy, MapPin, Calendar, ChevronRight, Plus } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { NoTournamentsEmpty } from '@/components/ui';
@@ -88,7 +89,7 @@ interface TournamentCardProps {
     onSelect: (tripId: string) => void;
 }
 
-function TournamentCard({ trip, index, onSelect }: TournamentCardProps) {
+const TournamentCard = React.memo(function TournamentCard({ trip, index, onSelect }: TournamentCardProps) {
     return (
         <button
             onClick={() => onSelect(trip.id)}
@@ -147,4 +148,4 @@ function TournamentCard({ trip, index, onSelect }: TournamentCardProps) {
             />
         </button>
     );
-}
+});

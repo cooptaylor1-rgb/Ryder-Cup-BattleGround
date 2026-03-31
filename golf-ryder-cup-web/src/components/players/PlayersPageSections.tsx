@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Edit2, Mail, Trash2 } from 'lucide-react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
@@ -148,7 +149,7 @@ export function RosterSectionCard({
   );
 }
 
-function RosterPlayerRow({
+const RosterPlayerRow = React.memo(function RosterPlayerRow({
   player,
   tone,
   canEdit,
@@ -219,4 +220,4 @@ function RosterPlayerRow({
       ) : null}
     </div>
   );
-}
+});

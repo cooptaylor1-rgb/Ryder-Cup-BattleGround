@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
@@ -30,7 +30,7 @@ export interface PlayerCheckInCardProps {
   onText?: () => void;
 }
 
-export function PlayerCheckInCard({
+export const PlayerCheckInCard = React.memo(function PlayerCheckInCard({
   player,
   onQuickCheckIn,
   onSetETA,
@@ -166,4 +166,4 @@ export function PlayerCheckInCard({
       </AnimatePresence>
     </motion.div>
   );
-}
+});

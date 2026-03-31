@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft,
@@ -340,7 +341,7 @@ function MagicNumberBanner({
     );
 }
 
-function LiveMatchCard({ match }: { match: SpectatorMatch }) {
+const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: SpectatorMatch }) {
     const scoreNum =
         match.currentScore === 'AS'
             ? 0
@@ -408,9 +409,9 @@ function LiveMatchCard({ match }: { match: SpectatorMatch }) {
             </div>
         </motion.div>
     );
-}
+});
 
-function CompletedMatchCard({ match }: { match: SpectatorMatch }) {
+const CompletedMatchCard = React.memo(function CompletedMatchCard({ match }: { match: SpectatorMatch }) {
     const result = match.result || '';
     const isHalved = result.toLowerCase() === 'halved' || result === '';
     const scoreNum =
