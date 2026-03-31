@@ -3,19 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { loadCourseDetails } from '@/lib/services/golf-course-details/golfCourseDetailsPipeline';
 import { normalizeWebsiteUrl } from '@/lib/services/golf-course-details/golfCourseDetailsShared';
 import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_DATA } from '@/lib/constants/rateLimits';
 import { apiLogger } from '@/lib/utils/logger';
 import { formatZodError, golfCourseDetailsParamsSchema } from '@/lib/validations/api';
-
-const RATE_LIMIT_CONFIG = {
-  windowMs: 60 * 1000,
-  maxRequests: 30,
-};
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
-  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_DATA);
   if (rateLimitError) {
     return rateLimitError;
   }
@@ -39,7 +35,7 @@ export async function GET(
       success: true,
       data: courseData,
     });
-    response = addRateLimitHeaders(response, request, RATE_LIMIT_CONFIG);
+    response = addRateLimitHeaders(response, request, RATE_LIMIT_DATA);
     return response;
   } catch (error) {
     apiLogger.error('Course details error:', error);

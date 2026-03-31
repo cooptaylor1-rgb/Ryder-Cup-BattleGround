@@ -242,7 +242,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
               </p>
               {preview && (
                 <div className="mt-4 mx-auto max-w-[200px]">
-                  <Image src={preview} alt="Preview" className="rounded-lg w-full" width={200} height={150} unoptimized />
+                  <Image src={preview} alt="Preview" className="rounded-lg w-full" width={200} height={150} unoptimized loading="lazy" />
                 </div>
               )}
             </div>

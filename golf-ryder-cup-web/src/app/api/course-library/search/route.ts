@@ -6,14 +6,12 @@ import {
 } from '@/lib/services/courseLibrarySyncService';
 import { apiLogger } from '@/lib/utils/logger';
 import { applyRateLimitAsync } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_SEARCH } from '@/lib/constants/rateLimits';
 import {
   courseLibrarySearchSchema,
   courseLibraryGetSchema,
   formatZodError,
 } from '@/lib/validations/api';
-
-// Rate limit: 60 requests per minute for search operations
-const RATE_LIMIT_CONFIG = { maxRequests: 60, windowMs: 60000 };
 
 /**
  * COURSE LIBRARY SEARCH API
@@ -41,7 +39,7 @@ interface SearchResult {
  */
 export async function GET(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_SEARCH);
   if (rateLimitError) return rateLimitError;
 
   const { searchParams } = new URL(request.url);
@@ -104,7 +102,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_SEARCH);
   if (rateLimitError) return rateLimitError;
 
   try {

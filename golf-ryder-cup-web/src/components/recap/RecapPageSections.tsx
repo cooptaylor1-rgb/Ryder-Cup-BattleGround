@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { EmptyStatePremium } from '@/components/ui';
+import { stripHtml } from '@/lib/utils/sanitize';
 import type { FunStatHighlight, TripHighlight, TripRecapData } from '@/lib/services/recapService';
 
 export type RecapSection = 'overview' | 'leaderboard' | 'matches' | 'stats' | 'banter' | 'photos';
@@ -313,7 +314,7 @@ export function BanterSection({ recap }: { recap: TripRecapData }) {
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium">{post.authorName}</div>
-              <p className="text-sm text-[var(--ink-secondary)] mt-1">{post.content}</p>
+              <p className="text-sm text-[var(--ink-secondary)] mt-1">{stripHtml(post.content)}</p>
               {post.reactionCount > 0 ? (
                 <div className="flex items-center gap-1 mt-2 text-xs text-[var(--ink-tertiary)]">
                   <Zap size={12} />

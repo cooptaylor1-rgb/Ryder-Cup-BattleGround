@@ -196,6 +196,184 @@ describe('scoringEngine command flows', () => {
     expect(stored?.id).toBe(match.id);
   });
 
+  it('rejects invalid hole numbers', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    await expect(recordHoleResult('match-1', 0, 'teamA')).rejects.toThrow('Invalid hole number');
+    await expect(recordHoleResult('match-1', 19, 'teamA')).rejects.toThrow('Invalid hole number');
+    await expect(recordHoleResult('match-1', -1, 'teamA')).rejects.toThrow('Invalid hole number');
+  });
+
+  it('returns existing result for exact duplicate score (dedup guard)', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    // Score hole 1
+    const first = await recordHoleResult('match-1', 1, 'teamA', 4, 5);
+    assertHoleResult(first);
+
+    // Score the exact same hole with same result
+    const duplicate = await recordHoleResult('match-1', 1, 'teamA', 4, 5);
+    assertHoleResult(duplicate);
+
+    // Should return the same result without creating edit history
+    expect(duplicate.id).toBe(first.id);
+    expect(duplicate.editHistory).toBeUndefined();
+
+    // Should only have 1 scoring event (not 2)
+    const events = await db.scoringEvents.where('matchId').equals('match-1').toArray();
+    expect(events.filter(e => e.eventType === 'hole_scored')).toHaveLength(1);
+  });
+
+  it('detects conflict when different user scores same hole within 30s', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    // Score hole 1 as scorer-1
+    const first = await recordHoleResult('match-1', 1, 'teamA', 4, 5, 'scorer-1');
+    assertHoleResult(first);
+
+    // Different user scores same hole within 30s with different result
+    const conflictResult = await recordHoleResult('match-1', 1, 'teamB', 5, 4, 'scorer-2');
+
+    // Should return a ScoreConflict
+    expect('type' in conflictResult && conflictResult.type).toBe('conflict');
+  });
+
+  it('allows captain override even when conflict would be detected', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    // Score hole 1 as scorer-1
+    const first = await recordHoleResult('match-1', 1, 'teamA', 4, 5, 'scorer-1');
+    assertHoleResult(first);
+
+    // Captain overrides with different result — should NOT conflict
+    const override = await recordHoleResult('match-1', 1, 'teamB', 5, 4, 'captain-1', 'captain correction', true);
+    assertHoleResult(override);
+    expect(override.winner).toBe('teamB');
+  });
+
+  it('undoLastScore returns structured UndoResult', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    // Score a hole
+    await recordHoleResult('match-1', 1, 'teamA', 4, 5, 'scorer-1');
+
+    // Undo it
+    const undoResult = await undoLastScore('match-1');
+    expect(undoResult.success).toBe(true);
+    expect(undoResult.holeNumber).toBe(1);
+    expect(undoResult.previousWinner).toBe('teamA');
+  });
+
+  it('undoLastScore returns failure for empty match', async () => {
+    await seedTripAndSession();
+    const match: Match = {
+      id: 'match-1',
+      sessionId: 'session-1',
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: isoNow(),
+      updatedAt: isoNow(),
+    };
+    await db.matches.put(match);
+
+    const undoResult = await undoLastScore('match-1');
+    expect(undoResult.success).toBe(false);
+    expect(undoResult.failureReason).toBe('no_events');
+  });
+
   it('finalizeMatch marks a closed-out match completed with the stored result and margin', async () => {
     await seedTripAndSession();
     const match: Match = {

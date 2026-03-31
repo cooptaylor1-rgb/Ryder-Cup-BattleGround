@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import { stripHtml } from '@/lib/utils/sanitize';
 import type { BanterPost, Player } from '@/lib/types/models';
 import { Camera, Image as ImageIcon, MessageCircle, Send, Share2, Smile, Trash2 } from 'lucide-react';
 
@@ -130,7 +131,7 @@ export function PostCard({
             </div>
           </div>
 
-          <p className="mt-[var(--space-4)] text-sm leading-7 text-[var(--ink)]">{post.content}</p>
+          <p className="mt-[var(--space-4)] text-sm leading-7 text-[var(--ink)]">{stripHtml(post.content)}</p>
 
           {post.emoji ? <div className="mt-[var(--space-2)] text-[1.4rem]">{post.emoji}</div> : null}
 
