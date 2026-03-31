@@ -97,36 +97,25 @@ export function OfflineIndicator() {
   const [isSyncing, setIsSyncing] = useState(false);
   const timerIds = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+  // Handle online/offline transitions
   useEffect(() => {
-    // Defer state updates to avoid setState-in-effect warnings
     const timeoutId = setTimeout(() => {
       if (!isOnline) {
         setSyncStatus('offline');
         setShowBanner(true);
         setJustCameOnline(false);
       } else if (syncStatus === 'offline') {
-        // Just came back online - trigger sync
+        // Just came back online — start syncing
         setSyncStatus('syncing');
         setIsSyncing(true);
         setJustCameOnline(true);
 
-        // Simulate sync completion
+        // Hide "just came online" visual after animation
         const t1 = setTimeout(() => {
-          setIsSyncing(false);
-          setSyncStatus('synced');
-        }, 2000);
-
-        // Show "back online" message briefly
-        const t2 = setTimeout(() => {
-          setShowBanner(false);
-        }, 3000);
-
-        // Hide "just came online" indicator after animation
-        const t3 = setTimeout(() => {
           setJustCameOnline(false);
         }, 4000);
 
-        timerIds.current.push(t1, t2, t3);
+        timerIds.current.push(t1);
       }
     }, 0);
 
@@ -136,6 +125,19 @@ export function OfflineIndicator() {
       timerIds.current = [];
     };
   }, [isOnline, syncStatus]);
+
+  // Watch real sync queue — transition to 'synced' only when queue is verified empty
+  useEffect(() => {
+    if (syncStatus !== 'syncing') return;
+    if (pendingCount === 0) {
+      setIsSyncing(false);
+      setSyncStatus('synced');
+
+      // Hide banner after showing "synced" briefly
+      const t = setTimeout(() => setShowBanner(false), 2000);
+      timerIds.current.push(t);
+    }
+  }, [syncStatus, pendingCount]);
 
   // Don't show anything if online and not just reconnected
   if (isOnline && !showBanner && !justCameOnline) {

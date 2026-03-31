@@ -850,7 +850,7 @@ describe('100-User × 100-Trip Stress Simulation', () => {
       const undoResult = await undoLastScore(matchId);
       stats.undoOperations++;
 
-      if (undoResult) {
+      if (undoResult.success) {
         // Verify the hole result was removed
         const afterUndo = await db.holeResults
           .where('matchId')

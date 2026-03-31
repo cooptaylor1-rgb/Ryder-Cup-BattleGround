@@ -7,10 +7,18 @@ import {
   getCurrentHole,
   recordHoleResult,
   undoLastScore,
+  type ScoreConflict,
 } from '@/lib/services/scoringEngine';
 import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
 import { ScoringEventType } from '@/lib/types/events';
 import type { HoleResult, Match, Player, RyderCupSession, Team, TeamMember, Trip } from '@/lib/types/models';
+
+/** Type guard to narrow recordHoleResult return to HoleResult (not a conflict) */
+function assertHoleResult(result: HoleResult | ScoreConflict): asserts result is HoleResult {
+  if ('type' in result && result.type === 'conflict') {
+    throw new Error(`Expected HoleResult but got ScoreConflict on hole ${result.holeNumber}`);
+  }
+}
 
 function isoNow() {
   return '2026-03-12T12:00:00.000Z';
@@ -97,6 +105,7 @@ describe('scoringEngine command flows', () => {
     await db.matches.put(match);
 
     const initial = await recordHoleResult('match-1', 1, 'teamA', 4, 5, 'scorer-1');
+    assertHoleResult(initial);
     expect(initial.winner).toBe('teamA');
 
     const edited = await recordHoleResult(
@@ -110,6 +119,7 @@ describe('scoringEngine command flows', () => {
       true
     );
 
+    assertHoleResult(edited);
     expect(edited.winner).toBe('teamB');
     expect(edited.scoredBy).toBe('scorer-1');
     expect(edited.lastEditedBy).toBe('captain-1');
@@ -125,7 +135,7 @@ describe('scoringEngine command flows', () => {
     ]);
 
     const undone = await undoLastScore('match-1');
-    expect(undone).toBe(true);
+    expect(undone.success).toBe(true);
 
     const reverted = await db.holeResults.where({ matchId: 'match-1', holeNumber: 1 }).first();
     expect(reverted?.winner).toBe('teamA');

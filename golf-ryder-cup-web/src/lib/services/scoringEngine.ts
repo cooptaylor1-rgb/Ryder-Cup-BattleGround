@@ -22,7 +22,7 @@ export {
   formatFinalResult,
   wouldCloseOut,
 } from './scoring-engine/scoringEngineResults';
-export { recordHoleResult } from './scoring-engine/scoringEngineCommands';
-export { undoLastScore } from './scoring-engine/scoringEngineHistory';
+export { recordHoleResult, type ScoreConflict } from './scoring-engine/scoringEngineCommands';
+export { undoLastScore, type UndoResult } from './scoring-engine/scoringEngineHistory';
 export { createMatch, finalizeMatch } from './scoring-engine/scoringEngineMatch';
 

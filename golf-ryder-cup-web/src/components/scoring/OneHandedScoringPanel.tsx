@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion';
 import { Check, ChevronLeft, ChevronRight, Hand, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useHaptic } from '@/lib/hooks';
 import type { HoleWinner } from '@/lib/types/models';
 
 interface OneHandedScoringPanelProps {
@@ -73,6 +74,7 @@ export function OneHandedScoringPanel({
   currentScore,
   holesPlayed,
 }: OneHandedScoringPanelProps) {
+  const haptic = useHaptic();
   const [activeSwipe, setActiveSwipe] = useState<'teamA' | 'teamB' | null>(null);
   const [confirmingResult, setConfirmingResult] = useState<HoleWinner | null>(null);
 
@@ -107,30 +109,38 @@ export function OneHandedScoringPanel({
       const swipedRight = info.offset.x > SWIPE_THRESHOLD || info.velocity.x > 550;
       const swipedLeft = info.offset.x < -SWIPE_THRESHOLD || info.velocity.x < -550;
 
-      if (swipedRight) setConfirmingResult('teamA');
-      else if (swipedLeft) setConfirmingResult('teamB');
+      if (swipedRight) {
+        haptic.select();
+        setConfirmingResult('teamA');
+      } else if (swipedLeft) {
+        haptic.select();
+        setConfirmingResult('teamB');
+      }
       setActiveSwipe(null);
     },
-    [disabled]
+    [disabled, haptic]
   );
 
   const handleTapScore = useCallback(
     (winner: HoleWinner) => {
       if (disabled) return;
+      haptic.tap();
       setConfirmingResult(winner);
     },
-    [disabled]
+    [disabled, haptic]
   );
 
   const handleConfirm = useCallback(() => {
     if (!confirmingResult) return;
+    haptic.success();
     onScore(confirmingResult);
     setConfirmingResult(null);
-  }, [confirmingResult, onScore]);
+  }, [confirmingResult, onScore, haptic]);
 
   const handleCancel = useCallback(() => {
+    haptic.tap();
     setConfirmingResult(null);
-  }, []);
+  }, [haptic]);
 
   const confirmActions = isRightHanded
     ? [
