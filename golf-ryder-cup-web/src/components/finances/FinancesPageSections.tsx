@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import {
   AlertCircle,
@@ -181,7 +182,7 @@ export function LedgerSummaryPanel({
   );
 }
 
-export function PlayerLedgerCard({
+export const PlayerLedgerCard = React.memo(function PlayerLedgerCard({
   playerSummary,
   expanded,
   onToggle,

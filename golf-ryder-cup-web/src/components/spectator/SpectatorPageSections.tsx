@@ -459,4 +459,4 @@ const CompletedMatchCard = React.memo(function CompletedMatchCard({ match }: { m
             </div>
         </div>
     );
-}
+});

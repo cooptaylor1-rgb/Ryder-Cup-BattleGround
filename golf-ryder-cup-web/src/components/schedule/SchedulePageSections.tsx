@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { cn, getCountdown, getCountdownColor, isToday } from '@/lib/utils';
 import type { DaySchedule, ScheduleEntry } from '@/components/schedule/scheduleData';
@@ -63,7 +63,7 @@ export function ScheduleTabSelector({
   );
 }
 
-export function ScheduleDaySection({
+export const ScheduleDaySection = React.memo(function ScheduleDaySection({
   day,
   onEntryPress,
 }: {
@@ -110,9 +110,9 @@ export function ScheduleDaySection({
       )}
     </div>
   );
-}
+});
 
-function ScheduleEntryCard({
+const ScheduleEntryCard = React.memo(function ScheduleEntryCard({
   entry,
   onPress,
 }: {
@@ -252,4 +252,4 @@ function ScheduleEntryCard({
       </div>
     </button>
   );
-}
+});
