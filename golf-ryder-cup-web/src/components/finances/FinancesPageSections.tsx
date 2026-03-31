@@ -255,9 +255,9 @@ export const PlayerLedgerCard = React.memo(function PlayerLedgerCard({
       ) : null}
     </section>
   );
-}
+});
 
-function LineItemRow({
+const LineItemRow = React.memo(function LineItemRow({
   lineItem,
   onMarkPaid,
   isCaptainMode,
@@ -306,7 +306,7 @@ function LineItemRow({
       </div>
     </div>
   );
-}
+});
 
 export function ChargeComposer({
   chargeCategory,

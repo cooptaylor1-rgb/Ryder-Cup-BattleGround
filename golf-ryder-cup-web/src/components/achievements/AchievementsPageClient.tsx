@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ComponentType } from 'react';
+import React, { useEffect, useMemo, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Award,
@@ -195,7 +195,7 @@ function CategoryButton({
   );
 }
 
-function AchievementCard({ achievement }: { achievement: TripAchievement }) {
+const AchievementCard = React.memo(function AchievementCard({ achievement }: { achievement: TripAchievement }) {
   const colors = RARITY_COLORS[achievement.rarity];
   const Icon = ICONS[achievement.icon];
 
@@ -262,5 +262,5 @@ function AchievementCard({ achievement }: { achievement: TripAchievement }) {
       )}
     </article>
   );
-}
+});
 
