@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import { CaptainToggle } from '@/components/ui/CaptainToggle';
 
-const mockUIStore = {
+const mockAccessStore = {
   isCaptainMode: false,
   enableCaptainMode: vi.fn(),
   disableCaptainMode: vi.fn(),
@@ -13,20 +13,20 @@ const mockUIStore = {
 };
 
 vi.mock('@/lib/stores', () => ({
-  useUIStore: () => mockUIStore,
+  useAccessStore: () => mockAccessStore,
 }));
 
 describe('CaptainToggle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUIStore.isCaptainMode = false;
-    mockUIStore.captainPinHash = 'pbkdf2$existing-pin';
-    mockUIStore.enableCaptainMode.mockResolvedValue(undefined);
+    mockAccessStore.isCaptainMode = false;
+    mockAccessStore.captainPinHash = 'pbkdf2$existing-pin';
+    mockAccessStore.enableCaptainMode.mockResolvedValue(undefined);
   });
 
   it('opens an accessible dialog and surfaces invalid PIN errors', async () => {
     const user = userEvent.setup();
-    mockUIStore.enableCaptainMode.mockRejectedValue(new Error('Incorrect PIN'));
+    mockAccessStore.enableCaptainMode.mockRejectedValue(new Error('Incorrect PIN'));
 
     render(<CaptainToggle />);
 

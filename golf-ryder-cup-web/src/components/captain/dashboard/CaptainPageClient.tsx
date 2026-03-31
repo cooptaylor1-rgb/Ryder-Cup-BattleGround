@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import {
   AlertTriangle,
@@ -142,7 +142,8 @@ const setupActions: CaptainCommandAction[] = [
 export default function CaptainPageClient() {
   const router = useRouter();
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers })));
-  const { isCaptainMode, enableCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode, enableCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [captainPin, setCaptainPin] = useState('');
 
   const handleEnableCaptain = async () => {

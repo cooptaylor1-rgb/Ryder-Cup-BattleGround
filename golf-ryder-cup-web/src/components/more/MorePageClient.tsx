@@ -39,7 +39,7 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { clearDemoData, seedDemoData } from '@/lib/db/seed';
-import { useAuthStore, useTripStore, useUIStore } from '@/lib/stores';
+import { useAuthStore, useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -56,8 +56,8 @@ export default function MorePageClient() {
     isAdminMode,
     enableAdminMode,
     disableAdminMode,
-    showToast,
-  } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode, disableCaptainMode: s.disableCaptainMode, isAdminMode: s.isAdminMode, enableAdminMode: s.enableAdminMode, disableAdminMode: s.disableAdminMode, showToast: s.showToast })));
+  } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode, disableCaptainMode: s.disableCaptainMode, isAdminMode: s.isAdminMode, enableAdminMode: s.enableAdminMode, disableAdminMode: s.disableAdminMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [showCaptainModal, setShowCaptainModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);

@@ -15,7 +15,7 @@
 'use client';
 
 import { useCallback, useMemo, useRef } from 'react';
-import { useUIStore } from '../stores';
+import { useScoringPrefsStore } from '../stores';
 import { useShallow } from 'zustand/shallow';
 
 type HapticType =
@@ -98,7 +98,7 @@ const supportsVibration = (): boolean => {
  * Includes visual feedback fallback for iOS Safari
  */
 export function useHaptic() {
-  const { scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
+  const { scoringPreferences } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
   const cleanupTimers = useRef<Map<HTMLElement, NodeJS.Timeout>>(new Map());
 
   // Haptic patterns designed for premium feel

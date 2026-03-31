@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { X, Check, AlertCircle, Info, AlertTriangle } from 'lucide-react';
@@ -165,7 +165,7 @@ function ToastItem({ type, message, onDismiss, duration = 4000 }: ToastItemProps
 }
 
 export function ToastContainer() {
-  const { toasts, dismissToast } = useUIStore(useShallow(s => ({ toasts: s.toasts, dismissToast: s.dismissToast })));
+  const { toasts, dismissToast } = useToastStore(useShallow(s => ({ toasts: s.toasts, dismissToast: s.dismissToast })));
 
   if (toasts.length === 0) return null;
 

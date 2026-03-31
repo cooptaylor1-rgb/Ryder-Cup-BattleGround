@@ -12,7 +12,7 @@
  *
  * Benefits:
  * - Reduces initial JS bundle by deferring ~8000+ LOC of service code
- * - Heavy dependencies (html2canvas, etc.) only loaded when needed
+ * - Heavy dependencies only loaded when needed
  * - Cached after first load so subsequent calls are instant
  */
 

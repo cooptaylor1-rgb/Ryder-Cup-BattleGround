@@ -14,7 +14,7 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import {
@@ -26,7 +26,7 @@ import {
 export default function ContactsPage() {
   const router = useRouter();
   const { currentTrip, players, teams, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers })));
-  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   if (!currentTrip) {
     return (

@@ -29,7 +29,7 @@ import {
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { db } from '@/lib/db';
 import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
 import { captainLogger } from '@/lib/utils/logger';
@@ -50,7 +50,8 @@ export function ManagePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentTrip, players, teams, teamMembers, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());

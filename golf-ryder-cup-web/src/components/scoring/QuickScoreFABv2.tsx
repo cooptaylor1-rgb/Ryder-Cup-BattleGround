@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Mic, ChevronRight, X, Trophy, Minus } from 'lucide-react';
-import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useScoringStore, useScoringPrefsStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
@@ -45,7 +45,7 @@ export function QuickScoreFABv2({
   const haptic = useHaptic();
   const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
   const { scoreHole, selectMatch, activeMatch, currentHole: _currentHole } = useScoringStore();
-  const { scoringPreferences: _scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
+  const { scoringPreferences: _scoringPreferences } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);

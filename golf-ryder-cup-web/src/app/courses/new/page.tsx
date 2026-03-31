@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { createCourseProfile } from '@/lib/services/courseLibraryService';
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { HoleDataEditor, createDefaultHoles, ScorecardUpload, type HoleData, type ScorecardData, type TeeSetData } from '@/components/course';
 import { PageHeader } from '@/components/layout';
@@ -51,7 +51,7 @@ const TEE_COLORS = [
 
 export default function NewCoursePage() {
   const router = useRouter();
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [courseName, setCourseName] = useState('');
   const [location, setLocation] = useState('');

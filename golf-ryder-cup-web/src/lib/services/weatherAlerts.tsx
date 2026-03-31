@@ -14,7 +14,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { getWeather, type GolfWeather } from '@/lib/services/weatherService';
 import { sendNotification } from './liveScoreNotifications';
@@ -155,7 +155,7 @@ export function useWeatherAlerts(options: WeatherAlertOptions) {
     const [isLoading, setIsLoading] = useState(false);
     const [lastCheck, setLastCheck] = useState<Date | null>(null);
     const [weather, setWeather] = useState<GolfWeather | null>(null);
-    const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+    const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
     const previousAlertIds = useRef<Set<string>>(new Set());
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 

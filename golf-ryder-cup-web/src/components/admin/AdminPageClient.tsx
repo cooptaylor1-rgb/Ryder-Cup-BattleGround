@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { PageHeader } from '@/components/layout';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import type { Trip } from '@/lib/types/models';
@@ -30,7 +30,8 @@ const adminLogger = createLogger('Admin');
 export default function AdminPageClient() {
     const router = useRouter();
     const { deleteTrip, currentTrip, clearTrip } = useTripStore(useShallow(s => ({ deleteTrip: s.deleteTrip, currentTrip: s.currentTrip, clearTrip: s.clearTrip })));
-    const { isAdminMode, showToast } = useUIStore(useShallow(s => ({ isAdminMode: s.isAdminMode, showToast: s.showToast })));
+    const { isAdminMode } = useAccessStore(useShallow(s => ({ isAdminMode: s.isAdminMode })));
+    const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
     const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
     const [deletingTripId, setDeletingTripId] = useState<string | null>(null);

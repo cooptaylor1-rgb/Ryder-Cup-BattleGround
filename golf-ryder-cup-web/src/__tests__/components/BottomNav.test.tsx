@@ -10,13 +10,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BottomNav } from '@/components/layout/BottomNav';
 
-// Mock useUIStore
-const mockUIStore = {
+// Mock useAccessStore
+const mockAccessStore = {
   isCaptainMode: false,
 };
 
 vi.mock('@/lib/stores', () => ({
-  useUIStore: () => mockUIStore,
+  useAccessStore: () => mockAccessStore,
 }));
 
 // Mock next/navigation
@@ -36,7 +36,7 @@ describe('BottomNav Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockPathname.mockReturnValue('/');
-    mockUIStore.isCaptainMode = false;
+    mockAccessStore.isCaptainMode = false;
   });
 
   describe('Rendering', () => {
@@ -126,7 +126,7 @@ describe('BottomNav Component', () => {
 
   describe('Captain Mode Badge', () => {
     it('shows captain badge on More when captain mode is enabled', () => {
-      mockUIStore.isCaptainMode = true;
+      mockAccessStore.isCaptainMode = true;
       render(<BottomNav />);
 
       const moreButton = screen.getByText('More').closest('button');
@@ -134,7 +134,7 @@ describe('BottomNav Component', () => {
     });
 
     it('does not show captain badge when captain mode is disabled', () => {
-      mockUIStore.isCaptainMode = false;
+      mockAccessStore.isCaptainMode = false;
       render(<BottomNav />);
 
       const moreButton = screen.getByText('More').closest('button');

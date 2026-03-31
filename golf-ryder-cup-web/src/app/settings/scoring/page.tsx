@@ -13,7 +13,7 @@ import {
   Navigation,
   Target,
 } from 'lucide-react';
-import { useUIStore } from '@/lib/stores';
+import { useScoringPrefsStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
@@ -76,7 +76,7 @@ function SettingRow({
 
 export default function ScoringSettingsPage() {
   const router = useRouter();
-  const { scoringPreferences, updateScoringPreference, resetScoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences, updateScoringPreference: s.updateScoringPreference, resetScoringPreferences: s.resetScoringPreferences })));
+  const { scoringPreferences, updateScoringPreference, resetScoringPreferences } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences, updateScoringPreference: s.updateScoringPreference, resetScoringPreferences: s.resetScoringPreferences })));
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Bell, Database, HelpCircle, Palette, Settings, Target, type LucideIcon } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { useUIStore } from '@/lib/stores';
+import { useThemeStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 
@@ -55,7 +55,7 @@ const SETTING_ITEMS: SettingItem[] = [
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { theme } = useUIStore(useShallow(s => ({ theme: s.theme })));
+  const { theme } = useThemeStore(useShallow(s => ({ theme: s.theme })));
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">

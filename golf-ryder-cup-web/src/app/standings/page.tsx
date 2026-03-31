@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import {
   calculateTeamStandings,
@@ -59,7 +59,7 @@ const logger = createLogger('standings');
 export default function StandingsPage() {
   const router = useRouter();
   const { currentTrip, teams, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players })));
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [activeTab, setActiveTab] = useState<StandingsTab>('competition');
   const [standings, setStandings] = useState<TeamStandings | null>(null);

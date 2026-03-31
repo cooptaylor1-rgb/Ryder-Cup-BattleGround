@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore, useTripStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { useAuthStore, useTripStore, useToastStore, useAccessStore, type UserProfile } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { claimTripPlayerForCurrentUser } from '@/lib/services/tripPlayerLinkService';
 import { createLogger } from '@/lib/utils/logger';
@@ -60,7 +60,8 @@ export default function ProfilePage() {
     setOfflinePin,
   } = useAuthStore();
   const { currentTrip, players, loadTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, loadTrip: s.loadTrip })));
-  const { showToast, isCaptainMode } = useUIStore(useShallow(s => ({ showToast: s.showToast, isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});

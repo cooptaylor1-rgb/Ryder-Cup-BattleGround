@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal } from 'lucide-react';
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
@@ -15,7 +15,7 @@ export default function TripSettingsPage() {
   const router = useRouter();
   const tripId = params.tripId as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [isVerifyingTrip, setIsVerifyingTrip] = useState(true);
   const [tripName, setTripName] = useState<string | null>(null);

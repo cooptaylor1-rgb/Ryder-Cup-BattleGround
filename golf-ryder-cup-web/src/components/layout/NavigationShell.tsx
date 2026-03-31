@@ -11,7 +11,7 @@
 import { useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { SidebarNav } from './SidebarNav';
 import { BottomNav } from './BottomNav';
@@ -37,7 +37,7 @@ export function NavigationShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
-  const { isGlobalLoading, globalLoadingMessage } = useUIStore(useShallow(s => ({ isGlobalLoading: s.isGlobalLoading, globalLoadingMessage: s.globalLoadingMessage })));
+  const { isGlobalLoading, globalLoadingMessage } = useToastStore(useShallow(s => ({ isGlobalLoading: s.isGlobalLoading, globalLoadingMessage: s.globalLoadingMessage })));
 
   const hideNav = HIDE_NAV_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + '/')

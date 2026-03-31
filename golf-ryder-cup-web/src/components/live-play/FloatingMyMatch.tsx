@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Target, ChevronUp, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSessionMatchData } from '@/lib/hooks/useSessionMatchData';
-import { useTripStore, useScoringStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useScoringStore, useScoringPrefsStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -68,7 +68,7 @@ export function FloatingMyMatch({
     const { trigger } = useHaptic();
     const { currentTrip, sessions, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players })));
     const { selectMatch } = useScoringStore();
-    const { scoringPreferences: _scoringPreferences } = useUIStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
+    const { scoringPreferences: _scoringPreferences } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
 
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const [hasNewUpdate, setHasNewUpdate] = useState(false);

@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
-import { useAuthStore, useUIStore } from '@/lib/stores';
+import { useAuthStore, useToastStore } from '@/lib/stores';
 import {
   completeSupabaseAuthFromUrl,
   getSupabaseSession,
@@ -14,7 +14,7 @@ type CallbackState = 'processing' | 'success' | 'error' | 'noop';
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const showToast = useUIStore((state) => state.showToast);
+  const showToast = useToastStore((state) => state.showToast);
   const [state, setState] = useState<CallbackState>('processing');
   const [message, setMessage] = useState('Completing secure sign-in...');
 
