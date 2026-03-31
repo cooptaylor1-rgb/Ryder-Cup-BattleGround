@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimitAsync, addRateLimitHeaders, requireJson, validateBodySize } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_EXPENSIVE } from '@/lib/constants/rateLimits';
 import { ocrLogger } from '@/lib/utils/logger';
 import { ocrRequestSchema, formatZodError, type OcrRequest, type OcrImageData } from '@/lib/validations/api';
 
@@ -17,11 +18,6 @@ import { ocrRequestSchema, formatZodError, type OcrRequest, type OcrImageData } 
  * For PDFs, users should convert to image or use image capture.
  */
 
-// Rate limiting: 10 requests per minute per IP (more restrictive due to AI API costs)
-const RATE_LIMIT_CONFIG = {
-  windowMs: 60 * 1000,
-  maxRequests: 10,
-};
 
 // Max body size: 10MB for image uploads
 const MAX_BODY_SIZE = 10 * 1024 * 1024;
@@ -188,7 +184,7 @@ Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
   // Apply rate limiting (more restrictive due to AI API costs)
-  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_EXPENSIVE);
   if (rateLimitError) {
     return rateLimitError;
   }
@@ -294,7 +290,7 @@ export async function POST(request: NextRequest) {
         hasSlopes: cleanedData.teeSets?.some(t => t.slope) || false,
       },
     });
-    res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
+    res = addRateLimitHeaders(res, request, RATE_LIMIT_EXPENSIVE);
     return res;
   } catch (error) {
     ocrLogger.error('Scorecard OCR error:', error);

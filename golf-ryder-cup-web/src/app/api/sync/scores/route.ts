@@ -9,18 +9,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { createCorrelationId } from '@/lib/services/analyticsService';
-import { applyRateLimitAsync, requireJson, requireTripAccess } from '@/lib/utils/apiMiddleware';
+import { applyRateLimitAsync, requireJson, requireTripAccess, validateBodySize } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_DATA } from '@/lib/constants/rateLimits';
 import { apiLogger } from '@/lib/utils/logger';
 import {
   formatZodError,
   scoreSyncPayloadSchema,
   type ScoreSyncPayload,
 } from '@/lib/validations/api';
-
-const RATE_LIMIT_CONFIG = {
-  windowMs: 60 * 1000,
-  maxRequests: 30,
-};
 
 function withCorrelationId<T>(response: NextResponse<T>, correlationId: string): NextResponse<T> {
   response.headers.set('x-correlation-id', correlationId);
@@ -127,7 +123,14 @@ export async function POST(request: NextRequest) {
     return withCorrelationId(jsonError, correlationId);
   }
 
-  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  // Limit request body to 1MB — scoring events should be small JSON payloads
+  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  const bodySizeError = validateBodySize(contentLength, 1 * 1024 * 1024);
+  if (bodySizeError) {
+    return withCorrelationId(bodySizeError, correlationId);
+  }
+
+  const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_DATA);
   if (rateLimitError) {
     return withCorrelationId(rateLimitError, correlationId);
   }
@@ -196,7 +199,7 @@ export async function POST(request: NextRequest) {
           message: error instanceof Error ? error.message : 'Unexpected sync failure.',
           correlationId,
         },
-        { status: 502 }
+        { status: 500 }
       ),
       correlationId
     );

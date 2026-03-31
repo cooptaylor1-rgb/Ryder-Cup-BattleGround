@@ -21,7 +21,6 @@ export function ProfileHeroCard({ currentUser }: ProfileHeroCardProps) {
               width={88}
               height={88}
               className="w-full h-full object-cover"
-              unoptimized
             />
           ) : (
             <span className="font-serif text-[clamp(1.75rem,5vw,2.25rem)] italic text-masters leading-none tracking-[-0.02em]">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
 import { applyRateLimitAsync, addRateLimitHeaders } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_DATA } from '@/lib/constants/rateLimits';
 import { formatZodError, golfCourseDiscoverySearchSchema } from '@/lib/validations/api';
 
 /**
@@ -16,12 +17,6 @@ import { formatZodError, golfCourseDiscoverySearchSchema } from '@/lib/validatio
  */
 
 const logger = createLogger('api:golf-courses-search');
-
-// Rate limiting: 30 requests per minute per IP
-const RATE_LIMIT_CONFIG = {
-    windowMs: 60 * 1000,
-    maxRequests: 30,
-};
 
 // Cache duration: 1 hour for search results
 const CACHE_MAX_AGE = 3600;
@@ -67,7 +62,7 @@ interface _CourseDetails {
 
 export async function GET(request: NextRequest) {
     // Apply rate limiting
-    const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+    const rateLimitError = await applyRateLimitAsync(request, RATE_LIMIT_DATA);
     if (rateLimitError) {
         return rateLimitError;
     }
@@ -130,7 +125,7 @@ export async function GET(request: NextRequest) {
             'Cache-Control',
             `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=${CACHE_STALE_WHILE_REVALIDATE}`
         );
-        res = addRateLimitHeaders(res, request, RATE_LIMIT_CONFIG);
+        res = addRateLimitHeaders(res, request, RATE_LIMIT_DATA);
         return res;
     } catch (error) {
         logger.error('Course search error', { query, state, error });

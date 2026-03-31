@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimitAsync, requireTripAccess, requireAuth } from '@/lib/utils/apiMiddleware';
+import { RATE_LIMIT_PUSH } from '@/lib/constants/rateLimits';
 import { apiLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -42,11 +43,6 @@ type StoredSubscriptionContext = {
   tripId?: string;
 };
 
-// Rate limit config (10 requests per minute)
-const RATE_LIMIT_CONFIG = {
-  windowMs: 60 * 1000,
-  maxRequests: 10,
-};
 
 // Supabase client for push subscriptions
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -166,7 +162,7 @@ async function getStoredSubscriptionContext(
  */
 export async function POST(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_PUSH);
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
@@ -232,7 +228,7 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   // Apply rate limiting
-  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_CONFIG);
+  const rateLimitResponse = await applyRateLimitAsync(request, RATE_LIMIT_PUSH);
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
