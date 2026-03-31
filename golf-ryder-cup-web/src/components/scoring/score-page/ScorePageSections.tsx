@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, ErrorBoundary, NoScoresEmpty } from '@/components/ui';
 import { ChevronRight } from 'lucide-react';
@@ -232,7 +233,7 @@ interface MatchRowProps {
     isUserMatch?: boolean;
 }
 
-function MatchRow({
+const MatchRow = React.memo(function MatchRow({
     matchState,
     matchNumber,
     teamAPlayers,
@@ -360,7 +361,7 @@ function MatchRow({
             </div>
         </button>
     );
-}
+});
 
 function ScoreSessionStat({ label, value }: { label: string; value: number }) {
     return (

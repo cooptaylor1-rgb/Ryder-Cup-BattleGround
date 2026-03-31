@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Zap, Plus, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
@@ -242,7 +242,7 @@ interface PressCardProps {
   currentHole: number;
 }
 
-function PressCard({
+const PressCard = React.memo(function PressCard({
   press,
   pressNumber,
   teamAName,
@@ -312,6 +312,6 @@ function PressCard({
       </div>
     </div>
   );
-}
+});
 
 export default PressTracker;

@@ -38,19 +38,22 @@ export function buildMatchSummaryText({
   teamBName,
   teamAPlayers,
   teamBPlayers,
+  matchUrl,
 }: {
   matchState: MatchState;
   teamAName: string;
   teamBName: string;
   teamAPlayers: Player[];
   teamBPlayers: Player[];
+  matchUrl?: string;
 }) {
   const winnerText =
     matchState.winningTeam === 'halved'
       ? 'Match halved'
       : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} wins`;
 
-  return `⛳ ${winnerText} ${matchState.displayScore}\n${buildTeamLabel(teamAPlayers)} vs ${buildTeamLabel(teamBPlayers)}\nHoles won: ${teamAName} ${matchState.teamAHolesWon} | ${teamBName} ${matchState.teamBHolesWon}\nHalved: ${countHalvedHoles(matchState)}\nCompleted thru hole ${matchState.holesPlayed}`;
+  const base = `⛳ ${winnerText} ${matchState.displayScore}\n${buildTeamLabel(teamAPlayers)} vs ${buildTeamLabel(teamBPlayers)}\nHoles won: ${teamAName} ${matchState.teamAHolesWon} | ${teamBName} ${matchState.teamBHolesWon}\nHalved: ${countHalvedHoles(matchState)}\nCompleted thru hole ${matchState.holesPlayed}`;
+  return matchUrl ? `${base}\n\n${matchUrl}` : base;
 }
 
 export function buildMatchResultShareText({
@@ -59,19 +62,22 @@ export function buildMatchResultShareText({
   teamBName,
   teamALineup,
   teamBLineup,
+  matchUrl,
 }: {
   matchState: MatchState;
   teamAName: string;
   teamBName: string;
   teamALineup: string;
   teamBLineup: string;
+  matchUrl?: string;
 }) {
   const winnerText =
     matchState.winningTeam === 'halved'
       ? 'Match halved!'
       : `${matchState.winningTeam === 'teamA' ? teamAName : teamBName} wins ${matchState.displayScore}!`;
 
-  return `${winnerText}\n${teamALineup} vs ${teamBLineup}`;
+  const base = `${winnerText}\n${teamALineup} vs ${teamBLineup}`;
+  return matchUrl ? `${base}\n\n${matchUrl}` : base;
 }
 
 export function buildPrintableMatchSummary({

@@ -8,11 +8,14 @@
 import { create } from 'zustand';
 
 // ============================================
-// TYPES
+// CONSTANTS
 // ============================================
 
 // Track auto-dismiss timers so they can be cancelled when a toast is manually dismissed
 const toastTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+/** Maximum number of visible toasts at once. Oldest are evicted FIFO when exceeded. */
+const MAX_VISIBLE_TOASTS = 3;
 
 export interface Toast {
   id: string;
@@ -53,7 +56,7 @@ export const useToastStore = create<ToastState>()((set, get) => ({
   // Toasts
   toasts: [],
 
-  showToast: (type, message, duration = 3000) => {
+  showToast: (type, message, duration = 2500) => {
     const id = crypto.randomUUID();
     const toast: Toast = { id, type, message, duration };
 
@@ -70,9 +73,21 @@ export const useToastStore = create<ToastState>()((set, get) => ({
         return state;
       }
 
-      return {
-        toasts: [...state.toasts, toast],
-      };
+      // FIFO eviction: dismiss oldest toasts when queue is full
+      let nextToasts = [...state.toasts, toast];
+      if (nextToasts.length > MAX_VISIBLE_TOASTS) {
+        const evicted = nextToasts.slice(0, nextToasts.length - MAX_VISIBLE_TOASTS);
+        for (const old of evicted) {
+          const timer = toastTimers.get(old.id);
+          if (timer) {
+            clearTimeout(timer);
+            toastTimers.delete(old.id);
+          }
+        }
+        nextToasts = nextToasts.slice(-MAX_VISIBLE_TOASTS);
+      }
+
+      return { toasts: nextToasts };
     });
 
     // Auto-dismiss

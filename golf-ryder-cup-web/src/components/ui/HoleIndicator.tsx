@@ -16,6 +16,8 @@
 import { cn } from '@/lib/utils';
 import type { HoleWinner } from '@/lib/types/models';
 
+export type HoleSyncStatus = 'synced' | 'pending' | 'failed';
+
 interface HoleIndicatorProps {
     holeNumber: number;
     winner?: HoleWinner;
@@ -23,6 +25,8 @@ interface HoleIndicatorProps {
     isCurrentHole?: boolean;
     onClick?: () => void;
     size?: 'sm' | 'md' | 'lg';
+    /** Sync status for this hole's score. Shows visual cue for pending/failed. */
+    syncStatus?: HoleSyncStatus;
 }
 
 export function HoleIndicator({
@@ -32,6 +36,7 @@ export function HoleIndicator({
     isCurrentHole = false,
     onClick,
     size = 'md',
+    syncStatus,
 }: HoleIndicatorProps) {
     // WCAG 2.2 compliant touch targets (minimum 44x44px)
     // Inner circle may be smaller, but hit area is always >= 44px
@@ -89,10 +94,12 @@ export function HoleIndicator({
                 onClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2',
                 !onClick && 'cursor-default',
                 // Premium hover effect
-                winner !== 'none' && onClick && 'hover:shadow-lg'
+                winner !== 'none' && onClick && 'hover:shadow-lg',
+                // Sync status visual cues
+                syncStatus === 'pending' && winner !== 'none' && 'opacity-75 border-dashed animate-pulse',
+                syncStatus === 'failed' && winner !== 'none' && 'ring-2 ring-[var(--error)] ring-offset-1 ring-offset-[var(--canvas)]'
             )}
-            aria-label={`Hole ${holeNumber}${par ? `, Par ${par}` : ''}${winner !== 'none' ? `, ${winner === 'halved' ? 'Halved' : `Won by ${winner}`}` : ''
-                }`}
+            aria-label={`Hole ${holeNumber}${par ? `, Par ${par}` : ''}${winner !== 'none' ? `, ${winner === 'halved' ? 'Halved' : `Won by ${winner}`}` : ''}${syncStatus === 'pending' ? ', syncing' : syncStatus === 'failed' ? ', sync failed' : ''}`}
         >
             <span className="font-bold leading-none">{holeNumber}</span>
             {par && size !== 'sm' && (
@@ -113,6 +120,8 @@ interface HoleStripProps {
     onHoleClick?: (holeNumber: number) => void;
     size?: 'sm' | 'md' | 'lg';
     showPars?: boolean;
+    /** Map of hole number → sync status. Holes not in the map default to 'synced'. */
+    holeSyncStatuses?: Map<number, HoleSyncStatus>;
 }
 
 export function HoleStrip({
@@ -121,6 +130,7 @@ export function HoleStrip({
     onHoleClick,
     size = 'sm',
     showPars = false,
+    holeSyncStatuses,
 }: HoleStripProps) {
     // Fill in missing holes
     const allHoles = Array.from({ length: 18 }, (_, i) => {
@@ -143,6 +153,7 @@ export function HoleStrip({
                     isCurrentHole={currentHole === hole.holeNumber}
                     onClick={onHoleClick ? () => onHoleClick(hole.holeNumber) : undefined}
                     size={size}
+                    syncStatus={holeSyncStatuses?.get(hole.holeNumber)}
                 />
             ))}
         </div>

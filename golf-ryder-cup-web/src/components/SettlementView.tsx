@@ -32,52 +32,25 @@ export default function SettlementView() {
   const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
 
-  // Load all completed side games from DB
-  const wolfGames = useLiveQuery(
+  // Load all side game data in a single batched query (avoids 5 separate DB round-trips)
+  const sideGameData = useLiveQuery(
     async () => {
-      if (!currentTrip) return [];
-      return db.wolfGames.where('tripId').equals(currentTrip.id).toArray();
+      if (!currentTrip) return { wolfGames: [], vegasGames: [], hammerGames: [], nassauGames: [], sideBets: [] };
+      const tripId = currentTrip.id;
+      const [wolfGames, vegasGames, hammerGames, nassauGames, sideBets] = await Promise.all([
+        db.wolfGames.where('tripId').equals(tripId).toArray(),
+        db.vegasGames.where('tripId').equals(tripId).toArray(),
+        db.hammerGames.where('tripId').equals(tripId).toArray(),
+        db.nassauGames.where('tripId').equals(tripId).toArray(),
+        db.sideBets.where('tripId').equals(tripId).toArray(),
+      ]);
+      return { wolfGames, vegasGames, hammerGames, nassauGames, sideBets };
     },
     [currentTrip?.id],
-    []
+    { wolfGames: [], vegasGames: [], hammerGames: [], nassauGames: [], sideBets: [] }
   );
 
-  const vegasGames = useLiveQuery(
-    async () => {
-      if (!currentTrip) return [];
-      return db.vegasGames.where('tripId').equals(currentTrip.id).toArray();
-    },
-    [currentTrip?.id],
-    []
-  );
-
-  const hammerGames = useLiveQuery(
-    async () => {
-      if (!currentTrip) return [];
-      return db.hammerGames.where('tripId').equals(currentTrip.id).toArray();
-    },
-    [currentTrip?.id],
-    []
-  );
-
-  const nassauGames = useLiveQuery(
-    async () => {
-      if (!currentTrip) return [];
-      return db.nassauGames.where('tripId').equals(currentTrip.id).toArray();
-    },
-    [currentTrip?.id],
-    []
-  );
-
-  // Get skins results from side bets
-  const sideBets = useLiveQuery(
-    async () => {
-      if (!currentTrip) return [];
-      return db.sideBets.where('tripId').equals(currentTrip.id).toArray();
-    },
-    [currentTrip?.id],
-    []
-  );
+  const { wolfGames, vegasGames, hammerGames, nassauGames, sideBets } = sideGameData;
 
   const activitySummary = useMemo(() => {
     if (!currentTrip) {

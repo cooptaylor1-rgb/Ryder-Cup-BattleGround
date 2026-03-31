@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronRight,
@@ -126,6 +126,8 @@ const DEFAULT_SETUP_DATA: TripSetupData = {
     teeTimeSettings: DEFAULT_TEE_TIME_SETTINGS,
 };
 
+const WIZARD_STORAGE_KEY = 'trip-wizard-draft';
+
 interface EnhancedTripWizardProps {
     onComplete: (data: TripSetupData) => void;
     onCancel: () => void;
@@ -139,12 +141,35 @@ export function EnhancedTripWizard({
     initialData,
     className,
 }: EnhancedTripWizardProps) {
-    const [currentStep, setCurrentStep] = useState<WizardStep>('basics');
-    const [data, setData] = useState<TripSetupData>({
-        ...DEFAULT_SETUP_DATA,
-        ...initialData,
+    const [currentStep, setCurrentStep] = useState<WizardStep>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem(WIZARD_STORAGE_KEY + '-step');
+            if (saved && WIZARD_STEPS.some(s => s.id === saved)) {
+                return saved as WizardStep;
+            }
+        }
+        return 'basics';
+    });
+    const [data, setData] = useState<TripSetupData>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem(WIZARD_STORAGE_KEY);
+            if (saved) {
+                try {
+                    return { ...DEFAULT_SETUP_DATA, ...JSON.parse(saved) };
+                } catch {
+                    // Corrupted data — ignore
+                }
+            }
+        }
+        return { ...DEFAULT_SETUP_DATA, ...initialData };
     });
     const [visitedSteps, setVisitedSteps] = useState<Set<WizardStep>>(new Set(['basics']));
+
+    // Auto-save wizard state for draft recovery
+    useEffect(() => {
+        sessionStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(data));
+        sessionStorage.setItem(WIZARD_STORAGE_KEY + '-step', currentStep);
+    }, [data, currentStep]);
 
     const currentStepIndex = WIZARD_STEPS.findIndex(s => s.id === currentStep);
     const currentStepConfig = WIZARD_STEPS[currentStepIndex];
@@ -178,8 +203,16 @@ export function EnhancedTripWizard({
     }, [currentStepIndex]);
 
     const handleComplete = useCallback(() => {
+        sessionStorage.removeItem(WIZARD_STORAGE_KEY);
+        sessionStorage.removeItem(WIZARD_STORAGE_KEY + '-step');
         onComplete(data);
     }, [data, onComplete]);
+
+    const handleCancel = useCallback(() => {
+        sessionStorage.removeItem(WIZARD_STORAGE_KEY);
+        sessionStorage.removeItem(WIZARD_STORAGE_KEY + '-step');
+        onCancel();
+    }, [onCancel]);
 
     // Calculate completion status for each step
     const stepCompletion = useMemo(() => {
@@ -331,7 +364,7 @@ export function EnhancedTripWizard({
             <div className="p-4 border-t border-[var(--rule)] flex gap-3">
                 {isFirstStep ? (
                     <button
-                        onClick={onCancel}
+                        onClick={handleCancel}
                         className="btn-secondary flex-1"
                     >
                         Cancel

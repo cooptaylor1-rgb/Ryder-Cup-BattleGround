@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { WeatherWidget } from './WeatherWidget';
 import type { GolfCourseAPICourse, GolfCourseAPITee } from '@/lib/services/golfCourseAPIService';
@@ -239,7 +239,7 @@ interface TeeCardProps {
     onSelect?: () => void;
 }
 
-function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
+const TeeCard = React.memo(function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
     const color = inferTeeColor(tee.tee_name);
     const isWhite = color === '#FFFFFF';
 
@@ -286,7 +286,7 @@ function TeeCard({ tee, isSelected, onSelect }: TeeCardProps) {
             )}
         </button>
     );
-}
+});
 
 interface ScorecardViewProps {
     tees: GolfCourseAPITee[];

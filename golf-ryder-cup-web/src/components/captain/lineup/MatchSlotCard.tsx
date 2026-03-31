@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { Scale, Trash2, User } from 'lucide-react';
 
@@ -94,7 +95,7 @@ export interface MatchSlotCardProps {
   isLocked: boolean;
 }
 
-export function MatchSlotCard({
+export const MatchSlotCard = React.memo(function MatchSlotCard({
   match,
   matchNumber,
   playersPerTeam,
@@ -198,4 +199,4 @@ export function MatchSlotCard({
       </div>
     </div>
   );
-}
+});

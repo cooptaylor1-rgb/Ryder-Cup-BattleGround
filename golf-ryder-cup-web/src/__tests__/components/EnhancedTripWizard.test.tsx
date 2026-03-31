@@ -9,6 +9,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EnhancedTripWizard } from '@/components/trip-setup/EnhancedTripWizard';
 
+// Clear wizard draft from sessionStorage before each test to prevent state leaking
+beforeEach(() => {
+  sessionStorage.removeItem('trip-wizard-draft');
+  sessionStorage.removeItem('trip-wizard-draft-step');
+});
+
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
     motion: {

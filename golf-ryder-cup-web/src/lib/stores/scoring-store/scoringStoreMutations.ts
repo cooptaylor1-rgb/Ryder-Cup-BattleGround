@@ -232,8 +232,8 @@ export async function undoLastHoleData({
   undoStack: UndoEntry[];
   matchStates: Map<string, MatchState>;
 } | null> {
-  const success = await undoLastScore(activeMatch.id);
-  if (!success) {
+  const undoResult = await undoLastScore(activeMatch.id);
+  if (!undoResult.success) {
     return null;
   }
 

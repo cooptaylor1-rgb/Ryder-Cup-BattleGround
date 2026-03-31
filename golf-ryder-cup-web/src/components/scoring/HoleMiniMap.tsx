@@ -1,11 +1,121 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp, Flag } from 'lucide-react';
 import { useHaptic } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import type { HoleResult } from '@/lib/types/models';
+
+/* ------------------------------------------------------------------ */
+/*  Memoized sub-components                                           */
+/* ------------------------------------------------------------------ */
+
+interface CompactHoleButtonProps {
+  hole: number;
+  status: string;
+  tone: { background: string; border: string; text: string };
+  isCurrent: boolean;
+  onSelect: (hole: number) => void;
+}
+
+const CompactHoleButton = React.memo(
+  React.forwardRef<HTMLButtonElement, CompactHoleButtonProps>(
+    function CompactHoleButton({ hole, status, tone, isCurrent, onSelect }, ref) {
+      return (
+        <button
+          ref={ref}
+          key={hole}
+          type="button"
+          onClick={() => onSelect(hole)}
+          className="relative flex h-8 w-8 items-center justify-center rounded-xl border text-[11px] font-semibold transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
+          style={{
+            background: tone.background,
+            borderColor: tone.border,
+            color: tone.text,
+            boxShadow: isCurrent ? '0 0 0 1px rgba(0, 102, 68, 0.12)' : undefined,
+          }}
+          aria-label={`Go to hole ${hole}`}
+        >
+          {hole}
+          {isCurrent && (
+            <motion.span
+              className="absolute inset-0 rounded-xl border border-[var(--masters)]"
+              animate={{ opacity: [0.95, 0.35, 0.95] }}
+              transition={{ duration: 1.4, repeat: Infinity }}
+            />
+          )}
+        </button>
+      );
+    }
+  )
+);
+
+interface ExpandedHoleButtonProps {
+  hole: number;
+  status: string;
+  tone: { background: string; border: string; text: string };
+  runningScore: number;
+  isCurrent: boolean;
+  teamAName: string;
+  teamBName: string;
+  onSelect: (hole: number) => void;
+}
+
+const ExpandedHoleButton = React.memo(function ExpandedHoleButton({
+  hole,
+  status,
+  tone,
+  runningScore,
+  isCurrent,
+  teamAName,
+  teamBName,
+  onSelect,
+}: ExpandedHoleButtonProps) {
+  return (
+    <button
+      key={hole}
+      type="button"
+      onClick={() => onSelect(hole)}
+      className="relative flex min-h-[72px] flex-col items-start justify-between rounded-2xl border px-3 py-2.5 text-left transition-transform duration-150 active:scale-[0.98]"
+      style={{
+        background: tone.background,
+        borderColor: tone.border,
+      }}
+      aria-label={`Go to hole ${hole}`}
+    >
+      <span className="text-sm font-semibold" style={{ color: tone.text }}>
+        {hole}
+      </span>
+      <div>
+        <p className="text-xs font-medium text-[var(--ink-secondary)]">
+          {status === 'teamA'
+            ? teamAName
+            : status === 'teamB'
+              ? teamBName
+              : status === 'halved'
+                ? 'Halved'
+                : status === 'current'
+                  ? 'Current'
+                  : 'Unscored'}
+        </p>
+        <p className="mt-0.5 text-xs text-[var(--ink-tertiary)]">
+          Match: {formatRunningScore(runningScore)}
+        </p>
+      </div>
+      {isCurrent && (
+        <Flag
+          size={14}
+          className="absolute right-2.5 top-2.5 text-[var(--masters)]"
+        />
+      )}
+    </button>
+  );
+});
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                           */
+/* ------------------------------------------------------------------ */
 
 interface HoleMiniMapProps {
   currentHole: number;
@@ -31,6 +141,10 @@ function holeNumbers(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => start + index);
 }
 
+/* ------------------------------------------------------------------ */
+/*  Main component                                                    */
+/* ------------------------------------------------------------------ */
+
 export function HoleMiniMap({
   currentHole,
   holeResults,
@@ -45,6 +159,13 @@ export function HoleMiniMap({
 }: HoleMiniMapProps) {
   const haptic = useHaptic();
   const [isExpanded, setIsExpanded] = useState(false);
+  const currentHoleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (currentHoleRef.current) {
+      currentHoleRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [currentHole]);
 
   const resultsByHole = useMemo(() => {
     const map = new Map<number, HoleResult>();
@@ -166,28 +287,15 @@ export function HoleMiniMap({
         const isCurrent = status === 'current';
 
         return (
-          <button
+          <CompactHoleButton
             key={hole}
-            type="button"
-            onClick={() => handleHoleSelect(hole)}
-            className="relative flex h-8 w-8 items-center justify-center rounded-xl border text-[11px] font-semibold transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
-            style={{
-              background: tone.background,
-              borderColor: tone.border,
-              color: tone.text,
-              boxShadow: isCurrent ? '0 0 0 1px rgba(0, 102, 68, 0.12)' : undefined,
-            }}
-            aria-label={`Go to hole ${hole}`}
-          >
-            {hole}
-            {isCurrent && (
-              <motion.span
-                className="absolute inset-0 rounded-xl border border-[var(--masters)]"
-                animate={{ opacity: [0.95, 0.35, 0.95] }}
-                transition={{ duration: 1.4, repeat: Infinity }}
-              />
-            )}
-          </button>
+            ref={isCurrent ? currentHoleRef : undefined}
+            hole={hole}
+            status={status}
+            tone={tone}
+            isCurrent={isCurrent}
+            onSelect={handleHoleSelect}
+          />
         );
       })}
     </div>
@@ -207,43 +315,17 @@ export function HoleMiniMap({
           const isCurrent = status === 'current';
 
           return (
-            <button
+            <ExpandedHoleButton
               key={hole}
-              type="button"
-              onClick={() => handleHoleSelect(hole)}
-              className="relative flex min-h-[72px] flex-col items-start justify-between rounded-2xl border px-3 py-2.5 text-left transition-transform duration-150 active:scale-[0.98]"
-              style={{
-                background: tone.background,
-                borderColor: tone.border,
-              }}
-              aria-label={`Go to hole ${hole}`}
-            >
-              <span className="text-sm font-semibold" style={{ color: tone.text }}>
-                {hole}
-              </span>
-              <div>
-                <p className="text-xs font-medium text-[var(--ink-secondary)]">
-                  {status === 'teamA'
-                    ? teamAName
-                    : status === 'teamB'
-                      ? teamBName
-                      : status === 'halved'
-                        ? 'Halved'
-                        : status === 'current'
-                          ? 'Current'
-                          : 'Unscored'}
-                </p>
-                <p className="mt-0.5 text-xs text-[var(--ink-tertiary)]">
-                  Match: {formatRunningScore(runningScore)}
-                </p>
-              </div>
-              {isCurrent && (
-                <Flag
-                  size={14}
-                  className="absolute right-2.5 top-2.5 text-[var(--masters)]"
-                />
-              )}
-            </button>
+              hole={hole}
+              status={status}
+              tone={tone}
+              runningScore={runningScore}
+              isCurrent={isCurrent}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              onSelect={handleHoleSelect}
+            />
           );
         })}
       </div>

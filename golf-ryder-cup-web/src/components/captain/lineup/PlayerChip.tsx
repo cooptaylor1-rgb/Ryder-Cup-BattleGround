@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { GripVertical, X } from 'lucide-react';
@@ -16,7 +17,7 @@ export interface PlayerChipProps {
   size?: 'sm' | 'md';
 }
 
-export function PlayerChip({
+export const PlayerChip = React.memo(function PlayerChip({
   player,
   onDragStart,
   onDragEnd,
@@ -97,4 +98,4 @@ export function PlayerChip({
       )}
     </div>
   );
-}
+});

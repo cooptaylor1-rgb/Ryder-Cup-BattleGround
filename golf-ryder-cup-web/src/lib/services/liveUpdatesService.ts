@@ -63,7 +63,9 @@ let cachedMatchIds: Set<string> | null = null;
 let isPageVisible = true;
 let visibilityHandler: (() => void) | null = null;
 let visibilityDisconnectTimer: ReturnType<typeof setTimeout> | null = null;
-const VISIBILITY_DISCONNECT_DELAY = 30000;
+// 5s grace period allows brief tab switches (check messages, copy-paste)
+// without disconnecting. Previous 30s value wasted battery on every tab switch.
+const VISIBILITY_DISCONNECT_DELAY = 5000;
 
 // ============================================
 // HELPERS

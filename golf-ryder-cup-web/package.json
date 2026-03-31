@@ -61,7 +61,6 @@
     "@sentry/nextjs": "^10.34.0",
     "@supabase/supabase-js": "^2.90.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
     "dexie": "^4.2.1",
     "dexie-react-hooks": "^4.2.0",
     "framer-motion": "^12.26.2",
@@ -74,7 +73,6 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.0",
     "tailwind-merge": "^3.4.0",
-    "uuid": "^13.0.0",
     "zod": "^4.3.5",
     "zustand": "^5.0.10"
   },
@@ -92,7 +90,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9",

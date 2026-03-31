@@ -501,8 +501,15 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
             </div>
 
             {error && (
-                <div className="mb-4 p-3 bg-[color:var(--error)]/10 text-[var(--error)] rounded-lg text-sm">
-                    {error}
+                <div className="mb-4 p-3 bg-[color:var(--error)]/10 rounded-lg text-sm flex items-center justify-between gap-3">
+                    <span className="text-[var(--error)]">{error}</span>
+                    <button
+                        type="button"
+                        onClick={() => performSearch(query)}
+                        className="shrink-0 rounded-full border border-[var(--error)]/30 px-3 py-1.5 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10"
+                    >
+                        Try Again
+                    </button>
                 </div>
             )}
 
@@ -546,8 +553,11 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
 
             {results.length === 0 && query && !isSearching && !error && (
                 <div className="text-center py-8 text-[var(--ink-secondary)]">
-                    <p>No courses found for &quot;{query}&quot;</p>
-                    <p className="text-sm mt-1">Try a different search term</p>
+                    <p className="font-medium">No courses found for &quot;{query}&quot;</p>
+                    <div className="mt-3 space-y-1 text-sm">
+                        <p>Try searching by city name, or use a shorter course name.</p>
+                        <p className="text-[var(--ink-tertiary)]">Example: &quot;Pinehurst&quot; or &quot;Myrtle Beach&quot;</p>
+                    </div>
                 </div>
             )}
 

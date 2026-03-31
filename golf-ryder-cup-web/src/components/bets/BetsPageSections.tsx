@@ -1,3 +1,4 @@
+import React from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
@@ -142,7 +143,7 @@ export function EmptyBoardPanel({
   );
 }
 
-export function PublicBetCard({
+export const PublicBetCard = React.memo(function PublicBetCard({
   bet,
   getPlayer,
   linkedMatch,
@@ -213,7 +214,7 @@ export function PublicBetCard({
       </div>
     </button>
   );
-}
+});
 
 export function SideNote({
   icon,

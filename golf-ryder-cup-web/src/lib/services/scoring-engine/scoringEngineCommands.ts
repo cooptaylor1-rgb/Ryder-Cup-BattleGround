@@ -15,6 +15,59 @@ import { scoringLogger } from '@/lib/utils/logger';
 
 import { isValidHoleNumber, isValidWinner, TOTAL_HOLES } from './scoringEngineShared';
 
+// ============================================
+// CONFLICT DETECTION
+// ============================================
+
+/** Threshold for considering two scores on the same hole as a conflict (30 seconds) */
+const CONFLICT_WINDOW_MS = 30_000;
+
+export interface ScoreConflict {
+  type: 'conflict';
+  matchId: string;
+  holeNumber: number;
+  existingResult: HoleResult;
+  existingBy: string;
+  incomingWinner: HoleWinner;
+  incomingBy: string;
+}
+
+/**
+ * Check if an incoming score conflicts with an existing one.
+ * A conflict occurs when a different user scored the same hole within the conflict window.
+ */
+function detectConflict(
+  existing: HoleResult,
+  winner: HoleWinner,
+  scoredBy: string | undefined,
+): ScoreConflict | null {
+  // No conflict if same user is editing their own score
+  if (!scoredBy || !existing.lastEditedBy || existing.lastEditedBy === scoredBy) {
+    // Also check original scorer
+    if (!scoredBy || !existing.scoredBy || existing.scoredBy === scoredBy) {
+      return null;
+    }
+  }
+
+  const existingTime = new Date(existing.lastEditedAt || existing.timestamp).getTime();
+  const now = Date.now();
+
+  // Only flag as conflict if the existing score was recent
+  if (now - existingTime > CONFLICT_WINDOW_MS) {
+    return null;
+  }
+
+  return {
+    type: 'conflict',
+    matchId: existing.matchId,
+    holeNumber: existing.holeNumber,
+    existingResult: existing,
+    existingBy: existing.lastEditedBy || existing.scoredBy || 'unknown',
+    incomingWinner: winner,
+    incomingBy: scoredBy || 'unknown',
+  };
+}
+
 export async function recordHoleResult(
   matchId: string,
   holeNumber: number,
@@ -26,7 +79,7 @@ export async function recordHoleResult(
   isCaptainOverride?: boolean,
   teamAPlayerScores?: PlayerHoleScore[],
   teamBPlayerScores?: PlayerHoleScore[]
-): Promise<HoleResult> {
+): Promise<HoleResult | ScoreConflict> {
   if (!isValidHoleNumber(holeNumber)) {
     throw new Error(`Invalid hole number: ${holeNumber}. Must be 1-${TOTAL_HOLES}.`);
   }
@@ -37,6 +90,33 @@ export async function recordHoleResult(
 
   return db.transaction('rw', [db.holeResults, db.scoringEvents], async () => {
     const existing = await db.holeResults.where({ matchId, holeNumber }).first();
+
+    // Deduplication: if the exact same score already exists, return it without re-writing.
+    // Prevents accidental double-taps on slow devices from creating spurious edit history.
+    if (
+      existing &&
+      existing.winner === winner &&
+      existing.teamAScore === teamAScore &&
+      existing.teamBScore === teamBScore
+    ) {
+      return existing;
+    }
+
+    // Conflict detection: flag when a different user scored the same hole within 30s.
+    // Captain overrides bypass conflict detection — they're intentional edits.
+    if (existing && !isCaptainOverride) {
+      const conflict = detectConflict(existing, winner, scoredBy);
+      if (conflict) {
+        scoringLogger.warn('Score conflict detected', {
+          matchId,
+          holeNumber,
+          existingBy: conflict.existingBy,
+          incomingBy: conflict.incomingBy,
+        });
+        return conflict;
+      }
+    }
+
     const now = new Date().toISOString();
 
     let editHistory: HoleResultEdit[] = existing?.editHistory || [];
