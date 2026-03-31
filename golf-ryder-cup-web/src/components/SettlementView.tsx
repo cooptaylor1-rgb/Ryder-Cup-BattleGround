@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import {
   SettlementBalancesSection,
@@ -29,7 +29,7 @@ import { Check, Calculator, Wallet } from 'lucide-react';
 export default function SettlementView() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
 
   // Load all side game data in a single batched query (avoids 5 separate DB round-trips)

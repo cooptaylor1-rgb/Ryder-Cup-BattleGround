@@ -12,7 +12,7 @@ import {
     type LineupState,
 } from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { getTeamPlayersForLineup, toLineupPlayers } from './lineupBuilderData';
 import {
@@ -40,7 +40,8 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
     const router = useRouter();
     const { currentTrip, sessions, teams, players, teamMembers, getSessionMatches, updateSession } =
         useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers, getSessionMatches: s.getSessionMatches, updateSession: s.updateSession })));
-    const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+    const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+    const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
     const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
     const [viewMode, setViewMode] = useState<SessionLineupViewMode>('matches');

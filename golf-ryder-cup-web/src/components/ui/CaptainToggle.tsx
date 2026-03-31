@@ -16,7 +16,7 @@ import { useState } from 'react';
 import { KeyRound, Shield, ShieldCheck } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { useUIStore } from '@/lib/stores';
+import { useAccessStore } from '@/lib/stores';
 import { ConfirmDialog, Modal } from './Modal';
 
 interface CaptainToggleProps {
@@ -25,7 +25,7 @@ interface CaptainToggleProps {
 
 export function CaptainToggle({ className }: CaptainToggleProps) {
   const { isCaptainMode, enableCaptainMode, disableCaptainMode, captainPinHash, resetCaptainPin } =
-    useUIStore();
+    useAccessStore();
   const [showPinModal, setShowPinModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [pin, setPin] = useState('');

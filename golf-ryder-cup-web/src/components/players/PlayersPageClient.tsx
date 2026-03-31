@@ -10,7 +10,7 @@ import {
   PlayersFactCard,
   RosterSectionCard,
 } from '@/components/players/PlayersPageSections';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Player } from '@/lib/types/models';
 import { createLogger } from '@/lib/utils/logger';
@@ -65,7 +65,8 @@ export default function PlayersPageClient() {
     assignPlayerToTeam,
     removePlayerFromTeam,
   } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addPlayer: s.addPlayer, updatePlayer: s.updatePlayer, removePlayer: s.removePlayer, assignPlayerToTeam: s.assignPlayerToTeam, removePlayerFromTeam: s.removePlayerFromTeam })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkAdd, setShowBulkAdd] = useState(false);

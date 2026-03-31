@@ -31,7 +31,7 @@ import { deleteTripCascade } from '../services/cascadeDelete';
 import { createLogger } from '../utils/logger';
 import { handleError } from '../utils/errorHandling';
 import { mergeTripPlayers } from '../utils/tripPlayers';
-import { useUIStore } from './uiStore';
+import { useAccessStore } from './accessStore';
 
 const logger = createLogger('TripStore');
 
@@ -253,10 +253,10 @@ export const useTripStore = create<TripState>()(
         });
 
         // After creating the trip, auto-enable captain mode for the creator
-        const uiStore = useUIStore.getState();
-        if (!uiStore.isCaptainMode) {
+        const accessStore = useAccessStore.getState();
+        if (!accessStore.isCaptainMode) {
           // Set captain mode without requiring PIN for trip creator
-          uiStore.enableCaptainModeForCreator();
+          accessStore.enableCaptainModeForCreator();
         }
 
         return trip;

@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { TripTemplatePicker } from '@/components/trip-setup';
 import type { LegacyTripTemplate as TripTemplate } from '@/lib/types/templates';
 import { createTripFromTemplate, previewTemplateTrip } from '@/lib/services/tripTemplateService';
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ type Step = 'select' | 'configure' | 'preview';
 
 export default function NewTripPage() {
   const router = useRouter();
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [step, setStep] = useState<Step>('select');
   const [selectedTemplate, setSelectedTemplate] = useState<TripTemplate | null>(null);

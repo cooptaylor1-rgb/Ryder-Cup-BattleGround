@@ -19,7 +19,7 @@ import {
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { AuditActionType, AuditLogEntry } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
@@ -139,7 +139,7 @@ const ACTION_META: Record<
 export default function CaptainAuditLogPage() {
   const router = useRouter();
   const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
-  const { isCaptainMode } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const [actorFilter, setActorFilter] = useState('');
   const [actionFilter, setActionFilter] = useState<'all' | AuditActionType>('all');
   const [searchTerm, setSearchTerm] = useState('');

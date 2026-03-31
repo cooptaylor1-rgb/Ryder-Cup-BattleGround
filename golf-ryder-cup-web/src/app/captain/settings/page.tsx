@@ -11,7 +11,7 @@ import {
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { captainLogger } from '@/lib/utils/logger';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,8 @@ import {
 export default function CaptainSettingsPage() {
   const router = useRouter();
   const { currentTrip, updateTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, updateTrip: s.updateTrip })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [tripName, setTripName] = useState(currentTrip?.name || '');
   const [startDate, setStartDate] = useState(currentTrip?.startDate || '');

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageLoadingSkeleton } from '@/components/ui';
-import { useAuthStore, useUIStore, type UserProfile } from '@/lib/stores';
+import { useAuthStore, useToastStore, type UserProfile } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import { buildMagicLinkRedirectPath, requestEmailSignInLink } from '@/lib/supabase/auth';
@@ -54,7 +54,7 @@ export default function CreateProfilePageClient() {
   const searchParams = useSearchParams();
   const { createProfile, isAuthenticated, currentUser, isLoading, error, clearError, authEmail } =
     useAuthStore();
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [step, setStep] = useState<Step>('essential');
   const [formData, setFormData] = useState<FormData>(initialFormData);

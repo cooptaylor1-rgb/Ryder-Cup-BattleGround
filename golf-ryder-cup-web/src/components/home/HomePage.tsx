@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FirstLaunchWalkthrough } from '@/components/FirstLaunchWalkthrough';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
@@ -58,7 +58,8 @@ function readPendingJoinCode(): string | undefined {
 export default function HomePage() {
   const router = useRouter();
   const { loadTrip, players, teams, teamMembers, sessions } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, sessions: s.sessions })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>(readPendingJoinCode);
   const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
   const [homeClock] = useState(() => Date.now());

@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog, EmptyStatePremium } from '@/components/ui';
 import { db } from '@/lib/db';
-import { useAuthStore, useTripStore, useUIStore } from '@/lib/stores';
+import { useAuthStore, useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { uiLogger } from '@/lib/utils/logger';
 import { shareBanterPost } from '@/lib/utils/share';
@@ -40,7 +40,7 @@ export default function SocialPageClient() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
   const { currentUser, authUserId } = useAuthStore();
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [message, setMessage] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const [pendingDeletePostId, setPendingDeletePostId] = useState<string | null>(null);

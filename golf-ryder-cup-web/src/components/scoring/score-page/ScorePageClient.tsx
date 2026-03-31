@@ -65,24 +65,26 @@ export default function ScorePageClient() {
         }
     }, [defaultActiveSession, selectedSessionId]);
 
-    const matches = useLiveQuery(
+    // Single batched query for matches + hole results (eliminates intermediate re-render)
+    const matchData = useLiveQuery(
         async () => {
-            if (!activeSession) return [];
-            return db.matches.where('sessionId').equals(activeSession.id).sortBy('matchNumber');
+            if (!activeSession) return { matches: [], holeResults: [] };
+            const matches = await db.matches
+                .where('sessionId')
+                .equals(activeSession.id)
+                .sortBy('matchNumber');
+            const matchIds = matches.map((m) => m.id);
+            const holeResults =
+                matchIds.length > 0
+                    ? await db.holeResults.where('matchId').anyOf(matchIds).toArray()
+                    : [];
+            return { matches, holeResults };
         },
         [activeSession?.id],
-        []
+        { matches: [], holeResults: [] }
     );
 
-    const holeResults = useLiveQuery(
-        async () => {
-            if (!matches || matches.length === 0) return [];
-            const matchIds = matches.map((match) => match.id);
-            return db.holeResults.where('matchId').anyOf(matchIds).toArray();
-        },
-        [matches],
-        []
-    );
+    const { matches, holeResults } = matchData;
 
     const holeResultsByMatchId = useMemo(
         () => buildHoleResultsByMatchId(holeResults),

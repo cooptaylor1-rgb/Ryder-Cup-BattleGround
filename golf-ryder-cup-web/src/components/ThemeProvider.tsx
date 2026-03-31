@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useUIStore } from '@/lib/stores';
+import { useThemeStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { TEAM_COLOR_PALETTE } from '@/lib/constants/teamColors';
 
@@ -12,7 +12,7 @@ import { TEAM_COLOR_PALETTE } from '@/lib/constants/teamColors';
  * Must be rendered client-side to access document.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme, autoTheme, accentTheme } = useUIStore(useShallow(s => ({ theme: s.theme, setTheme: s.setTheme, autoTheme: s.autoTheme, accentTheme: s.accentTheme })));
+  const { theme, setTheme, autoTheme, accentTheme } = useThemeStore(useShallow(s => ({ theme: s.theme, setTheme: s.setTheme, autoTheme: s.autoTheme, accentTheme: s.accentTheme })));
 
   // Apply theme on mount and when it changes
   // Apply theme on mount and toggle auto-theme interval.

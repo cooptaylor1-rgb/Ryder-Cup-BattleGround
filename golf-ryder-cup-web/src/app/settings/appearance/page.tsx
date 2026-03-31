@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Palette, Moon, Sun, Mountain, Shield, ChevronRight } from 'lucide-react';
-import { useUIStore } from '@/lib/stores';
+import { useThemeStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (value: boo
 
 export default function AppearanceSettingsPage() {
   const router = useRouter();
-  const { theme, setTheme, autoTheme, setAutoTheme, accentTheme, setAccentTheme } = useUIStore(useShallow(s => ({ theme: s.theme, setTheme: s.setTheme, autoTheme: s.autoTheme, setAutoTheme: s.setAutoTheme, accentTheme: s.accentTheme, setAccentTheme: s.setAccentTheme })));
+  const { theme, setTheme, autoTheme, setAutoTheme, accentTheme, setAccentTheme } = useThemeStore(useShallow(s => ({ theme: s.theme, setTheme: s.setTheme, autoTheme: s.autoTheme, setAutoTheme: s.setAutoTheme, accentTheme: s.accentTheme, setAccentTheme: s.setAccentTheme })));
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">

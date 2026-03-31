@@ -19,7 +19,7 @@ import {
 } from '@/components/bets/CaptainBetsPageSections';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { SideBet, SideBetType } from '@/lib/types/models';
 import { betsLogger } from '@/lib/utils/logger';
@@ -28,7 +28,8 @@ import { Check, DollarSign, Plus, Users } from 'lucide-react';
 export default function CaptainBetsPageClient() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
 
   const [showComposer, setShowComposer] = useState(false);

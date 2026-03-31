@@ -14,7 +14,7 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import {
@@ -35,7 +35,8 @@ type AttendanceRecord = {
 export default function AvailabilityPage() {
   const router = useRouter();
   const { currentTrip, players, sessions, teams, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions, teams: s.teams, teamMembers: s.teamMembers })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const [attendanceMap, setAttendanceMap] = useState<Map<string, AttendanceRecord>>(new Map());
   const [selectedSession, setSelectedSession] = useState<string | null>(null);

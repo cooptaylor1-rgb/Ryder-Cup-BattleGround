@@ -16,7 +16,7 @@ import {
   buildNassauSideBet,
   canCreateMatchNassau,
 } from '@/lib/services/sideBetBuilders';
-import { useUIStore } from '@/lib/stores';
+import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, Player, SideBet, SideBetType } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
@@ -41,7 +41,7 @@ export function MatchInsideGamesPanel({
   sideBets,
 }: MatchInsideGamesPanelProps) {
   const router = useRouter();
-  const { showToast } = useUIStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const matchPlayers = useMemo(() => [...teamAPlayers, ...teamBPlayers], [teamAPlayers, teamBPlayers]);
   const [showComposer, setShowComposer] = useState(false);

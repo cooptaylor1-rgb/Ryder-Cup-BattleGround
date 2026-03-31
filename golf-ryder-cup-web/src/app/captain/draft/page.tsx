@@ -9,7 +9,7 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
-import { useTripStore, useUIStore } from '@/lib/stores';
+import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { draftLogger } from '@/lib/utils/logger';
 import {
@@ -22,7 +22,8 @@ import {
 export default function DraftPage() {
   const router = useRouter();
   const { currentTrip, players, teams, assignPlayerToTeam, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, assignPlayerToTeam: s.assignPlayerToTeam, teamMembers: s.teamMembers })));
-  const { isCaptainMode, showToast } = useUIStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, showToast: s.showToast })));
+  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const handleDraftComplete = useCallback(
     async (assignments: Map<string, string>) => {
