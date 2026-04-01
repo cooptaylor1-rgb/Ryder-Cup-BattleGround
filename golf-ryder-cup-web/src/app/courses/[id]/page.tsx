@@ -71,7 +71,7 @@ export default function CourseDetailPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params.id as string;
-  const { showToast } = useToastStore(useShallow((s: { showToast: (type: string, msg: string) => void }) => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
   const course = useLiveQuery(
     () => db.courseProfiles.get(courseId),
