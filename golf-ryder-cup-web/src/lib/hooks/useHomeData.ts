@@ -80,7 +80,7 @@ interface HomeData {
  * Returns undefined while loading (first Dexie tick).
  */
 export function useConsolidatedTripData(): ConsolidatedData | undefined {
-    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
+    const { currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
 
     return useLiveQuery(async () => {
         const allTrips = await db.trips.orderBy('startDate').reverse().toArray();
@@ -92,10 +92,13 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
             return now >= start && now <= end;
         }) || null;
 
+        // If the user explicitly exited, don't auto-select a trip
         const selectedTrip =
             currentTrip
                 ? allTrips.find((trip) => trip.id === currentTrip.id) ?? currentTrip
-                : dateActiveTrip;
+                : userExitedTrip
+                    ? null
+                    : dateActiveTrip;
 
         if (!selectedTrip) {
             return {
@@ -107,7 +110,7 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
                 sideBets: [],
                 banterPosts: [],
                 tripAwards: [],
-                dateActiveTripId: dateActiveTrip?.id ?? null,
+                dateActiveTripId: userExitedTrip ? null : (dateActiveTrip?.id ?? null),
             };
         }
 
@@ -142,7 +145,7 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
             tripAwards,
             dateActiveTripId: dateActiveTrip?.id ?? null,
         };
-    }, [currentTrip?.id]);
+    }, [currentTrip?.id, userExitedTrip]);
 }
 
 // ============================================
