@@ -115,8 +115,8 @@ export default function MorePageClient() {
     try {
       await clearDemoData();
       clearTrip();
-      showToast('info', 'All data cleared');
-      router.push('/');
+      localStorage.removeItem('golf-trip-storage');
+      window.location.href = '/';
     } catch (error) {
       logger.error('Failed to clear data', { error });
       showToast('error', 'Could not clear data');
@@ -126,7 +126,12 @@ export default function MorePageClient() {
   const handleExitTrip = () => {
     clearTrip();
     setShowExitTripConfirm(false);
-    router.push('/');
+    // Remove persisted trip ID so rehydration won't restore it
+    localStorage.removeItem('golf-trip-storage');
+    // Full page reload ensures all reactive queries, live subscriptions,
+    // and cached hook results are cleared — router.push('/') left stale
+    // Dexie useLiveQuery results that kept showing the exited trip.
+    window.location.href = '/';
   };
 
   const primarySections: MenuSection[] = [
