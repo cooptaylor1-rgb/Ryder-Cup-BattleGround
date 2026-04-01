@@ -460,18 +460,24 @@ export function LineupSetupFact({
   label,
   value,
   note,
+  onClick,
 }: {
   label: string;
   value: string | number;
   note?: string;
+  onClick?: () => void;
 }) {
   return (
-    <div className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-[20px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/72 px-3 py-3 text-center cursor-pointer transition-colors hover:bg-[var(--surface-secondary)] hover:border-[var(--masters)] active:bg-[var(--surface)]"
+    >
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
         {label}
       </p>
       <p className="mt-1 font-serif text-[length:var(--text-xl)] text-[var(--ink)]">{value}</p>
       {note && <p className="mt-1 text-[11px] text-[var(--ink-secondary)]">{note}</p>}
-    </div>
+    </button>
   );
 }

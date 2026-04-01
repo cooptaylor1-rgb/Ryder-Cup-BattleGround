@@ -454,12 +454,21 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             </div>
 
             <div className="mt-[var(--space-6)] grid grid-cols-3 gap-3">
-              <LineupSetupFact label="Format" value={selectedType.label.split('(')[0]!.trim()} />
-              <LineupSetupFact label="Matches" value={matchCount} />
+              <LineupSetupFact
+                label="Format"
+                value={selectedType.label.split('(')[0]!.trim()}
+                onClick={() => { if (step === 'setup') setShowAdvanced(true); }}
+              />
+              <LineupSetupFact
+                label="Matches"
+                value={matchCount}
+                onClick={() => { if (step === 'setup') setShowAdvanced(true); }}
+              />
               <LineupSetupFact
                 label="Roster"
                 value={hasEnoughPlayers ? 'Ready' : 'Short'}
                 note={`${teamAPlayers.length}-${teamBPlayers.length} players`}
+                onClick={() => { if (step === 'setup') setShowAdvanced(true); }}
               />
             </div>
           </div>
