@@ -282,15 +282,18 @@ export function useSideBetsSummary(data: ConsolidatedData | undefined) {
  * changes or the selected trip falls out of sync.
  */
 export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
-    const { loadTrip, currentTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, currentTrip: s.currentTrip })));
+    const { loadTrip, currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
 
     useEffect(() => {
+        // Don't auto-load if the user explicitly exited the trip
+        if (userExitedTrip) return;
         if (!currentTrip && data?.dateActiveTripId) {
             loadTrip(data.dateActiveTripId);
         }
-    }, [data?.dateActiveTripId, currentTrip, loadTrip]);
+    }, [data?.dateActiveTripId, currentTrip, loadTrip, userExitedTrip]);
 
     useEffect(() => {
+        if (userExitedTrip) return;
         if (
             currentTrip &&
             data?.activeTrip &&
@@ -298,7 +301,7 @@ export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
         ) {
             loadTrip(data.activeTrip.id);
         }
-    }, [data?.activeTrip, currentTrip, loadTrip]);
+    }, [data?.activeTrip, currentTrip, loadTrip, userExitedTrip]);
 }
 
 // ============================================

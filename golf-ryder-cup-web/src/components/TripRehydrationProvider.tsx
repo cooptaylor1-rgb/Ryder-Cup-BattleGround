@@ -23,7 +23,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
     const hasRehydrated = useRef(false);
     const hasCheckedUserTrip = useRef(false);
     const isEnsuringTripPlayer = useRef(false);
-    const { currentTrip, loadTrip, isLoading, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, isLoading: s.isLoading, players: s.players })));
+    const { currentTrip, loadTrip, isLoading, players, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, isLoading: s.isLoading, players: s.players, userExitedTrip: s.userExitedTrip })));
     const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
     // Rehydrate persisted trip state
@@ -31,6 +31,9 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         // Only run once on mount
         if (hasRehydrated.current) return;
         hasRehydrated.current = true;
+
+        // Don't rehydrate if the user explicitly exited the trip
+        if (userExitedTrip) return;
 
         // Check localStorage for persisted trip ID
         const stored = localStorage.getItem('golf-trip-storage');
@@ -47,14 +50,14 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         } catch (error) {
             tripLogger.error('Failed to rehydrate trip state:', error);
         }
-    }, [currentTrip, loadTrip, isLoading]);
+    }, [currentTrip, loadTrip, isLoading, userExitedTrip]);
 
     // Auto-load active trip for authenticated users who have been invited
     useEffect(() => {
         // Only run once per session and only when authenticated
         if (hasCheckedUserTrip.current || !isAuthenticated || !currentUser) return;
-        // Don't run if a trip is already loaded
-        if (currentTrip) return;
+        // Don't run if a trip is already loaded or user explicitly exited
+        if (currentTrip || userExitedTrip) return;
 
         hasCheckedUserTrip.current = true;
 
@@ -133,7 +136,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         };
 
         findAndLoadUserTrip();
-    }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip]);
+    }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip, userExitedTrip]);
 
     useEffect(() => {
         if (!isAuthenticated || !currentUser || !currentTrip || isEnsuringTripPlayer.current) {

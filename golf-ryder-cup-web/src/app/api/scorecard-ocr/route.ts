@@ -48,138 +48,120 @@ interface ScorecardData {
 type ImageData = OcrImageData;
 type RequestBody = OcrRequest;
 
-const EXTRACTION_PROMPT = `You are an expert golf scorecard data extractor. Analyze this scorecard image and extract ALL data with extreme precision.
+const EXTRACTION_PROMPT = `You are an expert golf scorecard data extractor. Your job is to read every number on this scorecard with extreme precision, cell by cell.
 
-TYPICAL SCORECARD STRUCTURE (read carefully):
+STEP 1 — IDENTIFY THE LAYOUT
+Scorecards are tables. First, identify the structure:
+- The TOP half typically contains Holes 1-9 (Front Nine), ending with an "OUT" totals column.
+- The BOTTOM half typically contains Holes 10-18 (Back Nine), ending with "IN" and "TOTAL" columns.
+- Some scorecards place all 18 holes in a single long row.
 
-The scorecard has TWO MAIN SECTIONS stacked vertically:
-- TOP SECTION: Holes 1-9 (Front Nine) ending with "OUT" column
-- BOTTOM SECTION: Holes 10-18 (Back Nine) ending with "IN" and "TOTAL" columns
+STEP 2 — IDENTIFY EVERY ROW
+Read the ROW LABELS on the left side of the table. Common rows include:
+- HOLE: The hole numbers (1-9, 10-18)
+- TEE YARDAGE ROWS: Multiple rows, one per tee color (Black, Blue, White, Gold, Red, Green, etc.)
+  - The topmost yardage row is usually the longest tees
+  - The bottommost yardage row is usually the shortest tees
+  - Labels may say: Black, Championship, Blue, White, Gold, Senior, Red, Forward, Ladies, etc.
+- PAR: Values of 3, 4, or 5 for each hole
+- HANDICAP / HDCP / HCP: Difficulty ranking 1-18 (1 = hardest hole)
+  - There may be separate M HANDICAP (Men) and W HANDICAP (Women) rows — use the Men's row
+- YARDAGE TOTALS: "OUT", "IN", and "TOTAL" columns at the edges
 
-WITHIN EACH SECTION, look for these ROWS from top to bottom:
-1. HOLE ROW: Numbers 1-9 or 10-18
-2. TEE YARDAGE ROWS: Multiple rows (4-6), each is a different tee color/name
-   - First row = longest tees (Black/Championship)
-   - Last row = shortest tees (Forward/Red/Blue)
-   - Look for labels on LEFT: Black, Green, Tangerine, Silver, Blue, White, Gold, Red, etc.
-3. PAR ROW: Values 3, 4, or 5 for each hole
-4. HANDICAP ROWS: Often two rows labeled "M HANDICAP" (Men) and "W HANDICAP" (Women)
-   - Use M HANDICAP values (1-18)
-   - These numbers indicate hole difficulty (1=hardest)
+STEP 3 — EXTRACT CELL BY CELL
+For each identified row, read EVERY cell left to right. Do NOT guess or interpolate — read the actual printed number. If a cell is unclear, use your best reading of the digits visible.
 
-EXTRACTION CHECKLIST:
-☐ Did I find holes 1-9 AND holes 10-18? (18 total)
-☐ Did I count ALL tee yardage rows? (Usually 4-6 different tees)
-☐ Did I get the tee name for each row? (Black, Green, Tangerine, Silver, Blue...)
-☐ Did I extract 18 yardages for EACH tee? (9 front + 9 back)
-☐ Did I get par for all 18 holes?
-☐ Did I get handicap for all 18 holes? (from M HANDICAP row)
+STEP 4 — CROSS-CHECK YOUR WORK
+- Front 9 pars should sum to 34-37 (typically 36). Back 9 pars should sum to 34-37 (typically 36).
+- Total par for 18 holes is usually 70-72.
+- Handicap values 1-18 should each appear exactly once across all 18 holes.
+- Yardages should decrease from the longest tee to the shortest tee for each hole.
+- The "OUT" column should equal the sum of holes 1-9 for each row. Same for "IN" and holes 10-18.
 
-RETURN THIS JSON EXACTLY:
+RETURN THIS EXACT JSON FORMAT:
 {
-  "courseName": "Course name if visible at top",
+  "courseName": "Course name if visible anywhere on the scorecard",
   "holes": [
     {"par": 4, "handicap": 3, "yardage": 430},
     {"par": 3, "handicap": 15, "yardage": 210},
-    {"par": 5, "handicap": 11, "yardage": 601},
-    ... continue for ALL 18 holes (holes 1-18 in order)
+    ... ALL 18 holes in order (hole 1 through hole 18)
   ],
   "teeSets": [
     {
       "name": "Black",
       "color": "#000000",
-      "yardages": [430, 210, 601, 420, 460, 330, 418, 231, 585, 371, 616, 537, 478, 165, 437, 510, 206, 538]
-    },
-    {
-      "name": "Green",
-      "color": "#228B22",
-      "yardages": [420, 190, 542, 387, 440, 308, 388, 206, 540, 332, 568, 467, 429, 149, 383, 494, 178, 510]
-    },
-    {
-      "name": "Tangerine",
-      "color": "#FF9966",
-      "yardages": [377, 175, 513, 379, 415, 290, 373, 197, 473, 321, 515, 430, 398, 128, 360, 464, 171, 440]
-    },
-    {
-      "name": "Silver",
-      "color": "#C0C0C0",
-      "yardages": [292, 140, 437, 290, 345, 248, 351, 150, 390, 315, 415, 406, 334, 80, 319, 420, 120, 370]
+      "rating": 74.2,
+      "slope": 138,
+      "yardages": [430, 210, 601, ...]
     },
     {
       "name": "Blue",
-      "color": "#0000FF",
-      "yardages": [230, 128, 270, 245, 230, 170, 250, 78, 306, 290, 361, 243, 255, 71, 230, 388, 68, 311]
+      "color": "#1E40AF",
+      "rating": 72.1,
+      "slope": 131,
+      "yardages": [410, 195, 575, ...]
     }
   ]
 }
 
-IMPORTANT:
-- "holes" array MUST have exactly 18 items
-- "teeSets" array should have ALL tee rows you can see (typically 4-6)
-- Each tee's "yardages" array MUST have exactly 18 numbers
-- Use hex color codes for colors when possible
-- Return ONLY valid JSON, no other text or explanation`;
+RULES:
+- "holes" array MUST have exactly 18 entries, one per hole in order.
+- "holes[].yardage" should use the FIRST (longest) tee set's yardage.
+- "teeSets" should include EVERY tee row visible on the scorecard.
+- Each tee's "yardages" array MUST have exactly 18 numbers.
+- Include "rating" and "slope" for each tee set IF they appear on the scorecard (often printed near the tee name or on the back of the card).
+- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C.
+- Return ONLY the JSON object — no explanation, no markdown fences.`;
 
-const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have multiple images of a golf scorecard.
+const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have multiple images of a golf scorecard. Read every number cell by cell with extreme precision.
 
-IMAGE 1 (FRONT - Holes & Yardages):
-This image shows ALL 18 holes in a table format with:
-- Hole numbers 1-9 (Front/OUT) and 10-18 (Back/IN)
-- 4-6 ROWS of yardages (one row per tee: Black, Blue, White, Gold, Red, etc.)
-- PAR row (values: 3, 4, or 5 for each hole)
-- HANDICAP row (values 1-18, ranking difficulty)
+STEP 1 — ANALYZE EACH IMAGE
+- Image 1 (typically the FRONT of the scorecard): Contains the hole-by-hole table with yardages, pars, and handicaps.
+- Image 2 (typically the BACK of the scorecard): Contains course name, tee ratings, slopes, and additional info.
+- Some images may show different sections of the same table.
 
-IMAGE 2 (BACK - Ratings & Information):
-This image typically shows:
-- Course name and logo
-- TEE SET information with RATINGS and SLOPES
-- Format often like: "Black Tees - Rating: 74.2 / Slope: 138"
-- May have separate Men's and Women's ratings
+STEP 2 — EXTRACT FROM THE TABLE IMAGE(S)
+Read each row left to right, cell by cell:
+- HOLE ROW: Numbers 1-9 (Front) and 10-18 (Back)
+- TEE YARDAGE ROWS: One row per tee color. Read the label on the left (Black, Blue, White, Gold, Red, etc.)
+- PAR ROW: Values 3, 4, or 5 for each hole
+- HANDICAP ROW: Values 1-18 (use Men's handicap row if there are separate M/W rows)
 
-YOUR TASK - Combine BOTH images:
-1. From Image 1: Extract ALL 18 holes (par, handicap) and ALL yardages for EACH tee set (4-6 tees)
-2. From Image 2: Get the course name, AND rating/slope for EACH tee set
-3. MERGE: Match the yardages from Image 1 with the ratings/slopes from Image 2 by tee name/color
+STEP 3 — EXTRACT FROM THE INFO IMAGE(S)
+- Course name and club name
+- Tee set ratings and slopes (e.g., "Blue Tees: Rating 72.1 / Slope 131")
 
-CRITICAL - TEE SET EXTRACTION:
-- Count the rows of yardages in Image 1 - there should be 4-6 different tee rows
-- Each row is a different tee (Black, Blue, White, Gold, Red, etc.)
-- The first/top row is usually the longest (Championship/Black)
-- The last/bottom row is usually the shortest (Forward/Red)
-- INCLUDE ALL ROWS - don't skip any!
+STEP 4 — MERGE AND CROSS-CHECK
+- Match yardage rows to tee names/ratings by color or order
+- Front 9 pars should sum to ~36. Back 9 pars should sum to ~36. Total ~72.
+- Handicap values 1-18 should each appear exactly once
+- Yardages should decrease from longest tee to shortest for each hole
+- Check that "OUT"/"IN"/"TOTAL" columns match the sums of the individual holes
 
 Return this JSON:
 {
-  "courseName": "Full course name from Image 2",
+  "courseName": "Full course name",
   "holes": [
     {"par": 4, "handicap": 7, "yardage": 385},
-    ... (ALL 18 holes with par, handicap, and yardage from primary tee)
+    ... ALL 18 holes in order, using the longest tee for yardage
   ],
   "teeSets": [
     {
       "name": "Black",
-      "color": "black",
+      "color": "#000000",
       "rating": 74.2,
       "slope": 138,
       "yardages": [385, 165, 520, 410, 195, 545, 340, 180, 430, 395, 155, 510, 425, 185, 560, 365, 170, 445]
     },
-    {
-      "name": "Blue",
-      "color": "blue",
-      "rating": 72.1,
-      "slope": 131,
-      "yardages": [365, 150, 495, 385, 175, 520, 320, 165, 410, 375, 140, 485, 400, 170, 535, 345, 155, 420]
-    },
-    ... (INCLUDE ALL 4-6 TEE SETS)
+    ... INCLUDE EVERY TEE SET visible
   ]
 }
 
-VALIDATION:
-- holes array must have exactly 18 items
-- teeSets array should have 4-6 items (one per tee row visible)
-- Each tee's yardages array must have exactly 18 numbers
-
-Return ONLY the JSON object.`;
+RULES:
+- "holes" must have exactly 18 entries.
+- Each tee's "yardages" must have exactly 18 numbers.
+- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A.
+- Return ONLY the JSON object — no explanation, no markdown fences.`;
 
 export async function POST(request: NextRequest) {
   // Apply rate limiting (more restrictive due to AI API costs)
@@ -338,6 +320,7 @@ async function extractWithClaude(
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
+        temperature: 0,
         messages: [
           {
             role: 'user',
@@ -486,7 +469,8 @@ async function extractWithClaudeMultiple(
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192, // Increased for larger response with all tee sets
+        max_tokens: 8192,
+        temperature: 0,
         messages: [
           {
             role: 'user',

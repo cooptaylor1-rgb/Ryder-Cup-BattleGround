@@ -54,6 +54,9 @@ interface TripState {
   error: string | null;
   syncStatus: SyncStatus;
 
+  // Tracks whether the user explicitly exited the trip (prevents auto-reload)
+  userExitedTrip: boolean;
+
   // Actions
   loadTrip: (tripId: string) => Promise<void>;
   clearTrip: () => void;
@@ -105,10 +108,11 @@ export const useTripStore = create<TripState>()(
       isLoading: false,
       error: null,
       syncStatus: 'unknown' as SyncStatus,
+      userExitedTrip: false,
 
       // Load a trip with all related data
       loadTrip: async (tripId: string) => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true, error: null, userExitedTrip: false });
 
         try {
           const trip = await db.trips.get(tripId);
@@ -180,6 +184,7 @@ export const useTripStore = create<TripState>()(
           sessions: [],
           error: null,
           syncStatus: 'unknown',
+          userExitedTrip: true,
         });
       },
 
