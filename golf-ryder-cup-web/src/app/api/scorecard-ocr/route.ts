@@ -14,8 +14,7 @@ import { ocrRequestSchema, formatZodError, type OcrRequest, type OcrImageData } 
  * 1. Anthropic Claude (preferred - best accuracy for tables)
  * 2. OpenAI GPT-4o (fallback)
  *
- * Note: PDF files are not directly supported.
- * For PDFs, users should convert to image or use image capture.
+ * Also supports PDF files via Claude's document type.
  */
 
 
@@ -301,6 +300,27 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function buildClaudeContentBlock(base64Data: string, mimeType: string) {
+  if (mimeType === 'application/pdf') {
+    return {
+      type: 'document' as const,
+      source: {
+        type: 'base64' as const,
+        media_type: 'application/pdf' as const,
+        data: base64Data,
+      },
+    };
+  }
+  return {
+    type: 'image' as const,
+    source: {
+      type: 'base64' as const,
+      media_type: mimeType,
+      data: base64Data,
+    },
+  };
+}
+
 // Extract using Anthropic Claude (better for tables/structured data)
 async function extractWithClaude(
   imageBase64: string,
@@ -322,14 +342,7 @@ async function extractWithClaude(
           {
             role: 'user',
             content: [
-              {
-                type: 'image',
-                source: {
-                  type: 'base64',
-                  media_type: mimeType,
-                  data: imageBase64,
-                },
-              },
+              buildClaudeContentBlock(imageBase64, mimeType),
               {
                 type: 'text',
                 text: EXTRACTION_PROMPT,
@@ -444,18 +457,11 @@ async function extractWithClaudeMultiple(
   apiKey: string
 ): Promise<ScorecardData | null> {
   try {
-    // Build content array with all images
-    const content: Array<{ type: string; source?: { type: string; media_type: string; data: string }; text?: string }> = [];
+    // Build content array with all images/documents
+    const content: Array<Record<string, unknown>> = [];
 
     images.forEach((img, index) => {
-      content.push({
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: img.mimeType,
-          data: img.image,
-        },
-      });
+      content.push(buildClaudeContentBlock(img.image, img.mimeType));
       // Add label if provided
       if (img.label) {
         content.push({

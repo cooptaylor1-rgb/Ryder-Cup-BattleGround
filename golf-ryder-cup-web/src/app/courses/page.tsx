@@ -387,6 +387,7 @@ export default function CourseLibraryPage() {
                                 course={course}
                                 teeSets={teeSetsByCourse.get(course.id) || []}
                                 onDelete={handleDelete}
+                                onSelect={(c) => router.push(`/courses/${c.id}`)}
                             />
                         ))}
                     </div>

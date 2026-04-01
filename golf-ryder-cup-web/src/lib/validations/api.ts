@@ -134,17 +134,17 @@ export type CourseLibraryGet = z.infer<typeof courseLibraryGetSchema>;
 // ============================================
 
 /**
- * Supported image MIME types
+ * Supported MIME types for OCR (images + PDF)
  */
-const imageMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const;
+const ocrMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'] as const;
 
 /**
- * Individual image data for OCR
+ * Individual image/document data for OCR
  */
 export const ocrImageDataSchema = z.object({
-    image: z.string().min(100, 'Image data appears too short - ensure base64 encoding'),
-    mimeType: z.enum(imageMimeTypes, {
-        message: 'Unsupported image type. Use JPEG, PNG, WebP, or GIF.',
+    image: z.string().min(100, 'File data appears too short - ensure base64 encoding'),
+    mimeType: z.enum(ocrMimeTypes, {
+        message: 'Unsupported file type. Use JPEG, PNG, WebP, GIF, or PDF.',
     }),
     label: z.enum(['front', 'back', 'ratings', 'full']).optional(),
 });
@@ -154,7 +154,7 @@ export const ocrImageDataSchema = z.object({
  */
 export const ocrRequestSchema = z.object({
     image: z.string().min(100).optional(),
-    mimeType: z.enum(imageMimeTypes).optional(),
+    mimeType: z.enum(ocrMimeTypes).optional(),
     images: z.array(ocrImageDataSchema).max(5, 'Maximum 5 images allowed').optional(),
     provider: z.enum(['claude', 'openai', 'auto']).optional().default('auto'),
 }).refine(

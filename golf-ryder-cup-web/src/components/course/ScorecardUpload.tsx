@@ -49,19 +49,12 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
     setStatus('uploading');
     setError(null);
 
-    // Validate file type - now images only (PDF not supported by AI vision)
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-
-    // Check if PDF and show helpful message
-    if (file.type === 'application/pdf') {
-      setStatus('error');
-      setError('PDF files are not supported. Please take a photo of your scorecard or screenshot the PDF first.');
-      return;
-    }
+    // Validate file type - images and PDF supported
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
 
     if (!validTypes.includes(file.type)) {
       setStatus('error');
-      setError('Please upload an image (JPEG, PNG, HEIC, or WebP)');
+      setError('Please upload an image (JPEG, PNG, HEIC, WebP) or PDF');
       return;
     }
 
@@ -86,11 +79,11 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
       });
       reader.readAsDataURL(file);
 
-      // Show preview for images
+      // Show preview for images (not for PDFs)
       if (file.type.startsWith('image/')) {
         setPreview(URL.createObjectURL(file));
       } else {
-        setPreview(null);
+        setPreview(null); // No preview for PDFs
       }
 
       const base64Data = await base64Promise;
@@ -176,7 +169,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
             <div>
               <h3 className="type-title-sm">Scan Scorecard</h3>
               <p className="type-caption text-[var(--ink-tertiary)]">
-                Upload a photo
+                Upload a photo or PDF
               </p>
             </div>
           </div>
@@ -200,20 +193,20 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 className="cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors border-[var(--rule)] bg-[var(--surface-elevated)] hover:border-[var(--masters)]"
               >
                 <Upload size={48} className="mx-auto mb-4 text-[var(--ink-tertiary)]" />
-                <p className="type-body font-medium mb-2">Drop scorecard image here</p>
+                <p className="type-body font-medium mb-2">Drop scorecard image or PDF here</p>
                 <p className="type-caption mb-4 text-[var(--ink-tertiary)]">
                   or click to browse
                 </p>
                 <div className="flex items-center justify-center gap-4 text-xs text-[var(--ink-muted)]">
                   <span className="flex items-center gap-1">
                     <FileImage size={14} />
-                    JPEG, PNG, HEIC
+                    JPEG, PNG, HEIC, PDF
                   </span>
                 </div>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/heic"
+                  accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
