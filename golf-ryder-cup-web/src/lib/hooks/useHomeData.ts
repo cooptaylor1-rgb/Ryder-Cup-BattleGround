@@ -80,7 +80,7 @@ interface HomeData {
  * Returns undefined while loading (first Dexie tick).
  */
 export function useConsolidatedTripData(): ConsolidatedData | undefined {
-    const { currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
+    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
 
     return useLiveQuery(async () => {
         const allTrips = await db.trips.orderBy('startDate').reverse().toArray();
@@ -92,13 +92,10 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
             return now >= start && now <= end;
         }) || null;
 
-        // If the user explicitly exited, don't auto-select a trip
         const selectedTrip =
             currentTrip
                 ? allTrips.find((trip) => trip.id === currentTrip.id) ?? currentTrip
-                : userExitedTrip
-                    ? null
-                    : dateActiveTrip;
+                : dateActiveTrip;
 
         if (!selectedTrip) {
             return {
@@ -110,7 +107,7 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
                 sideBets: [],
                 banterPosts: [],
                 tripAwards: [],
-                dateActiveTripId: userExitedTrip ? null : (dateActiveTrip?.id ?? null),
+                dateActiveTripId: dateActiveTrip?.id ?? null,
             };
         }
 
@@ -145,7 +142,7 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
             tripAwards,
             dateActiveTripId: dateActiveTrip?.id ?? null,
         };
-    }, [currentTrip?.id, userExitedTrip]);
+    }, [currentTrip?.id]);
 }
 
 // ============================================
@@ -154,9 +151,13 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
 
 /** Trip list and active trip selection. */
 export function useTrips(data: ConsolidatedData | undefined) {
+    const { currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
+
     return useMemo(() => {
         const trips = data?.trips || [];
-        const activeTrip = data?.activeTrip || null;
+        // If user explicitly exited and no trip is loaded in the store,
+        // don't show any active trip — even if the DB query returned one.
+        const activeTrip = (userExitedTrip && !currentTrip) ? null : (data?.activeTrip || null);
         return {
             trips,
             activeTrip,
@@ -164,7 +165,7 @@ export function useTrips(data: ConsolidatedData | undefined) {
             hasTrips: trips.length > 0,
             isLoading: data === undefined,
         };
-    }, [data]);
+    }, [data, userExitedTrip, currentTrip]);
 }
 
 /** Team standings for the active trip. */
