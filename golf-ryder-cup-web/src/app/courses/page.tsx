@@ -174,37 +174,75 @@ export default function CourseLibraryPage() {
         }
     };
 
-    // Handle scorecard OCR data - creates a new course with the extracted tee set
+    // Handle scorecard OCR data - creates a new course with all extracted tee sets
     const handleScorecardData = useCallback(async (data: {
         courseName?: string;
         teeName?: string;
         rating?: number;
         slope?: number;
         holes: HoleData[];
+        teeSets?: Array<{
+            name: string;
+            color?: string;
+            rating?: number;
+            slope?: number;
+            yardages: (number | null)[];
+        }>;
     }) => {
         try {
-            const totalPar = data.holes.reduce((sum, h) => sum + h.par, 0);
-            const totalYardage = data.holes.reduce((sum, h) => sum + (h.yardage || 0), 0);
+            const baseHoles = data.holes;
 
-            // Create course with the scanned tee set
-            await createCourseProfile(
-                {
-                    name: data.courseName || 'Scanned Course',
-                    location: '',
-                },
-                [{
-                    name: data.teeName || 'Scanned Tees',
-                    color: '#2563eb',
-                    rating: data.rating || 72,
-                    slope: data.slope || 113,
-                    par: totalPar,
-                    holePars: data.holes.map(h => h.par),
-                    holeHandicaps: data.holes.map(h => h.handicap),
-                    totalYardage: totalYardage > 0 ? totalYardage : undefined,
-                }]
-            );
+            // If multiple tee sets returned from OCR, create one per tee
+            if (data.teeSets && data.teeSets.length > 0) {
+                const teeSetData = data.teeSets.map(tee => {
+                    const totalYardage = tee.yardages.reduce((sum, y) => sum + (y || 0), 0);
+                    const totalPar = baseHoles.reduce((sum, h) => sum + h.par, 0);
+                    return {
+                        name: tee.name,
+                        color: tee.color || '#2563eb',
+                        rating: tee.rating || 72,
+                        slope: tee.slope || 113,
+                        par: totalPar,
+                        holePars: baseHoles.map(h => h.par),
+                        holeHandicaps: baseHoles.map(h => h.handicap),
+                        totalYardage: totalYardage > 0 ? totalYardage : undefined,
+                    };
+                });
 
-            showToast('success', `Course "${data.courseName || 'Scanned Course'}" created from scorecard!`);
+                await createCourseProfile(
+                    {
+                        name: data.courseName || 'Scanned Course',
+                        location: '',
+                    },
+                    teeSetData
+                );
+
+                showToast('success', `Course "${data.courseName || 'Scanned Course'}" created with ${teeSetData.length} tee sets!`);
+            } else {
+                // Legacy single tee set fallback
+                const totalPar = baseHoles.reduce((sum, h) => sum + h.par, 0);
+                const totalYardage = baseHoles.reduce((sum, h) => sum + (h.yardage || 0), 0);
+
+                await createCourseProfile(
+                    {
+                        name: data.courseName || 'Scanned Course',
+                        location: '',
+                    },
+                    [{
+                        name: data.teeName || 'Scanned Tees',
+                        color: '#2563eb',
+                        rating: data.rating || 72,
+                        slope: data.slope || 113,
+                        par: totalPar,
+                        holePars: baseHoles.map(h => h.par),
+                        holeHandicaps: baseHoles.map(h => h.handicap),
+                        totalYardage: totalYardage > 0 ? totalYardage : undefined,
+                    }]
+                );
+
+                showToast('success', `Course "${data.courseName || 'Scanned Course'}" created from scorecard!`);
+            }
+
             setShowScorecardUpload(false);
         } catch {
             showToast('error', 'Could not create course from scorecard');
