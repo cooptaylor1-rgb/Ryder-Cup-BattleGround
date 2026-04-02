@@ -110,7 +110,9 @@ RULES:
 - "teeSets" should include EVERY tee row visible on the scorecard.
 - Each tee's "yardages" array MUST have exactly 18 numbers.
 - Include "rating" and "slope" for each tee set IF they appear on the scorecard (often printed near the tee name or on the back of the card).
-- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C.
+- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C, Tangerine=#FF9966, Maroon=#800000, Purple=#7B2D8B, Teal=#008080, Champagne=#F7E7CE, Copper=#B87333, Bronze=#CD7F32, Combo/Mixed=#888888.
+- If a tee name does not match any standard color above, pick the closest hex color that visually represents the name (e.g., "Tangerine/Silver" → "#C8A870").
+- Always use the EXACT tee name as printed on the scorecard (e.g., "TANGERINE / SILVER", not just "Tangerine").
 - Return ONLY the JSON object — no explanation, no markdown fences.`;
 
 const MULTI_IMAGE_PROMPT = `You are an expert golf scorecard data extractor. You have multiple images of a golf scorecard. Read every number cell by cell with extreme precision.
@@ -160,7 +162,8 @@ Return this JSON:
 RULES:
 - "holes" must have exactly 18 entries.
 - Each tee's "yardages" must have exactly 18 numbers.
-- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A.
+- Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C, Tangerine=#FF9966, Maroon=#800000, Combo/Mixed=#888888. For non-standard names, pick the closest hex color visually.
+- Always use the EXACT tee name as printed on the scorecard.
 - Return ONLY the JSON object — no explanation, no markdown fences.`;
 
 export async function POST(request: NextRequest) {

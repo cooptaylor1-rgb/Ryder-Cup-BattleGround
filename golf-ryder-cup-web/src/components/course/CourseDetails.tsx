@@ -41,7 +41,12 @@ function inferTeeColor(teeName: string): string {
     if (name.includes('red') || name.includes('forward')) return '#C62828';
     if (name.includes('green')) return '#2E7D32';
     if (name.includes('silver')) return '#9E9E9E';
+    if (name.includes('tangerine')) return '#FF9966';
     if (name.includes('orange')) return '#FF9800';
+    if (name.includes('maroon') || name.includes('burgundy')) return '#800000';
+    if (name.includes('purple')) return '#7B2D8B';
+    if (name.includes('teal')) return '#008080';
+    if (name.includes('copper') || name.includes('bronze')) return '#B87333';
     return '#1565C0';
 }
 

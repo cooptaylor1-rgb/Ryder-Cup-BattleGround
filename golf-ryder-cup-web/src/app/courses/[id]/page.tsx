@@ -35,6 +35,12 @@ const TEE_COLORS = [
   { name: 'Gold', color: '#ca8a04' },
   { name: 'Red', color: '#dc2626' },
   { name: 'Green', color: '#16a34a' },
+  { name: 'Silver', color: '#9e9e9e' },
+  { name: 'Orange', color: '#ea580c' },
+  { name: 'Tangerine', color: '#ff9966' },
+  { name: 'Maroon', color: '#800000' },
+  { name: 'Purple', color: '#7b2d8b' },
+  { name: 'Teal', color: '#008080' },
 ];
 
 interface TeeSetInput {
@@ -153,8 +159,10 @@ export default function CourseDetailPage() {
         const totalPar = holes.reduce((sum, h) => sum + h.par, 0);
         const totalYardage = tee.yardages.reduce((sum: number, y) => sum + (y || 0), 0);
 
+        const teeName = (tee.name || '').toLowerCase();
         const colorHex = TEE_COLORS.find(c =>
-          c.name.toLowerCase() === (tee.name || '').toLowerCase() ||
+          teeName === c.name.toLowerCase() ||
+          teeName.includes(c.name.toLowerCase()) ||
           c.name.toLowerCase() === (tee.color || '').toLowerCase()
         )?.color || tee.color || '#2563eb';
 
