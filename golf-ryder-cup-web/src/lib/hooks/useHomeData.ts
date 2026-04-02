@@ -151,13 +151,9 @@ export function useConsolidatedTripData(): ConsolidatedData | undefined {
 
 /** Trip list and active trip selection. */
 export function useTrips(data: ConsolidatedData | undefined) {
-    const { currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
-
     return useMemo(() => {
         const trips = data?.trips || [];
-        // If user explicitly exited and no trip is loaded in the store,
-        // don't show any active trip — even if the DB query returned one.
-        const activeTrip = (userExitedTrip && !currentTrip) ? null : (data?.activeTrip || null);
+        const activeTrip = data?.activeTrip || null;
         return {
             trips,
             activeTrip,
@@ -165,7 +161,7 @@ export function useTrips(data: ConsolidatedData | undefined) {
             hasTrips: trips.length > 0,
             isLoading: data === undefined,
         };
-    }, [data, userExitedTrip, currentTrip]);
+    }, [data]);
 }
 
 /** Team standings for the active trip. */
@@ -286,18 +282,15 @@ export function useSideBetsSummary(data: ConsolidatedData | undefined) {
  * changes or the selected trip falls out of sync.
  */
 export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
-    const { loadTrip, currentTrip, userExitedTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, currentTrip: s.currentTrip, userExitedTrip: s.userExitedTrip })));
+    const { loadTrip, currentTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip, currentTrip: s.currentTrip })));
 
     useEffect(() => {
-        // Don't auto-load if the user explicitly exited the trip
-        if (userExitedTrip) return;
         if (!currentTrip && data?.dateActiveTripId) {
             loadTrip(data.dateActiveTripId);
         }
-    }, [data?.dateActiveTripId, currentTrip, loadTrip, userExitedTrip]);
+    }, [data?.dateActiveTripId, currentTrip, loadTrip]);
 
     useEffect(() => {
-        if (userExitedTrip) return;
         if (
             currentTrip &&
             data?.activeTrip &&
@@ -305,7 +298,7 @@ export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
         ) {
             loadTrip(data.activeTrip.id);
         }
-    }, [data?.activeTrip, currentTrip, loadTrip, userExitedTrip]);
+    }, [data?.activeTrip, currentTrip, loadTrip]);
 }
 
 // ============================================

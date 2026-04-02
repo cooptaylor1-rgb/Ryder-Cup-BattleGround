@@ -126,11 +126,9 @@ export default function MorePageClient() {
   const handleExitTrip = () => {
     clearTrip();
     setShowExitTripConfirm(false);
-    // Remove persisted trip ID so rehydration won't restore it
+    // Persist exit intent so TripRehydrationProvider won't auto-load after reload
     localStorage.removeItem('golf-trip-storage');
-    // Full page reload ensures all reactive queries, live subscriptions,
-    // and cached hook results are cleared — router.push('/') left stale
-    // Dexie useLiveQuery results that kept showing the exited trip.
+    sessionStorage.setItem('trip-exit-intent', '1');
     window.location.href = '/';
   };
 
