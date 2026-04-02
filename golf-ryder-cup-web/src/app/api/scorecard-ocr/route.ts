@@ -72,9 +72,9 @@ STEP 3 — EXTRACT CELL BY CELL
 For each identified row, read EVERY cell left to right. Do NOT guess or interpolate — read the actual printed number. If a cell is unclear, use your best reading of the digits visible.
 
 STEP 4 — CROSS-CHECK YOUR WORK
-- Front 9 pars should sum to 34-37 (typically 36). Back 9 pars should sum to 34-37 (typically 36).
-- Total par for 18 holes is usually 70-72.
-- Handicap values 1-18 should each appear exactly once across all 18 holes.
+- For 18-hole courses: Front 9 pars should sum to ~36, Back 9 to ~36, total ~72.
+- For 9 or 10-hole courses: total par is typically 34-37. Do NOT pad to 18 holes.
+- Handicap values should each appear exactly once (1-18 for 18 holes, 1-9 for 9 holes, etc.).
 - Yardages should decrease from the longest tee to the shortest tee for each hole.
 - The "OUT" column should equal the sum of holes 1-9 for each row. Same for "IN" and holes 10-18.
 
@@ -105,10 +105,10 @@ RETURN THIS EXACT JSON FORMAT:
 }
 
 RULES:
-- "holes" array MUST have exactly 18 entries, one per hole in order.
+- "holes" array must have one entry per hole visible on the scorecard. Most courses have 18 holes, but some have 9, 10, or 12. Extract ONLY the holes that exist — do NOT invent or fabricate holes that aren't on the scorecard.
 - "holes[].yardage" should use the FIRST (longest) tee set's yardage.
 - "teeSets" should include EVERY tee row visible on the scorecard.
-- Each tee's "yardages" array MUST have exactly 18 numbers.
+- Each tee's "yardages" array must have the same number of entries as the "holes" array.
 - Include "rating" and "slope" for each tee set IF they appear on the scorecard (often printed near the tee name or on the back of the card).
 - Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C, Tangerine=#FF9966, Maroon=#800000, Purple=#7B2D8B, Teal=#008080, Champagne=#F7E7CE, Copper=#B87333, Bronze=#CD7F32, Combo/Mixed=#888888.
 - If a tee name does not match any standard color above, pick the closest hex color that visually represents the name (e.g., "Tangerine/Silver" → "#C8A870").
@@ -160,8 +160,8 @@ Return this JSON:
 }
 
 RULES:
-- "holes" must have exactly 18 entries.
-- Each tee's "yardages" must have exactly 18 numbers.
+- "holes" must have one entry per hole on the scorecard (9, 10, 12, or 18 — extract only what exists, never fabricate).
+- Each tee's "yardages" must have the same number of entries as "holes".
 - Use standard hex color codes: Black=#000000, Blue=#1E40AF, White=#F1F5F9, Gold=#CA8A04, Red=#DC2626, Green=#16A34A, Silver=#9E9E9E, Orange=#EA580C, Tangerine=#FF9966, Maroon=#800000, Combo/Mixed=#888888. For non-standard names, pick the closest hex color visually.
 - Always use the EXACT tee name as printed on the scorecard.
 - Return ONLY the JSON object — no explanation, no markdown fences.`;
@@ -592,11 +592,12 @@ async function extractWithOpenAIMultiple(
 }
 
 function validateAndCleanData(data: ScorecardData): ScorecardData {
-  // Ensure we have 18 holes
+  // Use the actual number of holes from the data (support 9, 10, 12, 18, etc.)
+  const holeCount = data.holes?.length || 18;
   const holes: HoleData[] = [];
   const usedHandicaps = new Set<number>();
 
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < holeCount; i++) {
     const hole = data.holes?.[i];
 
     // Validate par (3-5)
@@ -604,11 +605,11 @@ function validateAndCleanData(data: ScorecardData): ScorecardData {
     if (par < 3) par = 3;
     if (par > 5) par = 5;
 
-    // Validate handicap (1-18, unique)
+    // Validate handicap (1-N, unique)
     let handicap = hole?.handicap ?? i + 1;
-    if (handicap < 1 || handicap > 18 || usedHandicaps.has(handicap)) {
+    if (handicap < 1 || handicap > holeCount || usedHandicaps.has(handicap)) {
       // Find next available handicap
-      for (let h = 1; h <= 18; h++) {
+      for (let h = 1; h <= holeCount; h++) {
         if (!usedHandicaps.has(h)) {
           handicap = h;
           break;
@@ -635,9 +636,10 @@ function validateAndCleanData(data: ScorecardData): ScorecardData {
     for (const teeSet of data.teeSets) {
       if (!teeSet.name) continue;
 
-      // Ensure 18 yardages
+      // Use the actual number of yardages from the tee set (or match hole count)
+      const teeYardageCount = teeSet.yardages?.length || holeCount;
       const yardages: (number | null)[] = [];
-      for (let i = 0; i < 18; i++) {
+      for (let i = 0; i < teeYardageCount; i++) {
         let yardage = teeSet.yardages?.[i] ?? null;
         if (yardage !== null && (yardage < 50 || yardage > 700)) {
           yardage = null;
