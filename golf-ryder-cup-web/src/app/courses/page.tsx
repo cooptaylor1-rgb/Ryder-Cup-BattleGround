@@ -205,6 +205,7 @@ export default function CourseLibraryPage() {
                         par: totalPar,
                         holePars: baseHoles.map(h => h.par),
                         holeHandicaps: baseHoles.map(h => h.handicap),
+                        yardages: tee.yardages.filter((y): y is number => y !== null),
                         totalYardage: totalYardage > 0 ? totalYardage : undefined,
                     };
                 });
