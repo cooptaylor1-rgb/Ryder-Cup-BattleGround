@@ -43,6 +43,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [extractedData, setExtractedData] = useState<ScorecardData | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File) => {
@@ -107,12 +108,8 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
       }
 
       setExtractedData(result.data);
+      setIsDemoMode(result.provider === 'demo');
       setStatus('success');
-
-      if (result.message) {
-        // Demo mode notice
-        ocrLogger.info(result.message);
-      }
     } catch (err) {
       ocrLogger.error('Error processing scorecard:', err);
       setStatus('error');
@@ -150,6 +147,7 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
     setError(null);
     setPreview(null);
     setExtractedData(null);
+    setIsDemoMode(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -264,6 +262,16 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 <Check size={48} className="mx-auto mb-3 text-[var(--success)]" />
                 <p className="type-body font-medium">Scorecard Analyzed!</p>
               </div>
+
+              {isDemoMode && (
+                <div className="p-3 rounded-lg mb-4 bg-[rgba(234,179,8,0.1)] border border-[rgba(234,179,8,0.3)]">
+                  <p className="type-meta font-medium text-[var(--warning)]">Demo Mode</p>
+                  <p className="type-caption text-[var(--ink-secondary)] mt-1">
+                    No AI API key is configured. Showing sample data instead of real scorecard analysis.
+                    Set <code className="px-1 py-0.5 rounded bg-[var(--surface-elevated)] text-xs">ANTHROPIC_API_KEY</code> in your environment for real OCR.
+                  </p>
+                </div>
+              )}
 
               {/* Preview extracted data */}
               <div className="p-4 rounded-lg mb-4 bg-[var(--surface-elevated)]">
