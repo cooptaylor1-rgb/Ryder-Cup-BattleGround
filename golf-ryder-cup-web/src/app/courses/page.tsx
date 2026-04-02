@@ -195,7 +195,7 @@ export default function CourseLibraryPage() {
             // If multiple tee sets returned from OCR, create one per tee
             if (data.teeSets && data.teeSets.length > 0) {
                 const teeSetData = data.teeSets.map(tee => {
-                    const totalYardage = tee.yardages.reduce((sum, y) => sum + (y || 0), 0);
+                    const totalYardage = tee.yardages.reduce((sum: number, y) => sum + (y || 0), 0);
                     const totalPar = baseHoles.reduce((sum, h) => sum + h.par, 0);
                     return {
                         name: tee.name,
