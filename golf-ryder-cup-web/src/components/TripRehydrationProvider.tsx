@@ -23,8 +23,19 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
     const hasRehydrated = useRef(false);
     const hasCheckedUserTrip = useRef(false);
     const isEnsuringTripPlayer = useRef(false);
-    const { currentTrip, loadTrip, isLoading, players, userExitedTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, isLoading: s.isLoading, players: s.players, userExitedTrip: s.userExitedTrip })));
+    // Check once on mount whether the user just exited a trip (survives page reload)
+    const didUserExitTrip = useRef(
+        typeof window !== 'undefined' && sessionStorage.getItem('trip-exit-intent') === '1'
+    );
+    const { currentTrip, loadTrip, isLoading, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, isLoading: s.isLoading, players: s.players })));
     const { currentUser, isAuthenticated, authUserId } = useAuthStore();
+
+    // Clear the exit-intent flag once consumed so future navigations work normally
+    useEffect(() => {
+        if (didUserExitTrip.current) {
+            sessionStorage.removeItem('trip-exit-intent');
+        }
+    }, []);
 
     // Rehydrate persisted trip state
     useEffect(() => {
@@ -32,8 +43,8 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         if (hasRehydrated.current) return;
         hasRehydrated.current = true;
 
-        // Don't rehydrate if the user explicitly exited the trip
-        if (userExitedTrip) return;
+        // Don't rehydrate if the user just exited a trip
+        if (didUserExitTrip.current) return;
 
         // Check localStorage for persisted trip ID
         const stored = localStorage.getItem('golf-trip-storage');
@@ -50,14 +61,14 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         } catch (error) {
             tripLogger.error('Failed to rehydrate trip state:', error);
         }
-    }, [currentTrip, loadTrip, isLoading, userExitedTrip]);
+    }, [currentTrip, loadTrip, isLoading]);
 
     // Auto-load active trip for authenticated users who have been invited
     useEffect(() => {
         // Only run once per session and only when authenticated
         if (hasCheckedUserTrip.current || !isAuthenticated || !currentUser) return;
-        // Don't run if a trip is already loaded or user explicitly exited
-        if (currentTrip || userExitedTrip) return;
+        // Don't run if a trip is already loaded or user just exited
+        if (currentTrip || didUserExitTrip.current) return;
 
         hasCheckedUserTrip.current = true;
 
@@ -136,7 +147,7 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
         };
 
         findAndLoadUserTrip();
-    }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip, userExitedTrip]);
+    }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip]);
 
     useEffect(() => {
         if (!isAuthenticated || !currentUser || !currentTrip || isEnsuringTripPlayer.current) {
