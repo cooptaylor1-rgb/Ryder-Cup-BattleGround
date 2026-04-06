@@ -38,7 +38,6 @@ export {
 // Feedback & overlays
 export { Modal, ConfirmDialog, type ModalProps, type ConfirmDialogProps } from './Modal';
 export { ToastContainer } from './Toast';
-export { UndoToast, useUndoToast } from './UndoToast';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export {
   ErrorBoundary,
