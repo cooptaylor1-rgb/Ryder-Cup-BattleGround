@@ -20,10 +20,20 @@ Sentry.init({
     // Tag with deployment environment (production, staging, preview)
     environment: process.env.NEXT_PUBLIC_SENTRY_ENV ?? process.env.NODE_ENV,
 
+    // Send default PII (IP / user agent) for debuggable server traces.
+    sendDefaultPii: true,
+
+    // Attach local variable values to server-side stack frames so we can
+    // see the state at the crash site. Invaluable during a live event.
+    includeLocalVariables: true,
+
+    // Forward structured logs (console.error, logger.error) into Sentry
+    // Logs so we can tail production issues from one dashboard.
+    enableLogs: true,
+
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 0.1,
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
     // Filter out common server errors
