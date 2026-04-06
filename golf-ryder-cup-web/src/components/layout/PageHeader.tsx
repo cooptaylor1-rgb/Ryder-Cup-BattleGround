@@ -3,6 +3,8 @@
 import type React from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SyncStatusBadge } from '@/components/SyncStatusBadge';
+import { useTripStore } from '@/lib/stores/tripStore';
 
 export function PageHeader({
   title,
@@ -12,6 +14,7 @@ export function PageHeader({
   rightSlot,
   iconContainerStyle,
   iconContainerClassName,
+  hideSyncBadge = false,
 }: {
   title: string;
   subtitle?: string;
@@ -20,7 +23,16 @@ export function PageHeader({
   rightSlot?: React.ReactNode;
   iconContainerStyle?: React.CSSProperties;
   iconContainerClassName?: string;
+  /**
+   * Hide the global trip sync badge. Defaults to false so that every page
+   * using PageHeader surfaces real-time sync state — critical during a live
+   * event on flaky course Wi-Fi. Set true on screens that are intentionally
+   * outside any trip context (e.g. landing, sign-in).
+   */
+  hideSyncBadge?: boolean;
 }) {
+  const currentTrip = useTripStore((state) => state.currentTrip);
+  const showSyncBadge = !hideSyncBadge && Boolean(currentTrip);
   return (
     <header className="header-premium">
       <div className="container-editorial flex items-center justify-between">
@@ -56,7 +68,12 @@ export function PageHeader({
           </div>
         </div>
 
-        {rightSlot ? <div className="shrink-0">{rightSlot}</div> : null}
+        {(showSyncBadge || rightSlot) && (
+          <div className="flex shrink-0 items-center gap-2">
+            {showSyncBadge ? <SyncStatusBadge /> : null}
+            {rightSlot}
+          </div>
+        )}
       </div>
     </header>
   );

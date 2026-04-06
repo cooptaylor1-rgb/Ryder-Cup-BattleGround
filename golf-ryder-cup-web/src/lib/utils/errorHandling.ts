@@ -109,7 +109,22 @@ export function createAppError(
 }
 
 /**
+ * Best-effort detection of whether the browser is currently offline.
+ * Safe in non-browser environments (SSR, tests).
+ */
+function isBrowserOffline(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    return navigator.onLine === false;
+}
+
+/**
  * Convert unknown error to AppError
+ *
+ * Detection priority (most specific first):
+ *   1. Already-normalized AppError
+ *   2. Browser offline state — promotes any network-shaped error to OFFLINE
+ *   3. Standard Error subtypes (AbortError, Dexie, etc.)
+ *   4. String / unknown
  */
 export function normalizeError(error: unknown, context?: ErrorContext): AppError {
     // Already an AppError
@@ -119,18 +134,74 @@ export function normalizeError(error: unknown, context?: ErrorContext): AppError
 
     // Standard Error
     if (error instanceof Error) {
-        // Check for specific error types
-        if (error.name === 'AbortError') {
-            return createAppError(ErrorCodes.NETWORK_TIMEOUT, error.message, context, error);
-        }
-        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-            return createAppError(ErrorCodes.NETWORK_ERROR, error.message, context, error);
-        }
-        if (error.message.includes('quota')) {
-            return createAppError(ErrorCodes.STORAGE_QUOTA_EXCEEDED, error.message, context, error);
+        const message = error.message ?? '';
+        const name = error.name ?? '';
+
+        // Timeout / cancellation
+        if (name === 'AbortError') {
+            return createAppError(ErrorCodes.NETWORK_TIMEOUT, message, context, error);
         }
 
-        return createAppError(ErrorCodes.UNKNOWN_ERROR, error.message, context, error);
+        // Network-shaped errors. If the browser reports offline, prefer the
+        // OFFLINE code so the user sees "your changes are saved locally" copy
+        // instead of the more alarming generic network message.
+        const looksLikeNetwork =
+            message.includes('Failed to fetch') ||
+            message.includes('NetworkError') ||
+            message.includes('Network request failed') ||
+            name === 'TypeError' && message.toLowerCase().includes('fetch');
+        if (looksLikeNetwork) {
+            return createAppError(
+                isBrowserOffline() ? ErrorCodes.NETWORK_OFFLINE : ErrorCodes.NETWORK_ERROR,
+                message,
+                context,
+                error,
+            );
+        }
+
+        // Auth-shaped errors (Supabase / API responses)
+        if (
+            name === 'AuthApiError' ||
+            /unauthorized|invalid (?:credentials|token|jwt)|jwt expired/i.test(message)
+        ) {
+            return createAppError(
+                /expired/i.test(message)
+                    ? ErrorCodes.AUTH_SESSION_EXPIRED
+                    : ErrorCodes.AUTH_UNAUTHORIZED,
+                message,
+                context,
+                error,
+            );
+        }
+
+        // IndexedDB / Dexie storage errors
+        if (
+            name === 'QuotaExceededError' ||
+            message.toLowerCase().includes('quota')
+        ) {
+            return createAppError(ErrorCodes.STORAGE_QUOTA_EXCEEDED, message, context, error);
+        }
+        if (
+            name === 'OpenFailedError' ||
+            name === 'InvalidStateError' ||
+            name === 'DatabaseClosedError' ||
+            message.includes('IDBDatabase')
+        ) {
+            return createAppError(ErrorCodes.STORAGE_UNAVAILABLE, message, context, error);
+        }
+
+        // Validation / not-found shapes
+        if (/not found|404/i.test(message)) {
+            return createAppError(ErrorCodes.DATA_NOT_FOUND, message, context, error);
+        }
+        if (/validation|invalid input|400/i.test(message)) {
+            return createAppError(ErrorCodes.DATA_VALIDATION_FAILED, message, context, error);
+        }
+        if (/conflict|409|version mismatch/i.test(message)) {
+            return createAppError(ErrorCodes.DATA_CONFLICT, message, context, error);
+        }
+
+        return createAppError(ErrorCodes.UNKNOWN_ERROR, message, context, error);
     }
 
     // String error
