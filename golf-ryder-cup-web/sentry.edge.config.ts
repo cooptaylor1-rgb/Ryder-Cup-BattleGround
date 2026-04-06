@@ -19,9 +19,14 @@ Sentry.init({
     // Tag with deployment environment (production, staging, preview)
     environment: process.env.NEXT_PUBLIC_SENTRY_ENV ?? process.env.NODE_ENV,
 
+    // Send default PII (IP / user agent) for debuggable traces.
+    sendDefaultPii: true,
+
+    // Forward structured logs into Sentry Logs.
+    enableLogs: true,
+
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 0.1,
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 });

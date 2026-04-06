@@ -96,6 +96,11 @@ const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
 
+  // Explicit auth token for source map uploads. The Sentry webpack
+  // plugin auto-picks this up from env, but passing it explicitly
+  // keeps the requirement visible to future maintainers.
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
