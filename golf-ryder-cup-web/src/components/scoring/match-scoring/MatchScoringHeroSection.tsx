@@ -63,7 +63,10 @@ export function MatchScoringHeroSection({
 }: MatchScoringHeroSectionProps) {
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur">
+      <header
+        className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div className="container-editorial py-[var(--space-3)]">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
@@ -103,14 +106,17 @@ export function MatchScoringHeroSection({
                 onClick={onUndo}
                 disabled={undoCount === 0}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors',
+                  // h-11 (44px) meets the iOS touch target recommendation.
+                  // High-frequency action during live scoring — needs to be
+                  // confidently tappable with a gloved hand in wind.
+                  'inline-flex h-11 items-center gap-2 rounded-full px-4 text-xs font-semibold uppercase tracking-[0.12em] transition-colors',
                   undoCount > 0
                     ? 'bg-[var(--gold-subtle)] text-[var(--masters)]'
                     : 'bg-transparent text-[var(--ink-tertiary)] opacity-50'
                 )}
                 aria-label={`Undo last action${undoCount > 0 ? ` (${undoCount} available)` : ''}`}
               >
-                <Undo2 size={14} />
+                <Undo2 size={16} />
                 Undo
               </button>
             </div>
@@ -129,13 +135,20 @@ export function MatchScoringHeroSection({
               <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
                 {teamALineup} vs {teamBLineup}
               </p>
-              <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
-                <div className="inline-flex items-center gap-1 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-2 py-1">
-                  <MapPin size={12} className="text-[var(--ink-tertiary)]" />
+              {/*
+                Course / tee badges. Must stay legible in bright sunlight
+                on the course — bumped to text-xs (12px → ~13px scaled)
+                with py-2 padding for a larger visual target. Previously
+                rendered at text-[11px] / py-1 which was borderline
+                unreadable at arm's length.
+              */}
+              <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
+                  <MapPin size={14} className="text-[var(--ink-tertiary)]" />
                   <span>{currentCourseName ?? 'Course not assigned'}</span>
                 </div>
-                <div className="inline-flex items-center gap-1 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-2 py-1">
-                  <Flag size={12} className="text-[var(--ink-tertiary)]" />
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
+                  <Flag size={14} className="text-[var(--ink-tertiary)]" />
                   <span>{currentTeeSetName ?? 'Tee set not assigned'}</span>
                 </div>
               </div>
