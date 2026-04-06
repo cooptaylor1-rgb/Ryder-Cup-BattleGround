@@ -104,10 +104,11 @@ export function BottomNav() {
               )}
             </div>
 
-            {/* Label */}
+            {/* Label — text-[11px] for outdoor legibility. 10px is too
+                small at arm's length in sunlight on the course. */}
             <span
               className={cn(
-                'text-[10px] mt-0.5 tracking-[0.02em] font-sans',
+                'text-[11px] mt-0.5 tracking-[0.02em] font-sans',
                 active ? 'font-bold' : 'font-medium'
               )}
             >
