@@ -40,7 +40,7 @@
     "analyze": "ANALYZE=true next build",
     "check:fast": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test",
-    "check:prepush": "pnpm -s typecheck && pnpm -s test && pnpm -s build"
+    "check:prepush": "pnpm -s typecheck && pnpm -s test && (test \"$SKIP_BUILD_CHECK\" = \"1\" && echo '⏭  Skipping local build (SKIP_BUILD_CHECK=1) — CI will verify.' || pnpm -s build)"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
