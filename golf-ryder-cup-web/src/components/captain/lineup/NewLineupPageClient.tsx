@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
 import { createLogger } from '@/lib/utils/logger';
+import { normalizeError } from '@/lib/utils/errorHandling';
 import { shuffle } from '@/lib/utils/shuffle';
 import {
   LineupBuilder,
@@ -273,6 +274,20 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
     async (matches: MatchSlot[]) => {
       if (!currentTrip) return;
 
+      // Defense in depth. The LineupBuilder already disables the publish
+      // button until validation passes, but handlePublish is called with
+      // the raw matches array so we re-check the essentials here in case
+      // callers bypass the UI guard.
+      const trimmedName = sessionName.trim();
+      if (!trimmedName) {
+        showToast('error', 'Give the session a name before publishing');
+        return;
+      }
+      if (matches.length === 0) {
+        showToast('error', 'Add at least one match before publishing');
+        return;
+      }
+
       setIsCreating(true);
       try {
         const [hours] = firstTeeTime.split(':').map(Number);
@@ -280,7 +295,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
         const session = await addSession({
           tripId: currentTrip.id,
-          name: sessionName,
+          name: trimmedName,
           sessionNumber: nextSessionNumber,
           sessionType,
           scheduledDate: scheduledDate || undefined,
@@ -306,8 +321,19 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           router.push(`/lineup/${session.id}`);
         }, 1500);
       } catch (error) {
-        logger.error('Failed to create session', { error });
-        showToast('error', 'Failed to create session');
+        // Use the shared classifier so users see a meaningful message
+        // (network / storage / data) instead of a generic "Failed to
+        // create session" that doesn't tell them whether to retry.
+        const appError = normalizeError(error, {
+          component: 'NewLineupPageClient',
+          action: 'publishSession',
+          tripId: currentTrip.id,
+        });
+        logger.error('Failed to create session', {
+          code: appError.code,
+          message: appError.message,
+        });
+        showToast('error', appError.userMessage);
       } finally {
         setIsCreating(false);
       }
