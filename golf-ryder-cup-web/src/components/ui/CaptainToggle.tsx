@@ -61,7 +61,18 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
       setShowPinModal(false);
       setPin('');
       setAttempts(0);
-    } catch {
+    } catch (err) {
+      // The store enforces an exponential lockout after repeated failures and
+      // returns a descriptive message ("Too many incorrect Captain PIN
+      // attempts. Locked for 1m."). Surface that directly when present.
+      const message = err instanceof Error ? err.message : 'Incorrect PIN';
+      const isLockoutMessage = /locked|try again in|too many/i.test(message);
+
+      if (isLockoutMessage) {
+        setError(message);
+        return;
+      }
+
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       if (newAttempts >= 3) {

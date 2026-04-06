@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, Check, ChevronLeft, Flag, MapPin, Mic, Undo2 } from 'lucide-react';
 import { HoleMiniMap } from '@/components/scoring';
+import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import type { MatchState } from '@/lib/types/computed';
 import { cn } from '@/lib/utils';
 import {
@@ -83,6 +84,12 @@ export function MatchScoringHeroSection({
             </div>
 
             <div className="flex items-center gap-2">
+              {/*
+                Trip-level sync status — critical on a flaky course connection.
+                Icon-only on phones to preserve sticky-header space; the badge
+                itself opens a tooltip and acts as a manual retry when failed.
+              */}
+              <SyncStatusBadge />
               <button
                 type="button"
                 onClick={onOpenVoiceScoring}

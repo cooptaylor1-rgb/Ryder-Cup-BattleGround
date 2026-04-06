@@ -77,8 +77,9 @@ export default function MorePageClient() {
       setShowCaptainModal(false);
       setCaptainPin('');
       showToast('success', 'Captain mode enabled');
-    } catch {
-      showToast('error', 'Incorrect captain PIN');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Incorrect captain PIN';
+      showToast('error', message);
     }
   };
 
@@ -92,8 +93,9 @@ export default function MorePageClient() {
       setShowAdminModal(false);
       setAdminPin('');
       showToast('success', 'Admin mode enabled');
-    } catch {
-      showToast('error', 'Incorrect admin PIN');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Incorrect admin PIN';
+      showToast('error', message);
     }
   };
 

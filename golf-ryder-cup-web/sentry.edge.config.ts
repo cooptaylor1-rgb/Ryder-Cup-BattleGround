@@ -13,6 +13,12 @@ Sentry.init({
     // Only enable in production
     enabled: process.env.NODE_ENV === 'production',
 
+    // Tag every event with the deploy release so errors map to commits.
+    release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
+
+    // Tag with deployment environment (production, staging, preview)
+    environment: process.env.NEXT_PUBLIC_SENTRY_ENV ?? process.env.NODE_ENV,
+
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 0.1,
 

@@ -442,7 +442,9 @@ describe('1000-Trip Mega Stress Simulation', () => {
       );
 
       // Should return existing result (dedup), not create a new one
-      if ('type' in result && result.type === 'conflict') {
+      const isConflict = (r: typeof result): r is ScoreConflict =>
+        'type' in r && r.type === 'conflict';
+      if (isConflict(result)) {
         // Conflict is also acceptable (different user within 30s)
         stats.conflictsDetected++;
       } else {
