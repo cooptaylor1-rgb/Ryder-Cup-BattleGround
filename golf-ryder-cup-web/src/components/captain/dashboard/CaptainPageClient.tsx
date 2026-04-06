@@ -150,8 +150,9 @@ export default function CaptainPageClient() {
     try {
       await enableCaptainMode(captainPin);
       setCaptainPin('');
-    } catch {
-      showToast('error', 'Incorrect PIN');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Incorrect PIN';
+      showToast('error', message);
     }
   };
 
