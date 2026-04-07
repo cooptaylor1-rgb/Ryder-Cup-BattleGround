@@ -93,14 +93,16 @@ function LoginPageContent() {
     };
   }, []);
 
+  // Clear any prior error / magic-link confirmation when the user edits the
+  // email or PIN fields. `error` and `magicLinkSentTo` are intentionally NOT in
+  // the dependency array — including them causes this effect to fire as soon as
+  // an error is set (e.g. by `login()` or `requestEmailSignInLink()`) and wipe
+  // it before the user can ever see it.
   useEffect(() => {
-    if (error) {
-      clearError();
-    }
-    if (magicLinkSentTo) {
-      setMagicLinkSentTo(null);
-    }
-  }, [email, pin, error, clearError, magicLinkSentTo]);
+    clearError();
+    setMagicLinkSentTo(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, pin]);
 
   const nextPath = searchParams?.get('next');
   const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
