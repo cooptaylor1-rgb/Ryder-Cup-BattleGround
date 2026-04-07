@@ -154,11 +154,12 @@ export function AwardsTab({
           ))}
         </div>
       ) : (
-        <div className="px-[var(--space-4)] py-[var(--space-12)] text-center">
-          <div className="mb-[var(--space-4)] text-5xl">🏆</div>
-          <h3 className="mb-[var(--space-2)] type-title">Awards Coming Soon</h3>
+        <div className="px-[var(--space-4)] py-[var(--space-6)] text-center">
+          {/* Compact empty state — was 12-unit vertical chrome for two
+              lines of content. Per docs/TERMINOLOGY.md empty states are
+              one-line facts, not pep talks. */}
           <p className="type-body text-[var(--ink-tertiary)]">
-            Complete some matches to unlock trip superlatives and see who earns the bragging rights!
+            🏆 Awards unlock as matches complete.
           </p>
         </div>
       )}

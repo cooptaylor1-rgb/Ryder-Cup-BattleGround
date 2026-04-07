@@ -557,8 +557,8 @@ export function ErrorEmpty({
     return (
         <EmptyStatePremium
             illustration="flag"
-            title="Something went wrong"
-            description={message || "We hit a rough patch. Please try again."}
+            title="Unexpected error"
+            description={message || "Your data is safe. Tap retry and we’ll reload this section."}
             action={
                 onRetry
                     ? {

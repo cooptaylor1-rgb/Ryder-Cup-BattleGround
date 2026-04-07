@@ -33,7 +33,7 @@ export default function LoginError({ error, reset }: ErrorPageProps) {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Login"
-        subtitle="Something went wrong"
+        subtitle="Couldn’t reach the sign-in service"
         icon={<KeyRound size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />

@@ -22,7 +22,7 @@ export default function RouteError({ error, reset }: ErrorPageProps) {
     error.message?.toLowerCase().includes('failed to load') ||
     error.name === 'TypeError';
 
-  const title = isNetworkError ? 'Connection issue' : 'Something went wrong';
+  const title = isNetworkError ? 'You’re offline' : 'Unexpected error';
   const description = isNetworkError
     ? 'Looks like you\'re offline or have a weak signal. Your data is saved locally and will sync when you reconnect.'
     : 'We encountered an unexpected error. Your data is safe \u2014 please try again or return to the home screen.';

@@ -28,10 +28,10 @@ export default function LineupError({ error, reset }: ErrorPageProps) {
         <AlertTriangle size={40} className="text-[var(--error)]" />
       </div>
 
-      <h1 className="text-2xl font-semibold mb-3 text-[var(--ink)]">Lineup Error</h1>
+      <h1 className="text-2xl font-semibold mb-3 text-[var(--ink)]">Couldn’t load the lineup</h1>
 
       <p className="text-center max-w-md mb-8 text-[var(--ink-secondary)]">
-        Something went wrong loading the lineup. Your match data is safe.
+        Your match data is safe on this device. Tap below to try again.
       </p>
 
       {process.env.NODE_ENV === 'development' && (

@@ -32,8 +32,8 @@ export default function CaptainError({ error, reset }: ErrorPageProps) {
               The command room hit a rough patch.
             </h1>
             <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
-              Something went wrong while loading the captain controls. The trip data should still be
-              intact. This screen just needs a cleaner entrance back into the room.
+              We couldn’t open the command room. Your trip data is safe on
+              this device — tap below for a cleaner route back in.
             </p>
 
             <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">

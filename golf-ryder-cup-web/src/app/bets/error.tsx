@@ -32,8 +32,8 @@ export default function BetsError({ error, reset }: ErrorPageProps) {
               The side games room lost the board for a moment.
             </h1>
             <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
-              Something went wrong while loading the bets view. The wager data should still be intact.
-              This page just needs a cleaner route back into the room.
+              We couldn’t draw the bets view. Your wagers and payouts are
+              safe on this device — tap below for a clean route back in.
             </p>
 
             <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">

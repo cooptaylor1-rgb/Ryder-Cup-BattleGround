@@ -36,13 +36,14 @@ export default function GlobalError({
                             <AlertTriangle className="w-10 h-10 text-[var(--error)]" />
                         </div>
 
-                        {/* Error Message */}
+                        {/* Error Message — copy follows docs/TERMINOLOGY.md */}
                         <h1 className="text-2xl font-bold text-[var(--ink-primary)] mb-2">
-                            Something went wrong
+                            Unexpected error
                         </h1>
                         <p className="text-[var(--ink-secondary)] mb-6">
-                            We&apos;ve been notified and are working to fix the issue.
-                            Please try again or return to the home page.
+                            Your scores and trip data are safe on this device.
+                            We’ve logged what happened — tap Try again to reload,
+                            or head back home.
                         </p>
 
                         {/* Error Details (development only) */}

@@ -69,21 +69,25 @@ export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
 // USER-FRIENDLY MESSAGES
 // ============================================
 
+// User-facing error copy. Voice rules from docs/TERMINOLOGY.md:
+// - lead with reassurance about data safety where applicable
+// - name the actual problem (no "Something went wrong")
+// - end with a verb-led next action when one exists
 const userMessages: Record<ErrorCode, string> = {
-    [ErrorCodes.NETWORK_OFFLINE]: 'You appear to be offline. Changes will sync when you reconnect.',
-    [ErrorCodes.NETWORK_TIMEOUT]: 'The request timed out. Please try again.',
-    [ErrorCodes.NETWORK_ERROR]: 'Unable to connect. Please check your internet connection.',
-    [ErrorCodes.AUTH_INVALID_CREDENTIALS]: 'Invalid email or PIN. Please try again.',
-    [ErrorCodes.AUTH_SESSION_EXPIRED]: 'Your session has expired. Please sign in again.',
-    [ErrorCodes.AUTH_UNAUTHORIZED]: 'You don\'t have permission to perform this action.',
-    [ErrorCodes.DATA_NOT_FOUND]: 'The requested data could not be found.',
-    [ErrorCodes.DATA_VALIDATION_FAILED]: 'Please check your input and try again.',
-    [ErrorCodes.DATA_CONFLICT]: 'This data was modified elsewhere. Please refresh and try again.',
-    [ErrorCodes.DATA_SYNC_FAILED]: 'Failed to sync data. Your changes are saved locally.',
-    [ErrorCodes.STORAGE_QUOTA_EXCEEDED]: 'Storage is full. Please clear some data.',
-    [ErrorCodes.STORAGE_UNAVAILABLE]: 'Unable to save data locally. Please try again.',
-    [ErrorCodes.UNKNOWN_ERROR]: 'Something went wrong. Please try again.',
-    [ErrorCodes.OPERATION_FAILED]: 'The operation could not be completed. Please try again.',
+    [ErrorCodes.NETWORK_OFFLINE]: 'You’re offline. Your changes are saved here and will sync the moment you’re back online.',
+    [ErrorCodes.NETWORK_TIMEOUT]: 'That took too long. Tap to try again.',
+    [ErrorCodes.NETWORK_ERROR]: 'Couldn’t reach the server. Your data is safe — try again in a moment.',
+    [ErrorCodes.AUTH_INVALID_CREDENTIALS]: 'That email or PIN didn’t match. Try again.',
+    [ErrorCodes.AUTH_SESSION_EXPIRED]: 'Your sign-in expired. Please sign in again.',
+    [ErrorCodes.AUTH_UNAUTHORIZED]: 'You don’t have permission for that. Ask the captain.',
+    [ErrorCodes.DATA_NOT_FOUND]: 'We couldn’t find that.',
+    [ErrorCodes.DATA_VALIDATION_FAILED]: 'Check the highlighted fields and try again.',
+    [ErrorCodes.DATA_CONFLICT]: 'Someone else just changed this. Refresh and try again.',
+    [ErrorCodes.DATA_SYNC_FAILED]: 'Sync paused. Your changes are saved locally and will retry automatically.',
+    [ErrorCodes.STORAGE_QUOTA_EXCEEDED]: 'This device is out of storage. Clear some space and try again.',
+    [ErrorCodes.STORAGE_UNAVAILABLE]: 'Couldn’t write to local storage. Reload the app and try again.',
+    [ErrorCodes.UNKNOWN_ERROR]: 'Unexpected error. Your data is safe — tap to try again.',
+    [ErrorCodes.OPERATION_FAILED]: 'That action didn’t complete. Tap to try again.',
 };
 
 // ============================================

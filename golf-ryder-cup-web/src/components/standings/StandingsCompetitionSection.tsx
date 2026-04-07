@@ -291,9 +291,19 @@ export function CompetitionTab({
             ))}
           </div>
         ) : (
-          <p className="type-caption px-0 py-[var(--space-10)] text-center">
-            Complete matches to see individual standings
-          </p>
+          // Empty state with a path forward — see docs/TERMINOLOGY.md.
+          // Fact + verb-led action, not a pep talk.
+          <div className="px-0 py-[var(--space-8)] text-center">
+            <p className="type-caption mb-[var(--space-3)]">
+              No individual standings yet — players appear once their first match is scored.
+            </p>
+            <Link
+              href="/matchups"
+              className="type-caption font-semibold text-[var(--masters)] no-underline"
+            >
+              Open matchups →
+            </Link>
+          </div>
         )}
       </section>
     </>

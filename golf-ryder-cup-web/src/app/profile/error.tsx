@@ -28,10 +28,10 @@ export default function ProfileError({ error, reset }: ErrorPageProps) {
         <AlertTriangle size={40} className="text-[var(--error)]" />
       </div>
 
-      <h1 className="text-2xl font-semibold mb-3 text-[var(--ink)]">Profile Error</h1>
+      <h1 className="text-2xl font-semibold mb-3 text-[var(--ink)]">Couldn’t load your profile</h1>
 
       <p className="text-center max-w-md mb-8 text-[var(--ink-secondary)]">
-        Something went wrong loading your profile. Your data is safe.
+        Your account info is safe on this device. Tap below to try again.
       </p>
 
       {process.env.NODE_ENV === 'development' && (

@@ -29,6 +29,10 @@ function categorizeError(appError: AppError): ErrorCategory {
   return 'general';
 }
 
+// Category titles and icons. Copy follows docs/TERMINOLOGY.md:
+// "Something went wrong" is banned — every category names the
+// actual problem so the user knows whether to retry, wait, or
+// contact the captain.
 const categoryConfig: Record<ErrorCategory, {
   icon: React.ReactNode;
   title: string;
@@ -36,22 +40,25 @@ const categoryConfig: Record<ErrorCategory, {
 }> = {
   network: {
     icon: <WifiOff size={40} />,
-    title: 'Connection issue',
+    title: 'You’re offline',
     iconColor: 'var(--warning)',
   },
   auth: {
     icon: <Lock size={40} />,
-    title: 'Authentication required',
+    title: 'Please sign in again',
     iconColor: 'var(--gold)',
   },
   data: {
     icon: <Database size={40} />,
-    title: 'Data problem',
+    title: 'That didn’t load',
     iconColor: 'var(--info, #5B8FA8)', // --info is a Tailwind token, not a CSS var; fallback matches tailwind.config.ts info.DEFAULT
   },
   general: {
     icon: <AlertTriangle size={40} />,
-    title: 'Something went wrong',
+    // Per docs/TERMINOLOGY.md we avoid "Something went wrong" even in
+    // the generic bucket. "Unexpected error" names the category
+    // without pretending we know what happened.
+    title: 'Unexpected error',
     iconColor: 'var(--error)',
   },
 };

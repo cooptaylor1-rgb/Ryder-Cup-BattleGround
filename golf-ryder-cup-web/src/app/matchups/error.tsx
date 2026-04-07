@@ -33,7 +33,7 @@ export default function MatchupsError({ error, reset }: ErrorPageProps) {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Matchups"
-        subtitle="Something went wrong"
+        subtitle="Couldn’t load matchups"
         icon={<Swords size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />

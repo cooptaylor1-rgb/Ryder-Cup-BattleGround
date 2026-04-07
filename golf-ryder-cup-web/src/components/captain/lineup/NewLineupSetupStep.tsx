@@ -446,14 +446,66 @@ export function NewLineupSetupStep({
           )}
 
           <section className="section">
-            <Button variant="primary" fullWidth onClick={onContinue} disabled={!canProceedToLineup}>
-              Continue to Lineup Builder
+            {/*
+              Primary CTA uses the canonical "Save and continue" verb
+              (docs/TERMINOLOGY.md). When the form is incomplete we
+              rewrite the label to explain the blocker inline, rather
+              than greying the button out silently and hoping the user
+              scrolls up 40px to find the warning card.
+            */}
+            <Button
+              variant="primary"
+              fullWidth
+              onClick={onContinue}
+              disabled={!canProceedToLineup}
+            >
+              {canProceedToLineup
+                ? 'Save and continue'
+                : deriveBlockerLabel({
+                    sessionName,
+                    hasEnoughPlayers,
+                    playersNeededPerTeam: selectedType.playersPerTeam * matchCount,
+                    teamAPlayerCount,
+                    teamBPlayerCount,
+                  })}
             </Button>
           </section>
         </>
       )}
     </>
   );
+}
+
+/**
+ * Rewrites the disabled CTA label into the specific reason the user
+ * can't advance. Returning a user-facing string, not a code — this
+ * is the copy they read. Ordering matters: show the blocker that
+ * needs the least additional work to resolve.
+ */
+function deriveBlockerLabel(args: {
+  sessionName: string;
+  hasEnoughPlayers: boolean;
+  playersNeededPerTeam: number;
+  teamAPlayerCount: number;
+  teamBPlayerCount: number;
+}): string {
+  if (!args.sessionName.trim()) {
+    return 'Name this session';
+  }
+  if (!args.hasEnoughPlayers) {
+    const shortA = Math.max(0, args.playersNeededPerTeam - args.teamAPlayerCount);
+    const shortB = Math.max(0, args.playersNeededPerTeam - args.teamBPlayerCount);
+    if (shortA > 0 && shortB > 0) {
+      return `Add ${shortA + shortB} more players`;
+    }
+    if (shortA > 0) {
+      return `Add ${shortA} more player${shortA === 1 ? '' : 's'} to Team A`;
+    }
+    if (shortB > 0) {
+      return `Add ${shortB} more player${shortB === 1 ? '' : 's'} to Team B`;
+    }
+  }
+  return 'Save and continue';
 }
 
 export function LineupSetupFact({

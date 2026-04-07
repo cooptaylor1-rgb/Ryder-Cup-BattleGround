@@ -110,6 +110,20 @@
   --success: #2D7A4F;
   --warning: #B8860B;
   --error: #A63D40;
+  --info: #3B6E8F;
+
+  /* ---- STATE SEMANTICS — single-purpose tokens ----
+     Each token has ONE meaning in the product. Do not reuse
+     --dormie for anything that isn't dormie, or --live for
+     anything that isn't a live match. This prevents color-
+     meaning drift as the design system grows. */
+  --dormie: var(--gold);                       /* match is dormie — unmissable */
+  --dormie-strong: var(--gold-dark);           /* dormie border / text */
+  --dormie-subtle: var(--gold-subtle);         /* dormie backgrounds */
+  --live: var(--success);                      /* match/session is in progress */
+  --live-subtle: rgba(45, 122, 79, 0.16);
+  --destructive: var(--maroon);                /* actions that can lose data */
+  --destructive-subtle: var(--maroon-subtle);
 
   /* ---- SPACING ----
      8px grid. Generous editorial rhythm. */
@@ -518,6 +532,120 @@ textarea:focus-visible {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-secondary);
+}
+
+/* ---- STATE PILLS ----
+   Single taxonomy for every "status" chip in the app. Before this
+   existed, every component rolled its own colors + padding and they
+   drifted. Usage:
+     <span class="state-pill state-pill--live">Live</span>
+     <span class="state-pill state-pill--upcoming">Upcoming</span>
+     <span class="state-pill state-pill--complete">Complete</span>
+     <span class="state-pill state-pill--dormie">Dormie</span>
+     <span class="state-pill state-pill--danger">Locked</span>
+
+   Contrast targets:
+   - live:     WCAG AA+ for body text on the subtle background
+   - upcoming: AA for inactive state (less critical)
+   - complete: AA (archival)
+   - dormie:   AAA — the most critical warning in match play
+   - danger:   AA, high-visibility red
+
+   All variants share the same geometry so they line up in grids. */
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.state-pill--live {
+  background: var(--live-subtle);
+  color: var(--live);
+  border-color: color-mix(in srgb, var(--live) 30%, transparent);
+}
+
+.state-pill--live::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--live);
+  animation: pulse-live 1.6s ease-in-out infinite;
+}
+
+.state-pill--upcoming {
+  background: rgba(26, 24, 21, 0.08);
+  color: var(--ink-secondary);
+  border-color: rgba(26, 24, 21, 0.14);
+}
+
+.state-pill--complete {
+  background: rgba(26, 24, 21, 0.05);
+  color: var(--ink-tertiary);
+  border-color: rgba(26, 24, 21, 0.08);
+}
+
+.state-pill--dormie {
+  background: var(--dormie-subtle);
+  color: var(--dormie-strong);
+  border-color: color-mix(in srgb, var(--dormie) 40%, transparent);
+  /* dormie is the product's most urgent state — full caps weight */
+  font-weight: 700;
+}
+
+.state-pill--danger {
+  background: var(--destructive-subtle);
+  color: var(--destructive);
+  border-color: color-mix(in srgb, var(--destructive) 30%, transparent);
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.88); }
+}
+
+/* Reduced-motion: no pulse, solid dot, state still obvious. */
+@media (prefers-reduced-motion: reduce) {
+  .state-pill--live::before {
+    animation: none;
+  }
+}
+
+/* ---- DORMIE CARD ACCENT ----
+   Applied to the match score card when matchState.isDormie is true.
+   Uses a breathing border animation capped at 0.33Hz — slow feels
+   more urgent than fast. Reduced-motion keeps the border, drops the
+   breathing. The visual language is: "something here has changed,
+   pay attention" without being frantic. */
+
+.dormie-accent {
+  position: relative;
+  border: 2px solid var(--dormie);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dormie) 15%, transparent);
+  animation: dormie-breathe 3s ease-in-out infinite;
+}
+
+@keyframes dormie-breathe {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--dormie) 15%, transparent); }
+  50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--dormie) 22%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dormie-accent {
+    animation: none;
+  }
 }
 
 /* Alias for backwards compatibility */

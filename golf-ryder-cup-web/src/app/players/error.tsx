@@ -33,7 +33,7 @@ export default function PlayersError({ error, reset }: ErrorPageProps) {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Players"
-        subtitle="Something went wrong"
+        subtitle="Couldn’t load players"
         icon={<Users size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />

@@ -213,7 +213,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
             </button>
             <button
               onClick={handleJoin}
-              disabled={isJoining || !shareCode.trim()}
+              disabled={isJoining || shareCode.trim().length < 8}
               className={cn(
                 'flex-1 px-4 py-3 rounded-lg font-medium transition-colors',
                 'flex items-center justify-center gap-2',
@@ -225,10 +225,18 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
               {isJoining ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Joining...
+                  Joining…
                 </>
+              ) : shareCode.trim().length === 0 ? (
+                // Disabled-state label doubles as the blocker explanation —
+                // see docs/TERMINOLOGY.md "Button disabled state".
+                'Enter your 8-character code'
+              ) : shareCode.trim().length < 8 ? (
+                `${8 - shareCode.trim().length} more character${
+                  8 - shareCode.trim().length === 1 ? '' : 's'
+                }`
               ) : (
-                'Join Trip'
+                'Join trip'
               )}
             </button>
           </div>

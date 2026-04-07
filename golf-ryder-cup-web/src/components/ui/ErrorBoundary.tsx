@@ -149,24 +149,26 @@ export function ErrorFallback({
         <AlertTriangle className={cn(isCompact ? 'w-6 h-6' : 'w-8 h-8', 'text-[var(--error)]')} />
       </div>
 
-      {/* Title */}
+      {/* Title — copy follows docs/TERMINOLOGY.md */}
       <h2
         className={cn(
           'font-semibold mb-2 text-[var(--ink)]',
           isCompact ? 'text-base' : 'text-lg',
         )}
       >
-        Something went wrong
+        Unexpected error
       </h2>
 
-      {/* Description */}
+      {/* Description — prefer the specific error message, fall back
+          to a reassuring statement about data safety. Never generic. */}
       <p
         className={cn(
           'max-w-sm mb-6 text-[var(--ink-secondary)]',
           isCompact ? 'text-xs' : 'text-sm',
         )}
       >
-        {error?.message || 'An unexpected error occurred. Please try again.'}
+        {error?.message ||
+          'Your trip data is safe on this device. Tap below to try again.'}
       </p>
 
       {/* Actions */}
@@ -260,7 +262,7 @@ export function withErrorBoundary<P extends object>(
 
 // Compact error display for inline usage
 export function MiniErrorFallback({
-  message = 'Something went wrong',
+  message = 'This section didn’t load',
   onRetry,
 }: {
   message?: string;
@@ -285,8 +287,8 @@ export function MiniErrorFallback({
 
 // Card-style error display
 export function ErrorCard({
-  title = 'Error',
-  message = 'Something went wrong',
+  title = 'Unexpected error',
+  message = 'Your data is safe. Tap retry to try again.',
   onRetry,
   className,
 }: {

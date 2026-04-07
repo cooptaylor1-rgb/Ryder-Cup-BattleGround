@@ -201,9 +201,9 @@ export default function NewTripPage() {
               </div>
             </div>
 
-            {/* Continue button */}
+            {/* Primary CTA — canonical "Save and continue" per docs/TERMINOLOGY.md */}
             <button onClick={handleConfigure} className="btn-primary w-full">
-              Review Trip
+              Save and continue
             </button>
           </section>
         )}

@@ -33,7 +33,7 @@ export default function ScheduleError({ error, reset }: ErrorPageProps) {
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" role="alert">
       <PageHeader
         title="Schedule"
-        subtitle="Something went wrong"
+        subtitle="Couldn’t load the schedule"
         icon={<CalendarDays size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.back()}
       />

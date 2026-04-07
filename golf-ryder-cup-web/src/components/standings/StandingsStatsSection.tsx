@@ -99,10 +99,10 @@ export function FunStatsTab({
         <div className="mt-[var(--space-5)]">
           <EmptyStatePremium
             illustration="podium"
-            title="No trip stats yet"
-            description="As soon as scores and side stats are entered, you'll see leaders and highlights here."
+            title="No stats yet"
+            description="Leaders and highlights appear after the first hole is scored."
             action={{
-              label: 'Go score a match',
+              label: 'Open matchups',
               onClick: onGoToMatchups,
               icon: <TrendingUp size={18} strokeWidth={2} />,
             }}

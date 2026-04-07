@@ -29,12 +29,16 @@ describe('Error Handling Utilities', () => {
             expect(error.message).toBe('Test error');
             expect(error.code).toBe('DATA_VALIDATION_FAILED');
             expect(error.context).toEqual({ field: 'name' });
-            expect(error.userMessage).toBe('Please check your input and try again.');
+            expect(error.userMessage).toBe('Check the highlighted fields and try again.');
         });
 
         it('provides default user message for unknown errors', () => {
             const error = createAppError(ErrorCodes.UNKNOWN_ERROR, 'Test error');
-            expect(error.userMessage).toBe('Something went wrong. Please try again.');
+            // Per docs/TERMINOLOGY.md the unknown-error copy must lead with
+            // data-safety reassurance, never the generic "something went wrong".
+            expect(error.userMessage).toBe(
+                'Unexpected error. Your data is safe — tap to try again.',
+            );
         });
     });
 
