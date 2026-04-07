@@ -19,7 +19,8 @@ describe('Error Categorization', () => {
             const error = new Error('Failed to fetch');
             const result = normalizeError(error);
             expect(result.code).toBe(ErrorCodes.NETWORK_ERROR);
-            expect(result.userMessage).toContain('internet connection');
+            // Voice rule: lead with reassurance + name the connection problem.
+            expect(result.userMessage.toLowerCase()).toContain('reach the server');
         });
 
         it('classifies NetworkError as NETWORK_ERROR', () => {
@@ -33,14 +34,16 @@ describe('Error Categorization', () => {
             error.name = 'AbortError';
             const result = normalizeError(error);
             expect(result.code).toBe(ErrorCodes.NETWORK_TIMEOUT);
-            expect(result.userMessage).toContain('timed out');
+            // Voice rule: name the long delay with a verb-led action.
+            expect(result.userMessage.toLowerCase()).toContain('took too long');
         });
 
         it('classifies quota errors as STORAGE_QUOTA_EXCEEDED', () => {
             const error = new Error('QuotaExceededError: quota exceeded');
             const result = normalizeError(error);
             expect(result.code).toBe(ErrorCodes.STORAGE_QUOTA_EXCEEDED);
-            expect(result.userMessage).toContain('Storage');
+            // Voice rule: name the device-storage problem with a clear action.
+            expect(result.userMessage.toLowerCase()).toContain('storage');
         });
 
         it('classifies unknown errors as UNKNOWN_ERROR', () => {
@@ -88,7 +91,8 @@ describe('Error Categorization', () => {
             const error = createAppError(ErrorCodes.DATA_SYNC_FAILED, 'Sync issue');
             expect(error.code).toBe(ErrorCodes.DATA_SYNC_FAILED);
             expect(error.message).toBe('Sync issue');
-            expect(error.userMessage).toContain('sync');
+            // Case-insensitive: copy may capitalize "Sync" at sentence start.
+            expect(error.userMessage.toLowerCase()).toContain('sync');
         });
 
         it('includes context when provided', () => {
