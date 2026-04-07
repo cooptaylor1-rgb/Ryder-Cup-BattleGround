@@ -12,6 +12,7 @@ import {
   DollarSign,
   HardDrive,
   Heart,
+  Activity,
   HelpCircle,
   Lock,
   LogIn,
@@ -405,6 +406,13 @@ export default function MorePageClient() {
                   onClick={() => router.push('/help')}
                 >
                   Open help
+                </Button>
+                <Button
+                  variant="ghost"
+                  leftIcon={<Activity size={16} />}
+                  onClick={() => router.push('/diagnostics')}
+                >
+                  Diagnostics & backup
                 </Button>
               </div>
             </div>
