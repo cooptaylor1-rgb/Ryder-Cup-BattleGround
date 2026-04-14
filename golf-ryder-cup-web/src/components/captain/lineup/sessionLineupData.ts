@@ -7,6 +7,7 @@ import type {
     Player as LineupPlayer,
     SessionConfig,
 } from '@/components/captain';
+import { getPlayersPerTeam } from '@/components/captain/lineup/newLineupConfig';
 
 export type SessionLineupViewMode = 'matches' | 'edit';
 
@@ -20,7 +21,7 @@ export function buildSessionConfig(
         id: session.id,
         name: session.name,
         type: session.sessionType,
-        playersPerTeam: session.sessionType === 'singles' ? 1 : 2,
+        playersPerTeam: getPlayersPerTeam(session.sessionType),
         matchCount: matches.length || 4,
         pointsPerMatch: session.pointsPerMatch ?? 1,
     };

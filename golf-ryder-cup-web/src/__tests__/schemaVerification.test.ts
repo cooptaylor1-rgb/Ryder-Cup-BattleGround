@@ -190,7 +190,25 @@ describe('Database Schema Verification', () => {
         });
 
         it('should validate session types', () => {
-            expect(schemaContent).toMatch(/session_type.*CHECK.*\(.*session_type IN.*'foursomes'.*'fourball'.*'singles'/i);
+            // Constraint allows the original Ryder Cup formats plus the foundation
+            // formats unlocked for new scoring engines (Pinehurst, Greensomes,
+            // Scrambles, 6-6-6, Cha-Cha-Cha, 1-2-3, Best 2 of 4).
+            expect(schemaContent).toMatch(
+                /session_type[\s\S]*CHECK[\s\S]*session_type IN[\s\S]*'foursomes'[\s\S]*'fourball'[\s\S]*'singles'/i
+            );
+            for (const value of [
+                'pinehurst',
+                'greensomes',
+                'scramble',
+                'texas-scramble',
+                'shamble',
+                'best-2-of-4',
+                'six-six-six',
+                'cha-cha-cha',
+                'one-two-three',
+            ]) {
+                expect(schemaContent).toContain(`'${value}'`);
+            }
         });
 
         it('should validate match status', () => {
