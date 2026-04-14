@@ -94,13 +94,18 @@ function LoginPageContent() {
   }, []);
 
   useEffect(() => {
+    // Intentionally only re-run when the user edits email/pin.
+    // Including `error` or `magicLinkSentTo` in the dep array would cause
+    // this effect to clear those values the instant they're set, making
+    // failed-login errors and magic-link confirmations invisible.
     if (error) {
       clearError();
     }
     if (magicLinkSentTo) {
       setMagicLinkSentTo(null);
     }
-  }, [email, pin, error, clearError, magicLinkSentTo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, pin]);
 
   const nextPath = searchParams?.get('next');
   const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
