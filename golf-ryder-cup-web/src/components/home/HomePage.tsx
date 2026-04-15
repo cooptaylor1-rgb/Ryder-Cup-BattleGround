@@ -537,42 +537,71 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── TOURNAMENT ARCHIVE ── */}
-        <section className={`${activeTrip ? 'pt-[var(--space-6)]' : 'pt-[var(--space-10)]'} pb-[var(--space-10)]`}>
-          <div className="flex items-center justify-between mb-[var(--space-6)]">
-            <h2 className="type-overline tracking-[0.15em]">
-              {hasTrips ? (activeTrip ? 'Other Trips' : 'Tournaments') : 'Get Started'}
-            </h2>
-            {hasTrips && (
-              <button
-                onClick={() => router.push('/trip/new')}
-                className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
+        {/* ── TOURNAMENT ARCHIVE ──
+            When there's an active trip we keep the home page focused on today
+            and move the full archive to /trips, exposing just a compact "All
+            trips" link here. When there's no active trip the home page is the
+            only place to pick or create one, so the full list stays visible. */}
+        {activeTrip ? (
+          pastTrips.length > 0 ? (
+            <section className="pt-[var(--space-6)] pb-[var(--space-10)]">
+              <Link
+                href="/trips"
+                className="card-editorial card-interactive border border-[var(--rule)] no-underline flex items-center justify-between px-[var(--space-5)] py-[var(--space-4)] rounded-[var(--radius-xl)]"
               >
-                <Plus size={14} strokeWidth={2.5} />
-                New
-              </button>
-            )}
-          </div>
-
-          {pastTrips.length > 0 ? (
-            <div className="flex flex-col gap-[var(--space-3)]">
-              {pastTrips.map((trip) => (
-                <TripCard
-                  key={trip.id}
-                  trip={trip}
-                  onSelect={handleSelectTrip}
-                  tag={trip.isPracticeRound ? 'Practice' : undefined}
+                <div>
+                  <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">
+                    Other Trips
+                  </p>
+                  <p className="type-title-sm mt-[var(--space-1)] text-[var(--ink)]">
+                    {pastTrips.length} {pastTrips.length === 1 ? 'trip' : 'trips'} in the archive
+                  </p>
+                </div>
+                <ChevronRight
+                  size={22}
+                  strokeWidth={1.5}
+                  className="text-[var(--masters)] shrink-0"
                 />
-              ))}
+              </Link>
+            </section>
+          ) : null
+        ) : (
+          <section className="pt-[var(--space-10)] pb-[var(--space-10)]">
+            <div className="flex items-center justify-between mb-[var(--space-6)]">
+              <h2 className="type-overline tracking-[0.15em]">
+                {hasTrips ? 'Tournaments' : 'Get Started'}
+              </h2>
+              {hasTrips && (
+                <button
+                  onClick={() => router.push('/trip/new')}
+                  className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
+                >
+                  <Plus size={14} strokeWidth={2.5} />
+                  New
+                </button>
+              )}
             </div>
-          ) : !activeTrip ? (
-            <NoTournamentsEmpty
-              createHref="/trip/new"
-              onCreateTrip={() => router.push('/trip/new')}
-              onJoinTrip={() => setShowJoinTrip(true)}
-            />
-          ) : null}
-        </section>
+
+            {pastTrips.length > 0 ? (
+              <div className="flex flex-col gap-[var(--space-3)]">
+                {pastTrips.map((trip) => (
+                  <TripCard
+                    key={trip.id}
+                    trip={trip}
+                    onSelect={handleSelectTrip}
+                    tag={trip.isPracticeRound ? 'Practice' : undefined}
+                  />
+                ))}
+              </div>
+            ) : (
+              <NoTournamentsEmpty
+                createHref="/trip/new"
+                onCreateTrip={() => router.push('/trip/new')}
+                onJoinTrip={() => setShowJoinTrip(true)}
+              />
+            )}
+          </section>
+        )}
       </main>
 
       <FirstLaunchWalkthrough />
