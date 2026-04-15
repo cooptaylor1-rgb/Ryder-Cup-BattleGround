@@ -1,13 +1,18 @@
 /**
- * Simple QR Code Component
+ * QR Code Component
  *
- * Generates a QR code as an SVG using a hosted API service.
- * Falls back to displaying the code as text if image fails to load.
+ * Renders a QR code entirely client-side using the `qrcode` library, so the
+ * feature works offline (critical at a golf course) and doesn't leak trip
+ * share URLs to a third-party image service. No external requests are made.
+ *
+ * The QR is generated as inline SVG for crisp scaling at any size. If
+ * generation fails for any reason (unexpected input, etc.), we fall back to
+ * a clear "QR unavailable" affordance rather than rendering a broken image.
  */
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import QRCodeLib from 'qrcode';
 
 interface QRCodeProps {
   value: string;
@@ -16,15 +21,58 @@ interface QRCodeProps {
 }
 
 export function QRCode({ value, size = 200, className }: QRCodeProps) {
+  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
   const [error, setError] = useState(false);
+
+  // QRCode.toString with type: 'svg' is fully synchronous for our inputs,
+  // but the library still returns a Promise. Regenerate whenever the value
+  // or size changes.
+  useEffect(() => {
+    let cancelled = false;
+    setError(false);
+    setSvgMarkup(null);
+
+    if (!value) {
+      setError(true);
+      return;
+    }
+
+    QRCodeLib.toString(value, {
+      type: 'svg',
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      width: size,
+      color: {
+        dark: '#0a0a0a',
+        light: '#00000000', // transparent background — blends with the card
+      },
+    })
+      .then((svg) => {
+        if (!cancelled) setSvgMarkup(svg);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [value, size]);
+
+  const containerStyle = useMemo(
+    () => ({
+      width: size,
+      height: size,
+    }),
+    [size],
+  );
 
   if (error) {
     return (
       <div
         className={className}
         style={{
-          width: size,
-          height: size,
+          ...containerStyle,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -40,18 +88,35 @@ export function QRCode({ value, size = 200, className }: QRCodeProps) {
     );
   }
 
-  return (
-    <div className={className} style={{ textAlign: 'center' }}>
-      <Image
-        src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&margin=8&format=svg`}
-        alt={`QR code for ${value}`}
-        width={size}
-        height={size}
-        unoptimized
-        style={{ borderRadius: 'var(--radius-md)' }}
-        onError={() => setError(true)}
+  if (!svgMarkup) {
+    // Render a same-sized placeholder to prevent layout shift on first paint.
+    return (
+      <div
+        className={className}
+        style={{
+          ...containerStyle,
+          background: 'var(--canvas-raised)',
+          borderRadius: 'var(--radius-md)',
+        }}
+        aria-label={`Generating QR code for ${value}`}
       />
-    </div>
+    );
+  }
+
+  return (
+    <div
+      className={className}
+      style={{
+        ...containerStyle,
+        borderRadius: 'var(--radius-md)',
+        overflow: 'hidden',
+      }}
+      role="img"
+      aria-label={`QR code for ${value}`}
+      // The qrcode library returns a trusted, pre-rendered SVG with no
+      // scripting or external references — safe to inline.
+      dangerouslySetInnerHTML={{ __html: svgMarkup }}
+    />
   );
 }
 

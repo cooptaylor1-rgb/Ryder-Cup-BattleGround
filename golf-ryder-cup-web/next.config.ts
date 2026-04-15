@@ -27,15 +27,13 @@ const nextConfig: NextConfig = {
 
   // Image optimization configuration
   images: {
-    // Only allow images from Supabase storage (user-uploaded avatars, photos)
+    // Only allow images from Supabase storage (user-uploaded avatars, photos).
+    // QR codes are rendered entirely client-side, so no external image host
+    // is needed for them.
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '*.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'api.qrserver.com',
       },
     ],
     // Prefer AVIF (smaller) with WebP fallback
@@ -69,7 +67,7 @@ const nextConfig: NextConfig = {
               // scripts here prevents the client app from hydrating in production.
               "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.supabase.co https://api.qrserver.com",
+              "img-src 'self' data: blob: https://*.supabase.co",
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.weather.gov https://*.openweathermap.org https://api.open-meteo.com https://*.sentry.io",
               "frame-ancestors 'self'",
