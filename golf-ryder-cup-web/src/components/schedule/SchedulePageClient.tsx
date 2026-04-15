@@ -15,7 +15,7 @@ import {
 } from '@/components/schedule/scheduleData';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { db } from '@/lib/db';
-import { useAuthStore, useTripStore } from '@/lib/stores';
+import { useAccessStore, useAuthStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { tripLogger } from '@/lib/utils/logger';
 import { navigateBackOr } from '@/lib/utils/navigation';
@@ -28,6 +28,7 @@ export default function SchedulePageClient() {
   const searchParams = useSearchParams();
   const { currentTrip, sessions, players, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players, courses: s.courses, teeSets: s.teeSets })));
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
+  const isCaptainMode = useAccessStore(s => s.isCaptainMode);
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -258,7 +259,19 @@ export default function SchedulePageClient() {
             <EmptyStatePremium
               illustration="calendar"
               title="No sessions scheduled"
-              description="Sessions will appear here once the captain sets up the schedule."
+              description={
+                isCaptainMode
+                  ? 'Build your first session to start the lineup and kick off scoring.'
+                  : 'Sessions will appear here once the captain sets up the schedule.'
+              }
+              action={
+                isCaptainMode
+                  ? {
+                      label: 'Create session',
+                      onClick: () => router.push('/lineup/new?mode=session'),
+                    }
+                  : undefined
+              }
               variant="default"
             />
           </div>
