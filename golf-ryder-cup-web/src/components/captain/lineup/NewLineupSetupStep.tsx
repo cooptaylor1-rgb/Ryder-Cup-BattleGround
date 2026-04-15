@@ -13,6 +13,8 @@ import {
 } from './newLineupConfig';
 
 interface NewLineupSetupStepProps {
+  isSessionMode: boolean;
+  isSubmitting: boolean;
   showAdvanced: boolean;
   sessionName: string;
   sessionType: SessionType;
@@ -31,6 +33,7 @@ interface NewLineupSetupStepProps {
   canProceedToLineup: boolean;
   onToggleAdvanced: () => void;
   onQuickSetup: () => void;
+  onQuickAddSession: () => void;
   onSessionNameChange: (value: string) => void;
   onSelectFormat: (value: string) => void;
   onToggleShowAllFormats: () => void;
@@ -39,10 +42,13 @@ interface NewLineupSetupStepProps {
   onFirstTeeTimeChange: (value: string) => void;
   onTeeTimeIntervalChange: (value: number) => void;
   onPointsPerMatchChange: (value: number) => void;
+  onAddSessionToQueue: () => void;
   onContinue: () => void;
 }
 
 export function NewLineupSetupStep({
+  isSessionMode,
+  isSubmitting,
   showAdvanced,
   sessionName,
   sessionType,
@@ -61,6 +67,7 @@ export function NewLineupSetupStep({
   canProceedToLineup,
   onToggleAdvanced,
   onQuickSetup,
+  onQuickAddSession,
   onSessionNameChange,
   onSelectFormat,
   onToggleShowAllFormats,
@@ -69,6 +76,7 @@ export function NewLineupSetupStep({
   onFirstTeeTimeChange,
   onTeeTimeIntervalChange,
   onPointsPerMatchChange,
+  onAddSessionToQueue,
   onContinue,
 }: NewLineupSetupStepProps) {
   return (
@@ -90,12 +98,24 @@ export function NewLineupSetupStep({
           <p className="mb-4 text-sm opacity-90">
             Start with our recommended defaults. Most groups play Four-Ball with 4 matches.
           </p>
-          <button
-            onClick={onQuickSetup}
-            className="w-full rounded-lg bg-[color:var(--canvas)]/20 py-3 font-semibold transition-all hover:bg-[color:var(--canvas)]/30 backdrop-blur-sm"
-          >
-            Use Defaults & Continue →
-          </button>
+          <div className="space-y-3">
+            {isSessionMode && (
+              <button
+                onClick={onQuickAddSession}
+                disabled={isSubmitting}
+                className="w-full rounded-lg bg-[color:var(--canvas)] py-3 font-semibold text-[var(--masters)] transition-all hover:bg-[color:var(--canvas)]/92 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting ? 'Adding session…' : 'Use Defaults & Add Session'}
+              </button>
+            )}
+            <button
+              onClick={onQuickSetup}
+              disabled={isSubmitting}
+              className="w-full rounded-lg bg-[color:var(--canvas)]/20 py-3 font-semibold transition-all hover:bg-[color:var(--canvas)]/30 backdrop-blur-sm disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Use Defaults & Continue →
+            </button>
+          </div>
         </div>
 
         <div className="text-center">
@@ -446,9 +466,28 @@ export function NewLineupSetupStep({
           )}
 
           <section className="section">
-            <Button variant="primary" fullWidth onClick={onContinue} disabled={!canProceedToLineup}>
-              Continue to Lineup Builder
-            </Button>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {isSessionMode && (
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  onClick={onAddSessionToQueue}
+                  disabled={!canProceedToLineup}
+                  isLoading={isSubmitting}
+                  loadingText="Adding Session"
+                >
+                  Add Session to Queue
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={onContinue}
+                disabled={!canProceedToLineup || isSubmitting}
+              >
+                Continue to Lineup Builder
+              </Button>
+            </div>
           </section>
         </>
       )}

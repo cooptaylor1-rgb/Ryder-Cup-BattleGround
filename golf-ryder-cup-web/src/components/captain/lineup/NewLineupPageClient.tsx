@@ -364,10 +364,24 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
     ]
   );
 
-  const handleCreateSessionShell = useCallback(async () => {
+  const handleCreateSessionShell = useCallback(async (
+    overrides?: Partial<{
+      sessionName: string;
+      sessionType: SessionType;
+      scheduledDate: string;
+      firstTeeTime: string;
+      pointsPerMatch: number;
+    }>
+  ) => {
     if (!currentTrip) return;
 
-    const trimmedName = sessionName.trim();
+    const nextName = overrides?.sessionName ?? sessionName;
+    const nextType = overrides?.sessionType ?? sessionType;
+    const nextDate = overrides?.scheduledDate ?? scheduledDate;
+    const nextTeeTime = overrides?.firstTeeTime ?? firstTeeTime;
+    const nextPointsPerMatch = overrides?.pointsPerMatch ?? pointsPerMatch;
+
+    const trimmedName = nextName.trim();
     if (!trimmedName) {
       showToast('error', 'Give the session a name before adding it.');
       return;
@@ -375,17 +389,17 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
     setIsCreating(true);
     try {
-      const [hours] = firstTeeTime.split(':').map(Number);
+      const [hours] = nextTeeTime.split(':').map(Number);
       const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
 
       await addSession({
         tripId: currentTrip.id,
         name: trimmedName,
         sessionNumber: nextSessionNumber,
-        sessionType,
-        scheduledDate: scheduledDate || undefined,
+        sessionType: nextType,
+        scheduledDate: nextDate || undefined,
         timeSlot: derivedTimeSlot,
-        pointsPerMatch,
+        pointsPerMatch: nextPointsPerMatch,
         status: 'scheduled',
         isLocked: false,
       });
@@ -410,12 +424,12 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   }, [
     addSession,
     currentTrip,
-    firstTeeTime,
     nextSessionNumber,
-    pointsPerMatch,
-    scheduledDate,
     sessionName,
     sessionType,
+    scheduledDate,
+    firstTeeTime,
+    pointsPerMatch,
     showToast,
   ]);
 
@@ -603,6 +617,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
         {step === 'setup' ? (
           <NewLineupSetupStep
+            isSessionMode={mode === 'session'}
+            isSubmitting={isCreating}
             showAdvanced={showAdvanced}
             sessionName={sessionName}
             sessionType={sessionType}
@@ -626,6 +642,15 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
               setPointsPerMatch(1);
               setStep('lineup');
             }}
+            onQuickAddSession={async () => {
+              await handleCreateSessionShell({
+                sessionName: defaultSessionName,
+                sessionType: 'fourball',
+                scheduledDate: defaultDate,
+                firstTeeTime: defaultTeeTime,
+                pointsPerMatch: 1,
+              });
+            }}
             onSessionNameChange={setSessionName}
             onSelectFormat={handleTypeChange}
             onToggleShowAllFormats={() => setShowAllFormats((prev) => !prev)}
@@ -634,6 +659,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             onFirstTeeTimeChange={setFirstTeeTime}
             onTeeTimeIntervalChange={setTeeTimeInterval}
             onPointsPerMatchChange={setPointsPerMatch}
+            onAddSessionToQueue={handleCreateSessionShell}
             onContinue={() => setStep('lineup')}
           />
         ) : (
