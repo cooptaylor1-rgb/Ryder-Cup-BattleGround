@@ -34,6 +34,7 @@ import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { PageHeader } from '@/components/layout';
 import { TripDashboardSections } from './TripDashboardSections';
 import { HeroMetaPill, HeroMetaStat, HomeSectionHeader, SetupStep } from './HomeSharedComponents';
+import { TripCard } from './TripCard';
 
 function readPendingJoinCode(): string | undefined {
   if (typeof window === 'undefined') {
@@ -556,48 +557,12 @@ export default function HomePage() {
           {pastTrips.length > 0 ? (
             <div className="flex flex-col gap-[var(--space-3)]">
               {pastTrips.map((trip) => (
-                <button
+                <TripCard
                   key={trip.id}
-                  onClick={() => handleSelectTrip(trip.id)}
-                  className="card-editorial card-interactive w-full text-left flex items-center gap-[var(--space-4)] border border-[var(--rule)] p-[var(--space-5)]"
-                >
-                  {/* Tournament Icon */}
-                  <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shrink-0">
-                    <Trophy size={22} className="text-[var(--gold)]" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="type-title-sm font-semibold">{trip.name}</p>
-
-                    <div className="type-caption flex items-center gap-[var(--space-3)] mt-[var(--space-1)]">
-                      {trip.location && (
-                        <span className="flex items-center gap-[var(--space-1)] min-w-0">
-                          <MapPin
-                            size={12}
-                            strokeWidth={1.5}
-                            className="text-[var(--ink-tertiary)] shrink-0"
-                          />
-                          <span className="truncate">{trip.location}</span>
-                        </span>
-                      )}
-
-                      <span className="flex items-center gap-[var(--space-1)]">
-                        <Calendar
-                          size={12}
-                          strokeWidth={1.5}
-                          className="text-[var(--ink-tertiary)]"
-                        />
-                        {formatDate(trip.startDate, 'short')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <ChevronRight
-                    size={18}
-                    strokeWidth={1.5}
-                    className="text-[var(--ink-tertiary)] shrink-0"
-                  />
-                </button>
+                  trip={trip}
+                  onSelect={handleSelectTrip}
+                  tag={trip.isPracticeRound ? 'Practice' : undefined}
+                />
               ))}
             </div>
           ) : !activeTrip ? (
