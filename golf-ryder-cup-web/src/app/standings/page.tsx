@@ -201,7 +201,7 @@ export default function StandingsPage() {
           title="Standings"
           subtitle="No active trip"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -226,7 +226,7 @@ export default function StandingsPage() {
           title="Standings"
           subtitle={currentTrip.name}
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">

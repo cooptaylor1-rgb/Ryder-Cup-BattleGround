@@ -185,7 +185,7 @@ export default function SocialPageClient() {
           subtitle="No active trip"
           icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
           iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -216,7 +216,7 @@ export default function SocialPageClient() {
           subtitle={currentTrip.name}
           icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
           iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -242,7 +242,7 @@ export default function SocialPageClient() {
         subtitle={currentTrip.name}
         icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           <Button
             variant="outline"

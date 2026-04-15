@@ -6,6 +6,7 @@
 
 // Core hooks
 export { useOnlineStatus } from './useOnlineStatus';
+export { useSmartBack } from './useSmartBack';
 export { useHaptic } from './useHaptic';
 export { useMatchState, useHoleResults } from './useMatchState';
 export { useOnboarding } from './useOnboarding';

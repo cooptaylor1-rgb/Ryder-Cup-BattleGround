@@ -509,7 +509,7 @@ export default function PlayersPageClient() {
           title="Players"
           subtitle="No active trip"
           icon={<Users size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -531,7 +531,7 @@ export default function PlayersPageClient() {
         title="Players"
         subtitle={currentTrip.name}
         icon={<Users size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/"
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

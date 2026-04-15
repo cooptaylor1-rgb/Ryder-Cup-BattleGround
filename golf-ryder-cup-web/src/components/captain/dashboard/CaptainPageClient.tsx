@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
+import { CaptainToggle } from '@/components/ui/CaptainToggle';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -165,7 +166,7 @@ export default function CaptainPageClient() {
           subtitle="No active trip"
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
           iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          backFallback="/"
         />
         <main className="container-editorial py-12">
           <EmptyStatePremium
@@ -192,7 +193,7 @@ export default function CaptainPageClient() {
           subtitle={currentTrip.name}
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
           iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
@@ -298,14 +299,18 @@ export default function CaptainPageClient() {
         subtitle={currentTrip.name}
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
-          <Link
-            href="/captain/settings"
-            className="rounded-full p-2 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]"
-          >
-            <Settings size={20} strokeWidth={1.75} />
-          </Link>
+          <div className="flex items-center gap-1">
+            <CaptainToggle />
+            <Link
+              href="/captain/settings"
+              aria-label="Captain settings"
+              className="rounded-full p-2 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]"
+            >
+              <Settings size={20} strokeWidth={1.75} />
+            </Link>
+          </div>
         }
       />
 

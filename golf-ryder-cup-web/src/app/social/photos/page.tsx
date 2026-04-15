@@ -149,7 +149,7 @@ export default function PhotosPage() {
         title="Photos"
         subtitle={currentTrip.name}
         icon={<Camera size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/social"
         rightSlot={
           <div className="flex items-center gap-2">
             <button

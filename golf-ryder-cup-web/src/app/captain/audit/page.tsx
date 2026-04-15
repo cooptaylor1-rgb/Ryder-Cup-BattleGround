@@ -214,7 +214,7 @@ export default function CaptainAuditLogPage() {
         subtitle={currentTrip.name}
         icon={<ShieldCheck size={16} className="text-[var(--canvas)]" />}
         iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        backFallback="/captain"
         rightSlot={
           <Button variant="outline" size="sm" leftIcon={<Filter size={14} />} onClick={() => setActionFilter('all')}>
             Reset

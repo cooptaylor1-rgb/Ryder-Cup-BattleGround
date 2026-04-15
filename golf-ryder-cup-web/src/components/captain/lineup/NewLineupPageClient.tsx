@@ -491,7 +491,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           title="Build Lineup"
           subtitle="Loading next session"
           icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
+          backFallback="/schedule"
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">
@@ -512,7 +512,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           title="Build Lineup"
           subtitle={nextSessionNeedingLineup.name}
           icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
+          backFallback="/schedule"
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">

@@ -52,7 +52,7 @@ export default function MatchupsPage() {
       <PageHeader
         title="Matchups"
         subtitle={currentTrip.name}
-        onBack={() => router.back()}
+        backFallback="/"
         icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
         rightSlot={
           isCaptainMode ? (

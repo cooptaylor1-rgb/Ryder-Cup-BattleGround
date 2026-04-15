@@ -159,7 +159,7 @@ export default function TripSettingsPage() {
           <PageHeader
             title="Trip Settings"
             icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
-            onBack={() => router.back()}
+            backFallback="/trips"
             rightSlot={
               <button
                 onClick={() => router.push('/')}
@@ -204,7 +204,7 @@ export default function TripSettingsPage() {
           <PageHeader
             title="Trip Settings"
             icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
-            onBack={() => router.back()}
+            backFallback="/trips"
             rightSlot={
               <button
                 onClick={() => router.push('/')}

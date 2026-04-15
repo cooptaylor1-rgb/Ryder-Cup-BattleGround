@@ -138,7 +138,7 @@ export default function AdminPageClient() {
                     boxShadow:
                         '0 2px 8px color-mix(in srgb, var(--error) 30%, transparent)',
                 }}
-                onBack={() => router.back()}
+                backFallback="/"
             />
 
             <main className="container-editorial">

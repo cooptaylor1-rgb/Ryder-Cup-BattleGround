@@ -191,7 +191,7 @@ export default function CompleteProfilePageClient() {
     <div className="page-premium-enter texture-grain bg-canvas min-h-screen flex flex-col">
       <PageHeader
         title="Complete your profile"
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           <button
             type="button"

@@ -232,7 +232,7 @@ export default function ProfilePage() {
         title="Profile"
         subtitle={isEditing ? 'Editing' : undefined}
         icon={<User size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           !isEditing ? (
             <button

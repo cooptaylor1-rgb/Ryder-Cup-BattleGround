@@ -138,7 +138,7 @@ export default function LivePageClient() {
                 title="Live Scores"
                 subtitle={currentTrip.name}
                 icon={<Tv size={16} className="text-[var(--color-accent)]" />}
-                onBack={() => router.back()}
+                backFallback="/"
             />
 
             <LivePageSections

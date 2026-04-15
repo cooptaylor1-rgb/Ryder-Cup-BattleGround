@@ -239,7 +239,7 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                 title={session.name}
                 subtitle={`${session.sessionType} • ${session.pointsPerMatch} pt${session.pointsPerMatch !== 1 ? 's' : ''} each`}
                 icon={<Users size={18} color="var(--canvas)" />}
-                onBack={() => router.back()}
+                backFallback="/schedule"
                 rightSlot={
                     <div className="flex items-center gap-2">
                         {session.status === 'inProgress' ? (
