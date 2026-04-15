@@ -115,7 +115,19 @@ CREATE TABLE IF NOT EXISTS sessions (
     trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     session_number INTEGER NOT NULL,
-    session_type TEXT NOT NULL CHECK (session_type IN ('foursomes', 'fourball', 'singles')),
+    session_type TEXT NOT NULL CHECK (session_type IN (
+        -- Original Ryder Cup formats
+        'foursomes', 'fourball', 'singles',
+        -- Partner match-play variants
+        'pinehurst', 'greensomes',
+        -- Team scrambles
+        'scramble', 'scramble-2', 'scramble-3', 'scramble-4',
+        'texas-scramble', 'shamble',
+        -- Multi-player aggregates
+        'best-2-of-4',
+        -- Hole-range / rotating formats
+        'six-six-six', 'cha-cha-cha', 'one-two-three'
+    )),
     scheduled_date DATE,
     time_slot TEXT CHECK (time_slot IN ('AM', 'PM')),
     points_per_match DECIMAL(3,1) DEFAULT 1.0,

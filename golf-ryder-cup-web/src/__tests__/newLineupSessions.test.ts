@@ -8,7 +8,10 @@ import {
   getNextSessionNumber,
   getTimeSlotForSessionNumber,
 } from '@/components/captain/lineup/newLineupSessions';
-import { generateSessionName } from '@/components/captain/lineup/newLineupConfig';
+import {
+  generateSessionName,
+  getPlayersPerTeam,
+} from '@/components/captain/lineup/newLineupConfig';
 
 const NOW = '2026-04-29T12:00:00.000Z';
 
@@ -88,5 +91,42 @@ describe('new lineup session helpers', () => {
     expect(getDefaultSessionDateForNumber('2026-04-29T10:00:00.000Z', 4, '2026-04-29')).toBe(
       '2026-04-30'
     );
+  });
+});
+
+describe('getPlayersPerTeam', () => {
+  it('returns 1 for singles', () => {
+    expect(getPlayersPerTeam('singles')).toBe(1);
+  });
+
+  it('returns 2 for foursomes and fourball', () => {
+    expect(getPlayersPerTeam('foursomes')).toBe(2);
+    expect(getPlayersPerTeam('fourball')).toBe(2);
+  });
+
+  it('returns 3 for the existing 3-player Cha-Cha-Cha catalog entry', () => {
+    expect(getPlayersPerTeam('cha-cha-cha')).toBe(3);
+  });
+
+  it('returns 4 for the new 1-2-3 (4-player) format', () => {
+    expect(getPlayersPerTeam('one-two-three')).toBe(4);
+  });
+
+  it('returns 4 for scramble variants defined in the lineup catalog', () => {
+    expect(getPlayersPerTeam('scramble')).toBe(4);
+    expect(getPlayersPerTeam('texas-scramble')).toBe(4);
+    expect(getPlayersPerTeam('shamble')).toBe(4);
+    expect(getPlayersPerTeam('best-2-of-4')).toBe(4);
+  });
+
+  it('returns 2 for partner formats (Pinehurst, Greensomes)', () => {
+    expect(getPlayersPerTeam('pinehurst')).toBe(2);
+    expect(getPlayersPerTeam('greensomes')).toBe(2);
+  });
+
+  it('falls back to 2 for unknown / undefined session types', () => {
+    expect(getPlayersPerTeam(undefined)).toBe(2);
+    expect(getPlayersPerTeam(null)).toBe(2);
+    expect(getPlayersPerTeam('not-a-real-format')).toBe(2);
   });
 });

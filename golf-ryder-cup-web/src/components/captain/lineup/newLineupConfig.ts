@@ -130,6 +130,17 @@ export const ALL_FORMATS: FormatOption[] = [
     icon: '💃',
   },
   {
+    value: 'one-two-three',
+    label: '1-2-3 (4-Player)',
+    description:
+      '4-player teams: best 1 net counts holes 1-6, best 2 holes 7-12, best 3 holes 13-18',
+    playersPerTeam: 4,
+    defaultMatches: 1,
+    category: 'match_play',
+    isTeamBased: true,
+    icon: '🪜',
+  },
+  {
     value: 'six-six-six',
     label: 'Sixes (6-6-6)',
     description: 'Format changes every 6 holes: best ball, aggregate, alternate shot',
@@ -262,6 +273,32 @@ export const FORMAT_CATEGORIES: {
   { value: 'side_game', label: 'Side Games', description: 'Additional betting formats' },
   { value: 'individual', label: 'Individual', description: 'Stroke-based formats' },
 ];
+
+/**
+ * Resolve the canonical playersPerTeam for a session type.
+ *
+ * Single source of truth — looks up the format catalog (ALL_FORMATS first,
+ * then FORMAT_CONFIGS as a backup for formats only defined in the long-form
+ * catalog). Falls back to a sensible default so callers can rely on a number
+ * even for unknown / custom session types.
+ *
+ * Use this everywhere instead of hardcoding `sessionType === 'singles' ? 1 : 2`.
+ */
+export function getPlayersPerTeam(sessionType: string | undefined | null): number {
+  if (!sessionType) return 2;
+
+  const lineupOption = ALL_FORMATS.find((format) => format.value === sessionType);
+  if (lineupOption) return lineupOption.playersPerTeam;
+
+  const catalogConfig = FORMAT_CONFIGS[sessionType as MatchFormat];
+  if (catalogConfig) {
+    return typeof catalogConfig.playersPerTeam === 'number'
+      ? catalogConfig.playersPerTeam
+      : catalogConfig.playersPerTeam[0];
+  }
+
+  return 2;
+}
 
 export function generateSessionName(sessionNumber: number): string {
   const dayNum = Math.ceil(sessionNumber / 2);
