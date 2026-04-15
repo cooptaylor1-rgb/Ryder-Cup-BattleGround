@@ -91,7 +91,6 @@ export default function HomePage() {
 
   const handleSelectTrip = async (tripId: string) => {
     await loadTrip(tripId);
-    router.push('/');
   };
 
   const handleOpenStandings = useCallback(() => {
