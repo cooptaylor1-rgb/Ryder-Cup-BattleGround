@@ -364,6 +364,61 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
     ]
   );
 
+  const handleCreateSessionShell = useCallback(async () => {
+    if (!currentTrip) return;
+
+    const trimmedName = sessionName.trim();
+    if (!trimmedName) {
+      showToast('error', 'Give the session a name before adding it.');
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const [hours] = firstTeeTime.split(':').map(Number);
+      const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
+
+      await addSession({
+        tripId: currentTrip.id,
+        name: trimmedName,
+        sessionNumber: nextSessionNumber,
+        sessionType,
+        scheduledDate: scheduledDate || undefined,
+        timeSlot: derivedTimeSlot,
+        pointsPerMatch,
+        status: 'scheduled',
+        isLocked: false,
+      });
+
+      showToast('success', 'Session added. You can add another right away.');
+      setStep('setup');
+      setShowAdvanced(false);
+    } catch (error) {
+      const appError = normalizeError(error, {
+        component: 'NewLineupPageClient',
+        action: 'createSessionShell',
+        tripId: currentTrip.id,
+      });
+      logger.error('Failed to create session shell', {
+        code: appError.code,
+        message: appError.message,
+      });
+      showToast('error', appError.userMessage);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [
+    addSession,
+    currentTrip,
+    firstTeeTime,
+    nextSessionNumber,
+    pointsPerMatch,
+    scheduledDate,
+    sessionName,
+    sessionType,
+    showToast,
+  ]);
+
   if (!currentTrip) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
