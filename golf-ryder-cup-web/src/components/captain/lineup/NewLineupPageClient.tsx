@@ -161,6 +161,22 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const lineupTeamB = useMemo(() => toLineupPlayers(teamBPlayers, 'B'), [teamBPlayers]);
 
   const selectedType = ALL_FORMATS.find((format) => format.value === sessionType) || ALL_FORMATS[0];
+  const unassignedPlayers = useMemo(
+    () => players.filter((player) => !teamMembers.some((teamMember) => teamMember.playerId === player.id)),
+    [players, teamMembers]
+  );
+  const hasEnoughPlayers =
+    teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
+    teamBPlayers.length >= selectedType.playersPerTeam * matchCount;
+  const rosterGap = Math.abs(teamAPlayers.length - teamBPlayers.length);
+  const requiredPlayersPerSide = selectedType.playersPerTeam * matchCount;
+  const playersNeededTeamA = Math.max(requiredPlayersPerSide - teamAPlayers.length, 0);
+  const playersNeededTeamB = Math.max(requiredPlayersPerSide - teamBPlayers.length, 0);
+  const rosterNeedsAttention = unassignedPlayers.length > 0 || rosterGap > 1 || !hasEnoughPlayers;
+  const rosterReadinessLabel = rosterNeedsAttention ? 'Roster needs attention' : 'Roster ready';
+  const rosterReadinessTone = rosterNeedsAttention
+    ? 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10 text-[var(--warning)]'
+    : 'border-[color:var(--success)]/18 bg-[color:var(--success)]/10 text-[var(--success)]';
 
   const sessionConfig: SessionConfig = useMemo(
     () => ({
@@ -175,9 +191,6 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   );
 
   const canProceedToLineup = sessionName.trim().length > 0;
-  const hasEnoughPlayers =
-    teamAPlayers.length >= selectedType.playersPerTeam * matchCount &&
-    teamBPlayers.length >= selectedType.playersPerTeam * matchCount;
 
   const handleTypeChange = useCallback((type: string) => {
     if (!isSupportedSessionType(type)) {
@@ -578,6 +591,51 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
               />
             </div>
 
+            <div className="mt-[var(--space-4)] rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">
+              <div className="flex flex-col gap-[var(--space-4)] lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0">
+                  <div className={`inline-flex items-center gap-[var(--space-2)] rounded-full border px-[var(--space-3)] py-[var(--space-2)] ${rosterReadinessTone}`}>
+                    <span className="type-caption font-semibold">{rosterReadinessLabel}</span>
+                  </div>
+                  <p className="mt-[var(--space-3)] type-title-sm text-[var(--ink)]">
+                    {rosterNeedsAttention
+                      ? 'Clean up the roster before you publish the card.'
+                      : 'Everything is in place for a confident lineup build.'}
+                  </p>
+                  <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                    {rosterNeedsAttention
+                      ? `You need ${playersNeededTeamA} more on ${teamA?.name || 'Team A'}, ${playersNeededTeamB} more on ${teamB?.name || 'Team B'}, and ${unassignedPlayers.length} unassigned player${unassignedPlayers.length === 1 ? '' : 's'} resolved for this ${selectedType.label.toLowerCase()} setup.`
+                      : `Both sides are staffed for ${matchCount} match${matchCount === 1 ? '' : 'es'} and every golfer is already assigned.`}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-[var(--space-2)] sm:min-w-[220px]">
+                  <Link
+                    href="/players"
+                    className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
+                  >
+                    Manage roster
+                  </Link>
+                  {rosterNeedsAttention ? (
+                    <Link
+                      href="/players?panel=draft"
+                      className="btn-ghost no-underline px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
+                    >
+                      Open draft board
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setStep('lineup')}
+                      className="btn-ghost px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                    >
+                      Go straight to builder
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {mode === 'session' && (
               <div className="mt-[var(--space-4)] rounded-2xl border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">
                 <div className="flex flex-wrap items-center justify-between gap-[var(--space-3)]">
@@ -670,6 +728,31 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                 Drag players into place, keep an eye on fairness, and publish when the session
                 feels right.
               </p>
+            </div>
+            <div className="mb-[var(--space-4)] rounded-[1.4rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">
+              <div className="flex flex-col gap-[var(--space-3)] lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="type-overline text-[var(--ink-tertiary)]">Captain readiness</p>
+                  <p className="mt-[var(--space-2)] type-title-sm text-[var(--ink)]">
+                    {rosterNeedsAttention
+                      ? 'You can draft now, but the roster still has setup gaps.'
+                      : 'Balanced sides. Clear runway. Publish when the pairings feel right.'}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-[var(--space-2)]">
+                  <span className={`inline-flex items-center rounded-full border px-[var(--space-3)] py-[var(--space-2)] text-[11px] font-semibold uppercase tracking-[0.12em] ${rosterReadinessTone}`}>
+                    {rosterReadinessLabel}
+                  </span>
+                  {rosterNeedsAttention ? (
+                    <Link
+                      href="/players"
+                      className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                    >
+                      Fix roster
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
             </div>
             <LineupBuilder
               session={sessionConfig}

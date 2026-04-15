@@ -1,14 +1,17 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Plus, Shield, UserPlus, Users, UsersRound, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { DraftBoard } from '@/components/captain';
+import { ArrowRight, CheckCircle2, Plus, Shield, Shuffle, Sparkles, UserPlus, Users, UsersRound, X } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, NoPlayersEmpty } from '@/components/ui';
 import {
   PlayersFactCard,
   RosterSectionCard,
+  type RosterPlayerQuickAction,
 } from '@/components/players/PlayersPageSections';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -22,6 +25,8 @@ interface BulkPlayerRow {
   handicapIndex: string;
   teamId: string;
 }
+
+type CommandCenterPanel = 'roster' | 'draft';
 
 const logger = createLogger('players');
 
@@ -52,8 +57,13 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function getHandicapValue(player: Player, fallback: number) {
+  return player.handicapIndex ?? fallback;
+}
+
 export default function PlayersPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     currentTrip,
     teams,
@@ -75,11 +85,18 @@ export default function PlayersPageClient() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [activePanel, setActivePanel] = useState<CommandCenterPanel>(
+    searchParams.get('panel') === 'draft' ? 'draft' : 'roster'
+  );
   const [bulkRows, setBulkRows] = useState<BulkPlayerRow[]>(() =>
     Array(4)
       .fill(null)
       .map(() => createEmptyRow())
   );
+
+  useEffect(() => {
+    setActivePanel(searchParams.get('panel') === 'draft' ? 'draft' : 'roster');
+  }, [searchParams]);
 
   const getPlayerTeam = useCallback(
     (playerId: string) => {
@@ -271,6 +288,219 @@ export default function PlayersPageClient() {
   const validBulkCount = bulkRows.filter(
     (row) => row.firstName.trim() && row.lastName.trim()
   ).length;
+  const teamSizeGap = Math.abs(teamAPlayers.length - teamBPlayers.length);
+  const readyForClassicMatches = Math.min(teamAPlayers.length, teamBPlayers.length) >= 4;
+  const rosterReadyForCaptainFlow = unassignedPlayers.length === 0 && teamSizeGap <= 1;
+  const rosterStatusTone = rosterReadyForCaptainFlow
+    ? 'border-[color:var(--success)]/18 bg-[color:var(--success)]/10 text-[var(--success)]'
+    : 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10 text-[var(--warning)]';
+  const rosterStatusLabel = rosterReadyForCaptainFlow
+    ? 'Roster balanced and captain-ready'
+    : unassignedPlayers.length > 0
+      ? `${unassignedPlayers.length} player${unassignedPlayers.length === 1 ? '' : 's'} still need a side`
+      : `Teams are off by ${teamSizeGap} player${teamSizeGap === 1 ? '' : 's'}`;
+  const draftEligiblePlayers = unassignedPlayers;
+
+  const handlePanelChange = useCallback(
+    (nextPanel: CommandCenterPanel) => {
+      setActivePanel(nextPanel);
+
+      const params = new URLSearchParams(searchParams.toString());
+      if (nextPanel === 'draft') {
+        params.set('panel', 'draft');
+      } else {
+        params.delete('panel');
+      }
+
+      const nextQuery = params.toString();
+      router.replace(nextQuery ? `/players?${nextQuery}` : '/players');
+    },
+    [router, searchParams]
+  );
+
+  const movePlayerToTeam = useCallback(
+    async (player: Player, targetTeamId: string) => {
+      try {
+        await assignPlayerToTeam(player.id, targetTeamId);
+        const nextTeam = teams.find((team) => team.id === targetTeamId);
+        showToast(
+          'success',
+          `${player.firstName} ${player.lastName} moved to ${nextTeam?.name || 'the team'}`
+        );
+      } catch (error) {
+        logger.error('Failed to reassign player', { error, playerId: player.id, targetTeamId });
+        showToast('error', 'Failed to move player');
+      }
+    },
+    [assignPlayerToTeam, showToast, teams]
+  );
+
+  const unassignPlayer = useCallback(
+    async (player: Player) => {
+      const currentTeam = getPlayerTeam(player.id);
+      if (!currentTeam) return;
+
+      try {
+        await removePlayerFromTeam(player.id, currentTeam.id);
+        showToast('info', `${player.firstName} ${player.lastName} moved to unassigned`);
+      } catch (error) {
+        logger.error('Failed to unassign player', { error, playerId: player.id });
+        showToast('error', 'Failed to unassign player');
+      }
+    },
+    [getPlayerTeam, removePlayerFromTeam, showToast]
+  );
+
+  const handleAutoBalanceTeams = useCallback(async () => {
+    if (!teamA || !teamB) {
+      showToast('error', 'Both teams must exist before you can auto-balance');
+      return;
+    }
+
+    if (players.length < 2) {
+      showToast('error', 'Add more players before auto-balancing the roster');
+      return;
+    }
+
+    try {
+      const handicaps = players
+        .map((player) => player.handicapIndex)
+        .filter((handicap): handicap is number => handicap !== undefined);
+      const fallbackHandicap =
+        handicaps.length > 0
+          ? handicaps.reduce((sum, handicap) => sum + handicap, 0) / handicaps.length
+          : 18;
+
+      const sortedPlayers = [...players].sort((a, b) => {
+        const handicapDelta = getHandicapValue(a, fallbackHandicap) - getHandicapValue(b, fallbackHandicap);
+        if (handicapDelta !== 0) return handicapDelta;
+
+        return `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`);
+      });
+
+      const nextAssignments = new Map<string, string>();
+      const teamBuckets = {
+        usa: { count: 0, total: 0 },
+        europe: { count: 0, total: 0 },
+      };
+
+      sortedPlayers.forEach((player) => {
+        const handicap = getHandicapValue(player, fallbackHandicap);
+        const assignToUsa =
+          teamBuckets.usa.count < teamBuckets.europe.count ||
+          (teamBuckets.usa.count === teamBuckets.europe.count &&
+            teamBuckets.usa.total > teamBuckets.europe.total);
+
+        if (assignToUsa) {
+          nextAssignments.set(player.id, teamA.id);
+          teamBuckets.usa.count += 1;
+          teamBuckets.usa.total += handicap;
+        } else {
+          nextAssignments.set(player.id, teamB.id);
+          teamBuckets.europe.count += 1;
+          teamBuckets.europe.total += handicap;
+        }
+      });
+
+      for (const player of sortedPlayers) {
+        const targetTeamId = nextAssignments.get(player.id);
+        if (!targetTeamId) continue;
+        await assignPlayerToTeam(player.id, targetTeamId);
+      }
+
+      showToast('success', 'Teams auto-balanced for an immediate captain-ready split');
+    } catch (error) {
+      logger.error('Failed to auto-balance teams', { error });
+      showToast('error', 'Failed to auto-balance teams');
+    }
+  }, [assignPlayerToTeam, players, showToast, teamA, teamB]);
+
+  const getTeamQuickActions = useCallback(
+    (section: 'usa' | 'europe' | 'unassigned') => {
+      return (player: Player): RosterPlayerQuickAction[] => {
+        const actions: RosterPlayerQuickAction[] = [];
+
+        if (section !== 'usa' && teamA) {
+          actions.push({
+            id: `${player.id}-usa`,
+            label: `Move to ${teamA.name}`,
+            onClick: () => {
+              void movePlayerToTeam(player, teamA.id);
+            },
+            tone: 'usa',
+          });
+        }
+
+        if (section !== 'europe' && teamB) {
+          actions.push({
+            id: `${player.id}-europe`,
+            label: `Move to ${teamB.name}`,
+            onClick: () => {
+              void movePlayerToTeam(player, teamB.id);
+            },
+            tone: 'europe',
+          });
+        }
+
+        if (section !== 'unassigned') {
+          actions.push({
+            id: `${player.id}-unassign`,
+            label: 'Unassign',
+            onClick: () => {
+              void unassignPlayer(player);
+            },
+            tone: 'neutral',
+          });
+        }
+
+        return actions;
+      };
+    },
+    [movePlayerToTeam, teamA, teamB, unassignPlayer]
+  );
+
+  const handleDraftComplete = useCallback(
+    async (assignments: Map<string, string>) => {
+      let successCount = 0;
+      let failedCount = 0;
+
+      try {
+        for (const [playerId, teamId] of assignments.entries()) {
+          const existingMembership = teamMembers.find((membership) => membership.playerId === playerId);
+          if (existingMembership) continue;
+
+          try {
+            await assignPlayerToTeam(playerId, teamId);
+            successCount += 1;
+          } catch (error) {
+            logger.error('Failed to assign drafted player', { error, playerId, teamId });
+            failedCount += 1;
+          }
+        }
+
+        if (failedCount > 0) {
+          showToast(
+            'warning',
+            `Draft partially complete: ${successCount} assigned, ${failedCount} failed. Please retry.`
+          );
+          return;
+        }
+
+        if (successCount > 0) {
+          showToast('success', `Draft complete. ${successCount} player${successCount === 1 ? '' : 's'} assigned.`);
+          handlePanelChange('roster');
+          return;
+        }
+
+        showToast('info', 'All players were already assigned.');
+        handlePanelChange('roster');
+      } catch (error) {
+        logger.error('Draft flow failed', { error });
+        showToast('error', 'Draft failed. Please try again.');
+      }
+    },
+    [assignPlayerToTeam, handlePanelChange, showToast, teamMembers]
+  );
 
   if (!currentTrip) {
     return (
@@ -337,7 +567,7 @@ export default function PlayersPageClient() {
               </div>
 
               {isCaptainMode ? (
-                <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
+                <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
                   <Button
                     variant="primary"
                     leftIcon={<UserPlus size={16} />}
@@ -354,8 +584,65 @@ export default function PlayersPageClient() {
                   >
                     Add In Bulk
                   </Button>
+                  <Button
+                    variant="secondary"
+                    leftIcon={<Sparkles size={16} />}
+                    onClick={() => {
+                      void handleAutoBalanceTeams();
+                    }}
+                    className="w-full justify-center"
+                  >
+                    Auto-Balance Teams
+                  </Button>
                 </div>
               ) : null}
+
+              <div className="rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)] shadow-[0_14px_28px_rgba(46,34,18,0.05)]">
+                <div className="flex flex-col gap-[var(--space-4)] lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
+                    <div className={`inline-flex items-center gap-[var(--space-2)] rounded-full border px-[var(--space-3)] py-[var(--space-2)] ${rosterStatusTone}`}>
+                      <span className="type-caption font-semibold">{rosterStatusLabel}</span>
+                    </div>
+                    <h2 className="mt-[var(--space-3)] type-title-lg text-[var(--ink)]">
+                      Get the roster ready before lineup day.
+                    </h2>
+                    <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                      World-class captain flow means no dead ends: place every golfer, keep the sides even, then jump straight into session building with confidence.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-[var(--space-3)] sm:grid-cols-2 lg:min-w-[320px]">
+                    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-3)]">
+                      <p className="type-overline text-[var(--ink-tertiary)]">Next captain move</p>
+                      <p className="mt-[var(--space-2)] type-title-sm text-[var(--ink)]">
+                        {rosterReadyForCaptainFlow ? 'Open lineup studio' : 'Finish team assignment'}
+                      </p>
+                      <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                        {rosterReadyForCaptainFlow
+                          ? readyForClassicMatches
+                            ? 'Your roster is ready to build the next session.'
+                            : 'You have balance, but add more players before full four-ball cards.'
+                          : 'Use the quick move actions below or auto-balance the full field.'}
+                      </p>
+                    </div>
+
+                    <Link
+                      href={rosterReadyForCaptainFlow ? '/captain/lineup/new' : '/players?panel=draft'}
+                      className="flex items-center justify-between rounded-[1.1rem] border border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(114,47,55,0.08),rgba(255,255,255,0.96))] px-[var(--space-4)] py-[var(--space-4)] no-underline transition-transform hover:-translate-y-[1px]"
+                    >
+                      <div>
+                        <p className="type-overline text-[var(--maroon)]">
+                          {rosterReadyForCaptainFlow ? 'Ready for lineups' : 'Need assignment help'}
+                        </p>
+                        <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
+                          {rosterReadyForCaptainFlow ? 'Continue to lineups' : 'Open draft board'}
+                        </p>
+                      </div>
+                      <ArrowRight size={18} className="text-[var(--maroon)]" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -371,6 +658,81 @@ export default function PlayersPageClient() {
           </div>
         </section>
 
+        <section className="pt-[var(--space-6)]">
+          <div className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,244,237,0.96))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+            <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
+              <div className="flex flex-col gap-[var(--space-4)] lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
+                    Captain Command Center
+                  </p>
+                  <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,6vw,2.7rem)] italic leading-[1.04] text-[var(--ink)]">
+                    Run roster moves and the draft from one room.
+                  </h2>
+                  <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                    Keep the player list visible, move golfers manually when you need precision, or switch into the draft room without leaving the roster page.
+                  </p>
+                </div>
+
+                <div className="grid gap-[var(--space-2)] sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePanelChange('roster')}
+                    className={`rounded-[1rem] border px-[var(--space-4)] py-[var(--space-3)] text-left transition-colors ${
+                      activePanel === 'roster'
+                        ? 'border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10'
+                        : 'border-[var(--rule)] bg-[rgba(255,255,255,0.74)]'
+                    }`}
+                  >
+                    <p className="type-overline text-[var(--ink-tertiary)]">Roster view</p>
+                    <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">Manage players</p>
+                    <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                      Manual assignment, edits, and cleanup.
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePanelChange('draft')}
+                    className={`rounded-[1rem] border px-[var(--space-4)] py-[var(--space-3)] text-left transition-colors ${
+                      activePanel === 'draft'
+                        ? 'border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10'
+                        : 'border-[var(--rule)] bg-[rgba(255,255,255,0.74)]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-[var(--space-2)]">
+                      <div>
+                        <p className="type-overline text-[var(--ink-tertiary)]">Draft room</p>
+                        <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">Assign teams live</p>
+                      </div>
+                      <span className="inline-flex items-center rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 px-[var(--space-2)] py-[5px] text-[0.72rem] font-semibold text-[var(--gold-dark)]">
+                        {draftEligiblePlayers.length} left
+                      </span>
+                    </div>
+                    <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+                      Run snake, auction, random, or balanced assignment here.
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-[var(--space-3)] px-[var(--space-5)] py-[var(--space-5)] md:grid-cols-4">
+              <PlayersFactCard
+                label="Active Workspace"
+                value={activePanel === 'draft' ? 'Draft' : 'Roster'}
+                valueClassName="font-sans text-[1rem] not-italic"
+              />
+              <PlayersFactCard label="Draftable" value={draftEligiblePlayers.length} />
+              <PlayersFactCard label="Team Gap" value={teamSizeGap} />
+              <PlayersFactCard
+                label="Next Move"
+                value={draftEligiblePlayers.length > 0 ? 'Assign' : 'Lineup'}
+                valueClassName="font-sans text-[1rem] not-italic"
+              />
+            </div>
+          </div>
+        </section>
+
         {players.length === 0 ? (
           <div className="py-[var(--space-10)]">
             <NoPlayersEmpty
@@ -379,6 +741,68 @@ export default function PlayersPageClient() {
           </div>
         ) : (
           <div className="space-y-[var(--space-4)] pt-[var(--space-6)]">
+            {activePanel === 'draft' ? (
+              <section className="pb-[var(--space-2)]">
+                {!isCaptainMode ? (
+                  <EmptyStatePremium
+                    illustration="golfers"
+                    title="Captain Mode required"
+                    description="Turn on Captain Mode to run the draft room from the roster command center."
+                    variant="large"
+                  />
+                ) : draftEligiblePlayers.length === 0 ? (
+                  <EmptyStatePremium
+                    illustration="golfers"
+                    title="The draft room is clear"
+                    description="Every player already has a side. Fine-tune the roster manually below or move straight into lineup work."
+                    action={{
+                      label: 'Build lineups',
+                      onClick: () => router.push('/captain/lineup/new'),
+                      icon: <CheckCircle2 size={16} />,
+                    }}
+                    secondaryAction={{
+                      label: 'Return to roster',
+                      onClick: () => handlePanelChange('roster'),
+                    }}
+                    variant="large"
+                  />
+                ) : players.length < 2 ? (
+                  <EmptyStatePremium
+                    illustration="golfers"
+                    title="Add a few more players"
+                    description="You need at least two players before the draft means anything."
+                    action={{
+                      label: 'Add player',
+                      onClick: () => setShowAddModal(true),
+                      icon: <Users size={16} />,
+                    }}
+                    secondaryAction={{
+                      label: 'Return to roster',
+                      onClick: () => handlePanelChange('roster'),
+                    }}
+                    variant="large"
+                  />
+                ) : teams.length < 2 ? (
+                  <EmptyStatePremium
+                    illustration="trophy"
+                    title="Teams aren’t set up yet"
+                    description="Create both teams first, then come back here to sort players onto each side."
+                    secondaryAction={{
+                      label: 'Return to roster',
+                      onClick: () => handlePanelChange('roster'),
+                    }}
+                    variant="large"
+                  />
+                ) : (
+                  <DraftBoard
+                    players={draftEligiblePlayers}
+                    teams={teams}
+                    onDraftComplete={handleDraftComplete}
+                  />
+                )}
+              </section>
+            ) : null}
+
             <RosterSectionCard
               title={teamA?.name || 'USA'}
               eyebrow="United States"
@@ -388,6 +812,7 @@ export default function PlayersPageClient() {
               canEdit={isCaptainMode}
               onEdit={handleEdit}
               onDelete={setPlayerToDelete}
+              getQuickActions={isCaptainMode ? getTeamQuickActions('usa') : undefined}
             />
 
             <RosterSectionCard
@@ -399,6 +824,7 @@ export default function PlayersPageClient() {
               canEdit={isCaptainMode}
               onEdit={handleEdit}
               onDelete={setPlayerToDelete}
+              getQuickActions={isCaptainMode ? getTeamQuickActions('europe') : undefined}
             />
 
             <RosterSectionCard
@@ -410,6 +836,7 @@ export default function PlayersPageClient() {
               canEdit={isCaptainMode}
               onEdit={handleEdit}
               onDelete={setPlayerToDelete}
+              getQuickActions={isCaptainMode ? getTeamQuickActions('unassigned') : undefined}
             />
           </div>
         )}

@@ -162,7 +162,7 @@ export default function MatchupsPage() {
                 {teamBPlayers.length < 2 && ` ${teamB?.name || 'Europe'} has ${teamBPlayers.length}.`}
               </p>
               <button
-                onClick={() => router.push('/captain/draft')}
+                onClick={() => router.push('/players?panel=draft')}
                 className="btn-premium press-scale"
                 style={{ marginTop: 'var(--space-3)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)' }}
               >

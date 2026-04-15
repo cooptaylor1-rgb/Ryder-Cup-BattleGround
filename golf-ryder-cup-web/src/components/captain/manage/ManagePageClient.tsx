@@ -350,7 +350,7 @@ export function ManagePageClient() {
                   Course Library
                 </Link>
                 <Link
-                  href="/captain/draft"
+                  href="/players?panel=draft"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--gold)]/22 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
                 >
                   <Trophy size={16} />

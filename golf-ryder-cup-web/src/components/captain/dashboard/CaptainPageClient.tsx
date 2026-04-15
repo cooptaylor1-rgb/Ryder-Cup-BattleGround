@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
@@ -85,7 +85,7 @@ const setupActions: CaptainCommandAction[] = [
     id: 'draft',
     label: 'Team Draft',
     description: 'Sort the roster into sides when the trip still needs its shape.',
-    href: '/captain/draft',
+    href: '/players?panel=draft',
     icon: Shuffle,
     tone: 'ink',
   },
@@ -141,6 +141,7 @@ const setupActions: CaptainCommandAction[] = [
 
 export default function CaptainPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentTrip, sessions, teams, players, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers })));
   const { isCaptainMode, enableCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
@@ -288,6 +289,7 @@ export default function CaptainPageClient() {
   );
   const readinessTone =
     readinessPercent === 100 ? 'ready' : readinessPercent >= 50 ? 'building' : 'needs';
+  const showSetupCreatedBanner = searchParams.get('setup') === 'created';
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -308,6 +310,40 @@ export default function CaptainPageClient() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
+        {showSetupCreatedBanner ? (
+          <section className="mb-[var(--space-6)] overflow-hidden rounded-[1.8rem] border border-[var(--masters)]/16 bg-[linear-gradient(145deg,rgba(11,94,55,0.95),rgba(5,58,35,0.98))] text-[var(--canvas)] shadow-[0_24px_54px_rgba(5,58,35,0.24)]">
+            <div className="flex flex-col gap-[var(--space-4)] px-[var(--space-5)] py-[var(--space-5)] lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="type-overline tracking-[0.16em] text-[color:var(--canvas)]/72">
+                  Setup complete
+                </p>
+                <h2 className="mt-[var(--space-2)] font-serif text-[2rem] italic leading-[1.02] text-[var(--canvas)]">
+                  The trip is built. Now run the room.
+                </h2>
+                <p className="mt-[var(--space-3)] max-w-[38rem] text-sm leading-7 text-[color:var(--canvas)]/80">
+                  Your roster, teams, sessions, and tee-sheet defaults are already on the board.
+                  Publish the first lineup, share the invite, or run the pre-flight before the day starts moving.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-[var(--space-3)]">
+                <Link
+                  href="/lineup/new"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--masters)] transition-transform duration-150 hover:scale-[1.02]"
+                >
+                  Publish first lineup
+                </Link>
+                <Link
+                  href="/captain/checklist"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--canvas)]/22 bg-transparent px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)] transition-transform duration-150 hover:scale-[1.02] hover:bg-[color:var(--canvas)]/10"
+                >
+                  Run pre-flight
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
         <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,240,241,0.97))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
           <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
             <div className="flex flex-col gap-[var(--space-5)]">
@@ -460,7 +496,7 @@ export default function CaptainPageClient() {
                 </div>
 
                 <Link
-                  href="/captain/draft"
+                  href="/players?panel=draft"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--canvas)] transition-opacity hover:opacity-90"
                 >
                   <Shuffle size={16} />

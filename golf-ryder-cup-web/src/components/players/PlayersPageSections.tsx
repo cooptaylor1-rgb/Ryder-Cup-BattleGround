@@ -5,6 +5,13 @@ import { Edit2, Mail, Trash2 } from 'lucide-react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 
+export interface RosterPlayerQuickAction {
+  id: string;
+  label: string;
+  onClick: () => void;
+  tone?: 'usa' | 'europe' | 'neutral';
+}
+
 type RosterTone = 'usa' | 'europe' | 'neutral';
 
 const rosterToneStyles: Record<
@@ -79,6 +86,7 @@ export function RosterSectionCard({
   canEdit,
   onEdit,
   onDelete,
+  getQuickActions,
 }: {
   title: string;
   eyebrow: string;
@@ -88,6 +96,7 @@ export function RosterSectionCard({
   canEdit: boolean;
   onEdit: (player: Player) => void;
   onDelete: (player: Player) => void;
+  getQuickActions?: (player: Player) => RosterPlayerQuickAction[];
 }) {
   const toneStyles = rosterToneStyles[tone];
 
@@ -138,6 +147,7 @@ export function RosterSectionCard({
               player={player}
               tone={tone}
               canEdit={canEdit}
+              quickActions={getQuickActions?.(player) ?? []}
               onEdit={() => onEdit(player)}
               onDelete={() => onDelete(player)}
               className={index > 0 ? 'mt-[var(--space-2)]' : undefined}
@@ -153,6 +163,7 @@ const RosterPlayerRow = React.memo(function RosterPlayerRow({
   player,
   tone,
   canEdit,
+  quickActions,
   onEdit,
   onDelete,
   className,
@@ -160,12 +171,23 @@ const RosterPlayerRow = React.memo(function RosterPlayerRow({
   player: Player;
   tone: RosterTone;
   canEdit: boolean;
+  quickActions: RosterPlayerQuickAction[];
   onEdit: () => void;
   onDelete: () => void;
   className?: string;
 }) {
   const initials = `${player.firstName?.[0] || '?'}${player.lastName?.[0] || '?'}`;
   const toneStyles = rosterToneStyles[tone];
+  const quickActionToneClass = (actionTone: RosterPlayerQuickAction['tone']) => {
+    if (actionTone === 'usa') {
+      return 'border-[color:var(--team-usa)]/16 bg-[color:var(--team-usa)]/10 text-[var(--team-usa)] hover:bg-[color:var(--team-usa)]/14';
+    }
+    if (actionTone === 'europe') {
+      return 'border-[color:var(--team-europe)]/16 bg-[color:var(--team-europe)]/10 text-[var(--team-europe)] hover:bg-[color:var(--team-europe)]/14';
+    }
+
+    return 'border-[color:var(--gold)]/16 bg-[color:var(--gold)]/10 text-[var(--gold-dark)] hover:bg-[color:var(--gold)]/16';
+  };
 
   return (
     <div
@@ -198,6 +220,23 @@ const RosterPlayerRow = React.memo(function RosterPlayerRow({
             </span>
           ) : null}
         </div>
+
+        {canEdit && quickActions.length > 0 ? (
+          <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-[var(--space-2)]">
+            {quickActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={action.onClick}
+                className={cn(
+                  'rounded-full border px-[var(--space-3)] py-[6px] text-[0.72rem] font-semibold transition-colors',
+                  quickActionToneClass(action.tone)
+                )}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {canEdit ? (

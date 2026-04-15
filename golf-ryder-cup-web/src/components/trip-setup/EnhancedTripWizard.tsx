@@ -78,6 +78,7 @@ const WIZARD_STEPS: StepConfig[] = [
 export interface TripSetupData {
     // Basics
     tripName: string;
+    captainName: string;
     startDate: string;
     endDate: string;
     location: string;
@@ -107,8 +108,11 @@ export interface TripSetupData {
     teeTimeSettings: TeeTimeSettings;
 }
 
+export const TRIP_WIZARD_STORAGE_KEY = 'trip-wizard-draft';
+
 const DEFAULT_SETUP_DATA: TripSetupData = {
     tripName: '',
+    captainName: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
     location: '',
@@ -126,8 +130,6 @@ const DEFAULT_SETUP_DATA: TripSetupData = {
     teeTimeSettings: DEFAULT_TEE_TIME_SETTINGS,
 };
 
-const WIZARD_STORAGE_KEY = 'trip-wizard-draft';
-
 interface EnhancedTripWizardProps {
     onComplete: (data: TripSetupData) => void;
     onCancel: () => void;
@@ -143,7 +145,7 @@ export function EnhancedTripWizard({
 }: EnhancedTripWizardProps) {
     const [currentStep, setCurrentStep] = useState<WizardStep>(() => {
         if (typeof window !== 'undefined') {
-            const saved = sessionStorage.getItem(WIZARD_STORAGE_KEY + '-step');
+            const saved = sessionStorage.getItem(TRIP_WIZARD_STORAGE_KEY + '-step');
             if (saved && WIZARD_STEPS.some(s => s.id === saved)) {
                 return saved as WizardStep;
             }
@@ -152,7 +154,7 @@ export function EnhancedTripWizard({
     });
     const [data, setData] = useState<TripSetupData>(() => {
         if (typeof window !== 'undefined') {
-            const saved = sessionStorage.getItem(WIZARD_STORAGE_KEY);
+            const saved = sessionStorage.getItem(TRIP_WIZARD_STORAGE_KEY);
             if (saved) {
                 try {
                     return { ...DEFAULT_SETUP_DATA, ...JSON.parse(saved) };
@@ -167,9 +169,28 @@ export function EnhancedTripWizard({
 
     // Auto-save wizard state for draft recovery
     useEffect(() => {
-        sessionStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(data));
-        sessionStorage.setItem(WIZARD_STORAGE_KEY + '-step', currentStep);
+        sessionStorage.setItem(TRIP_WIZARD_STORAGE_KEY, JSON.stringify(data));
+        sessionStorage.setItem(TRIP_WIZARD_STORAGE_KEY + '-step', currentStep);
     }, [data, currentStep]);
+
+    useEffect(() => {
+        if (!data.startDate) return;
+
+        const safeTotalDays = Math.max(data.totalDays || 1, 1);
+        const startDate = new Date(`${data.startDate}T00:00:00`);
+        if (Number.isNaN(startDate.getTime())) return;
+
+        const computedEndDate = new Date(startDate);
+        computedEndDate.setDate(startDate.getDate() + safeTotalDays - 1);
+        const nextEndDate = computedEndDate.toISOString().split('T')[0] || data.startDate;
+
+        if (!data.endDate || data.endDate < data.startDate || data.endDate !== nextEndDate) {
+            setData(prev => ({
+                ...prev,
+                endDate: nextEndDate,
+            }));
+        }
+    }, [data.endDate, data.startDate, data.totalDays]);
 
     const currentStepIndex = WIZARD_STEPS.findIndex(s => s.id === currentStep);
     const currentStepConfig = WIZARD_STEPS[currentStepIndex];
@@ -203,24 +224,31 @@ export function EnhancedTripWizard({
     }, [currentStepIndex]);
 
     const handleComplete = useCallback(() => {
-        sessionStorage.removeItem(WIZARD_STORAGE_KEY);
-        sessionStorage.removeItem(WIZARD_STORAGE_KEY + '-step');
+        sessionStorage.removeItem(TRIP_WIZARD_STORAGE_KEY);
+        sessionStorage.removeItem(TRIP_WIZARD_STORAGE_KEY + '-step');
         onComplete(data);
     }, [data, onComplete]);
 
     const handleCancel = useCallback(() => {
-        sessionStorage.removeItem(WIZARD_STORAGE_KEY);
-        sessionStorage.removeItem(WIZARD_STORAGE_KEY + '-step');
+        sessionStorage.removeItem(TRIP_WIZARD_STORAGE_KEY);
+        sessionStorage.removeItem(TRIP_WIZARD_STORAGE_KEY + '-step');
         onCancel();
     }, [onCancel]);
 
     // Calculate completion status for each step
     const stepCompletion = useMemo(() => {
+        const hasValidBasics = Boolean(
+            data.tripName.trim() &&
+            data.startDate &&
+            data.teamColors.teamA.name.trim() &&
+            data.teamColors.teamB.name.trim()
+        );
+
         return {
-            basics: Boolean(data.tripName.trim()),
-            players: data.players.length >= 2,
-            sessions: data.sessions.length >= 1,
-            courses: data.courses.length >= 1,
+            basics: hasValidBasics,
+            players: data.players.length >= 4,
+            sessions: data.sessions.length >= 1 && data.sessions.every(session => session.matchCount > 0),
+            courses: true,
             scoring: true, // Always valid with defaults
             rules: true, // Always valid with defaults
             extras: true, // Always valid
@@ -228,7 +256,16 @@ export function EnhancedTripWizard({
         };
     }, [data]);
 
-    const _canProceed = stepCompletion[currentStep];
+    const canProceed = stepCompletion[currentStep];
+    const nextDisabledMessage = !canProceed
+        ? currentStep === 'basics'
+            ? 'Add the trip name and both team names to keep going.'
+            : currentStep === 'players'
+                ? 'Add at least four players so the trip has a real field.'
+                : currentStep === 'sessions'
+                    ? 'Create at least one session before reviewing the trip.'
+                    : 'Complete the required fields before continuing.'
+        : null;
 
     return (
         <div className={cn('flex flex-col h-full', className)}>
@@ -362,6 +399,9 @@ export function EnhancedTripWizard({
 
             {/* Footer with navigation */}
             <div className="p-4 border-t border-[var(--rule)] flex gap-3">
+                {nextDisabledMessage && !isLastStep && (
+                    <p className="absolute sr-only">{nextDisabledMessage}</p>
+                )}
                 {isFirstStep ? (
                     <button
                         onClick={handleCancel}
@@ -382,7 +422,7 @@ export function EnhancedTripWizard({
                 {isLastStep ? (
                     <button
                         onClick={handleComplete}
-                        disabled={!data.tripName.trim()}
+                        disabled={!stepCompletion.basics || !stepCompletion.players || !stepCompletion.sessions}
                         className="btn-primary flex-1"
                     >
                         <Zap className="w-4 h-4 mr-1" />
@@ -391,6 +431,7 @@ export function EnhancedTripWizard({
                 ) : (
                     <button
                         onClick={goNext}
+                        disabled={!canProceed}
                         className="btn-primary flex-1"
                     >
                         Next
@@ -398,6 +439,13 @@ export function EnhancedTripWizard({
                     </button>
                 )}
             </div>
+            {nextDisabledMessage && !isLastStep ? (
+                <div className="px-4 pb-4">
+                    <p className="rounded-xl bg-[var(--surface-secondary)] px-3 py-2 text-sm text-[var(--ink-secondary)]">
+                        {nextDisabledMessage}
+                    </p>
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -421,6 +469,17 @@ function BasicsStep({
                     placeholder="e.g., Myrtle Beach 2026"
                     className="input w-full text-lg"
                     autoFocus
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium mb-1.5">Captain Name</label>
+                <input
+                    type="text"
+                    value={data.captainName}
+                    onChange={(e) => updateData('captainName', e.target.value)}
+                    placeholder="Who is running the room?"
+                    className="input w-full"
                 />
             </div>
 
