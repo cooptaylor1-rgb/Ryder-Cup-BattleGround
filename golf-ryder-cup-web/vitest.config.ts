@@ -9,6 +9,13 @@ export default defineConfig({
         globals: true,
         setupFiles: ['./src/__tests__/setup.ts'],
         include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+        // Bumped from the 10s default. The pre-push hook runs ~80 test files in
+        // parallel forks and the jsdom setup inside `beforeEach` (mocking
+        // window.localStorage etc.) routinely loses the 10s race when CPU is
+        // contended, even though the hook code itself is microsecond-fast.
+        // 30s is generous enough to absorb that contention without masking real
+        // hangs (a true hang still fails — just later).
+        hookTimeout: 30_000,
         coverage: {
             provider: 'v8',
             reporter: ['text', 'text-summary', 'json', 'html', 'lcov'],

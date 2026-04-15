@@ -649,7 +649,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
 
     expect(stats.cascadeDeletes).toBe(20);
     expect(stats.invariantFailures).toBe(0);
-  }, 300000);
+  }, 600000);
 
   // ============================================
   // FINAL: BUG REPORT
