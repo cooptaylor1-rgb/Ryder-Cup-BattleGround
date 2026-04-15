@@ -97,10 +97,10 @@ describe('EnhancedTripWizard Component', () => {
     // navigation. Any test that walks all 8 steps needs all three gates
     // satisfied in initialData.
     const mockPlayers = [
-        { id: '1', firstName: 'P1', lastName: 'A', handicapIndex: 10, team: 'A' as const },
-        { id: '2', firstName: 'P2', lastName: 'A', handicapIndex: 12, team: 'A' as const },
-        { id: '3', firstName: 'P3', lastName: 'B', handicapIndex: 14, team: 'B' as const },
-        { id: '4', firstName: 'P4', lastName: 'B', handicapIndex: 16, team: 'B' as const },
+        { id: '1', name: 'Player One', handicap: 10, team: 'A' as const },
+        { id: '2', name: 'Player Two', handicap: 12, team: 'A' as const },
+        { id: '3', name: 'Player Three', handicap: 14, team: 'B' as const },
+        { id: '4', name: 'Player Four', handicap: 16, team: 'B' as const },
     ];
     const mockSessions = [
         {
