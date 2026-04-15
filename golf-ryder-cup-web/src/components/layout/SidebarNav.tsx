@@ -27,17 +27,28 @@ interface NavItem {
     href: string;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
-    tab: 'today' | 'score' | 'standings' | 'schedule' | 'more';
+    tab: 'today' | 'score' | 'standings' | 'schedule' | 'more' | 'captain';
 }
 
-// Navigation spine — matches BottomNav: Today / Score / Standings / Schedule / More
-const navItems: NavItem[] = [
+// Base navigation spine — matches BottomNav. The final slot flips from
+// "More" (general users) to "Captain" (captain mode) so captains don't have
+// to drill into More -> Captain command to reach their workbench.
+const BASE_NAV_ITEMS: NavItem[] = [
     { href: '/', label: 'Today', icon: Home, tab: 'today' },
     { href: '/score', label: 'Score', icon: Target, tab: 'score' },
     { href: '/standings', label: 'Standings', icon: Trophy, tab: 'standings' },
     { href: '/schedule', label: 'Schedule', icon: CalendarDays, tab: 'schedule' },
     { href: '/more', label: 'More', icon: Settings, tab: 'more' },
 ];
+
+function getNavItemsForMode(isCaptainMode: boolean): NavItem[] {
+    if (!isCaptainMode) return BASE_NAV_ITEMS;
+    return BASE_NAV_ITEMS.map((item) =>
+        item.href === '/more'
+            ? { href: '/captain', label: 'Captain', icon: Shield, tab: 'captain' as const }
+            : item
+    );
+}
 
 interface SidebarNavProps {
     isExpanded?: boolean;
@@ -99,7 +110,7 @@ export function SidebarNav({ isExpanded = false, onToggle }: SidebarNavProps) {
 
             {/* Nav Items */}
             <div className="flex-1 py-2">
-                {navItems.map((item) => {
+                {getNavItemsForMode(isCaptainMode).map((item) => {
                     const active = isActive(item);
                     const Icon = item.icon;
 
