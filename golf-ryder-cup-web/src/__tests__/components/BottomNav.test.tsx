@@ -124,21 +124,29 @@ describe('BottomNav Component', () => {
     });
   });
 
-  describe('Captain Mode Badge', () => {
-    it('shows captain badge on More when captain mode is enabled', () => {
+  describe('Captain Mode', () => {
+    it('swaps the More tab for Captain when captain mode is enabled', () => {
       mockAccessStore.isCaptainMode = true;
       render(<BottomNav />);
 
-      const moreButton = screen.getByText('More').closest('button');
-      expect(moreButton?.querySelector('svg.w-2\\.5')).toBeInTheDocument();
+      expect(screen.queryByText('More')).not.toBeInTheDocument();
+      expect(screen.getByText('Captain')).toBeInTheDocument();
     });
 
-    it('does not show captain badge when captain mode is disabled', () => {
+    it('captain tab navigates to the captain hub', () => {
+      mockAccessStore.isCaptainMode = true;
+      render(<BottomNav />);
+
+      fireEvent.click(screen.getByText('Captain'));
+      expect(mockPush).toHaveBeenCalledWith('/captain');
+    });
+
+    it('keeps the More tab when captain mode is disabled', () => {
       mockAccessStore.isCaptainMode = false;
       render(<BottomNav />);
 
-      const moreButton = screen.getByText('More').closest('button');
-      expect(moreButton?.querySelector('svg.w-2\\.5')).not.toBeInTheDocument();
+      expect(screen.getByText('More')).toBeInTheDocument();
+      expect(screen.queryByText('Captain')).not.toBeInTheDocument();
     });
   });
 

@@ -9,10 +9,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EnhancedTripWizard } from '@/components/trip-setup/EnhancedTripWizard';
 
-// Clear wizard draft from sessionStorage before each test to prevent state leaking
+// Clear wizard draft from sessionStorage before each test to prevent state
+// leaking (the wizard persists data, current step, AND quick/full mode).
 beforeEach(() => {
   sessionStorage.removeItem('trip-wizard-draft');
   sessionStorage.removeItem('trip-wizard-draft-step');
+  sessionStorage.removeItem('trip-wizard-draft-mode');
 });
 
 // Mock framer-motion
@@ -76,6 +78,50 @@ describe('EnhancedTripWizard Component', () => {
         onCancel: vi.fn(),
     };
 
+    // Most of the original assertions were written against the 8-step Full
+    // Setup flow. The wizard now defaults to 4-step Quick Setup, so force
+    // Full mode for legacy tests that walk the full step list. Dedicated
+    // quickMode tests live further down.
+    const fullProps = { ...defaultProps, initialMode: 'full' as const };
+
+    // The Basics step requires a trip name before the Next button is enabled
+    // (the actual production validation gate). Any test that needs to advance
+    // past Basics uses this pre-populated prop; the "disables Create Trip
+    // when trip name is empty" test intentionally uses `fullProps`.
+    const fullPropsWithName = {
+        ...fullProps,
+        initialData: { tripName: 'Test Trip' },
+    };
+
+    // Players (min 4) and Sessions (>=1 with matchCount > 0) also gate
+    // navigation. Any test that walks all 8 steps needs all three gates
+    // satisfied in initialData.
+    const mockPlayers = [
+        { id: '1', firstName: 'P1', lastName: 'A', handicapIndex: 10, team: 'A' as const },
+        { id: '2', firstName: 'P2', lastName: 'A', handicapIndex: 12, team: 'A' as const },
+        { id: '3', firstName: 'P3', lastName: 'B', handicapIndex: 14, team: 'B' as const },
+        { id: '4', firstName: 'P4', lastName: 'B', handicapIndex: 16, team: 'B' as const },
+    ];
+    const mockSessions = [
+        {
+            id: 's1',
+            name: 'Day 1',
+            dayOffset: 0,
+            timeSlot: 'AM' as const,
+            sessionType: 'singles' as const,
+            matchCount: 4,
+            pointsPerMatch: 1,
+        },
+    ];
+    const fullPropsForReview = {
+        ...fullProps,
+        initialData: {
+            tripName: 'Test Trip',
+            players: mockPlayers,
+            sessions: mockSessions,
+        },
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -87,8 +133,8 @@ describe('EnhancedTripWizard Component', () => {
             expect(screen.getByText('Name, dates, and teams')).toBeInTheDocument();
         });
 
-        it('shows step 1 of 8', () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+        it('shows step 1 of 8 in full mode', () => {
+            render(<EnhancedTripWizard {...fullProps} />);
             expect(screen.getByText('1 of 8')).toBeInTheDocument();
         });
 
@@ -106,7 +152,7 @@ describe('EnhancedTripWizard Component', () => {
 
     describe('Navigation', () => {
         it('navigates to next step when Next is clicked', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsWithName} />);
 
             fireEvent.click(screen.getByText('Next'));
 
@@ -116,7 +162,7 @@ describe('EnhancedTripWizard Component', () => {
         });
 
         it('shows Back button on second step', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsWithName} />);
 
             fireEvent.click(screen.getByText('Next'));
 
@@ -126,7 +172,7 @@ describe('EnhancedTripWizard Component', () => {
         });
 
         it('navigates back when Back is clicked', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsWithName} />);
 
             // Go to step 2
             fireEvent.click(screen.getByText('Next'));
@@ -150,8 +196,8 @@ describe('EnhancedTripWizard Component', () => {
     });
 
     describe('Step Progress', () => {
-        it('updates step counter when navigating', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+        it('updates step counter when navigating (full mode)', async () => {
+            render(<EnhancedTripWizard {...fullPropsWithName} />);
 
             expect(screen.getByText('1 of 8')).toBeInTheDocument();
 
@@ -162,8 +208,8 @@ describe('EnhancedTripWizard Component', () => {
             });
         });
 
-        it('renders 8 progress dots', () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+        it('renders 8 progress dots in full mode', () => {
+            render(<EnhancedTripWizard {...fullProps} />);
 
             // The progress dots container has buttons for each step
             const progressDots = document.querySelectorAll('.flex.gap-1\\.5 button');
@@ -207,11 +253,11 @@ describe('EnhancedTripWizard Component', () => {
         });
     });
 
-    describe('Final Step', () => {
+    describe('Final Step (full mode)', () => {
         it('navigates to review step', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsForReview} />);
 
-            // Navigate through all steps
+            // Navigate through all steps (full mode = 8 steps, so 7 Next clicks)
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -223,9 +269,8 @@ describe('EnhancedTripWizard Component', () => {
         });
 
         it('shows Create Trip button on final step', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsForReview} />);
 
-            // Navigate to final step
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -236,29 +281,20 @@ describe('EnhancedTripWizard Component', () => {
             });
         });
 
-        it('disables Create Trip button when trip name is empty', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+        it('disables Next on Basics when trip name is empty', () => {
+            // The older version of this test walked to the review step and
+            // checked Create Trip, but the Next button on Basics is already
+            // disabled without a trip name, so the user can't even reach
+            // Review. Assert the earlier gate directly — same intent.
+            render(<EnhancedTripWizard {...fullProps} />);
 
-            // Navigate to final step without entering trip name
-            for (let i = 0; i < 7; i++) {
-                fireEvent.click(screen.getByText('Next'));
-                await waitFor(() => { });
-            }
-
-            await waitFor(() => {
-                const createButton = screen.getByText('Create Trip').closest('button');
-                expect(createButton).toBeDisabled();
-            });
+            const nextButton = screen.getByText('Next').closest('button');
+            expect(nextButton).toBeDisabled();
         });
 
         it('enables Create Trip button when trip name is entered', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsForReview} />);
 
-            // Enter trip name
-            const input = screen.getByPlaceholderText('e.g., Myrtle Beach 2026');
-            await userEvent.type(input, 'My Trip');
-
-            // Navigate to final step
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -271,13 +307,8 @@ describe('EnhancedTripWizard Component', () => {
         });
 
         it('calls onComplete with data when Create Trip is clicked', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsForReview} />);
 
-            // Enter trip name
-            const input = screen.getByPlaceholderText('e.g., Myrtle Beach 2026');
-            await userEvent.type(input, 'Test Trip');
-
-            // Navigate to final step
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -310,15 +341,19 @@ describe('EnhancedTripWizard Component', () => {
         });
     });
 
-    describe('Review Step Content', () => {
+    describe('Review Step Content (full mode)', () => {
         it('displays summary on review step', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(
+                <EnhancedTripWizard
+                    {...fullProps}
+                    initialData={{
+                        tripName: 'Summer Championship',
+                        players: mockPlayers,
+                        sessions: mockSessions,
+                    }}
+                />
+            );
 
-            // Enter trip name
-            const input = screen.getByPlaceholderText('e.g., Myrtle Beach 2026');
-            await userEvent.type(input, 'Summer Championship');
-
-            // Navigate to final step
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -334,9 +369,8 @@ describe('EnhancedTripWizard Component', () => {
         });
 
         it('displays "Ready to create your trip!" message', async () => {
-            render(<EnhancedTripWizard {...defaultProps} />);
+            render(<EnhancedTripWizard {...fullPropsForReview} />);
 
-            // Navigate to final step
             for (let i = 0; i < 7; i++) {
                 fireEvent.click(screen.getByText('Next'));
                 await waitFor(() => { });
@@ -344,6 +378,48 @@ describe('EnhancedTripWizard Component', () => {
 
             await waitFor(() => {
                 expect(screen.getByText('Ready to create your trip!')).toBeInTheDocument();
+            });
+        });
+    });
+
+    describe('Quick Setup (default mode)', () => {
+        it('defaults to 4 steps', () => {
+            render(<EnhancedTripWizard {...defaultProps} />);
+            expect(screen.getByText('1 of 4')).toBeInTheDocument();
+            const progressDots = document.querySelectorAll('.flex.gap-1\\.5 button');
+            expect(progressDots.length).toBe(4);
+        });
+
+        it('skips Courses / Scoring / Rules / Extras and lands on Review fourth', async () => {
+            render(
+                <EnhancedTripWizard
+                    {...defaultProps}
+                    initialData={{
+                        tripName: 'Quick Trip',
+                        players: mockPlayers,
+                        sessions: mockSessions,
+                    }}
+                />
+            );
+
+            // Step 1 -> 2
+            fireEvent.click(screen.getByText('Next'));
+            await waitFor(() => expect(screen.getByText('Player Roster')).toBeInTheDocument());
+            // Step 2 -> 3
+            fireEvent.click(screen.getByText('Next'));
+            await waitFor(() => expect(screen.getByText('Session Builder')).toBeInTheDocument());
+            // Step 3 -> 4 (review, skipping Courses/Scoring/Rules/Extras)
+            fireEvent.click(screen.getByText('Next'));
+            await waitFor(() => expect(screen.getByText('Review & Create')).toBeInTheDocument());
+        });
+
+        it('toggles to Full mode when the user picks Full Setup', async () => {
+            render(<EnhancedTripWizard {...defaultProps} />);
+
+            fireEvent.click(screen.getByText('Full Setup'));
+
+            await waitFor(() => {
+                expect(screen.getByText('1 of 8')).toBeInTheDocument();
             });
         });
     });
