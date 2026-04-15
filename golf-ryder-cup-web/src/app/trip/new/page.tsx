@@ -212,6 +212,11 @@ export default function NewTripPage() {
                 <EnhancedTripWizard
                   key={`${selectedPreset}-${wizardSeed}`}
                   initialData={activePreset ? buildInitialSetupData(activePreset) : undefined}
+                  // The "classic" preset already implies heavy customization —
+                  // open the full 8-step flow so captains don't have to toggle.
+                  // Every other entry (weekend, single-day, custom) starts in
+                  // quick mode so the common case is 4 steps, not 8.
+                  initialMode={selectedPreset === 'classic' ? 'full' : 'quick'}
                   onComplete={handleComplete}
                   onCancel={handleCancelWizard}
                 />

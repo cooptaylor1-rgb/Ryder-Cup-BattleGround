@@ -56,6 +56,8 @@ type WizardStep =
     | 'extras'
     | 'review';
 
+type WizardMode = 'quick' | 'full';
+
 interface StepConfig {
     id: WizardStep;
     label: string;
@@ -64,7 +66,7 @@ interface StepConfig {
     description: string;
 }
 
-const WIZARD_STEPS: StepConfig[] = [
+const ALL_WIZARD_STEPS: StepConfig[] = [
     { id: 'basics', label: 'Trip Basics', shortLabel: 'Basics', icon: <Calendar className="w-5 h-5" />, description: 'Name, dates, and teams' },
     { id: 'players', label: 'Player Roster', shortLabel: 'Players', icon: <Users className="w-5 h-5" />, description: 'Add and assign players' },
     { id: 'sessions', label: 'Session Builder', shortLabel: 'Sessions', icon: <Trophy className="w-5 h-5" />, description: 'Configure tournament structure' },
@@ -74,6 +76,18 @@ const WIZARD_STEPS: StepConfig[] = [
     { id: 'extras', label: 'Extras', shortLabel: 'Extras', icon: <Sparkles className="w-5 h-5" />, description: 'Side bets, colors, tee times' },
     { id: 'review', label: 'Review & Create', shortLabel: 'Review', icon: <Check className="w-5 h-5" />, description: 'Final review' },
 ];
+
+/**
+ * Steps that are always required. Courses, Scoring, Rules, and Extras have
+ * sane defaults, so in Quick Setup they're skipped; captains can customize
+ * them later from trip settings.
+ */
+const QUICK_STEPS: WizardStep[] = ['basics', 'players', 'sessions', 'review'];
+
+function getStepsForMode(mode: WizardMode): StepConfig[] {
+    if (mode === 'full') return ALL_WIZARD_STEPS;
+    return ALL_WIZARD_STEPS.filter(step => QUICK_STEPS.includes(step.id));
+}
 
 export interface TripSetupData {
     // Basics
@@ -143,6 +157,13 @@ interface EnhancedTripWizardProps {
     onCancel: () => void;
     initialData?: Partial<TripSetupData>;
     className?: string;
+    /**
+     * Initial wizard mode. 'quick' shows only Basics / Players / Sessions /
+     * Review — optional steps (Courses, Scoring, Handicap Rules, Extras)
+     * are skipped and the trip uses defaults, which captains can tune later
+     * from trip settings. Defaults to 'quick'.
+     */
+    initialMode?: WizardMode;
 }
 
 export function EnhancedTripWizard({
@@ -150,11 +171,21 @@ export function EnhancedTripWizard({
     onCancel,
     initialData,
     className,
+    initialMode = 'quick',
 }: EnhancedTripWizardProps) {
+    const [mode, setMode] = useState<WizardMode>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem(TRIP_WIZARD_STORAGE_KEY + '-mode');
+            if (saved === 'quick' || saved === 'full') return saved;
+        }
+        return initialMode;
+    });
+    const wizardSteps = useMemo(() => getStepsForMode(mode), [mode]);
+
     const [currentStep, setCurrentStep] = useState<WizardStep>(() => {
         if (typeof window !== 'undefined') {
             const saved = sessionStorage.getItem(TRIP_WIZARD_STORAGE_KEY + '-step');
-            if (saved && WIZARD_STEPS.some(s => s.id === saved)) {
+            if (saved && ALL_WIZARD_STEPS.some(s => s.id === saved)) {
                 return saved as WizardStep;
             }
         }
@@ -179,7 +210,17 @@ export function EnhancedTripWizard({
     useEffect(() => {
         sessionStorage.setItem(TRIP_WIZARD_STORAGE_KEY, JSON.stringify(data));
         sessionStorage.setItem(TRIP_WIZARD_STORAGE_KEY + '-step', currentStep);
-    }, [data, currentStep]);
+        sessionStorage.setItem(TRIP_WIZARD_STORAGE_KEY + '-mode', mode);
+    }, [data, currentStep, mode]);
+
+    // If the user switches modes mid-flow to a smaller set of steps while
+    // parked on a step that no longer exists, land them on the nearest
+    // remaining step so the wizard doesn't render a blank page.
+    useEffect(() => {
+        if (!wizardSteps.some(s => s.id === currentStep)) {
+            setCurrentStep(wizardSteps[0].id);
+        }
+    }, [wizardSteps, currentStep]);
 
     useEffect(() => {
         if (!data.startDate) return;
@@ -200,9 +241,9 @@ export function EnhancedTripWizard({
         }
     }, [data.endDate, data.startDate, data.totalDays]);
 
-    const currentStepIndex = WIZARD_STEPS.findIndex(s => s.id === currentStep);
-    const currentStepConfig = WIZARD_STEPS[currentStepIndex];
-    const isLastStep = currentStepIndex === WIZARD_STEPS.length - 1;
+    const currentStepIndex = wizardSteps.findIndex(s => s.id === currentStep);
+    const currentStepConfig = wizardSteps[currentStepIndex] ?? wizardSteps[0];
+    const isLastStep = currentStepIndex === wizardSteps.length - 1;
     const isFirstStep = currentStepIndex === 0;
 
     const updateData = useCallback(<K extends keyof TripSetupData>(
@@ -219,17 +260,17 @@ export function EnhancedTripWizard({
 
     const goNext = useCallback(() => {
         const nextIndex = currentStepIndex + 1;
-        if (nextIndex < WIZARD_STEPS.length) {
-            goToStep(WIZARD_STEPS[nextIndex].id);
+        if (nextIndex < wizardSteps.length) {
+            goToStep(wizardSteps[nextIndex].id);
         }
-    }, [currentStepIndex, goToStep]);
+    }, [currentStepIndex, goToStep, wizardSteps]);
 
     const goPrev = useCallback(() => {
         const prevIndex = currentStepIndex - 1;
         if (prevIndex >= 0) {
-            setCurrentStep(WIZARD_STEPS[prevIndex].id);
+            setCurrentStep(wizardSteps[prevIndex].id);
         }
-    }, [currentStepIndex]);
+    }, [currentStepIndex, wizardSteps]);
 
     const handleComplete = useCallback(() => {
         sessionStorage.removeItem(TRIP_WIZARD_STORAGE_KEY);
@@ -293,13 +334,13 @@ export function EnhancedTripWizard({
                         </div>
                     </div>
                     <span className="text-sm text-[var(--ink-tertiary)]">
-                        {currentStepIndex + 1} of {WIZARD_STEPS.length}
+                        {currentStepIndex + 1} of {wizardSteps.length}
                     </span>
                 </div>
 
                 {/* Progress dots */}
                 <div className="flex gap-1.5">
-                    {WIZARD_STEPS.map((step, index) => (
+                    {wizardSteps.map((step, index) => (
                         <button
                             key={step.id}
                             onClick={() => visitedSteps.has(step.id) && goToStep(step.id)}
@@ -330,7 +371,12 @@ export function EnhancedTripWizard({
                         className="p-4"
                     >
                         {currentStep === 'basics' && (
-                            <BasicsStep data={data} updateData={updateData} />
+                            <BasicsStep
+                                data={data}
+                                updateData={updateData}
+                                mode={mode}
+                                onModeChange={setMode}
+                            />
                         )}
                         {currentStep === 'players' && (
                             <PlayerRosterImport
@@ -464,12 +510,58 @@ export function EnhancedTripWizard({
 function BasicsStep({
     data,
     updateData,
+    mode,
+    onModeChange,
 }: {
     data: TripSetupData;
     updateData: <K extends keyof TripSetupData>(key: K, value: TripSetupData[K]) => void;
+    mode: WizardMode;
+    onModeChange: (mode: WizardMode) => void;
 }) {
     return (
         <div className="space-y-6">
+            {/* Setup depth — Quick (4 steps) vs Full (8 steps) */}
+            <div className="rounded-xl border border-[var(--rule)] bg-[var(--surface-elevated)] p-3">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                    <div>
+                        <p className="text-sm font-semibold">Setup</p>
+                        <p className="mt-0.5 text-xs text-[var(--ink-tertiary)]">
+                            {mode === 'quick'
+                                ? '4 steps — good defaults; customize later.'
+                                : '8 steps — fine-tune scoring, rules, courses, and extras now.'}
+                        </p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        onClick={() => onModeChange('quick')}
+                        aria-pressed={mode === 'quick'}
+                        className={cn(
+                            'rounded-lg border px-3 py-2 text-sm transition-colors',
+                            mode === 'quick'
+                                ? 'border-[var(--masters)] bg-[var(--masters-soft)] font-semibold'
+                                : 'border-[var(--rule)] bg-[var(--canvas)] hover:border-[var(--masters)]/40'
+                        )}
+                    >
+                        Quick Setup
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onModeChange('full')}
+                        aria-pressed={mode === 'full'}
+                        className={cn(
+                            'rounded-lg border px-3 py-2 text-sm transition-colors',
+                            mode === 'full'
+                                ? 'border-[var(--masters)] bg-[var(--masters-soft)] font-semibold'
+                                : 'border-[var(--rule)] bg-[var(--canvas)] hover:border-[var(--masters)]/40'
+                        )}
+                    >
+                        Full Setup
+                    </button>
+                </div>
+            </div>
+
             {/* Trip format — Ryder Cup vs Practice Round */}
             <div>
                 <label className="block text-sm font-medium mb-2">Trip Format</label>
