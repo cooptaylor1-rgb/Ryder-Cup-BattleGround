@@ -217,6 +217,31 @@ export default function StandingsPage() {
     );
   }
 
+  // Practice-round trips don't have cup-style standings. Point users at the
+  // schedule where pairings and individual scoring live.
+  if (currentTrip.isPracticeRound) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Standings"
+          subtitle={currentTrip.name}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
+          onBack={() => router.back()}
+        />
+
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No cup score on practice rounds"
+            description="This trip is set as a practice round, so there's no team-vs-team leaderboard. Open the schedule to see pairings and scores."
+            action={{ label: 'Open schedule', onClick: () => router.push('/schedule?view=all') }}
+            variant="large"
+          />
+        </main>
+      </div>
+    );
+  }
+
   // Show loading skeleton while data loads
   if (isLoading) {
     return <PageLoadingSkeleton title="Standings" showBackButton={false} variant="default" />;

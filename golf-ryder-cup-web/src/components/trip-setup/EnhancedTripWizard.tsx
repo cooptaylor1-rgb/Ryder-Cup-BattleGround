@@ -83,6 +83,13 @@ export interface TripSetupData {
     endDate: string;
     location: string;
 
+    /**
+     * If true, the trip is a casual practice round instead of a cup-style
+     * team competition. The team-vs-team scoreboard is hidden on the home
+     * and standings pages; sessions, matches, and scoring still work.
+     */
+    isPracticeRound: boolean;
+
     // Teams
     teamColors: TeamColors;
     playersPerTeam: number;
@@ -116,6 +123,7 @@ const DEFAULT_SETUP_DATA: TripSetupData = {
     startDate: new Date().toISOString().split('T')[0],
     endDate: '',
     location: '',
+    isPracticeRound: false,
     teamColors: DEFAULT_TEAM_COLORS,
     playersPerTeam: 8,
     players: [],
@@ -240,8 +248,10 @@ export function EnhancedTripWizard({
         const hasValidBasics = Boolean(
             data.tripName.trim() &&
             data.startDate &&
-            data.teamColors.teamA.name.trim() &&
-            data.teamColors.teamB.name.trim()
+            (data.isPracticeRound || (
+                data.teamColors.teamA.name.trim() &&
+                data.teamColors.teamB.name.trim()
+            ))
         );
 
         return {
@@ -460,6 +470,43 @@ function BasicsStep({
 }) {
     return (
         <div className="space-y-6">
+            {/* Trip format — Ryder Cup vs Practice Round */}
+            <div>
+                <label className="block text-sm font-medium mb-2">Trip Format</label>
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => updateData('isPracticeRound', false)}
+                        aria-pressed={!data.isPracticeRound}
+                        className={`rounded-xl border p-3 text-left transition-colors ${
+                            !data.isPracticeRound
+                                ? 'border-[var(--masters)] bg-[var(--masters-soft)]'
+                                : 'border-[var(--rule)] bg-[var(--surface-elevated)] hover:border-[var(--masters)]/40'
+                        }`}
+                    >
+                        <div className="text-sm font-semibold">Ryder Cup</div>
+                        <div className="mt-1 text-xs text-[var(--ink-tertiary)]">
+                            Two teams, points, leaderboard
+                        </div>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => updateData('isPracticeRound', true)}
+                        aria-pressed={data.isPracticeRound}
+                        className={`rounded-xl border p-3 text-left transition-colors ${
+                            data.isPracticeRound
+                                ? 'border-[var(--masters)] bg-[var(--masters-soft)]'
+                                : 'border-[var(--rule)] bg-[var(--surface-elevated)] hover:border-[var(--masters)]/40'
+                        }`}
+                    >
+                        <div className="text-sm font-semibold">Practice Round</div>
+                        <div className="mt-1 text-xs text-[var(--ink-tertiary)]">
+                            Casual pairings, no cup score
+                        </div>
+                    </button>
+                </div>
+            </div>
+
             <div>
                 <label className="block text-sm font-medium mb-1.5">Trip Name *</label>
                 <input
@@ -516,34 +563,36 @@ function BasicsStep({
                 />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium mb-1.5">Team 1 Name</label>
-                    <input
-                        type="text"
-                        value={data.teamColors.teamA.name}
-                        onChange={(e) => updateData('teamColors', {
-                            ...data.teamColors,
-                            teamA: { ...data.teamColors.teamA, name: e.target.value }
-                        })}
-                        placeholder="Team USA"
-                        className="input w-full"
-                    />
+            {!data.isPracticeRound && (
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium mb-1.5">Team 1 Name</label>
+                        <input
+                            type="text"
+                            value={data.teamColors.teamA.name}
+                            onChange={(e) => updateData('teamColors', {
+                                ...data.teamColors,
+                                teamA: { ...data.teamColors.teamA, name: e.target.value }
+                            })}
+                            placeholder="Team USA"
+                            className="input w-full"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1.5">Team 2 Name</label>
+                        <input
+                            type="text"
+                            value={data.teamColors.teamB.name}
+                            onChange={(e) => updateData('teamColors', {
+                                ...data.teamColors,
+                                teamB: { ...data.teamColors.teamB, name: e.target.value }
+                            })}
+                            placeholder="Team Europe"
+                            className="input w-full"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1.5">Team 2 Name</label>
-                    <input
-                        type="text"
-                        value={data.teamColors.teamB.name}
-                        onChange={(e) => updateData('teamColors', {
-                            ...data.teamColors,
-                            teamB: { ...data.teamColors.teamB, name: e.target.value }
-                        })}
-                        placeholder="Team Europe"
-                        className="input w-full"
-                    />
-                </div>
-            </div>
+            )}
         </div>
     );
 }

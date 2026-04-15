@@ -249,7 +249,30 @@ export default function HomePage() {
                 </div>
 
                 <div className="px-[var(--space-5)] py-[var(--space-6)]">
-                  {standings ? (
+                  {activeTrip.isPracticeRound ? (
+                    <button
+                      onClick={handleOpenSchedule}
+                      className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
+                    >
+                      <div className="rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.64)] px-[var(--space-5)] py-[var(--space-6)]">
+                        <p className="type-overline text-[var(--ink-tertiary)]">Practice Round</p>
+                        <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,7vw,2.6rem)] italic leading-[1.05] text-[var(--ink)]">
+                          Casual pairings. No cup on the line.
+                        </h2>
+                        <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                          Use the schedule to set pairings, track scores, and keep things loose.
+                        </p>
+                        <div className="mt-[var(--space-5)] flex flex-wrap items-center gap-[var(--space-3)] text-sm">
+                          <HeroMetaStat label="Live" value={liveMatchesCount} />
+                          <HeroMetaStat label="Players" value={players.length} />
+                          <div className="ml-auto inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-2)] text-[var(--masters)] font-medium">
+                            <span>Open schedule</span>
+                            <ChevronRight size={16} strokeWidth={2} />
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ) : standings ? (
                     <button
                       onClick={handleOpenStandings}
                       className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"

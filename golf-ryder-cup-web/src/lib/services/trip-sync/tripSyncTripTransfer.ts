@@ -154,6 +154,7 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
           notes: trip.notes,
           isCaptainModeEnabled: trip.is_captain_mode_enabled,
           captainName: trip.captain_name,
+          isPracticeRound: trip.is_practice_round || undefined,
           createdAt: trip.created_at,
           updatedAt: trip.updated_at,
         };

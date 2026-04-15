@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS trips (
     notes TEXT,
     is_captain_mode_enabled BOOLEAN DEFAULT FALSE,
     captain_name TEXT,
+    is_practice_round BOOLEAN NOT NULL DEFAULT FALSE,
     share_code TEXT UNIQUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

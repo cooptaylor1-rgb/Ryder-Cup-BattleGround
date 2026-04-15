@@ -208,6 +208,7 @@ export async function createTripFromSetupWizard(
     notes: buildTripNotes(setupData),
     isCaptainModeEnabled: true,
     captainName: setupData.captainName.trim() || undefined,
+    isPracticeRound: setupData.isPracticeRound || undefined,
     settings: {
       pointsToWin: calculatePointsToWin(totalPoints, setupData.scoringSettings.pointsToWin),
       totalMatches,

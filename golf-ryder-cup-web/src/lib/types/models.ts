@@ -181,6 +181,13 @@ export interface Trip {
   captainName?: string;
   captainPin?: string;
   settings?: TripSettings;
+  /**
+   * If true, the trip is a casual practice round rather than a cup-style team
+   * competition. Team-vs-team leaderboards and cup-specific framing are
+   * suppressed; sessions/matches/scoring still work for pairings and handicap
+   * tracking, but there is no "USA vs Europe" scoreboard.
+   */
+  isPracticeRound?: boolean;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }

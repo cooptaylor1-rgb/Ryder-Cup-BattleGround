@@ -72,6 +72,7 @@ export async function syncTripToCloud(
     notes: trip.notes || null,
     is_captain_mode_enabled: trip.isCaptainModeEnabled,
     captain_name: trip.captainName || null,
+    is_practice_round: trip.isPracticeRound || false,
     updated_at: new Date().toISOString(),
   };
 
