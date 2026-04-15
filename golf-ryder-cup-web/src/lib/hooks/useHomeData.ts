@@ -71,6 +71,17 @@ interface HomeData {
     teamBName: string;
 }
 
+export function shouldRecoverToDateActiveTrip(
+    currentTripId: string | undefined,
+    tripIds: string[] | undefined,
+): boolean {
+    if (!currentTripId || !tripIds) {
+        return false;
+    }
+
+    return !tripIds.includes(currentTripId);
+}
+
 // ============================================
 // CORE DATA QUERY (shared by sub-hooks)
 // ============================================
@@ -291,14 +302,20 @@ export function useAutoLoadTrip(data: ConsolidatedData | undefined) {
     }, [data?.dateActiveTripId, currentTrip, loadTrip]);
 
     useEffect(() => {
-        if (
-            currentTrip &&
-            data?.activeTrip &&
-            data.activeTrip.id !== currentTrip.id
-        ) {
-            loadTrip(data.activeTrip.id);
+        if (!currentTrip || !data?.dateActiveTripId || !data.trips) {
+            return;
         }
-    }, [data?.activeTrip, currentTrip, loadTrip]);
+
+        // Respect explicit user trip selection. Only auto-recover when the selected
+        // trip no longer exists in local data (deleted/missing after sync).
+        const shouldRecover = shouldRecoverToDateActiveTrip(
+            currentTrip.id,
+            data.trips.map(trip => trip.id)
+        );
+        if (shouldRecover) {
+            loadTrip(data.dateActiveTripId);
+        }
+    }, [data?.dateActiveTripId, data?.trips, currentTrip, loadTrip]);
 }
 
 // ============================================
