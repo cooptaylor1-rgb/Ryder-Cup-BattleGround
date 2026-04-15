@@ -32,7 +32,7 @@ import {
     SessionLineupNoTripState,
     SessionStartButton,
 } from './SessionLineupPageSections';
-import { Lock, Unlock, Users } from 'lucide-react';
+import { Lock, Settings, Unlock, Users } from 'lucide-react';
 
 const lineupLogger = createLogger('lineup');
 
@@ -252,6 +252,16 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                             <span className="rounded-full bg-[color:var(--success)]/10 px-2 py-1 text-xs font-medium text-[var(--success)]">
                                 Complete
                             </span>
+                        ) : null}
+                        {isCaptainMode ? (
+                            <button
+                                onClick={() => router.push(`/captain/manage?sessionId=${session.id}`)}
+                                className="press-scale p-2 text-[var(--ink-tertiary)]"
+                                aria-label="Edit session details"
+                                title="Edit session details"
+                            >
+                                <Settings size={18} />
+                            </button>
                         ) : null}
                         {isCaptainMode && session.status === 'scheduled' ? (
                             <button

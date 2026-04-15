@@ -93,9 +93,16 @@ export default function HomePage() {
     await loadTrip(tripId);
   };
 
-  const handleOpenStandings = useCallback(() => {
+  const handleOpenStandings = useCallback(async () => {
+    // Ensure the trip store's currentTrip matches the trip displayed on the
+    // home page before navigating. Without this the standings page can fall
+    // back to a stale currentTrip and render a different trip than the one
+    // the user just tapped through from.
+    if (activeTrip && activeTrip.id) {
+      await loadTrip(activeTrip.id);
+    }
     router.push('/standings');
-  }, [router]);
+  }, [router, activeTrip, loadTrip]);
 
   const handleOpenSchedule = useCallback(() => {
     router.push('/schedule?view=all');
