@@ -17,6 +17,7 @@ import {
   type SessionConfig,
   type FairnessScore,
 } from '@/components/captain';
+import Link from 'next/link';
 import { Users, Info } from 'lucide-react';
 import type { Match, SessionType } from '@/lib/types';
 import { EmptyStatePremium } from '@/components/ui';
@@ -76,6 +77,10 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const nextSessionNeedingLineup = useMemo(
     () => (tripMatches ? findNextSessionNeedingLineup(sessions, tripMatches) : null),
     [sessions, tripMatches]
+  );
+  const orderedSessions = useMemo(
+    () => [...sessions].sort((a, b) => a.sessionNumber - b.sessionNumber),
+    [sessions]
   );
   const draftSeedKey = useMemo(
     () => `${mode}:${nextSessionNumber}:${defaultSessionName}:${defaultDate}:${defaultTeeTime}`,
@@ -315,11 +320,16 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           throw new Error('Failed to persist lineup matches');
         }
 
-        showToast('success', 'Session created and lineup published!');
-
-        setTimeout(() => {
-          router.push(`/lineup/${session.id}`);
-        }, 1500);
+        if (mode === 'session') {
+          showToast('success', 'Session created. Build the next one below.');
+          setStep('setup');
+          setShowAdvanced(false);
+        } else {
+          showToast('success', 'Session created and lineup published!');
+          setTimeout(() => {
+            router.push(`/lineup/${session.id}`);
+          }, 1500);
+        }
       } catch (error) {
         // Use the shared classifier so users see a meaningful message
         // (network / storage / data) instead of a generic "Failed to
@@ -350,8 +360,64 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
       buildPersistedLineupState,
       showToast,
       router,
+      mode,
     ]
   );
+
+  const handleCreateSessionShell = useCallback(async () => {
+    if (!currentTrip) return;
+
+    const trimmedName = sessionName.trim();
+    if (!trimmedName) {
+      showToast('error', 'Give the session a name before adding it.');
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const [hours] = firstTeeTime.split(':').map(Number);
+      const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
+
+      await addSession({
+        tripId: currentTrip.id,
+        name: trimmedName,
+        sessionNumber: nextSessionNumber,
+        sessionType,
+        scheduledDate: scheduledDate || undefined,
+        timeSlot: derivedTimeSlot,
+        pointsPerMatch,
+        status: 'scheduled',
+        isLocked: false,
+      });
+
+      showToast('success', 'Session added. You can add another right away.');
+      setStep('setup');
+      setShowAdvanced(false);
+    } catch (error) {
+      const appError = normalizeError(error, {
+        component: 'NewLineupPageClient',
+        action: 'createSessionShell',
+        tripId: currentTrip.id,
+      });
+      logger.error('Failed to create session shell', {
+        code: appError.code,
+        message: appError.message,
+      });
+      showToast('error', appError.userMessage);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [
+    addSession,
+    currentTrip,
+    firstTeeTime,
+    nextSessionNumber,
+    pointsPerMatch,
+    scheduledDate,
+    sessionName,
+    sessionType,
+    showToast,
+  ]);
 
   if (!currentTrip) {
     return (
@@ -497,6 +563,49 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                 onClick={() => { if (step === 'setup') setShowAdvanced(true); }}
               />
             </div>
+
+            {mode === 'session' && (
+              <div className="mt-[var(--space-4)] rounded-2xl border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">
+                <div className="flex flex-wrap items-center justify-between gap-[var(--space-3)]">
+                  <div>
+                    <p className="type-overline text-[var(--ink-tertiary)]">Session queue</p>
+                    <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                      Add sessions one-by-one here. You currently have {orderedSessions.length}{' '}
+                      session{orderedSessions.length === 1 ? '' : 's'} in this trip.
+                    </p>
+                  </div>
+                  <Link
+                    href="/captain/manage"
+                    className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                  >
+                    Manage sessions
+                  </Link>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCreateSessionShell}
+                  disabled={isCreating}
+                  className="btn-primary mt-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] text-sm"
+                >
+                  {isCreating ? 'Adding…' : 'Add this session now'}
+                </button>
+                {orderedSessions.length > 0 && (
+                  <ul className="mt-[var(--space-3)] space-y-2">
+                    {orderedSessions.slice(-3).map((session) => (
+                      <li
+                        key={session.id}
+                        className="rounded-xl border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)] text-sm text-[var(--ink-secondary)]"
+                      >
+                        <span className="font-medium text-[var(--ink)]">
+                          Session {session.sessionNumber}:
+                        </span>{' '}
+                        {session.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
         </section>
 

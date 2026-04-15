@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect, type CSSProperties } from 'react';
+import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createLogger } from '@/lib/utils/logger';
+import { db } from '@/lib/db';
 import {
     searchCourses as searchCoursesAPI,
     checkGolfCourseAPIConfigured,
@@ -122,6 +124,40 @@ export function CourseSelection({
     const [showSearch, setShowSearch] = useState(false);
     const [_expandedCourse, _setExpandedCourse] = useState<string | null>(null);
     const [isApiConfigured, setIsApiConfigured] = useState<boolean | null>(null);
+    const courseProfiles = useLiveQuery(() => db.courseProfiles.toArray(), [], []);
+    const teeSetProfiles = useLiveQuery(() => db.teeSetProfiles.toArray(), [], []);
+
+    const localLibraryCourses = useMemo((): CourseInfo[] => {
+        return (courseProfiles || []).map(profile => {
+            const locationParts = (profile.location || '').split(',').map(part => part.trim());
+            const tees = (teeSetProfiles || [])
+                .filter(tee => tee.courseProfileId === profile.id)
+                .map(tee => ({
+                    name: tee.name,
+                    color: tee.color || 'white',
+                    rating: tee.rating,
+                    slope: tee.slope,
+                    yardage: tee.totalYardage || tee.yardages?.reduce((sum, yards) => sum + yards, 0) || 0,
+                }));
+            const primaryTee = tees[0];
+
+            return {
+                id: profile.id,
+                name: profile.name,
+                address: '',
+                city: locationParts[0] || '',
+                state: locationParts[1] || '',
+                country: locationParts[2] || 'USA',
+                website: profile.sourceUrl,
+                rating: primaryTee?.rating,
+                slope: primaryTee?.slope,
+                par: undefined,
+                yardage: primaryTee?.yardage,
+                holes: 18,
+                teeBoxes: tees,
+            };
+        });
+    }, [courseProfiles, teeSetProfiles]);
 
     // Check if API is configured on mount
     useEffect(() => {
@@ -138,6 +174,14 @@ export function CourseSelection({
         setIsSearching(true);
         const timer = setTimeout(async () => {
             try {
+                const query = searchQuery.toLowerCase();
+                const localMatches = localLibraryCourses.filter(
+                    c =>
+                        c.name.toLowerCase().includes(query) ||
+                        c.city.toLowerCase().includes(query) ||
+                        c.state.toLowerCase().includes(query)
+                );
+
                 // Try real API first if configured
                 if (isApiConfigured) {
                     const apiResults = await searchCoursesAPI(searchQuery);
@@ -154,36 +198,48 @@ export function CourseSelection({
                         yardage: course.tees?.male?.[0]?.total_yards,
                         holes: 18,
                     }));
-                    setSearchResults(convertedResults);
+                    const seen = new Set<string>();
+                    const merged = [...localMatches, ...convertedResults].filter(course => {
+                        const key = `${course.name.toLowerCase()}|${course.city.toLowerCase()}|${course.state.toLowerCase()}`;
+                        if (seen.has(key)) return false;
+                        seen.add(key);
+                        return true;
+                    });
+                    setSearchResults(merged);
                 } else {
-                    // Fallback to demo courses
-                    const query = searchQuery.toLowerCase();
+                    // Fallback to local library + demo courses
                     const results = DEMO_COURSES.filter(
                         c =>
                             c.name.toLowerCase().includes(query) ||
                             c.city.toLowerCase().includes(query) ||
                             c.state.toLowerCase().includes(query)
                     );
-                    setSearchResults(results);
+                    setSearchResults([...localMatches, ...results]);
                 }
             } catch (error) {
                 logger.error('Course search error:', error);
-                // Fallback to demo on error
+                // Fallback to local library + demo on error
                 const query = searchQuery.toLowerCase();
+                const localMatches = localLibraryCourses.filter(
+                    c =>
+                        c.name.toLowerCase().includes(query) ||
+                        c.city.toLowerCase().includes(query) ||
+                        c.state.toLowerCase().includes(query)
+                );
                 const results = DEMO_COURSES.filter(
                     c =>
                         c.name.toLowerCase().includes(query) ||
                         c.city.toLowerCase().includes(query) ||
                         c.state.toLowerCase().includes(query)
                 );
-                setSearchResults(results);
+                setSearchResults([...localMatches, ...results]);
             } finally {
                 setIsSearching(false);
             }
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchQuery, isApiConfigured]);
+    }, [searchQuery, isApiConfigured, localLibraryCourses]);
 
     const addCourse = useCallback((course: CourseInfo) => {
         if (selectedCourses.length >= maxCourses) return;
@@ -467,6 +523,46 @@ export function CourseSelection({
                                 {/* Show popular courses when no search */}
                                 {!searchQuery && (
                                     <div>
+                                        {localLibraryCourses.length > 0 && (
+                                            <>
+                                                <p className="text-xs font-medium text-[var(--ink-tertiary)] px-3 py-2">
+                                                    Your Course Library
+                                                </p>
+                                                {localLibraryCourses.map(course => {
+                                                    const isSelected = selectedCourses.some(c => c.id === course.id);
+                                                    return (
+                                                        <button
+                                                            key={course.id}
+                                                            onClick={() => !isSelected && addCourse(course)}
+                                                            disabled={isSelected}
+                                                            className={cn(
+                                                                'w-full p-3 rounded-xl text-left transition-colors mb-1',
+                                                                isSelected
+                                                                    ? 'bg-[color:var(--masters)]/10 cursor-default'
+                                                                    : 'hover:bg-[var(--surface-secondary)]'
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-12 h-12 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center">
+                                                                    <Star className="w-6 h-6 text-[var(--masters)]" />
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="font-medium truncate">{course.name}</p>
+                                                                    <p className="text-sm text-[var(--ink-tertiary)]">
+                                                                        {course.city}, {course.state}
+                                                                    </p>
+                                                                </div>
+                                                                {isSelected ? (
+                                                                    <Check className="w-5 h-5 text-[var(--masters)]" />
+                                                                ) : (
+                                                                    <Plus className="w-5 h-5 text-[color:var(--ink-tertiary)]/70" />
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </>
+                                        )}
                                         <p className="text-xs font-medium text-[var(--ink-tertiary)] px-3 py-2">
                                             Popular Courses
                                         </p>
