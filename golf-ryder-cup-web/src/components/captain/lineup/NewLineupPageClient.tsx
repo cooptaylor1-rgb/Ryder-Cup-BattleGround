@@ -581,14 +581,6 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                     Manage sessions
                   </Link>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCreateSessionShell}
-                  disabled={isCreating}
-                  className="btn-primary mt-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] text-sm"
-                >
-                  {isCreating ? 'Adding…' : 'Add this session now'}
-                </button>
                 {orderedSessions.length > 0 && (
                   <ul className="mt-[var(--space-3)] space-y-2">
                     {orderedSessions.slice(-3).map((session) => (
