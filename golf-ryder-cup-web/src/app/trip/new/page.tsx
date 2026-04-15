@@ -1,13 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { TripTemplatePicker } from '@/components/trip-setup';
-import type { LegacyTripTemplate as TripTemplate } from '@/lib/types/templates';
-import { createTripFromTemplate, previewTemplateTrip } from '@/lib/services/tripTemplateService';
-'use client';
-
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
