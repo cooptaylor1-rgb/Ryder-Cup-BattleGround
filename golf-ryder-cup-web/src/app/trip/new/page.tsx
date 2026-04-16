@@ -189,7 +189,6 @@ export default function NewTripPage() {
           title="World-Class Trip Setup"
           subtitle={activePreset?.title || 'Custom setup'}
           icon={<Sparkles size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           onBack={handleCancelWizard}
         />
 
@@ -268,7 +267,7 @@ export default function NewTripPage() {
         title="New Trip"
         subtitle="World-class captain setup"
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        iconTone="captain"
         backFallback="/trips"
       />
 

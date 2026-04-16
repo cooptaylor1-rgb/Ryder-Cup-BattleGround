@@ -99,7 +99,6 @@ export default function StatsPageClient() {
           title="Stats"
           subtitle="No active trip"
           icon={<BarChart3 size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           backFallback="/"
         />
 
@@ -126,7 +125,6 @@ export default function StatsPageClient() {
         title="Stats"
         subtitle={activeTrip.name}
         icon={<BarChart3 size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         backFallback="/"
         rightSlot={
           <Button variant="outline" size="sm" leftIcon={<Trophy size={14} />} onClick={() => router.push('/standings')}>

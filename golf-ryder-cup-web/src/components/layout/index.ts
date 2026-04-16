@@ -5,4 +5,4 @@
 export { NavigationShell } from './NavigationShell';
 export { BottomNav, type NavBadges } from './BottomNav';
 export { SidebarNav } from './SidebarNav';
-export { PageHeader, type BreadcrumbSegment } from './PageHeader';
+export { PageHeader, type BreadcrumbSegment, type PageHeaderIconTone } from './PageHeader';

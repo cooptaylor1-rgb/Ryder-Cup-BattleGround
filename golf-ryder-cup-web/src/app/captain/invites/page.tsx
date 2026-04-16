@@ -131,7 +131,6 @@ export default function InvitesPage() {
         title="Invitations"
         subtitle={currentTrip.name}
         icon={<QrCode size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         backFallback="/captain"
         rightSlot={
           <Button

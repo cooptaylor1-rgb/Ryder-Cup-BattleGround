@@ -63,7 +63,6 @@ export default function SettingsPage() {
         title="Settings"
         subtitle="Device and app preferences"
         icon={<Settings size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
         onBack={() => router.push('/more')}
         rightSlot={
           <Button variant="outline" size="sm" leftIcon={<HelpCircle size={14} />} onClick={() => router.push('/help')}>

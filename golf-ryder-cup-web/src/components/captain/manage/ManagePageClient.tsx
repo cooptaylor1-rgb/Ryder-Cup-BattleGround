@@ -298,10 +298,7 @@ export function ManagePageClient() {
         title="Manage Trip"
         subtitle={currentTrip.name}
         icon={<Settings size={16} className="text-[var(--color-accent)]" />}
-        iconContainerStyle={{
-          background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-          boxShadow: 'var(--shadow-glow-green)',
-        }}
+        iconTone="neutral"
         onBack={() => navigateBackOr(router, '/captain')}
       />
 

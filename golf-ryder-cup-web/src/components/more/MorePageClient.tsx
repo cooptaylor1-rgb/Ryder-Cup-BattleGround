@@ -342,7 +342,7 @@ export default function MorePageClient() {
         title="More"
         subtitle={currentTrip?.name || 'Support, settings, and trip tools'}
         icon={<MoreHorizontal size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        iconTone="captain"
         onBack={() => router.push('/')}
         rightSlot={
           isAuthenticated ? (

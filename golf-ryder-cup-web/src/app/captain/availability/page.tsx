@@ -186,7 +186,7 @@ export default function AvailabilityPage() {
         title="Availability"
         subtitle={currentTrip.name}
         icon={<UserCheck size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        iconTone="captain"
         backFallback="/captain"
         rightSlot={
           <button

@@ -165,7 +165,7 @@ export default function CaptainPageClient() {
           title="Captain Command"
           subtitle="No active trip"
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          iconTone="captain"
           backFallback="/"
         />
         <main className="container-editorial py-12">
@@ -192,7 +192,7 @@ export default function CaptainPageClient() {
           title="Captain Command"
           subtitle={currentTrip.name}
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          iconTone="captain"
           backFallback="/"
         />
 
@@ -298,7 +298,7 @@ export default function CaptainPageClient() {
         title="Captain Command"
         subtitle={currentTrip.name}
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
+        iconTone="captain"
         backFallback="/"
         rightSlot={
           <div className="flex items-center gap-1">

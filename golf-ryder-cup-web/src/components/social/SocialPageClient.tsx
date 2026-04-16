@@ -184,7 +184,7 @@ export default function SocialPageClient() {
           title="Clubhouse"
           subtitle="No active trip"
           icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          iconTone="captain"
           backFallback="/"
         />
 
@@ -215,7 +215,7 @@ export default function SocialPageClient() {
           title="Clubhouse"
           subtitle={currentTrip.name}
           icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          iconTone="captain"
           backFallback="/"
         />
 
@@ -241,7 +241,7 @@ export default function SocialPageClient() {
         title="Clubhouse"
         subtitle={currentTrip.name}
         icon={<socialIcons.message size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        iconTone="captain"
         backFallback="/"
         rightSlot={
           <Button

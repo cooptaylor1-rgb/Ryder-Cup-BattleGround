@@ -138,7 +138,7 @@ export default function CaptainSettingsPage() {
         subtitle={currentTrip.name}
         onBack={() => router.back()}
         icon={<Settings size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+        iconTone="captain"
         rightSlot={
           <Button
             variant="primary"

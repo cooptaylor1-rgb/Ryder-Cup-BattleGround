@@ -89,7 +89,7 @@ export default function BetDetailPage() {
           subtitle={currentTrip.name}
           onBack={() => router.push('/bets')}
           icon={<Trophy size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
+          iconTone="captain"
         />
 
         <main className="container-editorial py-12">
@@ -200,11 +200,7 @@ export default function BetDetailPage() {
         subtitle={currentTrip.name}
         onBack={() => router.push('/bets')}
         icon={<definition.icon size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName={
-          bet.status === 'completed'
-            ? 'bg-[linear-gradient(135deg,var(--success)_0%,#1d7d53_100%)]'
-            : 'bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]'
-        }
+        iconTone="captain"
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

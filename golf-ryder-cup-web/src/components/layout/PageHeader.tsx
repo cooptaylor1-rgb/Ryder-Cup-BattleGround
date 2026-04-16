@@ -18,6 +18,29 @@ export interface BreadcrumbSegment {
   href?: string;
 }
 
+/**
+ * Semantic icon-tone presets. Each maps to a consistent background
+ * gradient + shadow so captain pages always look like captain pages,
+ * admin always looks like admin, etc. Use `iconContainerClassName` as
+ * an escape hatch for one-offs.
+ */
+export type PageHeaderIconTone = 'neutral' | 'captain' | 'admin' | 'action';
+
+const ICON_TONE_CLASSES: Record<PageHeaderIconTone, string> = {
+  /** Default — masters green. Used for general feature pages. */
+  neutral:
+    'bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] shadow-[var(--shadow-glow-green)]',
+  /** Maroon/command — used for captain tools and captain sub-pages. */
+  captain:
+    'bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.10)]',
+  /** Red/danger — used for admin and destructive contexts. */
+  admin:
+    'bg-[linear-gradient(135deg,var(--error)_0%,#991b1b_100%)] shadow-[0_2px_8px_color-mix(in_srgb,var(--error)_30%,transparent)]',
+  /** Masters green with extra glow — for active-play / scoring pages. */
+  action:
+    'bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] shadow-[var(--shadow-glow-green)]',
+};
+
 export function PageHeader({
   title,
   subtitle,
@@ -26,6 +49,7 @@ export function PageHeader({
   backFallback,
   breadcrumbs,
   rightSlot,
+  iconTone,
   iconContainerStyle,
   iconContainerClassName,
   hideSyncBadge = false,
@@ -56,7 +80,20 @@ export function PageHeader({
    */
   breadcrumbs?: BreadcrumbSegment[];
   rightSlot?: React.ReactNode;
+  /**
+   * Semantic tone for the icon container. Maps to a consistent background
+   * gradient and shadow. Takes precedence over the default green gradient
+   * but is overridden by `iconContainerClassName` when both are set.
+   *
+   *   neutral  — masters green (default for feature pages)
+   *   captain  — maroon (captain tools)
+   *   admin    — red (destructive / admin contexts)
+   *   action   — masters green with glow (scoring / live-play)
+   */
+  iconTone?: PageHeaderIconTone;
+  /** @deprecated Prefer `iconTone` for new pages. Kept as an escape hatch. */
   iconContainerStyle?: React.CSSProperties;
+  /** @deprecated Prefer `iconTone` for new pages. Kept as an escape hatch. */
   iconContainerClassName?: string;
   /**
    * Hide the global trip sync badge. Defaults to false so that every page
@@ -93,8 +130,10 @@ export function PageHeader({
             {icon ? (
               <div
                 className={cn(
-                  'w-8 h-8 rounded-[var(--radius-md)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shadow-[var(--shadow-glow-green)] shrink-0',
-                  iconContainerClassName
+                  'w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center shrink-0',
+                  // Explicit className wins; otherwise fall back to the tone
+                  // preset (or the default 'neutral' green gradient).
+                  iconContainerClassName ?? ICON_TONE_CLASSES[iconTone ?? 'neutral']
                 )}
                 style={iconContainerStyle}
               >
