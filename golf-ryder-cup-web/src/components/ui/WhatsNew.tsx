@@ -10,6 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from './Button';
 import {
   X,
   Tv,
@@ -284,29 +285,19 @@ export function WhatsNew({ onDismiss, forceShow = false }: WhatsNewProps) {
             borderTop: '1px solid var(--rule)',
           }}
         >
-          <button
+          <Button
+            variant="primary"
             onClick={handleDismiss}
-            className="btn-premium press-scale"
+            rightIcon={<ChevronRight className="w-5 h-5" />}
+            fullWidth
+            className="press-scale"
             style={{
-              width: '100%',
-              padding: 'var(--space-3) var(--space-4)',
               borderRadius: 'var(--radius-lg)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'var(--space-2)',
-              background: 'var(--masters)',
-              color: 'var(--canvas)',
-              border: 'none',
-              cursor: 'pointer',
               boxShadow: '0 4px 14px rgba(0, 77, 51, 0.25)',
             }}
           >
             Got it, let&apos;s go!
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

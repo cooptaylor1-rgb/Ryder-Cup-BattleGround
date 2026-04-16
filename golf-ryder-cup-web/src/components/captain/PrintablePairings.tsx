@@ -2,6 +2,7 @@
 
 import type { RyderCupSession, Match, Player, Team } from '@/lib/types/models';
 import { SessionTypeDisplay } from '@/lib/types/models';
+import { Button } from '@/components/ui/Button';
 import { Printer } from 'lucide-react';
 
 /**
@@ -241,21 +242,18 @@ export function PrintablePairings({
 
         {/* Print button - hidden in print */}
         <div className="no-print" style={{ marginBottom: 'var(--space-6)' }}>
-          <button
+          <Button
+            variant="primary"
             onClick={() => window.print()}
-            className="btn-premium press-scale"
+            leftIcon={<Printer size={16} />}
+            className="press-scale"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
               background: 'var(--maroon)',
-              color: 'var(--canvas)',
               fontFamily: 'var(--font-sans)',
             }}
           >
-            <Printer size={16} />
             Print Pairings
-          </button>
+          </Button>
         </div>
 
         {/* Sessions */}

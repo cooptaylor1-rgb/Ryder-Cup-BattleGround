@@ -267,14 +267,18 @@ function AdminCleanupSection({
                                 />
 
                                 {hasOrphans ? (
-                                    <button
+                                    <Button
+                                        variant="danger"
                                         onClick={onCleanOrphans}
                                         disabled={isCleaningOrphans}
-                                        className={`btn-premium mt-2 bg-[var(--error)] px-[var(--space-3)] py-[var(--space-2)] text-[var(--canvas)] ${isCleaningOrphans ? 'opacity-60' : ''}`}
+                                        isLoading={isCleaningOrphans}
+                                        loadingText="Cleaning..."
+                                        leftIcon={!isCleaningOrphans ? <Zap size={14} /> : undefined}
+                                        className="mt-2"
+                                        size="sm"
                                     >
-                                        <Zap size={14} />
-                                        {isCleaningOrphans ? 'Cleaning...' : 'Clean Orphaned Data'}
-                                    </button>
+                                        Clean Orphaned Data
+                                    </Button>
                                 ) : null}
                             </div>
                         </motion.div>

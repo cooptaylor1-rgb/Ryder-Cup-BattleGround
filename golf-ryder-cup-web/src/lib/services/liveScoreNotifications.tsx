@@ -15,6 +15,7 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { useTripStore } from '@/lib/stores';
 import { useToastStore } from '@/lib/stores';
+import { Button } from '@/components/ui/Button';
 import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
@@ -327,12 +328,12 @@ export function NotificationPermissionBanner() {
                         Get notified when scores change, matches finish, or your team takes the lead.
                     </p>
                     <div className="flex gap-2">
-                        <button onClick={handleEnable} className="btn-primary press-scale px-4 text-sm">
+                        <Button variant="primary" onClick={handleEnable} size="sm" className="press-scale px-4">
                             Enable Notifications
-                        </button>
-                        <button onClick={() => setDismissed(true)} className="btn-ghost press-scale px-4 text-sm">
+                        </Button>
+                        <Button variant="ghost" onClick={() => setDismissed(true)} size="sm" className="press-scale px-4">
                             Not Now
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
