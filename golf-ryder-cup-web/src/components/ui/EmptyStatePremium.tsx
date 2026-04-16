@@ -8,8 +8,8 @@
 
 'use client';
 
-import Link from 'next/link';
 import { type ReactNode, type ComponentType } from 'react';
+import { LinkButton } from './LinkButton';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import {
@@ -297,13 +297,14 @@ export function NoTournamentsEmpty({
         >
             <div style={{ display: 'flex', gap: 'var(--space-3)', width: '100%', marginTop: 'var(--space-6)' }}>
                 {createHref ? (
-                    <Link
+                    <LinkButton
                         href={createHref}
-                        className="btn-premium press-scale"
-                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)', textDecoration: 'none' }}
+                        variant="primary"
+                        leftIcon={<Plus size={18} />}
+                        className="press-scale flex-1"
                     >
-                        <Plus size={18} /> New Trip
-                    </Link>
+                        New Trip
+                    </LinkButton>
                 ) : (
                     <Button variant="primary" onClick={onCreateTrip} leftIcon={<Plus size={18} />} className="press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
                         New Trip

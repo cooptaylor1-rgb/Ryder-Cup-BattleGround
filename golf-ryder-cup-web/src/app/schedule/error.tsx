@@ -11,8 +11,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { CalendarDays } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { ErrorEmpty } from '@/components/ui';
@@ -55,9 +55,9 @@ export default function ScheduleError({ error, reset }: ErrorPageProps) {
         ) : null}
 
         <div className="mt-6 flex justify-center">
-          <Link href="/" className="btn-secondary">
+          <LinkButton href="/" variant="secondary">
             Back to Home
-          </Link>
+          </LinkButton>
         </div>
       </main>
 

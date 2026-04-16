@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout';
@@ -373,13 +374,14 @@ export default function CaptainPageClient() {
               </div>
 
               <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
-                <Link
+                <LinkButton
                   href="/lineup/new"
-                  className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
+                  variant="primary"
+                  leftIcon={<Plus size={16} />}
+                  className="rounded-[1rem]"
                 >
-                  <Plus size={16} />
                   Build Next Session
-                </Link>
+                </LinkButton>
                 <Link
                   href="/captain/manage"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--maroon-dark)] transition-colors hover:bg-[color:var(--maroon)]/14"

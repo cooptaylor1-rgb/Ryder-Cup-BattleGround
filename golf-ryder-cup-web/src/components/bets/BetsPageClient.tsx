@@ -15,6 +15,7 @@ import {
   buildNassauSideBet,
   buildQuickSideBet,
 } from '@/lib/services/sideBetBuilders';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, SideBet, SideBetType } from '@/lib/types/models';
@@ -56,18 +57,13 @@ export default function BetsPageClient() {
   const [nassauTeamB, setNassauTeamB] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sessionIds = sessions.map((session) => session.id);
+  const tripData = useTripScopedMatches(currentTrip?.id);
+  const matches = tripData?.matches ?? [];
 
   const sideBets = useLiveQuery(
     async () => (currentTrip ? db.sideBets.where('tripId').equals(currentTrip.id).toArray() : []),
     [currentTrip?.id],
     [] as SideBet[]
-  );
-
-  const matches = useLiveQuery(
-    async () => (sessionIds.length > 0 ? db.matches.where('sessionId').anyOf(sessionIds).toArray() : []),
-    [sessionIds.join('|')],
-    [] as Match[]
   );
 
   if (!currentTrip) {

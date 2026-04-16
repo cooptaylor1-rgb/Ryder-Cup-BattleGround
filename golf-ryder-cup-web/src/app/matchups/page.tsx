@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useTripStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn, formatPlayerName } from '@/lib/utils';
@@ -57,14 +58,15 @@ export default function MatchupsPage() {
         icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
         rightSlot={
           isCaptainMode ? (
-            <Link
+            <LinkButton
               href="/players"
-              className="btn-premium flex items-center gap-1 press-scale"
-              style={{ padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-sm)' }}
+              variant="primary"
+              leftIcon={<Plus size={16} strokeWidth={2} />}
+              className="press-scale"
+              size="sm"
             >
-              <Plus size={16} strokeWidth={2} />
               Manage
-            </Link>
+            </LinkButton>
           ) : null
         }
       />

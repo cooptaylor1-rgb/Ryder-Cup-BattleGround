@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CaptainModeRequiredState,
   CaptainNoTripState,
@@ -11,11 +10,10 @@ import {
 import { PrintablePairings } from '@/components/captain/PrintablePairings';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { db } from '@/lib/db';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { useTripStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
-import type { Match } from '@/lib/types/models';
 import {
   CalendarDays,
   Printer,
@@ -28,15 +26,8 @@ export default function CaptainPairingsPage() {
   const { currentTrip, sessions, teams, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
-  const sessionIds = sessions.map((session) => session.id);
-  const matches = useLiveQuery(
-    async (): Promise<Match[]> => {
-      if (sessionIds.length === 0) return [];
-      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
-    },
-    [sessionIds.join(',')],
-    [] as Match[]
-  );
+  const tripData = useTripScopedMatches(currentTrip?.id);
+  const matches = tripData?.matches ?? [];
 
   if (!currentTrip) {
     return <CaptainNoTripState description="Start or select a trip to view pairings." />;

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertTriangle,
@@ -59,12 +60,12 @@ export function AdminLockedState({ onBack }: AdminLockedStateProps) {
                     <p className="mb-6 type-body text-[var(--ink-secondary)]">
                         Enable Admin Mode from the More menu to access these features.
                     </p>
-                    <Link
+                    <LinkButton
                         href="/more"
-                        className="btn-premium px-[var(--space-5)] py-[var(--space-3)]"
+                        variant="primary"
                     >
                         Go to More
-                    </Link>
+                    </LinkButton>
                 </div>
             </main>
         </div>
