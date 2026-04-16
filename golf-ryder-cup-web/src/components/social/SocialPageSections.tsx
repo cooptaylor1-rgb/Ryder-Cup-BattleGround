@@ -115,7 +115,8 @@ export function PostCard({
               <button
                 type="button"
                 onClick={() => onShare(post)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04]"
+                aria-label="Share post"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
               >
                 <Share2 size={15} />
               </button>
@@ -123,7 +124,8 @@ export function PostCard({
                 <button
                   type="button"
                   onClick={() => onDelete(post.id)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04]"
+                  aria-label="Delete post"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80 text-[var(--ink-tertiary)] transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -161,8 +163,9 @@ export function PostCard({
               <button
                 type="button"
                 onClick={() => setShowReactionPicker((value) => !value)}
+                aria-label={showReactionPicker ? 'Close reactions' : 'Add reaction'}
                 className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-full border text-sm transition-transform duration-150 hover:scale-[1.04]',
+                  'flex h-8 w-8 items-center justify-center rounded-full border text-sm transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40',
                   showReactionPicker
                     ? 'border-[var(--masters)]/20 bg-[color:var(--masters)] text-[var(--canvas)]'
                     : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 text-[var(--ink-tertiary)]'
@@ -181,7 +184,8 @@ export function PostCard({
                         onToggleReaction(post.id, emoji);
                         setShowReactionPicker(false);
                       }}
-                      className="rounded-full p-2 text-[1.2rem] transition-transform duration-150 hover:scale-[1.08]"
+                      aria-label={`React with ${emoji}`}
+                      className="rounded-full p-2 text-[1.2rem] transition-transform duration-150 hover:scale-[1.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
                     >
                       {emoji}
                     </button>
@@ -275,7 +279,8 @@ export function SocialComposerDock({
                 key={emoji}
                 type="button"
                 onClick={() => onAppendEmoji(emoji)}
-                className="rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-3 py-2 text-xl transition-transform duration-150 hover:scale-[1.04]"
+                aria-label={`Insert ${emoji}`}
+                className="rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-3 py-2 text-xl transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
               >
                 {emoji}
               </button>
@@ -288,8 +293,9 @@ export function SocialComposerDock({
             <button
               type="button"
               onClick={onToggleEmojis}
+              aria-label={showEmojis ? 'Hide emoji picker' : 'Show emoji picker'}
               className={cn(
-                'flex h-11 w-11 items-center justify-center rounded-full border transition-transform duration-150 hover:scale-[1.04]',
+                'flex h-11 w-11 items-center justify-center rounded-full border transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40',
                 showEmojis
                   ? 'border-[var(--masters)]/25 bg-[color:var(--masters)]/10 text-[var(--masters)]'
                   : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 text-[var(--ink-tertiary)]'
