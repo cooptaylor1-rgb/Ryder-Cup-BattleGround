@@ -692,8 +692,6 @@ textarea:focus-visible {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* (btn-premium: enhanced definition with iOS support below) */
-
 /* (card-premium: enhanced definition with dark mode below) */
 
 /* (card: definition with padding in design system section below) */
@@ -858,46 +856,10 @@ textarea:focus-visible {
   transform: none;
 }
 
-/* Primary - Masters green - high contrast for outdoors */
-.btn-primary {
-  background: var(--masters);
-  color: white;
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary:hover {
-  background: var(--masters-hover);
-  box-shadow: var(--shadow-lg);
-}
-
-.btn-primary:active {
-  background: var(--masters);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Secondary - Outlined */
-.btn-secondary {
-  background: var(--canvas-raised);
-  color: var(--ink);
-  border: 1px solid var(--rule-strong);
-}
-
-.btn-secondary:hover {
-  background: var(--canvas-sunken);
-  border-color: var(--ink-faint);
-}
-
-/* Ghost - Minimal */
-.btn-ghost {
-  background: transparent;
-  color: var(--ink-secondary);
-}
-
-.btn-ghost:hover {
-  background: var(--canvas-sunken);
-  color: var(--ink);
-}
+/* Legacy btn-primary / btn-secondary / btn-ghost / btn-premium CSS classes
+   have been removed. Use <Button> or <LinkButton> from @/components/ui
+   instead — they provide consistent focus rings, tap targets, and
+   hover/disabled/loading states. */
 
 /* Danger */
 .btn-danger {
@@ -2251,10 +2213,6 @@ html.outdoor .card {
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
-html.outdoor .btn-premium {
-  font-weight: 600;
-}
-
 html.outdoor .texture-grain::before {
   opacity: 0.02;
 }
@@ -2656,31 +2614,6 @@ html.outdoor body {
 
 .dark .team-bg-europe {
   background: linear-gradient(135deg, rgba(162, 72, 88, 0.15) 0%, var(--canvas) 100%);
-}
-
-/* ---- DARK MODE BUTTONS ---- */
-.dark .btn-premium {
-  background: linear-gradient(180deg, var(--masters) 0%, var(--masters-deep) 100%);
-  box-shadow:
-    0 2px 8px rgba(0, 184, 122, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .btn-premium:hover {
-  background: linear-gradient(180deg, var(--masters-hover) 0%, var(--masters) 100%);
-  box-shadow: var(--shadow-glow-green);
-}
-
-.dark .btn-secondary {
-  background: var(--canvas-raised);
-  border: 1px solid var(--rule);
-  color: var(--ink);
-}
-
-.dark .btn-secondary:hover {
-  background: var(--surface-highlight);
-  border-color: var(--rule-strong);
 }
 
 /* ---- DARK MODE INPUTS ---- */
@@ -5087,63 +5020,6 @@ html.dark body {
   animation: scoreWin 600ms var(--ease-spring);
 }
 
-/* ---- PREMIUM BUTTON STATES ---- */
-
-.btn-premium {
-  position: relative;
-  background: var(--masters);
-  color: white;
-  padding: var(--space-4) var(--space-8);
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  font-size: var(--text-base);
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all var(--duration-normal) var(--ease-out);
-  box-shadow:
-    0 2px 8px rgba(0, 102, 68, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  /* iOS touch compatibility */
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.btn-premium:hover {
-  background: var(--masters-hover);
-  transform: translateY(-2px);
-  box-shadow:
-    0 4px 16px rgba(0, 102, 68, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.btn-premium:active {
-  transform: translateY(0);
-  box-shadow:
-    0 1px 4px rgba(0, 102, 68, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Ripple on click */
-.btn-premium::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  opacity: 0;
-  transform: scale(0);
-  transition: all var(--duration-slow) var(--ease-out);
-}
-
-.btn-premium:active::after {
-  opacity: 1;
-  transform: scale(2);
-  transition: none;
-}
-
 /* ---- PREMIUM HEADER ----
    Frosted glass effect */
 
@@ -5252,7 +5128,6 @@ html.dark body {
   /* Disable transitions for reduced motion */
   .progress-premium-fill,
   .match-card-premium,
-  .btn-premium,
   .hole-dot {
     transition: none;
   }

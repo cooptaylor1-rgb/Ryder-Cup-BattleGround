@@ -7,6 +7,7 @@
 // Core hooks
 export { useOnlineStatus } from './useOnlineStatus';
 export { useSmartBack } from './useSmartBack';
+export { useStableArray } from './useStableArray';
 export { useTripScopedMatches, type TripScopedMatchData } from './useTripScopedMatches';
 export { useHaptic } from './useHaptic';
 export { useMatchState, useHoleResults } from './useMatchState';

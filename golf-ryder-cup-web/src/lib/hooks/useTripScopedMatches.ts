@@ -7,8 +7,8 @@
  *
  *   1. All match queries are guaranteed trip-scoped (no more
  *      db.matches.toArray() loading every match the device has seen).
- *   2. Dependency tracking is consistent — no more `.join(',')` or
- *      `.join('|')` ad-hoc keys that may or may not re-fire correctly.
+ *   2. Dependency tracking is consistent — useStableArray prevents
+ *      spurious re-queries from array-reference churn.
  *   3. If we add a TTL cache layer later, it's one change, not six.
  *
  * Returns `undefined` while the initial query is loading so callers can
@@ -19,6 +19,7 @@
 import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import { useStableArray } from './useStableArray';
 import type { Match, RyderCupSession } from '@/lib/types/models';
 
 export interface TripScopedMatchData {
@@ -41,20 +42,21 @@ export function useTripScopedMatches(
         [tripId],
     );
 
-    const sessionIds = useMemo(
+    const rawSessionIds = useMemo(
         () => sessions?.map((s) => s.id) ?? [],
         [sessions],
     );
+
+    // useStableArray returns the same reference when the ids haven't
+    // changed, so Dexie's shallow dep-compare doesn't re-fire.
+    const sessionIds = useStableArray(rawSessionIds);
 
     const matches = useLiveQuery(
         async () =>
             sessionIds.length > 0
                 ? db.matches.where('sessionId').anyOf(sessionIds).toArray()
                 : [],
-        // Dexie's useLiveQuery does a shallow compare of the deps array.
-        // Passing sessionIds directly would fire on every render because
-        // the array reference changes. JSON.stringify is a stable key.
-        [JSON.stringify(sessionIds)],
+        [sessionIds],
     );
 
     if (sessions === undefined || matches === undefined) {

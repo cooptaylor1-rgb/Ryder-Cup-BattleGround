@@ -10,6 +10,21 @@ import { Camera, Image as ImageIcon, MessageCircle, Send, Share2, Smile, Trash2 
 
 const GOLF_REACTIONS = ['\u26F3', '\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE02', '\uD83D\uDCAA', '\uD83C\uDFC6'];
 
+/** Screen readers may not announce emoji names consistently. This map
+ *  gives each reaction a plain-English label for aria attributes. */
+const EMOJI_NAMES: Record<string, string> = {
+  '\u26F3': 'flag in hole',
+  '\uD83D\uDD25': 'fire',
+  '\uD83D\uDC4F': 'clapping',
+  '\uD83D\uDE02': 'laughing',
+  '\uD83D\uDCAA': 'strong',
+  '\uD83C\uDFC6': 'trophy',
+};
+
+function emojiLabel(emoji: string): string {
+  return EMOJI_NAMES[emoji] ?? emoji;
+}
+
 export function FeedPill({
   label,
   icon,
@@ -206,7 +221,7 @@ export function PostCard({
                         onToggleReaction(post.id, emoji);
                         setShowReactionPicker(false);
                       }}
-                      aria-label={`React with ${emoji}`}
+                      aria-label={`React with ${emojiLabel(emoji)}`}
                       className="rounded-full p-2 text-[1.2rem] transition-transform duration-150 hover:scale-[1.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
                     >
                       {emoji}
@@ -301,7 +316,7 @@ export function SocialComposerDock({
                 key={emoji}
                 type="button"
                 onClick={() => onAppendEmoji(emoji)}
-                aria-label={`Insert ${emoji}`}
+                aria-label={`Insert ${emojiLabel(emoji)}`}
                 className="rounded-full border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-3 py-2 text-xl transition-transform duration-150 hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40"
               >
                 {emoji}
