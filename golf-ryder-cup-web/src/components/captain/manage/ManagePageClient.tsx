@@ -69,7 +69,20 @@ export function ManagePageClient() {
     [] as RyderCupSession[]
   );
 
-  const matches = useLiveQuery(() => db.matches.toArray(), [], [] as Match[]);
+  // Scope matches to the current trip's sessions. The previous
+  // implementation loaded db.matches.toArray() — every match the device
+  // has ever seen — and relied on buildSessionsWithMatches to filter.
+  // On a device with 50+ sessions this caused perceptible lag on every
+  // tab switch.
+  const sessionIds = useMemo(() => sessions.map((s) => s.id), [sessions]);
+  const matches = useLiveQuery(
+    async () =>
+      sessionIds.length > 0
+        ? db.matches.where('sessionId').anyOf(sessionIds).toArray()
+        : [],
+    [sessionIds.join(',')],
+    [] as Match[]
+  );
 
   const teamById = useMemo(() => buildTeamById(teams), [teams]);
   const playerById = useMemo(() => buildPlayerById(players), [players]);

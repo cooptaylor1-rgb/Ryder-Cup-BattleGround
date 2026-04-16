@@ -55,9 +55,20 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
+  // Scope to the current trip's sessions rather than loading every
+  // match the device has ever seen.
+  const tripSessionIds = useMemo(
+    () => sessions.map((s) => s.id),
+    [sessions]
+  );
   const tripMatches = useLiveQuery(
-    async () => (currentTrip ? await db.matches.toArray() : []),
-    [currentTrip?.id],
+    async () =>
+      tripSessionIds.length > 0
+        ? db.matches.where('sessionId').anyOf(tripSessionIds).toArray()
+        : currentTrip
+          ? ([] as Match[])
+          : undefined,
+    [tripSessionIds.join(','), currentTrip?.id],
     undefined as Match[] | undefined
   );
 
