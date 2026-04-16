@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal } from 'lucide-react';
+import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal, Settings, Sliders, ChevronRight } from 'lucide-react';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
 import { useToastStore } from '@/lib/stores';
@@ -337,6 +338,41 @@ export default function TripSettingsPage() {
                   <div className="text-sm text-[var(--ink-secondary)]">Copy a shareable summary to your clipboard</div>
                 </div>
               </button>
+            </div>
+          </section>
+
+          {/* Competition Rules */}
+          <section className="card-elevated overflow-hidden">
+            <div className="p-4 border-b border-[var(--rule)]">
+              <h2 className="type-h3">Competition Rules</h2>
+              <p className="text-sm text-[var(--ink-secondary)] mt-1">
+                Scoring format, handicap allowances, and session structure are configured per-session from the captain manage page.
+              </p>
+            </div>
+
+            <div className="p-4 space-y-3">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-[color:var(--surface)]/60 border border-[color:var(--rule)]/30">
+                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-[var(--masters)]" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-[var(--ink-primary)]">Session-level rules</div>
+                  <div className="text-sm text-[var(--ink-secondary)]">
+                    Each session can have its own format, course, tee set, and handicap allowance. Adjust these from the captain workbench.
+                  </div>
+                </div>
+              </div>
+
+              <LinkButton
+                href={`/captain/manage`}
+                variant="secondary"
+                leftIcon={<Sliders size={16} />}
+                rightIcon={<ChevronRight size={16} />}
+                fullWidth
+                className="justify-between"
+              >
+                Open captain manage
+              </LinkButton>
             </div>
           </section>
 

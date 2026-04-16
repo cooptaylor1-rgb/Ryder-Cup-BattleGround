@@ -791,7 +791,8 @@ function ReviewStep({ data }: { data: TripSetupData }) {
                 <Zap className="w-8 h-8 mx-auto text-[var(--masters)] mb-2" />
                 <p className="font-medium text-[var(--masters)]">Ready to create your trip!</p>
                 <p className="text-sm text-[var(--ink-tertiary)] mt-1">
-                    You can always edit these settings later
+                    Scoring rules, handicap settings, and courses can be adjusted
+                    per-session from Trip Settings after creation.
                 </p>
             </div>
         </div>
