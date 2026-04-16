@@ -18,6 +18,7 @@ import { Target, Clock, ChevronRight, Zap } from 'lucide-react';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
 import { cn, formatPlayerName } from '@/lib/utils';
+import { getUserRelativeScoreClass } from '@/lib/utils/matchDisplay';
 
 interface YourMatchCardProps {
   match: Match;
@@ -128,19 +129,8 @@ export function YourMatchCard({
 
   const liveScoreClass = useMemo(() => {
     if (!matchState) return 'text-[var(--ink-secondary)]';
-
-    // Positive currentScore means Team A is leading.
-    if (matchState.currentScore === 0) return 'text-[var(--ink-secondary)]';
-
-    const isTeamALeading = matchState.currentScore > 0;
-    const userIsTeamA = userTeam === 'A';
-    const userIsTeamB = userTeam === 'B';
-
-    if (!userIsTeamA && !userIsTeamB) return 'text-[var(--ink-secondary)]';
-
-    const userLeading = (isTeamALeading && userIsTeamA) || (!isTeamALeading && userIsTeamB);
-    return userLeading ? teamTextClass : opponentTeamTextClass;
-  }, [matchState, userTeam, teamTextClass, opponentTeamTextClass]);
+    return getUserRelativeScoreClass(matchState.currentScore, userTeam);
+  }, [matchState, userTeam]);
 
   return (
     <button
