@@ -6,6 +6,7 @@ import { useAuthStore, useToastStore, type UserProfile } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import {
   Hash,
   Phone,
@@ -193,14 +194,14 @@ export default function CompleteProfilePageClient() {
         title="Complete your profile"
         backFallback="/"
         rightSlot={
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={handleSkip}
-            className="btn-ghost press-scale"
+            className="press-scale"
             style={{ padding: 'var(--space-2)' }}
           >
             Skip
-          </button>
+          </Button>
         }
       />
 
@@ -457,25 +458,18 @@ export default function CompleteProfilePageClient() {
 
       <div className="fixed bottom-0 left-0 right-0 bg-canvas border-t border-rule py-[var(--space-4)] px-[var(--space-5)] pb-[max(var(--space-4),env(safe-area-inset-bottom))] z-30">
         <div className="max-w-[600px] mx-auto flex flex-col gap-[var(--space-3)]">
-          <button
+          <Button
+            variant="primary"
             onClick={handleSaveAndContinue}
             disabled={isSubmitting || isLoading}
-            className={`btn-premium press-scale w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-4)] px-[var(--space-6)] text-[length:var(--text-base)] ${
-              isSubmitting || isLoading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-            }`}
+            isLoading={isSubmitting || isLoading}
+            loadingText="Saving..."
+            rightIcon={!(isSubmitting || isLoading) ? <ArrowRight className="w-4 h-4" /> : undefined}
+            fullWidth
+            className="press-scale py-[var(--space-4)] px-[var(--space-6)] text-[length:var(--text-base)]"
           >
-            {isSubmitting || isLoading ? (
-              <>
-                <span className="w-4 h-4 border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite] inline-block" />
-                Saving...
-              </>
-            ) : (
-              <>
-                Save &amp; Continue
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+            Save &amp; Continue
+          </Button>
 
           <button
             onClick={handleSkip}

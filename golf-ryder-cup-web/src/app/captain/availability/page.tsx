@@ -189,14 +189,15 @@ export default function AvailabilityPage() {
         iconTone="captain"
         backFallback="/captain"
         rightSlot={
-          <button
+          <Button
+            variant="primary"
             onClick={handleRefresh}
-            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)]"
+            leftIcon={<RefreshCw size={16} />}
+            size="sm"
             aria-label="Refresh attendance"
           >
-            <RefreshCw size={16} />
             Refresh
-          </button>
+          </Button>
         }
       />
 

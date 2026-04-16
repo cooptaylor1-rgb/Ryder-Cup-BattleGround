@@ -8,6 +8,7 @@ import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsEmpty } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 
 export default function MatchupsPage() {
@@ -161,14 +162,15 @@ export default function MatchupsPage() {
                 {teamAPlayers.length < 2 && ` ${teamA?.name || 'USA'} has ${teamAPlayers.length}.`}
                 {teamBPlayers.length < 2 && ` ${teamB?.name || 'Europe'} has ${teamBPlayers.length}.`}
               </p>
-              <button
+              <Button
+                variant="primary"
                 onClick={() => router.push('/players?panel=draft')}
-                className="btn-premium press-scale"
+                leftIcon={<Users size={14} />}
+                className="press-scale"
                 style={{ marginTop: 'var(--space-3)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)' }}
               >
-                <Users size={14} style={{ marginRight: '4px' }} />
                 Assign Players to Teams
-              </button>
+              </Button>
             </div>
           )}
 

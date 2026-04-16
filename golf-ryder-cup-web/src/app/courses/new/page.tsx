@@ -230,14 +230,14 @@ export default function NewCoursePage() {
         icon={<Flag size={16} className="text-[var(--color-accent)]" />}
         onBack={() => router.push('/courses')}
         rightSlot={
-          <button
+          <Button
+            variant="primary"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="btn-premium"
+            leftIcon={<Save size={16} />}
           >
-            <Save size={16} />
             Save
-          </button>
+          </Button>
         }
       />
 

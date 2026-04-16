@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { shareTrip } from '@/lib/utils/share';
+import { Button } from '@/components/ui/Button';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   NoTournamentsEmpty,
@@ -572,13 +573,14 @@ export default function HomePage() {
                 {hasTrips ? 'Tournaments' : 'Get Started'}
               </h2>
               {hasTrips && (
-                <button
+                <Button
+                  variant="primary"
                   onClick={() => router.push('/trip/new')}
-                  className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
+                  leftIcon={<Plus size={14} strokeWidth={2.5} />}
+                  className="press-scale rounded-full text-sm min-h-[44px]"
                 >
-                  <Plus size={14} strokeWidth={2.5} />
                   New
-                </button>
+                </Button>
               )}
             </div>
 

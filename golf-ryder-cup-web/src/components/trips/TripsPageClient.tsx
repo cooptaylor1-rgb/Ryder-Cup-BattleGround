@@ -8,6 +8,7 @@ import { db } from '@/lib/db';
 import { useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, NoTournamentsEmpty, PageLoadingSkeleton } from '@/components/ui';
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { TripCard } from '@/components/home/TripCard';
@@ -56,14 +57,15 @@ export default function TripsPageClient() {
                 icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
                 backFallback="/"
                 rightSlot={
-                    <button
+                    <Button
+                        variant="primary"
                         onClick={() => router.push('/trip/new')}
                         aria-label="Create a new trip"
-                        className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm"
+                        leftIcon={<Plus size={14} strokeWidth={2.5} />}
+                        className="press-scale rounded-full text-sm"
                     >
-                        <Plus size={14} strokeWidth={2.5} />
                         New
-                    </button>
+                    </Button>
                 }
             />
 

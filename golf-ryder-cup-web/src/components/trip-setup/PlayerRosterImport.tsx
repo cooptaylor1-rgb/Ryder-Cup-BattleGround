@@ -16,6 +16,7 @@ import {
     RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { generateId } from '@/lib/utils/generateId';
 
 export interface PlayerInfo {
@@ -202,20 +203,22 @@ export function PlayerRosterImport({
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => setShowImportModal(true)}
-                        className="btn-secondary text-sm"
+                        leftIcon={<Upload className="w-4 h-4" />}
+                        size="sm"
                     >
-                        <Upload className="w-4 h-4 mr-1" />
                         Import
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="primary"
                         onClick={() => addPlayer()}
-                        className="btn-primary text-sm"
+                        leftIcon={<UserPlus className="w-4 h-4" />}
+                        size="sm"
                     >
-                        <UserPlus className="w-4 h-4 mr-1" />
                         Add
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -328,20 +331,20 @@ export function PlayerRosterImport({
                             Add players manually or import from a spreadsheet
                         </p>
                         <div className="flex gap-2 justify-center">
-                            <button
+                            <Button
+                                variant="secondary"
                                 onClick={() => setShowImportModal(true)}
-                                className="btn-secondary"
+                                leftIcon={<Upload className="w-4 h-4" />}
                             >
-                                <Upload className="w-4 h-4 mr-1" />
                                 Import
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="primary"
                                 onClick={() => addPlayer()}
-                                className="btn-primary"
+                                leftIcon={<UserPlus className="w-4 h-4" />}
                             >
-                                <UserPlus className="w-4 h-4 mr-1" />
                                 Add Player
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -438,18 +441,20 @@ export function PlayerRosterImport({
 
                             {/* Footer */}
                             <div className="p-4 border-t border-[var(--rule)] flex gap-2">
-                                <button
+                                <Button
+                                    variant="secondary"
                                     onClick={() => setShowImportModal(false)}
-                                    className="btn-secondary flex-1"
+                                    className="flex-1"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    variant="primary"
                                     onClick={parseImport}
-                                    className="btn-primary flex-1"
+                                    className="flex-1"
                                 >
                                     Import Players
-                                </button>
+                                </Button>
                             </div>
                         </motion.div>
                     </motion.div>

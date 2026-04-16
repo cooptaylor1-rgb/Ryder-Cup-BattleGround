@@ -18,6 +18,7 @@ import {
     TreePine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { createLogger } from '@/lib/utils/logger';
 import { db } from '@/lib/db';
 import {
@@ -280,13 +281,14 @@ export function CourseSelection({
                     </p>
                 </div>
                 {selectedCourses.length < maxCourses && (
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => setShowSearch(true)}
-                        className="btn-secondary text-sm"
+                        leftIcon={<Plus className="w-4 h-4" />}
+                        size="sm"
                     >
-                        <Plus className="w-4 h-4 mr-1" />
                         Add Course
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -605,12 +607,13 @@ export function CourseSelection({
 
                             {/* Footer */}
                             <div className="p-4 border-t border-[var(--rule)]">
-                                <button
+                                <Button
+                                    variant="secondary"
                                     onClick={() => setShowSearch(false)}
-                                    className="btn-secondary w-full"
+                                    fullWidth
                                 >
                                     Done
-                                </button>
+                                </Button>
                             </div>
                         </motion.div>
                     </motion.div>

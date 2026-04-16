@@ -18,6 +18,7 @@ import {
     Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { generateId } from '@/lib/utils/generateId';
 
 export type SessionType = 'fourball' | 'foursomes' | 'singles' | 'mixed';
@@ -240,20 +241,23 @@ export function SessionBuilder({
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => setShowPresets(!showPresets)}
-                        className="btn-secondary text-sm px-3 py-1.5"
+                        leftIcon={<Sparkles className="w-4 h-4" />}
+                        size="sm"
                     >
-                        <Sparkles className="w-4 h-4 mr-1" />
                         Presets
-                    </button>
+                    </Button>
                     {sessions.length > 0 && (
-                        <button
+                        <Button
+                            variant="secondary"
                             onClick={clearAllSessions}
-                            className="btn-secondary text-sm px-3 py-1.5 text-[var(--error)]"
+                            size="sm"
+                            className="text-[var(--error)]"
                         >
                             <RotateCcw className="w-4 h-4" />
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
@@ -385,12 +389,12 @@ export function SessionBuilder({
                     <p className="text-sm text-[var(--ink-tertiary)] mb-4">
                         Start with a preset or build your own format
                     </p>
-                    <button
+                    <Button
+                        variant="primary"
                         onClick={() => setShowPresets(true)}
-                        className="btn-primary"
                     >
                         Choose a Preset
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

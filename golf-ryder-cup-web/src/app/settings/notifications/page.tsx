@@ -12,6 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
 import { Bell, BellOff, Clock, Zap, Trophy, ClipboardList, Check, AlertCircle } from 'lucide-react';
 import {
   requestNotificationPermission,
@@ -176,13 +177,17 @@ export default function NotificationSettingsPage() {
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="primary"
               onClick={handleEnableNotifications}
               disabled={isRequesting}
-              className="btn-primary mt-4 w-full py-3"
+              isLoading={isRequesting}
+              loadingText="Requesting…"
+              fullWidth
+              className="mt-4 py-3"
             >
-              {isRequesting ? 'Requesting…' : 'Enable Notifications'}
-            </button>
+              Enable Notifications
+            </Button>
           </div>
         )}
 

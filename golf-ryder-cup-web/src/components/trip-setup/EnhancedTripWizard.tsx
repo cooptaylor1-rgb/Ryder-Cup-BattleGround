@@ -16,6 +16,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 
 // Import all trip setup components
 import {
@@ -459,40 +460,44 @@ export function EnhancedTripWizard({
                     <p className="absolute sr-only">{nextDisabledMessage}</p>
                 )}
                 {isFirstStep ? (
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={handleCancel}
-                        className="btn-secondary flex-1"
+                        className="flex-1"
                     >
                         Cancel
-                    </button>
+                    </Button>
                 ) : (
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={goPrev}
-                        className="btn-secondary flex-1"
+                        leftIcon={<ChevronLeft className="w-4 h-4" />}
+                        className="flex-1"
                     >
-                        <ChevronLeft className="w-4 h-4 mr-1" />
                         Back
-                    </button>
+                    </Button>
                 )}
 
                 {isLastStep ? (
-                    <button
+                    <Button
+                        variant="primary"
                         onClick={handleComplete}
                         disabled={!stepCompletion.basics || !stepCompletion.players || !stepCompletion.sessions}
-                        className="btn-primary flex-1"
+                        leftIcon={<Zap className="w-4 h-4" />}
+                        className="flex-1"
                     >
-                        <Zap className="w-4 h-4 mr-1" />
                         Create Trip
-                    </button>
+                    </Button>
                 ) : (
-                    <button
+                    <Button
+                        variant="primary"
                         onClick={goNext}
                         disabled={!canProceed}
-                        className="btn-primary flex-1"
+                        rightIcon={<ChevronRight className="w-4 h-4" />}
+                        className="flex-1"
                     >
                         Next
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                    </button>
+                    </Button>
                 )}
             </div>
             {nextDisabledMessage && !isLastStep ? (

@@ -10,6 +10,7 @@
 
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from './Button';
 import type { LucideIcon } from 'lucide-react';
 import { Inbox } from 'lucide-react';
 
@@ -99,14 +100,15 @@ export function EmptyState({
         </p>
       )}
 
-      {/* Action -- btn-premium for Masters green CTA */}
+      {/* Action -- primary Button for Masters green CTA */}
       {action && (
-        <button
+        <Button
+          variant="primary"
           onClick={action.onClick}
-          className="btn-premium mt-6"
+          className="mt-6"
         >
           {action.label}
-        </button>
+        </Button>
       )}
 
       {children}

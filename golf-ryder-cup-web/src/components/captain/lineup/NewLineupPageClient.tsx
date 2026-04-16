@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Users, Info } from 'lucide-react';
 import type { Match, SessionType } from '@/lib/types';
 import { EmptyStatePremium } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NewLineupSetupStep, LineupSetupFact } from './NewLineupSetupStep';
 import {
@@ -624,13 +625,13 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                       Open draft board
                     </Link>
                   ) : (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
                       onClick={() => setStep('lineup')}
-                      className="btn-ghost px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                      className="px-[var(--space-3)] py-[var(--space-2)] text-xs"
                     >
                       Go straight to builder
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

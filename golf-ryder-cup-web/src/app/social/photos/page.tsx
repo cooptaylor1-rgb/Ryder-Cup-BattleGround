@@ -7,6 +7,7 @@ import { useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import {
   Camera,
   Plus,
@@ -152,20 +153,24 @@ export default function PhotosPage() {
         backFallback="/social"
         rightSlot={
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setViewMode(viewMode === 'grid' ? 'masonry' : 'grid')}
-              className="btn-secondary press-scale p-2"
+              size="icon"
+              className="press-scale"
               aria-label={viewMode === 'grid' ? 'Switch to masonry view' : 'Switch to grid view'}
             >
               {viewMode === 'grid' ? <LayoutGrid size={18} /> : <Grid size={18} />}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
               onClick={() => fileInputRef.current?.click()}
-              className="btn-premium press-scale p-2"
+              size="icon"
+              className="press-scale"
               aria-label="Add photo"
             >
               <Plus size={18} />
-            </button>
+            </Button>
           </div>
         }
       />

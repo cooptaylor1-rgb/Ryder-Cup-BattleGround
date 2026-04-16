@@ -436,12 +436,9 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 <Button variant="secondary" onClick={resetUpload} className="flex-1">
                   Scan Another
                 </Button>
-                <button
-                  onClick={handleUseData}
-                  className="btn-premium flex-1"
-                >
+                <Button variant="primary" onClick={handleUseData} className="flex-1">
                   Use This Data
-                </button>
+                </Button>
               </div>
             </div>
           )}

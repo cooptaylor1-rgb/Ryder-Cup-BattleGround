@@ -18,6 +18,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import type { Trip } from '@/lib/types/models';
 import type { AdminDatabaseStats, AdminSyncMetrics, OrphanStats } from './adminData';
 

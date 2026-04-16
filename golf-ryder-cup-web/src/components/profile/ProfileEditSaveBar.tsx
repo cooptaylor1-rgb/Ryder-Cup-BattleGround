@@ -1,4 +1,5 @@
 import { Save } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface ProfileEditSaveBarProps {
   isSaving: boolean;
@@ -25,27 +26,17 @@ export function ProfileEditSaveBar({
         </button>
 
         {/* Save Button */}
-        <button
+        <Button
+          variant="primary"
           onClick={onSave}
           disabled={isSaving || isLoading}
-          className="btn-premium press-scale flex-1"
-          style={{
-            opacity: isSaving || isLoading ? 0.6 : 1,
-            cursor: isSaving || isLoading ? 'not-allowed' : 'pointer',
-          }}
+          isLoading={isSaving}
+          loadingText="Saving..."
+          leftIcon={!isSaving ? <Save className="w-4 h-4" /> : undefined}
+          className="press-scale flex-1"
         >
-          {isSaving ? (
-            <span className="flex items-center justify-center gap-[var(--space-2)]">
-              <span className="w-4 h-4 border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] rounded-[var(--radius-full)] animate-[spin_0.6s_linear_infinite]" />
-              Saving...
-            </span>
-          ) : (
-            <span className="flex items-center justify-center gap-[var(--space-2)]">
-              <Save className="w-4 h-4" />
-              Save Changes
-            </span>
-          )}
-        </button>
+          Save Changes
+        </Button>
       </div>
     </div>
   );

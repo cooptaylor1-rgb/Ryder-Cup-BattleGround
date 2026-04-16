@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { createLogger } from '@/lib/utils/logger';
 
 const logger = createLogger('profile:offline-pin');
@@ -128,18 +129,16 @@ export function OfflinePinSection({
           </div>
 
           <div className="sm:col-span-2 flex justify-end">
-            <button
-              type="button"
+            <Button
+              variant="primary"
               onClick={handleSaveOfflinePin}
               disabled={isSavingOfflinePin}
-              className="btn-premium press-scale"
-              style={{
-                opacity: isSavingOfflinePin ? 0.6 : 1,
-                cursor: isSavingOfflinePin ? 'not-allowed' : 'pointer',
-              }}
+              isLoading={isSavingOfflinePin}
+              loadingText="Saving PIN..."
+              className="press-scale"
             >
-              {isSavingOfflinePin ? 'Saving PIN...' : hasOfflinePin ? 'Update Offline PIN' : 'Save Offline PIN'}
-            </button>
+              {hasOfflinePin ? 'Update Offline PIN' : 'Save Offline PIN'}
+            </Button>
           </div>
         </div>
       )}

@@ -81,14 +81,14 @@ export default function MessagesPage() {
         iconTone="captain"
         backFallback="/captain"
         rightSlot={
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={() => setShowComposer(true)}
-            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)]"
+            leftIcon={<Send size={16} />}
+            size="sm"
           >
-            <Send size={16} />
             New
-          </button>
+          </Button>
         }
       />
 
