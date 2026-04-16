@@ -206,7 +206,13 @@ export function QuickScoreFABv2({
     <div
       ref={fabRef}
       className="fixed z-50"
-      style={{ bottom: position.bottom, right: position.right }}
+      style={{
+        // Sit above the bottom nav + safe area so the FAB doesn't overlap
+        // on small devices like iPhone SE. Falls back to the explicit prop
+        // if the caller has a custom position.
+        bottom: `calc(${position.bottom}px + env(safe-area-inset-bottom, 0px))`,
+        right: position.right,
+      }}
     >
       <AnimatePresence>
         {/* Expanded Menu */}

@@ -175,11 +175,33 @@ export function PostCard({
               </button>
 
               {showReactionPicker ? (
-                <div className="absolute bottom-full left-0 mb-[var(--space-2)] flex gap-[var(--space-1)] rounded-[1rem] border border-[color:var(--rule)]/75 bg-[var(--canvas)] p-[var(--space-2)] shadow-[0_12px_28px_rgba(41,29,17,0.12)]">
-                  {GOLF_REACTIONS.map((emoji) => (
+                <div
+                  role="toolbar"
+                  aria-label="Reactions"
+                  aria-orientation="horizontal"
+                  className="absolute bottom-full left-0 mb-[var(--space-2)] flex gap-[var(--space-1)] rounded-[1rem] border border-[color:var(--rule)]/75 bg-[var(--canvas)] p-[var(--space-2)] shadow-[0_12px_28px_rgba(41,29,17,0.12)]"
+                  onKeyDown={(e) => {
+                    const items = e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="button"], button');
+                    const focused = document.activeElement as HTMLElement;
+                    const currentIdx = Array.from(items).indexOf(focused as HTMLButtonElement);
+                    let nextIdx = currentIdx;
+
+                    if (e.key === 'ArrowRight') nextIdx = (currentIdx + 1) % items.length;
+                    else if (e.key === 'ArrowLeft') nextIdx = (currentIdx - 1 + items.length) % items.length;
+                    else if (e.key === 'Home') nextIdx = 0;
+                    else if (e.key === 'End') nextIdx = items.length - 1;
+                    else if (e.key === 'Escape') { setShowReactionPicker(false); return; }
+                    else return;
+
+                    e.preventDefault();
+                    items[nextIdx]?.focus();
+                  }}
+                >
+                  {GOLF_REACTIONS.map((emoji, idx) => (
                     <button
                       key={emoji}
                       type="button"
+                      tabIndex={idx === 0 ? 0 : -1}
                       onClick={() => {
                         onToggleReaction(post.id, emoji);
                         setShowReactionPicker(false);
