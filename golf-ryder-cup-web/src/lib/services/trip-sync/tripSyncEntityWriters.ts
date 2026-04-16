@@ -73,6 +73,8 @@ export async function syncTripToCloud(
     is_captain_mode_enabled: trip.isCaptainModeEnabled,
     captain_name: trip.captainName || null,
     is_practice_round: trip.isPracticeRound || false,
+    scoring_settings: trip.scoringSettings ?? null,
+    handicap_settings: trip.handicapSettings ?? null,
     updated_at: new Date().toISOString(),
   };
 

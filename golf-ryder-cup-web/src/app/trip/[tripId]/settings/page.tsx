@@ -2,14 +2,24 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Download, Upload, Share2, AlertCircle, CheckCircle, Trash2, Home, MoreHorizontal, Settings, Sliders, ChevronRight } from 'lucide-react';
+import { Calculator, ChevronDown, ChevronRight, ChevronUp, Download, Home, MoreHorizontal, Settings, Share2, Sliders, AlertCircle, CheckCircle, Trash2, Upload } from 'lucide-react';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { Button } from '@/components/ui/Button';
+import {
+  ScoringFormatOptions,
+  HandicapRules,
+  DEFAULT_SCORING_SETTINGS,
+  DEFAULT_HANDICAP_SETTINGS,
+  type ScoringSettings,
+  type HandicapSettings,
+} from '@/components/trip-setup';
 import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
 import { db } from '@/lib/db';
 import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import type { Trip } from '@/lib/types/models';
 
 export default function TripSettingsPage() {
   const params = useParams();
@@ -32,16 +42,45 @@ export default function TripSettingsPage() {
     message: string;
   } | null>(null);
 
+  // Competition rules editing
+  const [tripObj, setTripObj] = useState<Trip | null>(null);
+  const [scoringOpen, setScoringOpen] = useState(false);
+  const [handicapOpen, setHandicapOpen] = useState(false);
+  const [localScoring, setLocalScoring] = useState<ScoringSettings>(DEFAULT_SCORING_SETTINGS);
+  const [localHandicap, setLocalHandicap] = useState<HandicapSettings>(DEFAULT_HANDICAP_SETTINGS);
+  const [isSavingRules, setIsSavingRules] = useState(false);
+
   const loadTrip = async () => {
     try {
       setTripLookupError(null);
       const trip = await db.trips.get(tripId);
       setTripName(trip?.name ?? null);
+      setTripObj(trip ?? null);
+      if (trip) {
+        setLocalScoring(trip.scoringSettings ?? DEFAULT_SCORING_SETTINGS);
+        setLocalHandicap(trip.handicapSettings ?? DEFAULT_HANDICAP_SETTINGS);
+      }
     } catch {
       setTripLookupError("We couldn't load this trip right now.");
       setTripName(null);
     } finally {
       setIsVerifyingTrip(false);
+    }
+  };
+
+  const handleSaveRules = async () => {
+    setIsSavingRules(true);
+    try {
+      await db.trips.update(tripId, {
+        scoringSettings: localScoring,
+        handicapSettings: localHandicap,
+        updatedAt: new Date().toISOString(),
+      });
+      showToast('success', 'Competition rules saved');
+    } catch {
+      showToast('error', 'Failed to save rules');
+    } finally {
+      setIsSavingRules(false);
     }
   };
 
@@ -341,30 +380,97 @@ export default function TripSettingsPage() {
             </div>
           </section>
 
-          {/* Competition Rules */}
+          {/* Competition Rules — Scoring */}
           <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-[var(--rule)]">
-              <h2 className="type-h3">Competition Rules</h2>
-              <p className="text-sm text-[var(--ink-secondary)] mt-1">
-                Scoring format, handicap allowances, and session structure are configured per-session from the captain manage page.
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setScoringOpen(v => !v)}
+              className="w-full p-4 flex items-center justify-between border-b border-[var(--rule)] text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
+                  <Calculator className="w-5 h-5 text-[var(--masters)]" />
+                </div>
+                <div>
+                  <h2 className="type-h3">Scoring Rules</h2>
+                  <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
+                    Format, win condition, and point values
+                  </p>
+                </div>
+              </div>
+              {scoringOpen ? <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" /> : <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />}
+            </button>
 
-            <div className="p-4 space-y-3">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-[color:var(--surface)]/60 border border-[color:var(--rule)]/30">
+            {scoringOpen && (
+              <div className="p-4 space-y-4">
+                <ScoringFormatOptions
+                  settings={localScoring}
+                  onSettingsChange={setLocalScoring}
+                />
+                <Button
+                  variant="primary"
+                  onClick={handleSaveRules}
+                  isLoading={isSavingRules}
+                  loadingText="Saving…"
+                  fullWidth
+                >
+                  Save scoring rules
+                </Button>
+              </div>
+            )}
+          </section>
+
+          {/* Competition Rules — Handicaps */}
+          <section className="card-elevated overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setHandicapOpen(v => !v)}
+              className="w-full p-4 flex items-center justify-between border-b border-[var(--rule)] text-left"
+            >
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
                   <Settings className="w-5 h-5 text-[var(--masters)]" />
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="font-medium text-[var(--ink-primary)]">Session-level rules</div>
-                  <div className="text-sm text-[var(--ink-secondary)]">
-                    Each session can have its own format, course, tee set, and handicap allowance. Adjust these from the captain workbench.
-                  </div>
+                <div>
+                  <h2 className="type-h3">Handicap Settings</h2>
+                  <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
+                    Allowances, methods, and max handicap
+                  </p>
                 </div>
               </div>
+              {handicapOpen ? <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" /> : <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />}
+            </button>
 
+            {handicapOpen && (
+              <div className="p-4 space-y-4">
+                <HandicapRules
+                  settings={localHandicap}
+                  onSettingsChange={setLocalHandicap}
+                />
+                <Button
+                  variant="primary"
+                  onClick={handleSaveRules}
+                  isLoading={isSavingRules}
+                  loadingText="Saving…"
+                  fullWidth
+                >
+                  Save handicap settings
+                </Button>
+              </div>
+            )}
+          </section>
+
+          {/* Session-level adjustments */}
+          <section className="card-elevated overflow-hidden">
+            <div className="p-4 border-b border-[var(--rule)]">
+              <h2 className="type-h3">Session Adjustments</h2>
+              <p className="text-sm text-[var(--ink-secondary)] mt-1">
+                Each session can override the trip defaults with its own format, course, and tee set.
+              </p>
+            </div>
+            <div className="p-4">
               <LinkButton
-                href={`/captain/manage`}
+                href="/captain/manage"
                 variant="secondary"
                 leftIcon={<Sliders size={16} />}
                 rightIcon={<ChevronRight size={16} />}

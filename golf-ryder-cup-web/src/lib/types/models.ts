@@ -188,6 +188,17 @@ export interface Trip {
    * tracking, but there is no "USA vs Europe" scoreboard.
    */
   isPracticeRound?: boolean;
+  /**
+   * Scoring rules chosen during trip setup. Persisted so the trip
+   * settings page can offer post-creation editing. Null/undefined
+   * means "use defaults" (backward compat for existing trips).
+   */
+  scoringSettings?: import('@/components/trip-setup').ScoringSettings;
+  /**
+   * Handicap rules chosen during trip setup. Same persistence story
+   * as scoringSettings.
+   */
+  handicapSettings?: import('@/components/trip-setup').HandicapSettings;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }

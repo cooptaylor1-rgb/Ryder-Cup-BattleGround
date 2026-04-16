@@ -209,6 +209,8 @@ export async function createTripFromSetupWizard(
     isCaptainModeEnabled: true,
     captainName: setupData.captainName.trim() || undefined,
     isPracticeRound: setupData.isPracticeRound || undefined,
+    scoringSettings: setupData.scoringSettings,
+    handicapSettings: setupData.handicapSettings,
     settings: {
       pointsToWin: calculatePointsToWin(totalPoints, setupData.scoringSettings.pointsToWin),
       totalMatches,
