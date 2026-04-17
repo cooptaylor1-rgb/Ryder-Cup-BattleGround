@@ -1,4 +1,4 @@
-import type { SessionType } from '../../types/models';
+import { SessionTypeDescription, SessionTypePlayersPerTeam, type SessionType } from '../../types/models';
 import { FORMAT_CONFIGS, type MatchFormat } from '../../types/matchFormats';
 import type {
     ExtendedFormatConfig,
@@ -7,6 +7,10 @@ import type {
 } from './tournamentEngineTypes';
 
 export function getSessionConfig(sessionType: SessionType): SessionConfig {
+    // Legacy trio keeps its bespoke match-count defaults (12 for singles,
+    // 4 for team formats) and descriptions. Newer match-play formats
+    // default to 4 matches and pick their player count from the canonical
+    // SessionTypePlayersPerTeam map.
     switch (sessionType) {
         case 'fourball':
             return {
@@ -28,6 +32,13 @@ export function getSessionConfig(sessionType: SessionType): SessionConfig {
                 matchCount: 12,
                 pointsPerMatch: 1,
                 description: 'Head-to-head individual matches',
+            };
+        default:
+            return {
+                playersPerTeam: SessionTypePlayersPerTeam[sessionType],
+                matchCount: 4,
+                pointsPerMatch: 1,
+                description: SessionTypeDescription[sessionType],
             };
     }
 }

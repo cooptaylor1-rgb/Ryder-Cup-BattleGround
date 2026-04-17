@@ -21,7 +21,9 @@ export interface MatchSlot {
 export interface SessionConfig {
   id: string;
   name: string;
-  type: 'foursomes' | 'fourball' | 'singles';
+  /** Any SessionType from models.ts — the lineup builder is format-agnostic;
+   *  it just needs the name and per-team player count. */
+  type: import('@/lib/types/models').SessionType;
   playersPerTeam: number;
   matchCount: number;
   pointsPerMatch: number;

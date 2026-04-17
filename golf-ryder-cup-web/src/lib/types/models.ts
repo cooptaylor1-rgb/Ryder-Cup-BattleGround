@@ -43,9 +43,40 @@ export type MatchResultType =
 export type HoleWinner = 'teamA' | 'teamB' | 'halved' | 'none';
 
 /**
- * Session type for Ryder Cup format (legacy - match play only)
+ * Session type — the set of competitive formats supported by the
+ * scoring engine today.
+ *
+ * Legacy Ryder Cup trio:
+ *   - foursomes: alternate shot, 2v2 team match play
+ *   - fourball:  best ball, 2v2 team match play
+ *   - singles:   1v1 match play
+ *
+ * Extended team match-play formats (all use the same hole-by-hole
+ * match-play scoring — who won the hole? — with gross scoring by
+ * default since their handicap allowances aren't yet formalised):
+ *   - pinehurst / greensomes: 2-player variations
+ *   - scramble / texas-scramble / shamble: 4-player team scrambles
+ *   - best-2-of-4 / cha-cha-cha / one-two-three / six-six-six:
+ *     multi-player team formats where the hole result is still who-won
+ *
+ * Side games (skins, nassau, wolf, vegas, etc.) and individual stroke
+ * formats (stroke-play, stableford, etc.) use fundamentally different
+ * scoring and are modelled via ExtendedSessionType below once their
+ * flows are ready.
  */
-export type SessionType = 'foursomes' | 'fourball' | 'singles';
+export type SessionType =
+  | 'foursomes'
+  | 'fourball'
+  | 'singles'
+  | 'pinehurst'
+  | 'greensomes'
+  | 'scramble'
+  | 'texas-scramble'
+  | 'shamble'
+  | 'best-2-of-4'
+  | 'cha-cha-cha'
+  | 'one-two-three'
+  | 'six-six-six';
 
 /**
  * Extended session type supporting all match formats
@@ -604,18 +635,45 @@ export const SessionTypeDisplay: Record<SessionType, string> = {
   foursomes: 'Foursomes',
   fourball: 'Fourball',
   singles: 'Singles',
+  pinehurst: 'Pinehurst',
+  greensomes: 'Greensomes',
+  scramble: 'Scramble',
+  'texas-scramble': 'Texas Scramble',
+  shamble: 'Shamble',
+  'best-2-of-4': 'Best 2 of 4',
+  'cha-cha-cha': 'Cha-Cha-Cha',
+  'one-two-three': '1-2-3',
+  'six-six-six': 'Sixes (6-6-6)',
 };
 
 export const SessionTypeDescription: Record<SessionType, string> = {
   foursomes: 'Alternate shot - partners take turns hitting the same ball',
   fourball: 'Best ball - each player plays their own ball, best score counts',
   singles: '1v1 match play - head to head competition',
+  pinehurst: 'Both tee off, switch balls for 2nd shot, choose one ball to finish',
+  greensomes: 'Both tee off, choose best drive, alternate shots from there',
+  scramble: 'All players hit, pick best shot, all play from there',
+  'texas-scramble': 'Scramble with minimum drive requirements per player',
+  shamble: 'Scramble off the tee, then everyone plays their own ball',
+  'best-2-of-4': 'Four players, best 2 net scores count on each hole',
+  'cha-cha-cha': 'Best 1 (1-6), best 2 (7-12), all 3 (13-18)',
+  'one-two-three': 'Best 1 net (1-6), best 2 (7-12), best 3 (13-18)',
+  'six-six-six': 'Format changes every 6 holes',
 };
 
 export const SessionTypePlayersPerTeam: Record<SessionType, number> = {
   foursomes: 2,
   fourball: 2,
   singles: 1,
+  pinehurst: 2,
+  greensomes: 2,
+  scramble: 4,
+  'texas-scramble': 4,
+  shamble: 4,
+  'best-2-of-4': 4,
+  'cha-cha-cha': 3,
+  'one-two-three': 4,
+  'six-six-six': 2,
 };
 
 export const HoleWinnerDisplay: Record<Exclude<HoleWinner, 'none'>, string> = {

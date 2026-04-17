@@ -17,7 +17,24 @@ export interface FormatOption {
   comingSoon?: boolean;
 }
 
-export const SUPPORTED_SESSION_TYPES = ['foursomes', 'fourball', 'singles'] as const;
+export const SUPPORTED_SESSION_TYPES = [
+  'foursomes',
+  'fourball',
+  'singles',
+  // Match-play-compatible team formats. All use the same hole-by-hole
+  // "who won the hole?" scoring as the legacy trio; they only differ in
+  // how the ball is played on the course (which the app doesn't need
+  // to enforce — captains just score the result).
+  'pinehurst',
+  'greensomes',
+  'scramble',
+  'texas-scramble',
+  'shamble',
+  'best-2-of-4',
+  'cha-cha-cha',
+  'one-two-three',
+  'six-six-six',
+] as const;
 
 export function isSupportedSessionType(value: string): value is SessionType {
   return SUPPORTED_SESSION_TYPES.includes(value as SessionType);
