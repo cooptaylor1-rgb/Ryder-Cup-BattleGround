@@ -1,552 +1,132 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Calculator, ChevronDown, ChevronRight, ChevronUp, Download, Home, MoreHorizontal, Settings, Share2, Sliders, AlertCircle, CheckCircle, Trash2, Upload } from 'lucide-react';
-import { LinkButton } from '@/components/ui/LinkButton';
-import { Button } from '@/components/ui/Button';
-import {
-  ScoringFormatOptions,
-  HandicapRules,
-  DEFAULT_SCORING_SETTINGS,
-  DEFAULT_HANDICAP_SETTINGS,
-  type ScoringSettings,
-  type HandicapSettings,
-} from '@/components/trip-setup';
-import { exportTripToFile, importTripFromFile, shareTripSummary } from '@/lib/services/exportImportService';
+import { Home, MoreHorizontal } from 'lucide-react';
 import { db } from '@/lib/db';
-import { useToastStore } from '@/lib/stores';
-import { useShallow } from 'zustand/shallow';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import {
+    TripBackupSection,
+    TripCompetitionRulesSection,
+    TripDangerZoneSection,
+} from '@/components/trip-settings';
 import type { Trip } from '@/lib/types/models';
 
+/**
+ * Trip Settings — post-creation customization hub.
+ *
+ * The page itself is a thin shell that loads the trip and delegates each
+ * feature to a focused sub-component in src/components/trip-settings/.
+ * Splitting the concerns keeps this file under 150 lines and makes each
+ * section independently testable.
+ */
 export default function TripSettingsPage() {
-  const params = useParams();
-  const router = useRouter();
-  const tripId = params.tripId as string;
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+    const params = useParams();
+    const router = useRouter();
+    const tripId = params.tripId as string;
 
-  const [isVerifyingTrip, setIsVerifyingTrip] = useState(true);
-  const [tripName, setTripName] = useState<string | null>(null);
-  const [tripLookupError, setTripLookupError] = useState<string | null>(null);
+    const [isVerifyingTrip, setIsVerifyingTrip] = useState(true);
+    const [trip, setTrip] = useState<Trip | null>(null);
+    const [tripLookupError, setTripLookupError] = useState<string | null>(null);
 
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [importResult, setImportResult] = useState<{
-    success: boolean;
-    message: string;
-  } | null>(null);
-
-  // Competition rules editing
-  const [tripObj, setTripObj] = useState<Trip | null>(null);
-  const [scoringOpen, setScoringOpen] = useState(false);
-  const [handicapOpen, setHandicapOpen] = useState(false);
-  const [localScoring, setLocalScoring] = useState<ScoringSettings>(DEFAULT_SCORING_SETTINGS);
-  const [localHandicap, setLocalHandicap] = useState<HandicapSettings>(DEFAULT_HANDICAP_SETTINGS);
-  const [isSavingRules, setIsSavingRules] = useState(false);
-
-  const loadTrip = async () => {
-    try {
-      setTripLookupError(null);
-      const trip = await db.trips.get(tripId);
-      setTripName(trip?.name ?? null);
-      setTripObj(trip ?? null);
-      if (trip) {
-        setLocalScoring(trip.scoringSettings ?? DEFAULT_SCORING_SETTINGS);
-        setLocalHandicap(trip.handicapSettings ?? DEFAULT_HANDICAP_SETTINGS);
-      }
-    } catch {
-      setTripLookupError("We couldn't load this trip right now.");
-      setTripName(null);
-    } finally {
-      setIsVerifyingTrip(false);
-    }
-  };
-
-  const handleSaveRules = async () => {
-    setIsSavingRules(true);
-    try {
-      await db.trips.update(tripId, {
-        scoringSettings: localScoring,
-        handicapSettings: localHandicap,
-        updatedAt: new Date().toISOString(),
-      });
-      showToast('success', 'Competition rules saved');
-    } catch {
-      showToast('error', 'Failed to save rules');
-    } finally {
-      setIsSavingRules(false);
-    }
-  };
-
-  useEffect(() => {
-    void loadTrip();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripId]);
-
-  const handleExport = async () => {
-    setIsExporting(true);
-    try {
-      await exportTripToFile(tripId);
-      showToast('success', 'Trip exported');
-    } catch {
-      showToast('error', 'Export failed');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsImporting(true);
-    setImportResult(null);
-
-    try {
-      const result = await importTripFromFile(file);
-      if (result.success) {
-        setImportResult({
-          success: true,
-          message: `Imported "${result.tripName}" with ${result.stats.players} players, ${result.stats.matches} matches`,
-        });
-        showToast('success', 'Trip imported');
-      } else {
-        setImportResult({
-          success: false,
-          message: 'Import failed. Check file format.',
-        });
-        showToast('error', 'Import failed');
-      }
-    } catch {
-      setImportResult({
-        success: false,
-        message: 'Could not read file',
-      });
-    } finally {
-      setIsImporting(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleShare = async () => {
-    setIsSharing(true);
-    try {
-      await shareTripSummary(tripId);
-      showToast('success', 'Summary copied to clipboard');
-    } catch {
-      showToast('error', 'Could not copy summary');
-    } finally {
-      setIsSharing(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      // Delete all related data
-      const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
-      const sessionIds = sessions.map((s) => s.id);
-      const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
-      const matchIds = matches.map((m) => m.id);
-
-      await db.transaction(
-        'rw',
-        [db.trips, db.teams, db.teamMembers, db.sessions, db.matches, db.holeResults],
-        async () => {
-          await db.holeResults.where('matchId').anyOf(matchIds).delete();
-          await db.matches.where('sessionId').anyOf(sessionIds).delete();
-          await db.sessions.where('tripId').equals(tripId).delete();
-
-          const teams = await db.teams.where('tripId').equals(tripId).toArray();
-          const teamIds = teams.map((t) => t.id);
-          await db.teamMembers.where('teamId').anyOf(teamIds).delete();
-          await db.teams.where('tripId').equals(tripId).delete();
-
-          await db.trips.delete(tripId);
+    const loadTrip = async () => {
+        try {
+            setTripLookupError(null);
+            const loaded = await db.trips.get(tripId);
+            setTrip(loaded ?? null);
+        } catch {
+            setTripLookupError("We couldn't load this trip right now.");
+            setTrip(null);
+        } finally {
+            setIsVerifyingTrip(false);
         }
-      );
+    };
 
-      showToast('success', 'Trip deleted');
-      router.push('/');
-    } catch {
-      showToast('error', 'Could not delete trip');
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
+    useEffect(() => {
+        void loadTrip();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tripId]);
+
+    if (isVerifyingTrip) {
+        return <PageLoadingSkeleton title="Trip Settings" variant="form" />;
     }
-  };
 
-  if (isVerifyingTrip) {
-    return <PageLoadingSkeleton title="Trip Settings" variant="form" />;
-  }
-
-  if (tripLookupError) {
-    return (
-      <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
-        <div className="relative page-container">
-          <PageHeader
-            title="Trip Settings"
-            icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
-            backFallback="/trips"
-            rightSlot={
-              <button
-                onClick={() => router.push('/')}
-                className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
-                aria-label="Go home"
-              >
-                <Home className="w-4 h-4" />
-                Home
-              </button>
-            }
-          />
-
-          <div className="content-area">
-            <EmptyStatePremium
-              illustration="flag"
-              title="Couldn’t load trip"
-              description={tripLookupError}
-              action={{
-                label: 'Try again',
-                onClick: () => {
-                  setIsVerifyingTrip(true);
-                  void loadTrip();
-                },
-              }}
-              secondaryAction={{
-                label: 'Go Home',
-                onClick: () => router.push('/'),
-              }}
-              variant="large"
-            />
-          </div>
-        </div>
-      </main>
+    const pageChrome = (children: React.ReactNode) => (
+        <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+            <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
+            <div className="relative page-container">
+                <PageHeader
+                    title="Trip Settings"
+                    subtitle={trip?.name ?? undefined}
+                    icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
+                    backFallback="/trips"
+                    rightSlot={
+                        <button
+                            onClick={() => router.push('/')}
+                            className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
+                            aria-label="Go home"
+                        >
+                            <Home className="w-4 h-4" />
+                            Home
+                        </button>
+                    }
+                />
+                {children}
+            </div>
+        </main>
     );
-  }
 
-  if (!tripName) {
-    return (
-      <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-        <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
-        <div className="relative page-container">
-          <PageHeader
-            title="Trip Settings"
-            icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
-            backFallback="/trips"
-            rightSlot={
-              <button
-                onClick={() => router.push('/')}
-                className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
-                aria-label="Go home"
-              >
-                <Home className="w-4 h-4" />
-                Home
-              </button>
-            }
-          />
+    if (tripLookupError) {
+        return pageChrome(
+            <div className="content-area">
+                <EmptyStatePremium
+                    illustration="flag"
+                    title="Couldn’t load trip"
+                    description={tripLookupError}
+                    action={{
+                        label: 'Try again',
+                        onClick: () => {
+                            setIsVerifyingTrip(true);
+                            void loadTrip();
+                        },
+                    }}
+                    secondaryAction={{
+                        label: 'Go Home',
+                        onClick: () => router.push('/'),
+                    }}
+                    variant="large"
+                />
+            </div>,
+        );
+    }
 
-          <div className="content-area">
-            <EmptyStatePremium
-              illustration="trophy"
-              title="Trip not found"
-              description="This trip doesn’t exist or may have been deleted."
-              action={{
-                label: 'Go Home',
-                onClick: () => router.push('/'),
-              }}
-              secondaryAction={{
-                label: 'More',
-                onClick: () => router.push('/more'),
-              }}
-              variant="large"
-            />
-          </div>
-        </div>
-      </main>
-    );
-  }
+    if (!trip) {
+        return pageChrome(
+            <div className="content-area">
+                <EmptyStatePremium
+                    illustration="trophy"
+                    title="Trip not found"
+                    description="This trip doesn’t exist or may have been deleted."
+                    action={{
+                        label: 'Go Home',
+                        onClick: () => router.push('/'),
+                    }}
+                    secondaryAction={{
+                        label: 'More',
+                        onClick: () => router.push('/more'),
+                    }}
+                    variant="large"
+                />
+            </div>,
+        );
+    }
 
-  return (
-    <main className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
-      <div className="absolute inset-0 bg-linear-to-b from-[color:var(--masters)]/15 via-transparent to-transparent pointer-events-none" />
-      <div className="relative page-container">
-        <PageHeader
-          title="Trip Settings"
-          subtitle={tripName ?? undefined}
-          icon={<MoreHorizontal size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.push(`/trip/${tripId}`)}
-          rightSlot={
-            <button
-              onClick={() => router.push('/')}
-              className="inline-flex items-center gap-2 text-sm text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
-              aria-label="Go home"
-            >
-              <Home className="w-4 h-4" />
-              Home
-            </button>
-          }
-        />
-
+    return pageChrome(
         <div className="content-area space-y-6">
-          {/* Backup & Export Section */}
-          <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-[var(--rule)]">
-              <h2 className="type-h3">Backup & Export</h2>
-              <p className="text-sm text-[var(--ink-secondary)] mt-1">Save your trip data or share with others.</p>
-            </div>
-
-            <div className="p-4 space-y-3">
-              {/* Export Button */}
-              <button
-                onClick={handleExport}
-                disabled={isExporting}
-                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
-              >
-                <div className="w-10 h-10 rounded-full bg-[color:var(--info)]/15 flex items-center justify-center">
-                  <Download className="w-5 h-5 text-[var(--info)]" />
-                </div>
-                <div className="text-left flex-1">
-                  <div className="font-medium text-[var(--ink-primary)]">{isExporting ? 'Exporting…' : 'Export Trip'}</div>
-                  <div className="text-sm text-[var(--ink-secondary)]">Download as JSON file for backup</div>
-                </div>
-              </button>
-
-              {/* Import Button */}
-              <button
-                onClick={handleImportClick}
-                disabled={isImporting}
-                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
-              >
-                <div className="w-10 h-10 rounded-full bg-[color:var(--success)]/15 flex items-center justify-center">
-                  <Upload className="w-5 h-5 text-[var(--success)]" />
-                </div>
-                <div className="text-left flex-1">
-                  <div className="font-medium text-[var(--ink-primary)]">{isImporting ? 'Importing…' : 'Import Trip'}</div>
-                  <div className="text-sm text-[var(--ink-secondary)]">Restore from a backup file</div>
-                </div>
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-
-              {/* Import Result */}
-              {importResult && (
-                <div
-                  className={`flex items-start gap-3 p-3 rounded-xl ${
-                    importResult.success
-                      ? 'bg-[color:var(--success)]/10 text-[var(--success)]'
-                      : 'bg-[color:var(--error)]/10 text-[var(--error)]'
-                  }`}
-                >
-                  {importResult.success ? (
-                    <CheckCircle className="w-5 h-5 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 mt-0.5" />
-                  )}
-                  <div className="text-sm">{importResult.message}</div>
-                </div>
-              )}
-
-              {/* Share Summary */}
-              <button
-                onClick={handleShare}
-                disabled={isSharing}
-                className="w-full flex items-center gap-3 p-4 rounded-xl transition-colors disabled:opacity-50 bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30"
-              >
-                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
-                  <Share2 className="w-5 h-5 text-[var(--masters)]" />
-                </div>
-                <div className="text-left flex-1">
-                  <div className="font-medium text-[var(--ink-primary)]">{isSharing ? 'Sharing…' : 'Share Summary'}</div>
-                  <div className="text-sm text-[var(--ink-secondary)]">Copy a shareable summary to your clipboard</div>
-                </div>
-              </button>
-            </div>
-          </section>
-
-          {/* Competition Rules — Scoring */}
-          <section className="card-elevated overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setScoringOpen(v => !v)}
-              className="w-full p-4 flex items-center justify-between border-b border-[var(--rule)] text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
-                  <Calculator className="w-5 h-5 text-[var(--masters)]" />
-                </div>
-                <div>
-                  <h2 className="type-h3">Scoring Rules</h2>
-                  <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
-                    Format, win condition, and point values
-                  </p>
-                </div>
-              </div>
-              {scoringOpen ? <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" /> : <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />}
-            </button>
-
-            {scoringOpen && (
-              <div className="p-4 space-y-4">
-                <ScoringFormatOptions
-                  settings={localScoring}
-                  onSettingsChange={setLocalScoring}
-                />
-                <Button
-                  variant="primary"
-                  onClick={handleSaveRules}
-                  isLoading={isSavingRules}
-                  loadingText="Saving…"
-                  fullWidth
-                >
-                  Save scoring rules
-                </Button>
-              </div>
-            )}
-          </section>
-
-          {/* Competition Rules — Handicaps */}
-          <section className="card-elevated overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setHandicapOpen(v => !v)}
-              className="w-full p-4 flex items-center justify-between border-b border-[var(--rule)] text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[color:var(--masters)]/12 flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-[var(--masters)]" />
-                </div>
-                <div>
-                  <h2 className="type-h3">Handicap Settings</h2>
-                  <p className="text-sm text-[var(--ink-secondary)] mt-0.5">
-                    Allowances, methods, and max handicap
-                  </p>
-                </div>
-              </div>
-              {handicapOpen ? <ChevronUp className="w-5 h-5 text-[var(--ink-tertiary)]" /> : <ChevronDown className="w-5 h-5 text-[var(--ink-tertiary)]" />}
-            </button>
-
-            {handicapOpen && (
-              <div className="p-4 space-y-4">
-                <HandicapRules
-                  settings={localHandicap}
-                  onSettingsChange={setLocalHandicap}
-                />
-                <Button
-                  variant="primary"
-                  onClick={handleSaveRules}
-                  isLoading={isSavingRules}
-                  loadingText="Saving…"
-                  fullWidth
-                >
-                  Save handicap settings
-                </Button>
-              </div>
-            )}
-          </section>
-
-          {/* Session-level adjustments */}
-          <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-[var(--rule)]">
-              <h2 className="type-h3">Session Adjustments</h2>
-              <p className="text-sm text-[var(--ink-secondary)] mt-1">
-                Each session can override the trip defaults with its own format, course, and tee set.
-              </p>
-            </div>
-            <div className="p-4">
-              <LinkButton
-                href="/captain/manage"
-                variant="secondary"
-                leftIcon={<Sliders size={16} />}
-                rightIcon={<ChevronRight size={16} />}
-                fullWidth
-                className="justify-between"
-              >
-                Open captain manage
-              </LinkButton>
-            </div>
-          </section>
-
-          {/* Danger Zone */}
-          <section className="card-elevated overflow-hidden">
-            <div className="p-4 border-b border-[var(--rule)]">
-              <h2 className="type-h3 text-[var(--error)]">Danger Zone</h2>
-              <p className="text-sm text-[var(--ink-secondary)] mt-1">Destructive actions can’t be undone.</p>
-            </div>
-
-            <div className="p-4 space-y-3">
-              {!showDeleteConfirm ? (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full flex items-center gap-3 p-4 bg-[color:var(--error)]/10 hover:bg-[color:var(--error)]/15 rounded-xl transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[color:var(--error)]/15 flex items-center justify-center">
-                    <Trash2 className="w-5 h-5 text-[var(--error)]" />
-                  </div>
-                  <div className="text-left flex-1">
-                    <div className="font-medium text-[var(--error)]">Delete Trip</div>
-                    <div className="text-sm text-[color:var(--error)]/70">Permanently remove this trip and all related data</div>
-                  </div>
-                </button>
-              ) : (
-                <div className="rounded-xl border border-[color:var(--error)]/25 bg-[color:var(--error)]/10 p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-[var(--error)] mt-0.5" />
-                    <div className="flex-1">
-                      <div className="font-semibold text-[var(--error)]">Confirm delete</div>
-                      <p className="text-sm text-[color:var(--error)]/80 mt-1">
-                        This will delete the trip, teams, players, sessions, matches, and scores from this device.
-                      </p>
-
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <button
-                          onClick={handleDelete}
-                          disabled={isDeleting}
-                          className="px-4 py-2 rounded-xl bg-[var(--error)] hover:bg-[color:var(--error)]/90 text-[var(--canvas)] text-sm font-semibold disabled:opacity-50"
-                        >
-                          {isDeleting ? 'Deleting…' : 'Yes, delete'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowDeleteConfirm(false);
-                            setIsDeleting(false);
-                          }}
-                          className="px-4 py-2 rounded-xl text-sm font-semibold bg-[color:var(--surface)]/60 hover:bg-[var(--surface)] border border-[color:var(--rule)]/30 text-[var(--ink-primary)]"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => router.push('/more')}
-                          className="ml-auto px-4 py-2 rounded-xl text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] text-sm font-semibold inline-flex items-center gap-2"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                          More
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
-      </div>
-
-    </main>
-  );
+            <TripBackupSection tripId={trip.id} />
+            <TripCompetitionRulesSection trip={trip} />
+            <TripDangerZoneSection tripId={trip.id} />
+        </div>,
+    );
 }

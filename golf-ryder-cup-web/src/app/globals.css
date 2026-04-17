@@ -856,22 +856,10 @@ textarea:focus-visible {
   transform: none;
 }
 
-/* Legacy btn-primary / btn-secondary / btn-ghost / btn-premium CSS classes
-   have been removed. Use <Button> or <LinkButton> from @/components/ui
-   instead — they provide consistent focus rings, tap targets, and
-   hover/disabled/loading states. */
-
-/* Danger */
-.btn-danger {
-  background: transparent;
-  color: var(--error);
-  border: 1px solid var(--error);
-}
-
-.btn-danger:hover {
-  background: var(--error);
-  color: white;
-}
+/* Legacy btn-primary / btn-secondary / btn-ghost / btn-premium / btn-danger
+   CSS classes have been removed. Use <Button> or <LinkButton> from
+   @/components/ui instead — they provide consistent focus rings, tap
+   targets, and hover/disabled/loading states. */
 
 /* Small variant - still meets 44px minimum */
 .btn-sm {
