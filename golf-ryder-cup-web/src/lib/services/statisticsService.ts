@@ -222,16 +222,33 @@ export function calculateEnhancedPlayerStats(
     return stats;
 }
 
+/**
+ * Route a session's W/L/H into the closest existing format bucket.
+ * Stats are still tracked per match — we just don't yet have dedicated
+ * buckets for every team format, so alt-shot variations roll up to
+ * foursomes and best-ball / multi-player team formats roll up to
+ * fourball. Individual formats (scoring-engine-compatible today are
+ * only 'singles'-like) stay in singlesRecord.
+ */
 function getFormatRecord(
     stats: PlayerStatistics,
-    sessionType: 'singles' | 'foursomes' | 'fourball'
+    sessionType: import('@/lib/types/models').SessionType
 ): { w: number; l: number; h: number } {
     switch (sessionType) {
         case 'singles':
             return stats.singlesRecord;
         case 'foursomes':
+        case 'greensomes':
+        case 'pinehurst':
             return stats.foursomesRecord;
         case 'fourball':
+        case 'scramble':
+        case 'texas-scramble':
+        case 'shamble':
+        case 'best-2-of-4':
+        case 'cha-cha-cha':
+        case 'one-two-three':
+        case 'six-six-six':
             return stats.fourballRecord;
     }
 }

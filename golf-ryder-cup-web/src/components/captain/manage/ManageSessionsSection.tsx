@@ -174,6 +174,16 @@ export function SessionManagementCard({
             </div>
 
             <div className="flex items-center gap-[var(--space-2)]">
+              {session.isPracticeSession ? (
+                <div
+                  className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[color:var(--info)]/20 bg-[color:var(--info)]/10 px-[var(--space-2)] py-[6px]"
+                  title="Practice session — doesn't count toward the cup"
+                >
+                  <span className="type-micro font-semibold text-[var(--info)]">
+                    Practice
+                  </span>
+                </div>
+              ) : null}
               <SessionStatusPill status={session.status} />
               {session.isLocked ? (
                 <div className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 px-[var(--space-2)] py-[6px]">
@@ -283,13 +293,19 @@ function SessionSettingsEditor({
   onDelete: () => void;
   isSubmitting: boolean;
 }) {
+  const [name, setName] = useState(session.name);
+  const [sessionType, setSessionType] = useState(session.sessionType);
   const [status, setStatus] = useState<RyderCupSession['status']>(session.status);
   const [pointsPerMatch, setPointsPerMatch] = useState(
     session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : ''
   );
+  const [sessionNumber, setSessionNumber] = useState(String(session.sessionNumber));
 
   const hasChanges =
+    name !== session.name ||
+    sessionType !== session.sessionType ||
     status !== session.status ||
+    sessionNumber !== String(session.sessionNumber) ||
     pointsPerMatch !==
       (session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : '');
 
@@ -308,30 +324,79 @@ function SessionSettingsEditor({
 
       <div className="mt-[var(--space-5)] space-y-[var(--space-4)]">
         <label className="space-y-[var(--space-2)]">
-          <span className="type-meta font-semibold text-[var(--ink)]">Status</span>
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as RyderCupSession['status'])}
-            className="input"
-          >
-            <option value="scheduled">Scheduled</option>
-            <option value="inProgress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </label>
-
-        <label className="space-y-[var(--space-2)]">
-          <span className="type-meta font-semibold text-[var(--ink)]">Points per match</span>
+          <span className="type-meta font-semibold text-[var(--ink)]">Session name</span>
           <input
-            type="number"
-            min="0"
-            step="0.5"
-            value={pointsPerMatch}
-            onChange={(event) => setPointsPerMatch(event.target.value)}
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
             className="input"
-            placeholder="1"
+            placeholder="e.g., Friday AM Fourball"
           />
         </label>
+
+        <div className="grid grid-cols-2 gap-[var(--space-3)]">
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Format</span>
+            <select
+              value={sessionType}
+              onChange={(event) => setSessionType(event.target.value as typeof sessionType)}
+              className="input"
+            >
+              <option value="fourball">Four-Ball</option>
+              <option value="foursomes">Foursomes</option>
+              <option value="singles">Singles</option>
+              <option value="pinehurst">Pinehurst</option>
+              <option value="greensomes">Greensomes</option>
+              <option value="scramble">Scramble</option>
+              <option value="texas-scramble">Texas Scramble</option>
+              <option value="shamble">Shamble</option>
+              <option value="best-2-of-4">Best 2 of 4</option>
+              <option value="cha-cha-cha">Cha-Cha-Cha</option>
+              <option value="one-two-three">1-2-3</option>
+              <option value="six-six-six">Sixes (6-6-6)</option>
+            </select>
+          </label>
+
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Order</span>
+            <input
+              type="number"
+              min="1"
+              value={sessionNumber}
+              onChange={(event) => setSessionNumber(event.target.value)}
+              className="input"
+              title="Session order in the schedule"
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-cols-2 gap-[var(--space-3)]">
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Status</span>
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value as RyderCupSession['status'])}
+              className="input"
+            >
+              <option value="scheduled">Scheduled</option>
+              <option value="inProgress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Points per match</span>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={pointsPerMatch}
+              onChange={(event) => setPointsPerMatch(event.target.value)}
+              className="input"
+              placeholder="1"
+            />
+          </label>
+        </div>
       </div>
 
       <div className="mt-[var(--space-5)] flex flex-col gap-[var(--space-3)] sm:flex-row">
@@ -339,6 +404,9 @@ function SessionSettingsEditor({
           variant="secondary"
           onClick={() =>
             onSave({
+              name: name.trim() || session.name,
+              sessionType,
+              sessionNumber: sessionNumber.trim() ? Number(sessionNumber) : session.sessionNumber,
               status,
               pointsPerMatch: pointsPerMatch.trim() ? Number(pointsPerMatch) : undefined,
             })

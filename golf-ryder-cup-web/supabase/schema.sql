@@ -137,6 +137,10 @@ CREATE TABLE IF NOT EXISTS sessions (
     notes TEXT,
     status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'inProgress', 'completed')),
     is_locked BOOLEAN DEFAULT FALSE,
+    -- Practice sessions don't count toward the cup leaderboard but
+    -- still get paired/scored normally. Separate from trip-level
+    -- isPracticeRound (which makes the entire trip casual).
+    is_practice_session BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

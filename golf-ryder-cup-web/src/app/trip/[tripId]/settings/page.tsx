@@ -10,6 +10,7 @@ import {
     TripBackupSection,
     TripCompetitionRulesSection,
     TripDangerZoneSection,
+    TripDetailsSection,
 } from '@/components/trip-settings';
 import type { Trip } from '@/lib/types/models';
 
@@ -124,6 +125,7 @@ export default function TripSettingsPage() {
 
     return pageChrome(
         <div className="content-area space-y-6">
+            <TripDetailsSection trip={trip} />
             <TripBackupSection tripId={trip.id} />
             <TripCompetitionRulesSection trip={trip} />
             <TripDangerZoneSection tripId={trip.id} />

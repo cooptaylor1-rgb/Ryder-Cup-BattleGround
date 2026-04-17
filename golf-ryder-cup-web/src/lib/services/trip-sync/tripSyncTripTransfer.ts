@@ -221,6 +221,7 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
             notes: session.notes,
             status: session.status,
             isLocked: session.is_locked,
+            isPracticeSession: session.is_practice_session || undefined,
             createdAt: session.created_at,
             updatedAt: session.updated_at,
           });

@@ -44,6 +44,10 @@ interface NewLineupSetupStepProps {
   onPointsPerMatchChange: (value: number) => void;
   onAddSessionToQueue: () => void;
   onContinue: () => void;
+  /** Practice-session toggle. When true, pointsPerMatch is forced to 0
+   *  and the session is excluded from the cup leaderboard. */
+  isPracticeSession: boolean;
+  onPracticeSessionChange: (value: boolean) => void;
 }
 
 export function NewLineupSetupStep({
@@ -78,6 +82,8 @@ export function NewLineupSetupStep({
   onPointsPerMatchChange,
   onAddSessionToQueue,
   onContinue,
+  isPracticeSession,
+  onPracticeSessionChange,
 }: NewLineupSetupStepProps) {
   return (
     <>
@@ -154,6 +160,40 @@ export function NewLineupSetupStep({
                 fontWeight: 500,
               }}
             />
+
+            {/* Practice session toggle — lets Day 0 warm-up live on the
+                same trip as Friday's Foursomes without polluting the
+                cup leaderboard. */}
+            <label
+              className="mt-[var(--space-4)] flex items-start gap-[var(--space-3)] cursor-pointer rounded-[var(--radius-lg)] border p-[var(--space-4)] transition-colors"
+              style={{
+                borderColor: isPracticeSession
+                  ? 'var(--masters)'
+                  : 'var(--rule)',
+                background: isPracticeSession
+                  ? 'var(--masters-soft, rgba(0,102,68,0.08))'
+                  : 'transparent',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isPracticeSession}
+                onChange={(event) => onPracticeSessionChange(event.target.checked)}
+                className="mt-[2px] h-5 w-5 cursor-pointer accent-[var(--masters)]"
+                aria-describedby="practice-session-hint"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-semibold">Practice round</div>
+                <div
+                  id="practice-session-hint"
+                  className="mt-[2px] text-xs text-[var(--ink-tertiary)]"
+                >
+                  Runs on the trip but doesn&apos;t count toward the cup
+                  leaderboard. Good for Thursday warm-up rounds before the
+                  competition starts.
+                </div>
+              </div>
+            </label>
           </section>
 
           <section className="section">
