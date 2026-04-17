@@ -439,56 +439,112 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* SETUP GUIDE — For captains until setup is complete */}
-            {isCaptainMode && sessions.length === 0 && (
-              <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
-                <HomeSectionHeader
-                  eyebrow={
-                    <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
-                      <Shield size={12} className="align-middle" />
-                      Captain Setup
-                    </span>
-                  }
-                  title="Build the trip before the first shot is struck."
-                />
-                <div className="mt-[var(--space-4)]">
-                  <div className="card-captain">
-                    {(() => {
-                      const steps = [players.length >= 4, teams.length >= 2 && teamMembers.length >= 4, sessions.length > 0];
-                      const done = steps.filter(Boolean).length;
-                      const pct = Math.round((done / steps.length) * 100);
-                      return (
-                        <>
-                          <div className="flex items-center gap-[var(--space-3)] mb-[var(--space-4)]">
-                            <p className="type-title-sm flex-1">Get Your Trip Ready</p>
-                            <span className="type-micro font-semibold text-[var(--masters)]">{pct}%</span>
-                          </div>
-                          <div className="h-1 rounded-full mb-[var(--space-4)] bg-[var(--canvas-sunken)]" style={{ overflow: 'hidden' }}>
-                            <div className="h-full rounded-full bg-[var(--masters)] transition-all duration-500" style={{ width: `${pct}%` }} />
-                          </div>
-                        </>
-                      );
-                    })()}
-                    <div className="flex flex-col gap-[var(--space-2)]">
-                      <SetupStep number={1} label="Add Players" done={players.length >= 4} href="/players" hint={`${players.length} added — need at least 4`} />
-                      <SetupStep number={2} label="Assign Teams" done={teams.length >= 2 && teamMembers.length >= 4} href="/players?panel=draft" hint="Draft players to teams" />
-                      <SetupStep number={3} label="Create First Session" done={sessions.length > 0} href="/lineup/new?mode=session" hint="Set up matchups" />
-                    </div>
+            {/* SETUP GUIDE — Shown to captains until the trip is fully
+                cup-ready. Previously it disappeared after the first
+                session was created, but captains still need to publish
+                lineups and assign courses before the trip can actually
+                run. The extended checklist gives a captain one place
+                to see "what's left" at any point in setup. */}
+            {(() => {
+              if (!isCaptainMode) return null;
 
-                    {/* Prominent invite CTA after setup steps */}
-                    {players.length >= 2 && (
-                      <button
-                        onClick={handleInviteFriends}
-                        className="mt-[var(--space-4)] w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-xl font-medium text-[var(--text-sm)] bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)] press-scale"
-                      >
-                        <Share2 size={16} className="text-[var(--masters)]" />
-                        Share invite link with your group
-                      </button>
-                    )}
+              const hasPlayers = players.length >= 4;
+              const hasTeams = teams.length >= 2 && teamMembers.length >= 4;
+              const hasSessions = sessions.length > 0;
+              const hasMatches = tripMatches.length > 0;
+              const hasCourses = tripMatches.length > 0 && tripMatches.every((m) => Boolean(m.courseId));
+
+              const steps = [hasPlayers, hasTeams, hasSessions, hasMatches, hasCourses];
+              const done = steps.filter(Boolean).length;
+              const allDone = done === steps.length;
+
+              // Once every step is checked, the guide hides — the trip
+              // is ready to run. Any regression (e.g. captain deletes a
+              // course) brings it back automatically.
+              if (allDone) return null;
+
+              const pct = Math.round((done / steps.length) * 100);
+
+              return (
+                <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
+                  <HomeSectionHeader
+                    eyebrow={
+                      <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
+                        <Shield size={12} className="align-middle" />
+                        Captain Setup
+                      </span>
+                    }
+                    title="Build the trip before the first shot is struck."
+                  />
+                  <div className="mt-[var(--space-4)]">
+                    <div className="card-captain">
+                      <div className="flex items-center gap-[var(--space-3)] mb-[var(--space-4)]">
+                        <p className="type-title-sm flex-1">Get Your Trip Ready</p>
+                        <span className="type-micro font-semibold text-[var(--masters)]">
+                          {done} / {steps.length} · {pct}%
+                        </span>
+                      </div>
+                      <div className="h-1 rounded-full mb-[var(--space-4)] bg-[var(--canvas-sunken)]" style={{ overflow: 'hidden' }}>
+                        <div className="h-full rounded-full bg-[var(--masters)] transition-all duration-500" style={{ width: `${pct}%` }} />
+                      </div>
+
+                      <div className="flex flex-col gap-[var(--space-2)]">
+                        <SetupStep
+                          number={1}
+                          label="Add Players"
+                          done={hasPlayers}
+                          href="/players"
+                          hint={hasPlayers ? `${players.length} on the roster` : `${players.length} added — need at least 4`}
+                        />
+                        <SetupStep
+                          number={2}
+                          label="Assign Teams"
+                          done={hasTeams}
+                          href="/players?panel=draft"
+                          hint={hasTeams ? 'Both sides have players' : 'Draft players to teams'}
+                        />
+                        <SetupStep
+                          number={3}
+                          label="Create First Session"
+                          done={hasSessions}
+                          href="/lineup/new?mode=session"
+                          hint={hasSessions ? `${sessions.length} session${sessions.length === 1 ? '' : 's'} scheduled` : 'Set up rounds and formats'}
+                        />
+                        <SetupStep
+                          number={4}
+                          label="Publish a Lineup"
+                          done={hasMatches}
+                          href="/lineup/new"
+                          hint={hasMatches ? `${tripMatches.length} match${tripMatches.length === 1 ? '' : 'es'} on the board` : 'Pair players into matches'}
+                        />
+                        <SetupStep
+                          number={5}
+                          label="Assign Courses"
+                          done={hasCourses}
+                          href="/captain/manage"
+                          hint={hasCourses
+                            ? 'Every match has a course'
+                            : hasMatches
+                              ? `${tripMatches.filter((m) => !m.courseId).length} match${tripMatches.filter((m) => !m.courseId).length === 1 ? '' : 'es'} still need a course`
+                              : 'Needed before matches can be scored with handicaps'}
+                        />
+                      </div>
+
+                      {/* Prominent invite CTA after setup steps */}
+                      {players.length >= 2 && (
+                        <button
+                          onClick={handleInviteFriends}
+                          className="mt-[var(--space-4)] w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-xl font-medium text-[var(--text-sm)] bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)] press-scale"
+                        >
+                          <Share2 size={16} className="text-[var(--masters)]" />
+                          Share invite link with your group
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </section>
-            )}
+                </section>
+              );
+            })()}
 
             {/* NON-CAPTAIN GUIDANCE — Show when not captain and no sessions exist */}
             {!isCaptainMode && sessions.length === 0 && players.length > 0 && (

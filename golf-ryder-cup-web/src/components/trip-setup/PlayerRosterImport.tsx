@@ -203,24 +203,43 @@ export function PlayerRosterImport({
                     </p>
                 </div>
                 <div className="flex gap-2">
+                    {/* Paste-from-spreadsheet is the primary path. Most
+                        captains live in Google Sheets / Excel; tapping
+                        through an Add modal eight times takes ~40 taps
+                        vs. one paste. */}
                     <Button
-                        variant="secondary"
+                        variant="primary"
                         onClick={() => setShowImportModal(true)}
                         leftIcon={<Upload className="w-4 h-4" />}
                         size="sm"
                     >
-                        Import
+                        Paste roster
                     </Button>
                     <Button
-                        variant="primary"
+                        variant="secondary"
                         onClick={() => addPlayer()}
                         leftIcon={<UserPlus className="w-4 h-4" />}
                         size="sm"
                     >
-                        Add
+                        Add one
                     </Button>
                 </div>
             </div>
+
+            {/* Inline hint when the roster is empty — nudges first-time
+                users toward the fast path before they start tapping
+                "Add one" over and over. */}
+            {players.length === 0 && (
+                <div className="rounded-xl border border-dashed border-[var(--masters)]/30 bg-[color:var(--masters)]/5 p-4 text-sm">
+                    <p className="font-semibold text-[var(--ink)]">
+                        Fastest way to add your roster
+                    </p>
+                    <p className="mt-1 text-[var(--ink-secondary)]">
+                        Copy <kbd className="rounded bg-[var(--canvas-sunken)] px-1 py-0.5 text-xs">Name, Handicap, Email</kbd> from your spreadsheet,
+                        then tap <strong>Paste roster</strong>. Works with Google Sheets, Excel, Numbers, or a plain text list.
+                    </p>
+                </div>
+            )}
 
             {/* Team summary */}
             <div className="grid grid-cols-3 gap-2">
@@ -369,7 +388,7 @@ export function PlayerRosterImport({
                         >
                             {/* Header */}
                             <div className="p-4 border-b border-[var(--rule)] flex items-center justify-between">
-                                <h3 className="font-semibold text-lg">Import Players</h3>
+                                <h3 className="font-semibold text-lg">Paste your roster</h3>
                                 <button
                                     onClick={() => setShowImportModal(false)}
                                     className="p-2 hover:bg-[var(--surface-secondary)] rounded-lg"
@@ -378,9 +397,28 @@ export function PlayerRosterImport({
                                 </button>
                             </div>
 
-                            {/* Content */}
+                            {/* Content — paste-first. The textarea is the
+                                primary affordance; file upload is a
+                                secondary option below. */}
                             <div className="p-4 space-y-4 overflow-y-auto max-h-[60vh]">
-                                {/* File upload */}
+                                <div>
+                                    <label className="text-sm font-medium mb-1.5 block">
+                                        Paste from your spreadsheet
+                                    </label>
+                                    <textarea
+                                        value={importText}
+                                        onChange={(e) => setImportText(e.target.value)}
+                                        placeholder="Name, Handicap, Email&#10;John Smith, 12, john@example.com&#10;Jane Doe, 8, jane@example.com"
+                                        rows={8}
+                                        autoFocus
+                                        className="input w-full resize-none font-mono text-sm"
+                                    />
+                                    <p className="mt-1.5 text-xs text-[var(--ink-tertiary)]">
+                                        Copy rows from Google Sheets, Excel, or Numbers — the header row is optional. Tab-separated also works.
+                                    </p>
+                                </div>
+
+                                {/* File upload — secondary path */}
                                 <div>
                                     <input
                                         ref={fileInputRef}
@@ -391,26 +429,11 @@ export function PlayerRosterImport({
                                     />
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-full p-6 border-2 border-dashed border-[color:var(--rule)]/60 rounded-xl text-center hover:border-[var(--masters)] transition-colors"
+                                        className="w-full p-3 border border-dashed border-[color:var(--rule)]/60 rounded-xl text-center hover:border-[var(--masters)] transition-colors text-sm text-[var(--ink-secondary)]"
                                     >
-                                        <Upload className="w-8 h-8 mx-auto mb-2 text-[var(--ink-tertiary)]" />
-                                        <p className="font-medium">Upload CSV or TXT file</p>
-                                        <p className="text-sm text-[var(--ink-tertiary)]">or paste data below</p>
+                                        <Upload className="w-4 h-4 inline-block mr-2 align-middle" />
+                                        Or upload a CSV file
                                     </button>
-                                </div>
-
-                                {/* Text area */}
-                                <div>
-                                    <label className="text-sm font-medium mb-1.5 block">
-                                        Paste player data
-                                    </label>
-                                    <textarea
-                                        value={importText}
-                                        onChange={(e) => setImportText(e.target.value)}
-                                        placeholder="Name, Handicap, Email (one player per line)"
-                                        rows={6}
-                                        className="input w-full resize-none font-mono text-sm"
-                                    />
                                 </div>
 
                                 {/* Error */}
