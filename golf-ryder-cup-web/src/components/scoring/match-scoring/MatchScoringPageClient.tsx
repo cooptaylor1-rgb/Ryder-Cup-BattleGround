@@ -179,8 +179,29 @@ export default function MatchScoringPageClient() {
     return <MatchScoringUnavailableState onBackToScore={handleBackToScore} />;
   }
 
+  // Pre-flight: warn (but don't block) when no course is assigned. Handicap
+  // strokes can't be calculated without a tee set, so the match will be
+  // scored gross. If the captain fixes the course later, they can re-enter.
+  const missingCourse = !activeMatch.courseId;
+
   return (
-    <MatchScoringPageSections
+    <>
+      {missingCourse && (
+        <div className="fixed top-0 inset-x-0 z-[60] bg-[color:var(--warning)]/95 text-[var(--ink)] px-4 py-3 text-center text-sm font-medium backdrop-blur-sm safe-top">
+          <span className="mr-2">⚠</span>
+          No course assigned — scoring as gross (no handicap strokes).
+          {isCaptainMode && (
+            <button
+              type="button"
+              onClick={() => router.push('/captain/manage')}
+              className="ml-2 underline font-semibold"
+            >
+              Assign now
+            </button>
+          )}
+        </div>
+      )}
+      <MatchScoringPageSections
       matchId={matchId}
       currentTripId={currentTrip?.id}
       matchOrder={activeMatch.matchOrder}
@@ -219,5 +240,6 @@ export default function MatchScoringPageClient() {
       }}
       onScoringModeChange={handleScoringModeChange}
     />
+    </>
   );
 }

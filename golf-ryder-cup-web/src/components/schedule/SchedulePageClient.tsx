@@ -33,7 +33,16 @@ export default function SchedulePageClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const selectedTab = searchParams?.get('view') === 'all' ? 'all' : 'my';
+  // Default to "all" when there's no linked player profile. Otherwise
+  // first-time users land on an empty "My Schedule" tab and think the
+  // page is broken. Once the profile link exists, "my" becomes the
+  // default so you see your own tee times first.
+  const explicitView = searchParams?.get('view');
+  const selectedTab =
+    explicitView === 'all' ? 'all'
+      : explicitView === 'my' ? 'my'
+        : currentUser ? 'my'
+          : 'all';
   const myScheduleHref = '/schedule';
   const fullScheduleHref = '/schedule?view=all';
 
