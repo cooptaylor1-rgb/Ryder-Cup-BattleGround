@@ -119,7 +119,7 @@ export default function AchievementsPageClient() {
         title="Achievements"
         subtitle={`${unlockedCount} of ${totalCount} unlocked`}
         icon={<Award size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           <Button variant="outline" size="sm" leftIcon={<TrendingUp size={14} />} onClick={() => router.push('/stats')}>
             Stats Hub

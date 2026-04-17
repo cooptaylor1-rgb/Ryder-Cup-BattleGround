@@ -200,8 +200,8 @@ export default function HelpPage() {
         title="Help"
         subtitle="Guidebook and support"
         icon={<HelpCircle size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/"
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

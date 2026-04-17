@@ -189,7 +189,6 @@ export default function NewTripPage() {
           title="World-Class Trip Setup"
           subtitle={activePreset?.title || 'Custom setup'}
           icon={<Sparkles size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
           onBack={handleCancelWizard}
         />
 
@@ -212,6 +211,11 @@ export default function NewTripPage() {
                 <EnhancedTripWizard
                   key={`${selectedPreset}-${wizardSeed}`}
                   initialData={activePreset ? buildInitialSetupData(activePreset) : undefined}
+                  // The "classic" preset already implies heavy customization —
+                  // open the full 8-step flow so captains don't have to toggle.
+                  // Every other entry (weekend, single-day, custom) starts in
+                  // quick mode so the common case is 4 steps, not 8.
+                  initialMode={selectedPreset === 'classic' ? 'full' : 'quick'}
                   onComplete={handleComplete}
                   onCancel={handleCancelWizard}
                 />
@@ -263,8 +267,8 @@ export default function NewTripPage() {
         title="New Trip"
         subtitle="World-class captain setup"
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/trips"
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
+import { CaptainToggle } from '@/components/ui/CaptainToggle';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -164,8 +166,8 @@ export default function CaptainPageClient() {
           title="Captain Command"
           subtitle="No active trip"
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          iconTone="captain"
+          backFallback="/"
         />
         <main className="container-editorial py-12">
           <EmptyStatePremium
@@ -191,8 +193,8 @@ export default function CaptainPageClient() {
           title="Captain Command"
           subtitle={currentTrip.name}
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-          onBack={() => router.back()}
+          iconTone="captain"
+          backFallback="/"
         />
 
         <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
@@ -297,15 +299,19 @@ export default function CaptainPageClient() {
         title="Captain Command"
         subtitle={currentTrip.name}
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.12)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/"
         rightSlot={
-          <Link
-            href="/captain/settings"
-            className="rounded-full p-2 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]"
-          >
-            <Settings size={20} strokeWidth={1.75} />
-          </Link>
+          <div className="flex items-center gap-1">
+            <CaptainToggle />
+            <Link
+              href="/captain/settings"
+              aria-label="Captain settings"
+              className="rounded-full p-2 text-[var(--ink-secondary)] transition-colors hover:bg-[var(--canvas-sunken)]"
+            >
+              <Settings size={20} strokeWidth={1.75} />
+            </Link>
+          </div>
         }
       />
 
@@ -368,13 +374,14 @@ export default function CaptainPageClient() {
               </div>
 
               <div className="grid gap-[var(--space-3)] sm:grid-cols-2">
-                <Link
+                <LinkButton
                   href="/lineup/new"
-                  className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
+                  variant="primary"
+                  leftIcon={<Plus size={16} />}
+                  className="rounded-[1rem]"
                 >
-                  <Plus size={16} />
                   Build Next Session
-                </Link>
+                </LinkButton>
                 <Link
                   href="/captain/manage"
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--maroon-dark)] transition-colors hover:bg-[color:var(--maroon)]/14"

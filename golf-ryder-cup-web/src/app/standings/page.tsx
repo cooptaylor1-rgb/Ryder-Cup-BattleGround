@@ -201,7 +201,7 @@ export default function StandingsPage() {
           title="Standings"
           subtitle="No active trip"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -210,6 +210,31 @@ export default function StandingsPage() {
             title="No active trip"
             description="Start or select a trip to view standings."
             action={{ label: 'Back to Home', onClick: () => router.push('/') }}
+            variant="large"
+          />
+        </main>
+      </div>
+    );
+  }
+
+  // Practice-round trips don't have cup-style standings. Point users at the
+  // schedule where pairings and individual scoring live.
+  if (currentTrip.isPracticeRound) {
+    return (
+      <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
+        <PageHeader
+          title="Standings"
+          subtitle={currentTrip.name}
+          icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
+          backFallback="/"
+        />
+
+        <main className="container-editorial py-12">
+          <EmptyStatePremium
+            illustration="trophy"
+            title="No cup score on practice rounds"
+            description="This trip is set as a practice round, so there's no team-vs-team leaderboard. Open the schedule to see pairings and scores."
+            action={{ label: 'Open schedule', onClick: () => router.push('/schedule?view=all') }}
             variant="large"
           />
         </main>

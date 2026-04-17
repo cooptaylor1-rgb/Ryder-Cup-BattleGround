@@ -17,6 +17,7 @@ import {
     Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { generateId } from '@/lib/utils/generateId';
 
 export interface SideBetConfig {
@@ -185,13 +186,14 @@ export function SideBetPresets({
                         {activeBets.length} active • {currency}{totalPotential} potential per round
                     </p>
                 </div>
-                <button
+                <Button
+                    variant="secondary"
                     onClick={() => setShowAddModal(true)}
-                    className="btn-secondary text-sm"
+                    leftIcon={<Plus className="w-4 h-4" />}
+                    size="sm"
                 >
-                    <Plus className="w-4 h-4 mr-1" />
                     Add Bet
-                </button>
+                </Button>
             </div>
 
             {/* Quick add presets */}
@@ -437,13 +439,14 @@ export function SideBetPresets({
                                                 </button>
                                             ))}
                                         </div>
-                                        <button
+                                        <Button
+                                            variant="primary"
                                             onClick={addCustomBet}
                                             disabled={!customBet.name?.trim()}
-                                            className="btn-primary w-full"
+                                            fullWidth
                                         >
                                             Add Custom Bet
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { shareTrip } from '@/lib/utils/share';
+import { Button } from '@/components/ui/Button';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   NoTournamentsEmpty,
@@ -34,6 +35,7 @@ import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { PageHeader } from '@/components/layout';
 import { TripDashboardSections } from './TripDashboardSections';
 import { HeroMetaPill, HeroMetaStat, HomeSectionHeader, SetupStep } from './HomeSharedComponents';
+import { TripCard } from './TripCard';
 
 function readPendingJoinCode(): string | undefined {
   if (typeof window === 'undefined') {
@@ -93,9 +95,16 @@ export default function HomePage() {
     await loadTrip(tripId);
   };
 
-  const handleOpenStandings = useCallback(() => {
+  const handleOpenStandings = useCallback(async () => {
+    // Ensure the trip store's currentTrip matches the trip displayed on the
+    // home page before navigating. Without this the standings page can fall
+    // back to a stale currentTrip and render a different trip than the one
+    // the user just tapped through from.
+    if (activeTrip && activeTrip.id) {
+      await loadTrip(activeTrip.id);
+    }
     router.push('/standings');
-  }, [router]);
+  }, [router, activeTrip, loadTrip]);
 
   const handleOpenSchedule = useCallback(() => {
     router.push('/schedule?view=all');
@@ -242,7 +251,30 @@ export default function HomePage() {
                 </div>
 
                 <div className="px-[var(--space-5)] py-[var(--space-6)]">
-                  {standings ? (
+                  {activeTrip.isPracticeRound ? (
+                    <button
+                      onClick={handleOpenSchedule}
+                      className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
+                    >
+                      <div className="rounded-[1.5rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.64)] px-[var(--space-5)] py-[var(--space-6)]">
+                        <p className="type-overline text-[var(--ink-tertiary)]">Practice Round</p>
+                        <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,7vw,2.6rem)] italic leading-[1.05] text-[var(--ink)]">
+                          Casual pairings. No cup on the line.
+                        </h2>
+                        <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
+                          Use the schedule to set pairings, track scores, and keep things loose.
+                        </p>
+                        <div className="mt-[var(--space-5)] flex flex-wrap items-center gap-[var(--space-3)] text-sm">
+                          <HeroMetaStat label="Live" value={liveMatchesCount} />
+                          <HeroMetaStat label="Players" value={players.length} />
+                          <div className="ml-auto inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-4)] py-[var(--space-2)] text-[var(--masters)] font-medium">
+                            <span>Open schedule</span>
+                            <ChevronRight size={16} strokeWidth={2} />
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ) : standings ? (
                     <button
                       onClick={handleOpenStandings}
                       className="w-full border-none bg-transparent p-0 text-left press-scale cursor-pointer"
@@ -506,78 +538,72 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── TOURNAMENT ARCHIVE ── */}
-        <section className={`${activeTrip ? 'pt-[var(--space-6)]' : 'pt-[var(--space-10)]'} pb-[var(--space-10)]`}>
-          <div className="flex items-center justify-between mb-[var(--space-6)]">
-            <h2 className="type-overline tracking-[0.15em]">
-              {hasTrips ? (activeTrip ? 'Other Trips' : 'Tournaments') : 'Get Started'}
-            </h2>
-            {hasTrips && (
-              <button
-                onClick={() => router.push('/trip/new')}
-                className="btn-premium press-scale flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] rounded-full text-sm min-h-[44px]"
+        {/* ── TOURNAMENT ARCHIVE ──
+            When there's an active trip we keep the home page focused on today
+            and move the full archive to /trips, exposing just a compact "All
+            trips" link here. When there's no active trip the home page is the
+            only place to pick or create one, so the full list stays visible. */}
+        {activeTrip ? (
+          pastTrips.length > 0 ? (
+            <section className="pt-[var(--space-6)] pb-[var(--space-10)]">
+              <Link
+                href="/trips"
+                className="card-editorial card-interactive border border-[var(--rule)] no-underline flex items-center justify-between px-[var(--space-5)] py-[var(--space-4)] rounded-[var(--radius-xl)]"
               >
-                <Plus size={14} strokeWidth={2.5} />
-                New
-              </button>
-            )}
-          </div>
-
-          {pastTrips.length > 0 ? (
-            <div className="flex flex-col gap-[var(--space-3)]">
-              {pastTrips.map((trip) => (
-                <button
-                  key={trip.id}
-                  onClick={() => handleSelectTrip(trip.id)}
-                  className="card-editorial card-interactive w-full text-left flex items-center gap-[var(--space-4)] border border-[var(--rule)] p-[var(--space-5)]"
+                <div>
+                  <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">
+                    Other Trips
+                  </p>
+                  <p className="type-title-sm mt-[var(--space-1)] text-[var(--ink)]">
+                    {pastTrips.length} {pastTrips.length === 1 ? 'trip' : 'trips'} in the archive
+                  </p>
+                </div>
+                <ChevronRight
+                  size={22}
+                  strokeWidth={1.5}
+                  className="text-[var(--masters)] shrink-0"
+                />
+              </Link>
+            </section>
+          ) : null
+        ) : (
+          <section className="pt-[var(--space-10)] pb-[var(--space-10)]">
+            <div className="flex items-center justify-between mb-[var(--space-6)]">
+              <h2 className="type-overline tracking-[0.15em]">
+                {hasTrips ? 'Tournaments' : 'Get Started'}
+              </h2>
+              {hasTrips && (
+                <Button
+                  variant="primary"
+                  onClick={() => router.push('/trip/new')}
+                  leftIcon={<Plus size={14} strokeWidth={2.5} />}
+                  className="press-scale rounded-full text-sm min-h-[44px]"
                 >
-                  {/* Tournament Icon */}
-                  <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] flex items-center justify-center shrink-0">
-                    <Trophy size={22} className="text-[var(--gold)]" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="type-title-sm font-semibold">{trip.name}</p>
-
-                    <div className="type-caption flex items-center gap-[var(--space-3)] mt-[var(--space-1)]">
-                      {trip.location && (
-                        <span className="flex items-center gap-[var(--space-1)] min-w-0">
-                          <MapPin
-                            size={12}
-                            strokeWidth={1.5}
-                            className="text-[var(--ink-tertiary)] shrink-0"
-                          />
-                          <span className="truncate">{trip.location}</span>
-                        </span>
-                      )}
-
-                      <span className="flex items-center gap-[var(--space-1)]">
-                        <Calendar
-                          size={12}
-                          strokeWidth={1.5}
-                          className="text-[var(--ink-tertiary)]"
-                        />
-                        {formatDate(trip.startDate, 'short')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <ChevronRight
-                    size={18}
-                    strokeWidth={1.5}
-                    className="text-[var(--ink-tertiary)] shrink-0"
-                  />
-                </button>
-              ))}
+                  New
+                </Button>
+              )}
             </div>
-          ) : !activeTrip ? (
-            <NoTournamentsEmpty
-              createHref="/trip/new"
-              onCreateTrip={() => router.push('/trip/new')}
-              onJoinTrip={() => setShowJoinTrip(true)}
-            />
-          ) : null}
-        </section>
+
+            {pastTrips.length > 0 ? (
+              <div className="flex flex-col gap-[var(--space-3)]">
+                {pastTrips.map((trip) => (
+                  <TripCard
+                    key={trip.id}
+                    trip={trip}
+                    onSelect={handleSelectTrip}
+                    tag={trip.isPracticeRound ? 'Practice' : undefined}
+                  />
+                ))}
+              </div>
+            ) : (
+              <NoTournamentsEmpty
+                createHref="/trip/new"
+                onCreateTrip={() => router.push('/trip/new')}
+                onJoinTrip={() => setShowJoinTrip(true)}
+              />
+            )}
+          </section>
+        )}
       </main>
 
       <FirstLaunchWalkthrough />

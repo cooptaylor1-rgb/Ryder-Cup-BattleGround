@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import {
   CalendarDays,
   Map,
@@ -62,14 +63,9 @@ export function ManagePageClient() {
   const requestedMatchId = searchParams?.get('matchId') ?? null;
   const requestedFocus = searchParams?.get('focus') ?? null;
 
-  const sessions = useLiveQuery(
-    async () =>
-      currentTrip ? await db.sessions.where('tripId').equals(currentTrip.id).toArray() : [],
-    [currentTrip?.id],
-    [] as RyderCupSession[]
-  );
-
-  const matches = useLiveQuery(() => db.matches.toArray(), [], [] as Match[]);
+  const tripData = useTripScopedMatches(currentTrip?.id);
+  const sessions = tripData?.sessions ?? [];
+  const matches = tripData?.matches ?? [];
 
   const teamById = useMemo(() => buildTeamById(teams), [teams]);
   const playerById = useMemo(() => buildPlayerById(players), [players]);
@@ -298,10 +294,7 @@ export function ManagePageClient() {
         title="Manage Trip"
         subtitle={currentTrip.name}
         icon={<Settings size={16} className="text-[var(--color-accent)]" />}
-        iconContainerStyle={{
-          background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
-          boxShadow: 'var(--shadow-glow-green)',
-        }}
+        iconTone="neutral"
         onBack={() => navigateBackOr(router, '/captain')}
       />
 
@@ -333,14 +326,15 @@ export function ManagePageClient() {
               </div>
 
               <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
-                <Link
+                <LinkButton
                   href="/lineup/new?mode=session"
-                  data-testid="captain-new-session-link"
-                  className="btn-premium inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
+                  aria-label="captain-new-session-link"
+                  variant="primary"
+                  leftIcon={<Plus size={16} />}
+                  className="rounded-[1rem]"
                 >
-                  <Plus size={16} />
                   New Session
-                </Link>
+                </LinkButton>
                 <Link
                   href="/courses"
                   data-testid="captain-course-library-link"

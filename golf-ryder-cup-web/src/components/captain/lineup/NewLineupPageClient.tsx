@@ -17,10 +17,11 @@ import {
   type SessionConfig,
   type FairnessScore,
 } from '@/components/captain';
-import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { Users, Info } from 'lucide-react';
 import type { Match, SessionType } from '@/lib/types';
 import { EmptyStatePremium } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NewLineupSetupStep, LineupSetupFact } from './NewLineupSetupStep';
 import {
@@ -54,9 +55,20 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
+  // Scope to the current trip's sessions rather than loading every
+  // match the device has ever seen.
+  const tripSessionIds = useMemo(
+    () => sessions.map((s) => s.id),
+    [sessions]
+  );
   const tripMatches = useLiveQuery(
-    async () => (currentTrip ? await db.matches.toArray() : []),
-    [currentTrip?.id],
+    async () =>
+      tripSessionIds.length > 0
+        ? db.matches.where('sessionId').anyOf(tripSessionIds).toArray()
+        : currentTrip
+          ? ([] as Match[])
+          : undefined,
+    [tripSessionIds.join(','), currentTrip?.id],
     undefined as Match[] | undefined
   );
 
@@ -491,7 +503,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           title="Build Lineup"
           subtitle="Loading next session"
           icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
+          backFallback="/schedule"
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">
@@ -512,7 +524,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           title="Build Lineup"
           subtitle={nextSessionNeedingLineup.name}
           icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
-          onBack={() => router.back()}
+          backFallback="/schedule"
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">
@@ -610,27 +622,31 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-2)] sm:min-w-[220px]">
-                  <Link
+                  <LinkButton
                     href="/players"
-                    className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
+                    variant="secondary"
+                    size="sm"
+                    className="px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
                   >
                     Manage roster
-                  </Link>
+                  </LinkButton>
                   {rosterNeedsAttention ? (
-                    <Link
+                    <LinkButton
                       href="/players?panel=draft"
-                      className="btn-ghost no-underline px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
+                      variant="ghost"
+                      size="sm"
+                      className="px-[var(--space-3)] py-[var(--space-2)] text-center text-xs"
                     >
                       Open draft board
-                    </Link>
+                    </LinkButton>
                   ) : (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
                       onClick={() => setStep('lineup')}
-                      className="btn-ghost px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                      className="px-[var(--space-3)] py-[var(--space-2)] text-xs"
                     >
                       Go straight to builder
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -646,12 +662,14 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                       session{orderedSessions.length === 1 ? '' : 's'} in this trip.
                     </p>
                   </div>
-                  <Link
+                  <LinkButton
                     href="/captain/manage"
-                    className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                    variant="secondary"
+                    size="sm"
+                    className="px-[var(--space-3)] py-[var(--space-2)] text-xs"
                   >
                     Manage sessions
-                  </Link>
+                  </LinkButton>
                 </div>
                 {orderedSessions.length > 0 && (
                   <ul className="mt-[var(--space-3)] space-y-2">
@@ -744,12 +762,14 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                     {rosterReadinessLabel}
                   </span>
                   {rosterNeedsAttention ? (
-                    <Link
+                    <LinkButton
                       href="/players"
-                      className="btn-secondary no-underline px-[var(--space-3)] py-[var(--space-2)] text-xs"
+                      variant="secondary"
+                      size="sm"
+                      className="px-[var(--space-3)] py-[var(--space-2)] text-xs"
                     >
                       Fix roster
-                    </Link>
+                    </LinkButton>
                   ) : null}
                 </div>
               </div>

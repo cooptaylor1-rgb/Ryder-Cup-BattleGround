@@ -22,13 +22,30 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
 }
 
-const navItems: NavItem[] = [
+// Base nav for non-captains. The 5th slot is swapped in captain mode —
+// see `getNavItemsForMode` below.
+const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/', label: 'Today', icon: Home },
   { href: '/score', label: 'Score', icon: Target },
   { href: '/standings', label: 'Standings', icon: Trophy },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
   { href: '/more', label: 'More', icon: Settings },
 ];
+
+/**
+ * When captain mode is on, swap the final "More" entry for "Captain" so the
+ * tools captains actually use during an event are one tap away instead of
+ * buried under More -> Captain command. Settings and other non-captain
+ * admin still live at /more and remain reachable from the captain hub.
+ */
+function getNavItemsForMode(isCaptainMode: boolean): NavItem[] {
+  if (!isCaptainMode) return BASE_NAV_ITEMS;
+  return BASE_NAV_ITEMS.map((item) =>
+    item.href === '/more'
+      ? { href: '/captain', label: 'Captain', icon: Shield }
+      : item
+  );
+}
 
 export interface NavBadges {
   today?: number;
@@ -42,6 +59,8 @@ export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+
+  const navItems = getNavItemsForMode(isCaptainMode);
 
   const isActive = (item: NavItem) => {
     if (item.href === '/') return pathname === '/';
@@ -95,7 +114,9 @@ export function BottomNav() {
                 strokeWidth={active ? 2 : 1.5}
               />
 
-              {/* Captain indicator */}
+              {/* Captain indicator — only meaningful on the "More" slot when
+                  captain mode isn't surfaced directly. When captain mode is
+                  on the nav already exposes a Captain tab, so no badge. */}
               {item.href === '/more' && isCaptainMode && (
                 <Shield
                   className="absolute -top-0.5 -right-1.5 w-2.5 h-2.5 text-[var(--maroon)]"

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 
 import type { Award, PlayerStats } from '@/lib/types/awards';
 import {
@@ -96,12 +97,13 @@ export function AwardsTab({
             </p>
           </div>
         </div>
-        <Link
+        <LinkButton
           href="/trip-stats/awards"
-          className="btn-premium px-[var(--space-4)] py-[var(--space-3)] text-center"
+          variant="primary"
+          className="text-center"
         >
           Vote for MVP & Awards
-        </Link>
+        </LinkButton>
       </div>
 
       {hasAwards ? (

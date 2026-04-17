@@ -76,9 +76,25 @@ export default function LivePageClient() {
         enabled: !!currentTrip,
     });
 
+    // Only refetch on visibilitychange if the tab was hidden for more than
+    // 30 seconds. Without this, rapid app-switching (checking messages,
+    // switching between Score and Live) flashes a spinner on every return
+    // even though the data hasn't changed.
     useEffect(() => {
+        let hiddenAt: number | null = null;
+
         const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible' && activeSession) {
+            if (document.visibilityState === 'hidden') {
+                hiddenAt = Date.now();
+                return;
+            }
+
+            if (
+                document.visibilityState === 'visible' &&
+                activeSession &&
+                hiddenAt !== null &&
+                Date.now() - hiddenAt > 30_000
+            ) {
                 loadSessionMatches(activeSession.id);
                 setLastUpdate(new Date());
             }
@@ -138,7 +154,7 @@ export default function LivePageClient() {
                 title="Live Scores"
                 subtitle={currentTrip.name}
                 icon={<Tv size={16} className="text-[var(--color-accent)]" />}
-                onBack={() => router.back()}
+                backFallback="/"
             />
 
             <LivePageSections

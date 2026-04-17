@@ -88,7 +88,7 @@ export default function RecapPageClient() {
         <PageHeader
           title="Trip Recap"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
         <main className="container-editorial py-8">
           <div className="animate-pulse space-y-6">
@@ -111,7 +111,7 @@ export default function RecapPageClient() {
         <PageHeader
           title="Trip Recap"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/"
         />
         <main className="container-editorial py-12">
           <EmptyStatePremium
@@ -132,7 +132,7 @@ export default function RecapPageClient() {
         title="Trip Recap"
         subtitle={recap.tripName}
         icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           <button
             onClick={handleShare}

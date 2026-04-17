@@ -94,8 +94,8 @@ export default function ContactsPage() {
         title="Contacts"
         subtitle={currentTrip.name}
         icon={<Phone size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/captain"
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

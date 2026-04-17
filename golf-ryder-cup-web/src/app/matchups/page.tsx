@@ -2,12 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useTripStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player } from '@/lib/types/models';
 import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsEmpty } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
 
 export default function MatchupsPage() {
@@ -52,18 +54,19 @@ export default function MatchupsPage() {
       <PageHeader
         title="Matchups"
         subtitle={currentTrip.name}
-        onBack={() => router.back()}
+        backFallback="/"
         icon={<Users size={16} style={{ color: 'var(--color-accent)' }} />}
         rightSlot={
           isCaptainMode ? (
-            <Link
+            <LinkButton
               href="/players"
-              className="btn-premium flex items-center gap-1 press-scale"
-              style={{ padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-sm)' }}
+              variant="primary"
+              leftIcon={<Plus size={16} strokeWidth={2} />}
+              className="press-scale"
+              size="sm"
             >
-              <Plus size={16} strokeWidth={2} />
               Manage
-            </Link>
+            </LinkButton>
           ) : null
         }
       />
@@ -161,14 +164,15 @@ export default function MatchupsPage() {
                 {teamAPlayers.length < 2 && ` ${teamA?.name || 'USA'} has ${teamAPlayers.length}.`}
                 {teamBPlayers.length < 2 && ` ${teamB?.name || 'Europe'} has ${teamBPlayers.length}.`}
               </p>
-              <button
+              <Button
+                variant="primary"
                 onClick={() => router.push('/players?panel=draft')}
-                className="btn-premium press-scale"
+                leftIcon={<Users size={14} />}
+                className="press-scale"
                 style={{ marginTop: 'var(--space-3)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-sm)' }}
               >
-                <Users size={14} style={{ marginRight: '4px' }} />
                 Assign Players to Teams
-              </button>
+              </Button>
             </div>
           )}
 

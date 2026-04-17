@@ -27,15 +27,13 @@ const nextConfig: NextConfig = {
 
   // Image optimization configuration
   images: {
-    // Only allow images from Supabase storage (user-uploaded avatars, photos)
+    // Only allow images from Supabase storage (user-uploaded avatars, photos).
+    // QR codes are rendered entirely client-side, so no external image host
+    // is needed for them.
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '*.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'api.qrserver.com',
       },
     ],
     // Prefer AVIF (smaller) with WebP fallback

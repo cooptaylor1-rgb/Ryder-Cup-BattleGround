@@ -15,6 +15,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { EmptyStatePremium } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import type { TripSummary } from './backupPageData';
 
@@ -179,21 +180,20 @@ export function BackupImportSection({
                             </div>
 
                             <div className="mt-4 flex gap-2">
-                                <button
+                                <Button
+                                    variant="primary"
                                     onClick={onConfirmImport}
                                     disabled={isImporting}
-                                    className="btn-primary inline-flex flex-1 items-center justify-center gap-2"
+                                    isLoading={isImporting}
+                                    loadingText="Importing…"
+                                    leftIcon={!isImporting ? <CheckCircle className="h-4 w-4" /> : undefined}
+                                    className="flex-1"
                                 >
-                                    {isImporting ? (
-                                        <RefreshCw className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <CheckCircle className="h-4 w-4" />
-                                    )}
-                                    {isImporting ? 'Importing…' : 'Confirm import'}
-                                </button>
-                                <button onClick={onCancelImport} className="btn-secondary">
+                                    Confirm import
+                                </Button>
+                                <Button variant="secondary" onClick={onCancelImport}>
                                     Cancel
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     ) : (
@@ -338,31 +338,30 @@ function TripCard({
 
                 {isSelected ? (
                     <div className="shrink-0 flex items-center gap-2">
-                        <button
+                        <Button
+                            variant="secondary"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 onShare();
                             }}
-                            className="btn-secondary p-[var(--space-2)]"
+                            size="icon"
                             title="Copy summary"
                         >
                             <Copy className="h-4 w-4" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="primary"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 onExport();
                             }}
                             disabled={isExporting}
-                            className="btn-primary inline-flex items-center gap-2"
+                            isLoading={isExporting}
+                            loadingText="Export"
+                            leftIcon={!isExporting ? <Download className="h-4 w-4" /> : undefined}
                         >
-                            {isExporting ? (
-                                <RefreshCw className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Download className="h-4 w-4" />
-                            )}
                             Export
-                        </button>
+                        </Button>
                     </div>
                 ) : null}
             </div>

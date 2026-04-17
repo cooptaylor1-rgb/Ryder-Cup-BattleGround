@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import { LinkButton } from '@/components/ui/LinkButton';
 
 import { cn } from '@/lib/utils';
 
@@ -66,13 +66,14 @@ export function EmptyManageCard({
       </div>
       <h3 className="mt-[var(--space-4)] type-title-lg text-[var(--ink)]">{title}</h3>
       <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">{description}</p>
-      <Link
+      <LinkButton
         href={actionHref}
-        className="btn-premium mt-[var(--space-5)] inline-flex items-center gap-[var(--space-2)] rounded-[1rem] px-[var(--space-4)] py-[var(--space-3)]"
+        variant="primary"
+        leftIcon={<Plus size={16} />}
+        className="mt-[var(--space-5)] rounded-[1rem]"
       >
-        <Plus size={16} />
         {actionLabel}
-      </Link>
+      </LinkButton>
     </div>
   );
 }

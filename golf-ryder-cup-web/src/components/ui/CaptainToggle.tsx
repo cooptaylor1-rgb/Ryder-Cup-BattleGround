@@ -17,6 +17,7 @@ import { KeyRound, Shield, ShieldCheck } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useAccessStore } from '@/lib/stores';
+import { Button } from './Button';
 import { ConfirmDialog, Modal } from './Modal';
 
 interface CaptainToggleProps {
@@ -180,26 +181,28 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
         </div>
 
         {captainPinHash && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setShowResetConfirm(true)}
-            className="btn-ghost mb-[var(--space-3)] w-full text-sm text-[var(--masters)]"
+            leftIcon={<KeyRound size={14} />}
+            className="mb-[var(--space-3)] w-full text-sm text-[var(--masters)]"
           >
-            <KeyRound size={14} className="mr-1 inline align-middle" />
             Forgot PIN?
-          </button>
+          </Button>
         )}
 
         <div className="flex gap-[var(--space-3)]">
-          <button onClick={handleClosePinModal} className="btn-secondary flex-1">
+          <Button variant="secondary" onClick={handleClosePinModal} className="flex-1">
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleEnableCaptain}
             disabled={pin.length < 4 || attempts >= 3}
-            className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1"
           >
             {captainPinHash ? 'Unlock' : 'Enable'}
-          </button>
+          </Button>
         </div>
       </Modal>
 

@@ -181,6 +181,24 @@ export interface Trip {
   captainName?: string;
   captainPin?: string;
   settings?: TripSettings;
+  /**
+   * If true, the trip is a casual practice round rather than a cup-style team
+   * competition. Team-vs-team leaderboards and cup-specific framing are
+   * suppressed; sessions/matches/scoring still work for pairings and handicap
+   * tracking, but there is no "USA vs Europe" scoreboard.
+   */
+  isPracticeRound?: boolean;
+  /**
+   * Scoring rules chosen during trip setup. Persisted so the trip
+   * settings page can offer post-creation editing. Null/undefined
+   * means "use defaults" (backward compat for existing trips).
+   */
+  scoringSettings?: import('@/components/trip-setup').ScoringSettings;
+  /**
+   * Handicap rules chosen during trip setup. Same persistence story
+   * as scoringSettings.
+   */
+  handicapSettings?: import('@/components/trip-setup').HandicapSettings;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }

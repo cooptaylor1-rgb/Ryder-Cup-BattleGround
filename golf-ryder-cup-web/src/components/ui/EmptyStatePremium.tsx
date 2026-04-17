@@ -8,9 +8,10 @@
 
 'use client';
 
-import Link from 'next/link';
 import { type ReactNode, type ComponentType } from 'react';
+import { LinkButton } from './LinkButton';
 import { cn } from '@/lib/utils';
+import { Button } from './Button';
 import {
     GolfBallTee,
     TrophyIllustration,
@@ -204,15 +205,15 @@ export function EmptyStatePremium({
                 </div>
             )}
 
-            {/* Primary action -- btn-premium for Masters green CTA */}
+            {/* Primary action -- Button for Masters green CTA */}
             {action && (
-                <button
+                <Button
+                    variant="primary"
                     onClick={action.onClick}
-                    className="btn-premium"
+                    leftIcon={action.icon}
                 >
-                    {action.icon}
                     {action.label}
-                </button>
+                </Button>
             )}
 
             {/* Secondary action -- understated, editorial link style */}
@@ -296,17 +297,18 @@ export function NoTournamentsEmpty({
         >
             <div style={{ display: 'flex', gap: 'var(--space-3)', width: '100%', marginTop: 'var(--space-6)' }}>
                 {createHref ? (
-                    <Link
+                    <LinkButton
                         href={createHref}
-                        className="btn-premium press-scale"
-                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)', textDecoration: 'none' }}
+                        variant="primary"
+                        leftIcon={<Plus size={18} />}
+                        className="press-scale flex-1"
                     >
-                        <Plus size={18} /> New Trip
-                    </Link>
+                        New Trip
+                    </LinkButton>
                 ) : (
-                    <button onClick={onCreateTrip} className="btn-premium press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
-                        <Plus size={18} /> New Trip
-                    </button>
+                    <Button variant="primary" onClick={onCreateTrip} leftIcon={<Plus size={18} />} className="press-scale" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-2)' }}>
+                        New Trip
+                    </Button>
                 )}
                 {onJoinTrip && (
                     <button onClick={onJoinTrip} className="press-scale" style={{

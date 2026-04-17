@@ -11,6 +11,7 @@ import {
     Flag,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 
 export interface TeamColors {
     teamA: {
@@ -127,22 +128,24 @@ export function TeamColorPicker({
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => setShowPreview(!showPreview)}
+                        leftIcon={<Eye className="w-4 h-4" />}
+                        size="sm"
                         className={cn(
-                            'btn-secondary text-sm px-3 py-1.5',
                             showPreview && 'bg-[color:var(--masters)]/12 text-[var(--masters)]'
                         )}
                     >
-                        <Eye className="w-4 h-4 mr-1" />
                         Preview
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="secondary"
                         onClick={resetToDefault}
-                        className="btn-secondary text-sm px-3 py-1.5"
+                        size="sm"
                     >
                         <RotateCcw className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             </div>
 

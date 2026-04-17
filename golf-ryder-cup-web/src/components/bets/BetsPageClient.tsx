@@ -15,6 +15,7 @@ import {
   buildNassauSideBet,
   buildQuickSideBet,
 } from '@/lib/services/sideBetBuilders';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, SideBet, SideBetType } from '@/lib/types/models';
@@ -56,18 +57,13 @@ export default function BetsPageClient() {
   const [nassauTeamB, setNassauTeamB] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sessionIds = sessions.map((session) => session.id);
+  const tripData = useTripScopedMatches(currentTrip?.id);
+  const matches = tripData?.matches ?? [];
 
   const sideBets = useLiveQuery(
     async () => (currentTrip ? db.sideBets.where('tripId').equals(currentTrip.id).toArray() : []),
     [currentTrip?.id],
     [] as SideBet[]
-  );
-
-  const matches = useLiveQuery(
-    async () => (sessionIds.length > 0 ? db.matches.where('sessionId').anyOf(sessionIds).toArray() : []),
-    [sessionIds.join('|')],
-    [] as Match[]
   );
 
   if (!currentTrip) {
@@ -258,8 +254,8 @@ export default function BetsPageClient() {
         title="Side Bets"
         subtitle={currentTrip.name}
         icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/"
         rightSlot={
           <Button
             variant="primary"

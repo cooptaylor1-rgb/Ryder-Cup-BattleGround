@@ -78,17 +78,17 @@ export default function MessagesPage() {
         title="Messages"
         subtitle={currentTrip.name}
         icon={<MessageSquare size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/captain"
         rightSlot={
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={() => setShowComposer(true)}
-            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)]"
+            leftIcon={<Send size={16} />}
+            size="sm"
           >
-            <Send size={16} />
             New
-          </button>
+          </Button>
         }
       />
 

@@ -237,7 +237,7 @@ export default function TripAwardsPage() {
           title="Trip Awards"
           subtitle="No active trip"
           icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-          onBack={() => router.back()}
+          backFallback="/trip-stats"
         />
 
         <main className="container-editorial py-12">
@@ -263,7 +263,7 @@ export default function TripAwardsPage() {
         title="Trip Awards"
         subtitle={currentTrip.name}
         icon={<Trophy size={16} className="text-[var(--color-accent)]" />}
-        onBack={() => router.back()}
+        backFallback="/trip-stats"
       />
 
       <main className="container-editorial pb-12">

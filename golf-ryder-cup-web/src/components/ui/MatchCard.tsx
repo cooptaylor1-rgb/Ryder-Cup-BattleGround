@@ -9,6 +9,7 @@
 
 import React from 'react';
 import { cn, formatPlayerName } from '@/lib/utils';
+import { getScoreColorClass, getMatchStatusDisplay } from '@/lib/utils/matchDisplay';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player } from '@/lib/types/models';
 import { HoleStrip } from './HoleIndicator';
@@ -31,32 +32,7 @@ export const MatchCard = React.memo(function MatchCard({
 }: MatchCardProps) {
     const { currentScore, holesPlayed, isClosedOut: _isClosedOut, isDormie, displayScore, status } = matchState;
 
-    const getStatusBadge = () => {
-        if (status === 'completed') {
-            return (
-                <span className="badge badge-success">Complete</span>
-            );
-        }
-        if (isDormie) {
-            return (
-                <span className="badge badge-warning">Dormie</span>
-            );
-        }
-        if (holesPlayed > 0) {
-            return (
-                <span className="badge badge-info">Hole {holesPlayed}</span>
-            );
-        }
-        return (
-            <span className="badge badge-default">Not Started</span>
-        );
-    };
-
-    const getScoreColor = () => {
-        if (currentScore > 0) return 'text-team-usa';
-        if (currentScore < 0) return 'text-team-europe';
-        return 'text-[var(--ink-tertiary)]';
-    };
+    const statusDisplay = getMatchStatusDisplay(status, holesPlayed, isDormie);
 
     return (
         <div
@@ -76,7 +52,7 @@ export const MatchCard = React.memo(function MatchCard({
                 <span className="text-sm font-medium text-[var(--ink-tertiary)]">
                     Match {matchNumber}
                 </span>
-                {getStatusBadge()}
+                <span className={`badge badge-${statusDisplay.tone}`}>{statusDisplay.label}</span>
             </div>
 
             {/* Teams */}
@@ -103,7 +79,7 @@ export const MatchCard = React.memo(function MatchCard({
                 <div className="flex flex-col items-center justify-center px-4">
                     <span className={cn(
                         'text-2xl font-bold',
-                        getScoreColor()
+                        getScoreColorClass(currentScore)
                     )}>
                         {displayScore}
                     </span>

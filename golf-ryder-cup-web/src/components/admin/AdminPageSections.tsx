@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertTriangle,
@@ -18,6 +19,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
+import { Button } from '@/components/ui/Button';
 import type { Trip } from '@/lib/types/models';
 import type { AdminDatabaseStats, AdminSyncMetrics, OrphanStats } from './adminData';
 
@@ -58,12 +60,12 @@ export function AdminLockedState({ onBack }: AdminLockedStateProps) {
                     <p className="mb-6 type-body text-[var(--ink-secondary)]">
                         Enable Admin Mode from the More menu to access these features.
                     </p>
-                    <Link
+                    <LinkButton
                         href="/more"
-                        className="btn-premium px-[var(--space-5)] py-[var(--space-3)]"
+                        variant="primary"
                     >
                         Go to More
-                    </Link>
+                    </LinkButton>
                 </div>
             </main>
         </div>
@@ -266,14 +268,18 @@ function AdminCleanupSection({
                                 />
 
                                 {hasOrphans ? (
-                                    <button
+                                    <Button
+                                        variant="danger"
                                         onClick={onCleanOrphans}
                                         disabled={isCleaningOrphans}
-                                        className={`btn-premium mt-2 bg-[var(--error)] px-[var(--space-3)] py-[var(--space-2)] text-[var(--canvas)] ${isCleaningOrphans ? 'opacity-60' : ''}`}
+                                        isLoading={isCleaningOrphans}
+                                        loadingText="Cleaning..."
+                                        leftIcon={!isCleaningOrphans ? <Zap size={14} /> : undefined}
+                                        className="mt-2"
+                                        size="sm"
                                     >
-                                        <Zap size={14} />
-                                        {isCleaningOrphans ? 'Cleaning...' : 'Clean Orphaned Data'}
-                                    </button>
+                                        Clean Orphaned Data
+                                    </Button>
                                 ) : null}
                             </div>
                         </motion.div>

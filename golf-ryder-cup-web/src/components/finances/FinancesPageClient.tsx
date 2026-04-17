@@ -160,8 +160,7 @@ export default function FinancesPageClient() {
           title="Finances"
           subtitle="No active trip"
           icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
-          iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-          onBack={() => router.back()}
+          backFallback="/"
         />
 
         <main className="container-editorial py-12">
@@ -202,8 +201,7 @@ export default function FinancesPageClient() {
         title="Finances"
         subtitle={currentTrip.name}
         icon={<DollarSign size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)]"
-        onBack={() => router.back()}
+        backFallback="/"
         rightSlot={
           isCaptainMode ? (
             <Button

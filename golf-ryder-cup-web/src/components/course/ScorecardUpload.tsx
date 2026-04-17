@@ -361,6 +361,17 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                           <td style={{ padding: '4px 2px' }}></td>
                         </tr>
                       )}
+                      {extractedData.holes.some(h => h.yardage) && (
+                        <tr style={{ color: 'var(--ink-secondary)' }}>
+                          <td style={{ padding: '4px 2px', fontWeight: 500 }}>Yds</td>
+                          {extractedData.holes.slice(0, 9).map((h, i) => (
+                            <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.yardage ?? '-'}</td>
+                          ))}
+                          <td style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600 }}>
+                            {extractedData.holes.slice(0, 9).reduce((s, h) => s + (h.yardage || 0), 0) || '-'}
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -397,6 +408,17 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                             <td style={{ padding: '4px 2px' }}></td>
                           </tr>
                         )}
+                        {extractedData.holes.some(h => h.yardage) && (
+                          <tr style={{ color: 'var(--ink-secondary)' }}>
+                            <td style={{ padding: '4px 2px', fontWeight: 500 }}>Yds</td>
+                            {extractedData.holes.slice(9, 18).map((h, i) => (
+                              <td key={i} style={{ padding: '4px 2px', textAlign: 'center' }}>{h.yardage ?? '-'}</td>
+                            ))}
+                            <td style={{ padding: '4px 2px', textAlign: 'center', fontWeight: 600 }}>
+                              {extractedData.holes.slice(9, 18).reduce((s, h) => s + (h.yardage || 0), 0) || '-'}
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -414,12 +436,9 @@ export function ScorecardUpload({ onDataExtracted, onClose }: ScorecardUploadPro
                 <Button variant="secondary" onClick={resetUpload} className="flex-1">
                   Scan Another
                 </Button>
-                <button
-                  onClick={handleUseData}
-                  className="btn-premium flex-1"
-                >
+                <Button variant="primary" onClick={handleUseData} className="flex-1">
                   Use This Data
-                </button>
+                </Button>
               </div>
             </div>
           )}

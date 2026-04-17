@@ -9,6 +9,7 @@ import { useShallow } from 'zustand/shallow';
 import { createLogger } from '@/lib/utils/logger';
 import { buildMagicLinkRedirectPath, requestEmailSignInLink } from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/Button';
 import {
   ArrowLeft,
   ArrowRight,
@@ -267,15 +268,19 @@ export default function CreateProfilePageClient() {
         <div className="mx-auto max-w-[420px]">
           {step === 'essential' ? (
             <div>
-              <button
+              <Button
+                variant="primary"
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || isLoading}
-                className="btn-premium press-scale flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)] px-[var(--space-6)] py-[var(--space-4)] disabled:cursor-not-allowed disabled:opacity-60"
+                isLoading={isSubmitting || isLoading}
+                loadingText="Creating..."
+                rightIcon={!(isSubmitting || isLoading) ? <ArrowRight size={16} /> : undefined}
+                fullWidth
+                className="press-scale rounded-[var(--radius-lg)] px-[var(--space-6)] py-[var(--space-4)]"
               >
-                {isSubmitting || isLoading ? 'Creating...' : 'Create Account'}
-                {!isSubmitting && !isLoading && <ArrowRight size={16} />}
-              </button>
+                Create Account
+              </Button>
               <button
                 type="button"
                 onClick={() => {
@@ -298,15 +303,18 @@ export default function CreateProfilePageClient() {
               >
                 <ArrowLeft size={18} />
               </button>
-              <button
+              <Button
+                variant="primary"
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || isLoading}
-                className="btn-premium press-scale flex flex-1 items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)] px-[var(--space-6)] py-[var(--space-4)] disabled:cursor-not-allowed disabled:opacity-60"
+                isLoading={isSubmitting || isLoading}
+                loadingText="Creating..."
+                rightIcon={!(isSubmitting || isLoading) ? <Check size={16} /> : undefined}
+                className="press-scale flex-1 rounded-[var(--radius-lg)] px-[var(--space-6)] py-[var(--space-4)]"
               >
-                {isSubmitting || isLoading ? 'Creating...' : 'Complete Setup'}
-                {!isSubmitting && !isLoading && <Check size={16} />}
-              </button>
+                Complete Setup
+              </Button>
             </div>
           )}
         </div>

@@ -186,17 +186,18 @@ export default function AvailabilityPage() {
         title="Availability"
         subtitle={currentTrip.name}
         icon={<UserCheck size={16} className="text-[var(--canvas)]" />}
-        iconContainerClassName="bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)]"
-        onBack={() => router.back()}
+        iconTone="captain"
+        backFallback="/captain"
         rightSlot={
-          <button
+          <Button
+            variant="primary"
             onClick={handleRefresh}
-            className="btn-premium flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)]"
+            leftIcon={<RefreshCw size={16} />}
+            size="sm"
             aria-label="Refresh attendance"
           >
-            <RefreshCw size={16} />
             Refresh
-          </button>
+          </Button>
         }
       />
 
