@@ -193,7 +193,22 @@ export default function HomePage() {
       <PageHeader
         title="Ryder Cup Tracker"
         subtitle={headerSubtitle}
-        rightSlot={hasTrips ? <CaptainToggle /> : null}
+        rightSlot={
+          <div className="flex items-center gap-1">
+            {/* Persistent "New Trip" action — the most important captain
+                action should never be more than one tap from home,
+                whether there's an active trip or not. */}
+            <Link
+              href="/trip/new"
+              aria-label="Create a new trip"
+              title="Create a new trip"
+              className="press-scale p-2 rounded-[var(--radius-md)] text-[var(--ink-secondary)] hover:bg-[var(--canvas-sunken)] transition-colors"
+            >
+              <Plus size={20} strokeWidth={1.75} />
+            </Link>
+            {hasTrips ? <CaptainToggle /> : null}
+          </div>
+        }
       />
 
       {/* ── CONTINUE SCORING BANNER ── */}
