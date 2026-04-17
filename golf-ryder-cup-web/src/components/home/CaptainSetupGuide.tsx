@@ -47,11 +47,11 @@ export function CaptainSetupGuide({
     const allDone = done === steps.length;
     const pct = Math.round((done / steps.length) * 100);
 
-    // Auto-collapse once the captain is 3+ of 5 done — by that point
-    // they've seen the full checklist multiple times and just want to
-    // know what's left. User can still expand manually.
-    const shouldAutoCollapse = done >= 3 && !allDone;
-    const [expanded, setExpanded] = useState(!shouldAutoCollapse);
+    // Default to collapsed so Home doesn't duplicate the Captain Blocker
+    // dashboard card, which already surfaces the single most-urgent next
+    // action. The full 5-step list stays one tap away via the toggle and
+    // at /captain/checklist.
+    const [expanded, setExpanded] = useState(false);
 
     if (allDone) return null;
 
@@ -84,7 +84,7 @@ export function CaptainSetupGuide({
                         className="w-full flex items-center gap-[var(--space-3)] mb-[var(--space-4)] text-left bg-transparent border-0 cursor-pointer"
                     >
                         <p className="type-title-sm flex-1">
-                            {shouldAutoCollapse && !expanded && nextStep
+                            {!expanded && nextStep
                                 ? `Next: ${nextStep.label}`
                                 : 'Get Your Trip Ready'}
                         </p>

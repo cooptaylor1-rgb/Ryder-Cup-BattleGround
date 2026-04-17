@@ -156,41 +156,34 @@ export function TripDashboardSections({
           accentClassName="bg-[color:var(--gold)]/14 text-[var(--gold-dark)]"
         />
 
-        <DashboardCard
-          href="/bets"
-          eyebrow="Bets"
-          title={
-            activeBets.length > 0
-              ? `${activeBets.length} active game${activeBets.length === 1 ? '' : 's'}`
-              : 'No bets started yet'
-          }
-          body={
-            activeBets.length > 0
-              ? `$${activeBetPot} currently in play across trip-wide and match-side games.`
-              : 'Open Nassau, skins, and match-side action.'
-          }
-          footerLabel="Open bets"
-          icon={<ScrollText size={18} strokeWidth={1.8} />}
-          accentClassName="bg-[color:var(--maroon)]/10 text-[var(--maroon)]"
-        />
+        {/* Bets and Awards tiles are demoted to "only when they have
+            content". A trip with zero bets and no awards yet sees four
+            high-signal tiles instead of six, most of which were empty
+            prompts. Both are still reachable via /bets and /trip-stats/
+            awards directly (or via the /captain hub for captains). */}
+        {activeBets.length > 0 && (
+          <DashboardCard
+            href="/bets"
+            eyebrow="Bets"
+            title={`${activeBets.length} active game${activeBets.length === 1 ? '' : 's'}`}
+            body={`$${activeBetPot} currently in play across trip-wide and match-side games.`}
+            footerLabel="Open bets"
+            icon={<ScrollText size={18} strokeWidth={1.8} />}
+            accentClassName="bg-[color:var(--maroon)]/10 text-[var(--maroon)]"
+          />
+        )}
 
-        <DashboardCard
-          href="/trip-stats/awards"
-          eyebrow="Awards"
-          title={
-            tripAwards.length > 0
-              ? `${tripAwards.length} award${tripAwards.length === 1 ? '' : 's'} on record`
-              : 'Awards room is open'
-          }
-          body={
-            tripAwards.length > 0
-              ? 'Review the ceremony board and lock in the weekend superlatives.'
-              : 'Vote on the trip characters, moments, and superlatives.'
-          }
-          footerLabel="View awards"
-          icon={<Sparkles size={18} strokeWidth={1.8} />}
-          accentClassName="bg-[color:var(--masters-deep)]/10 text-[var(--masters-deep)]"
-        />
+        {tripAwards.length > 0 && (
+          <DashboardCard
+            href="/trip-stats/awards"
+            eyebrow="Awards"
+            title={`${tripAwards.length} award${tripAwards.length === 1 ? '' : 's'} on record`}
+            body="Review the ceremony board and lock in the weekend superlatives."
+            footerLabel="View awards"
+            icon={<Sparkles size={18} strokeWidth={1.8} />}
+            accentClassName="bg-[color:var(--masters-deep)]/10 text-[var(--masters-deep)]"
+          />
+        )}
 
         <DashboardCard
           href="/social"

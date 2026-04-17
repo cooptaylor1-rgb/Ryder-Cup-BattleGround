@@ -12,6 +12,8 @@ import {
     TripDangerZoneSection,
     TripDetailsSection,
 } from '@/components/trip-settings';
+import { useAccessStore, useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Trip } from '@/lib/types/models';
 
 /**
@@ -27,9 +29,24 @@ export default function TripSettingsPage() {
     const router = useRouter();
     const tripId = params.tripId as string;
 
+    const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+    const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
+
     const [isVerifyingTrip, setIsVerifyingTrip] = useState(true);
     const [trip, setTrip] = useState<Trip | null>(null);
     const [tripLookupError, setTripLookupError] = useState<string | null>(null);
+
+    // Captains have /captain/settings as the single configuration hub
+    // (trip details + team names + competition rules + backup + danger
+    // zone). When a captain lands here for the active trip, forward them
+    // there instead of showing a duplicate page with the same controls.
+    // Non-captains and captains viewing a non-active trip still see this
+    // page unchanged.
+    useEffect(() => {
+        if (isCaptainMode && currentTrip?.id === tripId) {
+            router.replace('/captain/settings');
+        }
+    }, [isCaptainMode, currentTrip?.id, tripId, router]);
 
     const loadTrip = async () => {
         try {
