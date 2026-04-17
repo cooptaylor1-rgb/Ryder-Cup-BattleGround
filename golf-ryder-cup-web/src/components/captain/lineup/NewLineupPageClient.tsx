@@ -106,6 +106,11 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const [firstTeeTime, setFirstTeeTime] = useState(defaultTeeTime);
   const [teeTimeInterval, setTeeTimeInterval] = useState(10);
   const [matchCount, setMatchCount] = useState(4);
+  /** When true, this session is a practice round — it gets paired and
+   *  scored but doesn't contribute to the cup leaderboard. Lets a single
+   *  trip contain both practice rounds (Day 0 warm-up) and tournament
+   *  sessions (Friday onwards). */
+  const [isPracticeSession, setIsPracticeSession] = useState(false);
   const [pointsPerMatch, setPointsPerMatch] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -330,9 +335,10 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
           sessionType,
           scheduledDate: scheduledDate || undefined,
           timeSlot: derivedTimeSlot,
-          pointsPerMatch,
+          pointsPerMatch: isPracticeSession ? 0 : pointsPerMatch,
           status: 'scheduled',
           isLocked: true,
+          isPracticeSession: isPracticeSession || undefined,
         });
 
         const lineupState = buildPersistedLineupState(session.id, matches);
@@ -424,9 +430,10 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
         sessionType: nextType,
         scheduledDate: nextDate || undefined,
         timeSlot: derivedTimeSlot,
-        pointsPerMatch: nextPointsPerMatch,
+        pointsPerMatch: isPracticeSession ? 0 : nextPointsPerMatch,
         status: 'scheduled',
         isLocked: false,
+        isPracticeSession: isPracticeSession || undefined,
       });
 
       showToast('success', 'Session added. You can add another right away.');
@@ -737,6 +744,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             onPointsPerMatchChange={setPointsPerMatch}
             onAddSessionToQueue={handleCreateSessionShell}
             onContinue={() => setStep('lineup')}
+            isPracticeSession={isPracticeSession}
+            onPracticeSessionChange={setIsPracticeSession}
           />
         ) : (
           <section className="section">

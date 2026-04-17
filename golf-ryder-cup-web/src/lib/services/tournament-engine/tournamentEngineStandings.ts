@@ -64,7 +64,12 @@ export async function calculateTeamStandings(tripId: string): Promise<TeamStandi
         .equals(tripId)
         .toArray();
 
-    const sessionIds = sessions.map((session) => session.id);
+    // Practice sessions are paired and scored but do NOT contribute
+    // points to the cup leaderboard. Exclude them from the match pool
+    // before aggregating standings so Thursday's warm-up round can't
+    // affect Friday's cup.
+    const cupSessions = sessions.filter((s) => !s.isPracticeSession);
+    const sessionIds = cupSessions.map((session) => session.id);
     const matches = await db.matches
         .where('sessionId')
         .anyOf(sessionIds)

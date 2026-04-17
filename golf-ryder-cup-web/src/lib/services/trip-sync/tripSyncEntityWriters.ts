@@ -214,6 +214,7 @@ export async function syncSessionToCloud(
     notes: session.notes || null,
     status: session.status || 'scheduled',
     is_locked: session.isLocked || false,
+    is_practice_session: session.isPracticeSession || false,
     updated_at: new Date().toISOString(),
   };
 

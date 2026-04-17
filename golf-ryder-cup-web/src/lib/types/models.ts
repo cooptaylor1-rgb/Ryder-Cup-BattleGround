@@ -328,6 +328,19 @@ export interface RyderCupSession {
   notes?: string;
   status: 'scheduled' | 'inProgress' | 'completed';
   isLocked?: boolean;
+  /**
+   * When true, the session is a casual practice round that runs inside
+   * the trip (e.g. "Day 0 Practice Round" before the Friday AM Foursomes).
+   * Matches in practice sessions still get paired and scored, but:
+   *   - they don't contribute points to the cup leaderboard
+   *   - they're shown with a "Practice" tag in the schedule / manage UI
+   *   - session.pointsPerMatch is ignored (treated as 0)
+   *
+   * Distinct from Trip.isPracticeRound, which makes the ENTIRE trip
+   * casual. A trip can be a cup (isPracticeRound=false) and still
+   * contain practice sessions via this flag.
+   */
+  isPracticeSession?: boolean;
   createdAt: ISODateString;
   updatedAt?: ISODateString;
 }

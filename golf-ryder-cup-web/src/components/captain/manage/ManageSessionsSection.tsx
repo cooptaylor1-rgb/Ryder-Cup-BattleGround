@@ -174,6 +174,16 @@ export function SessionManagementCard({
             </div>
 
             <div className="flex items-center gap-[var(--space-2)]">
+              {session.isPracticeSession ? (
+                <div
+                  className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[color:var(--info)]/20 bg-[color:var(--info)]/10 px-[var(--space-2)] py-[6px]"
+                  title="Practice session — doesn't count toward the cup"
+                >
+                  <span className="type-micro font-semibold text-[var(--info)]">
+                    Practice
+                  </span>
+                </div>
+              ) : null}
               <SessionStatusPill status={session.status} />
               {session.isLocked ? (
                 <div className="inline-flex items-center gap-[var(--space-1)] rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 px-[var(--space-2)] py-[6px]">
