@@ -112,7 +112,7 @@ export function TripDashboardSections({
             footerLabel={nextUp.footerLabel}
             icon={<Target size={18} strokeWidth={1.8} />}
             accentClassName="bg-[color:var(--masters)]/10 text-[var(--masters)]"
-            className="border-[color:var(--masters)]/18 bg-[linear-gradient(135deg,rgba(0,102,68,0.08),rgba(255,255,255,0.9))]"
+            className="border-[color:var(--masters)]/20 bg-[linear-gradient(135deg,rgba(0,102,68,0.08),rgba(255,255,255,0.9))]"
           />
         </div>
       ) : null}
@@ -246,30 +246,30 @@ function DashboardCard({
     <Link
       href={href}
       className={cn(
-        'group rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]',
+        'group block overflow-hidden rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]',
         className
       )}
     >
       <div className="flex items-start justify-between gap-[var(--space-3)]">
-        <div className={`inline-flex rounded-full px-[var(--space-3)] py-[var(--space-2)] ${accentClassName}`}>
+        <div className={`inline-flex shrink-0 rounded-full px-[var(--space-3)] py-[var(--space-2)] ${accentClassName}`}>
           {icon}
         </div>
-        <span className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        <span className="type-micro min-w-0 text-right uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
           {eyebrow}
         </span>
       </div>
-      <h3 className="mt-[var(--space-4)] text-[1.05rem] font-semibold leading-[1.2] text-[var(--ink)]">
+      <h3 className="mt-[var(--space-4)] break-words text-[1.05rem] font-semibold leading-[1.2] text-[var(--ink)]">
         {title}
       </h3>
-      <p className="mt-[var(--space-2)] text-sm leading-[1.55] text-[var(--ink-secondary)]">
+      <p className="mt-[var(--space-2)] break-words text-sm leading-[1.55] text-[var(--ink-secondary)]">
         {body}
       </p>
-      <div className="mt-[var(--space-4)] flex items-center gap-[var(--space-2)] text-sm font-medium text-[var(--masters)]">
-        <span>{footerLabel}</span>
+      <div className="mt-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-2)] text-sm font-medium text-[var(--masters)]">
+        <span className="min-w-0 break-words">{footerLabel}</span>
         <ChevronRight
           size={16}
           strokeWidth={1.8}
-          className="transition-transform duration-200 group-hover:translate-x-[2px]"
+          className="shrink-0 transition-transform duration-200 group-hover:translate-x-[2px]"
         />
       </div>
     </Link>

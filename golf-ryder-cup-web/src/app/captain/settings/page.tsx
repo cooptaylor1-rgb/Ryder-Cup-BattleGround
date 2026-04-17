@@ -26,6 +26,7 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
+import { TripDangerZoneSection } from '@/components/trip-settings';
 
 export default function CaptainSettingsPage() {
   const router = useRouter();
@@ -289,6 +290,10 @@ export default function CaptainSettingsPage() {
               </div>
             </div>
           </aside>
+        </section>
+
+        <section className="mt-[var(--space-6)]">
+          <TripDangerZoneSection tripId={currentTrip.id} />
         </section>
       </main>
     </div>

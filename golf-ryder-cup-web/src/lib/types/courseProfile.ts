@@ -32,11 +32,11 @@ export interface TeeSetProfile {
     rating: number;
     slope: number;
     par: number;
-    /** 18 elements: par for each hole */
+    /** Par for each hole. Length equals the course's hole count (typically 18, but short courses may be 9-17). */
     holePars: number[];
-    /** 18 elements: handicap rank 1-18 (1 = hardest) */
+    /** Handicap rank per hole, 1 = hardest. Values must be 1..holePars.length with each appearing exactly once. */
     holeHandicaps: number[];
-    /** 18 elements: yardage for each hole */
+    /** Yardage for each hole. Length should match holePars.length when provided. */
     yardages?: number[];
     totalYardage?: number;
     createdAt: ISODateString;
@@ -67,21 +67,26 @@ export function calculateTotalPar(holePars: number[]): number {
 }
 
 /**
- * Validate hole handicaps (should be 1-18, each appearing once)
+ * Validate hole handicaps — each value 1..N must appear exactly once,
+ * where N is the number of holes (typically 18 but may be less for
+ * short courses like par-3 loops).
  */
 export function validateHoleHandicaps(handicaps: number[]): boolean {
-    if (handicaps.length !== 18) return false;
+    const count = handicaps.length;
+    if (count < 1) return false;
     const sorted = [...handicaps].sort((a, b) => a - b);
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < count; i++) {
         if (sorted[i] !== i + 1) return false;
     }
     return true;
 }
 
 /**
- * Validate hole pars (should be 3-5 for each hole)
+ * Validate hole pars. Par 3-6 is accepted to allow par-3 courses and the
+ * occasional par-6 hole. The array length is not constrained here — short
+ * courses may have fewer than 18 holes.
  */
 export function validateHolePars(pars: number[]): boolean {
-    if (pars.length !== 18) return false;
-    return pars.every(par => par >= 3 && par <= 5);
+    if (pars.length < 1) return false;
+    return pars.every(par => par >= 3 && par <= 6);
 }
