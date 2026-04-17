@@ -14,10 +14,7 @@ import {
   Plus,
   Trophy,
   Shield,
-  Users,
-  ClipboardCheck,
   Tv,
-  Share2,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { shareTrip } from '@/lib/utils/share';
@@ -34,8 +31,9 @@ import {
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 import { PageHeader } from '@/components/layout';
 import { TripDashboardSections } from './TripDashboardSections';
-import { HeroMetaPill, HeroMetaStat, HomeSectionHeader, SetupStep } from './HomeSharedComponents';
+import { HeroMetaPill, HeroMetaStat, HomeSectionHeader } from './HomeSharedComponents';
 import { TripCard } from './TripCard';
+import { CaptainSetupGuide } from './CaptainSetupGuide';
 
 function readPendingJoinCode(): string | undefined {
   if (typeof window === 'undefined') {
@@ -237,8 +235,12 @@ export default function HomePage() {
                 <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
                   <div className="flex items-start justify-between gap-[var(--space-4)]">
                     <div className="min-w-0">
+                      {/* Eyebrow's job is orientation, not theme.
+                          Plain "YOUR TRIP" beats editorial copy here
+                          because users scan for "which section is
+                          today's trip?" — not for clever framing. */}
                       <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
-                        TODAY&apos;S MATCH BOOK
+                        YOUR TRIP
                       </p>
                       <h1 className="type-display mt-[var(--space-2)] text-[var(--ink)]">
                         {activeTrip.name}
@@ -439,117 +441,26 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* SETUP GUIDE — Shown to captains until the trip is fully
-                cup-ready. Previously it disappeared after the first
-                session was created, but captains still need to publish
-                lineups and assign courses before the trip can actually
-                run. The extended checklist gives a captain one place
-                to see "what's left" at any point in setup. */}
-            {(() => {
-              if (!isCaptainMode) return null;
-
-              const hasPlayers = players.length >= 4;
-              const hasTeams = teams.length >= 2 && teamMembers.length >= 4;
-              const hasSessions = sessions.length > 0;
-              const hasMatches = tripMatches.length > 0;
-              const hasCourses = tripMatches.length > 0 && tripMatches.every((m) => Boolean(m.courseId));
-
-              const steps = [hasPlayers, hasTeams, hasSessions, hasMatches, hasCourses];
-              const done = steps.filter(Boolean).length;
-              const allDone = done === steps.length;
-
-              // Once every step is checked, the guide hides — the trip
-              // is ready to run. Any regression (e.g. captain deletes a
-              // course) brings it back automatically.
-              if (allDone) return null;
-
-              const pct = Math.round((done / steps.length) * 100);
-
-              return (
-                <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
-                  <HomeSectionHeader
-                    eyebrow={
-                      <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
-                        <Shield size={12} className="align-middle" />
-                        Captain Setup
-                      </span>
-                    }
-                    title="Build the trip before the first shot is struck."
-                  />
-                  <div className="mt-[var(--space-4)]">
-                    <div className="card-captain">
-                      <div className="flex items-center gap-[var(--space-3)] mb-[var(--space-4)]">
-                        <p className="type-title-sm flex-1">Get Your Trip Ready</p>
-                        <span className="type-micro font-semibold text-[var(--masters)]">
-                          {done} / {steps.length} · {pct}%
-                        </span>
-                      </div>
-                      <div className="h-1 rounded-full mb-[var(--space-4)] bg-[var(--canvas-sunken)]" style={{ overflow: 'hidden' }}>
-                        <div className="h-full rounded-full bg-[var(--masters)] transition-all duration-500" style={{ width: `${pct}%` }} />
-                      </div>
-
-                      <div className="flex flex-col gap-[var(--space-2)]">
-                        <SetupStep
-                          number={1}
-                          label="Add Players"
-                          done={hasPlayers}
-                          href="/players"
-                          hint={hasPlayers ? `${players.length} on the roster` : `${players.length} added — need at least 4`}
-                        />
-                        <SetupStep
-                          number={2}
-                          label="Assign Teams"
-                          done={hasTeams}
-                          href="/players?panel=draft"
-                          hint={hasTeams ? 'Both sides have players' : 'Draft players to teams'}
-                        />
-                        <SetupStep
-                          number={3}
-                          label="Create First Session"
-                          done={hasSessions}
-                          href="/lineup/new?mode=session"
-                          hint={hasSessions ? `${sessions.length} session${sessions.length === 1 ? '' : 's'} scheduled` : 'Set up rounds and formats'}
-                        />
-                        <SetupStep
-                          number={4}
-                          label="Publish a Lineup"
-                          done={hasMatches}
-                          href="/lineup/new"
-                          hint={hasMatches ? `${tripMatches.length} match${tripMatches.length === 1 ? '' : 'es'} on the board` : 'Pair players into matches'}
-                        />
-                        <SetupStep
-                          number={5}
-                          label="Assign Courses"
-                          done={hasCourses}
-                          href="/captain/manage"
-                          hint={hasCourses
-                            ? 'Every match has a course'
-                            : hasMatches
-                              ? `${tripMatches.filter((m) => !m.courseId).length} match${tripMatches.filter((m) => !m.courseId).length === 1 ? '' : 'es'} still need a course`
-                              : 'Needed before matches can be scored with handicaps'}
-                        />
-                      </div>
-
-                      {/* Prominent invite CTA after setup steps */}
-                      {players.length >= 2 && (
-                        <button
-                          onClick={handleInviteFriends}
-                          className="mt-[var(--space-4)] w-full flex items-center justify-center gap-[var(--space-2)] py-[var(--space-3)] px-[var(--space-4)] rounded-xl font-medium text-[var(--text-sm)] bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)] press-scale"
-                        >
-                          <Share2 size={16} className="text-[var(--masters)]" />
-                          Share invite link with your group
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </section>
-              );
-            })()}
+            {/* SETUP GUIDE — Shown to captains until the trip is cup-ready.
+                Lives in its own component so it can own collapse state and
+                keep this page shorter. Auto-collapses when 3+/5 done. */}
+            {isCaptainMode && (
+              <CaptainSetupGuide
+                players={players}
+                teams={teams}
+                teamMembers={teamMembers}
+                sessions={sessions}
+                tripMatches={tripMatches}
+                onInviteFriends={handleInviteFriends}
+              />
+            )}
 
             {/* NON-CAPTAIN GUIDANCE — Show when not captain and no sessions exist */}
             {!isCaptainMode && sessions.length === 0 && players.length > 0 && (
               <section className="rounded-[1.5rem] border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(46,34,18,0.05)]">
-                <HomeSectionHeader eyebrow="Clubhouse Note" title="The trip is set up; the pairings are not." />
+                {/* "Clubhouse Note" read as a message/announcement. This
+                    section is actually a status update, so label it as one. */}
+                <HomeSectionHeader eyebrow="Trip Status" title="The trip is set up; the pairings are not." />
                 <div className="mt-[var(--space-4)]">
                   <div className="card-editorial" style={{ padding: 'var(--space-5)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)' }}>
                     <Shield size={20} strokeWidth={1.5} className="text-[var(--masters)] shrink-0 mt-0.5" />
@@ -566,46 +477,11 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* CAPTAIN QUICK TOOLS */}
-            {isCaptainMode && (
-              <section className="rounded-[1.5rem] border border-[color:var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(91,35,51,0.03),rgba(255,255,255,0.72))] px-[var(--space-5)] py-[var(--space-5)] shadow-[0_12px_30px_rgba(91,35,51,0.08)]">
-                <HomeSectionHeader
-                  eyebrow={
-                    <span className="inline-flex items-center gap-[var(--space-1)] text-[var(--maroon)]">
-                      <Shield size={12} className="align-middle" />
-                      Captain Tools
-                    </span>
-                  }
-                  title="Keep the day moving."
-                  action={
-                    <Link
-                      href="/captain"
-                      className="type-caption flex items-center gap-[var(--space-1)] text-[var(--maroon)] no-underline"
-                    >
-                      All Tools <ChevronRight size={14} />
-                    </Link>
-                  }
-                />
-                <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-3)] sm:grid-cols-4">
-                    <Link href="/lineup/new" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
-                      <Users size={18} className="text-[var(--maroon)]" />
-                      <span className="type-micro text-[var(--ink)]">Lineup</span>
-                    </Link>
-                    <Link href="/captain/checklist" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
-                      <ClipboardCheck size={18} className="text-[var(--maroon)]" />
-                      <span className="type-micro text-[var(--ink)]">Pre-Flight</span>
-                    </Link>
-                    <Link href="/players" className="quick-action-btn press-scale no-underline border-[var(--maroon-subtle)]">
-                      <Users size={18} className="text-[var(--maroon)]" />
-                      <span className="type-micro text-[var(--ink)]">Players</span>
-                    </Link>
-                    <button onClick={handleInviteFriends} className="quick-action-btn press-scale border-[var(--maroon-subtle)]">
-                      <Share2 size={18} className="text-[var(--maroon)]" />
-                      <span className="type-micro text-[var(--ink)]">Invite</span>
-                    </button>
-                </div>
-              </section>
-            )}
+            {/* Captain Quick Tools was removed from home — the bottom-nav
+                Captain tab (when captain mode is on) is now the single
+                entry point to /captain, where the full toolkit lives.
+                Duplicating 4 buttons here just added visual noise and a
+                second way to do the same thing. */}
           </div>
         )}
 
