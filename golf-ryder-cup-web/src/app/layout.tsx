@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { PWAProvider } from '@/components/PWAProvider';
 import { PWABanners } from '@/components/PWABanners';
 import { PWAUpdateToast } from '@/components/PWAUpdateToast';
+import { IOSInstallBanner } from '@/components/IOSInstallBanner';
 import { IOSInstallPrompt } from '@/components/IOSInstallPrompt';
 import { InstallBanner } from '@/components/InstallPrompt';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -229,6 +230,10 @@ export default function RootLayout({
               <CourseSyncInitializer />
               <TripSyncInitializer />
               <ToastContainer />
+              {/* Persistent-but-dismissible strip for iOS Safari users
+                  who haven't installed the PWA. Complements the modal
+                  IOSInstallPrompt, which only appears once per week. */}
+              <IOSInstallBanner />
               <PWABanners />
               <PWAUpdateToast />
               <InstallBanner position="bottom" />
