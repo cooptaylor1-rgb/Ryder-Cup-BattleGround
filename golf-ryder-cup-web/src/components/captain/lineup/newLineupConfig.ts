@@ -1,6 +1,7 @@
 import { FORMAT_CONFIGS } from '@/lib/types/matchFormats';
 import type { MatchFormat } from '@/lib/types/matchFormats';
 import type { SessionType } from '@/lib/types';
+import type { SideBetType } from '@/lib/types/models';
 import type { ScoringMode } from '@/lib/types/scoringFormats';
 
 export type FormatCategory = 'match_play' | 'side_game' | 'individual';
@@ -43,6 +44,24 @@ export function isSupportedSessionType(value: string): value is SessionType {
 export function getScoringMode(formatValue: string): ScoringMode | 'both' | undefined {
   const config = FORMAT_CONFIGS[formatValue as MatchFormat];
   return config?.scoringMode;
+}
+
+/**
+ * Side games that are available today via the captain bets flow.
+ * Clicking one of these in the session-format picker routes the
+ * captain to `/captain/bets?type=...` with the composer preselected.
+ *
+ * Wolf / Vegas / Bingo-Bango-Bongo are listed as side games in the
+ * picker but don't have a first-class SideBet type yet — they stay
+ * flagged as coming soon until the bets composer supports them.
+ */
+export const SIDE_GAME_BET_MAP: Record<string, SideBetType> = {
+  skins: 'skins',
+  nassau: 'nassau',
+};
+
+export function getSideGameBetType(formatValue: string): SideBetType | undefined {
+  return SIDE_GAME_BET_MAP[formatValue];
 }
 
 export const ALL_FORMATS: FormatOption[] = [
