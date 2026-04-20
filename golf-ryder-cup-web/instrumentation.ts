@@ -1,23 +1,30 @@
 /**
  * Next.js Instrumentation Hook
  *
- * This file is loaded by Next.js at server startup and is the only way
- * to bootstrap server-side Sentry for the App Router. Without it, the
- * sentry.server.config and sentry.edge.config files are never loaded
- * and any server-side error (API routes, Server Components, server
- * actions, middleware) is silently dropped.
+ * Loaded once at server startup. Bootstraps server-side Sentry and runs
+ * environment-variable validation so misconfigured deploys fail loudly
+ * at boot instead of silently on the first feature use.
  *
- * Also exports `onRequestError` so Sentry automatically captures every
- * unhandled server-side request error. This requires @sentry/nextjs
- * >= 8.28.0 and Next.js >= 15.
- *
- * https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+ * See https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
  */
 
 import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Validate env before anything else so ops sees the result in server
+    // logs at deploy time, not 4 hours into an event when sync silently
+    // stops working. The dynamic import avoids loading the validator on
+    // the edge runtime, where Node APIs used inside the module may not
+    // resolve.
+    const { validateEnvironment, logValidationResults, getConfiguredFeatures } = await import(
+      './src/lib/utils/validateEnv'
+    );
+    const result = validateEnvironment();
+    logValidationResults(result);
+    // eslint-disable-next-line no-console
+    console.log('[Env] Configured features:', getConfiguredFeatures());
+
     await import('./sentry.server.config');
   }
 
