@@ -272,6 +272,18 @@ export default function CaptainPageClient() {
   const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');
   const completedSessions = sessions.filter((session) => session.status === 'completed');
 
+  // Phase-aware section order. Before the trip starts, setup tools are the
+  // captain's actual work — surface them first. The moment anything goes
+  // live (or the whole trip is in the books) the game-day / audit tools
+  // take priority instead. Pure reorder, no tile changes.
+  const tripPhase: 'upcoming' | 'live' | 'completed' =
+    activeSessions.length > 0
+      ? 'live'
+      : sessions.length > 0 && upcomingSessions.length === 0
+        ? 'completed'
+        : 'upcoming';
+  const showGameDayFirst = tripPhase !== 'upcoming';
+
   const readinessItems = [
     { label: 'Roster Built', done: players.length >= 2, count: players.length },
     {
@@ -405,18 +417,20 @@ export default function CaptainPageClient() {
           </div>
         </section>
 
-        <section className="pt-[var(--space-6)]">
-          <CaptainSectionHeading
-            eyebrow="Today"
-            title="Day-of decisions"
-            description="These are the tools you reach for when the group is on site and the schedule is no longer theoretical."
-          />
-          <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-            {gameDayActions.map((action) => (
-              <CommandActionCard key={action.id} action={action} />
-            ))}
-          </div>
-        </section>
+        {showGameDayFirst && (
+          <section className="pt-[var(--space-6)]">
+            <CaptainSectionHeading
+              eyebrow="Today"
+              title="Day-of decisions"
+              description="These are the tools you reach for when the group is on site and the schedule is no longer theoretical."
+            />
+            <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+              {gameDayActions.map((action) => (
+                <CommandActionCard key={action.id} action={action} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="pt-[var(--space-8)]">
           <CaptainSectionHeading
@@ -430,6 +444,21 @@ export default function CaptainPageClient() {
             ))}
           </div>
         </section>
+
+        {!showGameDayFirst && (
+          <section className="pt-[var(--space-8)]">
+            <CaptainSectionHeading
+              eyebrow="Today"
+              title="Day-of decisions"
+              description="These are the tools you reach for when the group is on site and the schedule is no longer theoretical."
+            />
+            <div className="grid gap-[var(--space-4)] md:grid-cols-2">
+              {gameDayActions.map((action) => (
+                <CommandActionCard key={action.id} action={action} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="pt-[var(--space-8)]">
           <CaptainSectionHeading

@@ -26,6 +26,11 @@ import {
   Shield,
   Users,
 } from 'lucide-react';
+import {
+  TripBackupSection,
+  TripCompetitionRulesSection,
+  TripDangerZoneSection,
+} from '@/components/trip-settings';
 
 export default function CaptainSettingsPage() {
   const router = useRouter();
@@ -289,6 +294,16 @@ export default function CaptainSettingsPage() {
               </div>
             </div>
           </aside>
+        </section>
+
+        {/* Competition rules, backup, and danger-zone delete used to live
+            on /trip/[tripId]/settings. Consolidated here so captains have a
+            single destination for every trip-level configuration instead of
+            bouncing between two settings pages. */}
+        <section className="mt-[var(--space-6)] space-y-[var(--space-6)]">
+          <TripCompetitionRulesSection trip={currentTrip} />
+          <TripBackupSection tripId={currentTrip.id} />
+          <TripDangerZoneSection tripId={currentTrip.id} />
         </section>
       </main>
     </div>

@@ -321,19 +321,33 @@ function RosterCard({
   );
 }
 
-function SessionStatePill({ status }: { status: 'scheduled' | 'inProgress' | 'completed' }) {
+function SessionStatePill({
+  status,
+}: {
+  status: 'scheduled' | 'inProgress' | 'paused' | 'completed';
+}) {
+  const label =
+    status === 'inProgress'
+      ? 'Live'
+      : status === 'paused'
+        ? 'Paused'
+        : status === 'completed'
+          ? 'Complete'
+          : 'Upcoming';
+  const tone =
+    status === 'inProgress'
+      ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+      : status === 'completed'
+        ? 'bg-[color:rgba(76,175,80,0.12)] text-[var(--success)]'
+        : 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]';
   return (
     <span
       className={cn(
         'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
-        status === 'inProgress'
-          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
-          : status === 'completed'
-            ? 'bg-[color:rgba(76,175,80,0.12)] text-[var(--success)]'
-            : 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+        tone,
       )}
     >
-      {status === 'inProgress' ? 'Live' : status === 'completed' ? 'Complete' : 'Upcoming'}
+      {label}
     </span>
   );
 }

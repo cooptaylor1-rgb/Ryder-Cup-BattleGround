@@ -186,6 +186,45 @@ export async function deleteTeeSetProfile(id: string): Promise<void> {
 }
 
 /**
+ * Ensure a trip course exists in the reusable library.
+ *
+ * Dedupes by canonicalKey (name + location). If a matching CourseProfile
+ * already exists, returns it without creating a duplicate. Otherwise creates
+ * a new profile + tee set profiles and queues a cloud sync.
+ */
+export async function ensureCourseInLibrary(
+    course: Course,
+    teeSets: TeeSet[]
+): Promise<CourseProfile> {
+    const canonicalKey = buildCanonicalCourseKey({
+        name: course.name,
+        city: course.location,
+        state: course.location,
+        country: course.location,
+    });
+
+    const existingProfiles = await db.courseProfiles.toArray();
+    const existing = existingProfiles.find((profile) => {
+        const profileKey =
+            profile.canonicalKey ||
+            buildCanonicalCourseKey({
+                name: profile.name,
+                city: profile.location,
+                state: profile.location,
+                country: profile.location,
+                sourceUrl: profile.sourceUrl,
+            });
+        return profileKey === canonicalKey && Boolean(canonicalKey);
+    });
+
+    if (existing) {
+        return existing;
+    }
+
+    return saveCourseToLibrary(course, teeSets);
+}
+
+/**
  * Save a course from a trip to the library
  * Automatically syncs to Supabase cloud database
  */

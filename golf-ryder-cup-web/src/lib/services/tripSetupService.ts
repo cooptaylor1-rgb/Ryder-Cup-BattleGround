@@ -12,6 +12,10 @@ import type {
   Trip,
 } from '@/lib/types/models';
 import { queueSyncOperation } from '@/lib/services/tripSyncService';
+import { ensureCourseInLibrary } from '@/lib/services/courseLibraryService';
+import { createLogger } from '@/lib/utils/logger';
+
+const logger = createLogger('TripSetup');
 
 export interface TripSetupCreationResult {
   trip: Trip;
@@ -397,6 +401,16 @@ export async function createTripFromSetupWizard(
     queueSyncOperation('teamMember', member.id, 'create', trip.id, member)
   );
   courses.forEach((course) => queueSyncOperation('course', course.id, 'create', trip.id, course));
+
+  // Also register each course in the reusable Course Library so it appears in
+  // /courses and can be imported into future trips. Dedupes by canonicalKey.
+  await Promise.all(
+    courseBundles.map((bundle) =>
+      ensureCourseInLibrary(bundle.course, bundle.teeSets).catch((err) => {
+        logger.error('Failed to register trip course in library:', err);
+      })
+    )
+  );
   teeSets.forEach((teeSet) => queueSyncOperation('teeSet', teeSet.id, 'create', trip.id, teeSet));
   sessions.forEach((session) =>
     queueSyncOperation('session', session.id, 'create', trip.id, session)

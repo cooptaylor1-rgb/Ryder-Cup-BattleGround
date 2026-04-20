@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, MoreHorizontal, Trash2 } from 'lucide-react';
-import { db } from '@/lib/db';
+import { deleteTripCascade } from '@/lib/services/cascadeDelete';
 import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 
@@ -26,29 +26,11 @@ export function TripDangerZoneSection({ tripId }: TripDangerZoneSectionProps) {
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            // Cascade-delete all related data inside one transaction so
-            // we don't leave orphans if any step fails.
-            const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
-            const sessionIds = sessions.map((s) => s.id);
-            const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
-            const matchIds = matches.map((m) => m.id);
-
-            await db.transaction(
-                'rw',
-                [db.trips, db.teams, db.teamMembers, db.sessions, db.matches, db.holeResults],
-                async () => {
-                    await db.holeResults.where('matchId').anyOf(matchIds).delete();
-                    await db.matches.where('sessionId').anyOf(sessionIds).delete();
-                    await db.sessions.where('tripId').equals(tripId).delete();
-
-                    const teams = await db.teams.where('tripId').equals(tripId).toArray();
-                    const teamIds = teams.map((t) => t.id);
-                    await db.teamMembers.where('teamId').anyOf(teamIds).delete();
-                    await db.teams.where('tripId').equals(tripId).delete();
-
-                    await db.trips.delete(tripId);
-                },
-            );
+            // Use the full cascade delete so every table (scoring, teams, sessions,
+            // schedule, social, side bets, dues, photos, awards, sync queue, …) is
+            // cleaned up in one transaction. The previous manual version left
+            // orphans in 20+ tables.
+            await deleteTripCascade(tripId);
 
             showToast('success', 'Trip deleted');
             router.push('/');

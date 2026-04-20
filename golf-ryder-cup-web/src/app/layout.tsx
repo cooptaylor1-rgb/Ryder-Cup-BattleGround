@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Instrument_Serif } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { Suspense } from 'react';
 import { PWAProvider } from '@/components/PWAProvider';
@@ -24,19 +24,34 @@ import { CapacitorProvider } from '@/components/CapacitorProvider';
 import { SupabaseAuthBridge } from '@/components/SupabaseAuthBridge';
 import { baseMetadata, viewport as baseViewport } from '@/lib/utils/metadata';
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
+// Self-hosted fonts (see public/fonts). Previously used next/font/google,
+// which fetches woff2 files at build time — that pins builds to Google Fonts
+// availability and breaks in networks that can't reach fonts.gstatic.com.
+// Now the app has zero external font dependencies at build or runtime.
+const jakarta = localFont({
+  src: '../../public/fonts/plus-jakarta-sans.woff2',
   variable: '--font-jakarta',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: '400 700',
+  fallback: ['system-ui', 'Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif'],
 });
 
-const instrument = Instrument_Serif({
-  subsets: ['latin'],
+const instrument = localFont({
+  src: [
+    {
+      path: '../../public/fonts/instrument-serif.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/instrument-serif-italic.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+  ],
   variable: '--font-instrument',
   display: 'swap',
-  weight: ['400'],
-  style: ['normal', 'italic'],
+  fallback: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
 });
 
 export const metadata: Metadata = {

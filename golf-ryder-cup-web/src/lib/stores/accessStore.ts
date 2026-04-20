@@ -4,6 +4,15 @@
  * Manages Captain Mode and Admin Mode with PIN-based authentication.
  * Persisted to localStorage.
  *
+ * Per-device model (important for day-of captain handoff):
+ * The PIN hash is stored per-device in localStorage. A new device has
+ * no hash yet, so the first PIN a user enters on that device becomes
+ * that device's captain PIN. This means: if the primary captain's
+ * phone dies mid-event, any other captain can open Captain Mode on
+ * their own phone by entering any PIN — no handoff code is needed.
+ * For a forgotten PIN on the same device, the "Forgot PIN?" button in
+ * CaptainToggle calls resetCaptainPin() to clear the hash.
+ *
  * Rate limiting: After MAX_ATTEMPTS_BEFORE_LOCK consecutive failures,
  * the PIN is locked for an exponentially increasing window (capped at
  * LOCK_CAP_MS). State persists across reloads so refreshing doesn't

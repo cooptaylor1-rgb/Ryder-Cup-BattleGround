@@ -48,7 +48,7 @@ export interface TripSession {
     name: string;
     scheduledDate?: string;
     sessionType?: string;
-    status: 'scheduled' | 'inProgress' | 'completed';
+    status: 'scheduled' | 'inProgress' | 'paused' | 'completed';
     matchCount: number;
     courseId?: string;
     courseName?: string;

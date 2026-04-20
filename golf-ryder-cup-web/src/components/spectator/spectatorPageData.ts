@@ -4,10 +4,34 @@ import type { SpectatorView } from '@/lib/types/captain';
 
 export const SPECTATOR_POLL_INTERVAL_MS = 15000;
 
+/**
+ * Thrown when a spectator URL is accessed for a trip whose captain has
+ * not opted into public spectating. Previously any URL with a valid
+ * tripId rendered the live scoreboard, which leaked real-time scores
+ * to anyone the link reached. The captain can still enable public
+ * spectating via trip settings (`allowSpectators`).
+ */
+export class SpectatorAccessDeniedError extends Error {
+    constructor() {
+        super(
+            'This trip is not open to public spectating. Ask the captain ' +
+                'to enable the public scoreboard in trip settings.',
+        );
+        this.name = 'SpectatorAccessDeniedError';
+    }
+}
+
 export async function loadSpectatorViewData(tripId: string): Promise<SpectatorView | null> {
     const trip = await db.trips.get(tripId);
     if (!trip) {
         return null;
+    }
+
+    // Gate behind the captain's explicit opt-in. Default (undefined settings
+    // or false) = no public access. The SpectatorPageClient maps this error
+    // to the unavailable state so a stray URL doesn't leak live scores.
+    if (!trip.settings?.allowSpectators) {
+        throw new SpectatorAccessDeniedError();
     }
 
     const teams = await db.teams.where('tripId').equals(tripId).toArray();

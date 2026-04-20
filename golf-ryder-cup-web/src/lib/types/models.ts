@@ -326,7 +326,13 @@ export interface RyderCupSession {
   timeSlot?: 'AM' | 'PM';
   pointsPerMatch?: number;
   notes?: string;
-  status: 'scheduled' | 'inProgress' | 'completed';
+  /**
+   * 'paused' is a transient state a captain can set to halt scoring
+   * during rain delays or other in-progress interruptions without
+   * closing matches. Matches stay inProgress; sessionLockService treats
+   * it like inProgress for pairing/lineup purposes.
+   */
+  status: 'scheduled' | 'inProgress' | 'paused' | 'completed';
   isLocked?: boolean;
   /**
    * When true, the session is a casual practice round that runs inside
@@ -378,6 +384,15 @@ export interface Match {
   result: MatchResultType;
   margin: number; // e.g., 3 for "3&2"
   holesRemaining: number; // e.g., 2 for "3&2"
+
+  /**
+   * Optimistic-concurrency counter. Bumped on every scoring mutation so
+   * clients can detect when another device wrote since they last read and
+   * avoid silently overwriting fresh data with stale state. Optional so
+   * pre-existing matches (created before this field was added) keep
+   * working; absent = treat as version 0.
+   */
+  version?: number;
 
   notes?: string;
   createdAt: ISODateString;

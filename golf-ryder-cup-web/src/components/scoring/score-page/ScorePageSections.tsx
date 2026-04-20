@@ -374,9 +374,19 @@ function ScoreSessionStat({ label, value }: { label: string; value: number }) {
     );
 }
 
-function SessionStatusPill({ status }: { status: 'scheduled' | 'inProgress' | 'completed' }) {
+function SessionStatusPill({
+    status,
+}: {
+    status: 'scheduled' | 'inProgress' | 'paused' | 'completed';
+}) {
     const label =
-        status === 'inProgress' ? 'Live' : status === 'completed' ? 'Final' : 'Scheduled';
+        status === 'inProgress'
+            ? 'Live'
+            : status === 'paused'
+              ? 'Paused'
+              : status === 'completed'
+                ? 'Final'
+                : 'Scheduled';
 
     return (
         <span
@@ -384,9 +394,11 @@ function SessionStatusPill({ status }: { status: 'scheduled' | 'inProgress' | 'c
                 'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
                 status === 'inProgress'
                     ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
-                    : status === 'completed'
+                    : status === 'paused'
                       ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
-                      : 'bg-[color:rgba(201,162,39,0.15)] text-[var(--gold)]'
+                      : status === 'completed'
+                        ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+                        : 'bg-[color:rgba(201,162,39,0.15)] text-[var(--gold)]'
             )}
         >
             {label}

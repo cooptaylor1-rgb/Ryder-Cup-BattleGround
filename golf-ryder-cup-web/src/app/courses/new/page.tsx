@@ -67,17 +67,22 @@ export default function NewCoursePage() {
   const [showScorecardUpload, setShowScorecardUpload] = useState(false);
 
   const handleAddTeeSet = useCallback(() => {
-    const newTeeSet: TeeSetInput = {
-      id: crypto.randomUUID(),
-      name: '',
-      color: '#2563eb',
-      rating: '',
-      slope: '',
-      par: '72',
-      totalYardage: '',
-      holes: createDefaultHoles(),
-    };
-    setTeeSets(prev => [...prev, newTeeSet]);
+    setTeeSets(prev => {
+      // Match the hole count of any tee set already on this course so all
+      // tee sets for e.g. an 11-hole course stay consistent by default.
+      const inheritedCount = prev[0]?.holes.length ?? 18;
+      const newTeeSet: TeeSetInput = {
+        id: crypto.randomUUID(),
+        name: '',
+        color: '#2563eb',
+        rating: '',
+        slope: '',
+        par: '72',
+        totalYardage: '',
+        holes: createDefaultHoles(inheritedCount),
+      };
+      return [...prev, newTeeSet];
+    });
   }, []);
 
   const handleRemoveTeeSet = useCallback((id: string) => {

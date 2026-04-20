@@ -383,22 +383,25 @@ export default function CourseLibraryPage() {
                     </div>
                 </button>
 
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={() => setShowDatabaseSearch(true)}
-                        className={cn(
-                            "p-4 bg-[var(--surface-raised)] rounded-xl border-2 border-dashed text-left transition-colors",
-                            apiConfigured
-                                ? "border-[color:var(--masters)]/40 hover:border-[var(--masters)] hover:bg-[color:var(--masters)]/10"
-                                : "border-[color:var(--rule)]/50 hover:border-gold/50"
-                        )}
->
-                        <Globe className={cn("w-6 h-6 mb-2", apiConfigured ? "text-[var(--masters)]" : "text-[var(--ink-tertiary)]")} />
-                        <div className="font-medium text-[var(--ink-primary)]">Search Database</div>
-                        <div className="text-xs text-[var(--ink-secondary)] mt-1">
-                            {apiConfigured ? "Import from 30,000+ courses" : "API not configured"}
-                        </div>
-                    </button>
+                {/* Secondary add paths. When the course database API is
+                    not configured (default), the Search Database tile is a
+                    dead-end that just tells the user it's unavailable — it
+                    was consuming half the row for no action. Hiding it
+                    leaves a single full-width "Add Manually" fallback
+                    beside the featured Scan Scorecard path above. */}
+                <div className={cn('grid gap-3', apiConfigured ? 'grid-cols-2' : 'grid-cols-1')}>
+                    {apiConfigured && (
+                        <button
+                            onClick={() => setShowDatabaseSearch(true)}
+                            className="p-4 bg-[var(--surface-raised)] rounded-xl border-2 border-dashed text-left transition-colors border-[color:var(--masters)]/40 hover:border-[var(--masters)] hover:bg-[color:var(--masters)]/10"
+                        >
+                            <Globe className="w-6 h-6 mb-2 text-[var(--masters)]" />
+                            <div className="font-medium text-[var(--ink-primary)]">Search Database</div>
+                            <div className="text-xs text-[var(--ink-secondary)] mt-1">
+                                Import from 30,000+ courses
+                            </div>
+                        </button>
+                    )}
                     <Link
                         href="/courses/new"
                         className="p-4 bg-[var(--surface-raised)] rounded-xl border-2 border-dashed border-[color:var(--rule)]/50 text-left hover:border-gold hover:bg-gold/5 transition-colors"

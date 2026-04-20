@@ -16,6 +16,8 @@ import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { reopenMatch } from '@/lib/services/scoringEngine';
+import { scoringLogger } from '@/lib/utils/logger';
 
 import {
   MatchScoringErrorState,
@@ -234,7 +236,22 @@ export default function MatchScoringPageClient() {
       onViewStandings={() => router.push('/standings')}
       onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
       onBackToMatches={handleBackToScore}
-      onEditScores={() => {
+      onEditScores={async () => {
+        // Flip the match out of completed state so the rest of the UI
+        // treats it as live and subsequent scoring writes follow the
+        // normal inProgress path. Previously "Correct a Score" only
+        // switched the UI into edit mode, leaving match.status as
+        // 'completed' — peer devices, standings, and the audit log all
+        // still saw a finalized match while the captain was actively
+        // rewriting it.
+        if (activeMatch?.status === 'completed') {
+          try {
+            await reopenMatch(activeMatch.id);
+            scoringLogger.info('Match reopened for correction', { matchId: activeMatch.id });
+          } catch (error) {
+            scoringLogger.error('Failed to reopen match for correction', { matchId: activeMatch.id, error });
+          }
+        }
         ui.setIsEditingScores(true);
         goToHole(1);
       }}

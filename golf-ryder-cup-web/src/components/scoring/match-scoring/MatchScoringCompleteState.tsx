@@ -220,7 +220,7 @@ export function MatchScoringCompleteState({
             Share Result
           </button>
 
-          {canEditScores && (
+          {canEditScores ? (
             <button
               onClick={onEditScores}
               className="w-full py-3 px-6 rounded-xl flex items-center justify-center gap-2 font-sans font-medium bg-canvas-raised border border-rule text-ink"
@@ -228,6 +228,11 @@ export function MatchScoringCompleteState({
               <Pencil size={16} />
               Correct a Score
             </button>
+          ) : (
+            <p className="text-center text-sm text-ink-tertiary px-6">
+              Need to correct a score? Ask the captain — match corrections
+              are captain-only so the audit trail stays clean.
+            </p>
           )}
 
           <button

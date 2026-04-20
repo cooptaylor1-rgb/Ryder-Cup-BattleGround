@@ -112,7 +112,7 @@ export function TripDashboardSections({
             footerLabel={nextUp.footerLabel}
             icon={<Target size={18} strokeWidth={1.8} />}
             accentClassName="bg-[color:var(--masters)]/10 text-[var(--masters)]"
-            className="border-[color:var(--masters)]/18 bg-[linear-gradient(135deg,rgba(0,102,68,0.08),rgba(255,255,255,0.9))]"
+            className="border-[color:var(--masters)]/20 bg-[linear-gradient(135deg,rgba(0,102,68,0.08),rgba(255,255,255,0.9))]"
           />
         </div>
       ) : null}
@@ -156,41 +156,34 @@ export function TripDashboardSections({
           accentClassName="bg-[color:var(--gold)]/14 text-[var(--gold-dark)]"
         />
 
-        <DashboardCard
-          href="/bets"
-          eyebrow="Bets"
-          title={
-            activeBets.length > 0
-              ? `${activeBets.length} active game${activeBets.length === 1 ? '' : 's'}`
-              : 'No bets started yet'
-          }
-          body={
-            activeBets.length > 0
-              ? `$${activeBetPot} currently in play across trip-wide and match-side games.`
-              : 'Open Nassau, skins, and match-side action.'
-          }
-          footerLabel="Open bets"
-          icon={<ScrollText size={18} strokeWidth={1.8} />}
-          accentClassName="bg-[color:var(--maroon)]/10 text-[var(--maroon)]"
-        />
+        {/* Bets and Awards tiles are demoted to "only when they have
+            content". A trip with zero bets and no awards yet sees four
+            high-signal tiles instead of six, most of which were empty
+            prompts. Both are still reachable via /bets and /trip-stats/
+            awards directly (or via the /captain hub for captains). */}
+        {activeBets.length > 0 && (
+          <DashboardCard
+            href="/bets"
+            eyebrow="Bets"
+            title={`${activeBets.length} active game${activeBets.length === 1 ? '' : 's'}`}
+            body={`$${activeBetPot} currently in play across trip-wide and match-side games.`}
+            footerLabel="Open bets"
+            icon={<ScrollText size={18} strokeWidth={1.8} />}
+            accentClassName="bg-[color:var(--maroon)]/10 text-[var(--maroon)]"
+          />
+        )}
 
-        <DashboardCard
-          href="/trip-stats/awards"
-          eyebrow="Awards"
-          title={
-            tripAwards.length > 0
-              ? `${tripAwards.length} award${tripAwards.length === 1 ? '' : 's'} on record`
-              : 'Awards room is open'
-          }
-          body={
-            tripAwards.length > 0
-              ? 'Review the ceremony board and lock in the weekend superlatives.'
-              : 'Vote on the trip characters, moments, and superlatives.'
-          }
-          footerLabel="View awards"
-          icon={<Sparkles size={18} strokeWidth={1.8} />}
-          accentClassName="bg-[color:var(--masters-deep)]/10 text-[var(--masters-deep)]"
-        />
+        {tripAwards.length > 0 && (
+          <DashboardCard
+            href="/trip-stats/awards"
+            eyebrow="Awards"
+            title={`${tripAwards.length} award${tripAwards.length === 1 ? '' : 's'} on record`}
+            body="Review the ceremony board and lock in the weekend superlatives."
+            footerLabel="View awards"
+            icon={<Sparkles size={18} strokeWidth={1.8} />}
+            accentClassName="bg-[color:var(--masters-deep)]/10 text-[var(--masters-deep)]"
+          />
+        )}
 
         <DashboardCard
           href="/social"
@@ -246,30 +239,30 @@ function DashboardCard({
     <Link
       href={href}
       className={cn(
-        'group rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]',
+        'group block overflow-hidden rounded-[1.3rem] border border-[var(--rule)] bg-[color:var(--canvas)]/85 p-[var(--space-4)] no-underline shadow-[0_10px_24px_rgba(46,34,18,0.04)] transition-transform duration-200 hover:-translate-y-[1px]',
         className
       )}
     >
       <div className="flex items-start justify-between gap-[var(--space-3)]">
-        <div className={`inline-flex rounded-full px-[var(--space-3)] py-[var(--space-2)] ${accentClassName}`}>
+        <div className={`inline-flex shrink-0 rounded-full px-[var(--space-3)] py-[var(--space-2)] ${accentClassName}`}>
           {icon}
         </div>
-        <span className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+        <span className="type-micro min-w-0 text-right uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
           {eyebrow}
         </span>
       </div>
-      <h3 className="mt-[var(--space-4)] text-[1.05rem] font-semibold leading-[1.2] text-[var(--ink)]">
+      <h3 className="mt-[var(--space-4)] break-words text-[1.05rem] font-semibold leading-[1.2] text-[var(--ink)]">
         {title}
       </h3>
-      <p className="mt-[var(--space-2)] text-sm leading-[1.55] text-[var(--ink-secondary)]">
+      <p className="mt-[var(--space-2)] break-words text-sm leading-[1.55] text-[var(--ink-secondary)]">
         {body}
       </p>
-      <div className="mt-[var(--space-4)] flex items-center gap-[var(--space-2)] text-sm font-medium text-[var(--masters)]">
-        <span>{footerLabel}</span>
+      <div className="mt-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-2)] text-sm font-medium text-[var(--masters)]">
+        <span className="min-w-0 break-words">{footerLabel}</span>
         <ChevronRight
           size={16}
           strokeWidth={1.8}
-          className="transition-transform duration-200 group-hover:translate-x-[2px]"
+          className="shrink-0 transition-transform duration-200 group-hover:translate-x-[2px]"
         />
       </div>
     </Link>

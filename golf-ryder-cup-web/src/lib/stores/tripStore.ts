@@ -28,6 +28,7 @@ import {
   type SyncStatus,
 } from '../services/tripSyncService';
 import { deleteTripCascade } from '../services/cascadeDelete';
+import { buildMatchHandicapContext } from '../services/matchHandicapService';
 import { createLogger } from '../utils/logger';
 import { handleError } from '../utils/errorHandling';
 import { mergeTripPlayers } from '../utils/tripPlayers';
@@ -340,6 +341,77 @@ export const useTripStore = create<TripState>()(
           players: state.players.map((p) => (p.id === playerId ? { ...p, ...updates } : p)),
           syncStatus: 'pending',
         }));
+
+        // Mid-round handicap recalc. When a player's handicap index changes
+        // (captain correction, GHIN refresh), every non-completed match the
+        // player is in has a stale teamAHandicapAllowance / teamBHandicapAllowance
+        // because those were frozen at match creation. Rebuild the match-level
+        // allowance from current player data for any in-progress or scheduled
+        // match containing the player. Already-scored holes keep their computed
+        // winners; only future scoring uses the fresh allowance.
+        if ('handicapIndex' in updates && currentTrip) {
+          try {
+            const affectedMatches = (await db.matches.toArray()).filter(
+              (match) =>
+                match.status !== 'completed' &&
+                (match.teamAPlayerIds.includes(playerId) ||
+                  match.teamBPlayerIds.includes(playerId)),
+            );
+            if (affectedMatches.length > 0) {
+              const sessionIds = Array.from(
+                new Set(affectedMatches.map((m) => m.sessionId)),
+              );
+              const sessionsById = new Map(
+                (await db.sessions.bulkGet(sessionIds))
+                  .filter(Boolean)
+                  .map((session) => [session!.id, session!]),
+              );
+              for (const match of affectedMatches) {
+                const session = sessionsById.get(match.sessionId);
+                if (!session) continue;
+                const [teamAPlayers, teamBPlayers] = await Promise.all([
+                  Promise.all(match.teamAPlayerIds.map((id) => db.players.get(id))),
+                  Promise.all(match.teamBPlayerIds.map((id) => db.players.get(id))),
+                ]);
+                const ctx = buildMatchHandicapContext({
+                  sessionType: session.sessionType,
+                  teamAPlayers: teamAPlayers.filter((p): p is Player => Boolean(p)),
+                  teamBPlayers: teamBPlayers.filter((p): p is Player => Boolean(p)),
+                });
+                if (
+                  ctx.teamAHandicapAllowance === match.teamAHandicapAllowance &&
+                  ctx.teamBHandicapAllowance === match.teamBHandicapAllowance
+                ) {
+                  continue;
+                }
+                const nextVersion = (match.version ?? 0) + 1;
+                const now = new Date().toISOString();
+                await db.matches.update(match.id, {
+                  teamAHandicapAllowance: ctx.teamAHandicapAllowance,
+                  teamBHandicapAllowance: ctx.teamBHandicapAllowance,
+                  version: nextVersion,
+                  updatedAt: now,
+                });
+                queueSyncOperation('match', match.id, 'update', currentTrip.id, {
+                  ...match,
+                  teamAHandicapAllowance: ctx.teamAHandicapAllowance,
+                  teamBHandicapAllowance: ctx.teamBHandicapAllowance,
+                  version: nextVersion,
+                  updatedAt: now,
+                });
+              }
+              logger.log('Recalculated match handicap allowances after player edit', {
+                playerId,
+                matchCount: affectedMatches.length,
+              });
+            }
+          } catch (error) {
+            logger.error('Failed to recalc match allowances after player edit', {
+              playerId,
+              error,
+            });
+          }
+        }
       },
 
       removePlayer: async (playerId) => {

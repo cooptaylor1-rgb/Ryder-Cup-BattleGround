@@ -6,12 +6,14 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Target } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
+import { ContinueScoringBanner } from '@/components/ui/ContinueScoringBanner';
 import { db } from '@/lib/db';
 import { createLogger } from '@/lib/utils/logger';
 import { useAuthStore, useScoringStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { navigateBackOr } from '@/lib/utils/navigation';
 import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
+import { calculateMatchState } from '@/lib/services/scoringEngine';
 import {
     buildHoleResultsByMatchId,
     buildScoreSessionStats,
@@ -86,6 +88,47 @@ export default function ScorePageClient() {
 
     const { matches, holeResults } = matchData;
 
+    // Cross-session "your match" lookup for the resume banner. The session
+    // picker only shows matches inside the selected session, so a user in
+    // an in-progress match from another session would otherwise see only
+    // the picker and miss the 1-tap resume path that Home already offers.
+    const userMatchRecord = useLiveQuery(
+        async () => {
+            if (!currentTrip || !currentUserPlayer) return null;
+            const allSessions = await db.sessions
+                .where('tripId')
+                .equals(currentTrip.id)
+                .toArray();
+            const sessionIds = allSessions.map((s) => s.id);
+            if (sessionIds.length === 0) return null;
+
+            const tripMatches = await db.matches
+                .where('sessionId')
+                .anyOf(sessionIds)
+                .toArray();
+            const userMatches = tripMatches.filter(
+                (m) =>
+                    m.teamAPlayerIds.includes(currentUserPlayer.id) ||
+                    m.teamBPlayerIds.includes(currentUserPlayer.id)
+            );
+            const liveMatch =
+                userMatches.find((m) => m.status === 'inProgress') ??
+                userMatches.find((m) => m.status === 'scheduled');
+            if (!liveMatch || liveMatch.status !== 'inProgress') return null;
+
+            const results = await db.holeResults
+                .where('matchId')
+                .equals(liveMatch.id)
+                .toArray();
+            return {
+                match: liveMatch,
+                matchState: calculateMatchState(liveMatch, results),
+            };
+        },
+        [currentTrip?.id, currentUserPlayer?.id],
+        null
+    );
+
     const holeResultsByMatchId = useMemo(
         () => buildHoleResultsByMatchId(holeResults),
         [holeResults]
@@ -151,6 +194,19 @@ export default function ScorePageClient() {
                 onBack={() => navigateBackOr(router, '/')}
                 rightSlot={<SyncStatusBadge showText />}
             />
+
+            {/* Resume-scoring banner for a user whose in-progress match
+                may live in a different session than the one currently
+                selected in the picker below. Mirrors Home's behaviour so
+                the live path is always one tap from the bottom nav. */}
+            {userMatchRecord && (
+                <div className="px-[var(--space-4)] pt-[var(--space-4)]">
+                    <ContinueScoringBanner
+                        match={userMatchRecord.match}
+                        matchState={userMatchRecord.matchState ?? undefined}
+                    />
+                </div>
+            )}
 
             <ScorePageSections
                 activeSession={activeSession}

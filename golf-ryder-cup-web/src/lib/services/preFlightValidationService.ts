@@ -314,6 +314,38 @@ function validateLineups(
         }
     });
 
+    // Check for team-size mismatches in the same match. An incomplete
+    // lineup (e.g. 3-v-2 in fourball) is technically scoreable but
+    // almost always indicates a roster oversight — the captain forgot
+    // to replace a removed player, or slotted someone twice on one
+    // side. Warn rather than error so the captain can intentionally
+    // override for an odd-numbered format if needed.
+    sessions.forEach((session) => {
+        const sessionMatches = matches.filter((m) => m.sessionId === session.id);
+        const mismatched = sessionMatches.filter(
+            (m) =>
+                m.teamAPlayerIds.length > 0 &&
+                m.teamBPlayerIds.length > 0 &&
+                m.teamAPlayerIds.length !== m.teamBPlayerIds.length,
+        );
+        if (mismatched.length > 0) {
+            items.push(
+                createValidation(
+                    'lineups',
+                    'warning',
+                    `${session.name} has uneven team sizes`,
+                    `${mismatched.length} match(es) pair different-sized teams (e.g. 2-v-1). ` +
+                        `Check that nobody was accidentally dropped or doubled.`,
+                    {
+                        actionLabel: 'Review Lineup',
+                        actionHref: buildLineupHref(session.id),
+                        actionKind: 'open-lineup',
+                    },
+                ),
+            );
+        }
+    });
+
     // Check for duplicate players in same session
     sessions.forEach(session => {
         const sessionMatches = matches.filter(m => m.sessionId === session.id);
