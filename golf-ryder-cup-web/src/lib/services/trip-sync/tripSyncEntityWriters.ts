@@ -15,6 +15,34 @@ import type {
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
 import { getTable } from './tripSyncShared';
 
+/**
+ * Returns true if the row already in Supabase has a newer (or equal)
+ * updated_at than the incoming write. Used to implement last-write-wins
+ * for mutable tables — without this, two offline devices editing the
+ * same entity silently overwrite each other based on sync arrival
+ * order, not actual edit time. There is still a narrow race between
+ * the select and the upsert, but it closes the worst of the
+ * offline-replay data-loss window.
+ */
+async function isCloudNewer(
+  table: 'matches' | 'sessions',
+  id: string,
+  incomingUpdatedAt: string
+): Promise<boolean> {
+  const { data: existing } = await getTable(table)
+    .select('updated_at')
+    .eq('id', id)
+    .maybeSingle();
+
+  const existingUpdatedAt =
+    existing && typeof (existing as { updated_at?: string }).updated_at === 'string'
+      ? (existing as { updated_at: string }).updated_at
+      : null;
+
+  if (!existingUpdatedAt) return false;
+  return new Date(existingUpdatedAt).getTime() >= new Date(incomingUpdatedAt).getTime();
+}
+
 export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
   const { entity, entityId, operation, data } = item;
 
@@ -202,6 +230,7 @@ export async function syncSessionToCloud(
   const session = data || (await db.sessions.get(sessionId));
   if (!session) throw new Error('Session not found locally');
 
+  const incomingUpdatedAt = session.updatedAt || new Date().toISOString();
   const cloudData = {
     id: session.id,
     trip_id: session.tripId,
@@ -215,8 +244,13 @@ export async function syncSessionToCloud(
     status: session.status || 'scheduled',
     is_locked: session.isLocked || false,
     is_practice_session: session.isPracticeSession || false,
-    updated_at: new Date().toISOString(),
+    updated_at: incomingUpdatedAt,
   };
+
+  // Last-write-wins by updated_at. Two offline devices editing the same
+  // session (e.g. captain locking while player edits notes) would otherwise
+  // silently overwrite each other based on whichever sync ran last.
+  if (await isCloudNewer('sessions', session.id, incomingUpdatedAt)) return;
 
   const { error } = await getTable('sessions').upsert(cloudData, { onConflict: 'id' });
   if (error) throw new Error(error.message);
@@ -236,6 +270,7 @@ export async function syncMatchToCloud(
   const match = data || (await db.matches.get(matchId));
   if (!match) throw new Error('Match not found locally');
 
+  const incomingUpdatedAt = match.updatedAt || new Date().toISOString();
   const cloudData = {
     id: match.id,
     session_id: match.sessionId,
@@ -253,8 +288,13 @@ export async function syncMatchToCloud(
     margin: match.margin || 0,
     holes_remaining: match.holesRemaining || 0,
     notes: match.notes || null,
-    updated_at: new Date().toISOString(),
+    updated_at: incomingUpdatedAt,
   };
+
+  // Last-write-wins by updated_at. Two offline phones editing the same
+  // match (captain advancing the hole while player submits a score) would
+  // otherwise silently overwrite each other based on sync arrival order.
+  if (await isCloudNewer('matches', match.id, incomingUpdatedAt)) return;
 
   const { error } = await getTable('matches').upsert(cloudData, { onConflict: 'id' });
   if (error) throw new Error(error.message);

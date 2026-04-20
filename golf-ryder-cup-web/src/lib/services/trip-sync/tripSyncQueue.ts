@@ -93,7 +93,7 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   holeResult: 4,
 };
 
-function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
+export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
   const aRank = ENTITY_DEPENDENCY_ORDER[a.entity];
   const bRank = ENTITY_DEPENDENCY_ORDER[b.entity];
   const aEffective = a.operation === 'delete' ? -aRank : aRank;
@@ -263,17 +263,31 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         await persistQueueItem(item);
         synced++;
       } catch (err) {
-        item.retryCount++;
-        item.error = err instanceof Error ? err.message : 'Unknown error';
+        // Persist the new retry state before mutating the in-memory item.
+        // If the process dies between bumping memory and persisting, disk
+        // would keep the old retryCount and the item would retry forever;
+        // persist-first keeps disk as the source of truth so the retry
+        // budget survives crashes and tab reloads.
+        const nextRetryCount = item.retryCount + 1;
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const nextStatus: SyncQueueItem['status'] =
+          nextRetryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending';
 
-        if (item.retryCount >= MAX_RETRY_COUNT) {
-          item.status = 'failed';
+        await persistQueueItem({
+          ...item,
+          retryCount: nextRetryCount,
+          error: errorMessage,
+          status: nextStatus,
+        });
+
+        item.retryCount = nextRetryCount;
+        item.error = errorMessage;
+        item.status = nextStatus;
+
+        if (nextStatus === 'failed') {
           failed++;
-          errors.push(`${item.entity}:${item.entityId} - ${item.error}`);
-        } else {
-          item.status = 'pending';
+          errors.push(`${item.entity}:${item.entityId} - ${errorMessage}`);
         }
-        await persistQueueItem(item);
       }
     }
 
