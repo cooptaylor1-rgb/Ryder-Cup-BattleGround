@@ -14,6 +14,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 
 // ============================================
 // Types
@@ -177,18 +178,20 @@ export function IOSActionSheet({
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 z-9998 bg-[color:var(--ink)]/40 backdrop-blur-sm',
+          'fixed inset-0 bg-[color:var(--ink)]/40 backdrop-blur-sm',
           'transition-opacity duration-300',
           isAnimating ? 'opacity-100' : 'opacity-0'
         )}
+        style={{ zIndex: zIndex.sheet - 1 }}
         onClick={handleCancel}
         aria-hidden="true"
       />
 
       {/* Action Sheet Container */}
       <div
+        style={{ zIndex: zIndex.sheet }}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-9999 p-3',
+          'fixed inset-x-0 bottom-0 p-3',
           'pb-[max(12px,env(safe-area-inset-bottom))]',
           'transition-transform duration-300 ease-out',
           isAnimating ? 'translate-y-0' : 'translate-y-full'

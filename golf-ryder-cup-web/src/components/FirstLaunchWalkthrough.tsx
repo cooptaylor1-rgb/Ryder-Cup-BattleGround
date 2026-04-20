@@ -10,6 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Users, Calendar, Target, ChevronRight, X } from 'lucide-react';
+import { zIndex } from '@/lib/constants/zIndex';
 
 const STORAGE_KEY = 'walkthrough-completed';
 
@@ -87,7 +88,8 @@ export function FirstLaunchWalkthrough() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-[color:var(--ink)]/60 backdrop-blur-sm px-6"
+      className="fixed inset-0 flex items-center justify-center bg-[color:var(--ink)]/60 backdrop-blur-sm px-6"
+      style={{ zIndex: zIndex.tour }}
       onClick={dismiss}
     >
       <div

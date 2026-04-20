@@ -132,7 +132,7 @@ export function CaptainToggle({ className }: CaptainToggleProps) {
         closeOnOverlayClick
         closeOnEscape
         size="sm"
-        overlayClassName="z-[100] bg-[color:var(--ink)]/50 backdrop-blur-[4px]"
+        overlayClassName="bg-[color:var(--ink)]/50 backdrop-blur-[4px]"
         panelClassName="max-w-[320px] rounded-[var(--radius-xl)] border-0 bg-[var(--canvas)] shadow-[var(--shadow-xl)]"
         contentClassName="p-[var(--space-6)]"
       >

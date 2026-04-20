@@ -132,14 +132,21 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
 
     const config = getStatusConfig();
 
+    // Screen readers need a textual label even when the badge is icon-only.
+    // With showText=true the visible span carries the description; with
+    // showText=false only the icon renders, so we set aria-label on the
+    // wrapper and mark the icon aria-hidden so the label isn't doubled.
     const content = (
         <div
             className={
                 `inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ` +
                 `${config.tone} ${config.bg} ${className}`
             }
+            role="status"
+            aria-live="polite"
+            aria-label={showText ? undefined : `Sync status: ${config.text}`}
         >
-            {config.icon}
+            <span aria-hidden={!showText}>{config.icon}</span>
             {showText && <span>{config.text}</span>}
         </div>
     );

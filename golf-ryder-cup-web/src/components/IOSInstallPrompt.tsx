@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { X, Share, PlusSquare, ArrowDown } from 'lucide-react';
+import { zIndex } from '@/lib/constants/zIndex';
 
 interface IOSInstallPromptProps {
   /** Delay before showing prompt (ms) */
@@ -92,7 +93,8 @@ export function IOSInstallPrompt({
 
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-end justify-center p-4 ios-backdrop-enter"
+      className="fixed inset-0 flex items-end justify-center p-4 ios-backdrop-enter"
+      style={{ zIndex: zIndex.sheet }}
       onClick={handleDismiss}
       role="dialog"
       aria-modal="true"

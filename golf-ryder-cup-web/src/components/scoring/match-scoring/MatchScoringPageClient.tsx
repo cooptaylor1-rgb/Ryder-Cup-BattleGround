@@ -11,6 +11,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 import { useAuthStore, useScoringStore, useTripStore, useToastStore, useScoringPrefsStore, useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
+import { zIndex } from '@/lib/constants/zIndex';
 import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
@@ -189,7 +190,10 @@ export default function MatchScoringPageClient() {
   return (
     <>
       {missingCourse && (
-        <div className="fixed top-0 inset-x-0 z-[60] bg-[color:var(--warning)]/95 text-[var(--ink)] px-4 py-3 text-center text-sm font-medium backdrop-blur-sm safe-top">
+        <div
+          style={{ zIndex: zIndex.nav + 1 }}
+          className="fixed top-0 inset-x-0 bg-[color:var(--warning)]/95 text-[var(--ink)] px-4 py-3 text-center text-sm font-medium backdrop-blur-sm safe-top"
+        >
           <span className="mr-2">⚠</span>
           No course assigned — scoring as gross (no handicap strokes).
           {isCaptainMode && (

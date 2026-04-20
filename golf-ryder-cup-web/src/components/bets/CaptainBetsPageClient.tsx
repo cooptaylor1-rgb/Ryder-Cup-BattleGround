@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CaptainModeRequiredState,
@@ -25,8 +25,11 @@ import type { SideBet, SideBetType } from '@/lib/types/models';
 import { betsLogger } from '@/lib/utils/logger';
 import { Check, DollarSign, Plus, Users } from 'lucide-react';
 
+const VALID_BET_TYPES: SideBetType[] = ['skins', 'nassau', 'ctp', 'longdrive', 'custom'];
+
 export default function CaptainBetsPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
@@ -73,6 +76,21 @@ export default function CaptainBetsPageClient() {
     },
     [players]
   );
+
+  // Deep link from the lineup format picker — `/captain/bets?type=skins`
+  // lands here with the composer already primed. Guard with a ref so the
+  // modal fires once per visit; clear the query so a navigation back
+  // doesn't reopen it.
+  const typeParam = searchParams?.get('type');
+  const prefilledRef = useRef(false);
+  useEffect(() => {
+    if (prefilledRef.current) return;
+    if (!typeParam) return;
+    if (!VALID_BET_TYPES.includes(typeParam as SideBetType)) return;
+    prefilledRef.current = true;
+    openCreateModal(typeParam as SideBetType);
+    router.replace('/captain/bets');
+  }, [typeParam, openCreateModal, router]);
 
   const openEditModal = useCallback((bet: SideBet) => {
     setEditingBet(bet);

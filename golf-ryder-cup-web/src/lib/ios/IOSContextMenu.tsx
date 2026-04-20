@@ -22,6 +22,7 @@ import React, {
   type ReactElement,
 } from 'react';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 import { ChevronRight } from 'lucide-react';
 
 // ============================================
@@ -396,15 +397,17 @@ export function IOSContextMenu({
         <>
           {/* Backdrop with blur */}
           <div
-            className="fixed inset-0 z-9998 bg-[color:var(--ink)]/20 backdrop-blur-sm animate-in fade-in duration-150"
+            className="fixed inset-0 bg-[color:var(--ink)]/20 backdrop-blur-sm animate-in fade-in duration-150"
+            style={{ zIndex: zIndex.popover - 1 }}
             onClick={closeMenu}
           />
 
           {/* Scaled trigger preview (iOS effect) */}
           {triggerRect && (
             <div
-              className="fixed z-9999 pointer-events-none animate-in zoom-in-105 duration-200"
+              className="fixed pointer-events-none animate-in zoom-in-105 duration-200"
               style={{
+                zIndex: zIndex.popover,
                 left: triggerRect.left,
                 top: triggerRect.top,
                 width: triggerRect.width,

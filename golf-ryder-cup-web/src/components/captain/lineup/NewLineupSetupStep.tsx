@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AlertTriangle, CheckCircle2, ChevronDown, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium } from '@/components/ui';
@@ -8,6 +9,7 @@ import {
   FORMAT_CATEGORIES,
   POPULAR_FORMATS,
   getScoringMode,
+  getSideGameBetType,
   isSupportedSessionType,
   type FormatOption,
 } from './newLineupConfig';
@@ -85,6 +87,7 @@ export function NewLineupSetupStep({
   isPracticeSession,
   onPracticeSessionChange,
 }: NewLineupSetupStepProps) {
+  const router = useRouter();
   return (
     <>
       <section className="section">
@@ -244,6 +247,12 @@ export function NewLineupSetupStep({
                       {formats.map((format) => {
                         const isSelected = sessionType === format.value;
                         const isMatchPlay = isSupportedSessionType(format.value);
+                        const sideGameBetType = getSideGameBetType(format.value);
+                        // A format is selectable if it's a fully-supported
+                        // session type OR a side game we can hand off to
+                        // the captain bets composer. Everything else is
+                        // still in flight and stays labelled as such.
+                        const isAvailable = isMatchPlay || Boolean(sideGameBetType);
                         const scoringMode = getScoringMode(format.value);
 
                         return (
@@ -253,10 +262,17 @@ export function NewLineupSetupStep({
                             onClick={() => {
                               if (isMatchPlay) {
                                 onSelectFormat(format.value);
+                              } else if (sideGameBetType) {
+                                // Side games live in the captain bets
+                                // flow, not the session-format flow —
+                                // route the captain there with the type
+                                // pre-selected rather than blocking the
+                                // click behind "Coming Soon".
+                                router.push(`/captain/bets?type=${sideGameBetType}`);
                               }
                             }}
-                            disabled={!isMatchPlay}
-                            className={`card w-full text-left transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isMatchPlay ? 'cursor-not-allowed opacity-70' : ''}`}
+                            disabled={!isAvailable}
+                            className={`card w-full text-left transition-all ${isSelected ? 'ring-2 ring-masters' : ''} ${!isAvailable ? 'cursor-not-allowed opacity-70' : ''}`}
                             style={{ padding: 'var(--space-4)' }}
                           >
                             <div className="flex items-center justify-between">
@@ -265,7 +281,7 @@ export function NewLineupSetupStep({
                                 <div>
                                   <div className="flex items-center gap-2">
                                     <p className="type-title-sm">{format.label}</p>
-                                    {!isMatchPlay && (
+                                    {!isAvailable && (
                                       <span
                                         className="rounded px-2 py-0.5 text-[10px] font-medium"
                                         style={{
@@ -274,6 +290,17 @@ export function NewLineupSetupStep({
                                         }}
                                       >
                                         Coming Soon
+                                      </span>
+                                    )}
+                                    {!isMatchPlay && sideGameBetType && (
+                                      <span
+                                        className="rounded px-2 py-0.5 text-[10px] font-medium"
+                                        style={{
+                                          background: 'rgba(196, 167, 71, 0.15)',
+                                          color: 'var(--masters)',
+                                        }}
+                                      >
+                                        Side Bet
                                       </span>
                                     )}
                                     {scoringMode && (

@@ -2,6 +2,7 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
+import { zIndex } from '@/lib/constants/zIndex';
 import type { Match, Player, SideBet, SideBetType } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
 import {
@@ -297,7 +298,8 @@ export function BetComposerModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-[color:var(--ink)]/70 p-4"
+      className="fixed inset-0 flex items-end justify-center bg-[color:var(--ink)]/70 p-4"
+      style={{ zIndex: zIndex.sheet }}
       onClick={onClose}
     >
       <div

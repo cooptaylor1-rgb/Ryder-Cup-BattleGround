@@ -61,6 +61,11 @@
       "groupName": "Tailwind CSS"
     },
     {
+      "description": "Group Capacitor updates — core/CLI/plugins share a major version and must bump together",
+      "matchPackagePatterns": ["^@capacitor/"],
+      "groupName": "Capacitor"
+    },
+    {
       "description": "Require manual review for major updates",
       "matchUpdateTypes": ["major"],
       "automerge": false,
