@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { createCorrelationId, trackSyncFailure } from '@/lib/services/analyticsService';
 import { generateTrashTalk } from '@/lib/services/autoTrashTalkService';
 import { checkForDrama } from '@/lib/services/dramaNotificationService';
+import { notifyScoreUpdate } from '@/lib/services/notificationService';
 import {
   broadcastMatchUpdate,
   broadcastScoreUpdate,
@@ -211,6 +212,16 @@ export async function scoreActiveHoleData({
         cupScoreBefore: cupBefore,
         cupScoreAfter: cupAfter,
       });
+
+      // Fire a plain score-update notification for users who opted into
+      // them in settings. notifyScoreUpdate is a no-op when the user
+      // hasn't enabled score notifications, so this costs nothing for
+      // anyone who doesn't want the pings.
+      notifyScoreUpdate(
+        `${teamANames} vs ${teamBNames}`,
+        newMatchState.displayScore || 'AS',
+        trip?.name ?? '',
+      );
 
       generateTrashTalk({
         previousState: previousMatchState,
