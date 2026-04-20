@@ -24,6 +24,7 @@ import {
 } from '@/lib/services/tripSyncService';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 
 const POLL_INTERVAL_MS = 8000;
 
@@ -103,8 +104,9 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     <div
       role="status"
       aria-live="polite"
+      style={{ zIndex: zIndex.nav + 1 }}
       className={cn(
-        'fixed top-0 inset-x-0 z-[55] border-b border-[color:var(--error)]/30',
+        'fixed top-0 inset-x-0 border-b border-[color:var(--error)]/30',
         'bg-[color:var(--error)]/12 text-[var(--error)]',
         'backdrop-blur supports-[backdrop-filter]:bg-[color:var(--error)]/10',
         'pt-[env(safe-area-inset-top,0px)]',

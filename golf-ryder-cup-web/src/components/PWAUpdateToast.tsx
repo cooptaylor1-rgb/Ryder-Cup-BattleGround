@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import { usePWA } from './PWAProvider';
 import { Button } from './ui';
+import { zIndex } from '@/lib/constants/zIndex';
 
 // Grace period between the toast appearing and the auto-reload. Long
 // enough that someone mid-scoring can tap "Not now"; short enough that
@@ -86,7 +87,8 @@ export function PWAUpdateToast() {
 
   return (
     <div
-      className="pwa-update-toast fixed left-1/2 bottom-[calc(env(safe-area-inset-bottom,_0px)_+_80px)] z-[9999] animate-[slideUpFade_0.3s_ease-out]"
+      className="pwa-update-toast fixed left-1/2 bottom-[calc(env(safe-area-inset-bottom,_0px)_+_80px)] animate-[slideUpFade_0.3s_ease-out]"
+      style={{ zIndex: zIndex.toast }}
       role="alert"
       aria-live="polite"
     >

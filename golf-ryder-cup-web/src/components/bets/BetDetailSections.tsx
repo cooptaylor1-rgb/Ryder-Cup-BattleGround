@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
+import { zIndex } from '@/lib/constants/zIndex';
 import type { SideBetDefinition } from '@/lib/constants/sideBets';
 import type { Match, NassauResults, Player, SideBet } from '@/lib/types/models';
 import type { NassauSummary, SkinsStanding } from '@/lib/utils/sideBetLedger';
@@ -576,7 +577,8 @@ export function SkinsResultModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-[color:var(--ink)]/70 p-4"
+      className="fixed inset-0 flex items-end justify-center bg-[color:var(--ink)]/70 p-4"
+      style={{ zIndex: zIndex.sheet }}
       onClick={onClose}
     >
       <div

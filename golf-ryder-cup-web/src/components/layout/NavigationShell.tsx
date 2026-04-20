@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
+import { zIndex } from '@/lib/constants/zIndex';
 import { SidebarNav } from './SidebarNav';
 import { BottomNav } from './BottomNav';
 import { SyncFailureBanner } from '@/components/SyncFailureBanner';
@@ -91,7 +92,8 @@ export function NavigationShell({ children }: { children: ReactNode }) {
       {/* Global loading overlay */}
       {isGlobalLoading && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm"
+          className="fixed inset-0 flex items-center justify-center bg-[color:var(--ink)]/50 backdrop-blur-sm"
+          style={{ zIndex: zIndex.modal }}
           role="dialog"
           aria-modal="true"
           aria-label="Loading"

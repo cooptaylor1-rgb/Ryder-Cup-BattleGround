@@ -32,6 +32,7 @@ import {
     Hash,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 import { mediaLogger } from '@/lib/utils/logger';
 // Speech recognition types are global from speech-recognition.d.ts
 
@@ -337,7 +338,8 @@ export function QuickPhotoCapture({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex flex-col bg-[color:var(--ink)]"
+                        style={{ zIndex: zIndex.modal }}
+                        className="fixed inset-0 flex flex-col bg-[color:var(--ink)]"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-4">

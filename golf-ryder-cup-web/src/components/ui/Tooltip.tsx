@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 
 export interface TooltipProps {
     content: ReactNode;
@@ -81,8 +82,9 @@ export function Tooltip({
         createPortal(
             <div
                 role="tooltip"
+                style={{ zIndex: zIndex.popover }}
                 className={cn(
-                    'fixed z-[70] px-2.5 py-1.5',
+                    'fixed px-2.5 py-1.5',
                     'bg-[var(--surface-raised)] border border-[var(--rule)]',
                     'text-xs text-[var(--ink-primary)] font-medium',
                     'rounded-md shadow-lg',
