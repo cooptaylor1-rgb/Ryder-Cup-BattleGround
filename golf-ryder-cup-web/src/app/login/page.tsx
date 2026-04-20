@@ -10,12 +10,11 @@ import {
   EyeOff,
   ArrowRight,
   UserPlus,
-  Link as LinkIcon,
   WifiOff,
 } from 'lucide-react';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { buildMagicLinkRedirectPath, requestEmailSignInLink } from '@/lib/supabase/auth';
+import { signInWithEmailPassword, signUpWithEmailPassword } from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 /**
@@ -43,8 +42,13 @@ function LoginPageContent() {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSendingMagicLink, setIsSendingMagicLink] = useState(false);
-  const [magicLinkSentTo, setMagicLinkSentTo] = useState<string | null>(null);
+  // Email+password replaces the old magic-link flow (Supabase's built-in
+  // SMTP hit its 3-4/hour rate limit during the event and blocked
+  // everyone). Users pick a password at signup; no emails ever sent.
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<'sign-in' | 'sign-up'>('sign-in');
+  const [isCloudAuthInFlight, setIsCloudAuthInFlight] = useState(false);
   const [showOfflinePinForm, setShowOfflinePinForm] = useState(!isSupabaseConfigured);
   const [isOffline, setIsOffline] = useState(false);
 
@@ -94,18 +98,15 @@ function LoginPageContent() {
   }, []);
 
   useEffect(() => {
-    // Intentionally only re-run when the user edits email/pin.
-    // Including `error` or `magicLinkSentTo` in the dep array would cause
-    // this effect to clear those values the instant they're set, making
-    // failed-login errors and magic-link confirmations invisible.
+    // Intentionally only re-run when the user edits email/password/pin.
+    // Including `error` in the dep array would cause this effect to
+    // clear the error the instant it's set, making sign-in failures
+    // invisible.
     if (error) {
       clearError();
     }
-    if (magicLinkSentTo) {
-      setMagicLinkSentTo(null);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, pin]);
+  }, [email, password, pin]);
 
   const nextPath = searchParams?.get('next');
   const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
@@ -120,23 +121,28 @@ function LoginPageContent() {
     // Redirect handled by useEffect.
   };
 
-  const handleMagicLink = async () => {
-    if (!email || !isSupabaseConfigured) {
+  const handleCloudAuth = async () => {
+    if (!email || !password || !isSupabaseConfigured) {
       return;
     }
 
-    setIsSendingMagicLink(true);
-
+    setIsCloudAuthInFlight(true);
     try {
-      await requestEmailSignInLink(email, buildMagicLinkRedirectPath(nextPath));
-      setMagicLinkSentTo(email.trim().toLowerCase());
+      if (authMode === 'sign-up') {
+        await signUpWithEmailPassword(email, password);
+      } else {
+        await signInWithEmailPassword(email, password);
+      }
       clearError();
+      // The Supabase session listener (SupabaseAuthBridge) picks up the
+      // new session; the useEffect at the top of this component drives
+      // the redirect to /profile/create or the original next= path.
     } catch (requestError) {
       const message =
-        requestError instanceof Error ? requestError.message : 'Failed to send sign-in link';
+        requestError instanceof Error ? requestError.message : 'Sign-in failed';
       useAuthStore.setState({ error: message });
     } finally {
-      setIsSendingMagicLink(false);
+      setIsCloudAuthInFlight(false);
     }
   };
 
@@ -198,38 +204,80 @@ function LoginPageContent() {
 
           {isSupabaseConfigured && (
             <>
+              {/* Password field. The old magic-link button lived here and
+                  kept getting rate-limited by Supabase's built-in SMTP;
+                  password auth needs no email delivery at all. */}
+              <div className="mb-[var(--space-6)]">
+                <label
+                  htmlFor="password"
+                  className="block font-sans text-[length:var(--text-sm)] font-medium text-[var(--ink-secondary)] mb-[var(--space-2)] tracking-[0.02em]"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-[14px] top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--ink-tertiary)]" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={authMode === 'sign-up' ? 'At least 6 characters' : 'Your password'}
+                    autoComplete={authMode === 'sign-up' ? 'new-password' : 'current-password'}
+                    aria-invalid={Boolean(error)}
+                    className={cn(inputBaseClasses, 'pl-11 pr-12', error && 'border-[var(--error)]')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && email && password && !isCloudAuthInFlight) {
+                        e.preventDefault();
+                        void handleCloudAuth();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--ink-tertiary)] transition-opacity hover:opacity-80"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
               <button
                 type="button"
-                onClick={handleMagicLink}
-                disabled={!email || isSendingMagicLink}
+                onClick={handleCloudAuth}
+                disabled={!email || !password || isCloudAuthInFlight}
                 className={cn(
                   'btn-premium press-scale mb-[var(--space-4)] w-full rounded-[var(--radius-md)] px-6 py-4 font-sans text-[length:var(--text-base)] font-semibold flex items-center justify-center gap-[var(--space-2)] transition-[background-color,color,opacity] border border-transparent',
-                  email && !isSendingMagicLink
+                  email && password && !isCloudAuthInFlight
                     ? 'bg-[var(--masters)] text-[var(--canvas)]'
                     : 'bg-[var(--rule)] text-[var(--ink-tertiary)] cursor-not-allowed opacity-90'
                 )}
               >
-                {isSendingMagicLink ? (
+                {isCloudAuthInFlight ? (
                   <>
                     <span className="h-4 w-4 rounded-full border-2 border-[color:var(--canvas)]/30 border-t-[color:var(--canvas)] animate-spin" />
-                    Sending Link...
+                    {authMode === 'sign-up' ? 'Creating account…' : 'Signing in…'}
                   </>
                 ) : (
                   <>
-                    Email Me a Secure Sign-In Link
-                    <LinkIcon className="h-4 w-4" />
+                    {authMode === 'sign-up' ? 'Create Account' : 'Sign In'}
+                    <ArrowRight className="h-4 w-4" />
                   </>
                 )}
               </button>
 
-              {magicLinkSentTo && (
-                <div className="rounded-[var(--radius-md)] border border-[var(--masters)]/20 bg-[var(--masters)]/10 px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
-                  <p className="font-sans text-[length:var(--text-sm)] text-[var(--ink)]">
-                    Sign-in link sent to {magicLinkSentTo}. Open it on this device to finish secure
-                    sign-in.
-                  </p>
-                </div>
-              )}
+              <div className="mb-[var(--space-6)] text-center">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode((m) => (m === 'sign-in' ? 'sign-up' : 'sign-in'))}
+                  className="font-sans text-[length:var(--text-sm)] text-[var(--masters)] underline-offset-4 hover:underline"
+                >
+                  {authMode === 'sign-in'
+                    ? "New here? Create an account instead."
+                    : 'Already have an account? Sign in instead.'}
+                </button>
+              </div>
 
               <div className="mx-auto my-[var(--space-6)] flex items-center gap-[var(--space-4)]">
                 <div className="h-px flex-1 bg-[var(--rule)]" />

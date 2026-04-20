@@ -1,57 +1,86 @@
 /**
  * PWA Update Toast
  *
- * A non-intrusive toast notification that prompts users to refresh
- * when a new version of the app is available.
+ * Shown when a new service worker version is waiting to activate.
+ * Auto-applies the update after a short grace period so every device
+ * picks up bug fixes and schema patches without the captain having to
+ * walk every player through "remove the app and reinstall it" — the
+ * exact failure mode we hit during the first event.
  *
- * Features:
- * - Animated slide-in from bottom
- * - Clear update messaging
- * - One-click refresh action
- * - Dismiss option
- * - Auto-dismiss after 30 seconds (but can be re-triggered)
+ * The grace period gives someone actively entering a score a chance to
+ * tap "Not now" and defer the reload until they're done. Otherwise
+ * after ~7s we skip waiting and reload.
  */
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { RefreshCw, X, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { RefreshCw, Sparkles } from 'lucide-react';
 import { usePWA } from './PWAProvider';
 import { Button } from './ui';
+
+// Grace period between the toast appearing and the auto-reload. Long
+// enough that someone mid-scoring can tap "Not now"; short enough that
+// the expected behaviour from the user's perspective is "the app keeps
+// itself up to date".
+const AUTO_UPDATE_DELAY_MS = 7000;
+// If the user defers, try again every 5 minutes so the update still
+// lands the same session — not on the captain's next app restart.
+const DEFERRED_RETRY_MS = 5 * 60 * 1000;
 
 export function PWAUpdateToast() {
   const { hasUpdate, updateApp } = usePWA();
   const [visible, setVisible] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const deferredRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTimers = () => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    if (deferredRetryRef.current) {
+      clearTimeout(deferredRetryRef.current);
+      deferredRetryRef.current = null;
+    }
+  };
 
   useEffect(() => {
-    if (hasUpdate && !dismissed) {
-      // Slight delay for better UX - don't interrupt immediately
-      const timer = setTimeout(() => {
-        setVisible(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [hasUpdate, dismissed]);
+    if (!hasUpdate) return;
+    setVisible(true);
+    setSecondsLeft(Math.ceil(AUTO_UPDATE_DELAY_MS / 1000));
 
-  // Auto-hide after 30 seconds but user can still refresh from settings
-  useEffect(() => {
-    if (visible) {
-      const timer = setTimeout(() => {
-        setVisible(false);
-      }, 30000);
-      return () => clearTimeout(timer);
-    }
-  }, [visible]);
+    const startedAt = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, AUTO_UPDATE_DELAY_MS - elapsed);
+      setSecondsLeft(Math.ceil(remaining / 1000));
+      if (remaining <= 0) {
+        clearTimers();
+        updateApp();
+      }
+    };
+    countdownRef.current = setInterval(tick, 250);
+
+    return clearTimers;
+  }, [hasUpdate, updateApp]);
 
   if (!visible) return null;
 
-  const handleDismiss = () => {
+  const handleDefer = () => {
+    clearTimers();
     setVisible(false);
-    setDismissed(true);
+    // Re-show the toast in a few minutes so the update still lands this
+    // session. `hasUpdate` stays true on the provider, so the effect
+    // above will fire again when we bump the UI back to visible.
+    deferredRetryRef.current = setTimeout(() => {
+      setVisible(true);
+    }, DEFERRED_RETRY_MS);
   };
 
   const handleUpdate = () => {
+    clearTimers();
     updateApp();
   };
 
@@ -70,10 +99,12 @@ export function PWAUpdateToast() {
         {/* Message */}
         <div className="flex-1 min-w-0">
           <div className="text-[var(--text-sm)] font-semibold text-[var(--ink-primary)]">
-            Update Available
+            New version ready
           </div>
           <div className="text-[var(--text-xs)] text-[var(--ink-secondary)]">
-            New features and improvements ready
+            {secondsLeft !== null && secondsLeft > 0
+              ? `Auto-updating in ${secondsLeft}s…`
+              : 'Updating now…'}
           </div>
         </div>
 
@@ -95,15 +126,15 @@ export function PWAUpdateToast() {
 
           <button
             type="button"
-            onClick={handleDismiss}
+            onClick={handleDefer}
             onTouchEnd={(e) => {
               e.preventDefault();
-              handleDismiss();
+              handleDefer();
             }}
-            aria-label="Dismiss update notification"
-            className="flex items-center justify-center w-11 h-11 rounded-full border-0 bg-[var(--surface-secondary)] text-[var(--ink-tertiary)] cursor-pointer transition-all duration-200 ease-out hover:bg-[var(--surface)] [webkit-tap-highlight-color:transparent] touch-manipulation"
+            aria-label="Defer update"
+            className="flex items-center justify-center px-[var(--space-3)] h-11 rounded-full border-0 bg-[var(--surface-secondary)] text-[var(--ink-secondary)] text-[var(--text-xs)] font-medium cursor-pointer transition-all duration-200 ease-out hover:bg-[var(--surface)] [webkit-tap-highlight-color:transparent] touch-manipulation"
           >
-            <X size={16} />
+            Not now
           </button>
         </div>
       </div>

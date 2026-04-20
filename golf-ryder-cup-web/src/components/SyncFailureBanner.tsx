@@ -20,6 +20,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import {
   getSyncQueueStatus,
   processSyncQueue,
+  retryFailedQueue,
 } from '@/lib/services/tripSyncService';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -71,6 +72,11 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const handleRetry = async () => {
     setIsRetrying(true);
     try {
+      // Reset any items that already exhausted their retry budget back
+      // to 'pending'. Without this step the subsequent processSyncQueue
+      // call skips them entirely — the button appeared to do nothing
+      // whenever the captain had been tapping retry for a while.
+      await retryFailedQueue();
       await processSyncQueue();
       const status = getSyncQueueStatus();
       setFailedCount(status.failed);

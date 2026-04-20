@@ -134,6 +134,60 @@ export async function requestEmailSignInLink(
   }
 }
 
+/**
+ * Email+password sign-up. Produces an immediately-usable session when the
+ * Supabase project has "Confirm email" disabled (Auth → Providers → Email).
+ * The friend-group event doesn't need verification — captains share the
+ * trip code, invitees pick a password, they're in. This replaces the
+ * magic-link flow that was hitting Supabase's free-tier email rate limits
+ * (3-4 per hour) and blocking the event entirely.
+ */
+export async function signUpWithEmailPassword(email: string, password: string): Promise<void> {
+  if (!supabase) {
+    throw new Error('Cloud sign-in is temporarily unavailable. Your data is still saved locally.');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Please enter your email address.');
+  if (!password || password.length < 6) {
+    throw new Error('Please choose a password that is at least 6 characters.');
+  }
+
+  const { error } = await supabase.auth.signUp({ email: normalizedEmail, password });
+  if (error) {
+    authLogger.warn('Supabase sign-up failed:', error);
+    const detail = error.message?.trim();
+    throw new Error(detail ? `Sign-up failed: ${detail}` : 'Sign-up failed. Please try again.');
+  }
+}
+
+/**
+ * Email+password sign-in. Returns normally on success; the Supabase
+ * session listener wired up in SupabaseAuthBridge picks up the new
+ * session and drives the rest of the redirect flow.
+ */
+export async function signInWithEmailPassword(email: string, password: string): Promise<void> {
+  if (!supabase) {
+    throw new Error('Cloud sign-in is temporarily unavailable. Your data is still saved locally.');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Please enter your email address.');
+  if (!password) throw new Error('Please enter your password.');
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail,
+    password,
+  });
+  if (error) {
+    authLogger.warn('Supabase password sign-in failed:', error);
+    const detail = error.message?.trim();
+    throw new Error(
+      detail ? `Sign-in failed: ${detail}` : 'Sign-in failed. Check your email and password.',
+    );
+  }
+}
+
 export async function completeSupabaseAuthFromUrl(
   rawUrl: string | URL
 ): Promise<SupabaseAuthCompletionResult> {
