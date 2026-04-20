@@ -28,11 +28,15 @@ const POLL_INTERVAL_MS = 8000;
 
 export function SyncFailureBanner({ className }: { className?: string }) {
   const [failedCount, setFailedCount] = useState(0);
+  const [lastError, setLastError] = useState<string | undefined>(undefined);
+  const [showDetail, setShowDetail] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
     const tick = () => {
-      setFailedCount(getSyncQueueStatus().failed);
+      const status = getSyncQueueStatus();
+      setFailedCount(status.failed);
+      setLastError(status.lastError);
     };
     tick();
 
@@ -68,7 +72,9 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     setIsRetrying(true);
     try {
       await processSyncQueue();
-      setFailedCount(getSyncQueueStatus().failed);
+      const status = getSyncQueueStatus();
+      setFailedCount(status.failed);
+      setLastError(status.lastError);
     } finally {
       setIsRetrying(false);
     }
@@ -99,19 +105,35 @@ export function SyncFailureBanner({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2">
-        <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
-        <div className="flex-1 min-w-0 text-sm font-medium">{message}</div>
-        {!cloudUnreachable && (
-          <button
-            type="button"
-            onClick={handleRetry}
-            disabled={isRetrying}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
-          >
-            <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
-            {isRetrying ? 'Retrying…' : 'Retry sync'}
-          </button>
+      <div className="mx-auto max-w-3xl px-4 py-2">
+        <div className="flex items-center gap-3">
+          <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
+          <div className="flex-1 min-w-0 text-sm font-medium">{message}</div>
+          {!cloudUnreachable && lastError && (
+            <button
+              type="button"
+              onClick={() => setShowDetail((v) => !v)}
+              className="shrink-0 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)]"
+            >
+              {showDetail ? 'Hide detail' : 'Why?'}
+            </button>
+          )}
+          {!cloudUnreachable && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
+              {isRetrying ? 'Retrying…' : 'Retry sync'}
+            </button>
+          )}
+        </div>
+        {showDetail && lastError && (
+          <p className="mt-1 break-words text-xs text-[var(--error)]/85">
+            Last error: {lastError}
+          </p>
         )}
       </div>
     </div>
