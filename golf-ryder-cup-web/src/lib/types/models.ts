@@ -379,6 +379,15 @@ export interface Match {
   margin: number; // e.g., 3 for "3&2"
   holesRemaining: number; // e.g., 2 for "3&2"
 
+  /**
+   * Optimistic-concurrency counter. Bumped on every scoring mutation so
+   * clients can detect when another device wrote since they last read and
+   * avoid silently overwriting fresh data with stale state. Optional so
+   * pre-existing matches (created before this field was added) keep
+   * working; absent = treat as version 0.
+   */
+  version?: number;
+
   notes?: string;
   createdAt: ISODateString;
   updatedAt: ISODateString;

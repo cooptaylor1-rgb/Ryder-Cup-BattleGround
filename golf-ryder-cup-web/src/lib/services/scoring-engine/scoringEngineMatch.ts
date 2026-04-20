@@ -40,6 +40,7 @@ export async function createMatch(
     result: 'notFinished',
     margin: 0,
     holesRemaining: 18,
+    version: 1,
     createdAt: now,
     updatedAt: now,
   };
@@ -61,7 +62,31 @@ export async function finalizeMatch(matchId: string): Promise<void> {
       result: calculateStoredMatchResult(matchState),
       margin: Math.abs(matchState.currentScore),
       holesRemaining: matchState.holesRemaining,
+      version: (match.version ?? 0) + 1,
       updatedAt: new Date().toISOString(),
     });
   }
+}
+
+/**
+ * Revert a completed match back to in-progress so a captain can correct
+ * a miskeyed hole after the match was finalized. Caller is expected to
+ * guard this behind captain mode and log to the audit trail.
+ */
+export async function reopenMatch(matchId: string): Promise<void> {
+  const match = await db.matches.get(matchId);
+  if (!match) return;
+  if (match.status !== 'completed') return;
+
+  const holeResults = await db.holeResults.where('matchId').equals(matchId).toArray();
+  const matchState = calculateMatchState(match, holeResults);
+
+  await db.matches.update(matchId, {
+    status: 'inProgress',
+    result: 'notFinished',
+    margin: Math.abs(matchState.currentScore),
+    holesRemaining: matchState.holesRemaining,
+    version: (match.version ?? 0) + 1,
+    updatedAt: new Date().toISOString(),
+  });
 }

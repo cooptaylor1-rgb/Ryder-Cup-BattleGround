@@ -87,6 +87,9 @@ export async function scoreActiveHoleData({
   const persistedResult = calculateStoredMatchResult(newMatchState);
   const nextMatchStatus =
     newMatchState.isClosedOut || newMatchState.holesRemaining === 0 ? 'completed' : 'inProgress';
+  // Bump version on every scoring write. Peers reading this match will see
+  // a higher counter and know to reconcile rather than overwrite.
+  const nextVersion = (activeMatch.version ?? 0) + 1;
   const matchToSync: Match = {
     ...activeMatch,
     currentHole: nextHole,
@@ -94,6 +97,7 @@ export async function scoreActiveHoleData({
     result: persistedResult,
     margin: Math.abs(newMatchState.currentScore),
     holesRemaining: newMatchState.holesRemaining,
+    version: nextVersion,
     updatedAt: new Date().toISOString(),
   };
 
@@ -138,12 +142,19 @@ export async function scoreActiveHoleData({
       }
     }
 
+    // Both branches persist `currentHole` and `version`. The completion
+    // branch previously omitted currentHole, which caused a silent desync
+    // when a match closed out: UI advanced to the final hole, DB kept the
+    // old value, and a second device reading the match would try to score
+    // a hole that had already been played.
     if (newMatchState.isClosedOut || newMatchState.holesRemaining === 0) {
       await db.matches.update(activeMatch.id, {
+        currentHole: nextHole,
         status: 'completed' as const,
         result: persistedResult,
         margin: matchToSync.margin,
         holesRemaining: matchToSync.holesRemaining,
+        version: nextVersion,
         updatedAt: matchToSync.updatedAt,
       });
     } else {
@@ -153,6 +164,7 @@ export async function scoreActiveHoleData({
         result: persistedResult,
         margin: matchToSync.margin,
         holesRemaining: matchToSync.holesRemaining,
+        version: nextVersion,
         updatedAt: matchToSync.updatedAt,
       });
     }
