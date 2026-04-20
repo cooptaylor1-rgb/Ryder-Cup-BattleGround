@@ -155,7 +155,44 @@ export async function subscribeToMatch(
 // ============================================
 
 /**
- * Broadcast a score update to all subscribers
+ * Send a broadcast payload with exponential-backoff retries. The REST
+ * sync queue is the durable path for data integrity; this broadcast
+ * layer exists only to make peer devices update immediately instead of
+ * waiting for their next pull. Retries smooth over short channel
+ * hiccups (reconnect, tab inactivity) without blocking the caller.
+ *
+ * Throws on final failure so the caller can surface it — previously
+ * broadcast errors were logged and swallowed, so captains had no
+ * signal that other phones weren't seeing updates.
+ */
+const BROADCAST_RETRY_DELAYS_MS = [500, 1500, 4500];
+
+async function sendBroadcastWithRetry(
+  channelKey: string,
+  event: string,
+  payload: unknown
+): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= BROADCAST_RETRY_DELAYS_MS.length; attempt++) {
+    const channel = activeChannels.get(channelKey);
+    if (!channel) return; // Channel closed; nothing to broadcast to.
+    try {
+      await channel.send({ type: 'broadcast', event, payload });
+      return;
+    } catch (error) {
+      lastError = error;
+      const delay = BROADCAST_RETRY_DELAYS_MS[attempt];
+      if (delay === undefined) break;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`broadcast failed after retries: ${channelKey}/${event}`);
+}
+
+/**
+ * Broadcast a score update to all subscribers.
  */
 export async function broadcastScoreUpdate(
   _supabase: SupabaseClient,
@@ -163,33 +200,26 @@ export async function broadcastScoreUpdate(
   matchId: UUID,
   update: ScoreUpdate
 ): Promise<void> {
-  try {
-    // Broadcast to trip channel
-    const tripChannel = activeChannels.get(`trip:${tripId}`);
-    if (tripChannel) {
-      await tripChannel.send({
-        type: 'broadcast',
-        event: 'score_update',
-        payload: update,
-      });
-    }
-
-    // Broadcast to match channel
-    const matchChannel = activeChannels.get(`match:${matchId}`);
-    if (matchChannel) {
-      await matchChannel.send({
-        type: 'broadcast',
-        event: 'score_update',
-        payload: update,
-      });
-    }
-  } catch (error) {
-    syncLogger.error('Failed to broadcast score update:', error);
+  const errors: unknown[] = [];
+  // Fire both channels independently so a failure on one doesn't suppress
+  // the other. Callers see an aggregated error if either channel failed
+  // after all retries.
+  await Promise.all([
+    sendBroadcastWithRetry(`trip:${tripId}`, 'score_update', update).catch((e) =>
+      errors.push(e)
+    ),
+    sendBroadcastWithRetry(`match:${matchId}`, 'score_update', update).catch((e) =>
+      errors.push(e)
+    ),
+  ]);
+  if (errors.length > 0) {
+    syncLogger.error('Failed to broadcast score update:', errors);
+    throw errors[0];
   }
 }
 
 /**
- * Broadcast a match status update
+ * Broadcast a match status update.
  */
 export async function broadcastMatchUpdate(
   _supabase: SupabaseClient,
@@ -197,16 +227,10 @@ export async function broadcastMatchUpdate(
   match: Match
 ): Promise<void> {
   try {
-    const tripChannel = activeChannels.get(`trip:${tripId}`);
-    if (tripChannel) {
-      await tripChannel.send({
-        type: 'broadcast',
-        event: 'match_update',
-        payload: match,
-      });
-    }
+    await sendBroadcastWithRetry(`trip:${tripId}`, 'match_update', match);
   } catch (error) {
     syncLogger.error('Failed to broadcast match update:', error);
+    throw error;
   }
 }
 
