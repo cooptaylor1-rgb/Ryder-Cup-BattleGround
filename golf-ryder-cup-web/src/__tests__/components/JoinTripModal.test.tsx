@@ -3,17 +3,15 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 
-const { mockJoinTripByShareCode, mockLoadTrip, mockStoreTripShareCode, mockRouterPush } = vi.hoisted(() => ({
-  mockJoinTripByShareCode: vi.fn(),
+const { mockPullTripByShareCode, mockLoadTrip, mockStoreTripShareCode, mockRouterPush } = vi.hoisted(() => ({
+  mockPullTripByShareCode: vi.fn(),
   mockLoadTrip: vi.fn(),
   mockStoreTripShareCode: vi.fn(),
   mockRouterPush: vi.fn(),
 }));
 
-vi.mock('@/lib/supabase', () => ({
-  syncService: {
-    joinTripByShareCode: mockJoinTripByShareCode,
-  },
+vi.mock('@/lib/services/tripSyncService', () => ({
+  pullTripByShareCode: mockPullTripByShareCode,
 }));
 
 vi.mock('@/lib/stores/tripStore', () => ({
@@ -61,11 +59,9 @@ describe('JoinTripModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
-    mockJoinTripByShareCode.mockResolvedValue({
+    mockPullTripByShareCode.mockResolvedValue({
       success: true,
-      synced: 1,
       tripId: 'trip-123',
-      errors: [],
     });
     mockLoadTrip.mockResolvedValue(undefined);
   });

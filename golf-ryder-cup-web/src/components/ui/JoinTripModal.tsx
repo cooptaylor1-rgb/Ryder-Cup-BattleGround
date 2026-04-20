@@ -9,7 +9,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { syncService } from '@/lib/supabase';
+import { pullTripByShareCode } from '@/lib/services/tripSyncService';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { useAuthStore } from '@/lib/stores';
 import { useTripStore } from '@/lib/stores/tripStore';
@@ -97,11 +97,11 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
     setError(null);
 
     try {
-      const result = await syncService.joinTripByShareCode(trimmedCode);
+      const result = await pullTripByShareCode(trimmedCode);
 
-      if (result.success && result.synced > 0 && result.tripId) {
+      if (result.success && result.tripId) {
         storeTripShareCode(result.tripId, shareCode.trim());
-        // Load the trip from local DB (already synced by joinTripByShareCode)
+        // Load the trip from local DB (already synced by pullTripByShareCode)
         await loadTrip(result.tripId);
         const loadedPlayers = useTripStore.getState?.()?.players ?? [];
         const linkResult = await ensureCurrentUserTripPlayerLink(
@@ -124,7 +124,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
           handleClose();
         }, 1500);
       } else {
-        setError(result.errors[0] || 'Failed to join trip. Please check the code and try again.');
+        setError(result.error || 'Failed to join trip. Please check the code and try again.');
       }
     } catch {
       setError('Failed to join trip. Please check your connection and try again.');

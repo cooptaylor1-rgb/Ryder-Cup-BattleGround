@@ -15,8 +15,10 @@ export {
 } from './client';
 export type { ConnectionStatus, TableName } from './client';
 
-export { syncService, useSyncStatus } from './syncService';
-export type { SyncResult, SyncStatus } from './syncService';
+// Note: the legacy syncService and its localStorage-backed pending-changes
+// queue have been removed. All sync now flows through the typed
+// IndexedDB queue in src/lib/services/trip-sync/. Import pullTripByShareCode
+// and syncTripToCloudFull from '@/lib/services/tripSyncService'.
 
 export { useRealtime, useLiveScores } from './useRealtime';
 export type { RealtimeUser, UseRealtimeResult, LiveScore } from './useRealtime';
