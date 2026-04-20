@@ -78,6 +78,30 @@ export function buildSyncOperationKey(
   return `${tripId}:${entity}:${entityId}:${operation}`;
 }
 
+// Parents must be pushed to Supabase before children, or FK constraints reject
+// the child (e.g. team_members.team_id -> teams.id). Deletes reverse the order
+// so children are removed before their parent.
+const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
+  trip: 0,
+  course: 1,
+  player: 1,
+  team: 2,
+  teeSet: 2,
+  session: 2,
+  teamMember: 3,
+  match: 3,
+  holeResult: 4,
+};
+
+function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
+  const aRank = ENTITY_DEPENDENCY_ORDER[a.entity];
+  const bRank = ENTITY_DEPENDENCY_ORDER[b.entity];
+  const aEffective = a.operation === 'delete' ? -aRank : aRank;
+  const bEffective = b.operation === 'delete' ? -bRank : bRank;
+  if (aEffective !== bEffective) return aEffective - bEffective;
+  return a.createdAt.localeCompare(b.createdAt);
+}
+
 /**
  * Deterministic conflict policy for queued operations on the same entity.
  * Ensures queue transitions are idempotent and converge to the correct final state.
@@ -216,10 +240,13 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
   const errors: string[] = [];
 
   try {
-    const pendingItems = tripSyncRuntime.syncQueue.filter(
-      (item) =>
-        item.status === 'pending' || (item.status === 'failed' && item.retryCount < MAX_RETRY_COUNT)
-    );
+    const pendingItems = tripSyncRuntime.syncQueue
+      .filter(
+        (item) =>
+          item.status === 'pending' ||
+          (item.status === 'failed' && item.retryCount < MAX_RETRY_COUNT)
+      )
+      .sort(compareByDependency);
 
     for (const item of pendingItems) {
       item.status = 'syncing';
