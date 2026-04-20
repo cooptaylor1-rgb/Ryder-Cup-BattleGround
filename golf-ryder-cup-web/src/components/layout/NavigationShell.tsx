@@ -15,6 +15,7 @@ import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { SidebarNav } from './SidebarNav';
 import { BottomNav } from './BottomNav';
+import { SyncFailureBanner } from '@/components/SyncFailureBanner';
 
 // Lazy-load live-play widgets (they touch IndexedDB)
 const FloatingMyMatch = dynamic(
@@ -49,6 +50,11 @@ export function NavigationShell({ children }: { children: ReactNode }) {
 
   return (
     <>
+      {/* Site-wide escalation banner for sync failures. Kept outside the
+          flex layout so it overlays the page without shifting content.
+          Renders nothing when the queue has no failed operations. */}
+      {!hideNav && <SyncFailureBanner />}
+
       <div className="flex min-h-screen">
         {/* Desktop sidebar */}
         {!hideNav && (
