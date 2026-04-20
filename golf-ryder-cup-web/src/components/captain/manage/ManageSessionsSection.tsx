@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CheckCircle2,
   ChevronDown,
@@ -19,6 +20,9 @@ import {
 
 import { Button } from '@/components/ui/Button';
 import { cn, parseDateInLocalZone } from '@/lib/utils';
+import { db } from '@/lib/db';
+import { buildCanonicalCourseKey } from '@/lib/utils/courseImport';
+import { createCourseFromProfile } from '@/lib/services/courseLibraryService';
 import { pauseSession, resumeSession } from '@/lib/services/sessionPauseService';
 import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -521,6 +525,40 @@ function MatchManagementCard({
   const [status, setStatus] = useState<Match['status']>(match.status);
   const [courseId, setCourseId] = useState(initialCourseId);
   const [teeSetId, setTeeSetId] = useState(match.teeSetId ?? '');
+  const [isImportingProfile, setIsImportingProfile] = useState(false);
+  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
+
+  // Library-backed course profiles so captains don't have to double-hop
+  // through /courses to import before they can assign. The dropdown
+  // below shows these in a second optgroup; selecting one runs
+  // createCourseFromProfile() and then writes the new trip-course id
+  // back into `courseId`.
+  const courseProfiles = useLiveQuery(() => db.courseProfiles.toArray(), [], []);
+  const teeSetProfiles = useLiveQuery(() => db.teeSetProfiles.toArray(), [], []);
+
+  const importableProfiles = (courseProfiles ?? []).filter((profile) => {
+    // Hide profiles whose name/location already has a matching trip
+    // course — otherwise the captain sees a duplicate "import" option
+    // for a course they already pulled in on a previous session.
+    const profileKey =
+      profile.canonicalKey ||
+      buildCanonicalCourseKey({
+        name: profile.name,
+        city: profile.location,
+        state: profile.location,
+        country: profile.location,
+        sourceUrl: profile.sourceUrl,
+      });
+    return !courses.some((course) => {
+      const courseKey = buildCanonicalCourseKey({
+        name: course.name,
+        city: course.location,
+        state: course.location,
+        country: course.location,
+      });
+      return profileKey && courseKey === profileKey;
+    });
+  });
 
   const teamANames = getPlayerNames(match.teamAPlayerIds);
   const teamBNames = getPlayerNames(match.teamBPlayerIds);
@@ -533,8 +571,53 @@ function MatchManagementCard({
     : [];
   const readiness = getMatchReadinessState({ selectedCourse, selectedTeeSet });
   const needsCourseSetup = readiness !== 'ready';
-  const missingLibraryData = courses.length === 0 || (selectedCourse && availableTeeSets.length === 0);
+  const libraryHasImportable = importableProfiles.length > 0;
+  const missingLibraryData =
+    (courses.length === 0 && !libraryHasImportable) ||
+    (selectedCourse && availableTeeSets.length === 0);
   const primaryCourseActionLabel = missingLibraryData ? 'Add or import courses' : 'Set course & tee';
+
+  const handleCourseSelectChange = async (nextValue: string) => {
+    if (!nextValue) {
+      setCourseId('');
+      setTeeSetId('');
+      return;
+    }
+
+    // Library entries are encoded as `profile:<id>` so the select can
+    // offer both imported trip courses and not-yet-imported library
+    // profiles in a single control.
+    if (nextValue.startsWith('profile:')) {
+      const profileId = nextValue.slice('profile:'.length);
+      setIsImportingProfile(true);
+      try {
+        const { course, teeSets: importedTees } = await createCourseFromProfile(profileId);
+        setCourseId(course.id);
+        setTeeSetId(importedTees[0]?.id ?? '');
+        showToast('success', `Imported ${course.name} from library`);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Import failed';
+        showToast('error', `Could not import course: ${message}`);
+      } finally {
+        setIsImportingProfile(false);
+      }
+      return;
+    }
+
+    setCourseId(nextValue);
+    const teeSetStillValid = teeSets.some(
+      (teeSet) => teeSet.id === teeSetId && teeSet.courseId === nextValue,
+    );
+    if (!teeSetStillValid) {
+      setTeeSetId('');
+    }
+  };
+  // teeSetProfiles is intentionally unused here — the importable
+  // profile list above is driven by the profile metadata alone, and
+  // createCourseFromProfile reads the tee sets internally when it
+  // runs the import. Keeping the hook call so the component
+  // re-renders on tee-set edits to the library.
+  void teeSetProfiles;
   const statusMeta =
     status === 'completed'
       ? sessionStatusStyles.completed
@@ -609,32 +692,38 @@ function MatchManagementCard({
               <span className="type-meta font-semibold text-[var(--ink)]">Course</span>
               <select
                 value={courseId}
-                onChange={(event) => {
-                  const nextCourseId = event.target.value;
-                  setCourseId(nextCourseId);
-                  if (!nextCourseId) {
-                    setTeeSetId('');
-                    return;
-                  }
-
-                  const teeSetStillValid = teeSets.some(
-                    (teeSet) => teeSet.id === teeSetId && teeSet.courseId === nextCourseId
-                  );
-                  if (!teeSetStillValid) {
-                    setTeeSetId('');
-                  }
-                }}
+                onChange={(event) => void handleCourseSelectChange(event.target.value)}
                 className="input"
+                disabled={isImportingProfile}
               >
-                <option value="">No course assigned</option>
-                {courses
-                  .slice()
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.name}
-                    </option>
-                  ))}
+                <option value="">
+                  {isImportingProfile ? 'Importing from library…' : 'No course assigned'}
+                </option>
+                {courses.length > 0 && (
+                  <optgroup label="Trip courses">
+                    {courses
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                )}
+                {importableProfiles.length > 0 && (
+                  <optgroup label="From library (tap to import)">
+                    {importableProfiles
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((profile) => (
+                        <option key={profile.id} value={`profile:${profile.id}`}>
+                          {profile.name}
+                          {profile.location ? ` — ${profile.location}` : ''}
+                        </option>
+                      ))}
+                  </optgroup>
+                )}
               </select>
             </label>
 
