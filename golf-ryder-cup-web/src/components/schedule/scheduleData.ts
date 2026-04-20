@@ -1,6 +1,24 @@
 import { SessionTypeDisplay, type Course, type Match, type Player, type TeeSet, type Trip } from '@/lib/types/models';
 import type { CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { resolveCurrentTripPlayer } from '@/lib/utils/tripPlayerIdentity';
+import { parseDateInLocalZone } from '@/lib/utils';
+
+// Trip.startDate/endDate arrive as either "YYYY-MM-DD" (cloud pulls)
+// or "YYYY-MM-DDT00:00:00.000Z" (wizard-created locally). The latter
+// parsed in the user's timezone lands on the day-before for anyone
+// west of UTC — which is why Day 1 of "April 30" was rendering as
+// "Wednesday April 29". Strip the time portion and defer to
+// parseDateInLocalZone so every render anchors on local midnight of
+// the intended calendar day.
+function tripDayToLocalDate(input: string | Date | undefined): Date | null {
+  if (!input) return null;
+  if (input instanceof Date) return input;
+  const datePart = input.slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+    return new Date(input);
+  }
+  return parseDateInLocalZone(datePart);
+}
 
 export interface ScheduleEntry {
   id: string;
@@ -66,8 +84,8 @@ export function buildScheduleByDay({
     return [];
   }
 
-  const startDate = new Date(currentTrip.startDate);
-  const endDate = new Date(currentTrip.endDate);
+  const startDate = tripDayToLocalDate(currentTrip.startDate) ?? new Date(currentTrip.startDate);
+  const endDate = tripDayToLocalDate(currentTrip.endDate) ?? new Date(currentTrip.endDate);
   const playerNameById = new Map(
     players.map((player) => [
       player.id,
@@ -80,7 +98,12 @@ export function buildScheduleByDay({
   const days: DaySchedule[] = [];
 
   for (let day = new Date(startDate); day <= endDate; day.setDate(day.getDate() + 1)) {
-    const dateStr = day.toISOString().split('T')[0];
+    // dateStr used to key sessions by day; format from local getters so
+    // it stays in sync with the dayName (which is always local-tz).
+    const yyyy = day.getFullYear();
+    const mm = String(day.getMonth() + 1).padStart(2, '0');
+    const dd = String(day.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}-${mm}-${dd}`;
     const dayName = day.toLocaleDateString('en-US', { weekday: 'long' });
     const dayNumber =
       Math.floor((day.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -92,7 +115,9 @@ export function buildScheduleByDay({
           return false;
         }
 
-        const sessionDate = new Date(session.scheduledDate).toISOString().split('T')[0];
+        // Same date-only parse strategy: compare the first 10 chars so
+        // UTC-tagged session timestamps don't drift to the previous day.
+        const sessionDate = session.scheduledDate.slice(0, 10);
         return sessionDate === dateStr;
       })
       .sort((a, b) => {
