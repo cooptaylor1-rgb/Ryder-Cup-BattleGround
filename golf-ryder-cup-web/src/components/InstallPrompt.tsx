@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { pwaLogger } from '@/lib/utils/logger';
 
 /**
  * Interface for the BeforeInstallPromptEvent
@@ -88,7 +89,7 @@ export function useInstallPrompt() {
       setIsInstallable(false);
       return outcome === 'accepted';
     } catch (error) {
-      console.error('Error showing install prompt:', error);
+      pwaLogger.error('Error showing install prompt:', error);
       return false;
     }
   }, [deferredPrompt]);

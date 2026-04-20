@@ -41,15 +41,29 @@ const eslintConfig = defineConfig([
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
       }],
+
+      // Production code routes logging through src/lib/utils/logger so
+      // dev-only debug output is silenced in production. Bare console.*
+      // in src/ bypasses that and ships noise to end users; keep
+      // warn/error escape hatches for edge paths (API routes, service
+      // workers, error handlers) that genuinely need direct output.
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
   {
-    // Disable React hooks rules for Playwright test files
-    // Playwright fixtures use 'use' as a standard parameter name which conflicts
-    // with React's use() hook name detection
-    files: ["tests/**/*.ts", "e2e/**/*.ts", "**/*.spec.ts", "**/*.test.ts"],
+    // Tests, scripts, and the logger itself legitimately talk to the
+    // console. The logger wraps console internally; tests emit report
+    // output that CI captures.
+    files: [
+      "tests/**/*.ts",
+      "e2e/**/*.ts",
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "src/lib/utils/logger.ts",
+    ],
     rules: {
       "react-hooks/rules-of-hooks": "off",
+      "no-console": "off",
     },
   },
 ]);

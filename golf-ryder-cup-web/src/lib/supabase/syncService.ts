@@ -16,6 +16,7 @@ import {
   type TableName,
 } from './client';
 import { db } from '../db';
+import { syncLogger } from '../utils/logger';
 import { mergeTripPlayers } from '../utils/tripPlayers';
 import type {
   Trip,
@@ -162,7 +163,7 @@ class SyncService {
         this.pendingChanges = JSON.parse(stored);
       }
     } catch (error) {
-      console.warn('Failed to load pending sync changes from localStorage:', error);
+      syncLogger.warn('Failed to load pending sync changes from localStorage:', error);
       this.pendingChanges = [];
     }
   }
@@ -175,7 +176,7 @@ class SyncService {
     try {
       localStorage.setItem('golf-sync-pending', JSON.stringify(this.pendingChanges));
     } catch (error) {
-      console.warn(
+      syncLogger.warn(
         'Failed to save pending sync changes to localStorage (storage may be full):',
         error
       );
@@ -620,7 +621,7 @@ class SyncService {
 
       return true;
     } catch (error) {
-      console.error('Failed to push hole result to Supabase:', error);
+      syncLogger.error('Failed to push hole result to Supabase:', error);
       this.addPendingChange('hole_results', 'insert', holeResult);
       return false;
     }
@@ -649,7 +650,7 @@ class SyncService {
 
       return true;
     } catch (error) {
-      console.error('Failed to push match update to Supabase:', error);
+      syncLogger.error('Failed to push match update to Supabase:', error);
       this.addPendingChange('matches', 'update', match);
       return false;
     }

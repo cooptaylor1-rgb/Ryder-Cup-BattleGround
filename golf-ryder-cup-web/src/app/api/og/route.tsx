@@ -6,6 +6,7 @@
  */
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { apiLogger } from '@/lib/utils/logger';
 
 export const runtime = 'edge';
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Default app branding image
     return generateDefaultImage();
   } catch (e) {
-    console.error('OG Image generation error:', e);
+    apiLogger.error('OG Image generation error:', e);
     return new Response('Failed to generate image', { status: 500 });
   }
 }
