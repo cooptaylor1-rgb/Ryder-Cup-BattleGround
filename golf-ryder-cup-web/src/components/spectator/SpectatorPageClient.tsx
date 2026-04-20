@@ -12,6 +12,7 @@ import {
 } from './SpectatorPageSections';
 import {
     loadSpectatorViewData,
+    SpectatorAccessDeniedError,
     SPECTATOR_POLL_INTERVAL_MS,
 } from './spectatorPageData';
 
@@ -36,8 +37,16 @@ export default function SpectatorPageClient({ tripId }: { tripId: string }) {
                 setLastUpdated(new Date());
             }
         } catch (error) {
-            tripLogger.error('Spectator view load failed:', error);
-            setLoadError("We couldn't load this scoreboard right now.");
+            if (error instanceof SpectatorAccessDeniedError) {
+                // Distinguish "trip closed to public spectators" from
+                // "something is broken" so the user gets a useful message
+                // instead of a generic retry loop.
+                setLoadError(error.message);
+                setSpectatorView(null);
+            } else {
+                tripLogger.error('Spectator view load failed:', error);
+                setLoadError("We couldn't load this scoreboard right now.");
+            }
         } finally {
             setLoading(false);
         }
