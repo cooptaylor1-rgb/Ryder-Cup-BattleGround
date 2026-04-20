@@ -43,11 +43,23 @@ export async function saveLineup(
 
     if (existingMatches.length > 0) {
       const match = existingMatches[0];
+      // Guard: once a match has started or completed, overwriting the
+      // team IDs silently corrupts existing hole results — hole 5 would
+      // still show Player A's win, but the team roster would list
+      // Player B. Block the lineup save for these matches so the captain
+      // must use the explicit "pull player" action (which audits the
+      // change and rebuilds allowance for unscored holes only).
+      if (match.status !== 'scheduled') {
+        matchIds.push(match.id);
+        continue;
+      }
+
       await db.matches.update(match.id, {
         teamAPlayerIds,
         teamBPlayerIds,
         teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
         teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
+        version: (match.version ?? 0) + 1,
         updatedAt: now,
       });
       matchIds.push(match.id);
