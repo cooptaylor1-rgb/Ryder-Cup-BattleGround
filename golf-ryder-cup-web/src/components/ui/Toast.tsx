@@ -13,6 +13,7 @@
 'use client';
 
 import { useToastStore } from '@/lib/stores';
+import { zIndex } from '@/lib/constants/zIndex';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { X, Check, AlertCircle, Info, AlertTriangle } from 'lucide-react';
@@ -169,9 +170,19 @@ export function ToastContainer() {
 
   if (toasts.length === 0) return null;
 
+  // Anchor above the bottom nav and the iOS home indicator both, with
+  // margin for breathing room. `bottom-28` previously hard-coded a pixel
+  // gap that assumed no safe-area inset — on devices with a home bar
+  // the toast clipped into the nav. `calc(safe-area + nav height + gap)`
+  // gives a consistent 12px visible gap on every device. zIndex.toast
+  // keeps toasts on top of modals and bottom sheets.
   return (
     <div
-      className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 lg:bottom-8 px-4 w-full max-w-md pb-[env(safe-area-inset-bottom,0px)]"
+      className="fixed left-1/2 -translate-x-1/2 flex flex-col gap-3 px-4 w-full max-w-md lg:bottom-8"
+      style={{
+        zIndex: zIndex.toast,
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)',
+      }}
       aria-live="polite"
       aria-label="Notifications"
     >
