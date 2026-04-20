@@ -39,10 +39,25 @@ export async function registerServiceWorker(config?: SWConfig): Promise<ServiceW
         swRegistration = registration;
         pwaLogger.log('Service worker registered:', registration.scope);
 
-        // Check for updates periodically (every hour)
-        setInterval(() => {
-            registration.update();
-        }, 60 * 60 * 1000);
+        // Re-check for a new SW whenever the tab becomes visible. A
+        // trip-long session like a tournament day can keep the same
+        // tab open for hours; the hourly interval alone isn't
+        // responsive enough when we ship a server-side schema fix and
+        // want every phone to pick it up before the next score write.
+        const checkForUpdates = () => {
+            void registration.update();
+        };
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') checkForUpdates();
+        });
+        window.addEventListener('focus', checkForUpdates);
+        // Hourly poll stays as a backstop for backgrounded PWAs that
+        // iOS Safari keeps alive without firing the visibility event.
+        setInterval(checkForUpdates, 60 * 60 * 1000);
+        // And fire one immediately so the first tab visit after a
+        // deploy registers the new SW without waiting for the next
+        // visibility change.
+        checkForUpdates();
 
         // Handle updates
         registration.onupdatefound = () => {
