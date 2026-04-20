@@ -286,6 +286,7 @@ export async function syncHoleResultToCloud(
     throw new Error(`Invalid hole winner: ${holeResult.winner}`);
   }
 
+  const incomingTimestamp = holeResult.timestamp || new Date().toISOString();
   const cloudData = {
     id: holeResult.id,
     match_id: holeResult.matchId,
@@ -295,8 +296,32 @@ export async function syncHoleResultToCloud(
     team_b_strokes: holeResult.teamBStrokes || null,
     scored_by: holeResult.scoredBy || null,
     notes: holeResult.notes || null,
-    timestamp: holeResult.timestamp || new Date().toISOString(),
+    timestamp: incomingTimestamp,
   };
+
+  // Last-write-wins by timestamp, not by arrival order. Without this check
+  // an offline phone that reconnects hours later can silently overwrite a
+  // fresher score entered by another device during the offline window —
+  // the upsert did not consider timestamps, so whichever write hit Supabase
+  // last wrote. There is still a narrow race between the select and the
+  // upsert, but it closes the worst of the offline-replay data loss.
+  const { data: existing } = await getTable('hole_results')
+    .select('timestamp')
+    .eq('match_id', holeResult.matchId)
+    .eq('hole_number', holeResult.holeNumber)
+    .maybeSingle();
+
+  const existingTimestamp =
+    existing && typeof (existing as { timestamp?: string }).timestamp === 'string'
+      ? (existing as { timestamp: string }).timestamp
+      : null;
+  if (
+    existingTimestamp &&
+    new Date(existingTimestamp).getTime() >= new Date(incomingTimestamp).getTime()
+  ) {
+    // Cloud already has a newer (or equal) version; keep it.
+    return;
+  }
 
   const { error } = await getTable('hole_results').upsert(cloudData, {
     onConflict: 'match_id,hole_number',

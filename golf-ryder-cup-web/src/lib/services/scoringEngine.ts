@@ -25,4 +25,8 @@ export {
 export { recordHoleResult, type ScoreConflict } from './scoring-engine/scoringEngineCommands';
 export { undoLastScore, type UndoResult } from './scoring-engine/scoringEngineHistory';
 export { createMatch, finalizeMatch, reopenMatch } from './scoring-engine/scoringEngineMatch';
+export {
+  MatchNotReadyForScoringError,
+  validateMatchReadyForScoring,
+} from './scoring-engine/scoringEngineValidation';
 

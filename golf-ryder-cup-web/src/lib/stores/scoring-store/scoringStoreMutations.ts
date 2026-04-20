@@ -12,6 +12,7 @@ import {
   calculateStoredMatchResult,
   recordHoleResult,
   undoLastScore,
+  validateMatchReadyForScoring,
 } from '@/lib/services/scoringEngine';
 import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
@@ -59,6 +60,11 @@ export async function scoreActiveHoleData({
   matchStates: Map<string, MatchState>;
   lastSavedAt: Date;
 }> {
+  // Ensure the match is ready before we mutate any state. Throws
+  // MatchNotReadyForScoringError if course/tee set is missing; the caller
+  // (React component) surfaces a captain-readable message.
+  await validateMatchReadyForScoring(activeMatch.id);
+
   const previousResult =
     (await db.holeResults.where({ matchId: activeMatch.id, holeNumber: currentHole }).first()) ||
     null;

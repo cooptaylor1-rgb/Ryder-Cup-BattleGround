@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { db } from '@/lib/db';
 import { useScoringStore } from '@/lib/stores/scoringStore';
-import type { Match, RyderCupSession, Trip } from '@/lib/types/models';
+import type { Course, Match, RyderCupSession, TeeSet, Trip } from '@/lib/types/models';
 
 vi.mock('@/lib/services/tripSyncService', () => ({
   queueSyncOperation: vi.fn(),
@@ -58,9 +58,33 @@ async function seedMatch() {
     createdAt: now,
   };
 
+  // Scoring now validates the match has a course and tee set assigned
+  // before accepting a write, so the fixture seeds minimal test records
+  // for both. See scoringEngineValidation.validateMatchReadyForScoring.
+  const course: Course = {
+    id: 'course-1',
+    name: 'Test Course',
+    createdAt: now,
+    updatedAt: now,
+  };
+  const teeSet: TeeSet = {
+    id: 'tee-1',
+    courseId: course.id,
+    name: 'Test Tees',
+    rating: 72,
+    slope: 113,
+    par: 72,
+    holePars: Array(18).fill(4),
+    holeHandicaps: Array.from({ length: 18 }, (_, i) => i + 1),
+    createdAt: now,
+    updatedAt: now,
+  };
+
   const match: Match = {
     id: 'match-1',
     sessionId: session.id,
+    courseId: course.id,
+    teeSetId: teeSet.id,
     matchOrder: 1,
     status: 'scheduled',
     currentHole: 1,
@@ -77,6 +101,8 @@ async function seedMatch() {
 
   await db.trips.put(trip);
   await db.sessions.put(session);
+  await db.courses.put(course);
+  await db.teeSets.put(teeSet);
   await db.matches.put(match);
 
   return match;
