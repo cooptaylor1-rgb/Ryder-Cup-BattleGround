@@ -19,6 +19,9 @@ import {
 
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import { pauseSession, resumeSession } from '@/lib/services/sessionPauseService';
+import { useToastStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import type { Course, Match, RyderCupSession, TeeSet } from '@/lib/types/models';
 
 import { ManageFactCard } from './ManagePageShell';
@@ -61,6 +64,13 @@ const sessionStatusStyles: Record<
       'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.96))]',
     icon: <CheckCircle2 size={16} className="text-[var(--success)]" />,
     label: 'Completed',
+  },
+  paused: {
+    pill: 'border-[var(--rule)] bg-[color:var(--ink)]/6 text-[var(--ink-secondary)]',
+    panel:
+      'border-[var(--rule)] bg-[linear-gradient(180deg,rgba(0,0,0,0.04),rgba(255,255,255,0.96))]',
+    icon: <Lock size={16} className="text-[var(--ink-tertiary)]" />,
+    label: 'Paused',
   },
 };
 
@@ -143,6 +153,28 @@ export function SessionManagementCard({
   isSubmitting: boolean;
 }) {
   const statusMeta = sessionStatusStyles[session.status];
+  const { showToast } = useToastStore(
+    useShallow((s) => ({ showToast: s.showToast })),
+  );
+
+  const handlePauseToggle = async () => {
+    try {
+      if (session.status === 'paused') {
+        await resumeSession(session.id);
+        showToast('success', 'Session resumed');
+      } else {
+        await pauseSession(session.id);
+        showToast('info', 'Session paused — matches remain intact.');
+      }
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : 'Could not change session state',
+      );
+    }
+  };
+  const canPauseOrResume =
+    session.status === 'inProgress' || session.status === 'paused';
 
   return (
     <section
@@ -226,6 +258,28 @@ export function SessionManagementCard({
 
       {isExpanded ? (
         <div className="border-t border-[color:var(--rule)]/75 bg-[rgba(255,255,255,0.52)] px-[var(--space-5)] py-[var(--space-5)]">
+          {canPauseOrResume && (
+            <div className="mb-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.7)] px-[var(--space-4)] py-[var(--space-3)]">
+              <div className="flex-1 min-w-0">
+                <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">
+                  {session.status === 'paused' ? 'Session paused' : 'Live session'}
+                </p>
+                <p className="mt-[var(--space-1)] type-body-sm text-[var(--ink-secondary)]">
+                  {session.status === 'paused'
+                    ? 'Matches are on hold during this pause. Resume when play restarts.'
+                    : 'Pause for rain delays or other interruptions. Match state stays intact.'}
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handlePauseToggle}
+                disabled={isSubmitting}
+              >
+                {session.status === 'paused' ? 'Resume session' : 'Pause session'}
+              </Button>
+            </div>
+          )}
           <div className="grid gap-[var(--space-4)] lg:grid-cols-[0.92fr_1.08fr]">
             <SessionSettingsEditor
               key={`${session.id}:${session.status}:${session.pointsPerMatch ?? ''}`}

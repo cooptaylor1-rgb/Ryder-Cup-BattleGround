@@ -344,7 +344,19 @@ export function SessionInfoFact({ label, value }: { label: string; value: string
     );
 }
 
-export function SessionPageStatus({ status }: { status: Match['status'] | 'scheduled' }) {
+export function SessionPageStatus({
+    status,
+}: {
+    status: Match['status'] | 'scheduled' | 'paused';
+}) {
+    const label =
+        status === 'inProgress'
+            ? 'Live'
+            : status === 'paused'
+              ? 'Paused'
+              : status === 'completed'
+                ? 'Complete'
+                : 'Scheduled';
     return (
         <span
             className={`inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] ${
@@ -355,7 +367,7 @@ export function SessionPageStatus({ status }: { status: Match['status'] | 'sched
                       : 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
             }`}
         >
-            {status === 'inProgress' ? 'Live' : status === 'completed' ? 'Complete' : 'Scheduled'}
+            {label}
         </span>
     );
 }

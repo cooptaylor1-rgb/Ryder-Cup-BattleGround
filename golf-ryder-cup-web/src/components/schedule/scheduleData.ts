@@ -34,7 +34,7 @@ interface ScheduleSessionLike {
   timeSlot?: 'AM' | 'PM';
   sessionNumber: number;
   sessionType: string;
-  status: 'scheduled' | 'inProgress' | 'completed' | 'cancelled';
+  status: 'scheduled' | 'inProgress' | 'paused' | 'completed' | 'cancelled';
 }
 
 export function resolveCurrentUserPlayer(
