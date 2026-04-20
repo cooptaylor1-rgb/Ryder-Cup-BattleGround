@@ -151,8 +151,10 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
     return ALL_FORMATS.filter((format) => POPULAR_FORMATS.includes(format.value));
   }, [showAllFormats]);
 
+  const selectedType = ALL_FORMATS.find((format) => format.value === sessionType) || ALL_FORMATS[0];
+
   // Real golf groups four players per tee time. Singles (1 player per
-  // team, two heads-to-head per group of four) gets two matches per tee
+  // team, two head-to-head per group of four) gets two matches per tee
   // time; team formats (foursomes, fourball, pinehurst, …) get one
   // match per tee time. Other formats fall through to one-per-tee-time
   // by default. Without this, a 12-singles session printed twelve
@@ -189,7 +191,6 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
   const lineupTeamA = useMemo(() => toLineupPlayers(teamAPlayers, 'A'), [teamAPlayers]);
   const lineupTeamB = useMemo(() => toLineupPlayers(teamBPlayers, 'B'), [teamBPlayers]);
 
-  const selectedType = ALL_FORMATS.find((format) => format.value === sessionType) || ALL_FORMATS[0];
   const unassignedPlayers = useMemo(
     () => players.filter((player) => !teamMembers.some((teamMember) => teamMember.playerId === player.id)),
     [players, teamMembers]
