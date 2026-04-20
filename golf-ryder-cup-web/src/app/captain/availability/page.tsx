@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   AttendanceCheckIn,
   type AttendeePlayer,
@@ -14,6 +15,8 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/db';
+import { removePlayerFromMatch } from '@/lib/services/matchLineupService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
@@ -24,6 +27,7 @@ import {
   RefreshCw,
   Shield,
   UserCheck,
+  UserMinus,
   Users,
 } from 'lucide-react';
 
@@ -172,6 +176,61 @@ export default function AvailabilityPage() {
     showToast('info', 'Refreshing attendance data...');
   }, [showToast]);
 
+  // Live lookup of all scheduled matches containing no-show players.
+  // Drives the "pull from lineup" secondary panel below — captains can
+  // actually act on no-show status instead of just tagging it.
+  const noShowPlayerIds = useMemo(
+    () =>
+      attendeePlayers
+        .filter((player) => player.status === 'no-show')
+        .map((player) => player.id),
+    [attendeePlayers],
+  );
+
+  const scheduledMatchesWithNoShows = useLiveQuery(
+    async () => {
+      if (noShowPlayerIds.length === 0) return [];
+      const allMatches = await db.matches.toArray();
+      const relevantSessions = new Set(sessions.map((s) => s.id));
+      return allMatches.filter(
+        (match) =>
+          relevantSessions.has(match.sessionId) &&
+          match.status === 'scheduled' &&
+          (match.teamAPlayerIds.some((id) => noShowPlayerIds.includes(id)) ||
+            match.teamBPlayerIds.some((id) => noShowPlayerIds.includes(id))),
+      );
+    },
+    [noShowPlayerIds.join('|'), sessions.map((s) => s.id).join('|')],
+    [],
+  );
+
+  const handlePullNoShowFromMatch = useCallback(
+    async (matchId: string, playerId: string) => {
+      try {
+        const result = await removePlayerFromMatch({
+          matchId,
+          playerId,
+          actorName: 'Captain',
+          reason: 'no-show',
+        });
+        if (result.removedFrom) {
+          showToast(
+            result.unbalanced ? 'warning' : 'success',
+            result.unbalanced
+              ? 'Player removed — match is now unbalanced. Consider a substitution.'
+              : 'Player removed from match.',
+          );
+        }
+      } catch (error) {
+        showToast(
+          'error',
+          error instanceof Error ? error.message : 'Could not remove player from match.',
+        );
+      }
+    },
+    [showToast],
+  );
+
   if (!currentTrip) {
     return <CaptainNoTripState description="Start or select a trip to manage attendance." />;
   }
@@ -317,6 +376,66 @@ export default function AvailabilityPage() {
               firstTeeTime={firstTeeTime}
               teamLabels={teamLabels}
             />
+
+            {scheduledMatchesWithNoShows && scheduledMatchesWithNoShows.length > 0 && (
+              <section className="mt-[var(--space-6)] rounded-[1.6rem] border border-[color:var(--error)]/30 bg-[color:var(--error)]/8 p-[var(--space-5)] shadow-[0_18px_38px_rgba(110,35,35,0.08)]">
+                <div className="flex items-start gap-[var(--space-3)]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-[color:var(--error)]/15 text-[var(--error)]">
+                    <UserMinus size={18} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="type-overline tracking-[0.15em] text-[var(--error)]">Pull from Lineup</p>
+                    <h3 className="mt-[var(--space-1)] font-serif text-[1.3rem] italic text-[var(--ink)]">
+                      No-shows still in scheduled matches
+                    </h3>
+                    <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                      These players are marked no-show but still listed in scheduled lineups.
+                      Remove them so handicap strokes recalculate and the match isn&rsquo;t
+                      carrying a phantom competitor.
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="mt-[var(--space-4)] space-y-[var(--space-3)]">
+                  {scheduledMatchesWithNoShows.flatMap((match) => {
+                    const session = sessions.find((s) => s.id === match.sessionId);
+                    const rows: React.ReactNode[] = [];
+                    for (const playerId of noShowPlayerIds) {
+                      const onTeamA = match.teamAPlayerIds.includes(playerId);
+                      const onTeamB = match.teamBPlayerIds.includes(playerId);
+                      if (!onTeamA && !onTeamB) continue;
+                      const player = players.find((p) => p.id === playerId);
+                      if (!player) continue;
+                      rows.push(
+                        <li
+                          key={`${match.id}-${playerId}`}
+                          className="flex flex-wrap items-center justify-between gap-[var(--space-3)] rounded-[1.2rem] border border-[color:var(--rule)]/55 bg-[var(--canvas)]/88 px-[var(--space-4)] py-[var(--space-3)]"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-[var(--ink)]">
+                              {player.firstName} {player.lastName}
+                            </p>
+                            <p className="text-xs text-[var(--ink-tertiary)]">
+                              {session?.name ?? 'Session'} · Match {match.matchOrder} ·{' '}
+                              {onTeamA ? teamLabels.A : teamLabels.B}
+                            </p>
+                          </div>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<UserMinus size={14} />}
+                            onClick={() => handlePullNoShowFromMatch(match.id, playerId)}
+                          >
+                            Remove
+                          </Button>
+                        </li>,
+                      );
+                    }
+                    return rows;
+                  })}
+                </ul>
+              </section>
+            )}
           </section>
         ) : (
           <section className="mt-[var(--space-6)]">
