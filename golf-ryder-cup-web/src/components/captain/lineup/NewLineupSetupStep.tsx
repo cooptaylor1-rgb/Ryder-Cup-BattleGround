@@ -88,13 +88,17 @@ export function NewLineupSetupStep({
   return (
     <>
       <section className="section">
+        {/* Intentionally does not use the global `.card` class: `.card` pins
+            background to var(--canvas-raised) (white) with higher layer
+            precedence than inline styles, which blanked out the Masters-
+            green gradient and left cream-on-white text invisible. Using
+            Tailwind utilities + an inline gradient keeps the component
+            self-contained. */}
         <div
-          className="card"
+          className="rounded-2xl border border-[color:var(--rule-faint)] p-4 mb-4"
           style={{
-            padding: 'var(--space-4)',
             background: 'linear-gradient(135deg, var(--masters) 0%, var(--masters-deep) 100%)',
             color: 'var(--canvas)',
-            marginBottom: 'var(--space-4)',
           }}
         >
           <div className="mb-3 flex items-center gap-3">

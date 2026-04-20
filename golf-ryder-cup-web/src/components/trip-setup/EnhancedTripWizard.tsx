@@ -69,12 +69,16 @@ interface StepConfig {
 
 const ALL_WIZARD_STEPS: StepConfig[] = [
     { id: 'basics', label: 'Trip Basics', shortLabel: 'Basics', icon: <Calendar className="w-5 h-5" />, description: 'Name, dates, and teams' },
-    { id: 'players', label: 'Player Roster', shortLabel: 'Players', icon: <Users className="w-5 h-5" />, description: 'Add and assign players' },
     { id: 'sessions', label: 'Session Builder', shortLabel: 'Sessions', icon: <Trophy className="w-5 h-5" />, description: 'Configure tournament structure' },
     { id: 'courses', label: 'Courses', shortLabel: 'Courses', icon: <MapPin className="w-5 h-5" />, description: 'Select golf courses' },
     { id: 'scoring', label: 'Scoring System', shortLabel: 'Scoring', icon: <Calculator className="w-5 h-5" />, description: 'Points and format' },
     { id: 'rules', label: 'Handicap Rules', shortLabel: 'Rules', icon: <Settings className="w-5 h-5" />, description: 'Stroke allowances' },
     { id: 'extras', label: 'Extras', shortLabel: 'Extras', icon: <Sparkles className="w-5 h-5" />, description: 'Side bets, colors, tee times' },
+    // Players comes after the trip's shape is decided so captains finish all
+    // the decisions (formats, tee times, courses, scoring rules) before they
+    // start worrying about who's on the list. Otherwise captains end up
+    // bouncing back to Players to reshuffle after each session change.
+    { id: 'players', label: 'Player Roster', shortLabel: 'Players', icon: <Users className="w-5 h-5" />, description: 'Add and assign players' },
     { id: 'review', label: 'Review & Create', shortLabel: 'Review', icon: <Check className="w-5 h-5" />, description: 'Final review' },
 ];
 
@@ -83,7 +87,7 @@ const ALL_WIZARD_STEPS: StepConfig[] = [
  * sane defaults, so in Quick Setup they're skipped; captains can customize
  * them later from trip settings.
  */
-const QUICK_STEPS: WizardStep[] = ['basics', 'players', 'sessions', 'review'];
+const QUICK_STEPS: WizardStep[] = ['basics', 'sessions', 'players', 'review'];
 
 function getStepsForMode(mode: WizardMode): StepConfig[] {
     if (mode === 'full') return ALL_WIZARD_STEPS;
