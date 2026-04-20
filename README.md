@@ -199,6 +199,16 @@ npm start
 - Node.js 18+
 - npm 9+
 
+### Database Backups & Recovery
+
+Production Postgres runs on Supabase, which handles backups automatically:
+
+- **Daily backups**: retained for the duration configured on the project plan (Free: 7 days, Pro: 14 days, Team+: 28 days). Restorable from the Supabase dashboard under *Database → Backups*.
+- **Point-In-Time Recovery (PITR)**: available on Pro and above. Enable under *Database → Backups → PITR* for minute-level recovery granularity.
+- **Manual snapshots**: run `pnpm -C golf-ryder-cup-web supabase db dump --file ./backup.sql` before any risky migration.
+- **Schema migrations**: files in `golf-ryder-cup-web/supabase/migrations/` are the source of truth. Apply with `supabase db push` or the Supabase MCP `apply_migration` tool; never modify production schema from the dashboard.
+- **RLS advisory**: run `mcp__supabase__get_advisors` (security + performance) after any DDL change to catch permissive policies and unindexed FKs.
+
 ---
 
 ## 🎨 Design System
