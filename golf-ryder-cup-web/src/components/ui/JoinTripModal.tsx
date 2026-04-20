@@ -8,6 +8,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { syncService } from '@/lib/supabase';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { useAuthStore } from '@/lib/stores';
@@ -34,6 +35,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
   const [success, setSuccess] = useState(false);
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const router = useRouter();
   const { loadTrip } = useTripStore(useShallow(s => ({ loadTrip: s.loadTrip })));
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
 
@@ -74,11 +76,28 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
       return;
     }
 
+    // Require a completed profile before rostering someone onto a trip.
+    // An incomplete-profile invitee would otherwise show up on the
+    // captain's roster as a blank card and the captain would have to
+    // chase them for their name/email/handicap after the fact. Route
+    // them through the appropriate setup page, preserving the share
+    // code via the next= param so they finish back at the same modal.
+    const trimmedCode = shareCode.trim();
+    const joinPath = `/join?code=${encodeURIComponent(trimmedCode)}`;
+    if (!isAuthenticated || !currentUser) {
+      router.push(`/login?next=${encodeURIComponent(joinPath)}`);
+      return;
+    }
+    if (!currentUser.hasCompletedOnboarding) {
+      router.push(`/profile/complete?next=${encodeURIComponent(joinPath)}`);
+      return;
+    }
+
     setIsJoining(true);
     setError(null);
 
     try {
-      const result = await syncService.joinTripByShareCode(shareCode.trim());
+      const result = await syncService.joinTripByShareCode(trimmedCode);
 
       if (result.success && result.synced > 0 && result.tripId) {
         storeTripShareCode(result.tripId, shareCode.trim());
