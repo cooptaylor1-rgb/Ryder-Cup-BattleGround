@@ -155,16 +155,26 @@ export async function completeSupabaseAuthFromUrl(
     };
   }
 
+  // Build a message that includes the upstream Supabase detail so failures
+  // like "redirect_to URL not allowed", "Email link is invalid or has
+  // expired", or "Email rate limit exceeded" show the real cause instead
+  // of a generic "link expired" that sends the user back to request
+  // another one for no reason.
+  const linkFailureMessage = (error: { message?: string } | null | undefined): string => {
+    const detail = error?.message?.trim();
+    if (!detail) {
+      return 'This sign-in link has expired. Please request a new one from the login page.';
+    }
+    return `Sign-in link rejected by the server: ${detail}`;
+  };
+
   const authCode = url.searchParams.get('code');
   if (authCode) {
     const { error } = await supabase.auth.exchangeCodeForSession(authCode);
 
     if (error) {
       authLogger.warn('Failed to exchange Supabase auth code:', error);
-      return {
-        status: 'error',
-        message: 'This sign-in link has expired. Please request a new one from the login page.',
-      };
+      return { status: 'error', message: linkFailureMessage(error) };
     }
 
     return {
@@ -183,10 +193,7 @@ export async function completeSupabaseAuthFromUrl(
 
     if (error) {
       authLogger.warn('Failed to verify Supabase OTP:', error);
-      return {
-        status: 'error',
-        message: 'This sign-in link has expired. Please request a new one from the login page.',
-      };
+      return { status: 'error', message: linkFailureMessage(error) };
     }
 
     return {
@@ -205,10 +212,7 @@ export async function completeSupabaseAuthFromUrl(
 
     if (error) {
       authLogger.warn('Failed to restore Supabase session from callback hash:', error);
-      return {
-        status: 'error',
-        message: 'This sign-in link has expired. Please request a new one from the login page.',
-      };
+      return { status: 'error', message: linkFailureMessage(error) };
     }
 
     return {

@@ -11,6 +11,7 @@ import {
   CloudOff,
   Link2,
   QrCode,
+  RefreshCw,
   Send,
   Share2,
   Users,
@@ -21,16 +22,26 @@ import { ensureTripShareCode } from '@/lib/services/tripSyncService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
+import { useTripRosterRefresh } from '@/lib/hooks/useTripRosterRefresh';
 import { cn } from '@/lib/utils';
 
 export default function InvitesPage() {
   const router = useRouter();
-  const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const { currentTrip, players } = useTripStore(
+    useShallow((s) => ({ currentTrip: s.currentTrip, players: s.players })),
+  );
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [shareCode, setShareCode] = useState<string | null>(null);
   const [isLoadingShareCode, setIsLoadingShareCode] = useState(false);
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+  // Auto-pull the roster from Supabase every 15s so new invitees show
+  // up on the captain's screen without a restart. `tripStore.loadTrip`
+  // reads Dexie only — see useTripRosterRefresh for the full story.
+  const { isRefreshing: isRefreshingRoster, refresh: refreshRosterFromCloud } = useTripRosterRefresh(
+    currentTrip?.id ?? null,
+  );
 
   const handleShare = useCallback(
     async (resolvedShareCode: string, tripName: string) => {
@@ -186,6 +197,20 @@ export default function InvitesPage() {
                   onClick={() => router.push('/players')}
                 >
                   Review roster
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-[color:var(--canvas)]/22 bg-transparent text-[var(--canvas)] hover:bg-[color:var(--canvas)]/10"
+                  leftIcon={
+                    <RefreshCw
+                      size={16}
+                      className={isRefreshingRoster ? 'animate-spin' : undefined}
+                    />
+                  }
+                  onClick={() => void refreshRosterFromCloud()}
+                  disabled={isRefreshingRoster || !currentTrip}
+                >
+                  {isRefreshingRoster ? 'Refreshing…' : 'Refresh roster'}
                 </Button>
               </div>
             </div>

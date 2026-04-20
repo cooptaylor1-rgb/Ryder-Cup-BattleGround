@@ -157,7 +157,7 @@ describe('EnhancedTripWizard Component', () => {
             fireEvent.click(screen.getByText('Next'));
 
             await waitFor(() => {
-                expect(screen.getByText('Player Roster')).toBeInTheDocument();
+                expect(screen.getByText('Session Builder')).toBeInTheDocument();
             });
         });
 
@@ -174,10 +174,11 @@ describe('EnhancedTripWizard Component', () => {
         it('navigates back when Back is clicked', async () => {
             render(<EnhancedTripWizard {...fullPropsWithName} />);
 
-            // Go to step 2
+            // Go to step 2 (Session Builder — sessions come before the roster
+            // now so captains can shape tee times before recruiting players).
             fireEvent.click(screen.getByText('Next'));
             await waitFor(() => {
-                expect(screen.getByText('Player Roster')).toBeInTheDocument();
+                expect(screen.getByText('Session Builder')).toBeInTheDocument();
             });
 
             // Go back to step 1
@@ -402,12 +403,15 @@ describe('EnhancedTripWizard Component', () => {
                 />
             );
 
+            // Quick Setup order is Basics → Sessions → Players → Review.
+            // Sessions come before players so captains can shape tee times
+            // and formats before recruiting a roster.
             // Step 1 -> 2
             fireEvent.click(screen.getByText('Next'));
-            await waitFor(() => expect(screen.getByText('Player Roster')).toBeInTheDocument());
+            await waitFor(() => expect(screen.getByText('Session Builder')).toBeInTheDocument());
             // Step 2 -> 3
             fireEvent.click(screen.getByText('Next'));
-            await waitFor(() => expect(screen.getByText('Session Builder')).toBeInTheDocument());
+            await waitFor(() => expect(screen.getByText('Player Roster')).toBeInTheDocument());
             // Step 3 -> 4 (review, skipping Courses/Scoring/Rules/Extras)
             fireEvent.click(screen.getByText('Next'));
             await waitFor(() => expect(screen.getByText('Review & Create')).toBeInTheDocument());

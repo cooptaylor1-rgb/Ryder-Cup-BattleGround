@@ -331,12 +331,27 @@ export function getSyncQueueStatus(): {
   pending: number;
   failed: number;
   total: number;
+  /**
+   * The error message from the most recent failed item, if any. Surfaced
+   * in the SyncFailureBanner so captains can see why writes are
+   * bouncing (RLS denial, missing FK, rate limit) instead of just
+   * staring at a retry button that can't win.
+   */
+  lastError?: string;
 } {
   const pending = tripSyncRuntime.syncQueue.filter(
     (item) => item.status === 'pending' || item.status === 'syncing'
   ).length;
-  const failed = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed').length;
-  return { pending, failed, total: tripSyncRuntime.syncQueue.length };
+  const failedItems = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed');
+  const lastError = failedItems
+    .slice()
+    .sort((a, b) => (b.lastAttemptAt ?? '').localeCompare(a.lastAttemptAt ?? ''))[0]?.error;
+  return {
+    pending,
+    failed: failedItems.length,
+    total: tripSyncRuntime.syncQueue.length,
+    lastError,
+  };
 }
 
 export function getTripSyncStatus(tripId: string): SyncStatus {

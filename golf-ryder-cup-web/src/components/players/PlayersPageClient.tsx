@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DraftBoard } from '@/components/captain';
-import { ArrowRight, CheckCircle2, Plus, Shield, Shuffle, Sparkles, UserPlus, Users, UsersRound, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Plus, RefreshCw, Shield, Shuffle, Sparkles, UserPlus, Users, UsersRound, X } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, NoPlayersEmpty } from '@/components/ui';
@@ -17,6 +17,7 @@ import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Player } from '@/lib/types/models';
 import { createLogger } from '@/lib/utils/logger';
+import { useTripRosterRefresh } from '@/lib/hooks/useTripRosterRefresh';
 
 interface BulkPlayerRow {
   id: string;
@@ -77,6 +78,15 @@ export default function PlayersPageClient() {
   } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addPlayer: s.addPlayer, updatePlayer: s.updatePlayer, removePlayer: s.removePlayer, assignPlayerToTeam: s.assignPlayerToTeam, removePlayerFromTeam: s.removePlayerFromTeam })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+
+  // Poll the cloud for new signups while the captain watches the Roster
+  // Desk. Without this the page only reflects whatever was in local
+  // Dexie when the trip loaded — invitees signing up from their own
+  // devices never landed here. Manual refresh is wired into the
+  // rightSlot of the PageHeader below.
+  const { isRefreshing: isRefreshingRoster, refresh: refreshRoster } = useTripRosterRefresh(
+    currentTrip?.id ?? null,
+  );
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkAdd, setShowBulkAdd] = useState(false);
@@ -532,6 +542,18 @@ export default function PlayersPageClient() {
         subtitle={currentTrip.name}
         icon={<Users size={16} className="text-[var(--color-accent)]" />}
         backFallback="/"
+        rightSlot={
+          <button
+            type="button"
+            onClick={() => void refreshRoster()}
+            disabled={isRefreshingRoster}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[var(--canvas)] px-3 py-1.5 text-xs font-semibold text-[var(--ink-secondary)] disabled:opacity-60"
+            aria-label="Refresh roster from cloud"
+          >
+            <RefreshCw size={12} className={isRefreshingRoster ? 'animate-spin' : undefined} />
+            {isRefreshingRoster ? 'Refreshing…' : 'Refresh'}
+          </button>
+        }
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { cn, parseDateInLocalZone } from '@/lib/utils';
 import {
   AlertTriangle,
   CalendarDays,
@@ -225,7 +225,7 @@ export function SessionGroupCard({
                 <p className="mt-[var(--space-1)] type-caption capitalize">
                   {session.sessionType}
                   {session.scheduledDate
-                    ? ` · ${new Date(session.scheduledDate).toLocaleDateString()}`
+                    ? ` · ${parseDateInLocalZone(session.scheduledDate).toLocaleDateString()}`
                     : ''}
                 </p>
               </div>
