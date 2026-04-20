@@ -291,29 +291,41 @@ export function useLiveScores(tripId: string | null): {
                     .select('*')
                     .in('session_id', sessionIds);
 
-                if (matches) {
+                if (matches && matches.length > 0) {
+                    const matchRows = matches as Array<{
+                        id: string;
+                        current_hole: number;
+                        status: string;
+                    }>;
+                    const matchIds = matchRows.map((m) => m.id);
+
+                    // Batch fetch hole results for every match in one query.
+                    // Previously this iterated per-match, producing 18+ round
+                    // trips on a typical session and multiplying latency on
+                    // every realtime tick.
+                    const { data: allHoleResults } = await sb
+                        .from('hole_results')
+                        .select('match_id, winner')
+                        .in('match_id', matchIds);
+
+                    const winnersByMatch = new Map<string, { teamA: number; teamB: number }>();
+                    for (const hr of (allHoleResults ?? []) as Array<{
+                        match_id: string;
+                        winner: string;
+                    }>) {
+                        const bucket = winnersByMatch.get(hr.match_id) ?? { teamA: 0, teamB: 0 };
+                        if (hr.winner === 'teamA') bucket.teamA++;
+                        else if (hr.winner === 'teamB') bucket.teamB++;
+                        winnersByMatch.set(hr.match_id, bucket);
+                    }
+
                     const newScores = new Map<string, LiveScore>();
-                    for (const match of matches as Array<{ id: string; current_hole: number; status: string }>) {
-                        // Calculate score from hole results
-                        const { data: holeResults } = await sb
-                            .from('hole_results')
-                            .select('*')
-                            .eq('match_id', match.id);
-
-                        let teamAScore = 0;
-                        let teamBScore = 0;
-
-                        if (holeResults) {
-                            for (const hr of holeResults as Array<{ winner: string }>) {
-                                if (hr.winner === 'teamA') teamAScore++;
-                                else if (hr.winner === 'teamB') teamBScore++;
-                            }
-                        }
-
+                    for (const match of matchRows) {
+                        const bucket = winnersByMatch.get(match.id) ?? { teamA: 0, teamB: 0 };
                         newScores.set(match.id, {
                             matchId: match.id,
-                            teamAScore,
-                            teamBScore,
+                            teamAScore: bucket.teamA,
+                            teamBScore: bucket.teamB,
                             currentHole: match.current_hole,
                             status: match.status,
                             lastUpdate: new Date(),

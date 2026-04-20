@@ -69,6 +69,34 @@ export function TripSyncInitializer({ debug = false }: TripSyncInitializerProps)
         return () => clearTimeout(timer);
     }, []);
 
+    // Last-gasp flush on tab close / navigation away / app backgrounding.
+    // iOS PWAs are the worst offender: a tab kill between score entry and
+    // the next periodic sync drops queued writes on the floor. `pagehide`
+    // is the modern successor to `beforeunload` and fires reliably on
+    // iOS — `beforeunload` is kept as a defensive fallback for browsers
+    // that still need it. We fire-and-forget since the page is unloading
+    // and there's no timeline to await.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const attemptFinalFlush = () => {
+            const status = getSyncQueueStatus();
+            if (status.pending === 0 && status.failed === 0) return;
+            void processSyncQueue().catch(() => {
+                // Can't act on the error — the page is already gone. The
+                // queue persists to IndexedDB, so a later session will
+                // pick it back up.
+            });
+        };
+
+        window.addEventListener('pagehide', attemptFinalFlush);
+        window.addEventListener('beforeunload', attemptFinalFlush);
+        return () => {
+            window.removeEventListener('pagehide', attemptFinalFlush);
+            window.removeEventListener('beforeunload', attemptFinalFlush);
+        };
+    }, []);
+
     return null;
 }
 

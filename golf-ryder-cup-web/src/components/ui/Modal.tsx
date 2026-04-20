@@ -20,6 +20,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 import { X } from 'lucide-react';
 import { IconButton } from './IconButton';
 import { Button } from './Button';
@@ -158,12 +159,13 @@ export function Modal({
   const content = (
     <div
       className={cn(
-        'fixed inset-0 z-50',
+        'fixed inset-0',
         'flex items-center justify-center p-4',
         'bg-[color:var(--ink)]/75 backdrop-blur-sm',
         isExiting ? 'animate-fade-out' : 'animate-fade-in',
         overlayClassName
       )}
+      style={{ zIndex: zIndex.modal }}
       onClick={handleOverlayClick}
       role="presentation"
     >

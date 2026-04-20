@@ -1,4 +1,6 @@
 
+import * as Sentry from '@sentry/nextjs';
+
 import { db } from '../../db';
 import type { SyncEntity, SyncOperation, SyncQueueItem } from '../../types/sync';
 import { syncEntityToCloud } from './tripSyncEntityWriters';
@@ -12,6 +14,22 @@ import {
   tripSyncRuntime,
 } from './tripSyncShared';
 import type { BulkSyncResult, SyncStatus } from './tripSyncTypes';
+
+/**
+ * Drop a breadcrumb into Sentry's event buffer. When a later error
+ * fires, the crumbs travel with it — so a FK violation or RLS denial
+ * arrives tagged with the queue operations that led up to it, not
+ * just the final stack. `level: 'info'` keeps them out of the error
+ * feed but available on replay.
+ */
+function syncBreadcrumb(message: string, data?: Record<string, unknown>): void {
+  Sentry.addBreadcrumb({
+    category: 'sync.queue',
+    level: 'info',
+    message,
+    data,
+  });
+}
 
 async function persistQueueItem(item: SyncQueueItem): Promise<void> {
   try {
@@ -93,7 +111,7 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   holeResult: 4,
 };
 
-function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
+export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
   const aRank = ENTITY_DEPENDENCY_ORDER[a.entity];
   const bRank = ENTITY_DEPENDENCY_ORDER[b.entity];
   const aEffective = a.operation === 'delete' ? -aRank : aRank;
@@ -248,6 +266,12 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
       )
       .sort(compareByDependency);
 
+    if (pendingItems.length > 0) {
+      syncBreadcrumb('processSyncQueue.start', {
+        pending: pendingItems.length,
+      });
+    }
+
     for (const item of pendingItems) {
       item.status = 'syncing';
       item.lastAttemptAt = new Date().toISOString();
@@ -263,17 +287,38 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         await persistQueueItem(item);
         synced++;
       } catch (err) {
-        item.retryCount++;
-        item.error = err instanceof Error ? err.message : 'Unknown error';
+        // Persist the new retry state before mutating the in-memory item.
+        // If the process dies between bumping memory and persisting, disk
+        // would keep the old retryCount and the item would retry forever;
+        // persist-first keeps disk as the source of truth so the retry
+        // budget survives crashes and tab reloads.
+        const nextRetryCount = item.retryCount + 1;
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const nextStatus: SyncQueueItem['status'] =
+          nextRetryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending';
 
-        if (item.retryCount >= MAX_RETRY_COUNT) {
-          item.status = 'failed';
+        await persistQueueItem({
+          ...item,
+          retryCount: nextRetryCount,
+          error: errorMessage,
+          status: nextStatus,
+        });
+
+        item.retryCount = nextRetryCount;
+        item.error = errorMessage;
+        item.status = nextStatus;
+
+        if (nextStatus === 'failed') {
           failed++;
-          errors.push(`${item.entity}:${item.entityId} - ${item.error}`);
-        } else {
-          item.status = 'pending';
+          errors.push(`${item.entity}:${item.entityId} - ${errorMessage}`);
+          syncBreadcrumb('processSyncQueue.item_failed', {
+            entity: item.entity,
+            entityId: item.entityId,
+            operation: item.operation,
+            retryCount: nextRetryCount,
+            error: errorMessage,
+          });
         }
-        await persistQueueItem(item);
       }
     }
 

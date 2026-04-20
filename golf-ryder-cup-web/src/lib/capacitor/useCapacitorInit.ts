@@ -72,7 +72,7 @@ export function useCapacitorInit(options: CapacitorInitOptions = {}) {
         router.push(path);
       }
     } catch {
-      console.warn('Invalid deep link URL:', url);
+      logger.warn('Invalid deep link URL:', url);
     }
   }, [options, router]);
 

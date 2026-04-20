@@ -25,6 +25,7 @@ import React, {
 } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 
 // ============================================
 // Types
@@ -359,10 +360,11 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
         {/* Backdrop */}
         <div
           className={cn(
-            'fixed inset-0 z-9998 bg-[color:var(--ink)]/40 backdrop-blur-sm',
+            'fixed inset-0 bg-[color:var(--ink)]/40 backdrop-blur-sm',
             'transition-opacity duration-200',
             isAnimating && !isOpen ? 'opacity-0' : 'opacity-100'
           )}
+          style={{ zIndex: zIndex.sheet - 1 }}
           onClick={closeOnBackdrop ? close : undefined}
           aria-hidden="true"
         />
@@ -374,7 +376,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
           aria-modal="true"
           aria-labelledby={title ? 'sheet-title' : undefined}
           className={cn(
-            'fixed left-0 right-0 bottom-0 z-9999',
+            'fixed left-0 right-0 bottom-0',
             'bg-[color:var(--surface-raised)] rounded-t-[20px] shadow-2xl',
             'flex flex-col overflow-hidden',
             !isDragging && 'transition-all duration-300 ease-out',
@@ -382,6 +384,7 @@ export const IOSBottomSheet = forwardRef<BottomSheetRef, BottomSheetProps>(
             className
           )}
           style={{
+            zIndex: zIndex.sheet,
             height: `${displayHeight}vh`,
             maxHeight: '95vh',
             paddingBottom: 'env(safe-area-inset-bottom)',

@@ -13,6 +13,8 @@
  * await sendNotification({ title: 'Match Started!' });
  */
 
+import { notifyLogger } from '@/lib/utils/logger';
+
 // ============================================
 // TYPES
 // ============================================
@@ -177,7 +179,7 @@ export async function subscribeToPush(
 
     return subscription;
   } catch (error) {
-    console.error('Failed to subscribe to push:', error);
+    notifyLogger.error('Failed to subscribe to push:', error);
     return null;
   }
 }
@@ -279,7 +281,7 @@ export async function showNotification(
 
     return true;
   } catch (error) {
-    console.error('Failed to show notification:', error);
+    notifyLogger.error('Failed to show notification:', error);
     return false;
   }
 }
@@ -470,7 +472,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
             }),
           });
         } catch (error) {
-          console.error('Failed to register push subscription on server:', error);
+          notifyLogger.error('Failed to register push subscription on server:', error);
         }
       }
     }
@@ -499,7 +501,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
           }),
         });
       } catch (error) {
-        console.error('Failed to unregister push subscription on server:', error);
+        notifyLogger.error('Failed to unregister push subscription on server:', error);
       }
     }
 
