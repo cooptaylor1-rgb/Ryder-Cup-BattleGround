@@ -120,8 +120,17 @@ export async function requestEmailSignInLink(
   });
 
   if (error) {
+    // Preserve the upstream detail so the user (and the captain debugging
+    // why an invitee can't sign in) can see whether it's rate-limit,
+    // misconfigured redirect, project down, etc. — the previous message
+    // swallowed every failure as "check your email address".
     authLogger.warn('Failed to request Supabase email sign-in link:', error);
-    throw new Error('Couldn\'t send the sign-in link. Check your email address and try again.');
+    const detail = error.message?.trim();
+    throw new Error(
+      detail
+        ? `Couldn’t send the sign-in link: ${detail}`
+        : 'Couldn’t send the sign-in link. Check your email address and try again.',
+    );
   }
 }
 
