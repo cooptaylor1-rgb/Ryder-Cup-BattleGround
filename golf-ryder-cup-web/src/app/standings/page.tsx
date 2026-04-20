@@ -82,17 +82,31 @@ export default function StandingsPage() {
 
   // If there is no active trip selected, we show a premium empty state instead of redirecting.
 
+  // Scope the load effect to currentTrip.id, not the whole currentTrip
+  // object. useShallow gives us reference-stable teams/players, but
+  // currentTrip is a fresh object on every store write (score entered,
+  // session locked, etc.), so keying the effect on it re-ran four
+  // expensive aggregations on every tick. Pull the toast setter out of
+  // the dep array via a ref so showToast's identity can't retrigger.
+  const tripId = currentTrip?.id;
+  const showToastRef = useRef(showToast);
   useEffect(() => {
-    const loadStandings = async () => {
-      if (!currentTrip) return;
-      setIsLoading(true);
+    showToastRef.current = showToast;
+  }, [showToast]);
+
+  useEffect(() => {
+    if (!tripId) return;
+    let cancelled = false;
+    setIsLoading(true);
+    (async () => {
       try {
         const [teamStandings, playerLeaderboard, computedAwards, stats] = await Promise.all([
-          calculateTeamStandings(currentTrip.id),
-          calculatePlayerLeaderboard(currentTrip.id),
-          computeAwards(currentTrip.id),
-          calculatePlayerStats(currentTrip.id),
+          calculateTeamStandings(tripId),
+          calculatePlayerLeaderboard(tripId),
+          computeAwards(tripId),
+          calculatePlayerStats(tripId),
         ]);
+        if (cancelled) return;
         const magic = calculateMagicNumber(teamStandings);
         setStandings(teamStandings);
         setMagicNumber(magic);
@@ -100,32 +114,35 @@ export default function StandingsPage() {
         setAwards(computedAwards);
         setPlayerStats(stats);
       } catch (error) {
+        if (cancelled) return;
         logger.error('Failed to load standings', { error });
-        showToast('error', 'Failed to load standings');
+        showToastRef.current('error', 'Failed to load standings');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    loadStandings();
-  }, [currentTrip, showToast]);
+  }, [tripId]);
 
   useEffect(() => {
-    if (!currentTrip || isLoading) return;
+    if (!tripId || isLoading) return;
     trackStandingsViewed({
-      tripId: currentTrip.id,
+      tripId,
       activeTab,
       correlationId: createCorrelationId('standings-view'),
     });
-  }, [activeTab, currentTrip, isLoading]);
+  }, [activeTab, tripId, isLoading]);
 
   useEffect(() => {
-    if (!currentTrip || isLoading) return;
+    if (!tripId || isLoading) return;
     trackStandingsTabChanged({
-      tripId: currentTrip.id,
+      tripId,
       tab: activeTab,
       correlationId: createCorrelationId('standings-tab'),
     });
-  }, [activeTab, currentTrip, isLoading]);
+  }, [activeTab, tripId, isLoading]);
 
   const tablistRef = useRef<HTMLDivElement>(null);
 
