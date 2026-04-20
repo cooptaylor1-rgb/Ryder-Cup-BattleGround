@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, InlineLoadingSkeleton } from '@/components/ui';
 import { LineupBuilder, type FairnessScore, type MatchSlot, type SessionConfig } from '@/components/captain';
 import { ChevronRight, Edit3, Eye, Play, Users } from 'lucide-react';
+import { parseDateInLocalZone } from '@/lib/utils';
 import type { Match } from '@/lib/types';
 import type { RyderCupSession } from '@/lib/types/models';
 import type { SessionLineupViewMode } from './sessionLineupData';
@@ -74,7 +75,7 @@ export function SessionLineupHeroSection({
                         label="Date"
                         value={
                             session.scheduledDate
-                                ? new Date(session.scheduledDate).toLocaleDateString()
+                                ? parseDateInLocalZone(session.scheduledDate).toLocaleDateString()
                                 : 'Unscheduled'
                         }
                     />

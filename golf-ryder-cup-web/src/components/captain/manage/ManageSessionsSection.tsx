@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
-import { cn } from '@/lib/utils';
+import { cn, parseDateInLocalZone } from '@/lib/utils';
 import { pauseSession, resumeSession } from '@/lib/services/sessionPauseService';
 import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -825,7 +825,9 @@ function SessionStatusPill({ status }: { status: SessionStatus }) {
 }
 
 function formatShortDate(isoString: string) {
-  return new Date(isoString).toLocaleDateString('en-US', {
+  // Route through parseDateInLocalZone so a bare YYYY-MM-DD doesn't flip
+  // to the prior day in US timezones.
+  return parseDateInLocalZone(isoString).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
   });

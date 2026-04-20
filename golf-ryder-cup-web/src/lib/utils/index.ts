@@ -84,11 +84,30 @@ export function formatHandicapIndex(handicapIndex: number): string {
  * @param date - Date to format
  * @param format - Display format
  */
+/**
+ * Parse a date-like value safely across timezones. A bare `YYYY-MM-DD`
+ * string is parsed as UTC midnight by the Date constructor — in any
+ * timezone west of UTC that renders as the previous day, which is how
+ * "Trip starts 4/30" was showing "Day 1 AM · Apr 29" on the session
+ * desk. Anchor date-only strings to LOCAL midnight so the rendered day
+ * always matches the captain's intent.
+ */
+export function parseDateInLocalZone(date: Date | string): Date {
+    if (date instanceof Date) return date;
+    if (typeof date !== 'string') return new Date(date);
+    const trimmed = date.trim();
+    // Date-only ISO (no time component) → local midnight.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        return new Date(`${trimmed}T00:00:00`);
+    }
+    return new Date(trimmed);
+}
+
 export function formatDate(
     date: Date | string,
     format: 'full' | 'short' | 'day' = 'short'
 ): string {
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = parseDateInLocalZone(date);
 
     switch (format) {
         case 'full':

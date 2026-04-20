@@ -1,5 +1,6 @@
 import type { MatchState } from '@/lib/types/computed';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
+import { parseDateInLocalZone } from '@/lib/utils';
 import type { TripPlayerLinkResult } from '@/lib/utils/tripPlayerIdentity';
 
 interface UserMatchData {
@@ -36,7 +37,7 @@ export function getNextSession(sessions: RyderCupSession[]): RyderCupSession | n
 
 function formatSessionTiming(session: RyderCupSession): string {
   const date = session.scheduledDate
-    ? new Date(session.scheduledDate).toLocaleDateString('en-US', {
+    ? parseDateInLocalZone(session.scheduledDate).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
       })
