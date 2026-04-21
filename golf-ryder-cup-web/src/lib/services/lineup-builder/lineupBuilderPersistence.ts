@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import type { Match, Player, UUID } from '@/lib/types/models';
 
 import { buildMatchHandicapContext } from '../matchHandicapService';
+import { queueSyncOperation } from '../tripSyncService';
 import type { LineupState } from './lineupBuilderTypes';
 
 export async function saveLineup(
@@ -15,6 +16,11 @@ export async function saveLineup(
 
   const matchIds: UUID[] = [];
   const now = new Date().toISOString();
+  // tripId is resolved from the session rather than the caller-provided
+  // _tripId so the sync op always matches the session's actual parent —
+  // a caller passing a stale id would cascade wrong-trip writes into
+  // the cloud.
+  const tripId = session.tripId;
 
   for (const lineupMatch of state.matches) {
     if (lineupMatch.teamAPlayers.length === 0 && lineupMatch.teamBPlayers.length === 0) {
@@ -70,7 +76,7 @@ export async function saveLineup(
       // set — a later lineup re-publish on a course-less match would
       // otherwise clobber a correctly-computed value with the
       // raw-index fallback.
-      await db.matches.update(match.id, {
+      const updates = {
         teamAPlayerIds,
         teamBPlayerIds,
         teamAHandicapAllowance: handicapContext.hasCourseHandicapInfo
@@ -81,7 +87,14 @@ export async function saveLineup(
           : match.teamBHandicapAllowance ?? 0,
         version: (match.version ?? 0) + 1,
         updatedAt: now,
-      });
+      };
+      await db.matches.update(match.id, updates);
+      // Queue a sync op so the lineup publish actually reaches the
+      // cloud — before this, every lineup save was Dexie-only and
+      // other devices never saw the roster.
+      if (tripId) {
+        queueSyncOperation('match', match.id, 'update', tripId, { ...match, ...updates });
+      }
       matchIds.push(match.id);
       continue;
     }
@@ -110,6 +123,9 @@ export async function saveLineup(
       updatedAt: now,
     };
     await db.matches.add(newMatch);
+    if (tripId) {
+      queueSyncOperation('match', matchId, 'create', tripId, newMatch);
+    }
     matchIds.push(matchId);
   }
 
