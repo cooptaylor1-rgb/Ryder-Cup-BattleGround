@@ -11,8 +11,11 @@ export interface NassauSummary {
   teamAWins: number;
   teamBWins: number;
   pushes: number;
+  completed: number;
   segmentValue: number;
 }
+
+const DEFAULT_NASSAU_POT = 60;
 
 export function upsertHoleResult(results: SideBetResult[], holeNumber: number, winnerId?: string) {
   const next = results.filter((entry) => entry.holeNumber !== holeNumber);
@@ -94,17 +97,29 @@ export function getNassauSummary(bet: SideBet): NassauSummary {
   let teamAWins = 0;
   let teamBWins = 0;
   let pushes = 0;
+  let completed = 0;
 
   for (const value of [results.front9Winner, results.back9Winner, results.overallWinner]) {
+    if (!value) continue;
+    completed += 1;
     if (value === 'teamA') teamAWins += 1;
-    if (value === 'teamB') teamBWins += 1;
-    if (value === 'push') pushes += 1;
+    else if (value === 'teamB') teamBWins += 1;
+    else if (value === 'push') pushes += 1;
   }
 
+  // Exact per-segment value. Rounding here was causing a $21-paid-from-$20
+  // overpay because `Math.round(20/3) * 3 = 21`; keep the float and let
+  // each display site format it as needed.
   return {
     teamAWins,
     teamBWins,
     pushes,
-    segmentValue: Math.round((bet.pot || 20) / 3),
+    completed,
+    segmentValue: (bet.pot ?? DEFAULT_NASSAU_POT) / 3,
   };
+}
+
+/** Integer-dollar display. Use when you need `$12` not `$12.33`. */
+export function formatNassauAmount(value: number): string {
+  return `$${Math.round(value)}`;
 }

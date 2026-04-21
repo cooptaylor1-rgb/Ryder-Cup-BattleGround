@@ -18,6 +18,7 @@ import {
   MessageCircle,
   Grid,
   LayoutGrid,
+  Trash2,
 } from 'lucide-react';
 
 /**
@@ -127,6 +128,20 @@ export default function PhotosPage() {
       };
       setPhotos((prev) => [newPhoto, ...prev]);
     });
+  };
+
+  const handleDeletePhoto = (photo: Photo) => {
+    // Blob URLs we minted for user uploads get revoked on delete so
+    // memory isn't held until unmount. Demo (unsplash) URLs are http(s)
+    // and revokeObjectURL is a no-op on non-blob URLs, so this is safe
+    // to call either way.
+    const ownedIndex = createdObjectURLsRef.current.indexOf(photo.url);
+    if (ownedIndex >= 0) {
+      URL.revokeObjectURL(photo.url);
+      createdObjectURLsRef.current.splice(ownedIndex, 1);
+    }
+    setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+    setSelectedPhoto((current) => (current?.id === photo.id ? null : current));
   };
 
   const getPlayer = (id: string) => players.find((p) => p.id === id);
@@ -281,6 +296,13 @@ export default function PhotosPage() {
                     aria-label="Download photo"
                   >
                     <Download size={20} />
+                  </button>
+                  <button
+                    onClick={() => handleDeletePhoto(selectedPhoto)}
+                    className="p-2 text-[color:var(--canvas)]/70 hover:text-[var(--danger)]"
+                    aria-label="Delete photo"
+                  >
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>
