@@ -259,7 +259,10 @@ export function calcRetryDelay(
     maxDelayMs: number = DEFAULT_CONFIG.maxRetryDelayMs
 ): number {
     const delay = Math.min(baseDelayMs * Math.pow(2, retryCount), maxDelayMs);
-    return delay * (0.8 + Math.random() * 0.4);
+    // Jitter ±20% to de-sync retry storms, then clamp back to the
+    // ceiling — unclamped jitter at max (factor 1.2) was overshooting
+    // the 30s cap by 6s and delaying reconnect bursts.
+    return Math.min(delay * (0.8 + Math.random() * 0.4), maxDelayMs);
 }
 
 /**

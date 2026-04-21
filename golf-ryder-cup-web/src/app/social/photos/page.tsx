@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useTripStore } from '@/lib/stores';
+import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { EmptyStatePremium, NoPhotosEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -91,9 +91,13 @@ function createDemoPhotos(players: { id?: string }[]): Photo[] {
   ];
 }
 
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024; // 10 MB per image
+const MAX_PHOTO_LABEL = '10 MB';
+
 export default function PhotosPage() {
   const router = useRouter();
   const { currentTrip, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players })));
+  const showToast = useToastStore((state) => state.showToast);
 
   // Use lazy initialization for demo photos to avoid Date.now() in render
   const [photos, setPhotos] = useState<Photo[]>(() => createDemoPhotos(players));
@@ -116,7 +120,14 @@ export default function PhotosPage() {
     const files = e.target.files;
     if (!files) return;
 
+    let skipped = 0;
     Array.from(files).forEach((file) => {
+      // Oversized images blow up memory on older phones and are almost
+      // always an accidental video (".jpg" from a screen recording).
+      if (file.size > MAX_PHOTO_BYTES) {
+        skipped += 1;
+        return;
+      }
       const url = URL.createObjectURL(file);
       createdObjectURLsRef.current.push(url);
       const newPhoto: Photo = {
@@ -128,6 +139,18 @@ export default function PhotosPage() {
       };
       setPhotos((prev) => [newPhoto, ...prev]);
     });
+
+    if (skipped > 0) {
+      showToast(
+        'error',
+        skipped === 1
+          ? `One photo skipped (over ${MAX_PHOTO_LABEL}).`
+          : `${skipped} photos skipped (each over ${MAX_PHOTO_LABEL}).`,
+      );
+    }
+
+    // Allow re-selecting the same file after a skip/upload cycle.
+    e.target.value = '';
   };
 
   const handleDeletePhoto = (photo: Photo) => {
