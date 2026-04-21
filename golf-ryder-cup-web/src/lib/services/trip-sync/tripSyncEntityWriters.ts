@@ -244,6 +244,8 @@ export async function syncSessionToCloud(
     status: session.status || 'scheduled',
     is_locked: session.isLocked || false,
     is_practice_session: session.isPracticeSession || false,
+    default_course_id: session.defaultCourseId || null,
+    default_tee_set_id: session.defaultTeeSetId || null,
     updated_at: incomingUpdatedAt,
   };
 
