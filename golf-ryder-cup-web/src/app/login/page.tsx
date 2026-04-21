@@ -138,9 +138,16 @@ function LoginPageContent() {
       // new session; the useEffect at the top of this component drives
       // the redirect to /profile/create or the original next= path.
     } catch (requestError) {
-      const message =
-        requestError instanceof Error ? requestError.message : 'Sign-in failed';
-      useAuthStore.setState({ error: message });
+      const raw = requestError instanceof Error ? requestError.message : 'Sign-in failed';
+      // Supabase returns "User already registered" when a signup email
+      // collides with an existing row. Rewrite the message with an
+      // action the user can take — the raw error sounds like a bug.
+      const friendly = /already registered/i.test(raw)
+        ? 'That email already has an account. Switch to Sign in and use your existing password (or reset it if you\'ve forgotten).'
+        : /invalid login credentials/i.test(raw)
+          ? 'Email or password didn\'t match. Double-check both, or switch to Sign up if you\'re new here.'
+          : raw;
+      useAuthStore.setState({ error: friendly });
     } finally {
       setIsCloudAuthInFlight(false);
     }
