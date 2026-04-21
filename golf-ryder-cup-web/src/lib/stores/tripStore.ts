@@ -361,14 +361,23 @@ export const useTripStore = create<TripState>()(
               const sessionIds = Array.from(
                 new Set(affectedMatches.map((m) => m.sessionId)),
               );
-              const sessionsById = new Map(
+              const sessionsById = new Map<string, RyderCupSession>(
                 (await db.sessions.bulkGet(sessionIds))
-                  .filter(Boolean)
-                  .map((session) => [session!.id, session!]),
+                  .filter((s): s is RyderCupSession => Boolean(s))
+                  .map((session) => [session.id, session]),
               );
               for (const match of affectedMatches) {
                 const session = sessionsById.get(match.sessionId);
                 if (!session) continue;
+                // Resolve the effective tee set for this match: match
+                // override first, session default as fallback. Without
+                // this the allowances persist as raw rounded indexes
+                // (no slope/rating) and overwrite previously-correct
+                // values the next time scoring recomputes.
+                const effectiveTeeSetId = match.teeSetId ?? session.defaultTeeSetId;
+                const teeSet = effectiveTeeSetId
+                  ? (await db.teeSets.get(effectiveTeeSetId)) ?? undefined
+                  : undefined;
                 const [teamAPlayers, teamBPlayers] = await Promise.all([
                   Promise.all(match.teamAPlayerIds.map((id) => db.players.get(id))),
                   Promise.all(match.teamBPlayerIds.map((id) => db.players.get(id))),
@@ -377,7 +386,14 @@ export const useTripStore = create<TripState>()(
                   sessionType: session.sessionType,
                   teamAPlayers: teamAPlayers.filter((p): p is Player => Boolean(p)),
                   teamBPlayers: teamBPlayers.filter((p): p is Player => Boolean(p)),
+                  teeSet,
                 });
+                // Don't persist fallback (no-teeSet) allowances. A match
+                // that's between roster edit and course assignment
+                // would otherwise clobber a future correct value.
+                if (!ctx.hasCourseHandicapInfo) {
+                  continue;
+                }
                 if (
                   ctx.teamAHandicapAllowance === match.teamAHandicapAllowance &&
                   ctx.teamBHandicapAllowance === match.teamBHandicapAllowance

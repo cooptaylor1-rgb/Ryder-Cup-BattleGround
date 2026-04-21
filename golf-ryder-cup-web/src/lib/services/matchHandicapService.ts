@@ -1,4 +1,5 @@
 import type { Player, SessionType, TeeSet } from '../types/models';
+import { scoringLogger } from '../utils/logger';
 import {
   calculateCourseHandicap,
   calculateFourballStrokes,
@@ -21,6 +22,17 @@ export interface MatchHandicapContext {
   teamBPlayerCourseHandicaps: number[];
   teamAPlayers: MatchHandicapPlayerContext[];
   teamBPlayers: MatchHandicapPlayerContext[];
+  /**
+   * True when a teeSet (slope + rating + par) was available and
+   * course handicaps were computed through the full USGA formula.
+   * False when the caller didn't pass a teeSet — in that mode the
+   * function falls back to `Math.round(handicapIndex)` so UI layers
+   * that just read strokeAllowance keep rendering, but any code that
+   * persists allowances back to the match row should check this flag
+   * and *not* write on false, otherwise an intermediate state (match
+   * without course) silently overwrites a previously-correct value.
+   */
+  hasCourseHandicapInfo: boolean;
 }
 
 function resolveHandicapIndex(handicapIndex?: number): number {
@@ -34,6 +46,12 @@ export function resolvePlayerCourseHandicap(
   const handicapIndex = resolveHandicapIndex(player.handicapIndex);
 
   if (!teeSet) {
+    // Kept for render-time compatibility: the match-scoring page used
+    // to show 0 strokes on a course-less match and that was confusing.
+    // Fall back to raw rounded index so the UI has *something*. The
+    // `hasCourseHandicapInfo` flag on the context is the authoritative
+    // signal for persistence — anything that stores allowances should
+    // gate on that, not on the return value here.
     return Math.round(handicapIndex);
   }
 
@@ -51,6 +69,17 @@ export function buildMatchHandicapContext({
   teamBPlayers: Player[];
   teeSet?: TeeSet;
 }): MatchHandicapContext {
+  const hasCourseHandicapInfo = Boolean(teeSet);
+  if (!hasCourseHandicapInfo && (teamAPlayers.length > 0 || teamBPlayers.length > 0)) {
+    // One warn per compute so the breadcrumb shows up in Sentry when a
+    // caller forgot the teeSet. Keeping it at warn (not error) since
+    // the function is still returning a valid shape — the flag on the
+    // context is what consumers should branch on.
+    scoringLogger.warn(
+      'buildMatchHandicapContext called without a teeSet — allowances fall back to raw index. Caller should check hasCourseHandicapInfo before persisting.'
+    );
+  }
+
   const teamAPlayerCourseHandicaps = teamAPlayers.map((player) =>
     resolvePlayerCourseHandicap(player, teeSet)
   );
@@ -111,5 +140,6 @@ export function buildMatchHandicapContext({
       courseHandicap: teamBPlayerCourseHandicaps[index] ?? 0,
       strokeAllowance: teamBPlayerAllowances[index] ?? 0,
     })),
+    hasCourseHandicapInfo,
   };
 }
