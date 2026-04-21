@@ -43,9 +43,6 @@ export const loadCourseLibrarySyncService = createLazyLoader(
   () => import('./courseLibrarySyncService'),
 );
 
-/** Statistics service (~563 LOC). Only needed on stats/analytics pages. */
-export const loadStatisticsService = createLazyLoader(() => import('./statisticsService'));
-
 /** Lineup builder service (~769 LOC). Only needed on the lineup builder page. */
 export const loadLineupBuilderService = createLazyLoader(() => import('./lineupBuilderService'));
 

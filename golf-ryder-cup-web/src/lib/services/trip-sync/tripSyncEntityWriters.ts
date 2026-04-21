@@ -258,8 +258,49 @@ export async function syncSessionToCloud(
   // silently overwrite each other based on whichever sync ran last.
   if (await isCloudNewer('sessions', session.id, incomingUpdatedAt)) return;
 
-  const { error } = await getTable('sessions').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  const { data: returned, error } = await getTable('sessions')
+    .upsert(cloudData, { onConflict: 'id' })
+    .select('updated_at')
+    .single();
+  if (!error) {
+    // The DB trigger force_server_updated_at overrides client-supplied
+    // updated_at with NOW(). Pull the server value back into Dexie so
+    // the next LWW comparison on this row is server-time vs server-time
+    // instead of silently treating a skewed client clock as the newer.
+    const serverUpdatedAt = (returned as { updated_at?: string } | null)?.updated_at;
+    if (serverUpdatedAt && serverUpdatedAt !== incomingUpdatedAt) {
+      await db.sessions.update(session.id, { updatedAt: serverUpdatedAt });
+    }
+    return;
+  }
+
+  // 23505 = unique_violation. The DB has a unique constraint on
+  // (trip_id, session_number); when two offline devices both allocated
+  // the same number and this is the second one to land, bump locally
+  // to max+1 for the trip and re-upsert so the captain doesn't stay
+  // stuck retrying forever against the constraint.
+  const isUniqueViolation =
+    (error as { code?: string }).code === '23505' ||
+    error.message?.includes('sessions_trip_id_session_number_key');
+  if (!isUniqueViolation) throw new Error(error.message);
+
+  const existing = await db.sessions.where('tripId').equals(session.tripId).toArray();
+  const taken = new Set(existing.map((s) => s.sessionNumber));
+  let candidate = Math.max(0, ...existing.map((s) => s.sessionNumber)) + 1;
+  while (taken.has(candidate)) candidate += 1;
+
+  const rewrittenAt = new Date().toISOString();
+  await db.sessions.update(session.id, { sessionNumber: candidate, updatedAt: rewrittenAt });
+  const retryData = { ...cloudData, session_number: candidate, updated_at: rewrittenAt };
+  const { data: retryReturned, error: retryError } = await getTable('sessions')
+    .upsert(retryData, { onConflict: 'id' })
+    .select('updated_at')
+    .single();
+  if (retryError) throw new Error(retryError.message);
+  const retryServerUpdatedAt = (retryReturned as { updated_at?: string } | null)?.updated_at;
+  if (retryServerUpdatedAt && retryServerUpdatedAt !== rewrittenAt) {
+    await db.sessions.update(session.id, { updatedAt: retryServerUpdatedAt });
+  }
 }
 
 export async function syncMatchToCloud(
@@ -302,8 +343,17 @@ export async function syncMatchToCloud(
   // otherwise silently overwrite each other based on sync arrival order.
   if (await isCloudNewer('matches', match.id, incomingUpdatedAt)) return;
 
-  const { error } = await getTable('matches').upsert(cloudData, { onConflict: 'id' });
+  const { data: returned, error } = await getTable('matches')
+    .upsert(cloudData, { onConflict: 'id' })
+    .select('updated_at')
+    .single();
   if (error) throw new Error(error.message);
+  // Pull the trigger-set server updated_at back into Dexie so subsequent
+  // LWW comparisons compare like-for-like; see sessions writer above.
+  const serverUpdatedAt = (returned as { updated_at?: string } | null)?.updated_at;
+  if (serverUpdatedAt && serverUpdatedAt !== incomingUpdatedAt) {
+    await db.matches.update(match.id, { updatedAt: serverUpdatedAt });
+  }
 }
 
 export async function syncHoleResultToCloud(

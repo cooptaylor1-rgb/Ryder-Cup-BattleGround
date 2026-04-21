@@ -283,6 +283,15 @@ export class GolfTripDB extends Dexie {
       scoringEvents:
         '++localId, id, matchId, timestamp, synced, [matchId+timestamp], [matchId+synced], [tripId+synced]',
     });
+
+    // Schema version 13 - Session number compound index
+    // Supports collision-safe lookups when reconciling duplicate session
+    // numbers that slipped through from concurrent offline creates on
+    // multiple devices. Purely additive; no data migration needed.
+    this.version(13).stores({
+      sessions:
+        'id, tripId, scheduledDate, [tripId+scheduledDate], [tripId+status], [tripId+sessionNumber]',
+    });
   }
 }
 

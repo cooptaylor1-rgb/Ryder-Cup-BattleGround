@@ -20,7 +20,7 @@ import type {
     PlayerBalance,
     SettlementSummary,
 } from '@/lib/types/captain';
-import type { Player, UUID, HoleResult, Match } from '@/lib/types/models';
+import type { Player, UUID } from '@/lib/types/models';
 
 // Re-export types for convenience
 export type {
@@ -113,83 +113,14 @@ export function getNassauConfig(game: SideGame): NassauConfig {
 // ============================================
 // SKINS CALCULATION
 // ============================================
-
-/**
- * Calculate skins results for a round
- */
-export function calculateSkins(
-    game: SideGame,
-    holeResults: HoleResult[],
-    match: Match,
-    _players: Player[]
-): SideGameEntry[] {
-    const entries: SideGameEntry[] = [];
-    const config = getSkinsConfig(game);
-
-    // Group hole results by hole
-    const holeScores = new Map<number, { teamA: number | undefined; teamB: number | undefined }>();
-
-    for (const result of holeResults) {
-        if (!config.holesIncluded.includes(result.holeNumber)) continue;
-
-        holeScores.set(result.holeNumber, {
-            teamA: result.teamAStrokes ?? result.teamAScore,
-            teamB: result.teamBStrokes ?? result.teamBScore,
-        });
-    }
-
-    let carryover = 0;
-    const skinValue = game.buyIn;
-
-    for (let hole = 1; hole <= 18; hole++) {
-        if (!config.holesIncluded.includes(hole)) continue;
-
-        const scores = holeScores.get(hole);
-        if (!scores || scores.teamA === undefined || scores.teamB === undefined) continue;
-
-        // `doublesAfterCarry` was a no-op: the ternary returned `carryover`
-        // on both branches, so enabling the "double on carry" rule did
-        // nothing. When the flag is on and the previous hole pushed,
-        // the carry rides in at 2x its accumulated value.
-        const currentValue =
-          skinValue + (config.doublesAfterCarry && carryover > 0 ? carryover * 2 : carryover);
-
-        if (scores.teamA < scores.teamB) {
-            // Team A wins skin
-            const winnerId = match.teamAPlayerIds[0]; // Simplified - would need proper scoring
-            entries.push({
-                id: crypto.randomUUID(),
-                sideGameId: game.id,
-                playerId: winnerId,
-                holeNumber: hole,
-                value: currentValue,
-                description: `Skin won on hole ${hole}${carryover > 0 ? ' (with carryover)' : ''}`,
-                timestamp: new Date().toISOString(),
-            });
-            carryover = 0;
-        } else if (scores.teamB < scores.teamA) {
-            // Team B wins skin
-            const winnerId = match.teamBPlayerIds[0];
-            entries.push({
-                id: crypto.randomUUID(),
-                sideGameId: game.id,
-                playerId: winnerId,
-                holeNumber: hole,
-                value: currentValue,
-                description: `Skin won on hole ${hole}${carryover > 0 ? ' (with carryover)' : ''}`,
-                timestamp: new Date().toISOString(),
-            });
-            carryover = 0;
-        } else {
-            // Halved - carryover
-            if (config.carryOver) {
-                carryover += skinValue;
-            }
-        }
-    }
-
-    return entries;
-}
+//
+// Note: the old `calculateSkins(game, holeResults, match, players)` helper
+// was removed because it hard-coded `match.teamAPlayerIds[0]` as the skin
+// winner — it couldn't tell which player actually shot the lowest score.
+// The live skins flow tracks per-hole winners on `bet.results` via
+// `upsertHoleResult` + `normalizeSkinsResults` in `utils/sideBetLedger.ts`;
+// see `CaptainBetsPageClient` and the trip settlement service for the
+// real distribution math.
 
 /**
  * Calculate standings for a side game

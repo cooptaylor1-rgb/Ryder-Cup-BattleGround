@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
-import { ensureTripShareCode } from '@/lib/services/tripSyncService';
+import { ensureTripShareCode, regenerateTripShareCode } from '@/lib/services/tripSyncService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
@@ -238,6 +238,16 @@ export default function InvitesPage() {
               onSendInvite={() => showToast('success', 'Invite drafted')}
               onRevokeInvite={() => showToast('info', 'Invite revoked')}
               onCopyLink={() => showToast('success', 'Invite copied')}
+              onRegenerateCode={async () => {
+                if (!currentTrip) return;
+                const nextCode = await regenerateTripShareCode(currentTrip.id);
+                if (nextCode) {
+                  setShareCode(nextCode);
+                  showToast('success', 'New invite code is live. Reshare the link.');
+                } else {
+                  showToast('error', 'Could not regenerate. Check your connection and retry.');
+                }
+              }}
             />
           </section>
         ) : (
