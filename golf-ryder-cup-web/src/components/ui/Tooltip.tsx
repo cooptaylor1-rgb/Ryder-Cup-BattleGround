@@ -82,7 +82,6 @@ export function Tooltip({
         createPortal(
             <div
                 role="tooltip"
-                style={{ zIndex: zIndex.popover }}
                 className={cn(
                     'fixed px-2.5 py-1.5',
                     'bg-[var(--surface-raised)] border border-[var(--rule)]',
@@ -100,6 +99,7 @@ export function Tooltip({
                     className
                 )}
                 style={{
+                    zIndex: zIndex.popover,
                     top: position.top,
                     left: position.left,
                 }}
