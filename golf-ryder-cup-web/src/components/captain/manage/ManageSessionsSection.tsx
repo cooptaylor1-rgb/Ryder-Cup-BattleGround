@@ -286,9 +286,17 @@ export function SessionManagementCard({
           )}
           <div className="grid gap-[var(--space-4)] lg:grid-cols-[0.92fr_1.08fr]">
             <SessionSettingsEditor
-              key={`${session.id}:${session.status}:${session.pointsPerMatch ?? ''}`}
+              key={`${session.id}:${session.status}:${session.pointsPerMatch ?? ''}:${session.defaultCourseId ?? ''}:${session.defaultTeeSetId ?? ''}`}
               session={session}
+              courses={courses}
+              teeSets={teeSets}
               onSave={onSaveSession}
+              onCascadeToMatches={async (updates) => {
+                for (const match of session.matches) {
+                  await onSaveMatch(match.id, updates);
+                }
+              }}
+              matchCount={session.matches.length}
               onDelete={onDeleteSession}
               isSubmitting={isSubmitting}
             />
@@ -321,21 +329,6 @@ export function SessionManagementCard({
                 </div>
               ) : (
                 <>
-                  <SessionCourseCascade
-                    session={session}
-                    courses={courses}
-                    teeSets={teeSets}
-                    onCascade={async (updates) => {
-                      // Per-match save is the only atomic handle we have
-                      // from this surface; loop the session's matches
-                      // sequentially so the first failure aborts the rest
-                      // instead of leaving a half-assigned session.
-                      for (const match of session.matches) {
-                        await onSaveMatch(match.id, updates);
-                      }
-                    }}
-                    isSubmitting={isSubmitting}
-                  />
                   {session.matches.map((match) => (
                     <MatchManagementCard
                       key={`${match.id}:${match.status}:${match.teamAHandicapAllowance}:${match.teamBHandicapAllowance}:${match.courseId ?? ''}:${match.teeSetId ?? ''}:${editingMatchId === match.id ? 'edit' : 'view'}`}
@@ -365,12 +358,20 @@ export function SessionManagementCard({
 
 function SessionSettingsEditor({
   session,
+  courses,
+  teeSets,
+  matchCount,
   onSave,
+  onCascadeToMatches,
   onDelete,
   isSubmitting,
 }: {
   session: RyderCupSession;
+  courses: Course[];
+  teeSets: TeeSet[];
+  matchCount: number;
   onSave: (updates: Partial<RyderCupSession>) => Promise<void>;
+  onCascadeToMatches: (updates: Partial<Match>) => Promise<void>;
   onDelete: () => void;
   isSubmitting: boolean;
 }) {
@@ -382,6 +383,14 @@ function SessionSettingsEditor({
   );
   const [sessionNumber, setSessionNumber] = useState(String(session.sessionNumber));
   const [isPracticeSession, setIsPracticeSession] = useState(Boolean(session.isPracticeSession));
+  const [defaultCourseId, setDefaultCourseId] = useState(session.defaultCourseId ?? '');
+  const [defaultTeeSetId, setDefaultTeeSetId] = useState(session.defaultTeeSetId ?? '');
+
+  // Tee sets are scoped per-course; only show tees that belong to the
+  // picked course, and clear the tee if the captain switches courses.
+  const availableTees = defaultCourseId
+    ? teeSets.filter((tee) => tee.courseId === defaultCourseId)
+    : [];
 
   const hasChanges =
     name !== session.name ||
@@ -389,8 +398,14 @@ function SessionSettingsEditor({
     status !== session.status ||
     sessionNumber !== String(session.sessionNumber) ||
     isPracticeSession !== Boolean(session.isPracticeSession) ||
+    defaultCourseId !== (session.defaultCourseId ?? '') ||
+    defaultTeeSetId !== (session.defaultTeeSetId ?? '') ||
     pointsPerMatch !==
       (session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : '');
+
+  const courseOrTeeChanged =
+    defaultCourseId !== (session.defaultCourseId ?? '') ||
+    defaultTeeSetId !== (session.defaultTeeSetId ?? '');
 
   return (
     <div className="rounded-[1.45rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.78)] p-[var(--space-5)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
@@ -502,21 +517,101 @@ function SessionSettingsEditor({
             </span>
           </span>
         </label>
+
+        {/* Course + Tee Set. Stored on the session so the captain can
+            set them once and (a) have every match created through the
+            lineup builder inherit them, and (b) cascade the new value
+            to every existing match on save. Before this the captain
+            had to hunt per-match, and zero-match sessions had no
+            visible control at all. */}
+        <div className="space-y-[var(--space-2)] rounded-[var(--radius-md)] border border-[var(--rule)] bg-[rgba(255,255,255,0.6)] px-[var(--space-3)] py-[var(--space-3)]">
+          <div>
+            <span className="block type-meta font-semibold text-[var(--ink)]">Course &amp; Tee</span>
+            <span className="mt-1 block type-caption text-[var(--ink-secondary)]">
+              {matchCount === 0
+                ? 'Set once now — new matches you publish will inherit it.'
+                : `Applies to all ${matchCount} ${matchCount === 1 ? 'match' : 'matches'} on save.`}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-[var(--space-3)] md:grid-cols-2">
+            <label className="space-y-[var(--space-1)]">
+              <span className="type-caption font-semibold text-[var(--ink-secondary)]">Course</span>
+              <select
+                value={defaultCourseId}
+                onChange={(event) => {
+                  setDefaultCourseId(event.target.value);
+                  setDefaultTeeSetId('');
+                }}
+                className="input"
+                disabled={isSubmitting}
+              >
+                <option value="">Select course…</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-[var(--space-1)]">
+              <span className="type-caption font-semibold text-[var(--ink-secondary)]">Tee set</span>
+              <select
+                value={defaultTeeSetId}
+                onChange={(event) => setDefaultTeeSetId(event.target.value)}
+                className="input"
+                disabled={!defaultCourseId || isSubmitting}
+              >
+                <option value="">
+                  {defaultCourseId ? 'Select tee set…' : 'Choose course first'}
+                </option>
+                {availableTees.map((tee) => (
+                  <option key={tee.id} value={tee.id}>
+                    {tee.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {courses.length === 0 && (
+            <p className="type-caption text-[var(--warning)]">
+              No courses in the library yet.{' '}
+              <Link href="/courses" className="underline underline-offset-2">
+                Build or import one
+              </Link>
+              , then come back to assign.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="mt-[var(--space-5)] flex flex-col gap-[var(--space-3)] sm:flex-row">
         <Button
           variant="secondary"
-          onClick={() =>
-            onSave({
+          onClick={async () => {
+            // Persist the session fields first so the defaults are on
+            // record even if the cascade to matches fails (partial
+            // success is preferable to no session save at all).
+            await onSave({
               name: name.trim() || session.name,
               sessionType,
               sessionNumber: sessionNumber.trim() ? Number(sessionNumber) : session.sessionNumber,
               status,
               pointsPerMatch: pointsPerMatch.trim() ? Number(pointsPerMatch) : undefined,
               isPracticeSession,
-            })
-          }
+              defaultCourseId: defaultCourseId || undefined,
+              defaultTeeSetId: defaultTeeSetId || undefined,
+            });
+            // Only touch matches when the captain actually changed the
+            // course/tee — skipping this when nothing changed avoids a
+            // pointless N-match rewrite + sync storm on any other
+            // session edit (name, status, points, practice toggle).
+            if (courseOrTeeChanged && matchCount > 0) {
+              await onCascadeToMatches({
+                courseId: defaultCourseId || undefined,
+                teeSetId: defaultTeeSetId || undefined,
+              });
+            }
+          }}
           disabled={isSubmitting || !hasChanges}
           leftIcon={<Save size={15} />}
           className="flex-1"
@@ -983,167 +1078,3 @@ function formatSessionType(type: RyderCupSession['sessionType']) {
   }
 }
 
-/**
- * Session Course & Tee cascade.
- *
- * Pick a course + tee once and apply to every match in the session.
- * Before this, the per-match editor was the only surface — so a
- * session with 12 singles matches meant 12 trips through the same
- * dialog, and captains hit an apparent dead-end on zero-match
- * sessions with no visible control at all. This control also doubles
- * as a readout: when every match already shares a course, it
- * reflects the current value; when matches disagree it labels the
- * mix so the captain can see it at a glance and re-set intentionally.
- */
-function SessionCourseCascade({
-  session,
-  courses,
-  teeSets,
-  onCascade,
-  isSubmitting,
-}: {
-  session: SessionWithMatches;
-  courses: Course[];
-  teeSets: TeeSet[];
-  onCascade: (updates: Partial<Match>) => Promise<void>;
-  isSubmitting: boolean;
-}) {
-  // Detect the shared-vs-mixed state before rendering so the picker
-  // can pre-fill with the current value instead of forcing a re-pick.
-  const distinctCourseIds = Array.from(
-    new Set(session.matches.map((match) => match.courseId ?? ''))
-  );
-  const distinctTeeIds = Array.from(
-    new Set(session.matches.map((match) => match.teeSetId ?? ''))
-  );
-  const sharedCourseId =
-    distinctCourseIds.length === 1 && distinctCourseIds[0] ? distinctCourseIds[0] : '';
-  const sharedTeeId =
-    distinctTeeIds.length === 1 && distinctTeeIds[0] ? distinctTeeIds[0] : '';
-  const courseIsMixed = distinctCourseIds.length > 1;
-  const teeIsMixed = distinctTeeIds.length > 1;
-
-  const [courseId, setCourseId] = useState(sharedCourseId);
-  const [teeSetId, setTeeSetId] = useState(sharedTeeId);
-  const [isBusy, setIsBusy] = useState(false);
-  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
-
-  const availableTees = courseId
-    ? teeSets.filter((tee) => tee.courseId === courseId)
-    : [];
-
-  const selectedCourse = courses.find((course) => course.id === courseId);
-
-  const hasChange =
-    (courseId !== sharedCourseId || teeSetId !== sharedTeeId) && Boolean(courseId);
-
-  const handleApply = async () => {
-    if (!courseId) {
-      showToast('error', 'Pick a course first.');
-      return;
-    }
-    setIsBusy(true);
-    try {
-      await onCascade({ courseId, teeSetId: teeSetId || undefined });
-      showToast(
-        'success',
-        `Course ${selectedCourse?.name ?? ''} applied to ${session.matches.length} ${
-          session.matches.length === 1 ? 'match' : 'matches'
-        }.`
-      );
-    } catch (error) {
-      showToast(
-        'error',
-        error instanceof Error ? error.message : 'Couldn\'t apply course to every match.'
-      );
-    } finally {
-      setIsBusy(false);
-    }
-  };
-
-  return (
-    <div className="rounded-[1.35rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)]">
-      <div className="flex items-start justify-between gap-[var(--space-3)]">
-        <div>
-          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
-            Course &amp; Tee
-          </p>
-          <h5 className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
-            Applies to all {session.matches.length}{' '}
-            {session.matches.length === 1 ? 'match' : 'matches'}
-          </h5>
-          <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
-            Pick once — we&apos;ll set the course and tee on every match in this session.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-[var(--space-3)] grid grid-cols-1 gap-[var(--space-3)] md:grid-cols-2">
-        <label className="space-y-[var(--space-2)]">
-          <span className="type-meta font-semibold text-[var(--ink)]">
-            Course
-            {courseIsMixed ? (
-              <span className="ml-2 rounded-full bg-[color:var(--warning)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--warning)]">
-                Mixed
-              </span>
-            ) : null}
-          </span>
-          <select
-            value={courseId}
-            onChange={(event) => {
-              setCourseId(event.target.value);
-              setTeeSetId('');
-            }}
-            className="input"
-            disabled={isBusy || isSubmitting}
-          >
-            <option value="">Select course…</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="space-y-[var(--space-2)]">
-          <span className="type-meta font-semibold text-[var(--ink)]">
-            Tee set
-            {teeIsMixed ? (
-              <span className="ml-2 rounded-full bg-[color:var(--warning)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--warning)]">
-                Mixed
-              </span>
-            ) : null}
-          </span>
-          <select
-            value={teeSetId}
-            onChange={(event) => setTeeSetId(event.target.value)}
-            className="input"
-            disabled={!courseId || isBusy || isSubmitting}
-          >
-            <option value="">
-              {courseId ? 'Select tee set…' : 'Choose course first'}
-            </option>
-            {availableTees.map((tee) => (
-              <option key={tee.id} value={tee.id}>
-                {tee.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="mt-[var(--space-3)] flex justify-end">
-        <Button
-          variant="secondary"
-          onClick={handleApply}
-          disabled={!hasChange || isBusy || isSubmitting}
-          isLoading={isBusy}
-        >
-          Apply to {session.matches.length}{' '}
-          {session.matches.length === 1 ? 'match' : 'matches'}
-        </Button>
-      </div>
-    </div>
-  );
-}

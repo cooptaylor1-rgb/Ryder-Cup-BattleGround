@@ -347,6 +347,18 @@ export interface RyderCupSession {
    * contain practice sessions via this flag.
    */
   isPracticeSession?: boolean;
+  /**
+   * Default course + tee set the captain intends to play for this
+   * session. Stored at the session level so the captain can set them
+   * once (even before matches exist) and have every match created
+   * through the lineup builder inherit them automatically. When the
+   * captain picks these in Session Settings, existing matches are
+   * also cascaded to the new values; when the lineup builder then
+   * publishes a brand-new match it reads the session defaults so the
+   * captain never has to assign course+tee per match.
+   */
+  defaultCourseId?: UUID;
+  defaultTeeSetId?: UUID;
   createdAt: ISODateString;
   updatedAt?: ISODateString;
 }

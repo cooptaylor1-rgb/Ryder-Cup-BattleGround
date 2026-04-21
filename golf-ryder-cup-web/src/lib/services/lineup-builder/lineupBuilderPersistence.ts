@@ -77,6 +77,12 @@ export async function saveLineup(
       teamBPlayerIds,
       teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
       teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
+      // Inherit the session's default course + tee so a captain who
+      // set them in Session Settings before publishing pairings
+      // doesn't have to touch every match afterward. Per-match
+      // overrides still work via the match card editor.
+      courseId: session.defaultCourseId,
+      teeSetId: session.defaultTeeSetId,
       result: 'notFinished',
       margin: 0,
       holesRemaining: 18,
