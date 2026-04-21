@@ -52,6 +52,11 @@ export async function validateMatchReadyForScoring(matchId: string): Promise<voi
     const session = await db.sessions.get(match.sessionId);
     if (!session || session.sessionType === 'singles') return;
 
+    // match.teeSetId is guaranteed non-null above (the guard at line
+    // 47 would have thrown). Load it and the session default so the
+    // drift comparison computes with the same course data scoring
+    // will actually use.
+    const teeSet = (await db.teeSets.get(match.teeSetId!)) ?? undefined;
     const [teamAPlayers, teamBPlayers] = await Promise.all([
       Promise.all(match.teamAPlayerIds.map((id) => db.players.get(id))),
       Promise.all(match.teamBPlayerIds.map((id) => db.players.get(id))),
@@ -60,6 +65,7 @@ export async function validateMatchReadyForScoring(matchId: string): Promise<voi
       sessionType: session.sessionType,
       teamAPlayers: teamAPlayers.filter((p): p is Player => Boolean(p)),
       teamBPlayers: teamBPlayers.filter((p): p is Player => Boolean(p)),
+      teeSet,
     });
 
     const storedA = match.teamAHandicapAllowance ?? 0;

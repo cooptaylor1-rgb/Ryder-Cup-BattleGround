@@ -31,6 +31,17 @@ export async function saveLineup(
     const teamBPlayerIds = lineupMatch.teamBPlayers.map((player) => player.id);
     const loadedPlayers = (await db.players.bulkGet([...teamAPlayerIds, ...teamBPlayerIds])).filter(Boolean) as Player[];
     const playerById = new Map(loadedPlayers.map((player) => [player.id, player]));
+    // Use the existing match's tee set for re-pairs, or fall back to
+    // the session default for brand-new matches. Without this, lineup
+    // publish would compute allowances from raw index and either
+    // overwrite a correctly-computed allowance (existing match) or
+    // seed the new match with a raw-index number that scoring then
+    // has to re-correct on first render.
+    const existingMatchTeeSetId = existingMatches[0]?.teeSetId;
+    const effectiveTeeSetId = existingMatchTeeSetId ?? session.defaultTeeSetId;
+    const teeSet = effectiveTeeSetId
+      ? (await db.teeSets.get(effectiveTeeSetId)) ?? undefined
+      : undefined;
     const handicapContext = buildMatchHandicapContext({
       sessionType: session.sessionType,
       teamAPlayers: teamAPlayerIds
@@ -39,6 +50,7 @@ export async function saveLineup(
       teamBPlayers: teamBPlayerIds
         .map((playerId) => playerById.get(playerId))
         .filter((player): player is Player => Boolean(player)),
+      teeSet,
     });
 
     if (existingMatches.length > 0) {
@@ -54,11 +66,19 @@ export async function saveLineup(
         continue;
       }
 
+      // Preserve the stored allowance when we couldn't resolve a tee
+      // set — a later lineup re-publish on a course-less match would
+      // otherwise clobber a correctly-computed value with the
+      // raw-index fallback.
       await db.matches.update(match.id, {
         teamAPlayerIds,
         teamBPlayerIds,
-        teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
-        teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
+        teamAHandicapAllowance: handicapContext.hasCourseHandicapInfo
+          ? handicapContext.teamAHandicapAllowance
+          : match.teamAHandicapAllowance ?? 0,
+        teamBHandicapAllowance: handicapContext.hasCourseHandicapInfo
+          ? handicapContext.teamBHandicapAllowance
+          : match.teamBHandicapAllowance ?? 0,
         version: (match.version ?? 0) + 1,
         updatedAt: now,
       });

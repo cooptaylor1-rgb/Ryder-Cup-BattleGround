@@ -58,6 +58,13 @@ export async function removePlayerFromMatch({
   const nextTeamBIds = match.teamBPlayerIds.filter((id) => id !== playerId);
 
   const session = await db.sessions.get(match.sessionId);
+  // Resolve effective tee set: match first, session default as
+  // fallback. Skipping this would persist a raw-index allowance and
+  // overwrite a previously-correct value.
+  const effectiveTeeSetId = match.teeSetId ?? session?.defaultTeeSetId;
+  const teeSet = effectiveTeeSetId
+    ? (await db.teeSets.get(effectiveTeeSetId)) ?? undefined
+    : undefined;
   const allIds = [...nextTeamAIds, ...nextTeamBIds];
   const loadedPlayers = (await db.players.bulkGet(allIds)).filter(Boolean) as Player[];
   const playerById = new Map(loadedPlayers.map((p) => [p.id, p]));
@@ -69,16 +76,26 @@ export async function removePlayerFromMatch({
     teamBPlayers: nextTeamBIds
       .map((id) => playerById.get(id))
       .filter((p): p is Player => Boolean(p)),
+    teeSet,
   });
 
   const nextVersion = (match.version ?? 0) + 1;
   const now = new Date().toISOString();
+  // Preserve the existing stored allowances when the tee set is
+  // missing — otherwise a pull-player action would clobber a
+  // correctly-computed value with the raw-index fallback.
+  const teamAHandicapAllowance = ctx.hasCourseHandicapInfo
+    ? ctx.teamAHandicapAllowance
+    : match.teamAHandicapAllowance ?? 0;
+  const teamBHandicapAllowance = ctx.hasCourseHandicapInfo
+    ? ctx.teamBHandicapAllowance
+    : match.teamBHandicapAllowance ?? 0;
   const updated: Match = {
     ...match,
     teamAPlayerIds: nextTeamAIds,
     teamBPlayerIds: nextTeamBIds,
-    teamAHandicapAllowance: ctx.teamAHandicapAllowance,
-    teamBHandicapAllowance: ctx.teamBHandicapAllowance,
+    teamAHandicapAllowance,
+    teamBHandicapAllowance,
     version: nextVersion,
     updatedAt: now,
   };

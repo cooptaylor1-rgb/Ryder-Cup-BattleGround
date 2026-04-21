@@ -13,6 +13,12 @@ export async function createMatch(
 ): Promise<Match> {
   const now = new Date().toISOString();
   const session = await db.sessions.get(sessionId);
+  // A new match inherits the session's default course + tee set so
+  // allowances are computed with real slope/rating from the start,
+  // not the raw-rounded-index fallback.
+  const teeSet = session?.defaultTeeSetId
+    ? (await db.teeSets.get(session.defaultTeeSetId)) ?? undefined
+    : undefined;
   const loadedPlayers = (await db.players.bulkGet([...teamAPlayers, ...teamBPlayers])).filter(
     Boolean
   ) as Player[];
@@ -25,6 +31,7 @@ export async function createMatch(
     teamBPlayers: teamBPlayers
       .map((playerId) => playerById.get(playerId))
       .filter((player): player is Player => Boolean(player)),
+    teeSet,
   });
 
   const match: Match = {
@@ -35,6 +42,9 @@ export async function createMatch(
     teamBPlayerIds: teamBPlayers,
     status: 'scheduled',
     currentHole: 1,
+    // Inherit the session defaults so per-match overrides are opt-in.
+    courseId: session?.defaultCourseId,
+    teeSetId: session?.defaultTeeSetId,
     teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
     teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
     result: 'notFinished',
