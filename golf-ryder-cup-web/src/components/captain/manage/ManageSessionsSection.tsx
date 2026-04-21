@@ -1044,7 +1044,7 @@ function SessionCourseCascade({
     }
     setIsBusy(true);
     try {
-      await onCascade({ courseId, teeSetId: teeSetId || null });
+      await onCascade({ courseId, teeSetId: teeSetId || undefined });
       showToast(
         'success',
         `Course ${selectedCourse?.name ?? ''} applied to ${session.matches.length} ${
