@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useTripStore } from '@/lib/stores';
@@ -99,6 +99,15 @@ export default function PhotosPage() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const createdObjectURLsRef = useRef<string[]>([]);
+
+  // Revoke any blob URLs we created when the component unmounts so we don't leak memory.
+  useEffect(() => {
+    return () => {
+      createdObjectURLsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      createdObjectURLsRef.current = [];
+    };
+  }, []);
 
   // No redirect when no trip is selected -- render a premium empty state instead.
 
@@ -108,6 +117,7 @@ export default function PhotosPage() {
 
     Array.from(files).forEach((file) => {
       const url = URL.createObjectURL(file);
+      createdObjectURLsRef.current.push(url);
       const newPhoto: Photo = {
         id: crypto.randomUUID(),
         url,

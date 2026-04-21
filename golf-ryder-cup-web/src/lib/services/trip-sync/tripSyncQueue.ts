@@ -109,6 +109,10 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   teamMember: 3,
   match: 3,
   holeResult: 4,
+  // side_bets.trip_id references trips, and match_id (nullable) can
+  // reference matches — so sideBet lives at rank 4 alongside
+  // holeResult; both trip and match are guaranteed present by then.
+  sideBet: 4,
 };
 
 export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
