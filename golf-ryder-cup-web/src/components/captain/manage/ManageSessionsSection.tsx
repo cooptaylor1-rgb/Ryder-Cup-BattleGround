@@ -407,6 +407,64 @@ function SessionSettingsEditor({
     defaultCourseId !== (session.defaultCourseId ?? '') ||
     defaultTeeSetId !== (session.defaultTeeSetId ?? '');
 
+  // Pull the course library so we can offer an "Import from library"
+  // optgroup directly in the Session Settings course picker. Without
+  // this, a captain with zero trip-courses but several library entries
+  // saw an empty dropdown with no path forward — the only way to
+  // import was to dig into an individual match card. Matches the same
+  // pattern used in MatchManagementCard further down.
+  const courseProfiles = useLiveQuery(() => db.courseProfiles.toArray(), [], []);
+  const importableProfiles = (courseProfiles ?? []).filter((profile) => {
+    const profileKey =
+      profile.canonicalKey ||
+      buildCanonicalCourseKey({
+        name: profile.name,
+        city: profile.location,
+        state: profile.location,
+        country: profile.location,
+        sourceUrl: profile.sourceUrl,
+      });
+    return !courses.some((course) => {
+      const courseKey = buildCanonicalCourseKey({
+        name: course.name,
+        city: course.location,
+        state: course.location,
+        country: course.location,
+      });
+      return profileKey && courseKey === profileKey;
+    });
+  });
+  const [isImportingProfile, setIsImportingProfile] = useState(false);
+  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
+
+  const handleCourseSelectChange = async (nextValue: string) => {
+    if (!nextValue) {
+      setDefaultCourseId('');
+      setDefaultTeeSetId('');
+      return;
+    }
+    // Library entries are encoded `profile:<id>` so the dropdown can
+    // mix not-yet-imported library courses alongside trip courses.
+    if (nextValue.startsWith('profile:')) {
+      const profileId = nextValue.slice('profile:'.length);
+      setIsImportingProfile(true);
+      try {
+        const { course, teeSets: importedTees } = await createCourseFromProfile(profileId);
+        setDefaultCourseId(course.id);
+        setDefaultTeeSetId(importedTees[0]?.id ?? '');
+        showToast('success', `Imported ${course.name} from library`);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Import failed';
+        showToast('error', `Could not import course: ${message}`);
+      } finally {
+        setIsImportingProfile(false);
+      }
+      return;
+    }
+    setDefaultCourseId(nextValue);
+    setDefaultTeeSetId('');
+  };
+
   return (
     <div className="rounded-[1.45rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.78)] p-[var(--space-5)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
       <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
@@ -535,22 +593,40 @@ function SessionSettingsEditor({
           </div>
           <div className="grid grid-cols-1 gap-[var(--space-3)] md:grid-cols-2">
             <label className="space-y-[var(--space-1)]">
-              <span className="type-caption font-semibold text-[var(--ink-secondary)]">Course</span>
+              <span className="type-caption font-semibold text-[var(--ink-secondary)]">
+                Course
+                {isImportingProfile ? (
+                  <span className="ml-2 text-[10px] font-medium text-[var(--ink-tertiary)]">
+                    Importing…
+                  </span>
+                ) : null}
+              </span>
               <select
                 value={defaultCourseId}
-                onChange={(event) => {
-                  setDefaultCourseId(event.target.value);
-                  setDefaultTeeSetId('');
-                }}
+                onChange={(event) => void handleCourseSelectChange(event.target.value)}
                 className="input"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isImportingProfile}
               >
                 <option value="">Select course…</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
-                  </option>
-                ))}
+                {courses.length > 0 && (
+                  <optgroup label="In this trip">
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {importableProfiles.length > 0 && (
+                  <optgroup label="From library (tap to import)">
+                    {importableProfiles.map((profile) => (
+                      <option key={profile.id} value={`profile:${profile.id}`}>
+                        {profile.name}
+                        {profile.location ? ` — ${profile.location}` : ''}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </label>
             <label className="space-y-[var(--space-1)]">
@@ -572,9 +648,9 @@ function SessionSettingsEditor({
               </select>
             </label>
           </div>
-          {courses.length === 0 && (
+          {courses.length === 0 && importableProfiles.length === 0 && (
             <p className="type-caption text-[var(--warning)]">
-              No courses in the library yet.{' '}
+              No courses in the trip or library yet.{' '}
               <Link href="/courses" className="underline underline-offset-2">
                 Build or import one
               </Link>
